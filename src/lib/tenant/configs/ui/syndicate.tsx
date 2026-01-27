@@ -703,5 +703,9 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "include-nonivotes",
       enabled: true,
     },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });

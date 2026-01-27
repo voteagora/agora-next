@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Tenant from "@/lib/tenant/tenant";
 
 interface VerifyEmailPageProps {
   searchParams: Promise<{
@@ -13,6 +15,12 @@ interface VerifyEmailPageProps {
 export default async function VerifyEmailPage({
   searchParams,
 }: VerifyEmailPageProps) {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("notifications")?.enabled) {
+    redirect("/");
+  }
+
   const { status, error, email } = await searchParams;
 
   const isSuccess = status === "success";

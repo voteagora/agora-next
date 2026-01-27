@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useForumSubscriptions } from "@/contexts/ForumSubscriptionsContext";
+import Tenant from "@/lib/tenant/tenant";
 
 interface TopicWatchProps {
   topicId: number;
@@ -19,6 +20,7 @@ export default function TopicWatch({ topicId, topicTitle }: TopicWatchProps) {
   const { address } = useAccount();
   const { isTopicWatched, toggleTopicWatch, isLoading, isReady } =
     useForumSubscriptions();
+  const { ui } = Tenant.current();
 
   const isWatching = isTopicWatched(topicId);
   const isBusy = !isReady || isLoading;
@@ -27,7 +29,7 @@ export default function TopicWatch({ topicId, topicTitle }: TopicWatchProps) {
     toggleTopicWatch(topicId, topicTitle);
   };
 
-  if (!address) {
+  if (!address || !ui.toggle("notifications")?.enabled) {
     return null;
   }
 

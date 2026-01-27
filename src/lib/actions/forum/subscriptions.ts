@@ -15,6 +15,12 @@ import {
   hashForumSubscriptionsPayload,
 } from "@/lib/forumSubscriptionsSignedRequests";
 import { verifyEip712Signature } from "@/lib/crypto/verifyEip712Signature";
+import Tenant from "@/lib/tenant/tenant";
+
+function isNotificationsEnabled(): boolean {
+  const { ui } = Tenant.current();
+  return ui.toggle("notifications")?.enabled === true;
+}
 
 const signedRequestSchema = z.object({
   address: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid address"),
@@ -126,6 +132,10 @@ function invalidateCachedSubscriptions(address: string) {
 }
 
 export async function subscribeToForumContent(data: SignedRequest) {
+  if (!isNotificationsEnabled()) {
+    return { success: false, error: "Notifications not enabled" };
+  }
+
   try {
     const { recipientId, payload } = await verifySignedRequest({
       data,
@@ -160,6 +170,10 @@ export async function subscribeToForumContent(data: SignedRequest) {
 }
 
 export async function unsubscribeFromForumContent(data: SignedRequest) {
+  if (!isNotificationsEnabled()) {
+    return { success: false, error: "Notifications not enabled" };
+  }
+
   try {
     const { recipientId, payload } = await verifySignedRequest({
       data,
@@ -194,6 +208,13 @@ export async function unsubscribeFromForumContent(data: SignedRequest) {
 }
 
 export async function getForumSubscriptions(address: string) {
+  if (!isNotificationsEnabled()) {
+    return {
+      success: true,
+      data: { topicSubscriptions: [], categorySubscriptions: [] },
+    };
+  }
+
   try {
     const recipientId = address.toLowerCase();
 

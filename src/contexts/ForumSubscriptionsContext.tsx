@@ -23,6 +23,7 @@ import {
   hashForumSubscriptionsPayload,
   type ForumSubscriptionsAction,
 } from "@/lib/forumSubscriptionsSignedRequests";
+import Tenant from "@/lib/tenant/tenant";
 
 interface ForumSubscriptionsContextValue {
   // State
@@ -44,7 +45,41 @@ interface ForumSubscriptionsContextValue {
 const ForumSubscriptionsContext =
   createContext<ForumSubscriptionsContextValue | null>(null);
 
+const disabledContextValue: ForumSubscriptionsContextValue = {
+  watchedTopics: new Set(),
+  watchedCategories: new Set(),
+  isLoading: false,
+  isReady: true,
+  toggleTopicWatch: async () => false,
+  toggleCategoryWatch: async () => false,
+  isTopicWatched: () => false,
+  isCategoryWatched: () => false,
+};
+
 export function ForumSubscriptionsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const { ui } = Tenant.current();
+  const notificationsEnabled = ui.toggle("notifications")?.enabled;
+
+  if (!notificationsEnabled) {
+    return (
+      <ForumSubscriptionsContext.Provider value={disabledContextValue}>
+        {children}
+      </ForumSubscriptionsContext.Provider>
+    );
+  }
+
+  return (
+    <ForumSubscriptionsProviderInner>
+      {children}
+    </ForumSubscriptionsProviderInner>
+  );
+}
+
+function ForumSubscriptionsProviderInner({
   children,
 }: {
   children: ReactNode;

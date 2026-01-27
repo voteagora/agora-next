@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
+import Tenant from "@/lib/tenant/tenant";
 
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 
@@ -11,6 +12,17 @@ export type NotificationPreferencesAuthResult =
 export async function requireNotificationPreferencesAuth(
   request: NextRequest
 ): Promise<NotificationPreferencesAuthResult> {
+  const { ui } = Tenant.current();
+  if (!ui.toggle("notifications")?.enabled) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { message: "Notifications not enabled for this tenant" },
+        { status: 403 }
+      ),
+    };
+  }
+
   const auth = await validateBearerToken(request);
   if (!auth.authenticated || auth.type !== "jwt" || !auth.userId) {
     return {

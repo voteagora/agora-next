@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { buildForumCategoryPath } from "@/lib/forumUtils";
 import { useForumSubscriptions } from "@/contexts/ForumSubscriptionsContext";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Category {
   id: number;
@@ -34,6 +35,8 @@ export default function CategoryList({
   const { address } = useAccount();
   const { isCategoryWatched, toggleCategoryWatch, isLoading, isReady } =
     useForumSubscriptions();
+  const { ui } = Tenant.current();
+  const notificationsEnabled = ui.toggle("notifications")?.enabled;
   const isBusy = !isReady || isLoading;
 
   const handleToggle = (
@@ -73,7 +76,7 @@ export default function CategoryList({
               <span className="text-sm truncate">{cat.name}</span>
             </Link>
             <div className="flex items-center gap-1 flex-shrink-0">
-              {address && (
+              {address && notificationsEnabled && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
