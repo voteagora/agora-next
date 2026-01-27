@@ -299,8 +299,8 @@ function TelegramChannelRow({
                 </svg>
               </div>
               <span className="truncate text-sm font-medium text-primary">
-              {telegram.username ? `@${telegram.username}` : "Telegram user"}
-            </span>
+                {telegram.username ? `@${telegram.username}` : "Telegram user"}
+              </span>
             </div>
             {telegram.onUnlink && (
               <button
