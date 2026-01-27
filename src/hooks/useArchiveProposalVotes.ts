@@ -208,16 +208,19 @@ async function fetchArchiveNonVoters({
     data?: ArchiveNonVoterRow[];
   };
 
-  // Transform raw data on client side and deduplicate
+  // Transform raw data on client side and deduplicate by citizen_type + address
   const seen = new Set<string>();
   const nonVoters =
     payload.data?.reduce<ArchiveNonVoter[]>((acc, row) => {
       const address = row.addr?.toLowerCase();
-      if (!address || seen.has(address)) {
+      const citizenType = row.citizen_type ?? "";
+      const dedupeKey = `${citizenType}:${address}`;
+
+      if (!address || seen.has(dedupeKey)) {
         return acc;
       }
 
-      seen.add(address);
+      seen.add(dedupeKey);
 
       acc.push({
         delegate: address,
