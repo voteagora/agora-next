@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import Tenant from "@/lib/tenant/tenant";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 const URL_BASE64_TO_UINT8_ARRAY = (base64String: string) => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -15,6 +15,32 @@ const URL_BASE64_TO_UINT8_ARRAY = (base64String: string) => {
   }
   return outputArray;
 };
+
+async function readErrorMessage(
+  response: Response,
+  fallback: string
+): Promise<string> {
+  try {
+    const data = (await response.json()) as {
+      error?: string;
+      message?: string;
+    };
+    if (typeof data?.error === "string" && data.error.trim()) return data.error;
+    if (typeof data?.message === "string" && data.message.trim())
+      return data.message;
+  } catch {
+    // ignore
+  }
+
+  try {
+    const text = await response.text();
+    if (text.trim()) return text;
+  } catch {
+    // ignore
+  }
+
+  return fallback;
+}
 
 interface UsePushNotificationsReturn {
   isSupported: boolean;
@@ -62,6 +88,11 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
     try {
       if (!address) throw new Error("Address is required");
 
+      const token = getStoredSiweJwt({ expectedAddress: address });
+      if (!token) {
+        throw new Error("Please sign in to enable push notifications");
+      }
+
       // 1. Request Permission
       const permissionResult = await Notification.requestPermission();
 
@@ -72,7 +103,11 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
 
       // 2. Fetch VAPID Key from Proxy
       const configRes = await fetch("/api/common/notifications/config");
-      if (!configRes.ok) throw new Error("Failed to fetch VAPID key");
+      if (!configRes.ok) {
+        throw new Error(
+          await readErrorMessage(configRes, "Failed to fetch VAPID key")
+        );
+      }
 
       const { vapidPublicKey } = await configRes.json();
 
@@ -91,11 +126,21 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
       });
 
       // 5. Send to Server (Hub Proxy)
-      await fetch("/api/common/notifications/subscriptions", {
+      const res = await fetch("/api/common/notifications/subscriptions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription, address }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ subscription }),
       });
+
+      if (!res.ok) {
+        await subscription.unsubscribe();
+        throw new Error(
+          await readErrorMessage(res, "Failed to register push subscription")
+        );
+      }
 
       setIsSubscribed(true);
       setSubscription(subscription);
@@ -111,12 +156,33 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
     setError(null);
     try {
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      if (subscription) {
-        await subscription.unsubscribe();
-        // TODO: Notify server about unsubscription
-        setIsSubscribed(false);
-        setSubscription(null);
+      const currentSubscription =
+        await registration.pushManager.getSubscription();
+      if (currentSubscription) {
+        await currentSubscription.unsubscribe();
+      }
+
+      setIsSubscribed(false);
+      setSubscription(null);
+
+      const token = getStoredSiweJwt();
+      if (!token) {
+        throw new Error(
+          "Please sign in to finish disabling push notifications"
+        );
+      }
+
+      const res = await fetch("/api/common/notifications/subscriptions", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(
+          await readErrorMessage(res, "Failed to disable push notifications")
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to unsubscribe");
