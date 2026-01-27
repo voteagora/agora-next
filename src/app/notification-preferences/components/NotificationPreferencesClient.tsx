@@ -732,9 +732,9 @@ export default function NotificationPreferencesClient() {
 
   if (!isConnected) {
     return (
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
+      <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-2xl font-extrabold text-primary">
             Notification Preferences
           </h1>
           <p className="text-secondary">
@@ -750,9 +750,9 @@ export default function NotificationPreferencesClient() {
 
   if (!recipientId) {
     return (
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
+      <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-2xl font-extrabold text-primary">
             Notification Preferences
           </h1>
           <p className="text-secondary">Loading wallet...</p>
@@ -763,9 +763,9 @@ export default function NotificationPreferencesClient() {
 
   if (siweJwt === undefined || siweJwt === null) {
     return (
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
+      <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-2xl font-extrabold text-primary">
             Notification Preferences
           </h1>
           <p className="text-secondary">
@@ -781,9 +781,9 @@ export default function NotificationPreferencesClient() {
 
   if (isLoading) {
     return (
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
+      <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-2xl font-extrabold text-primary">
             Notification Preferences
           </h1>
           <p className="text-secondary">Loading your settings...</p>
@@ -796,9 +796,9 @@ export default function NotificationPreferencesClient() {
     const message =
       (error as Error | undefined)?.message ?? "Failed to load settings.";
     return (
-      <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
+      <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-2xl font-extrabold text-primary">
             Notification Preferences
           </h1>
           <p className="text-sm text-negative">{message}</p>
