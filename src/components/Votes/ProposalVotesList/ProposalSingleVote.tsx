@@ -153,7 +153,15 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                 {ensAvatar()}
                 <div className="flex flex-col">
                   <div className="text-primary font-bold hover:underline">
-                    <Link href={`/delegates/${vote.address}`}>
+                    <Link
+                      href={
+                        vote.citizenType
+                          ? `https://atlas.optimism.io/profile_by_voter_address/${vote.address}`
+                          : `/delegates/${vote.address}`
+                      }
+                      target={vote.citizenType ? "_blank" : undefined}
+                      rel={vote.citizenType ? "noopener noreferrer" : undefined}
+                    >
                       {name ? name : <ENSName address={vote.address} />}
                     </Link>
                   </div>
