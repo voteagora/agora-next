@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
+import { VoterTypes } from "@/app/api/common/votes/vote";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
@@ -33,6 +38,15 @@ const OptimisticProposalVotesCard = ({
   againstLengthString,
   status,
 }: Props) => {
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  });
   const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
@@ -117,18 +131,34 @@ const OptimisticProposalVotesCard = ({
             />
           </div>
         </div>
-        <div className="px-4">
+        <div className="px-4 flex flex-col gap-4">
           <ProposalVotesFilter
             initialSelection={showVoters ? "Voters" : "Hasn't voted"}
             onSelectionChange={(value) => {
               setShowVoters(value === "Voters");
             }}
           />
+          <div className="flex justify-between items-center border-b border-line pb-2">
+            <ProposalVoterListFilter
+              selectedVoterType={selectedVoterType}
+              onVoterTypeChange={setSelectedVoterType}
+              isOffchain={isOffchain}
+            />
+            <ProposalVotesSort
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+            />
+          </div>
         </div>
         {/* Show the scrolling list of votes for the proposal */}
         {useArchiveVoteHistory ? (
           showVoters ? (
-            <ArchiveProposalVotesList proposal={proposal} />
+            <ArchiveProposalVotesList
+              proposal={proposal}
+              sort={sortOption.sortKey}
+              sortOrder={sortOption.sortOrder}
+              voterType={selectedVoterType.type}
+            />
           ) : (
             <ArchiveProposalNonVoterList proposal={proposal} />
           )
@@ -136,11 +166,17 @@ const OptimisticProposalVotesCard = ({
           <ProposalVotesList
             proposalId={proposal.id}
             offchainProposalId={proposal.offchainProposalId}
+            sort={sortOption.sortKey}
+            sortOrder={sortOption.sortOrder}
+            voterType={selectedVoterType.type}
           />
         ) : (
           <ProposalNonVoterList
             proposal={proposal}
             offchainProposalId={proposal.offchainProposalId}
+            sort={sortOption.sortKey}
+            sortOrder={sortOption.sortOrder}
+            selectedVoterType={selectedVoterType}
           />
         )}
         {/* Show the input for the user to vote on a proposal if allowed */}
