@@ -620,6 +620,10 @@ export const townsTenantUIConfig = new TenantUI({
         title: "TOWNS Lodge Updates",
       },
     },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });
 

@@ -28,7 +28,10 @@ const queryClient = new QueryClient({
 const metadata = {
   name: "Agora Next",
   description: "The on-chain governance company",
-  url: process.env.NEXT_PUBLIC_AGORA_BASE_URL!,
+  url:
+    typeof window !== "undefined"
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_AGORA_BASE_URL!,
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;

@@ -1,10 +1,38 @@
 import { TokenAmountDisplay } from "@/lib/utils";
 import { formatUnits } from "ethers";
 
+/**
+ * Safely converts a vote value to a string, handling objects and invalid types to prevent crashes.
+ */
+function safeVotesString(val) {
+  if (typeof val === "string") {
+    // Handle case where object was already stringified to "[object Object]"
+    return val === "[object Object]" ? "0" : val;
+  }
+  if (typeof val === "number") return String(val);
+  if (typeof val === "bigint") return val.toString();
+  if (val === null || val === undefined) return "0";
+
+  // Handle objects (BigInt polyfills, BigNumber wrappers, etc.)
+  if (typeof val === "object") {
+    console.error("DEBUG: Invalid vote value encountered:", val);
+    try {
+      const str = val.toString();
+      if (str !== "[object Object]") return str;
+    } catch (e) {
+      // ignore error
+    }
+    return "0";
+  }
+
+  return String(val);
+}
+
 function formatNumber(amount, decimals) {
   if (amount == null) return 0;
   try {
-    const standardUnitAmount = Number(formatUnits(amount, decimals));
+    const safeAmount = safeVotesString(amount);
+    const standardUnitAmount = Number(formatUnits(safeAmount, decimals));
     return standardUnitAmount;
   } catch (error) {
     console.error("Error formatting number:", error);
@@ -14,6 +42,8 @@ function formatNumber(amount, decimals) {
 
 export function OPStandardStatusView(props) {
   const { forAmount, againstAmount, abstainAmount, decimals } = props;
+  const safeForAmount = safeVotesString(forAmount);
+  const safeAgainstAmount = safeVotesString(againstAmount);
   const forLength = formatNumber(forAmount, decimals);
   const againstLength = formatNumber(againstAmount, decimals);
   const abstainLength = formatNumber(abstainAmount, decimals);
@@ -23,7 +53,7 @@ export function OPStandardStatusView(props) {
       <div className="flex flex-row space-between text-primary gap-1">
         <div>
           {TokenAmountDisplay({
-            amount: forAmount,
+            amount: safeForAmount,
             currency: "",
           })}{" "}
           For
@@ -31,7 +61,7 @@ export function OPStandardStatusView(props) {
         <div>–</div>
         <div>
           {TokenAmountDisplay({
-            amount: againstAmount,
+            amount: safeAgainstAmount,
             currency: "",
           })}{" "}
           Against
