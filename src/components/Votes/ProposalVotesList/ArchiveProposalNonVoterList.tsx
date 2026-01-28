@@ -46,6 +46,10 @@ export default function ArchiveProposalNonVoterList({
       const citizenType = nonVoter.citizen_type?.toUpperCase();
       const selectedType = selectedVoterType.type.toUpperCase();
 
+      if (selectedType === "ALL") {
+        return true;
+      }
+
       // Token House: show non-voters without citizen type
       if (selectedType === "TH" && !citizenType) {
         return true;
