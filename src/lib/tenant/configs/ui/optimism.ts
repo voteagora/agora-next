@@ -323,7 +323,11 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     },
     {
       name: "use-archive-for-proposals",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",
