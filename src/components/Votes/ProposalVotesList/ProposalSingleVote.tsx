@@ -156,7 +156,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                     <Link
                       href={
                         vote.citizenType
-                          ? `https://atlas.optimism.io/profile_by_voter_address/${vote.address}`
+                          ? `https://atlas.optimism.io/voter_address_info/${vote.address}`
                           : `/delegates/${vote.address}`
                       }
                       target={vote.citizenType ? "_blank" : undefined}
