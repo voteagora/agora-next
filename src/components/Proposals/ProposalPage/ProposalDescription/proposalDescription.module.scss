@@ -58,15 +58,23 @@
 
   ul,
   ol {
-    padding-left: 1rem;
+    padding-left: 2rem;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
   }
 
   li {
     padding-left: $spacing-0;
+    display: list-item;
   }
 
-  li::marker,
-  ol::marker {
+  li::marker {
     color: var(--primary);
   }
 
