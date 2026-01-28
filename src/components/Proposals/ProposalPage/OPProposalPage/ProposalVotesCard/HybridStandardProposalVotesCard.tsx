@@ -94,10 +94,12 @@ const HybridStandardProposalVotesCard = ({
                     onVoterTypeChange={setSelectedVoterType}
                     isOffchain={true}
                   />
-                  <ProposalVotesSort
-                    sortOption={sortOption}
-                    onSortChange={setSortOption}
-                  />
+                  {showVoters && (
+                    <ProposalVotesSort
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                    />
+                  )}
                 </div>
               </div>
               {useArchiveVoteHistory ? (
@@ -109,7 +111,10 @@ const HybridStandardProposalVotesCard = ({
                     voterType={selectedVoterType.type}
                   />
                 ) : (
-                  <ArchiveProposalNonVoterList proposal={proposal} />
+                  <ArchiveProposalNonVoterList
+                    proposal={proposal}
+                    selectedVoterType={selectedVoterType}
+                  />
                 )
               ) : showVoters ? (
                 <ProposalVotesList

@@ -216,10 +216,12 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     onVoterTypeChange={setSelectedVoterType}
                     isOffchain
                   />
-                  <ProposalVotesSort
-                    sortOption={sortOption}
-                    onSortChange={setSortOption}
-                  />
+                  {showVoters && (
+                    <ProposalVotesSort
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                    />
+                  )}
                 </div>
               </div>
               {useArchiveVoteHistory ? (
@@ -231,7 +233,10 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     voterType={selectedVoterType.type}
                   />
                 ) : (
-                  <ArchiveProposalNonVoterList proposal={proposal} />
+                  <ArchiveProposalNonVoterList
+                    proposal={proposal}
+                    selectedVoterType={selectedVoterType}
+                  />
                 )
               ) : showVoters ? (
                 <ProposalVotesList
