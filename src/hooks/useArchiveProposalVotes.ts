@@ -198,10 +198,12 @@ export function useArchiveVotes({
         } else if (voterType === "CH") {
           // Citizen House: citizenType is present
           return !!vote.citizenType;
-        } else if (voterType === "CH_USER") {
-          return vote.citizenType === "USER"; // Check exact string if needed
-        } else if (voterType === "CH_APP") {
+        } else if (voterType === "USER") {
+          return vote.citizenType === "USER";
+        } else if (voterType === "APP") {
           return vote.citizenType === "APP";
+        } else if (voterType === "CHAIN") {
+          return vote.citizenType === "CHAIN";
         }
         return true;
       });
