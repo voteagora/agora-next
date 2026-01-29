@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProposalType, PostType, RelatedItem } from "../types";
+import { ProposalType, PostType, RelatedItem, EASVotingType } from "../types";
 
 interface ProposalSettingsCardProps {
   selectedProposalType: ProposalType;
@@ -16,6 +16,7 @@ interface ProposalSettingsCardProps {
   postType: PostType;
   isGovProposal: boolean;
   relatedTempChecks?: RelatedItem[];
+  selectedVotingType: EASVotingType;
 }
 
 export function ProposalSettingsCard({
@@ -25,11 +26,15 @@ export function ProposalSettingsCard({
   postType,
   isGovProposal,
   relatedTempChecks = [],
+  selectedVotingType,
 }: ProposalSettingsCardProps) {
   const hasRelatedTempCheck = relatedTempChecks.length > 0;
   const showDetails =
     postType === "tempcheck" ||
     (postType === "gov-proposal" && hasRelatedTempCheck);
+  const filteredTypes = proposalTypes.filter(
+    (type) => type.module?.toLowerCase() === selectedVotingType.toLowerCase()
+  );
 
   return (
     <Card>
@@ -48,7 +53,7 @@ export function ProposalSettingsCard({
                   <SelectValue placeholder="Select a type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {proposalTypes.map((type) => (
+                  {filteredTypes.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       {type.name}
                     </SelectItem>
@@ -106,7 +111,7 @@ export function ProposalSettingsCard({
           <p className="text-xs text-tertiary leading-relaxed">
             {isGovProposal
               ? "Proposal Type is being inherited from the approved Temp Check as per the governance docs."
-              : "All proposal type selections must be approved by the DUNA admin beforethe vote is allowed to pass."}
+              : "All proposal type selections must be approved by the DUNA admin before the vote is allowed to pass."}
           </p>
         </div>
       )}

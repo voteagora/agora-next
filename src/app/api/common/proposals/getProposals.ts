@@ -474,7 +474,6 @@ async function getProposalTypes() {
     let types = [];
 
     const typesFromApi = await getProposalTypesFromDaoNode();
-
     if (typesFromApi) {
       const parsedTypes = Object.entries(typesFromApi.proposal_types)
         ?.filter(([proposalTypeId, type]: any) => !!type.name)

@@ -1,10 +1,18 @@
 import { UseFormReturn, FormProvider } from "react-hook-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { CreatePostFormData, PostType, RelatedItem } from "../types";
+import {
+  CreatePostFormData,
+  PostType,
+  RelatedItem,
+  EASVotingType,
+  ApprovalProposalSettings,
+} from "../types";
 import { RelatedItemsCard } from "./RelatedItemsCard";
+import { VotingTypeSelector } from "./VotingTypeSelector";
+import { ApprovalOptionsInput } from "./ApprovalOptionsInput";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
@@ -25,6 +33,12 @@ interface CreatePostFormProps {
   onAddRelatedTempCheck: (item: RelatedItem) => void;
   onRemoveRelatedTempCheck: (id: string) => void;
   onRemoveRelatedItems: () => void;
+  // Voting type props
+  showVotingTypeSettings?: boolean;
+  selectedVotingType: EASVotingType;
+  onVotingTypeChange: (type: EASVotingType) => void;
+  approvalSettings: ApprovalProposalSettings;
+  onApprovalSettingsChange: (settings: ApprovalProposalSettings) => void;
 }
 
 export function CreatePostForm({
@@ -43,12 +57,16 @@ export function CreatePostForm({
   onAddRelatedTempCheck,
   onRemoveRelatedTempCheck,
   onRemoveRelatedItems,
+  showVotingTypeSettings = false,
+  selectedVotingType,
+  onVotingTypeChange,
+  approvalSettings,
+  onApprovalSettingsChange,
 }: CreatePostFormProps) {
   const {
     register,
     watch,
     formState: { errors },
-    setValue,
   } = form;
   const relatedDiscussions = watch("relatedDiscussions") || [];
   const relatedTempChecks = watch("relatedTempChecks") || [];
@@ -63,10 +81,26 @@ export function CreatePostForm({
     ? "bg-wash border border-line text-primary hover:bg-hoverBackground"
     : "bg-black text-white hover:bg-gray-800";
 
+  // Disable voting type selector when governance proposal has a related temp check
+  const isVotingTypeLocked =
+    postType === "gov-proposal" && relatedTempChecks.length > 0;
+
   return (
     <FormProvider {...form}>
       <Card>
         <CardContent className="space-y-6 mt-4">
+          {/* Voting Type Selection - At the top */}
+          {showVotingTypeSettings && (
+            <div className="pb-6 border-b border-line">
+              <VotingTypeSelector
+                value={selectedVotingType}
+                onChange={onVotingTypeChange}
+                disabled={isVotingTypeLocked}
+              />
+            </div>
+          )}
+
+          {/* Title */}
           <div>
             <Label
               className="text-xs font-semibold text-secondary"
@@ -87,6 +121,7 @@ export function CreatePostForm({
             )}
           </div>
 
+          {/* Description / Body */}
           <div>
             <div className="mt-2">
               <MarkdownTextareaInput
@@ -98,6 +133,17 @@ export function CreatePostForm({
             </div>
           </div>
 
+          {/* Voting Type Specific Settings - In the form body */}
+          {showVotingTypeSettings && selectedVotingType === "approval" && (
+            <div className="pt-6 border-t border-line">
+              <ApprovalOptionsInput
+                settings={approvalSettings}
+                onChange={onApprovalSettingsChange}
+              />
+            </div>
+          )}
+
+          {/* Related Items */}
           <RelatedItemsCard
             postType={postType}
             relatedDiscussions={relatedDiscussions}
@@ -109,6 +155,7 @@ export function CreatePostForm({
             onRemoveCard={onRemoveRelatedItems}
           />
 
+          {/* Submit Section */}
           <div className="flex flex-col lg:flex-row items-center justify-between pt-6 border-t">
             <div className="text-sm text-gray-500">
               {postType === "tempcheck" && (
@@ -172,7 +219,12 @@ export function CreatePostForm({
                   !title?.trim() ||
                   !description?.trim() ||
                   (postType === "tempcheck" && !canCreateTempCheck) ||
-                  (postType === "gov-proposal" && !canCreateGovernanceProposal)
+                  (postType === "gov-proposal" &&
+                    !canCreateGovernanceProposal) ||
+                  (selectedVotingType === "approval" &&
+                    (approvalSettings.choices.length === 0 ||
+                      (approvalSettings.criteria === "threshold" &&
+                        approvalSettings.criteriaValue <= 0)))
                 }
                 className={submitClassName}
               >
