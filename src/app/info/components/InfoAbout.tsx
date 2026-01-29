@@ -103,11 +103,23 @@ const InfoAbout = () => {
               <h3 className="text-lg font-bold text-primary">
                 {ui.customization?.customAboutSubtitle || "About " + brandName}
               </h3>
-              <p
-                className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
-              >
-                {page.description}
-              </p>
+
+              {(() => {
+                const desc = page.description;
+                const paragraphClass = `text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`;
+
+                if (Array.isArray(desc)) {
+                  return (
+                    <ul className="text-secondary mt-3 list-disc pl-5">
+                      {desc.map((d, i) => (
+                        <li key={i}>{d}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                return <p className={paragraphClass}>{String(desc)}</p>;
+              })()}
             </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (

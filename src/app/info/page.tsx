@@ -11,7 +11,6 @@ import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
-import OgDunaDisclosures from "@/app/duna/components/0gDunaDisclosures";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";

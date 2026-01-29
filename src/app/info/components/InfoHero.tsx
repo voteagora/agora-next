@@ -17,6 +17,19 @@ export const InfoHero = () => {
     "sm:rotate-1",
   ];
 
+  const renderDesc = (desc: any, className = "whitespace-pre-line") => {
+    if (Array.isArray(desc)) {
+      return (
+        <ul className={`${className} list-disc pl-5`}>
+          {desc.map((d: string, i: number) => (
+            <li key={i}>{d}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <div className={className}>{desc}</div>;
+  };
+
   return (
     <div className="flex flex-col md:flex-col mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap lg:flex-row">
       <div
@@ -29,7 +42,7 @@ export const InfoHero = () => {
         </h1>
         {ui.toggle("towns-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
-            <div className="whitespace-pre-line">{page!.description}</div>
+            {renderDesc(page!.description, "whitespace-pre-line")}
             <div className="mt-4">
               <a
                 href="#duna-administration"
@@ -66,7 +79,7 @@ export const InfoHero = () => {
           </div>
         ) : ui.toggle("syndicate-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
-            <div className="whitespace-pre-line">{page!.description}</div>
+            {renderDesc(page!.description, "whitespace-pre-line")}
             <div className="mt-4">
               <a
                 href="#duna-administration"
@@ -103,7 +116,7 @@ export const InfoHero = () => {
           </div>
         ) : ui.toggle("0g-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
-            <div className="whitespace-pre-line">{page!.description}</div>
+            {renderDesc(page!.description, "whitespace-pre-line")}
             <div className="mt-4">
               <a
                 href="#duna-administration"
@@ -132,15 +145,14 @@ export const InfoHero = () => {
                   />
                 </svg>
                 <span className="whitespace-normal">
-                  View 0g DUNA Member{" "}
-                  <span className="underline">Disclosure</span>
+                  View 0G DUNA Member <span className="underline">Disclosure</span>
                 </span>
               </a>
             </div>
           </div>
         ) : (
-          <p className="text-base text-secondary mt-4">
-            {page!.description}
+          <div className="text-base text-secondary mt-4">
+            {renderDesc(page!.description)}
             {namespace === TENANT_NAMESPACES.SCROLL && (
               <div className="flex flex-row gap-2 mt-4">
                 <Link href={"https://claim.scroll.io/faq"}>
@@ -150,7 +162,7 @@ export const InfoHero = () => {
                 </Link>
               </div>
             )}
-          </p>
+          </div>
         )}
       </div>
 
