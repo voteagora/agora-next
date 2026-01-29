@@ -28,6 +28,7 @@ import ContactInformationSection, {
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 
 const CHANNEL_ORDER: ChannelType[] = [
   "email",
@@ -66,6 +67,13 @@ export default function NotificationPreferencesClient() {
   const pushState = usePushNotifications();
   const { isSubscribed: isPushSubscribed } = pushState;
   const hasAutoSignAttemptedRef = useRef(false);
+
+  // Check if user has grants admin permission
+  const { hasPermission: isGrantsAdmin } = useHasPermission(
+    "grants",
+    "applications",
+    "read"
+  );
 
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
@@ -813,10 +821,22 @@ export default function NotificationPreferencesClient() {
   }
 
   const preferences: PreferencesByEvent = data?.preferences?.preferences ?? {};
-  const eventTypes =
+  const rawEventTypes =
     data?.eventTypes && data.eventTypes.length
       ? data.eventTypes
       : fallbackEventTypes;
+
+  // Filter out grants events for non-admin users
+  // Grants notifications are admin-only; regular users cannot opt in/out
+  const eventTypes = useMemo(() => {
+    if (isGrantsAdmin) {
+      return rawEventTypes;
+    }
+    return rawEventTypes.filter(
+      (et) => !et.event_type.startsWith("grants.")
+    );
+  }, [rawEventTypes, isGrantsAdmin]);
+
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
   return (
