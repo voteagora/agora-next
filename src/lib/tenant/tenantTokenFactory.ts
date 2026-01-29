@@ -124,7 +124,7 @@ export default class TenantTokenFactory {
         };
       case TENANT_NAMESPACES.TOWNS:
         return {
-          name: "Towns Protocol",
+          name: "Towns Lodge",
           symbol: "TOWNS",
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
