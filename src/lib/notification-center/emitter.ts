@@ -11,7 +11,13 @@ import {
 import type { ChannelType, RecipientType } from "./types";
 import { processAddressOrEnsName } from "@/app/lib/ENSUtils";
 
-const ALL_CHANNELS: ChannelType[] = ["email", "telegram", "discord", "slack"];
+const ALL_CHANNELS: ChannelType[] = [
+  "email",
+  "telegram",
+  "discord",
+  "slack",
+  "pwa",
+];
 
 /**
  * Format an address for display in notifications.
