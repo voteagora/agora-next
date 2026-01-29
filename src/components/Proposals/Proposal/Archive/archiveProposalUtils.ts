@@ -192,7 +192,7 @@ export const deriveStatus = (
   // For STANDARD proposals, use vote-based logic
   // Handle different data sources: EAS-OODAO vs standard
   const source = proposal.data_eng_properties?.source;
-  const isApprovalVoting = proposal.kwargs?.voting_module === "approval";
+  const isApprovalVoting = proposal.voting_module === "approval";
 
   // For approval voting, use no-param for total votes, otherwise use token-holders
   const voteTotals =
@@ -216,7 +216,7 @@ export const deriveStatus = (
   let quorumMet = true;
   let hasMetThreshold = true;
 
-  if (proposal.kwargs?.voting_module === "optimistic") {
+  if (proposal.voting_module === "optimistic") {
     const qorumVotes = againstVotes;
     quorumMet = qorumVotes < quorum;
 
@@ -224,7 +224,7 @@ export const deriveStatus = (
       return "SUCCEEDED";
     }
     return "DEFEATED";
-  } else if (proposal.kwargs?.voting_module === "approval") {
+  } else if (proposal.voting_module === "approval") {
     // Handle approval voting module
     const criteria = proposal.kwargs?.criteria;
     const thresholdRaw = proposal.kwargs?.criteria_value ?? 0;

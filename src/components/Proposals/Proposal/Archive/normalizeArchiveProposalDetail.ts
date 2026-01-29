@@ -6,9 +6,9 @@ export { normalizeArchiveOptimisticProposal } from "./normalizeArchiveOptimistic
 export { normalizeArchiveApprovalProposal } from "./normalizeArchiveApprovalProposal";
 
 export function isArchiveStandardProposal(proposal: ArchiveListProposal) {
-  // Check kwargs.voting_module first (for eas-oodao proposals)
-  if (proposal.kwargs?.voting_module) {
-    return proposal.kwargs.voting_module === "standard";
+  // Check voting_module first (for eas-oodao proposals)
+  if (proposal.voting_module) {
+    return proposal.voting_module === "standard";
   }
   const moduleName = proposal.voting_module_name;
   return typeof moduleName === "string"
@@ -17,9 +17,9 @@ export function isArchiveStandardProposal(proposal: ArchiveListProposal) {
 }
 
 export function isArchiveOptimisticProposal(proposal: ArchiveListProposal) {
-  // Check kwargs.voting_module first (for eas-oodao proposals)
-  if (proposal.kwargs?.voting_module) {
-    return proposal.kwargs.voting_module === "optimistic";
+  // Check voting_module first (for eas-oodao proposals)
+  if (proposal.voting_module) {
+    return proposal.voting_module === "optimistic";
   }
   const moduleName = proposal.voting_module_name;
   return typeof moduleName === "string"
@@ -28,9 +28,9 @@ export function isArchiveOptimisticProposal(proposal: ArchiveListProposal) {
 }
 
 export function isArchiveApprovalProposal(proposal: ArchiveListProposal) {
-  // Check kwargs.voting_module first (for eas-oodao proposals)
-  if (proposal.kwargs?.voting_module) {
-    return proposal.kwargs.voting_module === "approval";
+  // Check voting_module first (for eas-oodao proposals)
+  if (proposal.voting_module) {
+    return proposal.voting_module === "approval";
   }
   const moduleName = proposal.voting_module_name;
   return typeof moduleName === "string"

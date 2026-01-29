@@ -215,7 +215,7 @@ async function getVotesForDelegateForAddress({
                   createdBlockNumber: archiveProposal.created_block_number,
                 };
               }
-              const votingType = archiveProposal?.kwargs?.voting_module;
+              const votingType = archiveProposal.voting_module;
               if (votingType) {
                 voteWithType = {
                   ...voteWithType,
