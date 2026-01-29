@@ -2,8 +2,7 @@ import { PaginatedResult } from "@/app/lib/pagination";
 import { ArchiveListProposal } from "./types/archiveProposal";
 import {
   getArchiveSlugAllProposals,
-  getArchiveSlugForDaoNodeProposal,
-  getArchiveSlugForEasOodaoProposal,
+  getArchiveUrlsForProposal,
   getArchiveSlugForProposalNonVoters,
   getArchiveSlugForProposalVotes,
 } from "./constants";
@@ -14,6 +13,29 @@ const withCacheBust = (url: string) => {
   const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}t=${rounded}`;
 };
+
+const isBrowser = typeof window !== "undefined";
+
+async function gunzipToString(buffer: ArrayBuffer): Promise<string> {
+  if (!isBrowser) {
+    const { gunzipSync } = await import("zlib");
+    return gunzipSync(Buffer.from(buffer)).toString("utf-8");
+  }
+
+  if (typeof (globalThis as any).DecompressionStream === "function") {
+    const decompressedStream = new Response(buffer).body?.pipeThrough(
+      new (globalThis as any).DecompressionStream("gzip")
+    );
+
+    if (!decompressedStream) {
+      throw new Error("Failed to read gzip stream from response body");
+    }
+
+    return await new Response(decompressedStream).text();
+  }
+
+  throw new Error("Gzip decompression is not supported in this environment");
+}
 
 /**
  * Parse NDJSON (Newline Delimited JSON) string to array of objects
@@ -37,6 +59,75 @@ function parseNDJSON<T>(ndjsonString: string): T[] {
 }
 
 /**
+ * Fetch and decompress a gzipped NDJSON file from the archive
+ */
+async function fetchArchiveNdjson<T>(url: string): Promise<T[]> {
+  const response = await fetch(withCacheBust(url), {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) {
+    return [];
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch archive data: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  let ndjsonText: string;
+  try {
+    ndjsonText = await gunzipToString(arrayBuffer);
+  } catch (error) {
+    console.warn(
+      `Failed to decompress archive payload from ${url}, falling back to plain text`,
+      error
+    );
+    const decoder = new TextDecoder();
+    ndjsonText = decoder.decode(arrayBuffer);
+  }
+  console.log(
+    `Fetched and parsed NDJSON from ${url}: ${ndjsonText.substring(0, 100)}...`
+  );
+  return parseNDJSON<T>(ndjsonText);
+}
+
+/**
+ * Fetch and decompress a gzipped JSON file from the archive
+ */
+async function fetchArchiveGzipJson<T>(url: string): Promise<T | null> {
+  const response = await fetch(withCacheBust(url), { cache: "no-store" });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch archive data: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  let jsonText: string;
+
+  try {
+    jsonText = await gunzipToString(arrayBuffer);
+  } catch (error) {
+    console.warn(
+      `Failed to decompress archive payload from ${url}, falling back to plain text`,
+      error
+    );
+    const decoder = new TextDecoder();
+    jsonText = decoder.decode(arrayBuffer);
+  }
+
+  return JSON.parse(jsonText);
+}
+
+/**
  * Fetch and parse proposals from GCS archive in NDJSON format
  */
 export async function fetchProposalsFromArchive(
@@ -48,7 +139,6 @@ export async function fetchProposalsFromArchive(
     const proposalBuckets = await Promise.all(
       archiveUrls.map((url) => fetchArchiveNdjson<ArchiveListProposal>(url))
     );
-
     const allProposals = proposalBuckets
       .flat()
       .filter((proposal) => {
@@ -58,8 +148,8 @@ export async function fetchProposalsFromArchive(
         );
       })
       .sort((a, b) => {
-        const aTime = Number(a.start_blocktime ?? a.start_block ?? 0);
-        const bTime = Number(b.start_blocktime ?? b.start_block ?? 0);
+        const aTime = Number(a.created_block_number ?? a.created_time ?? 0);
+        const bTime = Number(b.created_block_number ?? b.created_time ?? 0);
         return bTime - aTime;
       });
     // Apply filter if needed
@@ -103,50 +193,36 @@ export async function fetchProposalsFromArchive(
   }
 }
 
+/**
+ * Fetches a single proposal from the archive.
+ * Dynamically determines which sources to query based on TENANT_PROPOSAL_SOURCES.
+ */
 export const fetchProposalFromArchive = async (
   namespace: string,
   proposalId: string
-) => {
+): Promise<ArchiveListProposal | null> => {
   try {
-    const archiveDaoNodeUrl = getArchiveSlugForDaoNodeProposal(
-      namespace,
-      proposalId
+    const archiveUrls = getArchiveUrlsForProposal(namespace, proposalId);
+    // Fetch from all configured sources in parallel as gzipped JSON
+    const results = await Promise.all(
+      archiveUrls.map((url) =>
+        fetchArchiveGzipJson<ArchiveListProposal>(url).catch(() => null)
+      )
     );
-    const archiveEasOodaoUrl = getArchiveSlugForEasOodaoProposal(
-      namespace,
-      proposalId
-    );
-    const [responseDaoNode, responseEasOodao] = await Promise.all([
-      fetch(withCacheBust(archiveDaoNodeUrl), { cache: "no-store" }),
-      fetch(withCacheBust(archiveEasOodaoUrl), { cache: "no-store" }),
-    ]);
-
-    if (!responseDaoNode.ok && !responseEasOodao.ok) {
-      if (responseDaoNode.status === 404 && responseEasOodao.status === 404) {
-        return null;
+    // Return the first successful result
+    for (const result of results) {
+      if (result) {
+        return result;
       }
-      throw new Error(
-        `Failed to fetch archive data: daoNode ${responseDaoNode.status} ${responseDaoNode.statusText}; easOodao ${responseEasOodao.status} ${responseEasOodao.statusText}`
-      );
     }
 
-    const [jsonTextDaoNode, jsonTextEasOodao] = await Promise.all([
-      responseDaoNode.ok ? responseDaoNode.text() : Promise.resolve(""),
-      responseEasOodao.ok ? responseEasOodao.text() : Promise.resolve(""),
-    ]);
-    const allProposalsDaoNode = responseDaoNode.ok
-      ? JSON.parse(jsonTextDaoNode)
-      : undefined;
-    const allProposalsEasOodao = responseEasOodao.ok
-      ? JSON.parse(jsonTextEasOodao)
-      : undefined;
-    return allProposalsDaoNode || allProposalsEasOodao;
+    return null;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
       return null;
     }
-    console.error("Error fetching proposals from archive:", error);
+    console.error("Error fetching proposal from archive:", error);
     throw error;
   }
 };
@@ -184,59 +260,6 @@ export type ArchiveNonVoterRow = {
   name?: string | null;
   image?: string | null;
 };
-
-const isBrowser = typeof window !== "undefined";
-
-async function gunzipToString(buffer: ArrayBuffer): Promise<string> {
-  if (!isBrowser) {
-    const { gunzipSync } = await import("zlib");
-    return gunzipSync(Buffer.from(buffer)).toString("utf-8");
-  }
-
-  if (typeof (globalThis as any).DecompressionStream === "function") {
-    const decompressedStream = new Response(buffer).body?.pipeThrough(
-      new (globalThis as any).DecompressionStream("gzip")
-    );
-
-    if (!decompressedStream) {
-      throw new Error("Failed to read gzip stream from response body");
-    }
-
-    return await new Response(decompressedStream).text();
-  }
-
-  throw new Error("Gzip decompression is not supported in this environment");
-}
-
-async function fetchArchiveNdjson<T>(url: string): Promise<T[]> {
-  const response = await fetch(withCacheBust(url), {
-    cache: "no-store",
-  });
-
-  if (response.status === 404) {
-    return [];
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch archive data: ${response.status} ${response.statusText}`
-    );
-  }
-
-  const arrayBuffer = await response.arrayBuffer();
-  let ndjsonText: string;
-  try {
-    ndjsonText = await gunzipToString(arrayBuffer);
-  } catch (error) {
-    console.warn(
-      `Failed to decompress archive payload from ${url}, falling back to plain text`,
-      error
-    );
-    const decoder = new TextDecoder();
-    ndjsonText = decoder.decode(arrayBuffer);
-  }
-  return parseNDJSON<T>(ndjsonText);
-}
 
 /**
  * Fetch raw vote data from archive without transformation
