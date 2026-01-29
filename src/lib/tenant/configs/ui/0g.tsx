@@ -45,7 +45,7 @@ export const ogTenantUIConfig = new TenantUI({
     negative: "226 54 54",
     brandPrimary: "0 0 0",
     brandSecondary: "255 251 245", // #FFFBF5
-    font: "font-familjen-grotesk",
+    font: "font-regola",
     tokenAmountFont: "font-chivoMono",
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[80px] sm:w-[80px] lg:h-[100px] lg:w-[100px]",
@@ -213,7 +213,7 @@ export const ogTenantUIConfig = new TenantUI({
     { name: "proposal-lifecycle", enabled: false },
     { name: "use-daonode-for-proposals", enabled: false },
     { name: "use-daonode-for-votable-supply", enabled: false },
-    { name: "forums", enabled: true },
+    { name: "forums", enabled: false },
     { name: "use-daonode-for-proposal-types", enabled: false },
     { name: "duna", enabled: true },
     { name: "coming-soon", enabled: true },
