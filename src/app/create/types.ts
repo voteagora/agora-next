@@ -46,11 +46,6 @@ export const easVotingTypeToNumber: Record<EASVotingType, number> = {
 // Approval voting criteria
 export type ApprovalCriteria = "threshold" | "top-choices";
 
-export const approvalCriteriaOptions: Record<ApprovalCriteria, string> = {
-  threshold: "Threshold (votes must exceed value)",
-  "top-choices": "Top Choices (top N options win)",
-} as const;
-
 // Maps UI criteria to EAS schema criteria number
 export const approvalCriteriaToNumber: Record<ApprovalCriteria, number> = {
   threshold: 0,

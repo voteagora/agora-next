@@ -19,7 +19,7 @@ import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useAccount } from "wagmi";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
 import { Vote } from "@/app/api/common/votes/vote";
-import { VoteSuccessMessage } from "../CastVoteInput/CastEasOptimisticVoteInput";
+import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 
 type Props = {
   proposal: Proposal;
@@ -102,6 +102,7 @@ function VoteButton({
       <VoteSuccessMessage
         transactionHash={votes?.[0]?.transactionHash ?? null}
         timestamp={votes?.[0]?.timestamp ?? null}
+        showTimestamp={true}
       />
     );
   }

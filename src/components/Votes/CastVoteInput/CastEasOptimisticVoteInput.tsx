@@ -8,10 +8,7 @@ import { useEASV2 } from "@/hooks/useEASV2";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
-import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Image from "next/image";
 import { icons } from "@/icons/icons";
 import {
@@ -20,6 +17,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { parseVoteError } from "@/lib/voteErrorUtils";
+import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 
 interface CastEasOptimisticVoteInputProps {
   proposal: Proposal;
@@ -74,10 +73,9 @@ export default function CastEasOptimisticVoteInput({
     return (
       <div className="p-4">
         <VoteSuccessMessage
-          proposal={proposal}
           transactionHash={null}
-          reason=""
           timestamp={votes?.[0]?.timestamp}
+          showTimestamp={true}
         />
       </div>
     );
@@ -132,22 +130,7 @@ function CastEasOptimisticVoteInputContent({
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting optimistic vote:", err);
-
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      if (errorMessage.includes("0xb8daf542")) {
-        setError(
-          "Invalid attester - you are not authorized to vote on this proposal"
-        );
-      } else if (errorMessage.includes("0x7c9a1cf9")) {
-        setError("You have already voted on this proposal");
-      } else if (errorMessage.includes("0x7fa01202")) {
-        setError("Voting has not started yet");
-      } else if (errorMessage.includes("0x7a19ed05")) {
-        setError("Voting has ended for this proposal");
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to submit veto");
-      }
+      setError(parseVoteError(err));
     }
   };
 
@@ -165,10 +148,9 @@ function CastEasOptimisticVoteInputContent({
     return (
       <div className="p-4">
         <VoteSuccessMessage
-          proposal={proposal}
           transactionHash={transactionHash}
-          reason={reason}
           timestamp={voteTimestamp}
+          showTimestamp={true}
         />
       </div>
     );
@@ -294,27 +276,6 @@ function LoadingVote() {
           Approve transaction in your wallet to vote
         </Button>
       </div>
-    </div>
-  );
-}
-
-export function VoteSuccessMessage({
-  transactionHash,
-  timestamp,
-}: {
-  transactionHash: string | null;
-  timestamp?: Date | null;
-}) {
-  return (
-    <div className="flex flex-col w-full text-sm text-secondary font-medium p-4 pb-2 bg-transparent rounded-b-lg">
-      <p className="text-[14px] font-bold text-secondary text-center mt-2">
-        You voted for this proposal{" "}
-        {timestamp ? formatDistanceToNow(timestamp) : "just now"} ago
-      </p>
-      <BlockScanUrls
-        className="text-xs font-medium text-tertiary mx-auto pt-1"
-        hash1={transactionHash}
-      />
     </div>
   );
 }

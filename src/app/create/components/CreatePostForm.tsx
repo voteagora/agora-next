@@ -13,7 +13,6 @@ import {
 import { RelatedItemsCard } from "./RelatedItemsCard";
 import { VotingTypeSelector } from "./VotingTypeSelector";
 import { ApprovalOptionsInput } from "./ApprovalOptionsInput";
-import { OptimisticSettingsInput } from "./OptimisticSettingsInput";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";

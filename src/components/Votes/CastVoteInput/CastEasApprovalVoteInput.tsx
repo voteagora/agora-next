@@ -9,6 +9,8 @@ import { useEASV2 } from "@/hooks/useEASV2";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
+import { parseVoteError } from "@/lib/voteErrorUtils";
+import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 
 interface ApprovalOption {
   index: number;
@@ -20,23 +22,6 @@ interface CastEasApprovalVoteInputProps {
   proposal: Proposal;
   options: ApprovalOption[];
   maxApprovals: number;
-}
-
-function VoteSuccessMessage() {
-  return (
-    <div className="w-full rounded-lg border border-line bg-neutral p-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <CheckCircleIcon className="h-6 w-6 text-positive flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-primary">
-              Vote submitted successfully!
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default function CastEasApprovalVoteInput({
@@ -144,22 +129,7 @@ function CastEasApprovalVoteInputContent({
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting approval vote:", err);
-
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      if (errorMessage.includes("0xb8daf542")) {
-        setError(
-          "Invalid attester - you are not authorized to vote on this proposal"
-        );
-      } else if (errorMessage.includes("0x7c9a1cf9")) {
-        setError("You have already voted on this proposal");
-      } else if (errorMessage.includes("0x7fa01202")) {
-        setError("Voting has not started yet");
-      } else if (errorMessage.includes("0x7a19ed05")) {
-        setError("Voting has ended for this proposal");
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to submit vote");
-      }
+      setError(parseVoteError(err));
     }
   };
 
@@ -225,7 +195,9 @@ function CastEasApprovalVoteInputContent({
 
       <button
         onClick={handleSubmitVote}
-        disabled={selectedOptions.length === 0 || !address || isCreatingApprovalVote}
+        disabled={
+          selectedOptions.length === 0 || !address || isCreatingApprovalVote
+        }
         className="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isCreatingApprovalVote
@@ -235,4 +207,3 @@ function CastEasApprovalVoteInputContent({
     </div>
   );
 }
-
