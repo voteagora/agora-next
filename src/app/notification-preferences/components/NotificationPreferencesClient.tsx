@@ -6,10 +6,8 @@ import { useModal, useSIWE } from "connectkit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import { EVENT_TYPE_DEFINITIONS } from "@/lib/notification-center/eventTypes";
 import type {
   ChannelType,
-  EventType,
   PreferenceState,
   PreferencesByEvent,
   PreferencesResponse,
@@ -70,21 +68,6 @@ export default function NotificationPreferencesClient() {
   const recipientId = address?.toLowerCase() ?? "";
   const queryKey = ["notification-settings", recipientId];
 
-  const fallbackEventTypes = useMemo<EventType[]>(() => {
-    const timestamp = new Date().toISOString();
-    return EVENT_TYPE_DEFINITIONS.map((definition) => ({
-      event_type: definition.event_type,
-      display_name: definition.display_name,
-      description: definition.description,
-      category: definition.category,
-      default_state: definition.default_state,
-      enabled: true,
-      metadata: null,
-      created_at: timestamp,
-      updated_at: timestamp,
-    }));
-  }, []);
-
   const buildBaseSettings = useCallback((): NotificationSettings => {
     const timestamp = new Date().toISOString();
     return {
@@ -104,9 +87,9 @@ export default function NotificationPreferencesClient() {
         created_at: null,
         updated_at: null,
       },
-      eventTypes: fallbackEventTypes,
+      eventTypes: [],
     };
-  }, [fallbackEventTypes, recipientId]);
+  }, [recipientId]);
 
   const loadSiweJwt = useCallback((): string | null => {
     if (!recipientId) return null;
@@ -351,9 +334,6 @@ export default function NotificationPreferencesClient() {
 
       return {
         ...base,
-        eventTypes: base.eventTypes?.length
-          ? base.eventTypes
-          : fallbackEventTypes,
         recipient: updater(existingRecipient),
       };
     });
@@ -379,9 +359,6 @@ export default function NotificationPreferencesClient() {
 
       return {
         ...base,
-        eventTypes: base.eventTypes?.length
-          ? base.eventTypes
-          : fallbackEventTypes,
         preferences: {
           ...preferencesResponse,
           preferences: {
@@ -813,10 +790,7 @@ export default function NotificationPreferencesClient() {
   }
 
   const preferences: PreferencesByEvent = data?.preferences?.preferences ?? {};
-  const eventTypes =
-    data?.eventTypes && data.eventTypes.length
-      ? data.eventTypes
-      : fallbackEventTypes;
+  const eventTypes = data?.eventTypes ?? [];
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
   return (

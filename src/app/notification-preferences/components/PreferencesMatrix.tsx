@@ -2,7 +2,6 @@
 
 import { Fragment } from "react";
 import { cn } from "@/lib/utils";
-import { EVENT_CATEGORIES } from "@/lib/notification-center/eventTypes";
 import type {
   ChannelType,
   EventType,
@@ -31,9 +30,9 @@ interface PreferencesMatrixProps {
   isUpdating: (eventType: string, channel: ChannelType) => boolean;
 }
 
-const CATEGORY_LABELS: Map<string, string> = new Map(
-  EVENT_CATEGORIES.map((category) => [category.id, category.label])
-);
+function formatCategoryLabel(category: string): string {
+  return category.charAt(0).toUpperCase() + category.slice(1);
+}
 
 export default function PreferencesMatrix({
   eventTypes,
@@ -54,12 +53,7 @@ export default function PreferencesMatrix({
     grouped.get(category)?.push(eventType);
   });
 
-  const orderedCategories = [
-    ...EVENT_CATEGORIES.map((category) => category.id),
-    ...Array.from(grouped.keys()).filter(
-      (category) => !CATEGORY_LABELS.has(category)
-    ),
-  ];
+  const orderedCategories = Array.from(grouped.keys());
 
   let rowIndex = 0;
 
@@ -87,7 +81,7 @@ export default function PreferencesMatrix({
               const items = grouped.get(category) ?? [];
               if (!items.length) return null;
 
-              const label = CATEGORY_LABELS.get(category) ?? category;
+              const label = formatCategoryLabel(category);
               const showTopDivider = categoryIndex === 0;
               const showCategoryDivider =
                 categoryIndex === 0 || categoryIndex > 0;
