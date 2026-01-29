@@ -145,7 +145,8 @@ export const InfoHero = () => {
                   />
                 </svg>
                 <span className="whitespace-normal">
-                  View 0G DUNA Member <span className="underline">Disclosure</span>
+                  View 0G DUNA Member{" "}
+                  <span className="underline">Disclosure</span>
                 </span>
               </a>
             </div>

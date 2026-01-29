@@ -76,7 +76,7 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.DEMO4:
         return demo4TenantUIConfig;
-        
+
       case TENANT_NAMESPACES.DEMO3:
         return demo3TenantUIConfig;
 

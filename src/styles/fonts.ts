@@ -1,7 +1,6 @@
 import localFont from "next/font/local";
 import { NextFontWithVariable } from "next/dist/compiled/@next/font";
 
-
 export const inter = localFont({
   src: [
     {
