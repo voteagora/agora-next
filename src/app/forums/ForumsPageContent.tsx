@@ -2,7 +2,7 @@ import React from "react";
 import ForumsSidebar from "./ForumsSidebar";
 import { getForumData } from "@/lib/actions/forum/topics";
 import ForumsHeader from "./components/ForumsHeader";
-import ForumTopicCard from "./components/ForumTopicCard";
+import TopicList from "./components/TopicList";
 
 interface ForumsPageContentProps {
   categoryId: number | null;
@@ -69,9 +69,7 @@ export default async function ForumsPageContent({
                 <p className="text-tertiary">No topics found</p>
               </div>
             ) : (
-              sortedTopics.map((topic: any) => (
-                <ForumTopicCard key={topic.id} topic={topic} admins={admins} />
-              ))
+              <TopicList topics={sortedTopics} admins={admins} />
             )}
           </div>
         </div>

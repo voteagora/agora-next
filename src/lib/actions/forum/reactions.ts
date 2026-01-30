@@ -13,6 +13,12 @@ import {
   formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
+import {
+  buildForumPostUrl,
+  buildProfileUrl,
+  emitDirectEvent,
+  formatAddressForNotification,
+} from "@/lib/notification-center/emitter";
 
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
@@ -66,7 +72,7 @@ export async function addForumReaction(
         where: { id: validated.targetId },
         include: {
           topic: {
-            select: { categoryId: true },
+            select: { categoryId: true, title: true },
           },
         },
       }),
@@ -139,6 +145,28 @@ export async function addForumReaction(
         emoji,
       },
     });
+
+    const normalizedReactor = validated.address.toLowerCase();
+    if (post.address && post.address.toLowerCase() !== normalizedReactor) {
+      // Format address for display (ENS or truncated) and build profile URL
+      const reactorDisplayName =
+        await formatAddressForNotification(normalizedReactor);
+
+      emitDirectEvent(
+        "forum_reaction_received",
+        post.address,
+        `${post.id}:${normalizedReactor}:${emoji}`,
+        {
+          dao_name: slug,
+          topic_title: post.topic?.title ?? "Forum discussion",
+          post_url: buildForumPostUrl(post.topicId, post.topic?.title, post.id),
+          reaction_emoji: emoji,
+          reactor_address: normalizedReactor,
+          reactor_display_name: reactorDisplayName,
+          reactor_profile_url: buildProfileUrl(normalizedReactor),
+        }
+      );
+    }
 
     return { success: true, data: created };
   } catch (error) {
