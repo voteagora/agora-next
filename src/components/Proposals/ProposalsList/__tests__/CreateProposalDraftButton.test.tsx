@@ -56,8 +56,8 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   isPaused: false,
   isPlaceholderData: false,
   isStale: false,
-  fetchStatus: "idle",
   isEnabled: true,
+  fetchStatus: "idle",
   refetch: vi.fn(),
   promise: Promise.resolve(data),
 });
