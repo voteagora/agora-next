@@ -195,6 +195,42 @@ export class PermissionService {
   }
 
   /**
+   * Get all wallet addresses that have a specific permission within a DAO,
+   * including system-wide roles (daoSlug = null).
+   */
+  async getAddressesWithPermission(
+    module: string,
+    resource: string,
+    action: string,
+    daoSlug: DaoSlug
+  ): Promise<string[]> {
+    const userRoles = await db.forumUserRole.findMany({
+      where: {
+        isActive: true,
+        revokedAt: null,
+        OR: [{ daoSlug }, { daoSlug: null }],
+        role: {
+          rolePermissions: {
+            some: {
+              permission: { module, resource, action },
+            },
+          },
+        },
+      },
+      select: {
+        address: true,
+      },
+    });
+
+    const deduped = new Set<string>();
+    for (const entry of userRoles) {
+      deduped.add(normalizeAddress(entry.address));
+    }
+
+    return Array.from(deduped);
+  }
+
+  /**
    * Check if user is a super admin (system-wide role with daoSlug = null)
    */
   async isSuperAdmin(address: string): Promise<boolean> {
