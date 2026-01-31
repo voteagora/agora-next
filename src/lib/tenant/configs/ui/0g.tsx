@@ -5,9 +5,10 @@ import ogLogo from "@/assets/tenant/0g_logo.svg";
 import ogHero from "@/assets/tenant/0g_hero.svg";
 import syndicateSuccess from "@/assets/tenant/syndicate_success.svg";
 import syndicatePending from "@/assets/tenant/syndicate_pending.svg";
-import ogInfoCard1 from "@/assets/tenant/0g_info_1.svg";
-import ogInfoCard2 from "@/assets/tenant/0g_info_2.svg";
-import ogInfoCard3 from "@/assets/tenant/0g_info_3.svg";
+import ogInfoCard1 from "@/assets/tenant/0G_info_discord.svg";
+import ogInfoCard2 from "@/assets/tenant/0G_info_build.svg";
+import ogInfoCard3 from "@/assets/tenant/0G_info_doc.svg";
+import ogInfoCard4 from "@/assets/tenant/0G_info_0G.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CoinsIcon } from "@/icons/CoinsIcon";
 import { NotificationIcon } from "@/icons/NotificationIcon";
@@ -144,7 +145,7 @@ export const ogTenantUIConfig = new TenantUI({
           name: "0G",
           title: "0G",
           url: "https://0g.ai/",
-          image: ogInfoCard1,
+          image: ogInfoCard4,
         },
       ],
     },
