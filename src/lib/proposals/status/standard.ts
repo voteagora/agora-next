@@ -74,12 +74,9 @@ export const deriveStandardStatus = (
   const isOffchain =
     proposalType === "OFFCHAIN_STANDARD" || isEasAtlasSource(proposal);
 
-  let forVotes = 0;
-  let againstVotes = 0;
-  let abstainVotes = 0;
-  let totalVotingPower: string | undefined;
-  let calculationOptions = 0;
+  const calculationOptions = proposal.calculationOptions ?? 0;
 
+  // Handle hybrid/offchain with numbers
   if (isHybrid) {
     // HYBRID_STANDARD: Weighted combination of delegate + citizen votes
     const delegateTotals = proposal.totals?.["no-param"] || {};
@@ -98,89 +95,169 @@ export const deriveStandardStatus = (
 
     const govlessOutcome = (proposal.govless_proposal?.outcome ??
       {}) as CitizenOutcome;
-    totalVotingPower = proposal.total_voting_power_at_start;
+    const totalVotingPower = proposal.total_voting_power_at_start;
     const eligibleDelegates = totalVotingPower
       ? convertToNumber(String(totalVotingPower), decimals)
       : 1;
 
     // Calculate weighted percentages
-    forVotes = calcWeightedPercentage(delegateFor, eligibleDelegates, {
+    const forVotes = calcWeightedPercentage(delegateFor, eligibleDelegates, {
       user: Number(govlessOutcome?.USER?.["1"] ?? 0),
       app: Number(govlessOutcome?.APP?.["1"] ?? 0),
       chain: Number(govlessOutcome?.CHAIN?.["1"] ?? 0),
     });
-    againstVotes = calcWeightedPercentage(delegateAgainst, eligibleDelegates, {
-      user: Number(govlessOutcome?.USER?.["0"] ?? 0),
-      app: Number(govlessOutcome?.APP?.["0"] ?? 0),
-      chain: Number(govlessOutcome?.CHAIN?.["0"] ?? 0),
-    });
-    abstainVotes = calcWeightedPercentage(delegateAbstain, eligibleDelegates, {
-      user: Number(govlessOutcome?.USER?.["2"] ?? 0),
-      app: Number(govlessOutcome?.APP?.["2"] ?? 0),
-      chain: Number(govlessOutcome?.CHAIN?.["2"] ?? 0),
-    });
+    const againstVotes = calcWeightedPercentage(
+      delegateAgainst,
+      eligibleDelegates,
+      {
+        user: Number(govlessOutcome?.USER?.["0"] ?? 0),
+        app: Number(govlessOutcome?.APP?.["0"] ?? 0),
+        chain: Number(govlessOutcome?.CHAIN?.["0"] ?? 0),
+      }
+    );
+    const abstainVotes = calcWeightedPercentage(
+      delegateAbstain,
+      eligibleDelegates,
+      {
+        user: Number(govlessOutcome?.USER?.["2"] ?? 0),
+        app: Number(govlessOutcome?.APP?.["2"] ?? 0),
+        chain: Number(govlessOutcome?.CHAIN?.["2"] ?? 0),
+      }
+    );
+
+    const thresholds = resolveArchiveThresholds(proposal);
+    const thresholdVotes = forVotes + againstVotes;
+    const voteThresholdPercent =
+      thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
+
+    const hasMetThreshold =
+      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+      Number(thresholds.approvalThreshold) === 0;
+
+    const quorumVotes =
+      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+
+    // For hybrid, quorum is always met
+    if (!hasMetThreshold) {
+      return "DEFEATED";
+    }
+
+    if (forVotes > againstVotes) {
+      return "SUCCEEDED";
+    }
+
+    if (forVotes < againstVotes) {
+      return "DEFEATED";
+    }
+
+    return "FAILED";
   } else if (isOffchain) {
     // OFFCHAIN_STANDARD: Aggregate citizen votes from eas-atlas
     const outcome = proposal.outcome as CitizenOutcome | undefined;
     const aggregated = aggregateCitizenVotes(outcome);
-    forVotes = aggregated.for;
-    againstVotes = aggregated.against;
-    abstainVotes = aggregated.abstain;
-    calculationOptions = proposal.calculationOptions ?? 0;
+    const forVotes = aggregated.for;
+    const againstVotes = aggregated.against;
+    const abstainVotes = aggregated.abstain;
+
+    const thresholds = resolveArchiveThresholds(proposal);
+    const thresholdVotes = forVotes + againstVotes;
+    const voteThresholdPercent =
+      thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
+
+    const hasMetThreshold =
+      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+      Number(thresholds.approvalThreshold) === 0;
+
+    const quorumVotes =
+      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumMet = quorumVotes >= Number(thresholds.quorum);
+
+    if (!quorumMet || !hasMetThreshold) {
+      return "DEFEATED";
+    }
+
+    if (forVotes > againstVotes) {
+      return "SUCCEEDED";
+    }
+
+    if (forVotes < againstVotes) {
+      return "DEFEATED";
+    }
+
+    return "FAILED";
   } else if (isEasOodaoSource(proposal)) {
-    // eas-oodao: token-holders outcome
+    // eas-oodao: token-holders outcome - use BigInt
     const outcome = proposal.outcome as
       | { "token-holders"?: Record<string, string> }
       | undefined;
     const voteTotals = outcome?.["token-holders"] || {};
-    forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
-    againstVotes = convertToNumber(String(voteTotals["0"] ?? "0"), decimals);
-    abstainVotes = convertToNumber(String(voteTotals["2"] ?? "0"), decimals);
-    totalVotingPower = proposal.total_voting_power_at_start;
+    const forVotes = BigInt(voteTotals["1"] ?? "0");
+    const againstVotes = BigInt(voteTotals["0"] ?? "0");
+    const abstainVotes = BigInt(voteTotals["2"] ?? "0");
+
+    const thresholds = resolveArchiveThresholds(proposal);
+    const thresholdVotes = forVotes + againstVotes;
+    const voteThresholdPercent =
+      thresholdVotes > 0n
+        ? Number((forVotes * 10000n) / thresholdVotes) / 100
+        : 0;
+
+    const hasMetThreshold =
+      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+      Number(thresholds.approvalThreshold) === 0;
+
+    const quorumVotes =
+      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumMet = quorumVotes >= thresholds.quorum;
+
+    if (!quorumMet || !hasMetThreshold) {
+      return "DEFEATED";
+    }
+
+    if (forVotes > againstVotes) {
+      return "SUCCEEDED";
+    }
+
+    if (forVotes < againstVotes) {
+      return "DEFEATED";
+    }
+
+    return "FAILED";
   } else if (isDaoNodeSource(proposal)) {
-    // dao_node: standard onchain votes
+    // dao_node: standard onchain votes - use BigInt
     const voteTotals = proposal.totals?.["no-param"] || {};
-    forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
-    againstVotes = convertToNumber(String(voteTotals["0"] ?? "0"), decimals);
-    abstainVotes = convertToNumber(String(voteTotals["2"] ?? "0"), decimals);
-    totalVotingPower = proposal.total_voting_power_at_start;
-  }
+    const forVotes = BigInt(voteTotals["1"] ?? "0");
+    const againstVotes = BigInt(voteTotals["0"] ?? "0");
+    const abstainVotes = BigInt(voteTotals["2"] ?? "0");
 
-  const thresholds = resolveArchiveThresholds(proposal);
+    const thresholds = resolveArchiveThresholds(proposal);
+    const thresholdVotes = forVotes + againstVotes;
+    const voteThresholdPercent =
+      thresholdVotes > 0n
+        ? Number((forVotes * 10000n) / thresholdVotes) / 100
+        : 0;
 
-  // Calculate vote threshold percentage (for / (for + against))
-  const thresholdVotes = forVotes + againstVotes;
-  const voteThresholdPercent =
-    thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
+    const hasMetThreshold =
+      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+      Number(thresholds.approvalThreshold) === 0;
 
-  // Check approval threshold
-  const hasMetThreshold =
-    voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
-    Number(thresholds.approvalThreshold) === 0;
+    const quorumVotes =
+      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumMet = quorumVotes >= thresholds.quorum;
 
-  // Calculate quorum based on calculationOptions
-  // calculationOptions=1 means for only, otherwise for+abstain
-  const quorumVotes =
-    calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    if (!quorumMet || !hasMetThreshold) {
+      return "DEFEATED";
+    }
 
-  // Check quorum
-  let quorumMet = true;
-  if (totalVotingPower && !isHybrid) {
-    quorumMet =
-      quorumVotes >= convertToNumber(String(thresholds.quorum), decimals);
-  }
+    if (forVotes > againstVotes) {
+      return "SUCCEEDED";
+    }
 
-  // Determine status
-  if (!quorumMet || !hasMetThreshold) {
-    return "DEFEATED";
-  }
+    if (forVotes < againstVotes) {
+      return "DEFEATED";
+    }
 
-  if (forVotes > againstVotes) {
-    return "SUCCEEDED";
-  }
-
-  if (forVotes < againstVotes) {
-    return "DEFEATED";
+    return "FAILED";
   }
 
   return "FAILED";

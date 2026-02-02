@@ -139,11 +139,19 @@ decoded_proposal_data: [
 ### Quorum Calculation
 
 ```typescript
-// From proposalStatus.ts
-const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
-const proposalQuorumVotes = forVotes + abstainVotes;
+// Using BigInt for precise vote calculations
+const voteTotals = proposal.totals?.["no-param"] || {};
+const forVotes = BigInt(voteTotals["1"] ?? "0");
+const abstainVotes = BigInt(voteTotals["2"] ?? "0");
 
-if (quorum && proposalQuorumVotes < quorum) {
+// Quorum for approval = for + abstain
+const quorumVotes = forVotes + abstainVotes;
+
+// Get quorum value (from proposal.quorum or total_voting_power_at_start / 3)
+const quorumValue = getApprovalQuorum(proposal, decimals);
+
+// Check quorum
+if (convertToNumber(String(quorumVotes), decimals) < quorumValue) {
   return "DEFEATED";
 }
 ```
@@ -151,11 +159,22 @@ if (quorum && proposalQuorumVotes < quorum) {
 ### Criteria-Based Status
 
 ```typescript
-// From proposalStatus.ts - uses parsed string criteria
-if (proposalResults.kind.criteria === "THRESHOLD") {
-  // At least one option must exceed threshold votes
-  for (const option of proposalResults.kind.options) {
-    if (option.votes > proposalResults.kind.criteriaValue) {
+// Extract approval metrics (includes criteria and choices)
+const approvalMetrics = extractApprovalMetrics(proposal, {
+  tokenDecimals: decimals,
+});
+const { choices, criteria, criteriaValue } = approvalMetrics;
+
+// Criteria constants
+const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
+const CRITERIA_TOP_CHOICES = 1; // Top N options win
+
+if (criteria === CRITERIA_THRESHOLD) {
+  // THRESHOLD: at least one option must exceed threshold votes
+  const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
+
+  for (const choice of choices) {
+    if (choice.approvals > thresholdVotes) {
       return "SUCCEEDED";
     }
   }
@@ -166,7 +185,7 @@ if (proposalResults.kind.criteria === "THRESHOLD") {
 }
 ```
 
-> **Note:** Raw criteria from `decoded_proposal_data` is numeric (1 = TOP_CHOICES, 99 = THRESHOLD) but gets parsed to string in `parseProposalResults`.
+> **Note:** Raw criteria from `decoded_proposal_data` is numeric (0 = THRESHOLD, 1 = TOP_CHOICES). The criteriaValue represents either the threshold amount or the number of top choices to select.
 
 ---
 

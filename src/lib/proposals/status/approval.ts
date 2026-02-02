@@ -101,36 +101,29 @@ export const deriveApprovalStatus = (
   //   }
   // }
   // Fallback for standard APPROVAL (onchain only): check quorum and criteria
-  let voteTotals: Record<string, string | undefined> = {};
-  let totalVotingPower: string | undefined;
+  let forVotes: bigint;
+  let abstainVotes: bigint;
 
   if (isEasOodaoSource(proposal)) {
     const outcome = proposal.outcome as
       | { "token-holders"?: Record<string, string> }
       | undefined;
-    voteTotals = outcome?.["token-holders"] || {};
-    totalVotingPower = proposal.total_voting_power_at_start;
+    const voteTotals = outcome?.["token-holders"] || {};
+    forVotes = BigInt(voteTotals["1"] ?? "0");
+    abstainVotes = BigInt(voteTotals["2"] ?? "0");
   } else if (isDaoNodeSource(proposal)) {
-    voteTotals = proposal.totals?.["no-param"] || {};
-    console.log("voteTotals", voteTotals);
-    totalVotingPower = proposal.total_voting_power_at_start;
+    const voteTotals = proposal.totals?.["no-param"] || {};
+    forVotes = BigInt(voteTotals["1"] ?? "0");
+    abstainVotes = BigInt(voteTotals["2"] ?? "0");
+  } else {
+    return "DEFEATED";
   }
-  const forVotes = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
-  const abstainVotes = convertToNumber(
-    String(voteTotals["2"] ?? "0"),
-    decimals
-  );
 
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;
-  console.log(
-    "quorumValue, quorumVotes",
-    quorumValue,
-    quorumVotes,
-    proposal.id
-  );
+
   // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
-  if (quorumVotes < quorumValue) {
+  if (convertToNumber(String(quorumVotes), decimals) < quorumValue) {
     return "DEFEATED";
   }
 

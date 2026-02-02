@@ -51,6 +51,7 @@ export type ApprovalChoice = {
   index: number;
   text: string;
   approvals: number;
+  approvalsRaw?: bigint; // Raw BigInt value for dao_node sources (wei)
   percentage: number;
 };
 

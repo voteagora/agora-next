@@ -226,6 +226,7 @@ export function extractApprovalMetrics(
 
   // Extract approval votes per option
   const approvalVotesMap: Record<string, number> = {};
+  const approvalVotesRawMap: Record<string, bigint> = {};
 
   if (source !== "eas-atlas" && source !== "eas-oodao") {
     // dao_node format: totals[optionIndex] contains votes
@@ -236,6 +237,8 @@ export function extractApprovalMetrics(
         const voteObj = votes as Record<string, string>;
         // Check for votes under key "1" first, then "0"
         const voteValue = voteObj["1"] ?? voteObj["0"] ?? "0";
+        // Store both raw BigInt and converted number
+        approvalVotesRawMap[param] = BigInt(voteValue);
         approvalVotesMap[param] = convertToNumber(
           String(voteValue),
           tokenDecimals
@@ -247,6 +250,7 @@ export function extractApprovalMetrics(
   const choicesWithApprovals: ApprovalChoice[] = choices.map(
     (choice, index) => {
       let approvals = 0;
+      let approvalsRaw: bigint | undefined;
 
       if (source === "eas-atlas" || source === "eas-oodao") {
         approvals = aggregateApprovalVotes(
@@ -255,12 +259,14 @@ export function extractApprovalMetrics(
         );
       } else {
         approvals = approvalVotesMap[index.toString()] || 0;
+        approvalsRaw = approvalVotesRawMap[index.toString()];
       }
 
       return {
         index,
         text: choice,
         approvals,
+        approvalsRaw,
         percentage: 0,
       };
     }

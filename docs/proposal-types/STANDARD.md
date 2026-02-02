@@ -116,29 +116,42 @@ totals: {
 ### Vote-Based Status
 
 ```typescript
-// Inputs
-const forVotes = BigInt(totals["no-param"]["1"] || "0");
-const againstVotes = BigInt(totals["no-param"]["0"] || "0");
-const abstainVotes = BigInt(totals["no-param"]["2"] || "0");
-const quorum = BigInt(proposal.quorum);
-const approvalThreshold = proposal_type_info.approval_threshold; // basis points
+// Inputs (using BigInt for precision)
+const voteTotals = proposal.totals?.["no-param"] || {};
+const forVotes = BigInt(voteTotals["1"] ?? "0");
+const againstVotes = BigInt(voteTotals["0"] ?? "0");
+const abstainVotes = BigInt(voteTotals["2"] ?? "0");
 
-// Quorum calculation (varies by tenant)
-// OPTIMISM: forVotes + abstainVotes (default)
-// UNISWAP: forVotes only
-// SCROLL: forVotes + againstVotes + abstainVotes
-const quorumVotes = forVotes + abstainVotes;
+// Get thresholds
+const thresholds = resolveArchiveThresholds(proposal);
+// thresholds.quorum is bigint
+// thresholds.approvalThreshold is bigint (basis points)
+
+// Quorum calculation (varies by calculationOptions)
+// calculationOptions=1: forVotes only
+// default: forVotes + abstainVotes
+const calculationOptions = proposal.calculationOptions ?? 0;
+const quorumVotes =
+  calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
 
 // Approval calculation
 const thresholdVotes = forVotes + againstVotes;
-const approvalPercent =
-  thresholdVotes > 0n ? (forVotes * 10000n) / thresholdVotes : 0n;
+const voteThresholdPercent =
+  thresholdVotes > 0n ? Number((forVotes * 10000n) / thresholdVotes) / 100 : 0;
+
+// Check approval threshold
+const hasMetThreshold =
+  voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+  Number(thresholds.approvalThreshold) === 0;
+
+// Check quorum
+const quorumMet = quorumVotes >= thresholds.quorum;
 
 // Status logic
-if (quorumVotes < quorum) return "DEFEATED"; // Quorum not met
-if (approvalPercent < approvalThreshold) return "DEFEATED"; // Approval not met
+if (!quorumMet || !hasMetThreshold) return "DEFEATED";
 if (forVotes > againstVotes) return "SUCCEEDED";
-return "DEFEATED";
+if (forVotes < againstVotes) return "DEFEATED";
+return "FAILED";
 ```
 
 ---

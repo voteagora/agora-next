@@ -26,20 +26,39 @@ export const deriveOptimisticStatus = (
   proposalType: string,
   decimals: number
 ): string => {
-  // For simple OPTIMISTIC (dao_node only): veto if against > 50% of votable supply
+  // For simple OPTIMISTIC (dao_node only): veto if against > threshold
   if (proposalType === "OPTIMISTIC" && isDaoNodeSource(proposal)) {
-    // console.log("Optimistic proposal", proposal);
-    const votableSupply = convertToNumber(
-      String(proposal.votableSupply ?? proposal.votable_supply ?? "0"),
-      decimals
+    const votableSupply = BigInt(
+      proposal.votableSupply ?? proposal.total_voting_power_at_start ?? "0"
     );
     const voteTotals = proposal.totals?.["no-param"] || {};
-    const againstVotes = convertToNumber(
-      String(voteTotals["0"] ?? "0"),
-      decimals
-    );
+    const againstVotes = BigInt(voteTotals["0"] ?? "0");
 
-    if (votableSupply > 0 && againstVotes > votableSupply / 2) {
+    // Extract threshold from decoded_proposal_data
+    let threshold: bigint;
+    if (
+      proposal.decoded_proposal_data &&
+      Array.isArray(proposal.decoded_proposal_data) &&
+      proposal.decoded_proposal_data[0] &&
+      Array.isArray(proposal.decoded_proposal_data[0])
+    ) {
+      const thresholdBps = Number(proposal.decoded_proposal_data[0][0]);
+      const isRelative = Boolean(proposal.decoded_proposal_data[0][1]);
+
+      if (isRelative) {
+        // Threshold is relative: % of votable supply (basis points)
+        threshold = (votableSupply * BigInt(thresholdBps)) / 10000n;
+      } else {
+        // Threshold is absolute value in basis points
+        threshold = BigInt(thresholdBps);
+      }
+    } else {
+      // Default: 50% of votable supply
+      threshold = votableSupply / 2n;
+    }
+
+    // Proposal is defeated if veto votes exceed threshold
+    if (againstVotes > threshold) {
       return "DEFEATED";
     }
     return "SUCCEEDED";

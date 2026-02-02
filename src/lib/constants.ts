@@ -274,6 +274,7 @@ export const ARCHIVE_GCS_BUCKET =
     : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
+  console.log("namespace", namespace, ARCHIVE_GCS_BUCKET);
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
 };
 

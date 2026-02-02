@@ -358,9 +358,9 @@ function normalizeApprovalProposal(
           budgetTokensSpent: null,
         }));
 
-  // Determine criteria: 0 = TOP_CHOICES, non-zero = THRESHOLD
+  // Determine criteria: 0 = THRESHOLD, 1 = TOP_CHOICES
   const criteriaType =
-    metrics.criteria === 0 ? ("TOP_CHOICES" as const) : ("THRESHOLD" as const);
+    metrics.criteria === 1 ? ("TOP_CHOICES" as const) : ("THRESHOLD" as const);
 
   const proposalData: ParsedProposalData["APPROVAL"]["kind"] & {
     source?: string;
@@ -376,17 +376,39 @@ function normalizeApprovalProposal(
     source,
   };
 
+  // Extract vote totals from totals["no-param"] for approval proposals
+  const voteTotals = proposal.totals?.["no-param"] || {};
+
   const proposalResults = {
     options: metrics.choices.map((c) => ({
       option: c.text,
-      votes: BigInt(Math.floor(c.approvals)),
+      // Use approvalsRaw (BigInt) if available, otherwise convert approvals (number) to BigInt
+      votes: c.approvalsRaw ?? BigInt(Math.floor(c.approvals)),
     })),
     criteria: criteriaType,
     criteriaValue: metrics.criteriaValue,
-    for: BigInt(0),
-    against: BigInt(0),
-    abstain: BigInt(0),
+    for: BigInt(voteTotals["1"] ?? "0"),
+    against: BigInt(voteTotals["0"] ?? "0"),
+    abstain: BigInt(voteTotals["2"] ?? "0"),
   };
+
+  // For HYBRID_APPROVAL, add totals.vote_counts structure
+  if (proposal.hybrid && proposal.govless_proposal) {
+    // Use num_of_votes from govless_proposal as the total unique citizen voters
+    // This represents the total number of unique voters across all citizen types
+    const totalCitizenVoters = proposal.govless_proposal.num_of_votes || 0;
+
+    // Add totals structure for HYBRID_APPROVAL
+    // Note: We use the total citizen voters for all types since we don't have
+    // per-type unique voter counts in the data
+    (proposalResults as any).totals = {
+      vote_counts: {
+        APP: totalCitizenVoters,
+        USER: totalCitizenVoters,
+        CHAIN: totalCitizenVoters,
+      },
+    };
+  }
 
   return {
     ...baseFields,

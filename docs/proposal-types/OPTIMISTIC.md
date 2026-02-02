@@ -99,17 +99,35 @@ decoded_proposal_data: [
 
 ```typescript
 // Inputs
-const againstVotes = BigInt(totals["no-param"]["0"] || "0");
-const votableSupply = BigInt(proposal.total_voting_power_at_start);
+const votableSupply = BigInt(proposal.total_voting_power_at_start ?? "0");
+const voteTotals = proposal.totals?.["no-param"] || {};
+const againstVotes = BigInt(voteTotals["0"] ?? "0");
 
-// Extract threshold from decoded data
-const [thresholdBps, isRelative] = decoded_proposal_data[0];
-const threshold = isRelative
-  ? (votableSupply * BigInt(thresholdBps)) / 10000n
-  : BigInt(thresholdBps);
+// Extract threshold from decoded_proposal_data
+let threshold: bigint;
+if (
+  proposal.decoded_proposal_data &&
+  Array.isArray(proposal.decoded_proposal_data) &&
+  proposal.decoded_proposal_data[0] &&
+  Array.isArray(proposal.decoded_proposal_data[0])
+) {
+  const thresholdBps = Number(proposal.decoded_proposal_data[0][0]);
+  const isRelative = Boolean(proposal.decoded_proposal_data[0][1]);
+
+  if (isRelative) {
+    // Threshold is relative: % of votable supply (basis points)
+    threshold = (votableSupply * BigInt(thresholdBps)) / 10000n;
+  } else {
+    // Threshold is absolute value in basis points
+    threshold = BigInt(thresholdBps);
+  }
+} else {
+  // Default: 50% of votable supply
+  threshold = votableSupply / 2n;
+}
 
 // Status determination
-// Proposal fails if veto votes exceed threshold
+// Proposal is defeated if veto votes exceed threshold
 if (againstVotes > threshold) {
   return "DEFEATED";
 }
