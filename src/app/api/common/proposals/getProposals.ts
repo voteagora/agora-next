@@ -5,6 +5,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import {
   parseProposal,
   isTimestampBasedProposal,
@@ -50,10 +51,16 @@ async function fetchProposalsFromDaoNode(
   contracts: any
 ): Promise<ProposalPayload[]> {
   try {
-    const [data, typesFromApi] = await Promise.all([
-      getCachedAllProposalsFromDaoNode(),
-      getProposalTypesFromDaoNode(),
-    ]);
+    const data = await getCachedAllProposalsFromDaoNode();
+    let proposalTypes = {};
+
+    if (
+      namespace !== TENANT_NAMESPACES.ENS &&
+      namespace !== TENANT_NAMESPACES.UNISWAP
+    ) {
+      const typesData = await getProposalTypesFromDaoNode();
+      proposalTypes = typesData?.proposal_types || {};
+    }
 
     let proposals = data;
 
@@ -64,7 +71,7 @@ async function fetchProposalsFromDaoNode(
 
     // Adapt DAO Node response format
     proposals = proposals.map((proposal) =>
-      adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+      adaptDAONodeResponse(proposal, proposalTypes)
     );
 
     // Include snapshot proposals if enabled

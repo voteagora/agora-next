@@ -67,8 +67,8 @@ export function adaptDAONodeResponse(
     throw new Error(`Unknown voting module name: ${votingModuleName}`);
   }
 
-  const proposalType = proposalTypes[String(apiResponse.proposal_type)];
-  const parsedProposalType = Object.assign(proposalType, {
+  const proposalType = proposalTypes?.[String(apiResponse.proposal_type)] || {};
+  const parsedProposalType = Object.assign({}, proposalType, {
     proposal_type_id: String(apiResponse.proposal_type),
   });
 
