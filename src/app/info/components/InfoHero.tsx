@@ -38,7 +38,7 @@ export const InfoHero = () => {
                 <svg
                   width="14"
                   height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@ export const InfoHero = () => {
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="whitespace-normal">
+                <span className="whitespace-normal text-red-500 font-bold">
                   View Towns Lodge DUNA Member{" "}
                   <span className="underline">Disclosure</span>
                 </span>
