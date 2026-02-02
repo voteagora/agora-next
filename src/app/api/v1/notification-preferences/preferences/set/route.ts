@@ -7,6 +7,9 @@ import { z } from "zod";
 import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
 import { ensureNotificationRecipient } from "@/app/api/v1/notification-preferences/recipient";
 import { notificationCenterClient } from "@/lib/notification-center/client";
+import { PermissionService } from "@/server/services/permission.service";
+import Tenant from "@/lib/tenant/tenant";
+import type { DaoSlug } from "@prisma/client";
 
 const BodySchema = z.object({
   eventType: z.string().min(1),
@@ -31,6 +34,23 @@ export async function POST(request: NextRequest) {
       { message: "Invalid request payload" },
       { status: 400 }
     );
+  }
+
+  // Gate grants_* events to users with grants admin permission
+  if (parsed.data.eventType.startsWith("grants_")) {
+    const { slug } = Tenant.current();
+    const permissionService = new PermissionService();
+    const hasGrantsPermission = await permissionService.checkPermission(
+      { address: auth.recipientId, daoSlug: slug as DaoSlug },
+      { module: "grants", resource: "applications", action: "read" }
+    );
+
+    if (!hasGrantsPermission) {
+      return NextResponse.json(
+        { message: "You do not have permission to manage grants notifications" },
+        { status: 403 }
+      );
+    }
   }
 
   try {
