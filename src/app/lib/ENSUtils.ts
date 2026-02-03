@@ -3,8 +3,9 @@ import { isAddress } from "viem";
 import { AlchemyProvider } from "ethers";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { getAlchemyId } from "@/lib/alchemyConfig";
 
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
+const alchemyId = getAlchemyId();
 const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
 
 export const ensNameToAddress = unstable_cache(
