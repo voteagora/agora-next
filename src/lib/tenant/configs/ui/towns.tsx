@@ -18,6 +18,7 @@ export const townsTenantUIConfig = new TenantUI({
   title: "Towns Lodge",
   logo: townsLogo,
   logoSize: "36px",
+  documentColors: ["#9C8AED", "#4E4672", "#9991BA", "#918DA1"],
   tokens: [
     {
       address: "0x000000Fa00b200406de700041CFc6b19BbFB4d13",
