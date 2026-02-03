@@ -66,7 +66,10 @@ export default function ArchiveProposalVotesCard({
           {showVoters ? (
             <ArchiveProposalVotesList proposal={proposal} />
           ) : (
-            <ArchiveProposalNonVoterList proposal={proposal} />
+            <ArchiveProposalNonVoterList
+              proposal={proposal}
+              selectedVoterType={{ type: "ALL", value: "All" }} // Use default/all since this component doesn't have the same filter state yet or relies on internal
+            />
           )}
 
           {isProposalActive && (
