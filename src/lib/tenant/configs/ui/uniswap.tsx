@@ -177,7 +177,7 @@ export const uniswapTenantUIConfig = new TenantUI({
           name: "Community Discord",
           title: "Community Discord",
           url: "https://discord.com/invite/FCfyBSbCU5",
-          image: "",
+          image: infoPageCard01,
         },
         {
           name: "Protocol Docs",
@@ -195,7 +195,7 @@ export const uniswapTenantUIConfig = new TenantUI({
           name: "Document Archive",
           title: "Document Archive",
           url: "/document-archive",
-          image: "",
+          image: infoPageCard02,
         },
       ],
     },
