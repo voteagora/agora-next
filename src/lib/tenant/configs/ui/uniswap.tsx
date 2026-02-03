@@ -47,6 +47,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     brandSecondary: "255 255 255",
     tokenAmountFont: "font-chivoMono",
     customAboutSubtitle: "About DUNI",
+    heroCardGradient: { from: "#FC72FF", to: "#F50DB4" },
   },
 
   links: [
@@ -176,13 +177,7 @@ export const uniswapTenantUIConfig = new TenantUI({
           name: "Community Discord",
           title: "Community Discord",
           url: "https://discord.com/invite/FCfyBSbCU5",
-          image: infoPageCard01,
-        },
-        {
-          name: "Governance Forums",
-          title: "Governance Forums",
-          url: "https://gov.uniswap.org",
-          image: infoPageCard02,
+          image: "",
         },
         {
           name: "Protocol Docs",
@@ -195,6 +190,12 @@ export const uniswapTenantUIConfig = new TenantUI({
           title: "Uniswap Labs",
           url: "https://x.com/Uniswap",
           image: infoPageCard04,
+        },
+        {
+          name: "Document Archive",
+          title: "Document Archive",
+          url: "/document-archive",
+          image: "",
         },
       ],
     },
