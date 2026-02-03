@@ -144,7 +144,6 @@ function applyThemeColors(ui: TenantUI) {
 export function DevTenantProvider({ children }: { children: React.ReactNode }) {
   const isDevMode =
     typeof window !== "undefined" &&
-    process.env.NODE_ENV === "development" &&
     process.env.NEXT_PUBLIC_AGORA_ENV !== "prod";
 
   const [selectedTenant, setSelectedTenantState] =
