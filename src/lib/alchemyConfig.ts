@@ -36,8 +36,15 @@ export const getAlchemyId = (): string => {
   const serverKeyDev = process.env.SERVERSIDE_ALCHEMY_ID_DEV;
   const clientKey = process.env.NEXT_PUBLIC_ALCHEMY_ID;
 
-  // Use environment-specific server key
-  const serverKey = isProd ? serverKeyProd : serverKeyDev;
+  // Use environment-specific server key, with fallback from prod to dev
+  let serverKey = isProd ? serverKeyProd : serverKeyDev;
+
+  // If prod key is not configured, fall back to dev key
+  // This is mainly for any previews which use prod environment
+  // since prod key is a secret and not available in preview and previews will fail
+  if (isProd && !serverKeyProd && serverKeyDev) {
+    serverKey = serverKeyDev;
+  }
 
   if (serverKey) {
     return serverKey;
