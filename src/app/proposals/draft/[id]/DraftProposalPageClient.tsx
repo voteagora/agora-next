@@ -14,10 +14,7 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
-import {
-  LOCAL_STORAGE_SIWE_JWT_KEY,
-  LOCAL_STORAGE_SIWE_STAGE_KEY,
-} from "@/lib/constants";
+import { LOCAL_STORAGE_SIWE_STAGE_KEY } from "@/lib/constants";
 import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
 import Tenant from "@/lib/tenant/tenant";
@@ -163,7 +160,7 @@ export default function DraftProposalPageClient({
   useEffect(() => {
     try {
       const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-      const hasJwt = Boolean(localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY));
+      const hasJwt = Boolean(getStoredSiweJwt());
       if (stage === "awaiting_response" && !hasJwt) {
         localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
         setIsSigning(false);
@@ -231,8 +228,7 @@ export default function DraftProposalPageClient({
     const id = setInterval(async () => {
       try {
         const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-        const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-        const hasJwt = Boolean(sessionRaw);
+        const hasJwt = Boolean(getStoredSiweJwt());
         const isForbidden = (error || "").toLowerCase().includes("forbidden");
         const shouldAdvance = hasJwt && !draft && !isForbidden;
         if (hasJwt && stage !== "awaiting_response") {
