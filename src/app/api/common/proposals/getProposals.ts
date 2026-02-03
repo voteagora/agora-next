@@ -5,7 +5,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES, GOVERNOR_TYPE } from "@/lib/constants";
 import {
   parseProposal,
   isTimestampBasedProposal,
@@ -55,8 +55,8 @@ async function fetchProposalsFromDaoNode(
     let proposalTypes = {};
 
     if (
-      namespace !== TENANT_NAMESPACES.ENS &&
-      namespace !== TENANT_NAMESPACES.UNISWAP
+      contracts.governorType === GOVERNOR_TYPE.AGORA ||
+      contracts.governorType === GOVERNOR_TYPE.ALLIGATOR
     ) {
       const typesData = await getProposalTypesFromDaoNode();
       proposalTypes = typesData?.proposal_types || {};
@@ -122,18 +122,15 @@ async function fetchOnchainProposalsByIds(
   }
 
   try {
-    const onchainProposals = await findProposalsByIds({
+    const onchainProposals = (await findProposalsByIds({
       namespace,
       proposalIds,
       contract: contracts.governor.address,
-    });
+    })) as ProposalPayload[];
 
-    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
+    onchainProposals.forEach((proposal) => {
       if (proposal) {
-        onchainProposalsMap.set(
-          proposal.proposal_id,
-          proposal as ProposalPayload
-        );
+        onchainProposalsMap.set(proposal.proposal_id, proposal);
       }
     });
   } catch (error) {
