@@ -9,10 +9,10 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
-import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 const CreateProposalDraftButton = ({
   address,
@@ -75,32 +75,18 @@ const CreateProposalDraftButton = ({
         setIsPending(true);
         try {
           // Require SIWE JWT session before proceeding (middleware enforces it)
-          let jwt: string | undefined;
-          try {
-            const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-            const parsed = session ? JSON.parse(session) : null;
-            jwt = parsed?.access_token as string | undefined;
-          } catch {}
+          let jwt = getStoredSiweJwt({ expectedAddress: address });
           if (!jwt) {
             // Try to initiate SIWE sign-in and then proceed
             try {
               await signIn();
-
               // Retry fetching the session for up to 10 seconds to handle potential race conditions
               // specifically observed with Brave Wallet
-              let retries = 0;
-              while (!jwt && retries < 50) {
-                const session = localStorage.getItem(
-                  LOCAL_STORAGE_SIWE_JWT_KEY
-                );
-                const parsed = session ? JSON.parse(session) : null;
-                jwt = parsed?.access_token as string | undefined;
-
-                if (jwt) break;
-
-                await new Promise((resolve) => setTimeout(resolve, 200));
-                retries++;
-              }
+              jwt = await waitForStoredSiweJwt({
+                expectedAddress: address,
+                timeoutMs: 10_000,
+                intervalMs: 200,
+              });
             } catch (e) {
               toast("Sign-in cancelled or failed. Please try again.");
               setIsPending(false);

@@ -710,5 +710,9 @@ export const syndicateTenantUIConfig = new TenantUI({
         title: "Syndicate Collective Updates",
       },
     },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });
