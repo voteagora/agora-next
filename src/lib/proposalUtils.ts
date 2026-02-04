@@ -1283,7 +1283,7 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
   const proposalForVotes = BigInt(proposalResults?.for || 0);
   const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
   const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
-
+  console.log("proposalResults", proposalResults);
   const totalUniqueVoters = {
     ["delegates"]: proposalTotalVotes,
     ["apps"]: proposalResults.totals.vote_counts.APP,

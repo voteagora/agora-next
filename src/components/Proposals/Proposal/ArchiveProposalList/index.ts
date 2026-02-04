@@ -5,6 +5,9 @@ export { ArchiveProposalRow } from "./ArchiveProposalRow";
 
 // Individual row components (for direct usage if needed)
 export { StandardProposalRow } from "./StandardProposalRow";
+export { ApprovalProposalRow } from "./ApprovalProposalRow";
+export { OptimisticProposalRow } from "./OptimisticProposalRow";
+export { OptimisticTieredProposalRow } from "./OptimisticTieredProposalRow";
 export { SnapshotProposalRow } from "./SnapshotProposalRow";
 
 // Shared components
