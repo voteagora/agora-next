@@ -33,6 +33,11 @@ const DunaAdministrationArchive = async () => {
     console.error("Error fetching forum data:", error);
   }
 
+  const financialDocuments = documents.filter(
+    (doc) => doc.isFinancialStatement
+  );
+  const otherDocuments = documents.filter((doc) => !doc.isFinancialStatement);
+
   return (
     <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
@@ -51,7 +56,25 @@ const DunaAdministrationArchive = async () => {
         <CardContent className="p-6">
           <div className="">
             <DocumentsSection
-              initialDocuments={documents}
+              initialDocuments={otherDocuments}
+              hideHeader={true}
+              hideComms={true}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="my-4">
+        <h4 className="text-lg font-semibold text-primary">
+          Financial Statements
+        </h4>
+      </div>
+
+      <Card className="border border-line bg-cardBackground shadow-sm">
+        <CardContent className="p-6">
+          <div className="">
+            <DocumentsSection
+              initialDocuments={financialDocuments}
               hideHeader={true}
               hideComms={true}
             />
