@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { PROPOSAL_STATUS } from "@/lib/constants";
@@ -15,6 +15,112 @@ import {
   normalizeBoolean,
   PAYEE_FORM_URL_KEY,
 } from "@/lib/taxFormUtils";
+import { Clock } from "lucide-react";
+
+const TAX_FORM_DEADLINE_DAYS = 15;
+
+function useCountdown(endTime: Date | null) {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    isExpired: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!endTime) {
+      setTimeLeft(null);
+      return;
+    }
+
+    // Calculate deadline: 15 days from proposal end time
+    const deadline = new Date(endTime);
+    deadline.setDate(deadline.getDate() + TAX_FORM_DEADLINE_DAYS);
+
+    const calculateTimeLeft = () => {
+      const now = new Date();
+      const difference = deadline.getTime() - now.getTime();
+
+      if (difference <= 0) {
+        return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      return { days, hours, minutes, seconds, isExpired: false };
+    };
+
+    setTimeLeft(calculateTimeLeft());
+
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [endTime]);
+
+  return timeLeft;
+}
+
+function useIsDeadlinePassed(endTime: Date | null) {
+  const [isPassed, setIsPassed] = useState(false);
+
+  useEffect(() => {
+    if (!endTime) {
+      setIsPassed(false);
+      return;
+    }
+
+    const deadline = new Date(endTime);
+    deadline.setDate(deadline.getDate() + TAX_FORM_DEADLINE_DAYS);
+
+    const checkDeadline = () => {
+      setIsPassed(new Date() >= deadline);
+    };
+
+    checkDeadline();
+    const timer = setInterval(checkDeadline, 1000);
+    return () => clearInterval(timer);
+  }, [endTime]);
+
+  return isPassed;
+}
+
+function CountdownTimer({ endTime }: { endTime: Date | null }) {
+  const timeLeft = useCountdown(endTime);
+
+  if (!timeLeft) return null;
+
+  if (timeLeft.isExpired) {
+    return (
+      <div className="flex items-center gap-1.5 text-negative text-sm">
+        <Clock className="w-3.5 h-3.5" />
+        <span className="font-medium">Deadline passed</span>
+      </div>
+    );
+  }
+
+  const isUrgent = timeLeft.days < 3;
+  const colorClass = isUrgent ? "text-negative" : "text-positive";
+
+  return (
+    <div className={`flex items-center gap-1.5 text-sm ${colorClass}`}>
+      <Clock className="w-3.5 h-3.5" />
+      <span className="tabular-nums font-medium">
+        {timeLeft.days > 0 && `${timeLeft.days}d `}
+        {String(timeLeft.hours).padStart(2, "0")}h{" "}
+        {String(timeLeft.minutes).padStart(2, "0")}m
+      </span>
+      <span className="font-normal">left to complete form</span>
+    </div>
+  );
+}
 
 type Props = {
   proposal: Proposal;
@@ -23,6 +129,7 @@ type Props = {
 export function TaxFormBanner({ proposal }: Props) {
   const { address, isConnected } = useAccount();
   const { ui } = Tenant.current();
+  const isDeadlinePassed = useIsDeadlinePassed(proposal.endTime);
   const taxFormToggle = ui.toggle("tax-form") ?? ui.toggle("tax-form-banner");
   const isEnabled = taxFormToggle?.enabled ?? false;
   const togglePayeeFormUrl = (
@@ -96,10 +203,13 @@ export function TaxFormBanner({ proposal }: Props) {
           <div className="bg-wash rounded-md p-1.5">
             <CheckCircleBrokenIcon className="w-4 h-4" stroke="#7A7A7A" />
           </div>
-          <p className="text-secondary text-sm md:text-sm">
-            This proposal has passed. If you are the payee, please sign in to
-            complete your payment information.
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="text-secondary text-sm md:text-sm">
+              This proposal has passed. If you are the payee, please sign in to
+              complete your payment information.
+            </p>
+            <CountdownTimer endTime={proposal.endTime} />
+          </div>
         </div>
       </div>
     );
@@ -116,18 +226,22 @@ export function TaxFormBanner({ proposal }: Props) {
         <div className="bg-wash rounded-md p-1.5">
           <CheckCircleBrokenIcon className="w-4 h-4" stroke="#7A7A7A" />
         </div>
-        <p className="text-secondary text-sm md:text-sm">
-          You’re almost ready to receive the funds from this proposal. Please
-          complete your payment information to proceed.
-        </p>
+        <div className="flex flex-col gap-1">
+          <p className="text-secondary text-sm md:text-sm">
+            You&apos;re almost ready to receive the funds from this proposal.
+            Please complete your payment information to proceed.
+          </p>
+          <CountdownTimer endTime={proposal.endTime} />
+        </div>
       </div>
       {payeeFormUrl ? (
         <UpdatedButton
-          href={payeeFormUrl}
+          href={isDeadlinePassed ? undefined : payeeFormUrl}
           type="primary"
-          className={payeeButtonClass}
+          className={`${payeeButtonClass} ${isDeadlinePassed ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           target="_blank"
           rel="noreferrer"
+          aria-disabled={isDeadlinePassed}
         >
           Complete payee form
         </UpdatedButton>
