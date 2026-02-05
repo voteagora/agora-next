@@ -395,7 +395,7 @@ export async function POST(
           const adminLinkBase = process.env.AGORA_ADMIN_URL;
           const adminLinkPath = `/admin/grants/applications?dao_slug=${daoSlug}`;
           const adminLink = adminLinkBase
-            ? `${adminLinkBase}${adminLinkPath}`
+            ? `${adminLinkBase.replace(/\/+$/, "")}${adminLinkPath}`
             : adminLinkPath;
 
           const notificationData = {
