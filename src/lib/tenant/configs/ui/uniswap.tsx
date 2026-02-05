@@ -19,6 +19,7 @@ export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
   logo: uniswapLogo,
   logoSize: "16",
+  documentColors: ["#E34FB9", "#A83B89", "#754166", "#5C3C53"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.UNISWAP)],
 
   googleAnalytics: "G-KBG8GS1R45",

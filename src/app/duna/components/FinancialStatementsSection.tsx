@@ -65,6 +65,7 @@ export default function FinancialStatementsSection({
                   document={statement}
                   onCardClick={() => onStatementClick(statement)}
                   isRecentlyReleased={index === 0 && isRecentlyReleased}
+                  index={index}
                 />
               </CarouselItem>
             );
