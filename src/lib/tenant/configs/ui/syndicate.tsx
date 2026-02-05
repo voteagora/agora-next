@@ -17,6 +17,7 @@ import DelegatingSectionContent from "@/app/info/components/DelegatingSectionCon
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
+  documentColors: ["#CBD49B", "#7C873A", "#4A5413", "#2B3300"],
   tokens: [
     {
       address: "0x1bAB804803159aD84b8854581AA53AC72455614E",
@@ -167,7 +168,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         },
         {
           name: "Document Archive",
-          title: "Document Archive*",
+          title: "Document Archive",
           url: "/document-archive",
           image: syndicateInfoCard3,
         },

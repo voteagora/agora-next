@@ -201,6 +201,7 @@ type TenantUIParams = {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -213,6 +214,7 @@ type TenantUIParams = {
     myBalance?: string;
   };
   dunaDisclaimers?: string;
+  documentColors?: string[];
 };
 
 export class TenantUI {
@@ -268,6 +270,7 @@ export class TenantUI {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -285,11 +288,13 @@ export class TenantUI {
     myBalance?: string;
   };
   private _dunaDisclaimers?: string;
+  private _documentColors?: string[];
 
   constructor({
     assets,
     customization,
     delegates,
+    documentColors,
     dunaDisclaimers,
     favicon,
     googleAnalytics,
@@ -311,6 +316,7 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._documentColors = documentColors;
     this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
@@ -476,5 +482,9 @@ export class TenantUI {
 
   public get dunaDisclaimers(): string | undefined {
     return this._dunaDisclaimers;
+  }
+
+  public get documentColors(): string[] | undefined {
+    return this._documentColors;
   }
 }

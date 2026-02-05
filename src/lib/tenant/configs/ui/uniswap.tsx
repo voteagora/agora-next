@@ -19,6 +19,7 @@ export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
   logo: uniswapLogo,
   logoSize: "16",
+  documentColors: ["#E34FB9", "#A83B89", "#754166", "#5C3C53"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.UNISWAP)],
 
   googleAnalytics: "G-KBG8GS1R45",
@@ -47,6 +48,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     brandSecondary: "255 255 255",
     tokenAmountFont: "font-chivoMono",
     customAboutSubtitle: "About DUNI",
+    heroCardGradient: { from: "#FC72FF", to: "#F50DB4" },
   },
 
   links: [
@@ -179,12 +181,6 @@ export const uniswapTenantUIConfig = new TenantUI({
           image: infoPageCard01,
         },
         {
-          name: "Governance Forums",
-          title: "Governance Forums",
-          url: "https://gov.uniswap.org",
-          image: infoPageCard02,
-        },
-        {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "https://docs.uniswap.org",
@@ -195,6 +191,12 @@ export const uniswapTenantUIConfig = new TenantUI({
           title: "Uniswap Labs",
           url: "https://x.com/Uniswap",
           image: infoPageCard04,
+        },
+        {
+          name: "Document Archive",
+          title: "Document Archive",
+          url: "/document-archive",
+          image: infoPageCard02,
         },
       ],
     },
