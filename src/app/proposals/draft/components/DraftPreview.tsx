@@ -39,6 +39,8 @@ const DraftPreview = ({
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const config = plmToggle?.config as PLMConfig;
   const gatingType = config?.gatingType;
+  const offchainProposalsEnabled =
+    tenant.ui.toggle("proposals/offchain")?.enabled;
   const votingModuleType = proposalDraft.voting_module_type;
   const targets = proposalDraft.transactions.map((t) => t.target);
   const values = proposalDraft.transactions.map((t) => parseInt(t.value));
@@ -78,17 +80,7 @@ const DraftPreview = ({
   const effectiveVotes =
     accountVotes !== undefined ? accountVotes : lastValidVotes;
 
-  const canSponsor = () => {
-    if (
-      proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
-      (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
-        !!proposalDraft.onchain_transaction_hash)
-    ) {
-      return (
-        !!config.offchainProposalCreator &&
-        config.offchainProposalCreator.includes(address || "")
-      );
-    }
+  const canSponsorOnchain = () => {
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
@@ -108,61 +100,104 @@ const DraftPreview = ({
     }
   };
 
-  const canAddressSponsor = canSponsor();
+  const canSponsorOffchain = () =>
+    (proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      proposalDraft.proposal_scope === ProposalScope.HYBRID) &&
+    !!config.offchainProposalCreator &&
+    config.offchainProposalCreator.includes(address || "");
+
+  const canAddressSponsor = canSponsorOnchain() || canSponsorOffchain();
 
   const renderProposalDescription = (proposal: DraftProposal) => {
+    const getScopeDescription = (scope: ProposalScope) => {
+      if (!offchainProposalsEnabled) return null;
+
+      switch (scope) {
+        case ProposalScope.ONCHAIN_ONLY:
+          return "This proposal will be voted on-chain only.";
+        case ProposalScope.OFFCHAIN_ONLY:
+          return "This proposal will be voted on by the Citizen House using off-chain mechanisms.";
+        case ProposalScope.HYBRID:
+          return "This proposal will be voted on both on-chain and off-chain. Voting occurs in parallel across both platforms.";
+        default:
+          return null;
+      }
+    };
+
+    const scopeDescription = getScopeDescription(proposal.proposal_scope);
+
     switch (proposal.voting_module_type) {
       case ProposalType.BASIC:
         return (
-          <p className="text-secondary mt-2">
-            This is a <PreText text="basic" /> proposal.
-          </p>
+          <div>
+            <p className="text-secondary mt-2">
+              This is a <PreText text="basic" /> proposal.
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
+            )}
+          </div>
         );
       case ProposalType.APPROVAL:
         const isOnchainOnly =
           proposal.proposal_scope === ProposalScope.ONCHAIN_ONLY;
         return (
-          <p className="text-secondary mt-2">
-            This is an <PreText text="approval" /> proposal. The maximum number
-            of tokens that can be transferred from all the options in this
-            proposal is <PreText text={proposal.budget.toString()} />. The
-            number of options each voter may select is{" "}
-            <PreText text={proposal.max_options.toString()} />.{" "}
-            {proposal.criteria === "Threshold" && (
-              <>
-                All options with more than{" "}
-                <PreText
-                  text={
-                    isOnchainOnly
-                      ? proposal.threshold.toString()
-                      : `${(proposal.threshold / 100).toString()}%`
-                  }
-                />{" "}
-                {isOnchainOnly ? "votes" : ""} will be considered approved
-              </>
+          <div>
+            <p className="text-secondary mt-2">
+              This is an <PreText text="approval" /> proposal. The maximum
+              number of tokens that can be transferred from all the options in
+              this proposal is <PreText text={proposal.budget.toString()} />.
+              The number of options each voter may select is{" "}
+              <PreText text={proposal.max_options.toString()} />.{" "}
+              {proposal.criteria === "Threshold" && (
+                <>
+                  All options with more than{" "}
+                  <PreText
+                    text={
+                      isOnchainOnly
+                        ? proposal.threshold.toString()
+                        : `${(proposal.threshold / 100).toString()}%`
+                    }
+                  />{" "}
+                  {isOnchainOnly ? "votes" : ""} will be considered approved
+                </>
+              )}
+              {proposal.criteria === "Top choices" && (
+                <>
+                  The top <PreText text={proposal.top_choices.toString()} />{" "}
+                  choices will be considered approved
+                </>
+              )}
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
             )}
-            {proposal.criteria === "Top choices" && (
-              <>
-                The top <PreText text={proposal.top_choices.toString()} />{" "}
-                choices will be considered approved
-              </>
-            )}
-          </p>
+          </div>
         );
 
       case ProposalType.SOCIAL:
         return (
-          <p className="text-secondary mt-2">
-            This is a <PreText text="social" /> proposal. Voters will vote on
-            snapshot.
-          </p>
+          <div>
+            <p className="text-secondary mt-2">
+              This is a <PreText text="social" /> proposal. Voters will vote on
+              snapshot.
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
+            )}
+          </div>
         );
 
       case ProposalType.OPTIMISTIC:
         return (
-          <p className="text-secondary mt-2">
-            This is an <PreText text="optimistic" /> proposal
-          </p>
+          <div>
+            <p className="text-secondary mt-2">
+              This is an <PreText text="optimistic" /> proposal
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
+            )}
+          </div>
         );
 
       default:
@@ -172,6 +207,9 @@ const DraftPreview = ({
 
   const renderProposalRequirements = () => {
     const requirements = [];
+    const isHybrid = proposalDraft.proposal_scope === ProposalScope.HYBRID;
+    const isOffchainOnly =
+      proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
 
     if (votingModuleType === ProposalType.SOCIAL) {
       return (
@@ -185,12 +223,95 @@ const DraftPreview = ({
         </div>
       );
     }
-    if (
-      (proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
-        (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
-          !!proposalDraft.onchain_transaction_hash)) &&
-      config?.offchainProposalCreator
-    ) {
+
+    // For hybrid proposals, show both onchain and offchain requirements
+    if (isHybrid && config?.offchainProposalCreator) {
+      return (
+        <>
+          {/* Onchain requirement */}
+          <div className="mb-4">
+            <h4 className="text-sm font-semibold text-primary mb-2">
+              Step 1: On-chain Submission
+            </h4>
+            {(() => {
+              const onchainReqs = [];
+              if (
+                gatingType === ProposalGatingType.MANAGER ||
+                gatingType === ProposalGatingType.GOVERNOR_V1
+              ) {
+                onchainReqs.push(
+                  <div
+                    key="manager"
+                    className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+                  >
+                    <p className="flex-grow text-primary">Manager address</p>
+                    <span className="text-secondary font-mono text-xs">
+                      {manager?.toString()}
+                    </span>
+                  </div>
+                );
+              }
+
+              if (
+                gatingType === ProposalGatingType.TOKEN_THRESHOLD ||
+                gatingType === ProposalGatingType.GOVERNOR_V1
+              ) {
+                onchainReqs.push(
+                  <div
+                    key="threshold"
+                    className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4"
+                  >
+                    <p className="flex-grow text-primary">Voting power</p>
+                    <span className="text-secondary font-mono text-xs">
+                      {">= "}
+                      {threshold
+                        ? Math.round(
+                            parseFloat(
+                              formatUnits(
+                                BigInt(threshold),
+                                tenant.token.decimals
+                              )
+                            )
+                          )
+                        : "0"}{" "}
+                      tokens
+                    </span>
+                  </div>
+                );
+              }
+
+              return onchainReqs.length > 0 ? onchainReqs : null;
+            })()}
+          </div>
+
+          {/* Offchain requirement */}
+          <div>
+            <h4 className="text-sm font-semibold text-primary mb-2">
+              Step 2: Off-chain Submission
+            </h4>
+            <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+              <p className="flex-grow text-primary">
+                Offchain proposal creator
+              </p>
+              <span className="text-secondary font-mono text-xs">
+                <div className="flex flex-col">
+                  {config.offchainProposalCreator?.map((creator) => (
+                    <div key={creator}>
+                      <span className="text-secondary font-mono text-xs">
+                        {creator}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </span>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    // For offchain-only proposals
+    if (isOffchainOnly && config?.offchainProposalCreator) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
           <p className="flex-grow text-primary">Offchain proposal creator</p>
