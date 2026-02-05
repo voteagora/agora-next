@@ -4,6 +4,7 @@ import MarkdownPreview from "@uiw/react-markdown-preview";
 import styles from "./markdown.module.scss";
 import Tenant from "@/lib/tenant/tenant";
 import cn from "classnames";
+import { fixBrokenNumberedLists } from "@/lib/sanitizationUtils";
 
 const defaults = {
   primary: "23 23 23",
@@ -51,7 +52,7 @@ export default function Markdown({
       )}
     >
       <MarkdownPreview
-        source={content}
+        source={fixBrokenNumberedLists(content)}
         style={
           {
             "--color-fg-default": toRGBA(secondary, 1),

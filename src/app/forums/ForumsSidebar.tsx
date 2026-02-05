@@ -1,14 +1,11 @@
 import React from "react";
 import Link from "next/link";
 import { formatRelative } from "@/components/ForumShared/utils";
-import {
-  buildForumCategoryPath,
-  ForumCategory,
-  ForumPost,
-} from "@/lib/forumUtils";
+import { ForumCategory, ForumPost } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import CategoryList from "./CategoryList";
 
 const { namespace } = Tenant.current();
 
@@ -62,7 +59,7 @@ export default function ForumsSidebar({
       : "text-secondary";
 
   return (
-    <div className="w-80 bg-cardBackground rounded-lg border border-cardBorder max-h-max">
+    <div className="w-full lg:w-72 xl:w-64 bg-cardBackground rounded-lg border border-cardBorder max-h-max ml-auto">
       <div className="p-4">
         <h3 className="text-lg text-primary font-semibold mb-4">Categories</h3>
 
@@ -90,35 +87,12 @@ export default function ForumsSidebar({
                 </span>
               </Link>
 
-              {sortedCategories.map((cat, idx) => {
-                const isSelected = selectedCategoryId === cat.id;
-                const href = buildForumCategoryPath(cat.id, cat.name);
-                return (
-                  <Link
-                    key={cat.id}
-                    href={href}
-                    aria-current={isSelected ? "page" : undefined}
-                    className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
-                      isSelected
-                        ? bgStyle
-                        : "hover:bg-hoverBackground/5 text-secondary"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-3 h-3 rounded-full ${
-                          palette[idx % palette.length]
-                        }`}
-                      ></div>
-                      <span className="text-sm">{cat.name}</span>
-                    </div>
-                    <span className="text-xs">
-                      {cat.topicsCount ?? 0}
-                      {(cat.topicsCount ?? 0) === 1 ? " topic" : " topics"}
-                    </span>
-                  </Link>
-                );
-              })}
+              <CategoryList
+                categories={sortedCategories}
+                selectedCategoryId={selectedCategoryId}
+                bgStyle={bgStyle}
+                palette={palette}
+              />
 
               {uncategorizedCount > 0 && (
                 <Link

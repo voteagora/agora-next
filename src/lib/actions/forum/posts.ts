@@ -27,7 +27,27 @@ import {
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
 import { getIPFSUrl } from "@/lib/pinata";
+import { stripHtmlToText } from "@/app/forums/stripHtml";
+import {
+  addRecipientAttributeValue,
+  buildForumPostUrl,
+  buildForumTopicUrl,
+  buildProfileUrl,
+  emitCompoundEvent,
+  emitDirectEvent,
+  formatAddressForNotification,
+} from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
+
+const PREVIEW_LENGTH = 180;
+
+function buildPreview(content: string): string {
+  const plain = stripHtmlToText(content);
+  if (plain.length <= PREVIEW_LENGTH) {
+    return plain;
+  }
+  return `${plain.slice(0, PREVIEW_LENGTH - 3).trim()}...`;
+}
 
 // Lightweight schema for topic upvotes
 const topicVoteSchema = z.object({
@@ -59,7 +79,7 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       }),
       prismaWeb2Client.forumTopic.findFirst({
         where: { id: validated.topicId, dao_slug: slug },
-        select: { id: true, categoryId: true },
+        select: { id: true, categoryId: true, address: true, title: true },
       }),
     ]);
 
@@ -109,6 +129,7 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
       }
     }
 
+    const normalizedVoter = validated.address.toLowerCase();
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
       return { success: false, error: "Root post not found" } as const;
@@ -134,6 +155,26 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
     const upvotes = await prismaWeb2Client.forumPostVote.count({
       where: { dao_slug: slug, postId: rootPostId, vote: 1 },
     });
+
+    if (topic.address && topic.address.toLowerCase() !== normalizedVoter) {
+      // Format address for display (ENS or truncated) and build profile URL
+      const voterDisplayName =
+        await formatAddressForNotification(normalizedVoter);
+
+      emitDirectEvent(
+        "forum_topic_upvoted",
+        topic.address,
+        `${topic.id}:${normalizedVoter}`,
+        {
+          dao_name: slug,
+          topic_title: topic.title,
+          topic_url: buildForumTopicUrl(topic.id, topic.title),
+          voter_address: normalizedVoter,
+          voter_display_name: voterDisplayName,
+          voter_profile_url: buildProfileUrl(normalizedVoter),
+        }
+      );
+    }
 
     return { success: true as const, data: { postId: rootPostId, upvotes } };
   } catch (error) {
@@ -224,6 +265,55 @@ export async function getMyForumTopicVote(topicId: number, address: string) {
   }
 }
 
+export async function getMyVotesForTopics(topicIds: number[], address: string) {
+  try {
+    if (topicIds.length === 0) {
+      return {
+        success: true as const,
+        data: { votedTopicIds: [] as number[] },
+      };
+    }
+
+    const rootPosts = await prismaWeb2Client.forumPost.findMany({
+      where: {
+        dao_slug: slug,
+        topicId: { in: topicIds },
+        parentPostId: null,
+      },
+      select: { id: true, topicId: true },
+    });
+
+    if (rootPosts.length === 0) {
+      return {
+        success: true as const,
+        data: { votedTopicIds: [] as number[] },
+      };
+    }
+
+    const postIdToTopicId = new Map(rootPosts.map((p) => [p.id, p.topicId]));
+    const postIds = rootPosts.map((p) => p.id);
+
+    const votes = await prismaWeb2Client.forumPostVote.findMany({
+      where: {
+        dao_slug: slug,
+        address,
+        postId: { in: postIds },
+        vote: 1,
+      },
+      select: { postId: true },
+    });
+
+    const votedTopicIds = votes
+      .map((v) => postIdToTopicId.get(v.postId))
+      .filter((id): id is number => id !== undefined);
+
+    return { success: true as const, data: { votedTopicIds } };
+  } catch (error) {
+    console.error("Error getting votes for topics:", error);
+    return handlePrismaError(error);
+  }
+}
+
 export async function createForumPost(
   topicId: number,
   data: z.infer<typeof createPostSchema>
@@ -253,6 +343,8 @@ export async function createForumPost(
     if (!topic) {
       return { success: false, error: "Topic not found" };
     }
+
+    const normalizedAddress = validatedData.address.toLowerCase();
 
     // Check if user has posts.create permission (bypasses VP requirements)
     const hasPostPermission = await checkPermission(
@@ -343,6 +435,105 @@ export async function createForumPost(
         parentPostId: validatedData.parentId || undefined,
         createdAt: newPost.createdAt,
       }).catch((error) => console.error("Failed to index new post:", error));
+    }
+
+    if (!isNsfw) {
+      const preview = buildPreview(validatedData.content);
+      const topicUrl = buildForumTopicUrl(topicId, topic.title);
+
+      // Format address for display (ENS or truncated) and build profile URL
+      const authorDisplayName =
+        await formatAddressForNotification(normalizedAddress);
+      const authorProfileUrl = buildProfileUrl(normalizedAddress);
+
+      const dedupeGroup = "forum_post_created";
+      const dedupeKey = `forum_post:${newPost.id}`;
+
+      const candidates: Parameters<typeof emitCompoundEvent>[2] = [];
+
+      if (validatedData.parentId) {
+        const parentPost = await prismaWeb2Client.forumPost.findUnique({
+          where: { id: validatedData.parentId },
+          select: { address: true },
+        });
+
+        if (
+          parentPost?.address &&
+          parentPost.address.toLowerCase() !== normalizedAddress
+        ) {
+          // Link directly to the reply post
+          const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
+          candidates.push({
+            kind: "direct",
+            eventType: "forum_reply_to_your_comment",
+            entityId: String(newPost.id),
+            recipientIds: [parentPost.address],
+            data: {
+              dao_name: slug,
+              topic_title: topic.title,
+              topic_url: postUrl,
+              reply_preview: preview,
+              replier_address: normalizedAddress,
+              replier_display_name: authorDisplayName,
+              replier_profile_url: authorProfileUrl,
+            },
+          });
+        }
+      }
+
+      // Prefer "watched" over "engaged" when audiences overlap.
+      candidates.push(
+        {
+          kind: "broadcast",
+          eventType: "forum_comment_watched",
+          entityId: String(newPost.id),
+          filter: {
+            attributes: { subscribed_topics: { $contains: topicId } },
+            exclude_recipient_ids: [normalizedAddress],
+          },
+          data: {
+            dao_name: slug,
+            topic_title: topic.title,
+            topic_url: topicUrl,
+            comment_preview: preview,
+            author_address: normalizedAddress,
+            author_display_name: authorDisplayName,
+            author_profile_url: authorProfileUrl,
+          },
+        },
+        {
+          kind: "broadcast",
+          eventType: "forum_comment_engaged",
+          entityId: String(newPost.id),
+          filter: {
+            attributes: { engaged_topics: { $contains: topicId } },
+            exclude_recipient_ids: [normalizedAddress],
+          },
+          data: {
+            dao_name: slug,
+            topic_title: topic.title,
+            topic_url: topicUrl,
+            comment_preview: preview,
+            author_address: normalizedAddress,
+            author_display_name: authorDisplayName,
+            author_profile_url: authorProfileUrl,
+          },
+        }
+      );
+
+      emitCompoundEvent(dedupeGroup, dedupeKey, candidates);
+    }
+
+    const engagementCount = await prismaWeb2Client.forumPost.count({
+      where: {
+        dao_slug: slug,
+        topicId: topicId,
+        address: validatedData.address,
+      },
+    });
+
+    if (engagementCount === 1) {
+      addRecipientAttributeValue(normalizedAddress, "engaged_topics", topicId);
     }
 
     return {
@@ -660,6 +851,26 @@ export async function getForumPostsByUser(
 ) {
   try {
     const { limit, offset } = pagination;
+    const now = new Date();
+    const attachmentWhere = {
+      archived: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
+    };
 
     const posts = await prismaWeb2Client.forumPost.findMany({
       where: {
@@ -682,7 +893,9 @@ export async function getForumPostsByUser(
             },
           },
         },
-        attachments: true,
+        attachments: {
+          where: attachmentWhere,
+        },
       },
       orderBy: { createdAt: "desc" },
       take: limit + 1,
@@ -719,6 +932,17 @@ export async function getForumPostsByUser(
           : new Date(att.createdAt)
         ).toISOString(),
         uploadedBy: att.address,
+        isFinancialStatement: att.isFinancialStatement ?? false,
+        revealTime: att.revealTime
+          ? att.revealTime instanceof Date
+            ? att.revealTime.toISOString()
+            : new Date(att.revealTime).toISOString()
+          : null,
+        expirationTime: att.expirationTime
+          ? att.expirationTime instanceof Date
+            ? att.expirationTime.toISOString()
+            : new Date(att.expirationTime).toISOString()
+          : null,
       })),
     }));
 

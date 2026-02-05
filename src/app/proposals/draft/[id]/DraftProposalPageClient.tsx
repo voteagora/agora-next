@@ -14,14 +14,12 @@ import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
 import { SiweAccessCard } from "./components/SiweAccessCard";
-import {
-  LOCAL_STORAGE_SIWE_JWT_KEY,
-  LOCAL_STORAGE_SIWE_STAGE_KEY,
-} from "@/lib/constants";
+import { LOCAL_STORAGE_SIWE_STAGE_KEY } from "@/lib/constants";
 import ForbiddenAccessCard from "./components/ForbiddenAccessCard";
 import Loading from "./loading";
 import Tenant from "@/lib/tenant/tenant";
 import ShareDraftLink from "./components/ShareDraftLink";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 type DraftResponse = DraftProposalType;
 
@@ -111,14 +109,8 @@ export default function DraftProposalPageClient({
         return res.json();
       }
 
-      const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-      if (!sessionRaw) {
-        throw new Error("Not authenticated (missing SIWE session)");
-      }
-      const token = JSON.parse(sessionRaw)?.access_token as string | undefined;
-      if (!token) {
-        throw new Error("Not authenticated (invalid session)");
-      }
+      const token = getStoredSiweJwt({ expectedAddress: address });
+      if (!token) throw new Error("Not authenticated (missing SIWE session)");
       const res = await fetch(`/api/v1/drafts/${idParam}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -168,7 +160,7 @@ export default function DraftProposalPageClient({
   useEffect(() => {
     try {
       const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-      const hasJwt = Boolean(localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY));
+      const hasJwt = Boolean(getStoredSiweJwt());
       if (stage === "awaiting_response" && !hasJwt) {
         localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
         setIsSigning(false);
@@ -228,13 +220,15 @@ export default function DraftProposalPageClient({
     signIn,
   ]);
 
-  const loadedAfterJwtRef = useRef<boolean>(false);
+  const onDeleteSuccess = useCallback(() => {
+    window.location.href = "/";
+  }, []);
+
   useEffect(() => {
     const id = setInterval(async () => {
       try {
         const stage = localStorage.getItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
-        const sessionRaw = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-        const hasJwt = Boolean(sessionRaw);
+        const hasJwt = Boolean(getStoredSiweJwt());
         const isForbidden = (error || "").toLowerCase().includes("forbidden");
         const shouldAdvance = hasJwt && !draft && !isForbidden;
         if (hasJwt && stage !== "awaiting_response") {
@@ -407,7 +401,10 @@ export default function DraftProposalPageClient({
                   authorAddress={draft.author_address}
                 />
               )}
-              <DeleteDraftButton proposalId={draft.id} />
+              <DeleteDraftButton
+                proposalId={draft.id}
+                onDeleteSuccess={onDeleteSuccess}
+              />
             </div>
           )}
           {isShareMode && (

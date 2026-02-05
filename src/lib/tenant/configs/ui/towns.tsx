@@ -15,7 +15,7 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
 export const townsTenantUIConfig = new TenantUI({
-  title: "Towns Protocol",
+  title: "Towns Lodge",
   logo: townsLogo,
   logoSize: "36px",
   tokens: [
@@ -83,7 +83,7 @@ export const townsTenantUIConfig = new TenantUI({
     "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
   organization: {
-    title: "Towns Protocol",
+    title: "Towns Lodge",
   },
 
   links: [
@@ -102,27 +102,27 @@ export const townsTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Towns Protocol Governance",
+      title: "Towns Lodge Governance",
       description:
         "Towns is experimenting with minimal, onchain governance. This page is the canonical home for Towns governance info.",
       hero: townsHero,
       meta: {
-        title: "Towns Protocol Agora",
-        description: "Home of Towns Protocol governance",
-        imageTitle: "Towns Protocol Agora",
-        imageDescription: "Home of Towns Protocol governance",
+        title: "Towns Lodge Agora",
+        description: "Home of Towns Lodge governance",
+        imageTitle: "Towns Lodge Agora",
+        imageDescription: "Home of Towns Lodge governance",
       },
     },
     {
       route: "proposals",
-      title: "Towns Protocol Proposals",
+      title: "Towns Lodge Proposals",
       description:
-        "Towns Protocol is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        "Towns Lodge is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       meta: {
-        title: "Towns Protocol Proposals",
-        description: "View and vote on Towns Protocol proposals",
-        imageTitle: "Towns Protocol Proposals",
-        imageDescription: "View and vote on Towns Protocol proposals",
+        title: "Towns Lodge Proposals",
+        description: "View and vote on Towns Lodge proposals",
+        imageTitle: "Towns Lodge Proposals",
+        imageDescription: "View and vote on Towns Lodge proposals",
       },
     },
     {
@@ -134,7 +134,7 @@ export const townsTenantUIConfig = new TenantUI({
       links: [
         {
           name: "Deploy a vault",
-          title: "Towns Protocol",
+          title: "Towns Lodge",
           url: "https://docs.towns.com",
           image: townsInfoCard1,
         },
@@ -146,28 +146,28 @@ export const townsTenantUIConfig = new TenantUI({
         },
         {
           name: "Protocol Docs",
-          title: "Document Archive*",
+          title: "Document Archive",
           url: "/document-archive",
           image: townsInfoCard3,
         },
       ],
       meta: {
-        title: "Towns Protocol Agora",
-        description: "Home of Towns Protocol governance",
-        imageTitle: "Towns Protocol Agora",
-        imageDescription: "Home of Towns Protocol governance",
+        title: "Towns Lodge Agora",
+        description: "Home of Towns Lodge governance",
+        imageTitle: "Towns Lodge Agora",
+        imageDescription: "Home of Towns Lodge governance",
       },
     },
     {
       route: "delegates",
-      title: "Towns Protocol Delegates",
+      title: "Towns Lodge Delegates",
       description:
-        "Towns Protocol is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
+        "Towns Lodge is established as an organizational framework for community engagement, collective decision-making, and innovation. Tokenholders can vote their own tokens through self-delegation or assign voting rights to others through delegation.",
       meta: {
-        title: "Towns Protocol Delegates",
-        description: "Delegate your voting power in Towns Protocol",
-        imageTitle: "Towns Protocol Delegates",
-        imageDescription: "Delegate your voting power in Towns Protocol",
+        title: "Towns Lodge Delegates",
+        description: "Delegate your voting power in Towns Lodge",
+        imageTitle: "Towns Lodge Delegates",
+        imageDescription: "Delegate your voting power in Towns Lodge",
       },
     },
     {
@@ -175,7 +175,7 @@ export const townsTenantUIConfig = new TenantUI({
       title: "Towns Lodge Roadmap",
       hero: townsInfoHero,
       description:
-        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Protocol is supported by both a Swiss Association and the Towns Lodge DUNA – with the TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
+        "This dashboard is the focal point for information related to the Towns Lodge DUNA.  As a tax-paying U.S. entity, it is essential that members are aware of the financial inflows and outflows (and related tax consequences) of the DUNA Treasury in a clear and concise manner.\n\nThe Towns Lodge is supported by both a Swiss Association and the Towns Lodge DUNA – with the TOWNS governance token providing the members ultimate control over how the Treasury should be utilized.  While the initial funding of the Swiss Association allows it to operate within established parameters, its role and funding will ultimately be decided by the members of the DUNA who, through their voting power, control whether to extend additional funding to the Swiss Association, redirect that funding to another entity, or take on more responsibilities within the DUNA.\n\nThe DUNA Governance does not go live until January 1, 2026, to allow the members of the community time to familiarize themselves with the Swiss Association and the Protocol.",
       sectionTitle: "Towns Lodge Roadmap",
       tabs: [
         {
@@ -191,12 +191,12 @@ export const townsTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "About Towns Protocol",
+        title: "About Towns Lodge",
         description:
-          "Learn about Towns Protocol and decentralized community governance",
-        imageTitle: "About Towns Protocol",
+          "Learn about Towns Lodge and decentralized community governance",
+        imageTitle: "About Towns Lodge",
         imageDescription:
-          "Learn about Towns Protocol and decentralized community governance",
+          "Learn about Towns Lodge and decentralized community governance",
       },
     },
     {
@@ -205,10 +205,10 @@ export const townsTenantUIConfig = new TenantUI({
       description: "",
       hero: townsHero,
       meta: {
-        title: "Towns Protocol Governance",
-        description: "Towns Protocol governance coming soon",
-        imageTitle: "Towns Protocol Governance",
-        imageDescription: "Towns Protocol governance coming soon",
+        title: "Towns Lodge Governance",
+        description: "Towns Lodge governance coming soon",
+        imageTitle: "Towns Lodge Governance",
+        imageDescription: "Towns Lodge governance coming soon",
       },
     },
   ],
@@ -421,7 +421,7 @@ export const townsTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in Towns Protocol",
+        title: "Voting in Towns Lodge",
         sections: [
           {
             id: "voting-process",
@@ -613,6 +613,17 @@ export const townsTenantUIConfig = new TenantUI({
         ),
       },
     },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "TOWNS Lodge Updates",
+      },
+    },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });
 
@@ -625,7 +636,7 @@ export function TownsComingSoonContent() {
           🏗️ Governance Infrastructure
         </h3>
         <p className="text-secondary mb-4">
-          Towns Protocol is currently setting up its governance infrastructure.
+          Towns Lodge is currently setting up its governance infrastructure.
           Proposal functionality will be available soon as the protocol evolves.
         </p>
         <ul className="text-secondary space-y-2">

@@ -40,12 +40,14 @@ export const uniswapTenantUIConfig = new TenantUI({
     neutral: "250 250 250",
     wash: "255 255 255",
     line: "229 229 229",
+    infoBannerBackground: "#E134B0",
     positive: "97 209 97",
     negative: "226 54 54",
     brandPrimary: "0 0 0",
     brandSecondary: "255 255 255",
     tokenAmountFont: "font-chivoMono",
     customAboutSubtitle: "About DUNI",
+    heroCardGradient: { from: "#FC72FF", to: "#F50DB4" },
   },
 
   links: [
@@ -178,12 +180,6 @@ export const uniswapTenantUIConfig = new TenantUI({
           image: infoPageCard01,
         },
         {
-          name: "Governance Forums",
-          title: "Governance Forums",
-          url: "https://gov.uniswap.org",
-          image: infoPageCard02,
-        },
-        {
           name: "Protocol Docs",
           title: "Protocol Docs",
           url: "https://docs.uniswap.org",
@@ -194,6 +190,12 @@ export const uniswapTenantUIConfig = new TenantUI({
           title: "Uniswap Labs",
           url: "https://x.com/Uniswap",
           image: infoPageCard04,
+        },
+        {
+          name: "Document Archive",
+          title: "Document Archive",
+          url: "/document-archive",
+          image: infoPageCard02,
         },
       ],
     },
@@ -448,6 +450,13 @@ export const uniswapTenantUIConfig = new TenantUI({
             </div>
           </>
         ),
+      },
+    },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "DUNI Updates",
       },
     },
   ],

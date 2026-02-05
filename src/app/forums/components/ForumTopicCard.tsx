@@ -5,7 +5,7 @@ import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { buildForumTopicPath } from "@/lib/forumUtils";
+import { buildForumTopicPath, buildForumArticlePath } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
 import { useForum } from "@/hooks/useForum";
@@ -105,10 +105,15 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
   const adminRole = admins[authorAddress] || null;
   const isAuthorAdmin = authorAddress in admins;
 
+  const isFinancialStatement = (topic as any).isFinancialStatement ?? false;
+  const topicPath = isFinancialStatement
+    ? buildForumArticlePath(topic.id, topic.title)
+    : buildForumTopicPath(topic.id, topic.title);
+
   return (
     <>
       <Link
-        href={buildForumTopicPath(topic.id, topic.title)}
+        href={topicPath}
         className="group block bg-cardBackground border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
       >
         <div className="flex items-start gap-3">

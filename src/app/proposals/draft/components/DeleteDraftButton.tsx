@@ -7,10 +7,19 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
-import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { useSIWE } from "connectkit";
+import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
-const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
+const DeleteDraftButton = ({
+  proposalId,
+  onDeleteSuccess,
+  small = false,
+}: {
+  proposalId: number;
+  onDeleteSuccess?: () => void;
+  small?: boolean;
+}) => {
   const openDialog = useOpenDialog();
   return (
     <button
@@ -21,26 +30,30 @@ const DeleteDraftButton = ({ proposalId }: { proposalId: number }) => {
           type: "DELETE_DRAFT_PROPOSAL",
           params: {
             proposalId,
+            onDeleteSuccess,
           },
         });
       }}
     >
-      <TrashIcon className="h-5 w-5" />
-      <span className="block">Delete Proposal</span>
+      <TrashIcon className={small ? "h-4 w-4 text-negative" : "h-5 w-5"} />
+      <span className={small ? "hidden" : "block"}>Delete Proposal</span>
     </button>
   );
 };
 
 export const DeleteDraftProposalDialog = ({
   proposalId,
+  onDeleteSuccess,
   closeDialog,
 }: {
   proposalId: number;
+  onDeleteSuccess?: () => void;
   closeDialog: () => void;
 }) => {
   const [isPending, setIsPending] = useState(false);
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
+  const { signIn } = useSIWE();
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -64,41 +77,61 @@ export const DeleteDraftProposalDialog = ({
           fullWidth
           isLoading={isPending}
           onClick={async () => {
+            if (isPending) return;
             setIsPending(true);
-            // Require SIWE JWT before prompting for action signature
             try {
-              const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-              if (!session) {
-                toast("Session expired. Please sign in to continue.");
+              let jwt = getStoredSiweJwt({ expectedAddress: address });
+              if (!jwt) {
+                try {
+                  await signIn();
+                  jwt = await waitForStoredSiweJwt({
+                    expectedAddress: address,
+                    timeoutMs: 10_000,
+                    intervalMs: 200,
+                  });
+                } catch (e) {
+                  toast("Sign-in cancelled or failed. Please try again.");
+                  setIsPending(false);
+                  return;
+                }
+                if (!jwt) {
+                  toast("Session expired. Please sign in to continue.");
+                  setIsPending(false);
+                  return;
+                }
+              }
+
+              const messagePayload = {
+                action: "deleteDraft",
+                draftProposalId: proposalId,
+                creatorAddress: address,
+                timestamp: new Date().toISOString(),
+              };
+              const auth = await getAuthenticationData(messagePayload);
+              if (!auth || !address) {
                 setIsPending(false);
-                window.location.reload();
                 return;
               }
-            } catch {
-              toast("Session expired. Please sign in to continue.");
-              setIsPending(false);
-              window.location.reload();
-              return;
-            }
-            const messagePayload = {
-              action: "deleteDraft",
-              draftProposalId: proposalId,
-              creatorAddress: address,
-              timestamp: new Date().toISOString(),
-            };
-            const auth = await getAuthenticationData(messagePayload);
-            if (!auth || !address) {
-              setIsPending(false);
-              return;
-            }
 
-            await deleteAction(proposalId, {
-              address: address as `0x${string}`,
-              message: auth.message,
-              signature: auth.signature,
-              jwt: auth.jwt,
-            });
-            window.location.href = "/";
+              const result = await deleteAction(proposalId, {
+                address: address as `0x${string}`,
+                message: auth.message,
+                signature: auth.signature,
+                jwt: auth.jwt,
+              });
+
+              if (result.ok) {
+                toast.success("Draft deleted successfully");
+                closeDialog();
+                onDeleteSuccess?.();
+              } else {
+                toast.error(result.message || "Failed to delete draft");
+                setIsPending(false);
+              }
+            } catch (error) {
+              toast.error("An error occurred. Please try again.");
+              setIsPending(false);
+            }
           }}
         >
           Yes

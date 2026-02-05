@@ -64,6 +64,10 @@ export type UITaxFormConfig = {
   provider?: string;
 };
 
+export type UIFinancialStatementsConfig = {
+  title: string;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
@@ -71,7 +75,8 @@ type UIConfig =
   | UIGovernanceInfoConfig
   | UIInfoBannerConfig
   | UIDunaDisclosuresConfig
-  | UITaxFormConfig;
+  | UITaxFormConfig
+  | UIFinancialStatementsConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
@@ -196,6 +201,7 @@ type TenantUIParams = {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -263,6 +269,7 @@ export class TenantUI {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   private _theme: "light" | "dark";
   private _favicon?: {

@@ -8,6 +8,9 @@ import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
+import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
+import { DevTenantProvider } from "@/contexts/DevTenantContext";
+import { TenantSwitcher } from "@/components/DevTools/TenantSwitcher";
 
 declare global {
   interface BigInt {
@@ -149,15 +152,19 @@ export default async function RootLayout({
       </head>
 
       <NuqsAdapter>
-        <ClientLayout>
-          <ForumPermissionsProvider>
-            <Header />
-            <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-              {children}
-            </div>
-            <DAOMetricsHeader />
-          </ForumPermissionsProvider>
-        </ClientLayout>
+        <DevTenantProvider>
+          <ClientLayout>
+            <ForumPermissionsProvider>
+              <Header />
+              <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+                <RecentlyReleasedBanner />
+                {children}
+              </div>
+              <DAOMetricsHeader />
+            </ForumPermissionsProvider>
+            <TenantSwitcher />
+          </ClientLayout>
+        </DevTenantProvider>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
     </html>

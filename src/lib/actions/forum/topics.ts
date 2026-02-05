@@ -24,6 +24,13 @@ import {
   formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
+import {
+  addRecipientAttributeValue,
+  buildForumTopicUrl,
+  buildProfileUrl,
+  emitBroadcastEvent,
+  formatAddressForNotification,
+} from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
 interface GetForumTopicsOptions {
@@ -40,10 +47,27 @@ export async function getForumTopics({
   offset = 0,
 }: GetForumTopicsOptions = {}) {
   try {
+    const now = new Date();
     const whereClause: any = {
       dao_slug: slug,
       archived: false,
       isNsfw: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     if (categoryId !== undefined) {
@@ -129,6 +153,27 @@ export async function getForumTopic(topicId: number) {
       isNsfw: false,
     };
 
+    const now = new Date();
+    const attachmentWhere = {
+      archived: false,
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
+    };
+
     const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: whereClause,
       include: {
@@ -146,7 +191,9 @@ export async function getForumTopic(topicId: number) {
           include: {
             votes: true,
             reactions: true,
-            attachments: true,
+            attachments: {
+              where: attachmentWhere,
+            },
           },
         },
       },
@@ -186,6 +233,17 @@ export async function getForumTopic(topicId: number) {
           : new Date(att.createdAt)
         ).toISOString(),
         uploadedBy: att.address,
+        isFinancialStatement: att.isFinancialStatement ?? false,
+        revealTime: att.revealTime
+          ? att.revealTime instanceof Date
+            ? att.revealTime.toISOString()
+            : new Date(att.revealTime).toISOString()
+          : null,
+        expirationTime: att.expirationTime
+          ? att.expirationTime instanceof Date
+            ? att.expirationTime.toISOString()
+            : new Date(att.expirationTime).toISOString()
+          : null,
       })),
     }));
 
@@ -211,6 +269,7 @@ export async function getForumTopicsByUser(
 ) {
   try {
     const { limit, offset } = pagination;
+    const now = new Date();
 
     const topics = await prismaWeb2Client.forumTopic.findMany({
       where: {
@@ -218,6 +277,22 @@ export async function getForumTopicsByUser(
         address: address.toLowerCase(),
         archived: false,
         isNsfw: false,
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
       include: {
         category: {
@@ -316,6 +391,8 @@ export async function createForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
+    const normalizedAddress = validatedData.address.toLowerCase();
+
     // Only check voting power if user doesn't have RBAC permission
     if (!hasTopicPermission) {
       try {
@@ -405,6 +482,48 @@ export async function createForumTopic(
         categoryId: validatedData.categoryId || undefined,
         createdAt: newTopic.createdAt,
       }).catch((error) => console.error("Failed to index new topic:", error));
+    }
+
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "authored_topics",
+      newTopic.id
+    );
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "engaged_topics",
+      newTopic.id
+    );
+
+    if (!isNsfw && newTopic.categoryId) {
+      const category = await prismaWeb2Client.forumCategory.findUnique({
+        where: { id: newTopic.categoryId },
+        select: { name: true },
+      });
+
+      // Format address for display (ENS or truncated) and build profile URL
+      const authorDisplayName =
+        await formatAddressForNotification(normalizedAddress);
+
+      emitBroadcastEvent(
+        "forum_discussion_in_watched_category",
+        String(newTopic.id),
+        {
+          attributes: {
+            subscribed_categories: { $contains: newTopic.categoryId },
+          },
+          exclude_recipient_ids: [normalizedAddress],
+        },
+        {
+          dao_name: slug,
+          topic_title: newTopic.title,
+          topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
+          category_name: category?.name ?? "General",
+          author_address: normalizedAddress,
+          author_display_name: authorDisplayName,
+          author_profile_url: buildProfileUrl(normalizedAddress),
+        }
+      );
     }
 
     return {
@@ -675,6 +794,7 @@ interface ForumDataOptions {
 
 export const getForumTopicsCount = async () => {
   try {
+    const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
       where: {
         dao_slug: slug,
@@ -687,6 +807,22 @@ export const getForumTopicsCount = async () => {
             deletedAt: null,
           },
         },
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
     });
 
@@ -702,6 +838,7 @@ export const getForumTopicsCount = async () => {
 
 export const getUncategorizedTopicsCount = async () => {
   try {
+    const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
       where: {
         dao_slug: slug,
@@ -715,6 +852,22 @@ export const getUncategorizedTopicsCount = async () => {
             deletedAt: null,
           },
         },
+        OR: [
+          {
+            revealTime: null,
+            expirationTime: null,
+          },
+          {
+            AND: [
+              {
+                OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+              },
+              {
+                OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+              },
+            ],
+          },
+        ],
       },
     });
 
@@ -735,6 +888,7 @@ export const getForumData = async ({
   offset = 0,
 }: ForumDataOptions = {}) => {
   try {
+    const now = new Date();
     const whereClause: any = {
       dao_slug: slug,
       archived: false,
@@ -747,6 +901,22 @@ export const getForumData = async ({
           deletedAt: null,
         },
       },
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     if (categoryId !== undefined) {
@@ -779,6 +949,22 @@ export const getForumData = async ({
           deletedAt: null,
         },
       },
+      OR: [
+        {
+          revealTime: null,
+          expirationTime: null,
+        },
+        {
+          AND: [
+            {
+              OR: [{ revealTime: null }, { revealTime: { lte: now } }],
+            },
+            {
+              OR: [{ expirationTime: null }, { expirationTime: { gt: now } }],
+            },
+          ],
+        },
+      ],
     };
 
     const [

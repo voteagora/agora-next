@@ -277,6 +277,17 @@ export const demo3TenantUIConfig = new TenantUI({
         imageDescription: "",
       },
     },
+    {
+      route: "grants",
+      title: "Canopy Grants Program",
+      description: "Apply for grants to support the Canopy ecosystem",
+      meta: {
+        title: "Canopy Grants Program",
+        description: "Apply for grants to support the Canopy ecosystem",
+        imageTitle: "Canopy Grants Program",
+        imageDescription: "Apply for grants to support the Canopy ecosystem",
+      },
+    },
   ],
 
   toggles: [
@@ -579,6 +590,14 @@ export const demo3TenantUIConfig = new TenantUI({
     {
       name: "show-delegate-badges",
 
+      enabled: true,
+    },
+    {
+      name: "grants",
+      enabled: true,
+    },
+    {
+      name: "grants/intake-form",
       enabled: true,
     },
 
