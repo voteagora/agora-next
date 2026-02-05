@@ -472,7 +472,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "easv2-extended-voting",
-      enabled: true, // Enables approval and optimistic voting types
+      enabled: false, // Enables approval and optimistic voting types
     },
     {
       name: "syndicate-colours-fix-delegate-pages",
