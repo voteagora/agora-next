@@ -24,6 +24,13 @@ import {
   formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
+import {
+  addRecipientAttributeValue,
+  buildForumTopicUrl,
+  buildProfileUrl,
+  emitBroadcastEvent,
+  formatAddressForNotification,
+} from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
 interface GetForumTopicsOptions {
@@ -384,6 +391,8 @@ export async function createForumTopic(
       return { success: false, error: "Invalid signature" };
     }
 
+    const normalizedAddress = validatedData.address.toLowerCase();
+
     // Only check voting power if user doesn't have RBAC permission
     if (!hasTopicPermission) {
       try {
@@ -473,6 +482,48 @@ export async function createForumTopic(
         categoryId: validatedData.categoryId || undefined,
         createdAt: newTopic.createdAt,
       }).catch((error) => console.error("Failed to index new topic:", error));
+    }
+
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "authored_topics",
+      newTopic.id
+    );
+    addRecipientAttributeValue(
+      normalizedAddress,
+      "engaged_topics",
+      newTopic.id
+    );
+
+    if (!isNsfw && newTopic.categoryId) {
+      const category = await prismaWeb2Client.forumCategory.findUnique({
+        where: { id: newTopic.categoryId },
+        select: { name: true },
+      });
+
+      // Format address for display (ENS or truncated) and build profile URL
+      const authorDisplayName =
+        await formatAddressForNotification(normalizedAddress);
+
+      emitBroadcastEvent(
+        "forum_discussion_in_watched_category",
+        String(newTopic.id),
+        {
+          attributes: {
+            subscribed_categories: { $contains: newTopic.categoryId },
+          },
+          exclude_recipient_ids: [normalizedAddress],
+        },
+        {
+          dao_name: slug,
+          topic_title: newTopic.title,
+          topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
+          category_name: category?.name ?? "General",
+          author_address: normalizedAddress,
+          author_display_name: authorDisplayName,
+          author_profile_url: buildProfileUrl(normalizedAddress),
+        }
+      );
     }
 
     return {

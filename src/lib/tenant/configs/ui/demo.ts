@@ -303,6 +303,9 @@ If you meet the proposal threshold or are the manager of the governor, then you 
         payeeFormUrl: "http://cowrie.io/tax",
         provider: "cowrie",
       } as UITaxFormConfig,
+    {
+      name: "notifications",
+      enabled: true,
     },
   ],
 });

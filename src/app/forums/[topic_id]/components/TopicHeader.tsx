@@ -8,6 +8,7 @@ import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { useAccount } from "wagmi";
 
 import TopicUpvote from "./TopicUpvote";
+import TopicWatch from "./TopicWatch";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";
@@ -102,7 +103,8 @@ export default function TopicHeader({
             {formatRelative(topic.createdAt)}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
+          <TopicWatch topicId={topic.id} topicTitle={topic.title} />
           <TopicUpvote topicId={topic.id} />
         </div>
       </div>
