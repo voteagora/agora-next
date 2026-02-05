@@ -1,12 +1,16 @@
-name: PR Comment Preview Build (Python)
+name: Vercel Preview and Dev Deployment
 
 on:
   issue_comment:
     types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
   preview-build:
     runs-on: ubuntu-latest
+    if: github.event_name == 'issue_comment'
 
     steps:
       - name: Check out repository
@@ -15,16 +19,70 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'  # or whichever version you prefer
+          python-version: '3.11'
         
       - name: Install Python dependencies
         run: pip install requests
 
       - name: Run preview script
-        # We'll pass some data via environment variables and
-        # rely on GitHub's default "event payload" file for more details.
         run: python .github/scripts/preview.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          GITHUB_EVENT_PATH: ${{ github.event_path }}  # the path to the event payload (JSON)
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+
+  deploy-dev-on-main:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check instance name
+        id: check_instance
+        run: |
+          if [ -f ".env.development" ]; then
+            INSTANCE_NAME=$(grep "NEXT_PUBLIC_AGORA_INSTANCE_NAME" .env.development | cut -d '=' -f2 | tr -d ' ' | tr '[:upper:]' '[:lower:]')
+            echo "instance_name=$INSTANCE_NAME" >> $GITHUB_OUTPUT
+            if [ "$INSTANCE_NAME" = "syndicate" ] || [ "$INSTANCE_NAME" = "towns" ]; then
+              echo "should_deploy=true" >> $GITHUB_OUTPUT
+              echo "✅ Instance is $INSTANCE_NAME - will deploy"
+            else
+              echo "should_deploy=false" >> $GITHUB_OUTPUT
+              echo "⏭️ Instance is $INSTANCE_NAME - skipping deployment"
+            fi
+          else
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+            echo "⏭️ No .env.development found - skipping deployment"
+          fi
+
+      - name: Install Vercel CLI
+        if: steps.check_instance.outputs.should_deploy == 'true'
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment
+        if: steps.check_instance.outputs.should_deploy == 'true'
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Project
+        if: steps.check_instance.outputs.should_deploy == 'true'
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy with Constant Alias
+        if: steps.check_instance.outputs.should_deploy == 'true'
+        run: |
+          DEPLOYMENT_URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} 2>&1 | tee /dev/stderr | grep -o 'https://[^ ]*' | head -n 1)
+          PROJECT_NAME=$(echo "$DEPLOYMENT_URL" | sed -E 's|https://([^-]+)-.*\.vercel\.app.*|\1|')
+          ALIAS_DOMAIN="${PROJECT_NAME}-main-dev.vercel.app"
+          vercel alias set "$DEPLOYMENT_URL" "$ALIAS_DOMAIN" --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+          echo "✅ Deployed to: https://$ALIAS_DOMAIN"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

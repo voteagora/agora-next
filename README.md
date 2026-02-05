@@ -573,7 +573,25 @@ This is where all of the images, fonts, and other assets will live.
 
 We have integrated [OpenTelemetry](https://opentelemetry.io/) (OTel) to aid in instrumenting the application. OTel is a vendor-agnostic observability providing a single set of APIs, libraries, agents, and instrumentation to capture distributed traces and metrics.
 
-## Deploy on Vercel
+## Deployment
+
+### Auto-deploy on Main
+
+Every merge to `main` automatically deploys to:
+```
+https://agora-next-main-dev.vercel.app
+```
+
+**Note:** Only deploys for SYNDICATE and TOWNS instances. Other instances are skipped.
+
+**Setup:**
+1. Add GitHub secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+2. Add variables from `.env.development` to Vercel (Target: Preview)
+3. Merge to main
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for details.
+
+### Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
