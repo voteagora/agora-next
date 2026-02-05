@@ -2,40 +2,54 @@
 
 import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import {
+  verifyOwnerAndSiweForDraft,
+  verifyOwnerAndJwtForDraft,
+} from "./siweAuth";
 import { ProposalType } from "../types";
+import type { FormState } from "@/app/types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
-
 const formDataByType = (
   data: z.output<typeof DraftProposalSchema>,
   id: number
 ) => {
+  // Remove the unused sanitizedTransactions variable since we're sanitizing inline
   switch (data.type) {
     case ProposalType.BASIC:
+      if (!data.transactions) return {};
       return {
         transactions: {
           // deletes old transactions so we aren't stacking on top of old transactions
           deleteMany: {},
-          create: data.transactions.map((transaction, idx) => {
-            const asTransaction = {
-              order: idx,
-              target: transaction.target as string,
-              value: transaction.value,
-              calldata: transaction.calldata,
-              signature: transaction.signature,
-              description: transaction.description,
-            } as ProposalDraftTransaction;
-            return asTransaction;
-          }),
+          create: data.transactions.map(
+            (
+              transaction: {
+                target: string;
+                value: string;
+                calldata: string;
+                signature?: string;
+                description: string;
+              },
+              idx: number
+            ) => {
+              const asTransaction = {
+                order: idx,
+                target: transaction.target as string,
+                value: transaction.value,
+                calldata: transaction.calldata,
+                signature: transaction.signature,
+                description: sanitizeContent(transaction.description),
+              } as ProposalDraftTransaction;
+              return asTransaction;
+            }
+          ),
         },
       };
 
@@ -51,11 +65,11 @@ const formDataByType = (
         social_options: {
           // deletes all existing options so we aren't stacking on top of old options
           deleteMany: {},
-          create: data.socialProposal?.options.map((option) => {
-            return {
-              text: option.text,
-            };
-          }),
+          create: data.socialProposal?.options.map(
+            (option: { text: string }) => ({
+              text: sanitizeContent(option.text),
+            })
+          ),
         },
       };
 
@@ -76,24 +90,41 @@ const formDataByType = (
           // deletes all existing options so we aren't stacking on top of old options
           // TODO: do we need to make sure deletes cascade and remove transactions?
           deleteMany: {},
-          create: data.approvalProposal.options.map((option) => {
-            return {
-              title: option.title,
+          create: data.approvalProposal.options.map(
+            (option: {
+              title: string;
               transactions: {
-                create: option.transactions.map((transaction, idx) => {
-                  const asTransaction = {
+                target: string;
+                value: string;
+                calldata: string;
+                signature?: string;
+                description: string;
+              }[];
+            }) => ({
+              title: sanitizeContent(option.title),
+              transactions: {
+                create: option.transactions.map(
+                  (
+                    transaction: {
+                      target: string;
+                      value: string;
+                      calldata: string;
+                      signature?: string;
+                      description: string;
+                    },
+                    idx: number
+                  ) => ({
                     order: idx,
                     target: transaction.target as string,
                     value: transaction.value,
                     calldata: transaction.calldata,
-                    description: transaction.description,
+                    description: sanitizeContent(transaction.description),
                     proposal: { connect: { id } },
-                  };
-                  return asTransaction;
-                }),
+                  })
+                ),
               },
-            };
-          }),
+            })
+          ),
         },
       };
 
@@ -107,8 +138,32 @@ export async function onSubmitAction(
   data: z.output<typeof DraftProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
+    message?: string;
+    signature?: `0x${string}`;
+    jwt?: string;
   }
 ): Promise<FormState> {
+  if (data.jwt) {
+    const jwtCheck = await verifyOwnerAndJwtForDraft(
+      data.draftProposalId,
+      data.jwt
+    );
+    if (!jwtCheck.ok) {
+      return { ok: false, message: jwtCheck.reason };
+    }
+  } else if (data.message && data.signature) {
+    const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
+      address: data.creatorAddress as `0x${string}`,
+      message: data.message,
+      signature: data.signature,
+    });
+    if (!ownerCheck.ok) {
+      return { ok: false, message: ownerCheck.reason };
+    }
+  } else {
+    return { ok: false, message: "Missing authentication" };
+  }
+
   const parsed = DraftProposalSchema.safeParse(data);
 
   if (!parsed.success) {
@@ -127,8 +182,8 @@ export async function onSubmitAction(
 
     const baseformData = {
       stage: nextStage?.stage,
-      title: parsed.data.title,
-      abstract: parsed.data.abstract,
+      title: sanitizeContent(parsed.data.title),
+      abstract: sanitizeContent(parsed.data.abstract),
       voting_module_type: parsed.data.type,
       proposal_type: parsed.data.proposalConfigType,
       proposal_scope: parsed.data.proposal_scope,

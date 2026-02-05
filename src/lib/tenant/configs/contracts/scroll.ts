@@ -2,7 +2,7 @@ import {
   AgoraGovernor__factory,
   AgoraTimelock__factory,
   AgoraToken__factory,
-  ProposalTypesConfigurator__factory,
+  CyberProposalTypes__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
@@ -14,6 +14,7 @@ import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockCo
 import {
   DELEGATION_MODEL,
   GOVERNOR_TYPE,
+  PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
 
@@ -89,10 +90,10 @@ export const scrollTenantContractConfig = ({
     }),
 
     proposalTypesConfigurator: new TenantContract<BaseContract>({
-      abi: ProposalTypesConfigurator__factory.abi,
+      abi: CyberProposalTypes__factory.abi,
       address: TYPES,
       chain: scroll,
-      contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
+      contract: CyberProposalTypes__factory.connect(TYPES, provider),
       provider,
     }),
 
@@ -110,5 +111,7 @@ export const scrollTenantContractConfig = ({
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
       TIMELOCK_TYPE.TIMELOCKCONTROLLER_WITH_ACCESS_CONTROL_ERC721_ERC115,
+    proposalTypesConfiguratorFactory:
+      PROPOSAL_TYPES_CONFIGURATOR_FACTORY.WITHOUT_DESCRIPTION,
   };
 };

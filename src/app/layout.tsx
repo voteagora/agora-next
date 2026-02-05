@@ -7,6 +7,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
+import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
+import { DevTenantProvider } from "@/contexts/DevTenantContext";
+import { TenantSwitcher } from "@/components/DevTools/TenantSwitcher";
 
 declare global {
   interface BigInt {
@@ -17,11 +21,6 @@ declare global {
 BigInt.prototype.toJSON = function (): string {
   return this.toString();
 };
-
-async function fetchDaoMetrics() {
-  "use server";
-  return fetchMetrics();
-}
 
 const defaults = {
   primary: "23 23 23",
@@ -89,12 +88,35 @@ export default async function RootLayout({
     "--negative": negative,
     "--brand-primary": brandPrimary,
     "--brand-secondary": brandSecondary,
+    "--info-section-background":
+      ui?.customization?.infoSectionBackground || neutral,
+    "--header-background": ui?.customization?.headerBackground || wash,
+    "--info-tab-background": ui?.customization?.infoTabBackground || neutral,
+    "--button-background": ui?.customization?.buttonBackground || primary,
+    "--card-background": ui?.customization?.cardBackground || "255 255 255",
+    "--card-border": ui?.customization?.cardBorder || line,
+    "--card-background-light":
+      ui?.customization?.cardBackground || "255 255 255",
+    "--card-background-dark": ui?.customization?.cardBackground || "30 26 47",
+    "--hover-background-light":
+      ui?.customization?.hoverBackground || "249 250 251",
+    "--hover-background-dark": ui?.customization?.hoverBackground || "42 35 56",
+    "--modal-background-dark": ui?.customization?.cardBackground || "30 26 47",
+    "--input-background-dark": ui?.customization?.cardBackground || "42 35 56",
+    "--button-primary-dark": ui?.customization?.buttonBackground || "89 75 122",
+    "--button-secondary-dark":
+      ui?.customization?.buttonBackground || "25 16 62",
+    "--hover-background": ui?.customization?.hoverBackground || tertiary,
+    "--text-secondary": ui?.customization?.textSecondary || secondary,
+    "--footer-background": ui?.customization?.footerBackground || neutral,
+    "--inner-footer-background":
+      ui?.customization?.innerFooterBackground || wash,
     fontFamily: font,
     letterSpacing: letterSpacing,
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={style}>
+    <html lang="en" style={style} className={ui.theme === "dark" ? "dark" : ""}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -130,13 +152,19 @@ export default async function RootLayout({
       </head>
 
       <NuqsAdapter>
-        <ClientLayout>
-          <Header />
-          <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-            {children}
-          </div>
-          <DAOMetricsHeader />
-        </ClientLayout>
+        <DevTenantProvider>
+          <ClientLayout>
+            <ForumPermissionsProvider>
+              <Header />
+              <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+                <RecentlyReleasedBanner />
+                {children}
+              </div>
+              <DAOMetricsHeader />
+            </ForumPermissionsProvider>
+            <TenantSwitcher />
+          </ClientLayout>
+        </DevTenantProvider>
       </NuqsAdapter>
       {ui.googleAnalytics && <GoogleAnalytics gaId={ui.googleAnalytics} />}
     </html>

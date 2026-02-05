@@ -32,9 +32,6 @@ const SponsorOffchainProposalDialog = ({
             <div className="mb-2 text-2xl font-black text-primary">
               Proposal complete!
             </div>
-            <div className="mb-5 text-base text-secondary">
-              It might take up to a minute for the changes to be reflected.
-            </div>
             <div className="text-base text-secondary mb-5">
               It may take a few minutes for the proposal to be indexed and
               appear on Agora.

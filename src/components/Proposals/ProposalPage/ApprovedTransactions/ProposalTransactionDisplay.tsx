@@ -23,6 +23,7 @@ import {
 } from "@heroicons/react/20/solid";
 import React, { useState } from "react";
 import { formatUnits } from "viem";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { toast } from "react-hot-toast";
 import {
   checkExistingProposal,
@@ -225,12 +226,14 @@ const ProposalTransactionDisplay = ({
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                     onClick={() => setViewMode("summary")}
+                    type="button"
                   >
                     Summary
                   </button>
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                     onClick={() => setViewMode("raw")}
+                    type="button"
                   >
                     Raw
                   </button>
@@ -1061,12 +1064,12 @@ const ParameterValue = ({ param }: { param: any }) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <span className="text-xs truncate inline-block max-w-full">
-              {param.value?.toString()}
+              {param.value ? sanitizeContent(param.value.toString()) : null}
             </span>
           </TooltipTrigger>
           <TooltipContent>
             <div className="text-xs break-all max-w-[400px]">
-              {param.value?.toString()}
+              {param.value ? sanitizeContent(param.value.toString()) : null}
             </div>
           </TooltipContent>
         </Tooltip>
@@ -1074,7 +1077,11 @@ const ParameterValue = ({ param }: { param: any }) => {
     );
   }
 
-  return <span className="text-xs break-words">{param.value?.toString()}</span>;
+  return (
+    <span className="text-xs break-words">
+      {param.value ? sanitizeContent(param.value.toString()) : null}
+    </span>
+  );
 };
 
 function formatArrayItem(item: any): React.ReactNode {

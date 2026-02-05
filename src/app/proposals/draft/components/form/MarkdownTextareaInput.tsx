@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 type MarkdownTextareaInputProps = {
   label: string;
@@ -30,6 +31,7 @@ type MarkdownTextareaInputProps = {
   placeholder?: string;
   required?: boolean;
   tooltip?: string;
+  disabled?: boolean;
 };
 
 function MarkdownTextareaInput<
@@ -43,6 +45,7 @@ function MarkdownTextareaInput<
   placeholder,
   tooltip,
   description,
+  disabled,
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> &
   MarkdownTextareaInputProps) {
   const [value, setValue] = useState("");
@@ -89,7 +92,7 @@ function MarkdownTextareaInput<
                 <textarea
                   name="proposalDescription"
                   className={`py-3 px-4 border-0 placeholder-gray-af w-full bg-wash rounded-t-lg focus:outline-none focus:ring-0 resize-none
-                ${selectedMode === "write" ? "visible" : "hidden"}`}
+                ${selectedMode === "write" ? "visible" : "hidden"} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
                   placeholder={placeholder}
                   value={value}
                   onChange={(e) => {
@@ -97,13 +100,14 @@ function MarkdownTextareaInput<
                     field.onChange(e);
                   }}
                   rows={8}
+                  disabled={disabled}
                 />
 
                 <div>
                   <div
                     className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose ${selectedMode === "write" ? "hidden" : "visible"}`}
                   >
-                    <Markdown content={value} />
+                    <Markdown content={sanitizeContent(value)} />
                   </div>
                 </div>
               </div>
@@ -114,8 +118,9 @@ function MarkdownTextareaInput<
                     selectedMode === "write"
                       ? "bg-tertiary/5 text-primary"
                       : "text-tertiary"
-                  }`}
+                  } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
                   onClick={() => setSelectedMode("write")}
+                  disabled={disabled}
                 >
                   Write
                 </button>
@@ -125,8 +130,9 @@ function MarkdownTextareaInput<
                     selectedMode === "preview"
                       ? "bg-tertiary/5 text-primary"
                       : "text-tertiary"
-                  }`}
+                  } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
                   onClick={() => setSelectedMode("preview")}
+                  disabled={disabled}
                 >
                   Preview
                 </button>

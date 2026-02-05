@@ -11,6 +11,8 @@ import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
+import DelegatesPageInfoBanner from "../DelegatesPageInfoBanner";
+import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -36,11 +38,13 @@ export default function DelegateCardList({
     initialDelegates.data
   );
   const { isDelegatesFiltering, setIsDelegatesFiltering } = useAgoraContext();
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const showParticipation =
+    (ui.toggle("show-participation")?.enabled || false) &&
+    !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
 
   useEffect(() => {
     setDelegates(initialDelegates.data.slice(0, batchSize));
@@ -89,48 +93,56 @@ export default function DelegateCardList({
 
   const { isAdvancedUser } = useIsAdvancedUser();
 
+  // Check if banner is visible
+  const isBannerVisible = useInfoBannerVisibility("delegates-page-info-banner");
+
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-      {/* @ts-ignore */}
-      <InfiniteScroll
-        className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"
-        hasMore={meta.has_next}
-        pageStart={1}
-        loadMore={loadMore}
-        loader={
-          <div
-            className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
-            key="loader"
+      <div className="relative">
+        <DelegatesPageInfoBanner />
+        <div className={`relative z-10 ${isBannerVisible ? "mt-6" : "mt-4"}`}>
+          {/* @ts-ignore */}
+          <InfiniteScroll
+            className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"
+            hasMore={meta.has_next}
+            pageStart={1}
+            loadMore={loadMore}
+            loader={
+              <div
+                className="w-full h-full min-h-[140px] bg-wash rounded-xl text-tertiary flex items-center justify-center"
+                key="loader"
+              >
+                Loading...
+              </div>
+            }
+            element="div"
           >
-            Loading...
-          </div>
-        }
-        element="div"
-      >
-        {delegates?.map((delegate, idx) => {
-          let truncatedStatement = "";
+            {delegates?.map((delegate, idx) => {
+              let truncatedStatement = "";
 
-          if (delegate?.statement?.payload) {
-            const delegateStatement = (
-              delegate?.statement?.payload as { delegateStatement: string }
-            ).delegateStatement;
+              if (delegate?.statement?.payload) {
+                const delegateStatement = (
+                  delegate?.statement?.payload as { delegateStatement: string }
+                ).delegateStatement;
 
-            const plainTextStatement = stripMarkdown(delegateStatement);
-            truncatedStatement = plainTextStatement.slice(0, 120);
-          }
+                const plainTextStatement = stripMarkdown(delegateStatement);
+                truncatedStatement = plainTextStatement.slice(0, 120);
+              }
 
-          return (
-            <DelegateCard
-              key={delegate.address + idx}
-              delegate={delegate}
-              truncatedStatement={truncatedStatement}
-              isDelegatesFiltering={isDelegatesFiltering}
-              isAdvancedUser={isAdvancedUser}
-            />
-          );
-        })}
-      </InfiniteScroll>
+              return (
+                <DelegateCard
+                  key={delegate.address + idx}
+                  delegate={delegate}
+                  truncatedStatement={truncatedStatement}
+                  isDelegatesFiltering={isDelegatesFiltering}
+                  isAdvancedUser={isAdvancedUser}
+                />
+              );
+            })}
+          </InfiniteScroll>
+        </div>
+      </div>
     </DialogProvider>
   );
 }

@@ -66,7 +66,7 @@ export default function CastVoteInput({
 
   if (!isConnected) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <Button className="w-full" onClick={() => setOpen(true)}>
           Connect wallet to vote
         </Button>
@@ -76,7 +76,7 @@ export default function CastVoteInput({
 
   if (isPending) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <DisabledVoteButton reason="Loading..." />
       </div>
     );
@@ -84,7 +84,7 @@ export default function CastVoteInput({
 
   if (isSuccess && !delegate?.statement) {
     return (
-      <div className="flex flex-col justify-between py-3 px-3 border-t border-line">
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
         <NoStatementView />
       </div>
     );
@@ -175,7 +175,7 @@ function CastVoteInputContent({
       >
         <div className="flex flex-col items-stretch justify-between">
           {!isError && !showSuccessMessage && (
-            <div className="border-t border-line px-4 pb-3 pt-1">
+            <div className="px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
@@ -239,7 +239,7 @@ function CastVoteInputContent({
         <VotingBanner />
       )}
       {showSuccessMessage && (
-        <div className="border-t border-line">
+        <div className="p-4">
           <SuccessMessage
             proposal={proposal}
             votes={votes}

@@ -3,14 +3,12 @@
 import { useState, useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
-import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
 import {
-  ParsedProposalData,
   ParsedProposalResults,
   calculateHybridOptimisticProposalMetrics,
+  getProposalTiers,
 } from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
@@ -24,6 +22,11 @@ import {
 import { VotesBar } from "@/components/common/VotesBar";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
+import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
+import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
+import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   proposal: Proposal;
@@ -97,13 +100,17 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
+  const { ui } = Tenant.current();
+  const useArchiveVoteHistory = ui.toggle(
+    "use-archive-for-vote-history"
+  )?.enabled;
 
   const { totalAgainstVotes } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"];
+
+  const proposalQuorum = getProposalTiers(proposal);
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
@@ -122,7 +129,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
             <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
               <p className="text-primary font-bold mb-2">Threshold</p>
               <p className="line-height-[32px]">
-                3 groups {proposalData?.tiers?.[0] / 100 || 65}%
+                3 groups {proposalQuorum[0] || 20}%
               </p>
             </TooltipContent>
           </Tooltip>
@@ -169,7 +176,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <VotesBar
                       forVotes={0}
                       againstVotes={totalAgainstVotes}
-                      quorumPercentage={proposalData?.tiers?.[0] / 100 || 65}
+                      quorumPercentage={proposalQuorum[0] || 65}
                       showVotesPercentage
                     />
                   </div>
@@ -190,10 +197,22 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                   }}
                 />
               </div>
-              {showVoters ? (
-                <ProposalVotesList proposalId={proposal.id} />
+              {useArchiveVoteHistory ? (
+                showVoters ? (
+                  <ArchiveProposalVotesList proposal={proposal} />
+                ) : (
+                  <ArchiveProposalNonVoterList proposal={proposal} />
+                )
+              ) : showVoters ? (
+                <ProposalVotesList
+                  proposalId={proposal.id}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               ) : (
-                <ProposalNonVoterList proposal={proposal} />
+                <ProposalNonVoterList
+                  proposal={proposal}
+                  offchainProposalId={proposal.offchainProposalId}
+                />
               )}
             </>
           )}

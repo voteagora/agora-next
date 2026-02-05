@@ -5,6 +5,7 @@ import {
   fetchDirectDelegatee,
   fetchBalanceForDirectDelegation,
 } from "@/app/delegates/actions";
+import Tenant from "@/lib/tenant/tenant";
 
 export function UndelegateButton({
   full,
@@ -14,12 +15,16 @@ export function UndelegateButton({
   delegate: DelegateChunk;
 }) {
   const openDialog = useOpenDialog();
+  const { ui } = Tenant.current();
+  const useNeutral =
+    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
   return (
     <UpdatedButton
-      type="primary"
+      type={useNeutral ? "secondary" : "primary"}
       onClick={(e: any) => {
         e.preventDefault();
+        e.stopPropagation();
         openDialog({
           type: "UNDELEGATE",
           params: {

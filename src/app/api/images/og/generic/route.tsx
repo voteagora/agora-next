@@ -1,15 +1,31 @@
 import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
+import { sanitizeOgParam } from "@/lib/sanitizationUtilsEdge";
+import { truncateString } from "@/app/lib/utils/text";
+import { TenantNamespace } from "@/lib/types";
 
 export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.get("title") || "Agora Proposal";
-  const description =
+  const unsafeTitle = searchParams.get("title") || "Agora Proposal";
+  const unsafeDescription =
     searchParams.get("description") || "Home of token governance";
+  const unsafeAuthor = searchParams.get("author");
+  const isPost = searchParams.get("isPost") === "true";
+
+  // Sanitize the URL parameters to prevent XSS
+  const sanitizedTitle = sanitizeOgParam(unsafeTitle);
+  const sanitizedDescription = sanitizeOgParam(unsafeDescription);
+  const sanitizedAuthor = unsafeAuthor ? sanitizeOgParam(unsafeAuthor) : null;
+
+  const title = truncateString(sanitizedTitle, 70);
+  const description = truncateString(sanitizedDescription, 150);
+  const author = sanitizedAuthor ? truncateString(sanitizedAuthor, 42) : null;
+  const namespace = (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME ||
+    "optimism") as TenantNamespace;
 
   const interBoldFont = await fetch(
     new URL("../assets/Inter-Black.ttf", import.meta.url)
@@ -42,8 +58,14 @@ export async function GET(req: NextRequest) {
         <img src={bg} style={{ position: "absolute" }} />
         <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
           <div tw="flex flex-col justify-between h-full w-full">
-            <LogoPill />
+            <LogoPill namespace={namespace} />
             <div tw="flex flex-col">
+              <div
+                tw="font-normal text-3xl text-secondary mb-4"
+                style={{ display: isPost && author ? "flex" : "none" }}
+              >
+                Comment by {author}
+              </div>
               <div tw="font-bold text-5xl w-full">{title}</div>
               <div tw="font-normal mt-[30px] text-4xl text-secondary">
                 {description}

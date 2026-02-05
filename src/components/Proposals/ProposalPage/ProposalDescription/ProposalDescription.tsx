@@ -5,11 +5,14 @@ import styles from "./proposalDescription.module.scss";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
+import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
+import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
+import ENSName from "@/components/shared/ENSName";
 
-const { contracts } = Tenant.current();
+const { contracts, namespace } = Tenant.current();
 
 export default function ProposalDescription({
   proposal,
@@ -54,14 +57,83 @@ export default function ProposalDescription({
   // @ts-ignore
   const options = proposal.proposalData?.options;
   const option = options?.[0];
+  const { ui } = Tenant.current();
+  const tagBackground = ui.customization?.tagBackground;
+  const tagBgStyle = tagBackground
+    ? {
+        backgroundColor: tagBackground.startsWith("#")
+          ? tagBackground
+          : `rgb(${tagBackground})`,
+      }
+    : undefined;
+  const tagTextClass = tagBackground ? "text-white" : "text-neutral-700";
+  const tagBgClass = tagBackground ? "" : "bg-black/10";
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
+  const archiveMetadata = useArchiveForProposals
+    ? ((
+        proposal as unknown as {
+          archiveMetadata?: {
+            proposalTypeName?: string;
+            proposalTypeTag?: string;
+            source?: string;
+            proposerEns?: string;
+            defaultProposalTypeRanges?: {
+              min_quorum_pct: number;
+              max_quorum_pct: number;
+              min_approval_threshold_pct: number;
+              max_approval_threshold_pct: number;
+            };
+          };
+        }
+      ).archiveMetadata ?? null)
+    : null;
+
+  const proposerBadge = archiveMetadata?.proposerEns ? (
+    archiveMetadata.proposerEns
+  ) : (
+    <ENSName address={proposal.proposer} />
+  );
+
+  const typeBadgeLabel = archiveMetadata?.proposalTypeTag;
+
+  // Check if this is an archive proposal with ranges (pending state)
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
 
   return (
     <div
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
+      {archiveMetadata && (
+        <div className="inline-flex justify-start items-center gap-2 flex-wrap">
+          {typeBadgeLabel && (
+            <div
+              className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${tagTextClass}`}
+              style={tagBgStyle}
+            >
+              {typeBadgeLabel === "Gov Proposal"
+                ? "⚖️️ Gov Proposal"
+                : "🌡️ Temp Check"}
+            </div>
+          )}
+          <div
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${tagTextClass}`}
+            style={tagBgStyle}
+          >
+            By {proposerBadge}
+          </div>
+          <div
+            className={`px-2 py-0.5 rounded-[3px] text-xs font-semibold leading-4 ${tagBgClass} ${
+              hasPendingRanges ? "opacity-50" : ""
+            } ${tagTextClass}`}
+            style={tagBgStyle}
+          >
+            {archiveMetadata?.proposalTypeName}
+          </div>
+        </div>
+      )}
       <ProposalTitle title={shortTitle} proposal={proposal} />
-      {(proposal.proposalType?.includes("OFFCHAIN") ||
-        proposal.proposalType?.includes("HYBRID")) && (
+      {proposal.proposalType?.includes("HYBRID") && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p>
             <strong>New:</strong> This proposal implements the Joint House
@@ -82,6 +154,11 @@ export default function ProposalDescription({
         !proposal.proposalType?.includes("HYBRID") && (
           <ProposalChart proposal={proposal} />
         )}
+
+      {/* Execution Transactions - shown right below chart for succeeded proposals */}
+      {useArchiveForProposals && (
+        <ExecutionTransactions proposalId={proposal.id} tenant={namespace} />
+      )}
 
       <div className="flex flex-col gap-2">
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
@@ -107,6 +184,7 @@ export default function ProposalDescription({
             executedTransactionHash={proposal.executedTransactionHash}
           />
         )}
+        <RelatedProposalLinks proposalId={proposal.id} />
         <div className={styles.proposal_description_md}>
           <Markdown
             content={stripTitleFromDescription(

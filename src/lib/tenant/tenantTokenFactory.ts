@@ -1,5 +1,5 @@
 import { type TenantNamespace, type TenantToken } from "@/lib/types";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES, ZERO_ADDRESS } from "@/lib/constants";
 
 const isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
 
@@ -121,6 +121,47 @@ export default class TenantTokenFactory {
           symbol: "LINEA",
           decimals: 18,
           address: "0x03A61C68BF297aDffF451426ea8C491bb8F87c65",
+        };
+      case TENANT_NAMESPACES.TOWNS:
+        return {
+          name: "Towns Lodge",
+          symbol: "TOWNS",
+          decimals: 18,
+          address: "0x0000000000000000000000000000000000000000",
+        };
+      case TENANT_NAMESPACES.SYNDICATE:
+        return {
+          name: "Syndicate Protocol",
+          symbol: "SYNDICATE",
+          decimals: 18,
+          address: "0x0000000000000000000000000000000000000000",
+        };
+      case TENANT_NAMESPACES.DEMO2:
+        return {
+          name: "Demo Governance Token",
+          symbol: "DEMO",
+          decimals: 18,
+          address: isProd
+            ? ZERO_ADDRESS
+            : "0xf727988dbbeed852760a3876414b8d29f47998d3",
+        };
+      case TENANT_NAMESPACES.DEMO4:
+        return {
+          name: "Demo Governance Token",
+          symbol: "DEMO4",
+          decimals: 18,
+          address: isProd
+            ? ZERO_ADDRESS
+            : "0x54e196a89b17fa042bf7ec8b53dac922f5f714e9",
+        };
+      case TENANT_NAMESPACES.DEMO3:
+        return {
+          name: "Demo Governance Token",
+          symbol: "DEMO3",
+          decimals: 18,
+          address: isProd
+            ? ZERO_ADDRESS
+            : "0xf1f9686d8144c7c5f16feffc8fdf93ec64058dec",
         };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

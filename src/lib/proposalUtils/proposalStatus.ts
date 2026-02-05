@@ -1,10 +1,11 @@
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
 import {
-  calculateHybridApprovalMetrics,
+  calculateHybridApprovalProposalMetrics,
   calculateHybridOptimisticProposalMetrics,
   calculateHybridStandardTallies,
   getEndBlock,
   getEndTimestamp,
+  getProposalCreatedTime,
   getProposalCurrentQuorum,
   getStartBlock,
   getStartTimestamp,
@@ -231,9 +232,10 @@ export async function getProposalStatus(
           ? (Number(forVotes) / Number(thresholdVotes)) * 100
           : 0;
       const apprThresholdPercent = Number(approvalThreshold) / 100;
-      const hasMetThreshold = Boolean(
-        voteThresholdPercent >= apprThresholdPercent
-      );
+
+      const hasMetThresholdOrNoThreshold =
+        Boolean(voteThresholdPercent >= apprThresholdPercent) ||
+        approvalThreshold === undefined;
 
       const quorumForGovernor = getProposalCurrentQuorum(
         proposalResults.kind,
@@ -243,7 +245,7 @@ export async function getProposalStatus(
       if (
         (quorum && quorumForGovernor < quorum) ||
         forVotes < againstVotes ||
-        !hasMetThreshold
+        !hasMetThresholdOrNoThreshold
       ) {
         return "DEFEATED";
       }
@@ -267,11 +269,9 @@ export async function getProposalStatus(
       if (tallies.quorumMet) {
         return "SUCCEEDED";
       }
-
       return "DEFEATED";
     }
-    case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC": {
+    case "OPTIMISTIC": {
       const {
         for: forVotes,
         against: againstVotes,
@@ -323,7 +323,17 @@ export async function getProposalStatus(
         approvalThreshold: 0,
       };
 
-      const metrics = calculateHybridApprovalMetrics(proposalForMetrics, false);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults: kind,
+        proposalData:
+          proposalData.kind as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(quorum!),
+        createdTime: getProposalCreatedTime({
+          proposalData,
+          latestBlock,
+          createdBlock: proposal.created_block,
+        }),
+      });
 
       // Check if weighted quorum is met
       if (!metrics.quorumMet) {
@@ -336,6 +346,7 @@ export async function getProposalStatus(
         return "SUCCEEDED";
       }
     }
+    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "HYBRID_OPTIMISTIC_TIERED": {
       // Create a temporary proposal object for the metrics calculation

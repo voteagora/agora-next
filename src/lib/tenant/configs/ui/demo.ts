@@ -284,5 +284,21 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
+    {
+      name: "use-archive-for-vote-history",
+      enabled: false,
+    },
+    {
+      name: "duna",
+      enabled: true,
+    },
+    {
+      name: "forums",
+      enabled: false,
+    },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });

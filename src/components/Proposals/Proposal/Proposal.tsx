@@ -15,6 +15,7 @@ import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import ENSName from "@/components/shared/ENSName";
 import HybridStandardProposalStatus from "./HybridStandardProposalStatus";
+import { HybridOptimisticProposalStatus } from "./HybridOptimisticProposalStatus";
 
 export default function Proposal({
   proposal,
@@ -128,6 +129,11 @@ export default function Proposal({
               proposal.proposalData && (
                 <HybridStandardProposalStatus proposal={proposal} />
               )}
+            {(proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC" ||
+              proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") && (
+              <HybridOptimisticProposalStatus proposal={proposal} />
+            )}
           </div>
         </div>
       </div>

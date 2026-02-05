@@ -8,8 +8,8 @@ import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
 import { getBlockScanUrl, wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { DraftProposal, PLMConfig } from "../../types";
 import OffchainProposalAction from "@/app/proposals/sponsor/components/OffchainProposalAction";
-import { DraftProposal } from "../../types";
 
 const SponsorOnchainProposalDialog = ({
   redirectUrl,
@@ -25,6 +25,8 @@ const SponsorOnchainProposalDialog = ({
   draftProposal: DraftProposal;
 }) => {
   const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const config = plmToggle?.config as PLMConfig;
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -63,16 +65,18 @@ const SponsorOnchainProposalDialog = ({
             <div className="mb-2 text-2xl font-black text-primary">
               {isLoading ? "Creating your proposal ..." : "Proposal complete!"}
             </div>
-            {isHybrid && (
-              <div className="mb-5 text-base text-secondary">
-                <b>
-                  Don&apos;t leave this page until you have signed the
-                  attestation.
-                </b>
-                After the onchain transaction is confirmed, you will need to
-                sign an attestation to create the offchain proposal.{" "}
-              </div>
-            )}
+            {!!isHybrid &&
+              !!config.offchainProposalCreator &&
+              !!address &&
+              !config.offchainProposalCreator.includes(address) && (
+                <div className="mb-5 text-base text-secondary">
+                  Switch to the offchain proposal creator wallet to create an
+                  offchain proposal:
+                  <div className="text-primary">
+                    {config.offchainProposalCreator.join(", ")}
+                  </div>
+                </div>
+              )}
             {isLoading && (
               <div className="mb-5 text-base text-secondary">
                 It might take up to a minute for the changes to be reflected.
@@ -119,11 +123,14 @@ const SponsorOnchainProposalDialog = ({
                 </div>
               </div>
             )}
-            {isHybrid && (
-              <div className="mt-4">
-                <OffchainProposalAction draftProposal={draftProposal} />
-              </div>
-            )}
+            {!!isHybrid &&
+              !!config.offchainProposalCreator &&
+              !!address &&
+              config.offchainProposalCreator.includes(address) && (
+                <div className="mt-4">
+                  <OffchainProposalAction draftProposal={draftProposal} />
+                </div>
+              )}
           </VStack>
         </VStack>
       </VStack>

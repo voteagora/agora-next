@@ -38,6 +38,7 @@ import {
   getCachedAllProposalsFromDaoNode,
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
+import { fetchProposalTaxFormMetadata } from "./getProposalTaxFormMetadata";
 
 // Helper function to fetch proposals from DAO Node
 async function fetchProposalsFromDaoNode(
@@ -120,7 +121,7 @@ async function fetchOnchainProposalsByIds(
       contract: contracts.governor.address,
     });
 
-    onchainProposals.forEach((proposal) => {
+    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
       if (proposal) {
         onchainProposalsMap.set(
           proposal.proposal_id,
@@ -389,45 +390,82 @@ async function getProposal(proposalId: string) {
         })
     );
 
-    const [proposal, offchainProposal, votableSupply] = await Promise.all([
-      getProposalExecution,
-      getOffchainProposal,
-      fetchVotableSupply(),
-    ]);
+    const [proposal, offchainProposal, votableSupply, taxFormMetadata] =
+      await Promise.all([
+        getProposalExecution,
+        getOffchainProposal,
+        fetchVotableSupply(),
+        fetchProposalTaxFormMetadata(proposalId),
+      ]);
 
     if (!proposal) {
       return notFound();
+    }
+
+    // Resolve hybrid proposal logic - check if this is an offchain proposal that references an onchain proposal
+    let baseProposal = proposal as ProposalPayload;
+    let resolvedOffchainProposal = offchainProposal as
+      | ProposalPayload
+      | undefined;
+
+    // If this is an offchain proposal with an onchain_proposalid, we need to fetch the onchain proposal as the base
+    if (
+      proposal.proposal_type?.startsWith("OFFCHAIN") &&
+      (proposal.proposal_data as any)?.onchain_proposalid
+    ) {
+      const onchainId = (proposal.proposal_data as any).onchain_proposalid;
+      const onchainProposal = await doInSpan(
+        { name: "getOnchainProposal" },
+        async () =>
+          findProposal({
+            namespace,
+            proposalId: onchainId,
+            contract: contracts.governor.address,
+          })
+      );
+
+      if (onchainProposal) {
+        baseProposal = onchainProposal as ProposalPayload;
+        resolvedOffchainProposal = proposal as ProposalPayload;
+      }
     }
 
     const latestBlock = await latestBlockPromise;
 
     const isPending =
       (isTimeStampBasedTenant
-        ? !isTimestampBasedProposal(proposal as ProposalPayload) ||
-          Number(getStartTimestamp(proposal as ProposalPayload)) >
-            latestBlock.timestamp
-        : Number(getStartBlock(proposal as ProposalPayload)) >
-          latestBlock.number) || !latestBlock;
+        ? !isTimestampBasedProposal(baseProposal) ||
+          Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
+        : Number(getStartBlock(baseProposal)) > latestBlock.number) ||
+      !latestBlock;
 
     const quorum = isPending
       ? null
-      : await fetchQuorumForProposal(proposal as ProposalPayload);
+      : await fetchQuorumForProposal(baseProposal);
 
-    return parseProposal(
-      proposal as ProposalPayload,
+    const parsed = await parseProposal(
+      baseProposal,
       latestBlock,
       quorum ?? null,
       BigInt(votableSupply),
-      offchainProposal as ProposalPayload
+      resolvedOffchainProposal
     );
+
+    return {
+      ...parsed,
+      taxFormMetadata,
+    };
   });
 }
 
 async function getProposalTypes() {
   return withMetrics("getProposalTypes", async () => {
-    const { namespace, contracts } = Tenant.current();
+    const { namespace, contracts, ui } = Tenant.current();
 
     const configuratorContract = contracts.proposalTypesConfigurator;
+
+    const easV2GovlessVotingEnabled =
+      ui.toggle("easv2-govlessvoting")?.enabled ?? false;
 
     if (!configuratorContract) {
       return [];
@@ -438,26 +476,34 @@ async function getProposalTypes() {
     const typesFromApi = await getProposalTypesFromDaoNode();
 
     if (typesFromApi) {
-      const parsedTypes = Object.entries(typesFromApi.proposal_types)?.map(
-        ([proposalTypeId, type]: any) => ({
+      const parsedTypes = Object.entries(typesFromApi.proposal_types)
+        ?.filter(([proposalTypeId, type]: any) => !!type.name)
+        ?.map(([proposalTypeId, type]: any) => ({
           ...type,
           proposal_type_id: String(proposalTypeId),
           quorum: Number(type.quorum),
           approval_threshold: Number(type.approval_threshold),
           isClientSide: false,
           module: type.module,
-        })
-      );
+        }));
       types = parsedTypes;
     } else {
+      const contractExists =
+        configuratorContract.address !==
+        "0x0000000000000000000000000000000000000000";
+      const contractToUse = easV2GovlessVotingEnabled
+        ? contracts.governor.address
+        : contractExists
+          ? configuratorContract.address
+          : undefined;
       types = await findProposalType({
         namespace,
-        contract: configuratorContract.address,
+        contract: contractToUse,
       });
     }
 
     if (!contracts.supportScopes) {
-      const formattedTypes = types.map((type) => {
+      const formattedTypes = types.map((type: any) => {
         return {
           ...type,
           proposal_type_id: String(type.proposal_type_id),
@@ -472,7 +518,7 @@ async function getProposalTypes() {
     }
 
     const formattedTypes = await Promise.all(
-      types.map(async (type) => {
+      types.map(async (type: any) => {
         const scopes =
           typesFromApi?.proposal_types?.[type.proposal_type_id]?.scopes;
         const formattedScopes: {
@@ -581,7 +627,9 @@ async function getDraftProposals(address: `0x${string}`) {
         },
       },
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" },
+        },
       },
     });
   });
@@ -605,7 +653,9 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
         },
       },
       include: {
-        transactions: true,
+        transactions: {
+          orderBy: { order: "asc" },
+        },
       },
     });
   });

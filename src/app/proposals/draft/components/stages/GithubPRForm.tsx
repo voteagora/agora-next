@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
@@ -8,8 +8,9 @@ import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "../../actions/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { DraftProposal } from "../../types";
+import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 
 /**
  * TODO:
@@ -19,8 +20,11 @@ import { DraftProposal } from "../../types";
  */
 const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
   const openDialog = useOpenDialog();
   const { address } = useAccount();
+  const messageSigner = useSignMessage();
   const [isCreatePRPending, setIsCreatePRPending] = useState(false);
   const [isSkipPending, setIsSkipPending] = useState(false);
 
@@ -35,14 +39,30 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         throw new Error("No address found");
       }
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
+        message,
+        signature,
       });
 
       setIsSkipPending(false);
-      router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+      const nextId = draftProposal.uuid;
+      router.push(buildDraftUrl(nextId, 3, shareParam));
     } catch (e) {
       setIsSkipPending(false);
     }
@@ -57,10 +77,25 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
       const link = await createGithubProposal(draftProposal);
 
+      const messagePayload = {
+        action: "githubChecklist",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+      const message = JSON.stringify(messagePayload);
+      const signature = await messageSigner
+        .signMessageAsync({ message })
+        .catch(() => undefined);
+      if (!signature) {
+        throw new Error("Signature failed");
+      }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
+        message,
+        signature,
       });
 
       setIsCreatePRPending(false);
@@ -68,9 +103,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
       openDialog({
         type: "OPEN_GITHUB_PR",
         params: {
-          // read stage from URL and redirect to next stage
-          // get stage metadata to make sure it's not the last stage (it really shouldn't be though)
-          redirectUrl: `/proposals/draft/${draftProposal.id}?stage=3`,
+          redirectUrl: buildDraftUrl(draftProposal.uuid, 3, shareParam),
           githubUrl: link,
         },
       });
@@ -118,7 +151,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                router.push(`/proposals/draft/${draftProposal.id}?stage=3`);
+                router.push(buildDraftUrl(draftProposal.uuid, 3, shareParam));
               }}
             >
               Continue

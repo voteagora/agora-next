@@ -9,6 +9,8 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import Image from "next/image";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
 import discordIcon from "@/icons/discord.svg";
+import XIcon from "@/icons/x.svg";
+import FarcasterIcon from "@/icons/farcaster.svg";
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 import { formatNumber } from "@/lib/tokenUtils";
 
@@ -30,6 +32,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
+  const twitterLink = ui.link("townstwitter");
+  const farcasterLink = ui.link("townsfarcaster");
   const agoraLink = ui.link("agora");
 
   const proposalsToggle = ui.toggle("proposals");
@@ -48,11 +52,21 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
 
+  const comingSoonToggle = ui.toggle("coming-soon");
+  const hasComingSoon =
+    comingSoonToggle !== undefined && comingSoonToggle.enabled;
+  const forumsToggle = ui.toggle("forums");
+  const hasForums = forumsToggle !== undefined && forumsToggle.enabled;
+
+  const grantsToggle = ui.toggle("grants");
+  const hasGrants = grantsToggle !== undefined && grantsToggle.enabled;
+
   // Format metrics
   const formattedMetrics = {
     votableSupply: formatNumber(votableSupply),
     totalSupply: formatNumber(totalSupply),
   };
+  const hideVotableSupply = ui.toggle("footer/hide-votable-supply")?.enabled;
 
   const navItems = [
     ...(hasProposals
@@ -97,6 +111,16 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
+    ...(hasGrants
+      ? [
+          {
+            name: "Grants",
+            href: "/grants",
+            target: "_self",
+            isActive: pathname.includes("grants"),
+          },
+        ]
+      : []),
     ...(hasInfo
       ? [
           {
@@ -104,6 +128,26 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),
+          },
+        ]
+      : []),
+    ...(hasComingSoon
+      ? [
+          {
+            name: "Governance",
+            href: "/coming-soon",
+            target: "_self",
+            isActive: pathname.includes("coming-soon"),
+          },
+        ]
+      : []),
+    ...(hasForums
+      ? [
+          {
+            name: "Discussions",
+            href: "/forums",
+            target: "_self",
+            isActive: pathname.includes("forums"),
           },
         ]
       : []),
@@ -118,7 +162,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               key={item.name}
               href={item.href}
               target={item.target}
-              onClick={onClose}
+              onClick={() => setTimeout(onClose, 100)}
               className={cn(
                 "self-stretch pl-4 pr-2 py-2 h-12 flex items-center",
                 item.isActive ? "bg-tertiary/10" : ""
@@ -131,23 +175,29 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
         {/* Bottom Sections */}
         <div className="mt-auto text-tertiary text-base font-semibold leading-normal">
-          {(totalSupply > 0 || votableSupply > 0) && (
-            <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
-              <div className="">
-                {isLoading ? "-" : formattedMetrics.totalSupply} {token.symbol}{" "}
-                total supply
-              </div>
-              {contracts.token.isERC20() && (
+          {(totalSupply > 0 || votableSupply > 0) &&
+            !ui.toggle("footer/hide-total-supply")?.enabled && (
+              <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
                 <div className="">
-                  {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
-                  {token.symbol} votable supply
+                  {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
+                  {token.symbol} total supply
                 </div>
-              )}
-            </div>
-          )}
+                {!hideVotableSupply &&
+                  (contracts.token.isERC20() || contracts.token.isERC721()) && (
+                    <div className="">
+                      {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
+                      {token.symbol} votable supply
+                    </div>
+                  )}
+              </div>
+            )}
 
           {/* Links Section */}
-          {(changeLogLink || bugsLink || discordLink) && (
+          {(changeLogLink ||
+            bugsLink ||
+            discordLink ||
+            twitterLink ||
+            farcasterLink) && (
             <div className="p-8 border-b border-line flex flex-col justify-center items-start gap-2.5">
               <div className="flex flex-col justify-center items-start gap-6 font-medium">
                 {governanceForumLink && (
@@ -205,6 +255,31 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     <Image
                       src={discordIcon.src}
                       alt="Discord"
+                      width={24}
+                      height={24}
+                    />
+                  </a>
+                )}
+                {twitterLink && (
+                  <a
+                    href={twitterLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-6 h-6"
+                  >
+                    <Image src={XIcon} alt="Twitter" width={24} height={24} />
+                  </a>
+                )}
+                {farcasterLink && (
+                  <a
+                    href={farcasterLink.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-6 h-6"
+                  >
+                    <Image
+                      src={FarcasterIcon}
+                      alt="Farcaster"
                       width={24}
                       height={24}
                     />

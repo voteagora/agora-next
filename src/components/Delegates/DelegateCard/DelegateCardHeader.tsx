@@ -1,7 +1,10 @@
 "use client";
 
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { useVoterStats, useDelegateStats } from "@/hooks/useVoterStats";
+import {
+  useDelegateStats,
+  useArchiveParticipation,
+} from "@/hooks/useVoterStats";
 import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
@@ -9,62 +12,63 @@ interface Props {
 }
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
-  const { data: voterStats } = useVoterStats({ address: delegate.address });
   const { data: delegateResponse, error: delegateStatsError } =
     useDelegateStats({
       address: delegate.address,
     });
 
   const { ui } = Tenant.current();
-
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposal-details")?.enabled || false;
 
-  if (
-    !voterStats ||
-    !delegateResponse ||
-    delegateStatsError ||
-    !showParticipation
-  ) {
+  // Always call archive hook to keep hook order stable across renders
+  const { data: archiveParticipation } = useArchiveParticipation({
+    address: delegate.address,
+    enabled: useArchiveForProposals,
+  });
+
+  const showHeader = showParticipation || useArchiveForProposals;
+
+  if (!delegateResponse || delegateStatsError || !showHeader) {
     return null;
   }
 
   const delegateStats = delegateResponse.delegate;
-
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
 
-  const eligible = numRecentProposals >= 10;
-
-  if (!eligible) {
-    return <PendingActivityHeader />;
+  // Minimal change: optionally override counts for archive tenants
+  let votesCount = numRecentVotes;
+  let totalProposals = numRecentProposals;
+  if (useArchiveForProposals) {
+    if (!archiveParticipation) return <PendingActivityHeader />;
+    votesCount = archiveParticipation.participated;
+    totalProposals = archiveParticipation.totalProposals;
   }
 
-  const participationRate =
-    numRecentVotes / // Numerator
-    numRecentProposals; // Denominator
+  const eligible = totalProposals >= 10;
+  if (!eligible) return <PendingActivityHeader />;
 
+  const participationRate = votesCount / totalProposals;
   const participationString = Math.floor(participationRate * 100);
 
   if (participationRate > 0.5) {
     return (
       <ActiveHeader
-        outOfTen={numRecentVotes.toString()}
-        totalProposals={numRecentProposals}
+        outOfTen={votesCount.toString()}
+        totalProposals={totalProposals}
         percentParticipation={participationString}
       />
     );
-  } else if (participationRate <= 0.5) {
-    return (
-      <InactiveHeader
-        outOfTen={numRecentVotes.toString()}
-        totalProposals={numRecentProposals}
-        percentParticipation={participationString}
-      />
-    );
-  } else {
-    //   Fallback to pending if something goes wrong
-    return <PendingActivityHeader />;
   }
+  return (
+    <InactiveHeader
+      outOfTen={votesCount.toString()}
+      totalProposals={totalProposals}
+      percentParticipation={participationString}
+    />
+  );
 };
 
 const ActiveHeader = ({
@@ -78,8 +82,8 @@ const ActiveHeader = ({
 }) => {
   return (
     <CardHeader
-      title="Active delegate"
-      cornerTitle={`🎉 ${percentParticipation}%`}
+      title="Active delegate 🎉"
+      cornerTitle={`${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
@@ -96,8 +100,8 @@ const InactiveHeader = ({
 }) => {
   return (
     <CardHeader
-      title="Inactive delegate"
-      cornerTitle={`💤 ${percentParticipation}%`}
+      title="Inactive delegate 💤"
+      cornerTitle={`${percentParticipation}%`}
       subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
     />
   );
@@ -125,13 +129,13 @@ const CardHeader = ({
   subtitle: string;
 }) => {
   return (
-    <div className="px-4 pt-4 pb-8 border border-line bg-tertiary/5 rounded-lg mb-[-16px]">
+    <div className="p-7 border border-line bg-tertiary/5 rounded-xl mb-[-16px]">
       <div className="flex flex-col gap-0.5">
         <div className="flex flex-row justify-between">
-          <h3 className="text-primary font-bold">{title}</h3>
-          <span className="text-primary font-bold">{cornerTitle}</span>
+          <h3 className="text-primary font-medium">{title}</h3>
+          <span className="text-primary font-medium">{cornerTitle}</span>
         </div>
-        <p className="text-xs text-tertiary">{subtitle}</p>
+        <p className="text-xs font-medium text-tertiary">{subtitle}</p>
       </div>
     </div>
   );

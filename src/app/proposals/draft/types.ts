@@ -210,14 +210,20 @@ export type PLMConfig = {
   gatingType: ProposalGatingType;
   // Whether to show the create proposal button conditionally with a check
   protocolLevelCreateProposalButtonCheck?: boolean;
+  // The addresses that can create offchain proposals
+  offchainProposalCreator?: string[];
+  // Temporary: allow public draft sharing via ?share=AuthorAddress
+  allowDraftSharing?: boolean;
 };
 
 export type BaseProposal = ProposalDraft & {
+  uuid?: string;
   checklist_items: ProposalChecklist[];
   proposal_scope?: ProposalScope;
   tiers_enabled?: boolean;
   tiers?: number[];
   calculationOptions?: number;
+  transactions: ProposalDraftTransaction[];
 };
 
 export type BasicProposal = BaseProposal & {
@@ -294,6 +300,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
     proposal_scope: proposal.proposal_scope,
     tiers_enabled: proposal.tiers_enabled || proposal.tiers?.length > 0,
     tiers: proposal.tiers,
+    proposalConfigType: proposal.proposal_type,
   };
 
   switch (proposal.voting_module_type) {

@@ -21,10 +21,12 @@ const SUBTAB_PARAM = "subtab";
 function DelegationsContainer({
   delegatees,
   initialDelegators,
+  numOfDelegators,
   fetchDelegators,
 }: {
   delegatees: Delegation[];
   initialDelegators: PaginatedResult<Delegation[]>;
+  numOfDelegators: bigint;
   fetchDelegators: (params: {
     offset: number;
     limit: number;
@@ -38,10 +40,6 @@ function DelegationsContainer({
     history: "push",
     shallow: true,
   });
-
-  const handleSubtabChange = (value: string) => {
-    setSubtab(value);
-  };
 
   const { data: tokenBalance } = useTokenBalance(delegatees[0]?.from);
   const isLoadingRef = useRef(false);
@@ -74,8 +72,11 @@ function DelegationsContainer({
 
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
-      <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
-        No delegations found.
+      <div className="flex flex-col gap-2">
+        <h2 className="text-2xl font-bold text-primary">Delegations</h2>
+        <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl border border-line shadow-newDefault">
+          No delegations found.
+        </div>
       </div>
     );
   }
@@ -83,16 +84,22 @@ function DelegationsContainer({
   return (
     <div className="max-w-full text-primary">
       <Tabs
-        className="max-w-full mb-8"
-        value={subtab}
-        onValueChange={handleSubtabChange}
+        className="max-w-full"
+        value={subtab || "delegatedFrom"}
+        onValueChange={setSubtab}
       >
         <div className="flex flex-row items-center justify-between">
           <TabsList>
-            <TabsTrigger className="text-2xl" value="delegatedFrom">
+            <TabsTrigger
+              className="text-2xl opacity-60 data-[state=active]:opacity-100"
+              value="delegatedFrom"
+            >
               Delegated from
             </TabsTrigger>
-            <TabsTrigger className="text-2xl" value="delegatedTo">
+            <TabsTrigger
+              className="text-2xl opacity-60 data-[state=active]:opacity-100"
+              value="delegatedTo"
+            >
               Delegated to
             </TabsTrigger>
           </TabsList>
@@ -124,7 +131,9 @@ function DelegationsContainer({
                         className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                         colSpan={6}
                       >
-                        None found
+                        {numOfDelegators > 0n
+                          ? "Accounts with OVP or Dust are hidden"
+                          : "None found"}
                       </td>
                     ) : (
                       delegators.map((delegation) => (

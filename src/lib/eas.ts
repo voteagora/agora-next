@@ -8,22 +8,31 @@ import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { getEASAddress } from "./constants";
 
-const { slug } = Tenant.current();
+const { slug, contracts } = Tenant.current();
 
 const CREATE_PROPOSAL_SCHEMA_ID =
   process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
     ? "0x590765de6f34bbae3e51aa89e571f567fa6d63cf3f8225592d58133860a0ccda"
     : "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4";
 
+const EAS_V2_SCHEMA_IDS = {
+  CREATE_PROPOSAL:
+    "0x38bfba767c2f41790962f09bcf52923713cfff3ad6d7604de7cc77c15fcf169a",
+  VOTE: {
+    1: "0x12cd8679de42e111a5ece9f2aee44dc8b8351024dea881cda97c2ff5b58349f6",
+    11155111:
+      "0x19c36b80a224c4800fd6ed68901ec21f591563c8a5cb2dd95382d430603f91ff",
+    8453: "0x72edbb9603b8ff8ae5310c1d33912f4a7998bea0c03afc0e06a64e41d32b78b9",
+  } as Record<number, string>,
+};
+
 const schemaEncoder = new SchemaEncoder(
   "address contract,uint256 id,address proposer,string description,string[] choices,uint8 proposal_type_id,uint256 start_block,uint256 end_block, string proposal_type, uint256[] tiers, uint256 onchain_proposalid, uint8 max_approvals, uint8 criteria, uint128 criteria_value, uint8 calculationOptions"
 );
 
-const eas =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
-    ? new EAS("0x4200000000000000000000000000000000000021")
-    : new EAS("0x4200000000000000000000000000000000000021");
+const eas = new EAS(getEASAddress(contracts.token.chain.id));
 
 export async function createProposalAttestation({
   contract,
@@ -59,6 +68,7 @@ export async function createProposalAttestation({
   calculationOptions: number;
 }) {
   eas.connect(signer as any);
+
   const id = BigInt(
     keccak256(
       defaultAbiCoder.encode(
@@ -110,7 +120,7 @@ export async function createProposalAttestation({
     },
   });
 
-  const receipt = await txResponse.wait(1);
+  const receipt = await txResponse.wait();
 
   if (!receipt) {
     console.error(
@@ -194,3 +204,108 @@ export const signDelegatedAttestation = async ({
 
   return response.signature;
 };
+// EAS v2 Governance Functions
+
+// Schema encoders for EAS v2 attestations
+const v2SchemaEncoders = {
+  CREATE_PROPOSAL: new SchemaEncoder(
+    "string title,string description,uint64 startts,uint64 endts,string tags, string kwargs"
+  ),
+  VOTE: new SchemaEncoder("int8 choice,string reason"),
+};
+
+export async function createV2CreateProposalAttestation({
+  title,
+  description,
+  startts,
+  endts,
+  tags,
+  proposal_type_uid,
+  signer,
+}: {
+  title: string;
+  description: string;
+  startts: bigint;
+  endts: bigint;
+  tags: string;
+  proposal_type_uid?: string;
+  signer: JsonRpcSigner;
+}) {
+  eas.connect(signer as any);
+
+  const encodedData = v2SchemaEncoders.CREATE_PROPOSAL.encodeData([
+    { name: "title", value: title, type: "string" },
+    { name: "description", value: description, type: "string" },
+    { name: "startts", value: startts, type: "uint64" },
+    { name: "endts", value: endts, type: "uint64" },
+    { name: "tags", value: tags, type: "string" },
+    { name: "kwargs", value: "{'voting_module': 'standard'}", type: "string" },
+  ]);
+
+  const txResponse = await eas.attest({
+    schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
+    data: {
+      recipient:
+        contracts.easRecipient || "0x0000000000000000000000000000000000000000",
+      expirationTime: NO_EXPIRATION,
+      revocable: true,
+      refUID: proposal_type_uid || ZERO_BYTES32,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+  return { transactionHash: receipt };
+}
+export { EAS_V2_SCHEMA_IDS };
+
+export async function createVoteAttestation({
+  choice,
+  reason,
+  signer,
+  proposalId,
+}: {
+  choice: number; // 0 = against, 1 = for, 2 = abstain
+  reason: string;
+  signer: JsonRpcSigner;
+  proposalId: string;
+}) {
+  eas.connect(signer as any);
+
+  const encodedData = v2SchemaEncoders.VOTE.encodeData([
+    { name: "choice", value: choice, type: "int8" },
+    { name: "reason", value: reason, type: "string" },
+  ]);
+
+  const recipient =
+    contracts.easRecipient || "0x0000000000000000000000000000000000000000";
+  const expirationTime = NO_EXPIRATION;
+  const revocable = false;
+
+  const txResponse = await eas.attest({
+    schema: EAS_V2_SCHEMA_IDS.VOTE[contracts.token.chain.id],
+    data: {
+      recipient,
+      expirationTime,
+      revocable,
+      refUID: proposalId,
+      data: encodedData,
+      value: 0n,
+    },
+  });
+
+  const receipt = await txResponse.wait();
+
+  if (!receipt) {
+    console.error(
+      "Transaction failed or was not mined. Full response:",
+      receipt
+    );
+    throw new Error("Transaction failed or was not mined.");
+  }
+
+  return {
+    transactionHash: receipt,
+  };
+}

@@ -3,11 +3,15 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
+import { HStack } from "@/components/Layout/Stack";
+import { HYBRID_PROPOSAL_QUORUM } from "@/lib/constants";
 
 export const HybridApprovalCriteria = ({
   proposalSettings,
+  currentQorum,
 }: {
   proposalSettings?: ParsedProposalData["HYBRID_APPROVAL"]["kind"]["proposalSettings"];
+  currentQorum?: number;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -15,14 +19,23 @@ export const HybridApprovalCriteria = ({
 
   return (
     <div className="justify-start items-start">
+      <div className="px-4">
+        <HStack
+          justifyContent="justify-between"
+          className="text-xs font-semibold text-secondary pt-4"
+        >
+          <div>Quorum {HYBRID_PROPOSAL_QUORUM * 100}%</div>
+          <div>Current {currentQorum?.toFixed(2)}%</div>
+        </HStack>
+      </div>
       <Collapsible.Root
         open={isOpen}
         onOpenChange={setIsOpen}
-        className="self-stretch rounded-sm border border-line w-full"
+        className="self-stretch rounded-sm  w-full"
       >
         <Collapsible.Trigger asChild>
           <div className="flex w-full justify-between items-center cursor-pointer px-4">
-            <div className="flex-1 h-10 inline-flex flex-col justify-center items-start gap-4">
+            <div className="flex-1 h-10 inline-flex flex-col justify-center items-start gap-2">
               <div className="text-sm font-semibold leading-none">Details</div>
             </div>
             <button className="w-4 h-4 flex items-center justify-center">

@@ -1,12 +1,13 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import {
-  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
   fetchVotesForProposal,
+  fetchUserVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
-import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
+import { TaxFormBanner } from "../TaxFormBanner";
 
 async function fetchProposalVotes(
   proposalId: string,
@@ -20,13 +21,13 @@ async function fetchProposalVotes(
   });
 }
 
-async function fetchUserVotesForProposal(
+async function fetchUserVotes(
   proposalId: string,
   address: string | `0x${string}`
 ) {
   "use server";
 
-  return await apiFetchUserVotesForProposal({
+  return await fetchUserVotesForProposal({
     proposalId,
     address,
   });
@@ -40,6 +41,7 @@ export default async function OPProposalApprovalPage({
   return (
     // 2 Colum Layout: Description on left w/ transactions and Votes / voting on the right
     <div className="flex flex-col">
+      <TaxFormBanner proposal={proposal} />
       <ProposalStateAdmin proposal={proposal} />
 
       <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col sm:flex-row sm:items-start sm:justify-between">
@@ -53,7 +55,7 @@ export default async function OPProposalApprovalPage({
               <ApprovalVotesPanel
                 proposal={proposal}
                 fetchVotesForProposal={fetchProposalVotes}
-                fetchUserVotesForProposal={fetchUserVotesForProposal}
+                fetchUserVotes={fetchUserVotes}
               />
             </div>
           </div>

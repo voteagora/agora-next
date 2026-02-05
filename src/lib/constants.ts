@@ -1,4 +1,14 @@
-import { TenantNamespace } from "./types";
+import { VoterTypes } from "@/app/api/common/votes/vote";
+import { type Chain } from "viem";
+import {
+  mainnet,
+  sepolia,
+  optimism,
+  scroll,
+  linea,
+  lineaSepolia,
+  cyber,
+} from "viem/chains";
 
 export const INDEXER_DELAY = 3000;
 
@@ -45,7 +55,31 @@ export const TENANT_NAMESPACES = {
   B3: "b3",
   DEMO: "demo",
   LINEA: "linea",
+  TOWNS: "towns",
+  SYNDICATE: "syndicate",
+  DEMO2: "demo2",
+  DEMO4: "demo4",
+  DEMO3: "demo3",
 } as const;
+
+// SIWE localStorage keys
+export const LOCAL_STORAGE_SIWE_JWT_KEY = "agora-siwe-jwt";
+export const LOCAL_STORAGE_SIWE_STAGE_KEY = "agora-siwe-stage";
+
+// EIP-1271 magic value returned by isValidSignature on success
+export const EIP1271_MAGIC_VALUE = "0x1626ba7e";
+
+// Canonical set of chains we support across tenants for read-only ops (e.g., 1271 checks)
+// Note: tenant-derived chains (e.g., deriveMainnet) are appended in helpers to avoid cycles
+export const SUPPORTED_CHAINS: Chain[] = [
+  mainnet,
+  sepolia,
+  optimism,
+  scroll,
+  linea,
+  lineaSepolia,
+  cyber,
+];
 
 export const proposalsFilterOptions = {
   relevant: {
@@ -56,7 +90,12 @@ export const proposalsFilterOptions = {
     value: "Everything",
     filter: "everything",
   },
+  tempChecks: {
+    value: "Temp Checks",
+    filter: "temp-checks",
+  },
 };
+
 export const delegatesFilterOptions = {
   weightedRandom: {
     sort: "weighted_random",
@@ -138,13 +177,18 @@ export const retroPGFSort = {
   mostInBallots: "Most in ballots",
 };
 
-export const disapprovalThreshold = 12;
+export const disapprovalThreshold = 20;
 
 export enum GOVERNOR_TYPE {
   AGORA = "AGORA",
   ALLIGATOR = "ALLIGATOR",
   BRAVO = "BRAVO",
   ENS = "ENS",
+}
+
+export enum PROPOSAL_TYPES_CONFIGURATOR_FACTORY {
+  WITH_DESCRIPTION = "WITH_DESCRIPTION",
+  WITHOUT_DESCRIPTION = "WITHOUT_DESCRIPTION",
 }
 
 export enum TIMELOCK_TYPE {
@@ -166,3 +210,120 @@ export const HYBRID_VOTE_WEIGHTS = {
   users: 1 / 6,
   chains: 1 / 6,
 } as const;
+
+export const HYBRID_PROPOSAL_QUORUM = 0.3;
+
+export const HYBRID_OPTIMISTIC_TIERED_THRESHOLD = [55, 45, 35];
+export const OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD = [65, 65, 65];
+export const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];
+
+export const VOTER_TYPES: VoterTypes[] = [
+  {
+    type: "APP",
+    value: "Citizen House: Apps",
+  },
+  {
+    type: "CHAIN",
+    value: "Citizen House: Chains",
+  },
+  {
+    type: "USER",
+    value: "Citizen House: Users",
+  },
+  {
+    type: "TH", // used as default in voter/hasnt voted list apis
+    value: "Token House",
+  },
+];
+
+export const ADMIN_TYPES: Record<string, string> = {
+  duna_admin: "DUNA_ADMIN",
+  admin: "ADMIN",
+  super_admin: "SUPER_ADMIN",
+};
+
+export const ARCHIVE_GCS_BUCKET =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+    ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
+    : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
+
+export const getArchiveSlugGCSbucket = (namespace: string) => {
+  return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
+};
+
+export const getArchiveSlugAllProposals = (namespace: string): string[] => {
+  if (namespace === "optimism") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveEasAtlas(namespace),
+    ];
+  } else if (namespace === "ens") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveSnapshotProposals(namespace),
+    ];
+  } else if (namespace === "derive") {
+    return [getArchiveSnapshotProposals(namespace)];
+  }
+  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`];
+};
+
+export const getArchiveDaoNodeProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/dao_node/raw.ndjson.gz`;
+};
+
+export const getArchiveEasOodaoProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/eas-oodao/raw.ndjson.gz`;
+};
+
+export const getArchiveEasAtlas = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/eas-atlas/raw.ndjson.gz`;
+};
+
+export const getArchiveSnapshotProposals = (namespace: string) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/snapshot/raw.ndjson.gz`;
+};
+
+export const getArchiveSlugForDaoNodeProposal = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json`;
+};
+
+export const getArchiveSlugForEasOodaoProposal = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
+};
+
+export const getArchiveSlugForProposalVotes = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/votes/${proposalId}.ndjson.gz`;
+};
+
+export const getArchiveSlugForProposalNonVoters = (
+  namespace: string,
+  proposalId: string
+) => {
+  return `${getArchiveSlugGCSbucket(namespace)}/hasnt_voted/${proposalId}.ndjson.gz`;
+};
+
+export const getEASAddress = (chainId: number) => {
+  switch (chainId) {
+    case 10:
+      return "0x4200000000000000000000000000000000000021";
+    case 11155420:
+      return "0x4200000000000000000000000000000000000021";
+    case 1:
+      return "0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587";
+    case 11155111:
+      return "0xC2679fBD37d54388Ce493F1DB75320D236e1815e";
+    case 8453:
+      return "0x4200000000000000000000000000000000000021";
+  }
+  return "0x0000000000000000000000000000000000000000";
+};

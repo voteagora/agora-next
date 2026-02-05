@@ -8,17 +8,80 @@ import {
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
-
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
+import type { FormState } from "@/app/types";
+import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
     draftProposalId: number;
+    creatorAddress: string;
+    message?: string;
+    signature?: `0x${string}`;
+    jwt?: string;
   }
 ): Promise<FormState> {
+  if (data.jwt) {
+    const jwtAddress = await verifyJwtAndGetAddress(data.jwt);
+    if (!jwtAddress) {
+      return { ok: false, message: "Invalid token" };
+    }
+    if (jwtAddress.toLowerCase() !== data.creatorAddress.toLowerCase()) {
+      return { ok: false, message: "Token address mismatch" };
+    }
+  } else if (data.message && data.signature) {
+    const isValidSig = await verifySiwe({
+      address: data.creatorAddress as `0x${string}`,
+      message: data.message,
+      signature: data.signature,
+    });
+    if (!isValidSig) {
+      return { ok: false, message: "Invalid signature" };
+    }
+  } else {
+    return { ok: false, message: "Missing authentication" };
+  }
+
+  // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)
+  const draft = await prismaWeb2Client.proposalDraft.findUnique({
+    where: { id: data.draftProposalId },
+    select: {
+      id: true,
+      author_address: true,
+      proposal_scope: true,
+    },
+  });
+  if (!draft) return { ok: false, message: "Draft not found" };
+
+  const signer = data.creatorAddress.toLowerCase();
+  let isAuthorized = signer === draft.author_address.toLowerCase();
+
+  try {
+    const tenant = Tenant.current();
+    const offchainToggle = tenant.ui.toggle("proposals/offchain");
+    const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+    const plmConfig = plmToggle?.config as
+      | { offchainProposalCreator?: string[] }
+      | undefined;
+    const isOffchainScope =
+      (draft.proposal_scope || "").toLowerCase() ===
+      ProposalScope.OFFCHAIN_ONLY;
+    const allowOffchainCreator = Boolean(
+      offchainToggle?.enabled &&
+        (isOffchainScope || data.is_offchain_submission) &&
+        plmConfig?.offchainProposalCreator?.includes(signer)
+    );
+    if (allowOffchainCreator) {
+      isAuthorized = true;
+    }
+  } catch {
+    // tenant read failed; keep current isAuthorized
+  }
+
+  if (!isAuthorized) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
   const parsed = SponsorProposalSchema.safeParse(data);
 
   if (!parsed.success) {

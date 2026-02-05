@@ -9,7 +9,7 @@ export function MobileConnectButton() {
     <ConnectKitButton.Custom>
       {({ isConnected, show, ensName }) => {
         return (
-          <div className="md:hidden flex items-center opacity-100 transition-all active:opacity-60 ">
+          <div className="md:hidden flex items-center opacity-100 transition-all ">
             {isConnected ? (
               <MobileProfileDropDown ensName={ensName} />
             ) : (

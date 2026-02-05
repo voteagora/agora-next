@@ -25,27 +25,44 @@ export default function DelegateContent({
   initialDelegates,
   fetchDelegates,
 }: Props) {
-  const [layout] = useQueryState("layout", parseAsString.withDefault("grid"));
+  const { ui } = Tenant.current();
+  const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
+    ? "list"
+    : "grid";
+  const [layout] = useQueryState(
+    "layout",
+    parseAsString.withDefault(delegatesLayout)
+  );
   const { address } = useAccount();
   const [showDialog, setShowDialog] = useState(false);
   const openDialog = useOpenDialog();
-  const { ui } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!address && !showDialog && isDelegationEncouragementEnabled) {
+      // Check if we've already shown the dialog this session
+      const hasShownDialogThisSession =
+        sessionStorage.getItem("agora-delegation-dialog-shown") === "true";
+
+      if (
+        !address &&
+        !hasShownDialogThisSession &&
+        !showDialog &&
+        isDelegationEncouragementEnabled
+      ) {
         openDialog({
           type: "ENCOURAGE_CONNECT_WALLET",
           params: {},
         });
         setShowDialog(true);
+        // Mark that we've shown the dialog this session
+        sessionStorage.setItem("agora-delegation-dialog-shown", "true");
       }
     }, 900);
     return () => clearTimeout(timer);
-  }, [address, showDialog, openDialog]);
+  }, [address, showDialog, openDialog, isDelegationEncouragementEnabled]);
 
   useEffect(() => {
     if (address) {

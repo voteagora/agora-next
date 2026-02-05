@@ -8,22 +8,28 @@ import { useForm, FormProvider } from "react-hook-form";
 import SponsorActions from "../../../sponsor/components/SponsorActions";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { useManager } from "@/hooks/useManager";
-import { DraftProposal, PLMConfig, ProposalGatingType } from "../../types";
+import {
+  DraftProposal,
+  PLMConfig,
+  ProposalGatingType,
+  ProposalScope,
+} from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { UpdateVotableSupplyOracle } from "@/app/proposals/components/UpdateVotableSupplyOracle";
 
 const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
-  const tenant = Tenant.current();
-  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const { ui, contracts, token } = Tenant.current();
+  const plmToggle = ui.toggle("proposal-lifecycle");
+  const offchainToggle = ui.toggle("proposals/offchain");
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
 
   // Get wallet data with stable references
   const { address } = useAccount();
   // Stabilize hook calls
   const { data: blockNumber } = useBlockNumber({
-    chainId: tenant.ui.toggle("use-l1-block-number")?.enabled
-      ? tenant.contracts.chainForTime?.id
+    chainId: ui.toggle("use-l1-block-number")?.enabled
+      ? contracts.chainForTime?.id
       : undefined,
   });
 
@@ -53,6 +59,19 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
     accountVotes !== undefined ? accountVotes : lastValidVotes;
 
   const canAddressSponsor = useMemo(() => {
+    if (
+      offchainToggle?.enabled &&
+      ((proposalDraft.proposal_scope === ProposalScope.HYBRID &&
+        !!proposalDraft.onchain_transaction_hash) ||
+        proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY)
+    ) {
+      return (
+        address &&
+        (plmToggle?.config as PLMConfig)?.offchainProposalCreator?.includes(
+          address
+        )
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
@@ -73,10 +92,10 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   }, [gatingType, manager, address, stableAccountVotes, threshold]);
   return (
     <div className="mt-6">
-      {tenant.contracts.votableSupplyOracle?.address && (
+      {contracts.votableSupplyOracle?.address && (
         <UpdateVotableSupplyOracle
-          votableSupplyOracle={tenant.contracts.votableSupplyOracle}
-          tokenDecimal={tenant.token.decimals}
+          votableSupplyOracle={contracts.votableSupplyOracle}
+          tokenDecimal={token.decimals}
         />
       )}
       {canAddressSponsor ? (

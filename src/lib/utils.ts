@@ -28,6 +28,7 @@ import {
   scroll,
   sepolia,
 } from "viem/chains";
+import { getAlchemyId } from "./alchemyConfig";
 
 const { token } = Tenant.current();
 
@@ -40,6 +41,47 @@ export function shortAddress(address: string) {
     address &&
     [address.substring(0, 4), address.substring(address.length - 4)].join("...")
   );
+}
+
+export function resolveIPFSUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  // If it's already an HTTP/HTTPS URL, return as is
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  // Detect NFT references (eip155:chainId/erc721:contract/tokenId)
+  // Example: eip155:1/erc721:0x9dfffe8ccc228900ad4a348a3e0e7dd72f4711f7/132
+  // These require async resolution, so return null to let wagmi's useEnsAvatar handle it
+  if (url.match(/^eip155:\d+\/erc(721|1155):/)) {
+    return null;
+  }
+
+  const ipfsGateway = "https://ipfs.io";
+
+  // Convert ipfs:// to IPFS gateway URL
+  if (url.startsWith("ipfs://")) {
+    const ipfsPath = url.replace("ipfs://", "");
+    // Check if there's an NFT reference as a query parameter
+    if (ipfsPath.includes("?")) {
+      const [path, query] = ipfsPath.split("?");
+      // If query contains NFT reference, we still resolve the IPFS path
+      // The NFT reference would be handled separately if needed
+      return `${ipfsGateway}/ipfs/${path}${query ? `?${query}` : ""}`;
+    }
+    return `${ipfsGateway}/ipfs/${ipfsPath}`;
+  }
+
+  // If it's just an IPFS hash, convert it
+  if (
+    url.match(/^[Qm][1-9A-HJ-NP-Za-km-z]{44,}/) ||
+    url.match(/^ba[a-z0-9]{56,}/)
+  ) {
+    return `${ipfsGateway}/ipfs/${url}`;
+  }
+
+  return url;
 }
 
 export function bpsToString(bps: number) {
@@ -215,7 +257,8 @@ export function formatNumber(
       bigIntAmount = BigInt(amount);
     }
   } else {
-    bigIntAmount = amount || 0n;
+    // Ensure amount is converted to BigInt if it's a number
+    bigIntAmount = typeof amount === "number" ? BigInt(amount) : (amount ?? 0n);
   }
 
   // Convert to standard unit
@@ -424,49 +467,66 @@ export const isURL = (value: string) => {
 
 const FORK_NODE_URL = process.env.NEXT_PUBLIC_FORK_NODE_URL!;
 
+export function toNumericChainId(
+  // Normalize chain.id to a number even if it's a CAIP-2 string (e.g., "eip155:11155420")
+  // This format is relevant when using a wallet connect provider
+  input: number | string | { id: number | string }
+): number {
+  const raw =
+    typeof input === "object" && input !== null ? (input as any).id : input;
+
+  if (typeof raw === "number") return raw;
+
+  // Handle CAIP-2 strings like "eip155:11155420" or any "namespace:reference"
+  const parts = String(raw).split(":");
+  const maybeId = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+  const id = Number(maybeId);
+
+  if (Number.isNaN(id)) {
+    throw new Error(`Invalid chain id: ${String(raw)}`);
+  }
+
+  return id;
+}
+
 export const getTransportForChain = (chainId: number) => {
+  const alchemyId = getAlchemyId();
+
   switch (chainId) {
     // mainnet
     case 1:
       return http(
-        FORK_NODE_URL ||
-          `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // optimism
     case 10:
       return http(
-        FORK_NODE_URL ||
-          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://opt-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // optimism sepolia
     case 11155420:
       return http(
-        FORK_NODE_URL ||
-          `https://opt-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://opt-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // base
     case 8453:
       return http(
-        FORK_NODE_URL ||
-          `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://base-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // arbitrum one
     case 42161:
       return http(
-        FORK_NODE_URL ||
-          `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://arb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // arbitrum sepolia
     case 421614:
       return http(
-        FORK_NODE_URL ||
-          `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://arb-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // sepolia
     case 11155111:
       return http(
-        FORK_NODE_URL ||
-          `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://eth-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // cyber
     case 7560:
@@ -480,7 +540,7 @@ export const getTransportForChain = (chainId: number) => {
       return fallback([
         http(
           FORK_NODE_URL ||
-            `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+            `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
         ),
         http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
@@ -496,15 +556,19 @@ export const getTransportForChain = (chainId: number) => {
     // linea
     case 59144:
       return http(
-        FORK_NODE_URL ||
-          `https://linea-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://linea-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
     // linea sepolia
     case 59141:
       return http(
-        FORK_NODE_URL ||
-          `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://linea-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
+
+    // bsc (binance smart chain)
+    case 56:
+      return http(
+        FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
     // for each new dao with a new chainId add them here

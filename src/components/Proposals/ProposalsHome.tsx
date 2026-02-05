@@ -9,12 +9,14 @@ import { fetchGovernanceCalendar as apiFetchGovernanceCalendar } from "@/app/api
 import Hero from "@/components/Hero/Hero";
 import NeedsMyVoteProposalsList from "@/components/Proposals/NeedsMyVoteProposalsList/NeedsMyVoteProposalsList";
 import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
+import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import MyDraftProposals from "@/components/Proposals/DraftProposals/MyDraftProposals";
-import MySponsorshipRequests from "@/components/Proposals/DraftProposals/MySponsorshipRequests";
-import { PaginationParams } from "@/app/lib/pagination";
+import { DraftsTabsWrapper } from "@/components/Proposals/DraftsTabsWrapper";
+import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
+import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
 async function fetchProposals(
   filter: string,
@@ -40,60 +42,106 @@ async function fetchGovernanceCalendar() {
 }
 
 export default async function ProposalsHome() {
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
 
-  if (!ui.toggle("proposals")) {
+  const hasToggle = typeof (ui as any)?.toggle === "function";
+  if (!(hasToggle ? ui.toggle("proposals") : { enabled: true })) {
     return <div>Route not supported for namespace</div>;
   }
 
-  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled;
-  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
+  const plmEnabled = hasToggle
+    ? ui.toggle("proposal-lifecycle")?.enabled
+    : false;
+  const supportsNotifications = hasToggle
+    ? ui.toggle("email-subscriptions")?.enabled
+    : false;
+  const useArchiveForProposals = hasToggle
+    ? ui.toggle("use-archive-for-proposals")?.enabled
+    : false;
 
-  const [governanceCalendar, relevantProposals, allProposals, votableSupply] =
-    await Promise.all([
+  const emptyPaginated = () => ({
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [],
+  });
+
+  // Fetch data based on archive toggle
+  let governanceCalendar;
+  let relevantProposals;
+  let allProposals;
+  let votableSupply;
+  let archivedProposals: PaginatedResult<ArchiveListProposal[]> = {
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [],
+  };
+
+  if (useArchiveForProposals) {
+    [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
       fetchGovernanceCalendar(),
-      fetchProposals(proposalsFilterOptions.relevant.filter),
-      fetchProposals(proposalsFilterOptions.everything.filter),
+      fetchProposalsFromArchive(
+        namespace,
+        proposalsFilterOptions.everything.filter
+      ),
       fetchVotableSupply(),
     ]);
+
+    relevantProposals = emptyPaginated();
+    allProposals = emptyPaginated();
+  } else {
+    [governanceCalendar, relevantProposals, allProposals, votableSupply] =
+      await Promise.all([
+        fetchGovernanceCalendar(),
+        fetchProposals(proposalsFilterOptions.relevant.filter),
+        fetchProposals(proposalsFilterOptions.everything.filter),
+        fetchVotableSupply(),
+      ]);
+  }
+
+  const proposalsContent = (
+    <>
+      <NeedsMyVoteProposalsList
+        fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
+        votableSupply={votableSupply}
+      />
+      {useArchiveForProposals ? (
+        <ArchiveProposalsList
+          proposals={archivedProposals.data}
+          governanceCalendar={governanceCalendar}
+        />
+      ) : (
+        <ProposalsList
+          initRelevantProposals={relevantProposals}
+          initAllProposals={allProposals}
+          fetchProposals={async (
+            pagination: PaginationParams,
+            filter: string
+          ) => {
+            "use server";
+            return fetchProposals(filter, pagination);
+          }}
+          governanceCalendar={governanceCalendar}
+          votableSupply={votableSupply}
+        />
+      )}
+    </>
+  );
 
   return (
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
-      {plmEnabled && (
-        <>
-          <MyDraftProposals
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposals(address);
-            }}
-          />
-          <MySponsorshipRequests
-            fetchDraftProposals={async (address) => {
-              "use server";
-              return apiFetchDraftProposalsForSponsorship(address);
-            }}
-          />
-        </>
-      )}
-      <NeedsMyVoteProposalsList
-        fetchNeedsMyVoteProposals={fetchNeedsMyVoteProposals}
-        votableSupply={votableSupply}
-      />
-      <ProposalsList
-        initRelevantProposals={relevantProposals}
-        initAllProposals={allProposals}
-        fetchProposals={async (
-          pagination: PaginationParams,
-          filter: string
-        ) => {
+      <DraftsTabsWrapper
+        plmEnabled={!!plmEnabled}
+        fetchDraftProposals={async (address) => {
           "use server";
-          return fetchProposals(filter, pagination);
+          return apiFetchDraftProposals(address);
         }}
-        governanceCalendar={governanceCalendar}
-        votableSupply={votableSupply}
-      />
+        fetchSponsorshipProposals={async (address) => {
+          "use server";
+          return apiFetchDraftProposalsForSponsorship(address);
+        }}
+      >
+        {proposalsContent}
+      </DraftsTabsWrapper>
     </div>
   );
 }

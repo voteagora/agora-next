@@ -9,11 +9,12 @@ import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
+import { getAlchemyId } from "@/lib/alchemyConfig";
 
 export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
   etherfi: "EtherFi",
-  pguild: "PGuild",
+  pguild: "Protocol Guild",
   boost: "Boost",
   demo: "Canopy",
 };
@@ -36,7 +37,7 @@ export default class Tenant {
     this._contracts = TenantContractFactory.create(
       this._namespace,
       this._isProd,
-      process.env.NEXT_PUBLIC_ALCHEMY_ID as string
+      getAlchemyId()
     );
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);

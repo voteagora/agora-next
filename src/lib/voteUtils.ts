@@ -16,7 +16,7 @@ import {
 } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
-import { disapprovalThreshold, TENANT_NAMESPACES } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { AbiCoder } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
@@ -192,8 +192,8 @@ export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
 
 export async function parseVote(
   vote: VotePayload,
-  proposalData: ParsedProposalData[ProposalType],
-  latestBlock: Block | null
+  proposalData?: ParsedProposalData[ProposalType],
+  latestBlock?: Block | null
 ): Promise<Vote> {
   const { contracts } = Tenant.current();
   let blockNumber = vote.block_number;
@@ -211,8 +211,10 @@ export async function parseVote(
     support: parseSupport(vote.support, vote.proposal_type, vote.start_block),
     weight: vote.weight.toFixed(0),
     reason: vote.reason,
-    params: parseParams(vote.params, proposalData),
-    proposalValue: getProposalTotalValue(proposalData) || BigInt(0),
+    params: proposalData ? parseParams(vote.params, proposalData) : null,
+    proposalValue: proposalData
+      ? (getProposalTotalValue(proposalData) ?? BigInt(0))
+      : BigInt(0),
     proposalTitle: getTitleFromProposalDescription(vote.description || ""),
     proposalType: vote.proposal_type,
     blockNumber: vote.block_number,
@@ -341,7 +343,14 @@ export function calculateVoteMetadata({
     boundedForPercentage = metrics.totalForVotesPercentage;
     boundedAgainstPercentage = metrics.totalAgainstVotesPercentage;
   } else if (proposal.proposalType === "HYBRID_APPROVAL") {
-    const metrics = calculateHybridApprovalProposalMetrics(proposal);
+    const metrics = calculateHybridApprovalProposalMetrics({
+      proposalResults:
+        proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+      proposalData:
+        proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+      quorum: Number(proposal.quorum),
+      createdTime: proposal.createdTime,
+    });
     boundedForPercentage = metrics.totalWeightedParticipation;
     boundedAgainstPercentage = 0; // Approval proposals don't typically show against percentage
   } else if (
@@ -389,6 +398,9 @@ export function calculateVoteMetadata({
         const againstAmount = Number(
           formatUnits(adjustedResults.against, token.decimals)
         );
+        const proposalData =
+          proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+        const disapprovalThreshold = proposalData.disapprovalThreshold;
         const thresholdAmount =
           (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
 
@@ -448,7 +460,14 @@ export function calculateVoteMetadata({
 
     if (proposal.proposalType === "HYBRID_APPROVAL") {
       // Use weighted calculations for hybrid approval
-      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults:
+          proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+        proposalData:
+          proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(proposal.quorum),
+        createdTime: proposal.createdTime,
+      });
       totalVotingPower = BigInt(
         Math.round(metrics.totalWeightedParticipation * 10000)
       ); // Convert to scaled format
@@ -509,7 +528,14 @@ export function calculateVoteMetadata({
 
     if (proposal.proposalType === "HYBRID_APPROVAL") {
       // For hybrid approval, use weighted percentage for sorting
-      const metrics = calculateHybridApprovalProposalMetrics(proposal);
+      const metrics = calculateHybridApprovalProposalMetrics({
+        proposalResults:
+          proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"],
+        proposalData:
+          proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
+        quorum: Number(proposal.quorum),
+        createdTime: proposal.createdTime,
+      });
       sortedOptions = mutableOptions
         .map((option, i) => ({
           ...option,
@@ -684,6 +710,9 @@ export function calculateVoteMetadataMinified({
       const againstAmount = Number(
         formatUnits(adjustedResults.against, token.decimals)
       );
+      const proposalData =
+        proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+      const disapprovalThreshold = proposalData.disapprovalThreshold;
       const thresholdAmount =
         (disapprovalThreshold * Number(formattedVotableSupply)) / 100;
 

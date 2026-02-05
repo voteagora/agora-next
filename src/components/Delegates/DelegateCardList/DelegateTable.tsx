@@ -16,8 +16,11 @@ import {
 import DelegateTableRow from "./DelegateTableRow";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
+import DelegatesPageInfoBanner from "../DelegatesPageInfoBanner";
+import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
+import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 
 interface Props {
   initialDelegates: PaginatedResult<DelegateChunk[]>;
@@ -43,11 +46,14 @@ export default function DelegateTable({
   );
   const fetching = useRef(false);
 
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
-  const showParticipation = ui.toggle("show-participation")?.enabled || false;
+  const showParticipation =
+    (ui.toggle("show-participation")?.enabled || false) &&
+    !(ui.toggle("hide-participation-delegates-page")?.enabled || false);
+  const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const { isAdvancedUser } = useIsAdvancedUser();
   const { advancedDelegators } = useConnectedDelegate();
 
@@ -93,74 +99,91 @@ export default function DelegateTable({
     }
   };
 
+  // Check if banner is visible
+  const isBannerVisible = useInfoBannerVisibility("delegates-page-info-banner");
+
   return (
     <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
-
-      <div className="overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg mt-6">
-        <Table className="min-w-full">
-          <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
-            <TableRow className="bg-tertiary/5">
-              <TableHead className="h-10 text-secondary">Name</TableHead>
-              <TableHead className="h-10 text-secondary">
-                Voting power
-              </TableHead>
-              <TableHead className="h-10 text-secondary">7d Change</TableHead>
-              {showParticipation && (
+      <div className="relative">
+        <DelegatesPageInfoBanner />
+        <div
+          className={`overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg ${isBannerVisible ? "-mt-4" : "mt-6"} relative z-10`}
+        >
+          <Table className="min-w-full">
+            <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
+              <TableRow className="bg-tertiary/5">
+                <TableHead className="h-10 text-secondary">Name</TableHead>
                 <TableHead className="h-10 text-secondary">
-                  Participation
+                  <span className="inline-flex items-center">
+                    Voting power
+                    <VotingPowerInfoTooltip />
+                  </span>
                 </TableHead>
-              )}
-              <TableHead className="h-10 text-secondary">
-                # of Delegators
-              </TableHead>
-              <TableHead className="h-10 text-secondary">Info</TableHead>
-              <TableHead className="h-10 text-secondary"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <InfiniteScroll
-            hasMore={meta.has_next}
-            pageStart={1}
-            loadMore={loadMore}
-            loader={
-              <TableRow key={0}>
-                <TableCell
-                  key="loader"
-                  className="gl_loader justify-center py-6 text-sm text-secondary"
-                >
-                  Loading...
-                </TableCell>
+                {!hide7dChange && (
+                  <TableHead className="h-10 text-secondary">
+                    7d Change
+                  </TableHead>
+                )}
+                {showParticipation && (
+                  <TableHead className="h-10 text-secondary">
+                    Participation
+                  </TableHead>
+                )}
+                <TableHead className="h-10 text-secondary">
+                  # of Delegators
+                </TableHead>
+                <TableHead className="h-10 text-secondary">Info</TableHead>
+                <TableHead className="h-10 text-secondary"></TableHead>
               </TableRow>
-            }
-            // References styles of TableBody
-            className="[&_tr:last-child]:border-0"
-            element="tbody"
-          >
-            {delegates.length === 0 ? (
-              <td
-                className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                colSpan={6}
-              >
-                None found
-              </td>
-            ) : (
-              delegates.map((delegate, index) => (
-                <DelegateTableRow
-                  key={delegate.address + index}
-                  delegate={
-                    delegate as DelegateChunk & {
-                      numOfDelegators: bigint;
-                      participation: number;
-                    }
+            </TableHeader>
+            <InfiniteScroll
+              hasMore={meta.has_next}
+              pageStart={1}
+              loadMore={loadMore}
+              loader={
+                <TableRow key={0}>
+                  <TableCell
+                    key="loader"
+                    className="gl_loader justify-center py-6 text-sm text-secondary"
+                  >
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              }
+              // References styles of TableBody
+              className="[&_tr:last-child]:border-0"
+              element="tbody"
+            >
+              {delegates.length === 0 ? (
+                <td
+                  className="w-full p-4 bg-neutral text-center text-secondary text-sm"
+                  colSpan={
+                    5 + (!hide7dChange ? 1 : 0) + (showParticipation ? 1 : 0)
                   }
-                  isAdvancedUser={isAdvancedUser}
-                  delegators={advancedDelegators}
-                  showParticipation={showParticipation}
-                />
-              ))
-            )}
-          </InfiniteScroll>
-        </Table>
+                >
+                  None found
+                </td>
+              ) : (
+                delegates.map((delegate, index) => (
+                  <DelegateTableRow
+                    key={delegate.address + index}
+                    delegate={
+                      delegate as DelegateChunk & {
+                        numOfDelegators: bigint;
+                        participation: number;
+                      }
+                    }
+                    isAdvancedUser={isAdvancedUser}
+                    delegators={advancedDelegators}
+                    showParticipation={showParticipation}
+                    show7dChange={!hide7dChange}
+                  />
+                ))
+              )}
+            </InfiniteScroll>
+          </Table>
+        </div>
       </div>
     </DialogProvider>
   );

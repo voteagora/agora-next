@@ -60,8 +60,8 @@ const SubscribeDialog = ({
   const [isHovering, setIsHovering] = useState(false);
   const [email, setEmail] = useState<string | undefined>(undefined);
   const { data: delegate, refetch } = useDelegate({ address: address });
-  const existingEmail = delegate?.statement.email;
-  const hasEmail = existingEmail && existingEmail !== "";
+  const existingEmail = null;
+  const hasEmail = false;
 
   if (!address) return null;
 
@@ -99,21 +99,7 @@ const SubscribeDialog = ({
               "prompted"
             );
             try {
-              await updateNotificationPreferencesForAddress(
-                address,
-                existingEmail || email,
-                {
-                  wants_proposal_created_email: "prompted",
-                  wants_proposal_ending_soon_email: "prompted",
-                }
-              );
-              // refresh delegate data
-              await refetch();
               closeDialog();
-            } catch (error) {
-              toast.error("Error updating notification preferences.");
-              console.error(error);
-            } finally {
               toast.success(
                 <span>
                   No problem! We won&apos;t bug you again. You can change your
@@ -123,6 +109,18 @@ const SubscribeDialog = ({
                   </Link>
                 </span>
               );
+              await updateNotificationPreferencesForAddress(
+                address,
+                existingEmail || email || "",
+                {
+                  wants_proposal_created_email: "prompted",
+                  wants_proposal_ending_soon_email: "prompted",
+                }
+              );
+              // refresh delegate data
+              await refetch();
+            } catch (error) {
+              console.error(error);
             }
           }}
         >
@@ -139,9 +137,13 @@ const SubscribeDialog = ({
           }}
           onClick={async () => {
             try {
+              if (!existingEmail && !email) {
+                toast.error("Please enter an email address.");
+                return;
+              }
               await updateNotificationPreferencesForAddress(
                 address,
-                existingEmail || email,
+                (existingEmail || email) as string,
                 {
                   wants_proposal_created_email: true,
                   wants_proposal_ending_soon_email: true,

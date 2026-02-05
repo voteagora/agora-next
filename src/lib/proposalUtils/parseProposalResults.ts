@@ -1,4 +1,9 @@
-import { ParsedProposalData, ParsedProposalResults } from "../proposalUtils";
+import {
+  calculateHybridApprovalProposalMetrics,
+  ParsedProposalData,
+  ParsedProposalResults,
+  getProposalCreatedTime,
+} from "../proposalUtils";
 import { ProposalType } from "../types";
 import Tenant from "../tenant/tenant";
 import { TENANT_NAMESPACES } from "../constants";
@@ -15,7 +20,9 @@ export function parseProposalResults(
   proposalResults: string,
   proposalData: ParsedProposalData[ProposalType],
   startBlock: string,
-  offchainProposalData?: string
+  offchainProposalData?: string,
+  quorum?: number,
+  createdTime?: Date | null
 ): ParsedProposalResults[ProposalType] {
   const type = proposalData.key;
   switch (type) {
@@ -30,7 +37,6 @@ export function parseProposalResults(
     }
     case "STANDARD":
     case "OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 
@@ -97,24 +103,64 @@ export function parseProposalResults(
       ) as ProposalResults;
       const standardResults = parsedProposalResults.standard;
 
-      return {
-        key: "OFFCHAIN_APPROVAL",
+      // Parse offchain data from offchainProposalData
+      const offchainResults = parseOffChainProposalResults(
+        offchainProposalData || "{}",
+        "OFFCHAIN_APPROVAL"
+      );
+
+      const baseResult = {
+        key: "OFFCHAIN_APPROVAL" as const,
         kind: {
           for: BigInt(standardResults?.[1] ?? 0),
           against: BigInt(standardResults?.[0] ?? 0),
           abstain: BigInt(standardResults?.[2] ?? 0),
-          choices: proposalData.kind.choices.map((choice, idx) => {
-            return {
-              choice: choice,
-              votes: BigInt(
-                parsedProposalResults.approval?.find((res) => {
-                  return res.param === idx.toString();
-                })?.votes ?? 0
-              ),
-            };
-          }),
+          options: proposalData.kind.choices.map((choice) => ({
+            option: choice,
+            weightedPercentage: 0,
+            isApproved: false,
+          })),
         },
       };
+
+      // Calculate weighted percentages and approval status if we have the necessary data
+      if (quorum && createdTime) {
+        try {
+          const metrics = calculateHybridApprovalProposalMetrics({
+            proposalResults: {
+              ...baseResult.kind,
+              ...offchainResults.kind,
+              criteria: "THRESHOLD" as const,
+              criteriaValue: 0n,
+            },
+            proposalData: proposalData.kind as any,
+            quorum,
+            createdTime,
+          });
+
+          baseResult.kind.options = baseResult.kind.options.map(
+            (option: {
+              option: string;
+              weightedPercentage: number;
+              isApproved: boolean;
+            }) => {
+              const optionMetrics = metrics.optionResults.find(
+                (result) => result.optionName === option.option
+              );
+              return {
+                option: option.option,
+                weightedPercentage: optionMetrics?.weightedPercentage || 0,
+                isApproved: optionMetrics?.meetsThreshold || false,
+              };
+            }
+          );
+        } catch (error) {
+          // If calculation fails, keep default values
+          console.warn("Failed to calculate OFFCHAIN_APPROVAL metrics:", error);
+        }
+      }
+
+      return baseResult;
     }
     case "HYBRID_STANDARD": {
       // Parse onchain data (DELEGATES) from proposalResults
@@ -141,6 +187,7 @@ export function parseProposalResults(
         },
       };
     }
+
     case "HYBRID_OPTIMISTIC": {
       // Parse onchain data (DELEGATES) from proposalResults
       const parsedProposalResults = JSON.parse(proposalResults).standard;
@@ -165,10 +212,11 @@ export function parseProposalResults(
         },
       };
     }
+    case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED": {
       return parseOffChainProposalResults(
         proposalResults || "{}",
-        "OFFCHAIN_OPTIMISTIC_TIERED"
+        proposalData.key
       );
     }
     case "HYBRID_OPTIMISTIC_TIERED": {
@@ -243,27 +291,55 @@ export function parseProposalResults(
         delegatesOptions[optionName] = voteCount;
       });
 
-      // Combine both results
-      return {
-        key: "HYBRID_APPROVAL",
+      const baseResult = {
+        key: proposalData.key,
         kind: {
           ...offchainResults.kind,
           DELEGATES: delegatesOptions, // Use the transformed structure
-          options: proposalData.kind.options.map((option, idx) => {
-            return {
-              option: option.description,
-              votes: BigInt(
-                parsedProposalResults.approval?.find((res) => {
-                  return res.param === idx.toString();
-                })?.votes ?? 0
-              ),
-            };
-          }),
+          options: proposalData.kind.options.map((option) => ({
+            option: option.description,
+            weightedPercentage: 0,
+            isApproved: false,
+          })),
           criteria: proposalData.kind.proposalSettings.criteria,
           criteriaValue: proposalData.kind.proposalSettings.criteriaValue,
           ...standardResults,
         },
       };
+
+      // Calculate weighted percentages and approval status if we have the necessary data
+      if (quorum && createdTime) {
+        try {
+          const metrics = calculateHybridApprovalProposalMetrics({
+            proposalResults: baseResult.kind,
+            proposalData: proposalData.kind,
+            quorum,
+            createdTime,
+          });
+
+          baseResult.kind.options = baseResult.kind.options.map(
+            (option: {
+              option: string;
+              weightedPercentage: number;
+              isApproved: boolean;
+            }) => {
+              const optionMetrics = metrics.optionResults.find(
+                (result) => result.optionName === option.option
+              );
+              return {
+                option: option.option,
+                weightedPercentage: optionMetrics?.weightedPercentage || 0,
+                isApproved: optionMetrics?.meetsThreshold || false,
+              };
+            }
+          );
+        } catch (error) {
+          // If calculation fails, keep default values
+          console.warn("Failed to calculate HYBRID_APPROVAL metrics:", error);
+        }
+      }
+
+      return baseResult;
     }
   }
 }
@@ -352,6 +428,7 @@ export function parseOffChainProposalResults(
           APP: processApprovalTallySource(tallyData?.APP),
           USER: processApprovalTallySource(tallyData?.USER),
           CHAIN: processApprovalTallySource(tallyData?.CHAIN),
+          totals: tallyData?.totals,
         },
       };
       if (proposalType === "OFFCHAIN_APPROVAL") {
@@ -371,6 +448,7 @@ export function parseOffChainProposalResults(
           },
         };
       }
+
       return result;
     }
     case "OFFCHAIN_OPTIMISTIC":

@@ -23,6 +23,7 @@ import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 
 interface Props {
   ensName: string | undefined;
@@ -64,7 +65,7 @@ const RenderDelegateToSelf = ({ delegate }: { delegate: DelegateChunk }) => {
   return (
     <div className="p-4 rounded-lg border border-line gap-2 bg-neutral">
       <div className="flex flex-col text-neutral-900 leading-normal">
-        <div className="flex inline-flex gap-2">
+        <div className="inline-flex gap-2">
           <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
           <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
             <div className="flex flex-col justify-start items-start gap-1">
@@ -140,15 +141,13 @@ export const ProfileDropDownContent = ({
           }
           detail={
             <div className="flex flex-col gap-4">
-              {filteredDelegations
-                ?.slice(0, 3)
-                .map((delegate) => (
-                  <DelegatePanelRow
-                    key={delegate.transaction_hash}
-                    delegate={delegate}
-                    onClick={handleCloseDrawer}
-                  />
-                ))}
+              {filteredDelegations?.slice(0, 3).map((delegate) => (
+                <DelegatePanelRow
+                  key={delegate.transaction_hash}
+                  delegate={delegate}
+                  onClick={handleCloseDrawer}
+                />
+              ))}
               {filteredDelegations?.length > 3 && (
                 <Link
                   href={`/delegates/${address}?tab=delegations&subtab=delegatedTo`}
@@ -253,7 +252,12 @@ export const ProfileDropDownContent = ({
             }
           />
           <PanelRow
-            title="My voting power"
+            title={
+              <span className="inline-flex items-center">
+                My voting power
+                <VotingPowerInfoTooltip />
+              </span>
+            }
             detail={
               <RowSkeletonWrapper isLoading={isFetching}>
                 <TokenAmountDecorated
@@ -300,6 +304,15 @@ export const ProfileDropDownContent = ({
                 >
                   Edit delegate statement
                 </Link>
+                {ui.toggle("notifications")?.enabled && (
+                  <Link
+                    href={`/notification-preferences`}
+                    onClick={handleCloseDrawer}
+                    className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
+                  >
+                    Sign to manage notifications
+                  </Link>
+                )}
               </>
             )}
           </div>

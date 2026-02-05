@@ -197,6 +197,7 @@ input[type="number"] {
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -251,5 +252,14 @@ input[type="number"] {
 @media (max-width: 767px) {
   .proposal-description {
     padding-bottom: 90px !important;
+  }
+}
+
+.vote-reason {
+  div {
+    display: inline;
+  }
+  p {
+    display: inline;
   }
 }

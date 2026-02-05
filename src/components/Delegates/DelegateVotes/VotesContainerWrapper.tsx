@@ -31,7 +31,7 @@ const VotesContainerWrapper = async ({ delegate }: Props) => {
               />
             </div>
           ) : (
-            <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
+            <div className="p-8 text-center text-secondary align-middle bg-wash border border-line rounded-xl shadow-newDefault">
               No past votes available.
             </div>
           )}
@@ -51,7 +51,7 @@ const VotesContainerWrapper = async ({ delegate }: Props) => {
               }}
             />
           ) : (
-            <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl">
+            <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl border border-line shadow-newDefault">
               No past votes available.
             </div>
           )}

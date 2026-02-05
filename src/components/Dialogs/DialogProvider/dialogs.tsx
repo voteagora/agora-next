@@ -19,6 +19,7 @@ import {
 } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
@@ -38,6 +39,9 @@ import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
 import { DraftProposal } from "@/app/proposals/draft/types";
+import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
+import { ForumPost, ForumTopic } from "@/lib/forumUtils";
+import ReportModal from "@/app/duna/components/ReportModal";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -46,6 +50,7 @@ export type DialogType =
   | CreateDraftProposalDialog
   | DelegateDialogType
   | DeleteDraftProposalDialog
+  | DeleteAllDraftProposalsDialog
   | OpenGithubPRDialog
   | PartialDelegateDialogType
   | RetroPGFShareCardDialog
@@ -61,7 +66,9 @@ export type DialogType =
   | EncourageConnectWalletDialogType
   | CreateScopeDialogType
   | AccountActionDialogType
-  | SponsorOffchainDraftProposalDialog;
+  | SponsorOffchainDraftProposalDialog
+  | ConfirmDialogType
+  | ReportModalDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -221,7 +228,12 @@ export type ApprovalCastVoteDialogType = {
 
 export type DeleteDraftProposalDialog = {
   type: "DELETE_DRAFT_PROPOSAL";
-  params: { proposalId: number };
+  params: { proposalId: number; onDeleteSuccess?: () => void };
+};
+
+export type DeleteAllDraftProposalsDialog = {
+  type: "DELETE_ALL_DRAFT_PROPOSALS";
+  params: { draftCount: number; onSuccess?: () => void };
 };
 
 export type CreateDraftProposalDialog = {
@@ -289,6 +301,28 @@ export type CreateScopeDialogType = {
 export type AccountActionDialogType = {
   type: "ACCOUNT_ACTION";
   params: {};
+};
+
+export type ConfirmDialogType = {
+  type: "CONFIRM";
+  params: {
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  };
+};
+
+export type ReportModalDialogType = {
+  type: "REPORT_MODAL";
+  className?: string;
+  params: {
+    report: ForumTopic | null;
+    onDelete?: () => void;
+    onArchive?: () => void;
+    onCommentAdded?: (newComment: ForumPost) => void;
+    onCommentDeleted?: (commentId: number) => void;
+    onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
+  };
 };
 
 export const dialogs: DialogDefinitions<DialogType> = {
@@ -446,10 +480,18 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SWITCH_NETWORK: ({ chain }: { chain: Chain }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
-  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
+  DELETE_DRAFT_PROPOSAL: ({ proposalId, onDeleteSuccess }, closeDialog) => (
     <DeleteDraftProposalDialog
       closeDialog={closeDialog}
       proposalId={proposalId}
+      onDeleteSuccess={onDeleteSuccess}
+    />
+  ),
+  DELETE_ALL_DRAFT_PROPOSALS: ({ draftCount, onSuccess }, closeDialog) => (
+    <DeleteAllDraftProposalsDialogComponent
+      closeDialog={closeDialog}
+      draftCount={draftCount}
+      onSuccess={onSuccess}
     />
   ),
   CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (
@@ -517,6 +559,39 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   ACCOUNT_ACTION: ({}, closeDialog) => {
     return <CreateAccountActionDialog closeDialog={closeDialog} />;
+  },
+  CONFIRM: ({ title, message, onConfirm }, closeDialog) => {
+    return (
+      <ConfirmDialog
+        title={title}
+        message={message}
+        onConfirm={onConfirm}
+        closeDialog={closeDialog}
+      />
+    );
+  },
+  REPORT_MODAL: (
+    {
+      report,
+      onDelete,
+      onArchive,
+      onCommentAdded,
+      onCommentDeleted,
+      onCommentUpdated,
+    },
+    closeDialog
+  ) => {
+    return (
+      <ReportModal
+        report={report}
+        onDelete={onDelete}
+        onArchive={onArchive}
+        onCommentAdded={onCommentAdded}
+        onCommentDeleted={onCommentDeleted}
+        onCommentUpdated={onCommentUpdated}
+        closeDialog={closeDialog}
+      />
+    );
   },
   // FAQ: () => {
   //   return <FaqDialog />;

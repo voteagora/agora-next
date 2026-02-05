@@ -36,26 +36,28 @@ export const DelegateToSelf = ({
           isDelegationEncouragement: true,
         },
       });
-    } else if (contracts.delegationModel === DELEGATION_MODEL.ADVANCED) {
-      if (isAdvancedUser && hasAlligator) {
-        openDialog({
-          type: "ADVANCED_DELEGATE",
-          params: {
-            target: delegate.address,
-            fetchAllForAdvancedDelegation,
-            isDelegationEncouragement: true,
-          },
-        });
-      } else {
-        openDialog({
-          type: "DELEGATE",
-          params: {
-            delegate,
-            fetchDirectDelegatee,
-            isDelegationEncouragement: true,
-          },
-        });
-      }
+    } else if (
+      contracts.delegationModel === DELEGATION_MODEL.ADVANCED &&
+      isAdvancedUser &&
+      hasAlligator
+    ) {
+      openDialog({
+        type: "ADVANCED_DELEGATE",
+        params: {
+          target: delegate.address,
+          fetchAllForAdvancedDelegation,
+          isDelegationEncouragement: true,
+        },
+      });
+    } else {
+      openDialog({
+        type: "DELEGATE",
+        params: {
+          delegate,
+          fetchDirectDelegatee,
+          isDelegationEncouragement: true,
+        },
+      });
     }
   };
 

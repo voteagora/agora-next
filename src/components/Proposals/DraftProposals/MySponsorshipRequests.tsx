@@ -7,24 +7,37 @@ import DraftProposalCard from "./DraftProposalCard";
 
 const MySponsorshipRequests = ({
   fetchDraftProposals,
+  onCountChange,
 }: {
   fetchDraftProposals: (address: `0x${string}`) => Promise<ProposalDraft[]>;
+  onCountChange?: (count: number) => void;
 }) => {
   const { address } = useAccount();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
   const getDraftProposalsAndSet = useCallback(
     async (address: `0x${string}`) => {
-      const proposals = await fetchDraftProposals(address);
-      setDraftProposals(proposals);
+      try {
+        const proposals = await fetchDraftProposals(address);
+        setDraftProposals(proposals);
+        onCountChange?.(proposals.length);
+      } catch (error) {
+        console.error("Error fetching sponsorship requests:", error);
+        setDraftProposals([]);
+        onCountChange?.(0);
+      }
     },
-    []
+    [fetchDraftProposals, onCountChange]
   );
 
   useEffect(() => {
-    if (!address) return;
+    if (!address) {
+      setDraftProposals([]);
+      onCountChange?.(0);
+      return;
+    }
     getDraftProposalsAndSet(address);
-  }, [fetchDraftProposals, address]);
+  }, [address, getDraftProposalsAndSet, onCountChange]);
 
   if (!draftProposals.length) {
     return null;
@@ -37,10 +50,10 @@ const MySponsorshipRequests = ({
         {draftProposals.map((proposal) => (
           <Link
             key={proposal.id}
-            href={`/proposals/sponsor/${proposal.id}`}
+            href={`/proposals/sponsor/${proposal.uuid || proposal.id}`}
             className="block"
           >
-            <DraftProposalCard proposal={proposal} />
+            <DraftProposalCard proposal={proposal} showDelete={false} />
           </Link>
         ))}
       </div>

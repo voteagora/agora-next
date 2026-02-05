@@ -4,7 +4,10 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
-import { TENANT_NAMESPACES } from "./constants";
+import {
+  PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
+  TENANT_NAMESPACES,
+} from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
 import { Chain } from "viem/chains";
@@ -59,6 +62,8 @@ export type TenantContracts = {
   chainForTime?: Chain;
   providerForTime?: AlchemyProvider;
   supportScopes?: boolean;
+  easRecipient?: string;
+  proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;
 };
 
 export type TenantToken = {
@@ -66,6 +71,7 @@ export type TenantToken = {
   symbol: string;
   decimals: number;
   address: string;
+  chainId?: number;
 };
 
 export type RetroPGFProject = {
@@ -266,3 +272,24 @@ export type ProposalType =
   | "HYBRID_APPROVAL"
   | "HYBRID_OPTIMISTIC"
   | "HYBRID_OPTIMISTIC_TIERED";
+
+// Execution Transaction Types
+export interface ExecutionTransaction {
+  id: string;
+  tenant: string;
+  proposal_id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AddExecutionTransactionRequest {
+  proposal_id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+}

@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AlertTriangle, X } from "lucide-react";
+import SyndicateTempCheckTooltip from "../SyndicateTempCheckTooltip";
 
 export const QuorumTooltip = () => {
   return (
@@ -43,6 +44,13 @@ export const QuorumTooltip = () => {
   );
 };
 
+type RangeProposalType = {
+  min_quorum_pct: number;
+  max_quorum_pct: number;
+  min_approval_threshold_pct: number;
+  max_approval_threshold_pct: number;
+};
+
 function AmountAndPercent({
   amount,
   total,
@@ -55,7 +63,7 @@ function AmountAndPercent({
   return (
     <span>
       <TokenAmountDecorated amount={amount} hideCurrency specialFormatting />
-      {percent && `(${percent}%)`}
+      {percent ? `(${percent}%)` : "0%"}
     </span>
   );
 }
@@ -114,9 +122,49 @@ export default function ProposalVotesSummaryDetails({
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 
+  // Check if this is an archive proposal with ranges (pending state)
+  const archiveMetadata = (
+    proposal as unknown as {
+      archiveMetadata?: { source?: string; defaultProposalTypeRanges?: any };
+    }
+  ).archiveMetadata;
+
+  const defaultProposalTypeRanges =
+    archiveMetadata?.source === "eas-oodao"
+      ? (archiveMetadata.defaultProposalTypeRanges as
+          | RangeProposalType
+          | undefined)
+      : null;
+
+  const hasPendingRanges = (proposal as any).proposalTypeApproval === "PENDING";
+
+  const minQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_quorum_pct / 100
+    : null;
+  const maxQuorum = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_quorum_pct / 100
+    : null;
+
+  const minApprovalThreshold = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.min_approval_threshold_pct / 100
+    : null;
+  const maxApprovalThreshold = defaultProposalTypeRanges
+    ? defaultProposalTypeRanges.max_approval_threshold_pct / 100
+    : null;
+
+  const isTempCheck =
+    proposal.archiveMetadata?.proposalTypeTag === "Temp Check";
+
+  const isProposalCancelled = proposal.status === "CANCELLED";
+  const isProposalExecuted = proposal.status === "EXECUTED";
+  const isProposalCancelledBeforeVoteStarts =
+    proposal.cancelledTime &&
+    proposal.startTime &&
+    proposal.cancelledTime < proposal.startTime;
+
   return (
     <div className="flex flex-col font-inter font-semibold text-xs w-full max-w-[317px] sm:min-w-[317px] bg-wash">
-      <ProposalVotesBar proposal={proposal} />
+      <ProposalVotesBar proposal={proposal} barColor="neutral" />
 
       <div className="flex flex-col gap-2 w-full mt-4">
         <div className="flex justify-between text-positive">
@@ -132,82 +180,120 @@ export default function ProposalVotesSummaryDetails({
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-4 bg-wash border-t border-b border-line -ml-4 p-4">
-        <div className="flex justify-between">
-          <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
-            Quorum
-            {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+      <div className="flex flex-col gap-2 w-[calc(100%+32px)] mt-2 bg-wash border-t border-b border-line -ml-4 p-4">
+        {!!proposal.proposalTypeData?.name && (
+          <div className="flex justify-between text-secondary font-semibold text-xs">
+            Proposal Type
+            <span>{proposal.proposalTypeData.name}</span>
           </div>
-          {proposal.quorum && (
-            <div className="flex items-center gap-1 ">
-              {hasMetQuorum && (
-                <Image
-                  width="12"
-                  height="12"
-                  src={checkIcon}
-                  alt="check icon"
-                />
+        )}
+        {(!hasPendingRanges || minQuorum !== maxQuorum) && (
+          <div className="flex justify-between">
+            <div className="flex items-center gap-1 text-secondary font-semibold text-xs">
+              Quorum
+              {isProposalCreatedBeforeUpgrade && <QuorumTooltip />}
+              {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
+                <SyndicateTempCheckTooltip />
               )}
-              <p className="text-xs font-semibold text-secondary">
-                <TokenAmountDecorated
-                  amount={quorumVotes}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />{" "}
-                /{" "}
-                <TokenAmountDecorated
-                  amount={proposal.quorum}
-                  decimals={token.decimals}
-                  hideCurrency
-                  specialFormatting
-                />
-                {isProposalCreatedBeforeUpgrade && "0"} Required
-              </p>
             </div>
-          )}
-        </div>
-        {proposal.approvalThreshold && (
+            {hasPendingRanges ? (
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-semibold text-secondary">
+                  {minQuorum}% – {maxQuorum}% Required
+                </p>
+              </div>
+            ) : (
+              proposal.quorum && (
+                <div className="flex items-center gap-1 ">
+                  {hasMetQuorum && (
+                    <Image
+                      width="12"
+                      height="12"
+                      src={checkIcon}
+                      alt="check icon"
+                    />
+                  )}
+                  <p className="text-xs font-semibold text-secondary">
+                    <TokenAmountDecorated
+                      amount={quorumVotes}
+                      decimals={token.decimals}
+                      hideCurrency
+                      specialFormatting
+                    />{" "}
+                    /{" "}
+                    <TokenAmountDecorated
+                      amount={proposal.quorum}
+                      decimals={token.decimals}
+                      hideCurrency
+                      specialFormatting
+                    />
+                    {isProposalCreatedBeforeUpgrade && "0"} Required
+                  </p>
+                </div>
+              )
+            )}
+          </div>
+        )}
+        {hasPendingRanges && minApprovalThreshold !== maxApprovalThreshold ? (
           <div className="flex justify-between">
             <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
               Threshold
             </div>
-            <div className="flex flex-row gap-1 ">
-              {hasMetThreshold ? (
-                <Image src={checkIcon} alt="check icon" />
-              ) : (
-                <X className="h-4 w-4 text-negative" />
-              )}
-              <p className=" text-xs font-semibold text-secondary">
-                {voteThresholdPercent.toFixed(2)}% /{" "}
-                {`${apprThresholdPercent}%`} Required
+            <div className="flex flex-row gap-1">
+              <p className="text-xs font-semibold text-secondary">
+                {minApprovalThreshold}% – {maxApprovalThreshold}% Required
               </p>
             </div>
           </div>
-        )}
+        ) : !hasPendingRanges ? (
+          proposal.approvalThreshold && (
+            <div className="flex justify-between">
+              <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
+                Threshold
+              </div>
+              <div className="flex flex-row gap-1 ">
+                {hasMetThreshold ? (
+                  <Image src={checkIcon} alt="check icon" />
+                ) : (
+                  <X className="h-4 w-4 text-negative" />
+                )}
+                <p className=" text-xs font-semibold text-secondary">
+                  {voteThresholdPercent.toFixed(2)}% /{" "}
+                  {`${apprThresholdPercent}%`} Required
+                </p>
+              </div>
+            </div>
+          )
+        ) : null}
       </div>
       <ol className="overflow-hidden space-y-6 w-[calc(100%+32px)] bg-wash -ml-4 p-4 pb-6 rounded-br-lg rounded-bl-lg">
         <StepperRow
           label="Proposal created"
           value={formatTime(proposal.createdTime)}
         />
-        <StepperRow
-          label="Voting period start"
-          value={formatTime(proposal.startTime)}
-        />
+        {!isProposalCancelledBeforeVoteStarts && (
+          <StepperRow
+            label="Voting period start"
+            value={formatTime(proposal.startTime)}
+          />
+        )}
         <StepperRow
           label="Voting period end"
           value={formatTime(proposal.endTime)}
         />
-        <StepperRow
-          isLastStep
-          label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
-          value={
-            proposal.status === "EXECUTED"
-              ? formatTime(proposal.executedTime)
-              : formatTime(proposal.endTime)
-          }
-        />
+        {isProposalCancelled ? (
+          <StepperRow
+            isLastStep
+            label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
+            value={formatTime(proposal.cancelledTime)}
+          />
+        ) : isProposalExecuted ? (
+          <StepperRow
+            isLastStep
+            label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
+            value={formatTime(proposal.executedTime)}
+          />
+        ) : null}
       </ol>
     </div>
   );

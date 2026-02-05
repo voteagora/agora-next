@@ -16,9 +16,13 @@ import {
   DraftProposal,
   PLMConfig,
   ProposalGatingType,
+  ProposalScope,
   ProposalType,
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount } from "wagmi";
+
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const RequestSponsorshipForm = ({
   draftProposal,
@@ -30,6 +34,8 @@ const RequestSponsorshipForm = ({
   const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
   const [isPending, setIsPending] = useState(false);
   const { watch, control } = useFormContext();
+  const { address: creatorAddress } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const address = watch("sponsorAddress");
   const votingModuleType = draftProposal.voting_module_type;
@@ -55,6 +61,17 @@ const RequestSponsorshipForm = ({
         accountVotesData !== undefined &&
         requiredTokensForSnapshot !== undefined &&
         accountVotesData >= requiredTokensForSnapshot
+      );
+    }
+    if (
+      draftProposal.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      (draftProposal.proposal_scope === ProposalScope.HYBRID &&
+        !!draftProposal.onchain_transaction_hash)
+    ) {
+      const config = plmToggle?.config as PLMConfig;
+      return (
+        !!config.offchainProposalCreator &&
+        config.offchainProposalCreator.includes(address || "")
       );
     }
     switch (gatingType) {
@@ -109,9 +126,25 @@ const RequestSponsorshipForm = ({
         onClick={async () => {
           if (canAddressSponsor) {
             setIsPending(true);
+            const messagePayload = {
+              action: "requestSponsorship",
+              draftProposalId: draftProposal.id,
+              creatorAddress,
+              timestamp: new Date().toISOString(),
+            };
+            const auth = await getAuthenticationData(messagePayload);
+            if (!auth) {
+              setIsPending(false);
+              return;
+            }
+
             const res = await requestSponsorshipAction({
               draftProposalId: draftProposal.id,
               sponsor_address: address,
+              creatorAddress: creatorAddress as `0x${string}`,
+              message: auth.message,
+              signature: auth.signature,
+              jwt: auth.jwt,
             });
             setIsPending(false);
             if (res.ok) {

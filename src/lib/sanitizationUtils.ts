@@ -1,5 +1,4 @@
-/// <reference types="dompurify" />
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 export function sanitizeContent(content: string): string {
   // Remove dangerous content
@@ -12,9 +11,9 @@ export function sanitizeContent(content: string): string {
     .replace(/\\x/g, "")
     .replace(/\[([^\]]+)\]\([^)]*javascript:[^)]+\)/gi, "$1");
 
-  // Apply DOMPurify
-  cleaned = DOMPurify.sanitize(cleaned, {
-    ALLOWED_TAGS: [
+  // Apply HTML sanitizer
+  cleaned = sanitizeHtml(cleaned, {
+    allowedTags: [
       "p",
       "br",
       "strong",
@@ -28,30 +27,35 @@ export function sanitizeContent(content: string): string {
       "h4",
       "blockquote",
     ],
-    ALLOWED_ATTR: [], // No attributes allowed
-    ALLOW_DATA_ATTR: false,
-    ADD_TAGS: ["p", "br", "strong"],
-    FORBID_TAGS: [
-      "script",
-      "style",
-      "iframe",
-      "frame",
-      "object",
-      "embed",
-      "form",
-    ],
-    FORBID_ATTR: [
-      "onerror",
-      "onload",
-      "onclick",
-      "onmouseover",
-      "href",
-      "src",
-      "style",
-    ],
+    allowedAttributes: {},
+    allowVulnerableTags: false,
+    disallowedTagsMode: "discard",
+    allowedSchemes: [],
+    allowedSchemesByTag: {},
   });
 
   return cleaned;
+}
+
+// Fix broken numbered lists where blank lines break the list
+// In markdown, blank lines between numbered items break them into separate paragraphs
+// Only fixes items that end with ":" or ":**" (header-style items with no content)
+// e.g., "1. **Item 1:**\n\n2. **Item 2:**" should be "1. **Item 1:**\n2. **Item 2:**"
+export function fixBrokenNumberedLists(text: string): string {
+  // Remove extra blank lines between numbered list items that end with a colon
+  // This is safe because items ending with ":" are clearly incomplete/header-style
+  // Apply multiple times to handle consecutive items
+  let result = text;
+  let prev = "";
+  while (result !== prev) {
+    prev = result;
+    // Match: numbered item ending with colon (possibly in bold), blank lines, next numbered item
+    result = result.replace(
+      /^(\d+\.\s+.*?:\*{0,2})(\n\s*\n+)(\d+\.\s+)/gm,
+      "$1\n$3"
+    );
+  }
+  return result;
 }
 
 export function stripMarkdown(text: string): string {

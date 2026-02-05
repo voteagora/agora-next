@@ -3,8 +3,8 @@
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import { Vote } from "@/app/api/common/votes/vote";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
@@ -77,6 +77,12 @@ export default function ProposalVotesList({
 
   const proposalVotes = voteState.pages.flatMap((page) => page.data);
 
+  // Only hide a vote from the general list if it is already shown in userVotes
+  const userVoteAddressSet = useMemo(
+    () => new Set(userVotes.map((v) => v.address)),
+    [userVotes]
+  );
+
   const loadMore = useCallback(async () => {
     if (!fetching.current && voteState.meta?.has_next) {
       fetching.current = true;
@@ -98,7 +104,7 @@ export default function ProposalVotesList({
   }, [proposalId, voteState.meta]);
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto max-h-[calc(100vh-437px)] min-h-[36px]">
+    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
       {isFetched && fetchedVotes ? (
         <InfiniteScroll
           hasMore={voteState.meta?.has_next}
@@ -121,9 +127,7 @@ export default function ProposalVotesList({
             {proposalVotes.map((vote) => (
               <li
                 key={vote.transactionHash || vote.address + vote.citizenType}
-                className={`${
-                  connectedAddress?.toLowerCase() === vote.address && "hidden"
-                }`}
+                className={`${userVoteAddressSet.has(vote.address) ? "hidden" : ""}`}
               >
                 <ProposalSingleVote vote={vote} />
               </li>

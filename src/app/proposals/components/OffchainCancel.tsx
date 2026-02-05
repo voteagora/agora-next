@@ -2,24 +2,32 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAccount, useWalletClient } from "wagmi";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { cancelProposalAttestation } from "@/lib/eas";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { useState } from "react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { cancelOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { PLMConfig } from "../draft/types";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   proposal: Proposal;
 }
 
+const { ui } = Tenant.current();
+
 export const OffchainCancel = ({ proposal }: Props) => {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [isLoading, setIsLoading] = useState(false);
+  const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const offchainProposalCreator = plmConfig.offchainProposalCreator;
 
-  const { data: adminAddress } = useGovernorAdmin({ enabled: true });
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+    address &&
+    offchainProposalCreator?.some(
+      (creator) => creator.toLowerCase() === address?.toLowerCase()
+    );
 
   const handleCancel = async () => {
     if (!proposal.id || !walletClient || !address || !chain) {
@@ -34,14 +42,12 @@ export const OffchainCancel = ({ proposal }: Props) => {
     const signer = new JsonRpcSigner(provider, address);
 
     try {
-      const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
-
       const attestationUID = (
         proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"]
       ).created_attestation_hash;
 
-      if (!apiKey || !attestationUID) {
-        throw new Error("AGORA_API_KEY is not set");
+      if (!attestationUID) {
+        throw new Error("Attestation UID not found");
       }
 
       const { transactionHash } = await cancelProposalAttestation({
@@ -50,22 +56,11 @@ export const OffchainCancel = ({ proposal }: Props) => {
         canceller: address,
       });
 
-      const response = await fetch("/api/offchain-proposals/cancel", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          proposalId: proposal.id,
-          transactionHash: attestationUID,
-        }),
+      await cancelOffchainProposal({
+        proposalId: proposal.id,
+        transactionHash: attestationUID,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Failed to update cancellation in DB");
-      }
       toast.success("Offchain proposal cancelled successfully.");
     } catch (e: any) {
       console.error("Error in offchain cancel flow:", e);

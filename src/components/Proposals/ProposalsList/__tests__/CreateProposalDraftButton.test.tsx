@@ -5,15 +5,36 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { UseQueryResult } from "@tanstack/react-query";
+import { WagmiProvider, createConfig, http } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Mock Next.js App Router (next/navigation) to avoid "expected app router to be mounted"
+vi.mock("next/navigation", () => {
+  const push = vi.fn();
+  const replace = vi.fn();
+  const prefetch = vi.fn();
+  const back = vi.fn();
+  return {
+    useRouter: () => ({ push, replace, prefetch, back }),
+    useSearchParams: () => ({ get: vi.fn() }),
+  };
+});
 
 vi.mock("@/components/Button", () => ({
-  UpdatedButton: ({ children, ...props }: { children: React.ReactNode }) => (
-    <button {...props}>{children}</button>
-  ),
+  UpdatedButton: ({
+    children,
+    isLoading,
+    ...props
+  }: {
+    children: React.ReactNode;
+    isLoading?: boolean;
+  }) => <button {...props}>{children}</button>,
 }));
 
 const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   data,
+  isEnabled: true,
   isFetched: true,
   isFetching: false,
   isPending: false,
@@ -35,6 +56,7 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   isPaused: false,
   isPlaceholderData: false,
   isStale: false,
+  isEnabled: true,
   fetchStatus: "idle",
   refetch: vi.fn(),
   promise: Promise.resolve(data),
@@ -43,6 +65,21 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
 vi.mock("@/hooks/useGetVotes");
 vi.mock("@/hooks/useManager");
 vi.mock("@/hooks/useProposalThreshold");
+const testWagmiConfig = createConfig({
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http(),
+  },
+});
+
+const queryClient = new QueryClient();
+
+const renderWithProviders = (ui: React.ReactElement) =>
+  render(
+    <WagmiProvider config={testWagmiConfig}>
+      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
+    </WagmiProvider>
+  );
 
 const mockConfig = {
   protocolLevelCreateProposalButtonCheck: true,
@@ -78,7 +115,7 @@ describe("CreateProposalDraftButton", () => {
       createMockQueryResult(100n)
     );
 
-    render(<CreateProposalDraftButton address={mockAddress} />);
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
 
     expect(screen.getByText("Create proposal")).toBeInTheDocument();
   });
@@ -90,7 +127,7 @@ describe("CreateProposalDraftButton", () => {
       createMockQueryResult(100n)
     );
 
-    render(<CreateProposalDraftButton address={mockAddress} />);
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
 
     expect(screen.getByText("Create proposal")).toBeInTheDocument();
   });
@@ -102,7 +139,7 @@ describe("CreateProposalDraftButton", () => {
       createMockQueryResult(150n)
     );
 
-    render(<CreateProposalDraftButton address={mockAddress} />);
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
 
     expect(screen.queryByText("Create proposal")).not.toBeInTheDocument();
   });
@@ -116,7 +153,7 @@ describe("CreateProposalDraftButton", () => {
       createMockQueryResult(100n)
     );
 
-    render(<CreateProposalDraftButton address={mockAddress} />);
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
 
     expect(screen.getByText("Create proposal")).toBeInTheDocument();
   });

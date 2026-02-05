@@ -24,6 +24,7 @@ const DelegationsContainerWrapper = async ({ delegate }: Props) => {
     <DelegationsContainer
       delegatees={delegatees}
       initialDelegators={delegators}
+      numOfDelegators={delegate.numOfDelegators}
       fetchDelegators={async (pagination: PaginationParams) => {
         "use server";
         return fetchCurrentDelegators(delegate.address, pagination);

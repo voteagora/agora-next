@@ -24,7 +24,10 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
   };
 
   const handleCloseDrawer = () => {
-    setIsOpen(false);
+    // Add a small delay to allow navigation to start before closing the drawer
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 100);
   };
 
   return (
@@ -42,7 +45,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
         isOpen={isOpen}
         onClose={handleCloseDrawer}
         position="bottom"
-        showCloseButton={false}
+        showCloseButton={true}
         className="bg-wash rounded-t-2xl"
       >
         <div className="flex flex-col min-h-[280px] justify-center">

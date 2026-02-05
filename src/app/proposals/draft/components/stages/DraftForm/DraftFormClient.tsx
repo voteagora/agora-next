@@ -26,11 +26,12 @@ import ApprovalProposalForm from "../../ApprovalProposalForm";
 import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   getProposalTypeAddress,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
@@ -38,6 +39,8 @@ import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui, namespace } = Tenant.current();
 
@@ -176,12 +179,16 @@ const DraftFormClient = ({
     getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
   );
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const shareParam = searchParams?.get("share");
   const { address } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
     resolver: zodResolver(DraftProposalSchema),
     mode: "onBlur",
-    defaultValues: parseProposalToForm(draftProposal) || DEFAULT_FORM,
+    defaultValues: (parseProposalToForm(draftProposal) ||
+      DEFAULT_FORM) as z.output<typeof DraftProposalSchema>,
   });
 
   const { watch, handleSubmit, control } = methods;
@@ -202,16 +209,24 @@ const DraftFormClient = ({
     );
 
     setValidProposalTypes(newValidProposalTypes);
+  }, [votingModuleType, proposalTypes]);
 
-    if (newValidProposalTypes.length > 0) {
+  // Ensure proposalConfigType is set when returning from other stages
+  useEffect(() => {
+    const current = methods.getValues("proposalConfigType");
+    if (!current && validProposalTypes.length > 0) {
       methods.setValue(
         "proposalConfigType",
-        newValidProposalTypes[0].proposal_type_id
+        validProposalTypes[0].proposal_type_id
       );
     }
-  }, [votingModuleType, proposalTypes, methods]);
+  }, [validProposalTypes, methods]);
 
   const onSubmit = async (data: z.output<typeof DraftProposalSchema>) => {
+    if (isPending) {
+      return;
+    }
+
     setIsPending(true);
 
     try {
@@ -219,10 +234,34 @@ const DraftFormClient = ({
         toast("Account not connected.");
         return;
       }
+      // Guard: require SIWE JWT before prompting signature for this action
+      const jwt = getStoredSiweJwt({ expectedAddress: address });
+      if (!jwt) {
+        toast("Session expired. Please sign in to continue.");
+        window.location.reload();
+        return;
+      }
+      const messagePayload = {
+        action: "updateDraft",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) {
+        setIsPending(false);
+        toast("Authentication failed");
+        return;
+      }
+
       const res = await draftProposalAction({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
+        message: auth.message,
+        signature: auth.signature,
+        jwt: auth.jwt,
       });
       if (!res.ok) {
         setIsPending(false);
@@ -230,14 +269,15 @@ const DraftFormClient = ({
         return;
       } else {
         invalidatePath(draftProposal.id);
-        router.push(
-          `/proposals/draft/${draftProposal.id}?stage=${stageIndex + 1}`
-        );
+        const nextId = draftProposal.uuid;
+        router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
       }
     } catch (error: any) {
       setIsPending(false);
       console.error("An error was uncaught in `draftProposalAction`: ", error);
-      toast(error.message);
+      toast(error.message || "An unexpected error occurred");
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -338,9 +378,10 @@ const DraftFormClient = ({
               <UpdatedButton
                 fullWidth={true}
                 type="primary"
-                isSubmit={true}
+                isSubmit={false}
                 className="w-[200px] flex items-center justify-center"
                 isLoading={isPending}
+                onClick={handleSubmit(onSubmit)}
               >
                 {draftProposal.title ? "Update draft" : "Create draft"}
               </UpdatedButton>

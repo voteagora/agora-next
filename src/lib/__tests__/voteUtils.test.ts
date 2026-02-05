@@ -59,6 +59,7 @@ describe("calculateVoteMetadata", () => {
       scores: [],
       start_ts: 1715136000,
       link: "https://test.com",
+      disapprovalThreshold: 12,
       proposalSettings: {
         criteria: "THRESHOLD",
         criteriaValue: BigInt(500),
@@ -74,6 +75,7 @@ describe("calculateVoteMetadata", () => {
       abstain: BigInt(0),
     },
     proposalType: "STANDARD" as any,
+    proposalTypeData: null,
     status: "ACTIVE" as any,
     createdTransactionHash: "0x",
     cancelledTransactionHash: "0x",

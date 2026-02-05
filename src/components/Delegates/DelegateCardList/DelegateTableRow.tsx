@@ -13,6 +13,7 @@ export default function DelegateTableRow({
   isAdvancedUser,
   delegators,
   showParticipation,
+  show7dChange,
 }: {
   delegate: DelegateChunk & {
     numOfDelegators: bigint;
@@ -22,6 +23,7 @@ export default function DelegateTableRow({
   isAdvancedUser: boolean;
   delegators: string[] | null;
   showParticipation: boolean;
+  show7dChange: boolean;
 }) {
   const router = useRouter();
 
@@ -47,22 +49,26 @@ export default function DelegateTableRow({
         </div>
       </TableCell>
       <TableCell>{formatNumber(delegate.votingPower.total)}</TableCell>
-      <TableCell>
-        {delegate.vpChange7d ? (
-          <span
-            className={
-              Number(delegate.vpChange7d) >= 0
-                ? "text-green-500"
-                : "text-red-500"
-            }
-          >
-            {Number(delegate.vpChange7d) >= 0 ? "+" : ""}
-            {formatNumber(delegate.vpChange7d)}
-          </span>
-        ) : (
-          "0"
-        )}
-      </TableCell>
+      {show7dChange && (
+        <TableCell>
+          {delegate.vpChange7d ? (
+            <span
+              className={
+                Number(delegate.vpChange7d) > 0
+                  ? "text-green-500"
+                  : Number(delegate.vpChange7d) < 0
+                    ? "text-red-500"
+                    : "text-secondary"
+              }
+            >
+              {Number(delegate.vpChange7d) > 0 ? "+" : ""}
+              {formatNumber(delegate.vpChange7d)}
+            </span>
+          ) : (
+            "0"
+          )}
+        </TableCell>
+      )}
       {showParticipation && (
         <TableCell>{`${Math.round(delegate.participation)}%`}</TableCell>
       )}

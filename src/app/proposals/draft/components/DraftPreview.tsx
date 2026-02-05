@@ -20,7 +20,6 @@ import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEffect, useState } from "react";
-import { getInputData } from "../utils/getInputData";
 
 const PreText = ({ text }: { text: string }) => {
   return (
@@ -38,13 +37,13 @@ const DraftPreview = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-  const gatingType = (plmToggle?.config as PLMConfig)?.gatingType;
+  const config = plmToggle?.config as PLMConfig;
+  const gatingType = config?.gatingType;
   const votingModuleType = proposalDraft.voting_module_type;
-  const { inputData } = getInputData(proposalDraft);
-  const targets = inputData?.[0];
-  const values = inputData?.[1];
-  const calldatas = inputData?.[2];
-  const description = inputData?.[3];
+  const targets = proposalDraft.transactions.map((t) => t.target);
+  const values = proposalDraft.transactions.map((t) => parseInt(t.value));
+  const calldatas = proposalDraft.transactions.map((t) => t.calldata);
+  const description = proposalDraft.transactions.map((t) => t.description);
 
   const { address } = useAccount();
   const { data: threshold } = useProposalThreshold();
@@ -80,6 +79,16 @@ const DraftPreview = ({
     accountVotes !== undefined ? accountVotes : lastValidVotes;
 
   const canSponsor = () => {
+    if (
+      proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+      (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
+        !!proposalDraft.onchain_transaction_hash)
+    ) {
+      return (
+        !!config.offchainProposalCreator &&
+        config.offchainProposalCreator.includes(address || "")
+      );
+    }
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
@@ -169,9 +178,32 @@ const DraftPreview = ({
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
           <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
-            {"> "}
-            {(plmToggle?.config as PLMConfig)?.snapshotConfig?.requiredTokens}
+            {">= "}
+            {config?.snapshotConfig?.requiredTokens}
             {" tokens"}
+          </span>
+        </div>
+      );
+    }
+    if (
+      (proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+        (proposalDraft.proposal_scope === ProposalScope.HYBRID &&
+          !!proposalDraft.onchain_transaction_hash)) &&
+      config?.offchainProposalCreator
+    ) {
+      return (
+        <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b border-line last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
+          <p className="flex-grow text-primary">Offchain proposal creator</p>
+          <span className="text-secondary font-mono text-xs">
+            <div className="flex flex-col">
+              {config.offchainProposalCreator?.map((creator) => (
+                <div key={creator}>
+                  <span className="text-secondary font-mono text-xs">
+                    {creator}
+                  </span>
+                </div>
+              ))}
+            </div>
           </span>
         </div>
       );
@@ -205,7 +237,7 @@ const DraftPreview = ({
         >
           <p className="flex-grow text-primary">Voting power</p>
           <span className="text-secondary font-mono text-xs">
-            {"> "}
+            {">= "}
             {threshold
               ? Math.round(
                   parseFloat(

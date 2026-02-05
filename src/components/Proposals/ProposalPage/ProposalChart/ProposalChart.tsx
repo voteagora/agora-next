@@ -7,6 +7,11 @@ import BubbleChart from "../BubbleChart/BubbleChart";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
+import Tenant from "@/lib/tenant/tenant";
+
+const { ui } = Tenant.current();
+
+const easv2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
 export default function ProposalChart({ proposal }: { proposal: Proposal }) {
   const [tabIndex, setTabIndex] = useState(0);
@@ -37,6 +42,10 @@ export default function ProposalChart({ proposal }: { proposal: Proposal }) {
       e.stopPropagation();
     }
   };
+
+  if (votes && votes.length === 0 && easv2Enabled) {
+    return null;
+  }
 
   return (
     <div className="border border-line rounded-lg p-4 pb-2 w-full bg-neutral">

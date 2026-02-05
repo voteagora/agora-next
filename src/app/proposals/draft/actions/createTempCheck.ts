@@ -3,22 +3,30 @@
 import { z } from "zod";
 import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import type { FormState } from "@/app/types";
+import { verifyOwnerAndSiweForDraft } from "./siweAuth";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 
-export type FormState = {
-  ok: boolean;
-  message: string;
-};
-
 export async function onSubmitAction(
   data: z.output<typeof tempCheckSchema> & {
     draftProposalId: number;
     creatorAddress: string;
+    message: string;
+    signature: `0x${string}`;
   }
 ): Promise<FormState> {
+  const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
+    address: data.creatorAddress as `0x${string}`,
+    message: data.message,
+    signature: data.signature,
+  });
+  if (!ownerCheck.ok) {
+    return { ok: false, message: ownerCheck.reason };
+  }
+
   const parsed = tempCheckSchema.safeParse(data);
 
   if (!parsed.success) {

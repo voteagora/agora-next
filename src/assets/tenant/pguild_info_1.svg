@@ -1,0 +1,21 @@
+<svg width="94" height="94" viewBox="0 0 94 94" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_11_938)">
+<path d="M73.25 45C73.25 58.8071 62.6168 70 49.5 70M73.25 45C73.25 31.1929 62.6168 20 49.5 20M73.25 45H25.75M49.5 70C36.3832 70 25.75 58.8071 25.75 45M49.5 70C55.4405 63.1541 58.8165 54.2699 59 45C58.8165 35.7301 55.4405 26.8459 49.5 20M49.5 70C43.5595 63.1541 40.1835 54.2699 40 45C40.1835 35.7301 43.5595 26.8459 49.5 20M25.75 45C25.75 31.1929 36.3832 20 49.5 20" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path opacity="0.05" d="M12 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M27 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M42 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M57 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M71 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M85 -22V94" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M111 15H-43" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M111 36H-43" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M111 85H-43" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M111 71H-43" stroke="black" stroke-dasharray="2 2"/>
+<path opacity="0.05" d="M111 53H-43" stroke="black" stroke-dasharray="2 2"/>
+</g>
+<defs>
+<clipPath id="clip0_11_938">
+<rect width="94" height="94" fill="white"/>
+</clipPath>
+</defs>
+</svg>

@@ -1,4 +1,4 @@
-// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+export const dynamic = "force-dynamic"; // this line is uncommented for e2e tests
 
 import { NextResponse } from "next/server";
 

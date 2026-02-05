@@ -26,6 +26,9 @@ export type Vote = {
     image: string;
     type: string;
   }> | null;
+  easOodaoMetadata?: {
+    createdBlockNumber: number;
+  } | null;
 };
 
 export type SnapshotVotePayload = {
@@ -66,3 +69,8 @@ export type DelegatesSort =
   | "latest_voting_block"
   | "vp_change_7d"
   | "vp_change_7d_desc";
+
+export type VoterTypes = {
+  type: string;
+  value: string;
+};

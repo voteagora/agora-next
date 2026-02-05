@@ -25,6 +25,11 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import { proposalsFilterOptions } from "@/lib/constants";
+import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
+import { prismaWeb3Client } from "@/app/lib/prisma";
+import { fetchBadgesForDelegate as apiFetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -194,4 +199,100 @@ export async function updateNotificationPreferencesForAddress(
 
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);
+};
+
+// Archive-based participation rate for tenants using archive-backed proposals
+export const fetchArchiveParticipation = async (address: string) => {
+  const { namespace, ui } = Tenant.current();
+  const useArchive =
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
+
+  if (!useArchive) {
+    return null;
+  }
+
+  // Pull archive proposals then consider only the 10 most recent by created_time/created_block_number
+  const archiveList = await fetchProposalsFromArchive(
+    namespace,
+    proposalsFilterOptions.everything.filter
+  );
+
+  const proposals = archiveList?.data ?? [];
+  const recentProposals = [...proposals]
+    // Keep proposals that have a numeric created time (direct or via created_event)
+    .filter((p) => {
+      const createdTs =
+        (p as any).created_time ??
+        p.created_event?.timestamp ??
+        p.created_event?.blocktime;
+      return typeof createdTs === "number" && !Number.isNaN(createdTs);
+    })
+    // Sort by created_time desc; tie-break by created_block_number desc when available
+    .sort((a, b) => {
+      const aTime =
+        (a as any).created_time ??
+        a.created_event?.timestamp ??
+        a.created_event?.blocktime ??
+        0;
+      const bTime =
+        (b as any).created_time ??
+        b.created_event?.timestamp ??
+        b.created_event?.blocktime ??
+        0;
+
+      if (bTime !== aTime) {
+        return Number(bTime) - Number(aTime);
+      }
+
+      const aBlock = Number(
+        (a as any).created_block_number ?? a.created_event?.block_number ?? 0
+      );
+      const bBlock = Number(
+        (b as any).created_block_number ?? b.created_event?.block_number ?? 0
+      );
+      return bBlock - aBlock;
+    })
+    .slice(0, 10);
+
+  const totalProposals = recentProposals.length;
+
+  if (totalProposals === 0) {
+    return { participated: 0, totalProposals: 0, rate: 0 };
+  }
+
+  const proposalIds = recentProposals.map((p) => String(p.id));
+
+  // Count proposals among the recent ones that this delegate voted on
+  // Using CTE to filter by voter and contract first (most selective), then proposal ID
+  const { contracts } = Tenant.current();
+  const rows = await prismaWeb3Client.$queryRawUnsafe<
+    {
+      count: number;
+    }[]
+  >(
+    `
+      WITH filtered_votes AS (
+        SELECT proposal_id
+        FROM ${namespace}.votes
+        WHERE voter = $1
+          AND contract = $2
+        GROUP BY proposal_id
+      )
+      SELECT COUNT(*)::int AS count
+      FROM filtered_votes
+      WHERE proposal_id = ANY($3::text[])
+    `,
+    address.toLowerCase(),
+    contracts.governor.address.toLowerCase(),
+    proposalIds
+  );
+
+  const participated = rows?.[0]?.count ?? 0;
+  const rate = totalProposals > 0 ? participated / totalProposals : 0;
+
+  return {
+    participated,
+    totalProposals,
+    rate,
+  };
 };

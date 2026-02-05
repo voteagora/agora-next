@@ -1,6 +1,20 @@
 // Cast for more accurate arithmetic
 import Tenant from "@/lib/tenant/tenant";
 import { Block } from "ethers";
+import { optimism, scroll } from "viem/chains";
+
+const VARIABLE_BLOCK_TIMES = [
+  {
+    id: optimism.id,
+    secondsBeforeUpdate: 0.5,
+    updateBlockNumber: 105235062,
+  },
+  {
+    id: scroll.id,
+    secondsBeforeUpdate: 1.5,
+    updateBlockNumber: 25688713,
+  },
+];
 
 const { contracts, ui } = Tenant.current();
 
@@ -32,7 +46,7 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
       return 2;
 
     case 534352: // Scroll
-      return 3;
+      return 2;
 
     case 42161: // Arbitrum one
     case 421614: // Arbitrum sepolia
@@ -60,27 +74,28 @@ export function getHumanBlockTime(
 ) {
   const chainIdToUse = forceTokenChain ? forceTokenChainId : chainId;
 
-  // Special case for Optimism mainnet due to Bedrock upgrade
-  if (chainIdToUse === 10) {
+  const update = VARIABLE_BLOCK_TIMES.find((b) => b.id === chainIdToUse);
+  // Handle changes in block time production for Optimism and scroll
+  if (update) {
     const blockSeconds = getSecondsPerBlock(chainIdToUse);
-    const secondsPerBlockBeforeBedrock = 0.5;
-    const bedrockBlockNumber = 105235062;
+    const secondsPerBlockBeforeUpdate = update.secondsBeforeUpdate;
+    const blockTimeUpdateBlockNumber = update.updateBlockNumber;
 
-    const blocksBeforeBedrock = Math.max(
-      bedrockBlockNumber - Number(blockNumber),
+    const blocksBeforeUpdate = Math.max(
+      blockTimeUpdateBlockNumber - Number(blockNumber),
       0
     );
-    const blocksAfterBedrock = Math.min(
-      Number(latestBlock.number) - bedrockBlockNumber,
+
+    const blocksAfterUpdate = Math.min(
+      Number(latestBlock.number) - blockTimeUpdateBlockNumber,
       Number(latestBlock.number) - Number(blockNumber)
     );
 
-    const timeBeforeBedrock =
-      blocksBeforeBedrock * secondsPerBlockBeforeBedrock;
-    const timeAfterBedrock = blocksAfterBedrock * blockSeconds;
+    const timeBeforeUpdate = blocksBeforeUpdate * secondsPerBlockBeforeUpdate;
+    const timeAfterUpdate = blocksAfterUpdate * blockSeconds;
 
     return new Date(
-      (latestBlock.timestamp - timeBeforeBedrock - timeAfterBedrock) * 1000
+      (latestBlock.timestamp - timeBeforeUpdate - timeAfterUpdate) * 1000
     );
   }
 

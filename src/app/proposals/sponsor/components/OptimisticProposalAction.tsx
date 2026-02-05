@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
 import {
@@ -11,8 +12,11 @@ import { useSimulateContract, useWriteContract } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
+
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { parseError } from "../../draft/utils/stages";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const OptimisticProposalAction = ({
   draftProposal,
@@ -23,6 +27,8 @@ const OptimisticProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
+  const { address } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const {
     data: config,
@@ -66,11 +72,24 @@ const OptimisticProposalAction = ({
               },
             });
 
+            const messagePayload = {
+              action: "sponsorDraft",
+              draftProposalId: draftProposal.id,
+              creatorAddress: address,
+              timestamp: new Date().toISOString(),
+            };
+            const auth = await getAuthenticationData(messagePayload);
+            if (!auth) return;
+
             await sponsorDraftProposal({
               draftProposalId: draftProposal.id,
               onchain_transaction_hash: data,
               is_offchain_submission: false,
               proposal_scope: draftProposal.proposal_scope,
+              creatorAddress: address as `0x${string}`,
+              message: auth.message,
+              signature: auth.signature,
+              jwt: auth.jwt,
             });
 
             openDialog({
@@ -88,8 +107,8 @@ const OptimisticProposalAction = ({
         Submit proposal
       </UpdatedButton>
       {onPrepareError && (
-        <div className="p-4 border border-line bg-wash rounded mt-4 text-sm text-tertiary break-words hyphens-auto">
-          {error?.message}
+        <div className="p-4 border border-negative bg-negative/10 rounded mt-4 text-sm text-negative break-words hyphens-auto">
+          {parseError(error)}
         </div>
       )}
     </>

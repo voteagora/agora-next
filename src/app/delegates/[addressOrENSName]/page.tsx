@@ -5,6 +5,7 @@ import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
 import { fetchDelegate } from "@/app/delegates/actions";
+import { fetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 import { formatNumber } from "@/lib/tokenUtils";
 import {
@@ -16,8 +17,6 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 import { redirect } from "next/navigation";
 
-import { TabsContent } from "@/components/ui/tabs";
-import { ProfileTabs } from "./ProfileTabs";
 import DelegateStatementWrapper from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";
 import DelegationsContainerWrapper, {
   DelegationsContainerSkeleton,
@@ -25,7 +24,9 @@ import DelegationsContainerWrapper, {
 import VotesContainerWrapper, {
   VotesContainerSkeleton,
 } from "@/components/Delegates/DelegateVotes/VotesContainerWrapper";
-import { loadProfileSearchParams } from "@/app/delegates/[addressOrENSName]/params";
+import DiscussionsContainerWrapper, {
+  DiscussionsContainerSkeleton,
+} from "@/components/Delegates/Discussions/DiscussionsContainerWrapper";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 export const dynamic = "force-dynamic"; // needed for both app and e2e
@@ -94,11 +95,6 @@ export default async function Page({
   const { ui } = Tenant.current();
   const address = await ensNameToAddress(addressOrENSName);
 
-  // Parse the tab parameter from URL
-  const { tab } = loadProfileSearchParams(searchParams);
-
-  const activeTab = tab || "statement";
-
   // Check if this is a SCW address
   const scwConfig = ui.smartAccountConfig;
   const scwDelegate = scwConfig ? await fetchDelegateForSCW(address) : null;
@@ -108,12 +104,15 @@ export default async function Page({
     return redirect(`/delegates/${scwDelegate.address}`);
   }
 
-  const [delegate, textRecords, efpStats] = await Promise.all([
+  const [delegate, textRecords, efpStats, badges] = await Promise.all([
     fetchDelegate(address),
     ui.toggle("show-ens-text-records")?.enabled
       ? resolveENSTextRecords(address, ["description", "location"])
       : null,
     ui.toggle("show-efp-stats")?.enabled ? resolveEFPStats(address) : null,
+    ui.toggle("show-delegate-badges")?.enabled
+      ? fetchBadgesForDelegate(address)
+      : null,
   ]);
 
   if (!delegate) {
@@ -140,25 +139,25 @@ export default async function Page({
           location={textRecords?.location}
           followersCount={efpStats?.followers_count}
           followingCount={efpStats?.following_count}
+          badges={badges}
         />
       </div>
       {!scwDelegate ? (
-        <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full">
-          <ProfileTabs initialTab={activeTab}>
-            <TabsContent value="statement">
-              <DelegateStatementWrapper delegate={parsedDelegate} />
-            </TabsContent>
-            <TabsContent value="participation">
-              <Suspense fallback={<VotesContainerSkeleton />}>
-                <VotesContainerWrapper delegate={parsedDelegate} />
-              </Suspense>
-            </TabsContent>
-            <TabsContent value="delegations">
-              <Suspense fallback={<DelegationsContainerSkeleton />}>
-                <DelegationsContainerWrapper delegate={parsedDelegate} />
-              </Suspense>
-            </TabsContent>
-          </ProfileTabs>
+        <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full gap-8">
+          <DelegateStatementWrapper delegate={parsedDelegate} />
+
+          <Suspense fallback={<VotesContainerSkeleton />}>
+            <VotesContainerWrapper delegate={parsedDelegate} />
+          </Suspense>
+
+          <Suspense fallback={<DelegationsContainerSkeleton />}>
+            <DelegationsContainerWrapper delegate={parsedDelegate} />
+          </Suspense>
+          {ui.toggle("forums")?.enabled && (
+            <Suspense fallback={<DiscussionsContainerSkeleton />}>
+              <DiscussionsContainerWrapper delegate={parsedDelegate} />
+            </Suspense>
+          )}
         </div>
       ) : (
         <DelegateStatementWrapper delegate={parsedDelegate} />

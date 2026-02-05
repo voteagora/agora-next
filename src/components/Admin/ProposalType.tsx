@@ -27,7 +27,10 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
+  TENANT_NAMESPACES,
+} from "@/lib/constants";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { formatUnits } from "viem";
@@ -58,7 +61,7 @@ type Props = {
 
 const proposalTypeSchema = z.object({
   name: z.string(),
-  description: z.string(),
+  description: z.string().optional(),
   approval_threshold: z.coerce.number().lte(100),
   quorum: z.coerce.number().lte(100),
   voting_module_type: z.nativeEnum(ProposalTypeEnum),
@@ -79,6 +82,10 @@ export default function ProposalType({
 
   const { namespace, contracts, token } = Tenant.current();
   const configuratorContract = contracts.proposalTypesConfigurator;
+
+  const proposalTypeWithoutDescription =
+    contracts.proposalTypesConfiguratorFactory ===
+    PROPOSAL_TYPES_CONFIGURATOR_FACTORY.WITHOUT_DESCRIPTION;
 
   const [assignedScopes, setAssignedScopes] = useState<ScopeData[]>(
     scopes ?? []
@@ -225,8 +232,8 @@ export default function ProposalType({
       BigInt(index),
       Math.round(quorum * 100),
       Math.round(approvalThreshold * 100),
-      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) ? "" : ` - [${votingModuleType}]`}`,
-      formValues.description || "",
+      `${formValues.name}${formValues.name.toLowerCase().includes(votingModuleType) || contracts.supportScopes ? "" : ` - [${votingModuleType}]`}`,
+      ...(proposalTypeWithoutDescription ? [] : [formValues.description || ""]),
       proposalTypeAddress,
     ];
 

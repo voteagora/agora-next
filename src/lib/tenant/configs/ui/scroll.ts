@@ -294,11 +294,11 @@ export const scrollTenantUIConfig = new TenantUI({
             prodAddress: "0xe5bAF6359d200C144A9e52E3361efA6Dc5780cC9",
             testnetAddress: "0x678dEbd4B7bEB0412B2848FfEcbE761D39b961c4",
           },
-          //   {
-          //     type: ProposalType?.OPTIMISTIC,
-          //     prodAddress: "0x89c4C0E77f7876415d07a2e43E5e9a6A4Cab3538",
-          //     testnetAddress: "0x5fA0a34a3262d646E7e28a621F631bBA5Ae029c5",
-          //   },
+          {
+            type: ProposalType?.OPTIMISTIC,
+            prodAddress: "0x89c4C0E77f7876415d07a2e43E5e9a6A4Cab3538",
+            testnetAddress: "0x5fA0a34a3262d646E7e28a621F631bBA5Ae029c5",
+          },
         ],
         copy: {
           helperText: `
@@ -333,6 +333,14 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "use-archive-for-vote-history",
+      enabled: false,
+    },
+    {
+      name: "forums",
       enabled: false,
     },
   ],

@@ -3,30 +3,29 @@ run-name: ${{ github.actor }} - ${{ github.event_name }} - ${{ github.repository
 on:
   pull_request:
     branches:
-      - 'main'
+      - "main"
   push:
     branches:
-      - 'main'
+      - "main"
 
 jobs:
-#  swagger_lint:
-#    runs-on: ubuntu-latest
-#    name: Swagger Editor Validator Remote
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Validate OpenAPI definition
-#        uses: char0n/apidom-validate@v1
-#        with:
-#          fails-on: 2
-#          definition-file: spec/oas_v1.yaml
-
+  #  swagger_lint:
+  #    runs-on: ubuntu-latest
+  #    name: Swagger Editor Validator Remote
+  #
+  #    steps:
+  #      - uses: actions/checkout@v2
+  #      - name: Validate OpenAPI definition
+  #        uses: char0n/apidom-validate@v1
+  #        with:
+  #          fails-on: 2
+  #          definition-file: spec/oas_v1.yaml
 
   lint-prettier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
       - name: Lint with Prettier
-        run: yarn check-prettier
+        run: npm run check-prettier

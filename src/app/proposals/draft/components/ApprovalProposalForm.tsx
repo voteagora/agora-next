@@ -378,14 +378,17 @@ const ApprovalProposalForm = () => {
       );
 
       const anyInvalid = simulationResults.some(
-        (report) => report?.status === "error"
+        (report: any) => report?.status === "error"
       );
 
-      setValue("simulation_state", anyInvalid ? "INVALID" : "VALID");
+      if (anyInvalid) {
+        toast.error("Some simulations failed. Please check the results below.");
+      }
     } catch (e) {
       console.error(e);
+      const errorMessage = e instanceof Error ? e.message : String(e);
       toast.error(
-        <span className="break-all">{`Error simulating transactions: ${e}`}</span>
+        <span className="break-all">{`Error simulating transactions: ${errorMessage}`}</span>
       );
     } finally {
       setSimulationPending(false);
@@ -565,6 +568,11 @@ const ApprovalProposalForm = () => {
                 ? " All options that meet the threshold could potentially win together."
                 : " The top choices will be executed together."}
             </p>
+            {simulationPending && (
+              <p className="mt-2 text-sm text-blue-600">
+                Simulation in progress... This may take a few minutes.
+              </p>
+            )}
           </div>
         )}
       {simulationReports.length > 0 && (

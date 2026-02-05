@@ -32,8 +32,7 @@ type SiweData = {
 export async function authenticateApiUser(
   request: NextRequest
 ): Promise<AuthInfo> {
-  const prismaModule = require("@/app/lib/prisma");
-  const prisma = prismaModule.prismaWeb2Client as PrismaClient;
+  const { prismaWeb2Client: prisma } = await import("@/app/lib/prisma");
   let authResponse: AuthInfo = await validateBearerToken(request);
 
   if (!authResponse.authenticated) {
@@ -134,16 +133,27 @@ export async function getRolesForUser(
   const roles = [ROLE_PUBLIC_READER];
   if (siweData) {
     roles.push(ROLE_RF_DEMO_USER); // All Siwe users are RF voters
-
-    const { isBadgeholder, votingCategory, isCitizen } = await fetchBadgeholder(
-      siweData.address
-    );
-    roles.push(votingCategory);
-    if (isBadgeholder) {
-      roles.push(ROLE_BADGEHOLDER);
-    }
-    if (isCitizen) {
-      roles.push(ROLE_CITIZEN);
+    try {
+      const { isBadgeholder, votingCategory, isCitizen } =
+        await fetchBadgeholder(siweData.address);
+      if (votingCategory) {
+        roles.push(votingCategory);
+      }
+      if (isBadgeholder) {
+        roles.push(ROLE_BADGEHOLDER);
+      }
+      if (isCitizen) {
+        roles.push(ROLE_CITIZEN);
+      }
+    } catch (e: any) {
+      // Tolerate missing tables/views in certain dev DBs (e.g., agora.badgeholders)
+      // Log and continue with default/public roles only
+      console.warn(
+        "[AUTH] fetchBadgeholder failed; continuing with default roles",
+        {
+          error: e?.code || e?.message || String(e),
+        }
+      );
     }
   }
 

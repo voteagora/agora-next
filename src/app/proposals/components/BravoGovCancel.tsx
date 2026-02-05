@@ -8,7 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 
 interface Props {
   proposal: Proposal;
@@ -18,10 +17,8 @@ export const BravoGovCancel = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
-  const { data: adminAddress } = useGovernorAdmin({ enabled: true });
   const proposer = proposal.proposer;
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
     proposer?.toString().toLowerCase() === address?.toLowerCase();
 
   const { data, writeContract: write } = useWriteContract();

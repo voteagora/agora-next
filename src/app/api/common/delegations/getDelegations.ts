@@ -15,6 +15,7 @@ import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
+import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -148,6 +149,85 @@ async function getCurrentDelegatorsForAddress({
   return withMetrics("getCurrentDelegatorsForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
 
+    // -----------------------------------------------------------------------
+    // DAO Node path: use DAO Node delegators if available
+    // -----------------------------------------------------------------------
+    const daoNodeData = await getDelegateDataFromDaoNode(address);
+    const daoDelegate = daoNodeData?.delegate;
+
+    if (daoDelegate?.from_list && Array.isArray(daoDelegate.from_list)) {
+      let balanceFilter = BigInt(0);
+      if (contracts.token.isERC20()) {
+        balanceFilter = BigInt(1e15);
+      } else if (contracts.token.isERC721()) {
+        balanceFilter = BigInt(0);
+      } else {
+        throw new Error(
+          "Token is neither ERC20 nor ERC721, therefore unsupported."
+        );
+      }
+
+      const latestBlock =
+        daoDelegate.from_list.length > 0
+          ? await contracts.token.provider.getBlock("latest")
+          : null;
+
+      const mapped = daoDelegate.from_list.map((delegator: any) => {
+        const bn = delegator.bn ?? delegator.block_number;
+        const pct = delegator.percentage;
+        const balance = BigInt(delegator.balance ?? 0);
+        const isFull =
+          pct === 10000 || pct === undefined || pct === null || pct === 0;
+        const allowance = isFull
+          ? balance
+          : pct !== undefined && pct !== null
+            ? (balance * BigInt(pct)) / BigInt(10000)
+            : balance;
+
+        const timestamp =
+          latestBlock && bn
+            ? getHumanBlockTime(BigInt(bn), latestBlock, true)
+            : null;
+
+        return {
+          from: (delegator.delegator || delegator.from || "").toLowerCase(),
+          to: address,
+          allowance: allowance.toString(),
+          percentage: pct !== undefined && pct !== null ? String(pct) : "0",
+          timestamp,
+          type: "DIRECT" as const,
+          amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
+          transaction_hash:
+            delegator.txhash || delegator.transaction_hash || "",
+        };
+      });
+
+      const filtered = mapped.filter(
+        (delegator) => BigInt(delegator.allowance) > balanceFilter
+      );
+
+      const totalCount =
+        typeof daoDelegate.from_cnt === "number"
+          ? daoDelegate.from_cnt
+          : filtered.length;
+
+      const sliced = filtered.slice(
+        pagination.offset,
+        pagination.offset + pagination.limit
+      );
+      const hasNext = pagination.offset + pagination.limit < filtered.length;
+
+      return {
+        meta: {
+          has_next: hasNext,
+          next_offset: pagination.offset + pagination.limit,
+          total_returned: sliced.length,
+          total_count: totalCount,
+        },
+        data: sliced,
+      };
+    }
+
     let advancedDelegatorsSubQry: string;
     let directDelegatorsSubQry: string;
     let contractAddress = contracts.alligator
@@ -231,7 +311,7 @@ async function getCurrentDelegatorsForAddress({
                                                   log_index,
                                                   transaction_hash
                                               FROM
-                                                  ${namespace}.delegate_changed_events WHERE address = $2
+                                                  ${namespace}.delegate_changed_events WHERE address = $3
                                               ORDER BY
                                                   delegator,
                                                   block_number DESC,

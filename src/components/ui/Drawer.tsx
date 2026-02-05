@@ -1,6 +1,7 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ interface DrawerProps {
   showCloseButton?: boolean;
   className?: string;
   title?: string;
+  useHistoryBack?: boolean;
 }
 
 export function Drawer({
@@ -26,6 +28,41 @@ export function Drawer({
   className,
   title,
 }: DrawerProps) {
+  const pushedHistoryRef = useRef(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      window.history.pushState({ __drawer: true }, "");
+      pushedHistoryRef.current = true;
+    } catch (_) {}
+
+    const handlePopState = () => {
+      onClose();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      if (pushedHistoryRef.current && window.history.state?.__drawer) {
+        pushedHistoryRef.current = false;
+        try {
+          window.history.back();
+        } catch (_) {}
+      } else {
+        pushedHistoryRef.current = false;
+      }
+    };
+  }, [isOpen, onClose]);
   const positionVariants = {
     left: {
       initial: { x: "-100%" },
@@ -43,32 +80,28 @@ export function Drawer({
       exit: { y: "100%" },
     },
   };
-
-  // For backward compatibility
   const effectivePosition = position || side;
 
-  return (
+  const content = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-[4px]"
+            className="fixed inset-0 z-[999] bg-black/50 backdrop-blur-[4px]"
             onClick={onClose}
           />
 
-          {/* Drawer */}
           <motion.div
             initial={positionVariants[effectivePosition].initial}
             animate={positionVariants[effectivePosition].animate}
             exit={positionVariants[effectivePosition].exit}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "fixed z-50 flex flex-col bg-wash border-line shadow-lg",
+              "fixed z-[1000] flex flex-col bg-wash border-line shadow-lg",
               effectivePosition === "left" &&
                 "inset-y-0 left-0 w-5/6 max-w-sm border-r",
               effectivePosition === "right" &&
@@ -77,6 +110,11 @@ export function Drawer({
                 "inset-x-0 bottom-0 rounded-t-xl border-t",
               className
             )}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") onClose();
+            }}
+            role="dialog"
+            aria-modal="true"
           >
             {title && (
               <div className="p-4 border-b border-line">
@@ -86,10 +124,10 @@ export function Drawer({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 rounded-full hover:bg-neutral-100"
+                className="absolute top-3 right-3 inline-flex h-8 w-8 items-center justify-center rounded-full hover:bg-neutral"
+                aria-label="Close"
               >
                 <X className="h-5 w-5 text-primary" />
-                <span className="sr-only">Close</span>
               </button>
             )}
             <div className="flex-1 overflow-auto">{children}</div>
@@ -98,4 +136,8 @@ export function Drawer({
       )}
     </AnimatePresence>
   );
+  if (typeof document !== "undefined") {
+    return createPortal(content, document.body);
+  }
+  return content;
 }

@@ -4,6 +4,7 @@ import {
   BlockBasedProposal,
   TimestampBasedProposal,
   ProposalPayload,
+  ProposalTypeData,
 } from "@/app/api/common/proposals/proposal";
 import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
@@ -13,7 +14,10 @@ import {
   TENANT_NAMESPACES,
   OFFCHAIN_THRESHOLDS,
   HYBRID_VOTE_WEIGHTS,
-  disapprovalThreshold,
+  HYBRID_PROPOSAL_QUORUM,
+  HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
+  OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
+  OFFCHAIN_OPTIMISTIC_THRESHOLD,
 } from "./constants";
 import { ProposalType } from "./types";
 import {
@@ -302,13 +306,20 @@ export async function parseProposal(
   const proposalData = parseProposalData(
     JSON.stringify(proposal.proposal_data || {}),
     proposalType,
-    offChainProposalData?.calculation_options
+    offChainProposalData
   );
 
   let proposalResults;
+
+  const createdTime = getProposalCreatedTime({
+    proposalData,
+    latestBlock,
+    createdBlock,
+  });
+
   if (proposal.proposal_type.includes("OFFCHAIN") && !offChainProposalData) {
     proposalResults = parseOffChainProposalResults(
-      JSON.stringify(proposal.proposal_results || {}),
+      JSON.stringify(proposal.proposal_data?.offchain_tally || {}),
       proposalType
     );
   } else {
@@ -316,9 +327,12 @@ export async function parseProposal(
       JSON.stringify(proposal.proposal_results || {}),
       proposalData,
       String(startBlock),
-      JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {})
+      JSON.stringify(offchainProposal?.proposal_data?.offchain_tally || {}),
+      Number(quorum),
+      createdTime
     );
   }
+
   const calculateStartTime = (): Date | null => {
     if (proposalData.key === "SNAPSHOT") {
       return new Date(proposalData.kind.start_ts * 1000);
@@ -352,16 +366,28 @@ export async function parseProposal(
       ? BigInt(5100)
       : null;
 
+  const offchainProposalId = proposalType.startsWith("OFFCHAIN")
+    ? proposal.proposal_id
+    : offchainProposal?.proposal_id;
+
+  const status = latestBlock
+    ? await getProposalStatus(
+        proposal,
+        proposalResults,
+        proposalData,
+        latestBlock,
+        quorum,
+        votableSupply,
+        hardcodedThreshold ??
+          (proposalTypeData && proposalTypeData.approval_threshold)
+      )
+    : null;
+
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
-    createdTime:
-      proposalData.key === "SNAPSHOT"
-        ? new Date(proposalData.kind.created_ts * 1000)
-        : latestBlock
-          ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
-          : null,
+    createdTime,
     startTime: calculateStartTime(),
     startBlock: proposalData.key === "SNAPSHOT" ? null : startBlock,
     endTime: calculateEndTime(),
@@ -399,22 +425,12 @@ export async function parseProposal(
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResults.kind,
     proposalType,
-    status: latestBlock
-      ? await getProposalStatus(
-          proposal,
-          proposalResults,
-          proposalData,
-          latestBlock,
-          quorum,
-          votableSupply,
-          hardcodedThreshold ??
-            (proposalTypeData && proposalTypeData.approval_threshold)
-        )
-      : null,
+    proposalTypeData,
+    status,
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
     executedTransactionHash: proposal.executed_transaction_hash,
-    offchainProposalId: offchainProposal?.proposal_id,
+    offchainProposalId,
   };
 }
 
@@ -544,7 +560,10 @@ export type ParsedProposalData = {
   };
   OPTIMISTIC: {
     key: "OPTIMISTIC";
-    kind: { options: [] };
+    kind: {
+      options: [];
+      disapprovalThreshold: number;
+    };
   };
   HYBRID_OPTIMISTIC: {
     key: "HYBRID_OPTIMISTIC";
@@ -577,6 +596,7 @@ export type ParsedProposalData = {
       onchainProposalId?: string;
       created_attestation_hash?: string;
       cancelled_attestation_hash?: string;
+      tiers?: number[];
     };
   };
   OFFCHAIN_STANDARD: {
@@ -606,19 +626,52 @@ export function parseIfNecessary(obj: string | object) {
 }
 
 function parseMultipleStringsSeparatedByComma(obj: string | object) {
+  // Helper function to split string without catastrophic backtracking
+  // This replaces the dangerous regex: /(?![^(]*\)),\s*/
+  const safeSplit = (str: string): string[] => {
+    // For very large strings (>100KB), skip complex parsing to avoid hanging
+    // if (str.length > 100000 && process.env.NODE_ENV === "development") {
+    //   console.log("Skipping complex parsing for large string when in development mode.");
+    //   return [str];
+    // }
+
+    const result: string[] = [];
+    let current = "";
+    let parenDepth = 0;
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+
+      if (char === "(") {
+        parenDepth++;
+        current += char;
+      } else if (char === ")") {
+        parenDepth--;
+        current += char;
+      } else if (char === "," && parenDepth === 0) {
+        // Only split on commas outside of parentheses
+        if (current.trim()) {
+          result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+        }
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+
+    // Add the last item
+    if (current.trim()) {
+      result.push(current.trim().replace(/^['"]|['"]$/g, ""));
+    }
+
+    return result;
+  };
+
   return typeof obj === "string"
-    ? obj
-        .split(/(?![^(]*\)),\s*/)
-        .map((item) => item.replace(/^['"]|['"]$/g, ""))
+    ? safeSplit(obj)
     : Array.isArray(obj)
       ? obj
-          .map((item) =>
-            typeof item === "string"
-              ? item
-                  .split(/(?![^(]*\)),\s*/)
-                  .map((i) => i.replace(/^['"]|['"]$/g, ""))
-              : item
-          )
+          .map((item) => (typeof item === "string" ? safeSplit(item) : item))
           .flat()
       : obj;
 }
@@ -626,7 +679,7 @@ function parseMultipleStringsSeparatedByComma(obj: string | object) {
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType,
-  calculationOptions?: 0 | 1
+  offChainProposalData?: any
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
     case "SNAPSHOT": {
@@ -676,7 +729,7 @@ export function parseProposalData(
                 functionArgsName,
               },
             ],
-            calculationOptions,
+            calculationOptions: offChainProposalData?.calculation_options,
           },
         };
       } catch (error) {
@@ -687,10 +740,13 @@ export function parseProposalData(
       }
     }
     case "OPTIMISTIC": {
+      const parsedProposalData = JSON.parse(proposalData);
+      const disapprovalThreshold =
+        Number(parsedProposalData?.[0]?.[0] || 2000) / 100;
       return {
         key: proposalType,
-        kind: { options: [] },
-      };
+        kind: { options: [], disapprovalThreshold },
+      } as ParsedProposalData["OPTIMISTIC"];
     }
     case "HYBRID_OPTIMISTIC_TIERED": {
       const parsedProposalData = JSON.parse(proposalData);
@@ -698,7 +754,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: offChainProposalData?.tiers
+            .map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
             parsedProposalData.cancelled_attestation_hash,
@@ -774,7 +832,9 @@ export function parseProposalData(
         key: proposalType,
         kind: {
           options: [],
-          tiers: parsedProposalData.tiers,
+          tiers: parsedProposalData.tiers
+            ?.map((tier: number) => tier / 100)
+            .sort((a: number, b: number) => b - a),
           onchainProposalId: parsedProposalData.onchain_proposalid,
           created_attestation_hash: parsedProposalData.created_attestation_hash,
           cancelled_attestation_hash:
@@ -923,9 +983,10 @@ export type ParsedProposalResults = {
       for: bigint;
       abstain: bigint;
       against: bigint;
-      choices: {
-        choice: string;
-        votes: bigint;
+      options: {
+        option: string;
+        weightedPercentage: number;
+        isApproved?: boolean;
       }[];
     };
   };
@@ -962,7 +1023,8 @@ export type ParsedProposalResults = {
     kind: {
       options: {
         option: string;
-        votes: bigint;
+        weightedPercentage: number;
+        isApproved?: boolean;
       }[];
       APP: Record<string, bigint>;
       USER: Record<string, bigint>;
@@ -1039,13 +1101,6 @@ export const proposalToCallArgs = (proposal: Proposal) => {
       : "",
     keccak256(toUtf8Bytes(proposal.description!)),
   ];
-};
-
-type ProposalTypeData = {
-  proposal_type_id: number;
-  name: string;
-  quorum: bigint;
-  approval_threshold: bigint;
 };
 
 /**
@@ -1126,6 +1181,10 @@ export function calculateOptimisticProposalMetrics(
       ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
       : 0;
 
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+  const disapprovalThreshold = proposalData.disapprovalThreshold;
+
   const status =
     againstRelativeAmount <= disapprovalThreshold ? "approved" : "defeated";
 
@@ -1159,18 +1218,31 @@ export function calculateHybridApprovalOptionVotes(
   return optionVotes;
 }
 
-export function calculateHybridApprovalWeightedPercentage(
-  optionName: string,
-  proposalResults: any,
-  quorum: number
-) {
-  const eligibleVoters = {
+// Helper function to calculate individual group percentage contribution
+export function calculateGroupPercentageContribution(
+  votes: number,
+  eligibleVoters: number,
+  weight: number
+): number {
+  return (votes / eligibleVoters) * weight * 100;
+}
+
+// Helper function to get eligible voters for hybrid proposals
+export function getHybridEligibleVoters(quorum: number) {
+  return {
     delegates: Number(quorum) * (100 / 30), // Convert 30% quorum to total eligible
     apps: OFFCHAIN_THRESHOLDS.APP,
     users: OFFCHAIN_THRESHOLDS.USER,
     chains: OFFCHAIN_THRESHOLDS.CHAIN,
   };
+}
 
+export function calculateHybridApprovalWeightedPercentage(
+  optionName: string,
+  proposalResults: any,
+  quorum: number
+) {
+  const eligibleVoters = getHybridEligibleVoters(quorum);
   const weights = HYBRID_VOTE_WEIGHTS;
   let weightedOptionPercentage = 0;
 
@@ -1189,39 +1261,78 @@ export function calculateHybridApprovalWeightedPercentage(
     : 0;
 
   weightedOptionPercentage +=
-    (delegatesVotes / eligibleVoters.delegates) * weights.delegates;
+    (delegatesVotes / eligibleVoters.delegates) * weights.delegates * 100;
 
-  weightedOptionPercentage += (appsVotes / eligibleVoters.apps) * weights.apps;
   weightedOptionPercentage +=
-    (usersVotes / eligibleVoters.users) * weights.users;
+    (appsVotes / eligibleVoters.apps) * weights.apps * 100;
   weightedOptionPercentage +=
-    (chainsVotes / eligibleVoters.chains) * weights.chains;
+    (usersVotes / eligibleVoters.users) * weights.users * 100;
+  weightedOptionPercentage +=
+    (chainsVotes / eligibleVoters.chains) * weights.chains * 100;
 
   return weightedOptionPercentage;
 }
 
-export function calculateHybridApprovalMetrics(
-  proposal: any,
-  includeOptionApprovalData = false
+export function calculateHybridApprovalUniqueParticipationPercentage(
+  proposalResults: any,
+  quorum: number
 ) {
-  const quorumThreshold = 0.3; // 30% quorum
+  const weights = HYBRID_VOTE_WEIGHTS;
 
-  // Extract data from proposal object
-  const proposalResults = proposal.proposalResults;
-  const proposalData = proposal.proposalData;
-  const quorum = Number(proposal.quorum);
+  const eligibleVoters = getHybridEligibleVoters(quorum);
+  const proposalForVotes = BigInt(proposalResults?.for || 0);
+  const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
+  const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
+
+  const totalUniqueVoters = {
+    ["delegates"]: proposalTotalVotes,
+    ["apps"]: proposalResults.totals.vote_counts.APP,
+    ["users"]: proposalResults.totals.vote_counts.USER,
+    ["chains"]: proposalResults.totals.vote_counts.CHAIN,
+  };
+  let uniqueParticipationPercentage = 0;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates) *
+    100 *
+    weights.delegates;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps) *
+    100 *
+    weights.apps;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.users || 0) / eligibleVoters.users) *
+    100 *
+    weights.users;
+
+  uniqueParticipationPercentage +=
+    (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains) *
+    100 *
+    weights.chains;
+
+  return uniqueParticipationPercentage;
+}
+
+export function calculateHybridApprovalProposalMetrics({
+  proposalResults,
+  proposalData,
+  quorum,
+  createdTime,
+}: {
+  proposalResults: ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
+  proposalData: ParsedProposalData["HYBRID_APPROVAL"]["kind"];
+  quorum: number;
+  createdTime: Date | null;
+}) {
+  const quorumThreshold = HYBRID_PROPOSAL_QUORUM * 100; // 30% quorum
 
   // Get criteria value from proposal results (module-level criteria)
   const criteriaValue =
     proposalResults?.criteriaValue ||
     proposalData?.proposalSettings?.criteriaValue ||
     0;
-
-  // Get governor-level approval threshold if available
-  const governorApprovalThreshold =
-    typeof proposal.approvalThreshold === "bigint"
-      ? Number(proposal.approvalThreshold)
-      : proposal.approvalThreshold || 0;
 
   // Get all option names across all categories
   const optionNames = new Set<string>();
@@ -1236,7 +1347,12 @@ export function calculateHybridApprovalMetrics(
       optionNames.add(key)
     );
 
-  let totalWeightedParticipation = 0;
+  let totalWeightedParticipation =
+    calculateHybridApprovalUniqueParticipationPercentage(
+      proposalResults,
+      quorum
+    );
+
   let thresholdMet = false;
   const optionResults: Array<{
     optionName: string;
@@ -1268,8 +1384,6 @@ export function calculateHybridApprovalMetrics(
       quorum
     );
 
-    totalWeightedParticipation += weightedPercentage;
-
     // Check module-level criteria
     let meetsModuleCriteria = false;
     if (proposalResults.criteria === "THRESHOLD") {
@@ -1293,28 +1407,16 @@ export function calculateHybridApprovalMetrics(
     });
   }
 
-  // Calculate governor-level approval threshold check
+  // Calculate governor-level approval threshold check using weighted percentages
   const proposalForVotes = BigInt(proposalResults?.for || 0);
   const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
   const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
 
-  // TODO: this is not correct since, the total votes will have to be weighted instead of raw votes
-  const passesGovernorThreshold =
-    !governorApprovalThreshold ||
-    governorApprovalThreshold === 0 ||
-    (proposalTotalVotes > 0n &&
-      (proposalForVotes * 10000n) / proposalTotalVotes >=
-        BigInt(governorApprovalThreshold));
-
-  // If option approval data requested, calculate full approval data
+  // Calculate full approval data
   let optionsWithApproval = null;
   let remainingBudget = null;
 
-  if (
-    includeOptionApprovalData &&
-    proposalData?.proposalSettings &&
-    proposalResults?.options
-  ) {
+  if (proposalData?.proposalSettings && proposalResults?.options) {
     const proposalSettings = proposalData.proposalSettings;
     const options = proposalResults.options;
 
@@ -1334,9 +1436,8 @@ export function calculateHybridApprovalMetrics(
     optionsWithApproval = enrichedOptions.map((option: any) => {
       const optionBudget = calculateOptionBudget(
         option,
-        proposal.createdTime as Date,
-        contracts.governor.optionBudgetChangeDate || null,
-        contractTokenDecimals
+        contractTokenDecimals,
+        createdTime
       );
 
       // Find metrics for this option
@@ -1346,9 +1447,7 @@ export function calculateHybridApprovalMetrics(
 
       // Determine if option is approved
       const isApproved = !!(
-        passesGovernorThreshold &&
-        optionMetrics?.meetsThreshold &&
-        availableBudget >= optionBudget
+        optionMetrics?.meetsThreshold && availableBudget >= optionBudget
       );
 
       if (isApproved) {
@@ -1367,8 +1466,6 @@ export function calculateHybridApprovalMetrics(
         isApproved,
         weightedPercentage: optionMetrics?.weightedPercentage || 0,
         rawVotes: optionMetrics?.rawVotes || 0n,
-        budgetExceeded:
-          isExceeded && optionMetrics?.meetsThreshold && !isApproved,
       };
     });
 
@@ -1380,7 +1477,6 @@ export function calculateHybridApprovalMetrics(
     thresholdMet,
     optionResults,
     quorumMet: totalWeightedParticipation >= quorumThreshold,
-    passesGovernorThreshold,
     proposalForVotes,
     proposalAgainstVotes,
     proposalTotalVotes,
@@ -1392,11 +1488,12 @@ export function calculateHybridApprovalMetrics(
 // Helper function to calculate option budget based on proposal creation time
 export function calculateOptionBudget(
   option: any,
-  proposalCreatedTime: Date,
-  optionBudgetChangeDate: Date | null,
-  contractTokenDecimals: number
+  contractTokenDecimals: number,
+  proposalCreatedTime: Date | null
 ): bigint {
-  return proposalCreatedTime > (optionBudgetChangeDate || new Date(0))
+  const { contracts } = Tenant.current();
+  return (proposalCreatedTime as Date) >
+    (contracts.governor.optionBudgetChangeDate || new Date(0))
     ? BigInt(option?.budgetTokensSpent || 0)
     : parseUnits(
         option?.budgetTokensSpent?.toString() || "0",
@@ -1412,22 +1509,17 @@ export function calculateHybridStandardTallies(
   isHybridStandard: boolean,
   calculationOptions?: 0 | 1
 ) {
-  const eligibleVoters = {
-    delegates: Number(delegateQuorum) * (100 / 30), // Convert 30% quorum to total eligible
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
+  const eligibleVoters = getHybridEligibleVoters(Number(delegateQuorum));
 
-  const quorumThreshold = 0.3;
+  const quorumThreshold = HYBRID_PROPOSAL_QUORUM;
   const approvalThresholdNumber = approvalThreshold / 100 || 0.51; // Default to 51% approval threshold
 
   const calculateTally = (category: any, eligibleCount: number) => {
     const forVotes = category?.for ? Number(category.for) : 0;
     const againstVotes = category?.against ? Number(category.against) : 0;
     const abstainVotes = category?.abstain ? Number(category.abstain) : 0;
-    const totalVotes = forVotes + againstVotes;
-    let quorumVotes = forVotes + abstainVotes;
+    const totalVotes = forVotes + againstVotes + abstainVotes;
+    let quorumVotes = forVotes + againstVotes + abstainVotes;
 
     if (calculationOptions === 1) {
       quorumVotes = forVotes;
@@ -1579,120 +1671,23 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
   };
 }
 
-export function calculateHybridApprovalProposalMetrics(proposal: Proposal) {
-  const proposalResults =
-    proposal.proposalResults as ParsedProposalResults["HYBRID_APPROVAL"]["kind"];
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
+export const getProposalTiers = (proposal: Proposal) => {
+  const proposalData = proposal.proposalData as
+    | ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"]
+    | ParsedProposalData["OFFCHAIN_OPTIMISTIC_TIERED"]["kind"]
+    | ParsedProposalData["OFFCHAIN_OPTIMISTIC"]["kind"];
 
-  // For delegates, we need to calculate the total eligible voters
-  // proposal.quorum is 30% of votable supply, so we need to multiply by (100/30)
-  const eligibleVoters = {
-    delegates: Number(proposal.quorum) * (100 / 30),
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
-
-  // Setup weights and participating groups based on proposal type
-  let tallyWeights, eligibleCounts;
-  if (proposal.proposalType === "HYBRID_APPROVAL") {
-    // All 4 groups participate with hybrid weights
-    tallyWeights = [
-      HYBRID_VOTE_WEIGHTS.delegates,
-      HYBRID_VOTE_WEIGHTS.apps,
-      HYBRID_VOTE_WEIGHTS.users,
-      HYBRID_VOTE_WEIGHTS.chains,
-    ];
-    eligibleCounts = [
-      eligibleVoters.delegates,
-      eligibleVoters.apps,
-      eligibleVoters.users,
-      eligibleVoters.chains,
-    ];
-  } else {
-    // Only 3 groups participate with equal weights
-    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
-    eligibleCounts = [
-      eligibleVoters.apps,
-      eligibleVoters.users,
-      eligibleVoters.chains,
-    ];
+  if (proposalData.tiers) {
+    return proposalData.tiers;
   }
-
-  // Get all option names across all categories
-  const optionNames = new Set<string>();
-  if (proposalResults.APP)
-    Object.keys(proposalResults.APP).forEach((key) => optionNames.add(key));
-  if (proposalResults.USER)
-    Object.keys(proposalResults.USER).forEach((key) => optionNames.add(key));
-  if (proposalResults.CHAIN)
-    Object.keys(proposalResults.CHAIN).forEach((key) => optionNames.add(key));
-  if (proposalResults.DELEGATES)
-    Object.keys(proposalResults.DELEGATES).forEach((key) =>
-      optionNames.add(key)
-    );
-
-  // Calculate weighted participation for each option
-  const optionResults = [];
-  for (const optionName of optionNames) {
-    const categories =
-      proposal.proposalType === "HYBRID_APPROVAL"
-        ? [
-            proposalResults.DELEGATES,
-            proposalResults.APP,
-            proposalResults.USER,
-            proposalResults.CHAIN,
-          ]
-        : [proposalResults.APP, proposalResults.USER, proposalResults.CHAIN];
-
-    // Calculate weighted votes as percentage of potential participation
-    const calculatedWeightedVotes = categories.reduce(
-      (sum, category, index) => {
-        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
-        const votesPercentage =
-          votes > 0 ? (votes / eligibleCounts[index]) * 100 : 0;
-        return sum + votesPercentage * tallyWeights[index];
-      },
-      0
-    );
-
-    optionResults.push({
-      optionName,
-      weightedPercentage: Number(calculatedWeightedVotes.toFixed(2)),
-      rawVotes: categories.reduce((sum, category) => {
-        const votes = category?.[optionName] ? Number(category[optionName]) : 0;
-        return sum + votes;
-      }, 0),
-    });
+  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
+    return HYBRID_OPTIMISTIC_TIERED_THRESHOLD;
   }
-
-  // Calculate total weighted participation (sum of all option votes)
-  const totalWeightedParticipation = optionResults.reduce(
-    (sum, option) => sum + option.weightedPercentage,
-    0
-  );
-
-  // Check if quorum is met (30% threshold)
-  const quorumThreshold = 30;
-  const quorumMet = totalWeightedParticipation >= quorumThreshold;
-
-  // Check if threshold is met for THRESHOLD criteria
-  const criteriaValue = proposalData?.proposalSettings?.criteriaValue;
-  const thresholdMet =
-    proposalResults.criteria === "THRESHOLD" && criteriaValue
-      ? optionResults.some(
-          (option) => option.weightedPercentage >= Number(criteriaValue)
-        )
-      : false;
-
-  return {
-    totalWeightedParticipation: Number(totalWeightedParticipation.toFixed(2)),
-    quorumMet,
-    thresholdMet,
-    optionResults,
-  };
-}
+  if (proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") {
+    return OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD;
+  }
+  return OFFCHAIN_OPTIMISTIC_THRESHOLD;
+};
 
 export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
   const proposalResults =
@@ -1700,43 +1695,20 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
 
   // For delegates, we need to calculate the total eligible voters
   // proposal.quorum is 30% of votable supply, so we need to multiply by (100/30)
-  const eligibleVoters = {
-    delegates: Number(proposal.quorum) * (100 / 30),
-    apps: OFFCHAIN_THRESHOLDS.APP,
-    users: OFFCHAIN_THRESHOLDS.USER,
-    chains: OFFCHAIN_THRESHOLDS.CHAIN,
-  };
+  const eligibleVoters = getHybridEligibleVoters(Number(proposal.quorum));
 
   // Get thresholds from tiers array: [2GroupThreshold, 3GroupThreshold, 4GroupThreshold]
   const proposalData =
-    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"])
-      : (proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC"]["kind"]);
+    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
   // For non-hybrid optimistic tiered proposals, we use 65% threshold for all groups (apps, users, chains)
-  const tiers =
-    (proposalData as any)?.tiers ||
-    (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-      ? [55, 45, 35]
-      : [65, 65, 65]);
-  const thresholds = {
-    twoGroups: tiers[0] / 100 || 55,
-    threeGroups: tiers[1] / 100 || 45,
-    fourGroups: tiers[2] / 100 || 35,
-  };
+  const tiers = getProposalTiers(proposal);
 
-  // Setup weights based on proposal type
-  let tallyWeights;
-  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
-    tallyWeights = [
-      HYBRID_VOTE_WEIGHTS.delegates,
-      HYBRID_VOTE_WEIGHTS.apps,
-      HYBRID_VOTE_WEIGHTS.users,
-      HYBRID_VOTE_WEIGHTS.chains,
-    ];
-  } else {
-    tallyWeights = [1 / 3, 1 / 3, 1 / 3];
-  }
+  const thresholds = {
+    twoGroups: tiers[0],
+    threeGroups: tiers[1],
+    fourGroups: tiers[2],
+  };
 
   const calculateVetoTally = (category: any, eligibleCount: number) => {
     const againstVotes = category?.against ? Number(category.against) : 0;
@@ -1783,32 +1755,62 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
 
   // Determine if veto is triggered based on tiered logic
   let vetoTriggered = false;
+  if (proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") {
+    const totalWeightedVetoPercentage = groupTallies.reduce((sum, tally) => {
+      const vetoPercentage = tally.vetoPercentage;
+      return sum + vetoPercentage;
+    }, 0);
+    if (totalWeightedVetoPercentage / 3 >= tiers[0]) {
+      vetoTriggered = true;
+    }
+  } else {
+    const groupsExceedingFourThreshold = groupTallies.filter(
+      (g) => g.vetoPercentage >= thresholds.fourGroups
+    );
+    if (groupsExceedingFourThreshold.length >= 4) {
+      vetoTriggered = true;
+    } else if (
+      groupTallies.filter((g) => g.vetoPercentage >= thresholds.threeGroups)
+        .length >= 3
+    ) {
+      vetoTriggered = true;
+    } else if (
+      groupTallies.filter((g) => g.vetoPercentage >= thresholds.twoGroups)
+        .length >= 2
+    ) {
+      vetoTriggered = true;
+    }
+  }
 
+  // Determine which threshold applies based on how many groups actually exceed thresholds
   const groupsExceedingFourThreshold = groupTallies.filter(
     (g) => g.vetoPercentage >= thresholds.fourGroups
   );
-  if (groupsExceedingFourThreshold.length >= 4) {
-    vetoTriggered = true;
-  } else if (
-    groupTallies.filter((g) => g.vetoPercentage >= thresholds.threeGroups)
-      .length >= 3
-  ) {
-    vetoTriggered = true;
-  } else if (
-    groupTallies.filter((g) => g.vetoPercentage >= thresholds.twoGroups)
-      .length >= 2
-  ) {
-    vetoTriggered = true;
-  }
+  const groupsExceedingThreeThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.threeGroups
+  );
+  const groupsExceedingTwoThreshold = groupTallies.filter(
+    (g) => g.vetoPercentage >= thresholds.twoGroups
+  );
 
   const groupsExceedingThresholds = groupTallies.map((group) => {
     let exceedsThreshold = false;
-    if (groupTallies.length >= 4) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.fourGroups;
-    } else if (groupTallies.length >= 3) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.threeGroups;
-    } else if (groupTallies.length >= 2) {
-      exceedsThreshold = group.vetoPercentage >= thresholds.twoGroups;
+
+    if (
+      groupsExceedingFourThreshold.length >= 4 &&
+      group.vetoPercentage >= thresholds.fourGroups
+    ) {
+      exceedsThreshold = true;
+    } else if (
+      groupsExceedingThreeThreshold.length >= 3 &&
+      group.vetoPercentage >= thresholds.threeGroups
+    ) {
+      exceedsThreshold = true;
+    } else if (
+      groupsExceedingTwoThreshold.length >= 2 &&
+      group.vetoPercentage >= thresholds.twoGroups
+    ) {
+      exceedsThreshold = true;
     }
 
     return {
@@ -1817,19 +1819,36 @@ export function calculateHybridOptimisticProposalMetrics(proposal: Proposal) {
     };
   });
 
-  // Calculate weighted total against votes as percentage of potential participation
-  const calculatedTotalAgainstVotes = groupTallies.reduce(
-    (sum, tally, index) => {
-      const againstPercentage = tally.vetoPercentage;
-      return sum + againstPercentage * tallyWeights[index];
-    },
-    0
-  );
+  const calculatedTotalAgainstVotes = groupTallies.reduce((sum, tally) => {
+    const againstPercentage = tally.vetoPercentage;
+    return sum + againstPercentage;
+  }, 0);
+
+  const totalGroups =
+    proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? 4 : 3;
+
+  const weightedPercentage = calculatedTotalAgainstVotes / totalGroups;
 
   return {
     vetoThresholdMet: vetoTriggered,
-    totalAgainstVotes: Number(calculatedTotalAgainstVotes.toFixed(2)),
+    totalAgainstVotes: Number(weightedPercentage.toFixed(2)),
     groupTallies: groupsExceedingThresholds,
     thresholds,
   };
 }
+
+export const getProposalCreatedTime = ({
+  proposalData,
+  latestBlock,
+  createdBlock,
+}: {
+  proposalData: ParsedProposalData[ProposalType];
+  latestBlock: Block | null;
+  createdBlock: bigint | string | null;
+}) => {
+  return proposalData.key === "SNAPSHOT"
+    ? new Date(proposalData.kind.created_ts * 1000)
+    : latestBlock
+      ? getHumanBlockTime(createdBlock ?? 0, latestBlock)
+      : null;
+};

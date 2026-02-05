@@ -10,10 +10,12 @@ import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStag
 import { useSearchParams } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
+import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
+import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 
 export default function ProposalsList({
   initRelevantProposals,
@@ -46,6 +48,8 @@ export default function ProposalsList({
       "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Op Gov Manager for Prod
       "0xE4553b743E74dA3424Ac51f8C1E586fd43aE226F",
       "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Dev Wallet for testing on op-sepolia
+      "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
+      "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
     ];
 
     tenantSupportsProposalLifecycle = proposalCreators.includes(address || "");
@@ -80,6 +84,11 @@ export default function ProposalsList({
 
   const proposals = pages.flatMap((page) => page.data);
 
+  // Check if banner is configured and visible
+  const bannerConfig = ui.toggle("proposals-page-info-banner");
+  const isBannerEnabled = bannerConfig?.enabled && bannerConfig?.config;
+  const isBannerVisible = useInfoBannerVisibility("proposals-page-info-banner");
+
   return (
     <div className="flex flex-col max-w-[76rem]">
       {/* {address && <NonVotedProposalsList address={address} />} */}
@@ -101,38 +110,43 @@ export default function ProposalsList({
           votingPeriod={governanceCalendar.votingPeriod}
         />
       )}
-      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
-        <div>
-          {proposals.length === 0 ? (
-            <div className="flex flex-row justify-center py-8 text-secondary">
-              No proposals currently
-            </div>
-          ) : (
-            <InfiniteScroll
-              hasMore={meta.has_next}
-              pageStart={0}
-              loadMore={loadMore}
-              loader={
-                <div key={0}>
-                  <div
-                    className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
-                    key="loader"
-                  >
-                    Loading...
+      <div className="relative">
+        <ProposalsPageInfoBanner />
+        <div
+          className={`flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden relative z-10 ${isBannerEnabled ? (isBannerVisible ? "-mt-4" : "mt-4") : ""}`}
+        >
+          <div>
+            {proposals.length === 0 ? (
+              <div className="flex flex-row justify-center py-8 text-secondary">
+                No proposals currently
+              </div>
+            ) : (
+              <InfiniteScroll
+                hasMore={meta.has_next}
+                pageStart={0}
+                loadMore={loadMore}
+                loader={
+                  <div key={0}>
+                    <div
+                      className="flex flex-row gl_loader justify-center py-6 text-sm text-secondary"
+                      key="loader"
+                    >
+                      Loading...
+                    </div>
                   </div>
-                </div>
-              }
-              element="main"
-            >
-              {proposals.map((proposal) => (
-                <Proposal
-                  key={`${proposal.id}_${proposal.status}`}
-                  proposal={proposal}
-                  votableSupply={votableSupply}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
+                }
+                element="main"
+              >
+                {proposals.map((proposal) => (
+                  <Proposal
+                    key={`${proposal.id}_${proposal.status}`}
+                    proposal={proposal}
+                    votableSupply={votableSupply}
+                  />
+                ))}
+              </InfiniteScroll>
+            )}
+          </div>
         </div>
       </div>
     </div>

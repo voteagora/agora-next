@@ -2,7 +2,11 @@
 
 import Tenant from "@/lib/tenant/tenant";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { PROPOSAL_STATUS, TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  GOVERNOR_TYPE,
+  PROPOSAL_STATUS,
+  TENANT_NAMESPACES,
+} from "@/lib/constants";
 import { AgoraGovExecute } from "@/app/proposals/components/AgoraGovExecute";
 import { useAccount } from "wagmi";
 import { AgoraGovCancel } from "@/app/proposals/components/AgoraGovCancel";
@@ -15,15 +19,21 @@ import { BravoGovExecute } from "@/app/proposals/components/BravoGovExecute";
 import { BravoGovQueue } from "@/app/proposals/components/BravoGovQueue";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import { OffchainCancel } from "@/app/proposals/components/OffchainCancel";
+import { PLMConfig } from "../draft/types";
 
 interface Props {
   proposal: Proposal;
 }
 
 export const ProposalStateAdmin = ({ proposal }: Props) => {
-  const { ui } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
+  const governorType = contracts.governorType;
+  const isBravoGovernor = governorType === GOVERNOR_TYPE.BRAVO;
   const { isConnected, address } = useAccount();
   const { namespace } = Tenant.current();
+
+  const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
+  const offchainProposalCreator = plmConfig?.offchainProposalCreator;
 
   const hasProposalLifecycle = Boolean(ui.toggle("proposal-execute")?.enabled);
 
@@ -40,12 +50,18 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
       namespace === TENANT_NAMESPACES.DERIVE ||
       namespace === TENANT_NAMESPACES.UNISWAP ||
       namespace === TENANT_NAMESPACES.LINEA ||
-      namespace === TENANT_NAMESPACES.B3);
+      namespace === TENANT_NAMESPACES.B3 ||
+      namespace === TENANT_NAMESPACES.PGUILD);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
   const canCancel =
-    adminAddress?.toString().toLowerCase() === address?.toLowerCase();
+    adminAddress?.toString().toLowerCase() === address?.toLowerCase() ||
+    (proposal.proposalType?.startsWith("OFFCHAIN") &&
+      address &&
+      offchainProposalCreator?.some(
+        (creator) => creator.toLowerCase() === address?.toLowerCase()
+      ));
 
   const actionableStates: string[] = [
     PROPOSAL_STATUS.ACTIVE,
@@ -67,7 +83,12 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     switch (proposal.status) {
       case PROPOSAL_STATUS.ACTIVE:
       case PROPOSAL_STATUS.PENDING:
-        return "This proposal can still be cancelled by the admin.";
+        if (proposal.proposalType?.startsWith("OFFCHAIN")) {
+          return "This proposal can still be cancelled by the creator.";
+        }
+        return isBravoGovernor
+          ? "This proposal can still be cancelled by the proposer."
+          : "This proposal can still be cancelled by the admin.";
       case PROPOSAL_STATUS.SUCCEEDED:
         if (namespace === TENANT_NAMESPACES.OPTIMISM) {
           if (
@@ -81,6 +102,9 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
           ) {
             // No banner for Optimistic proposals.
             return null;
+          }
+          if (proposal.proposalType?.startsWith("OFFCHAIN")) {
+            return "This proposal can still be cancelled by the creator.";
           }
           return "This proposal can still be cancelled by the admin.";
         }
@@ -153,6 +177,7 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -210,7 +235,12 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
       return <OZGovQueue proposal={proposal} />;
 
     default:
-      return <AgoraGovQueue proposal={proposal} />;
+      return (
+        <>
+          <AgoraGovCancel proposal={proposal} />
+          <AgoraGovQueue proposal={proposal} />
+        </>
+      );
   }
 };
 
@@ -223,6 +253,7 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -267,7 +298,12 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
       return <BravoGovExecute proposal={proposal} />;
 
     default:
-      return <AgoraGovExecute proposal={proposal} />;
+      return (
+        <>
+          <AgoraGovCancel proposal={proposal} />
+          <AgoraGovExecute proposal={proposal} />
+        </>
+      );
   }
 };
 
@@ -280,6 +316,13 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
+    case TENANT_NAMESPACES.PGUILD:
+      return proposal.proposalType?.startsWith("OFFCHAIN") ? (
+        <OffchainCancel proposal={proposal} />
+      ) : (
+        <AgoraGovCancel proposal={proposal} />
+      );
+
     case TENANT_NAMESPACES.OPTIMISM:
       return proposal.proposalType?.startsWith("OFFCHAIN") ? (
         <OffchainCancel proposal={proposal} />

@@ -12,9 +12,7 @@ export async function generateMetadata() {
 
   const preview = `/api/images/og/proposals?title=${encodeURIComponent(
     "Optimism Agora"
-  )}&description=${encodeURIComponent(
-    "Home of token house governance and RPGF"
-  )}`;
+  )}&description=${encodeURIComponent("Home of Optimism governance")}`;
 
   return {
     title: title,

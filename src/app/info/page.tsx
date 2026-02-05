@@ -7,6 +7,10 @@ import { InfoHero } from "@/app/info/components/InfoHero";
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
+import DunaAdministration from "@/app/duna/components/DunaAdministration";
+import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
+import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
+import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { apiFetchTreasuryBalanceTS } from "@/app/api/balances/[frequency]/getTreasuryBalanceTS";
@@ -14,26 +18,35 @@ import { apiFetchDelegateWeights } from "@/app/api/analytics/top/delegates/getTo
 import { apiFetchProposalVoteCounts } from "@/app/api/analytics/vote/getProposalVoteCounts";
 import { apiFetchMetricTS } from "@/app/api/analytics/metric/[metric_id]/[frequency]/getMetricsTS";
 import Hero from "@/components/Hero/Hero";
+import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({}) {
   const tenant = Tenant.current();
   const page = tenant.ui.page("info") || tenant.ui.page("/");
 
   const { title, description } = page!.meta;
+  const metadataBase = getMetadataBaseUrl();
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
 
   return {
+    metadataBase,
     title: title,
     description: description,
     openGraph: {
+      type: "website",
+      title: title,
+      description: description,
       images: [
         {
           url: preview,
           width: 1200,
           height: 630,
+          alt: title,
         },
       ],
     },
@@ -56,6 +69,7 @@ export default async function Page() {
 
   const hasGovernanceCharts =
     ui.toggle("info/governance-charts")?.enabled === true;
+  const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
     const treasuryData = await apiFetchTreasuryBalanceTS(
@@ -66,7 +80,14 @@ export default async function Page() {
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
-        <GovernorSettings />
+        {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
+        {hasDunaAdministration &&
+        ui.toggle("towns-duna-administration")?.enabled ? (
+          <TownsDunaAdministration />
+        ) : (
+          hasDunaAdministration && <DunaAdministration />
+        )}
+        <GovernanceInfoSections />
         {treasuryData.result.length > 0 && (
           <ChartTreasury
             initialData={treasuryData.result}
@@ -92,6 +113,9 @@ export default async function Page() {
             }}
           />
         )}
+        {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
+          <DunaDisclosuresContent />
+        ) : null}
       </div>
     );
   } else {

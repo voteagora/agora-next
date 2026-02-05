@@ -42,6 +42,7 @@ export const optimismTenantUIConfig = new TenantUI({
     allowed: [],
     advanced: [],
     retired: [
+      "0x3eee61b92c36e97be6319bf9096a1ac3c04a1466", // ACC
       "0x5e349eca2dc61abcd9dd99ce94d04136151a09ee", // lindajxie.eth
     ],
   },
@@ -125,9 +126,9 @@ export const optimismTenantUIConfig = new TenantUI({
       hero: optimismHero,
       meta: {
         title: "Optimism Agora",
-        description: "Home of token house governance and RPGF",
+        description: "Home of Optimism governance",
         imageTitle: "Optimism Agora",
-        imageDescription: "Home of token house governance and RPGF",
+        imageDescription: "Home of Optimism governance",
       },
     },
     {
@@ -138,9 +139,9 @@ export const optimismTenantUIConfig = new TenantUI({
       hero: optimismHero,
       meta: {
         title: "Optimism Agora",
-        description: "Home of token house governance and RPGF",
+        description: "Home of Optimism governance",
         imageTitle: "Optimism Agora",
-        imageDescription: "Home of token house governance and RPGF",
+        imageDescription: "Home of Optimism governance",
       },
     },
     {
@@ -239,6 +240,15 @@ export const optimismTenantUIConfig = new TenantUI({
       name: "proposal-lifecycle",
       enabled: true,
       config: {
+        // Temporary: allow public draft sharing via ?share=AuthorAddress
+        allowDraftSharing: true,
+        offchainProposalCreator: [
+          "0xcC0B26236AFa80673b0859312a7eC16d2b72C1ea",
+          "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
+          "0x011B83250067782A4435FAb0B0119Ec835404E60",
+          "0x77a1c4669D642E8A25B1da8bAE4a7466f0f3a7c3",
+          "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
+        ],
         stages: [
           {
             stage: PrismaProposalStage.DRAFTING,
@@ -312,6 +322,10 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       enabled: true,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: false,
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },
@@ -324,12 +338,20 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       enabled: false,
     },
     {
+      name: "use-archive-for-vote-history",
+      enabled: true,
+    },
+    {
       name: "show-participation",
       enabled: true,
     },
     {
       name: "proposals/offchain",
       enabled: true,
+    },
+    {
+      name: "forums",
+      enabled: false,
     },
   ],
 });

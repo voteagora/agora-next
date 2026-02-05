@@ -297,7 +297,19 @@ If you need help creating transactions / calldata, please see this [video](https
       },
     },
     {
+      name: "hide-7d-change",
+      enabled: true,
+    },
+    {
       name: "use-daonode-for-proposal-types",
+      enabled: false,
+    },
+    {
+      name: "use-archive-for-vote-history",
+      enabled: false,
+    },
+    {
+      name: "forums",
       enabled: false,
     },
   ],

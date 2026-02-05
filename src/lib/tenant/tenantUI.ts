@@ -2,6 +2,7 @@ import { StaticImageData } from "next/image";
 import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { TenantToken } from "../types";
+import React, { ReactNode } from "react";
 
 type UIToggle = {
   name: string;
@@ -28,7 +29,54 @@ export type UIGasRelayConfig = {
 // UI config exists to give tenant specifc config options to a UI toggle
 // the canonical example is wanting to allow tenants to customize
 // their proposal lifecycle feature
-type UIConfig = PLMConfig;
+export type UIDunaDescriptionConfig = {
+  content: ReactNode;
+};
+
+export type UIVotingPowerInfoConfig = {
+  text: string;
+};
+
+export type UIGovernanceInfoSection = {
+  id: string;
+  title: string;
+  content: ReactNode;
+};
+
+export type UIGovernanceInfoConfig = {
+  title?: string;
+  sections: UIGovernanceInfoSection[];
+};
+
+export type UIInfoBannerConfig = {
+  text: string;
+  link: string;
+  storageKey: string;
+};
+
+export type UIDunaDisclosuresConfig = {
+  content: ReactNode;
+  disclaimer?: ReactNode;
+};
+
+export type UITaxFormConfig = {
+  payeeFormUrl?: string;
+  provider?: string;
+};
+
+export type UIFinancialStatementsConfig = {
+  title: string;
+};
+
+type UIConfig =
+  | PLMConfig
+  | UIDunaDescriptionConfig
+  | UIVotingPowerInfoConfig
+  | UIGovernanceInfoConfig
+  | UIInfoBannerConfig
+  | UIDunaDisclosuresConfig
+  | UITaxFormConfig
+  | UIFinancialStatementsConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
@@ -51,12 +99,18 @@ export type UILink = {
 };
 
 type UIPage = {
-  description: string;
+  description: string | React.ReactNode;
   hero?: StaticImageData | string;
   href?: string;
   links?: UILink[];
   route: string;
   title: string;
+  sectionTitle?: string;
+  tabs?: Array<{
+    icon: React.ReactNode;
+    title: string;
+    description: string | React.ReactNode;
+  }>;
   meta: {
     title: string;
     description: string;
@@ -102,6 +156,7 @@ type TenantUIParams = {
   hideAgoraBranding?: boolean;
   links?: UILink[];
   logo: string;
+  logoSize?: string;
   organization?: UIOrganization;
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
@@ -122,6 +177,31 @@ type TenantUIParams = {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    infoSectionBackground?: string;
+    headerBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
+    innerFooterBackground?: string;
+    customHeroImageSize?: string;
+    customInfoTabs?: Array<{ title: string; description: string }>;
+    customIconBackground?: string;
+    customInfoLayout?: string;
+    customTextContainer?: string;
+    customAboutSubtitle?: string;
+    customTitleSize?: string;
+    customCardSize?: string;
+    customIconColor?: string;
+    noReportsFound?: string;
+    customButtonBackground?: string;
+    customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -133,6 +213,7 @@ type TenantUIParams = {
   tacticalStrings?: {
     myBalance?: string;
   };
+  dunaDisclaimers?: string;
 };
 
 export class TenantUI {
@@ -144,6 +225,7 @@ export class TenantUI {
   private _hideAgoraBranding?: boolean;
   private _links?: UILink[];
   private _logo: string;
+  private _logoSize?: string;
   private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
@@ -163,6 +245,31 @@ export class TenantUI {
     font?: string;
     tokenAmountFont?: string;
     letterSpacing?: string;
+    infoSectionBackground?: string;
+    headerBackground?: string;
+    infoTabBackground?: string;
+    buttonBackground?: string;
+    cardBackground?: string;
+    cardBorder?: string;
+    hoverBackground?: string;
+    textSecondary?: string;
+    footerBackground?: string;
+    innerFooterBackground?: string;
+    customHeroImageSize?: string;
+    customInfoTabs?: Array<{ title: string; description: string }>;
+    customIconBackground?: string;
+    customInfoLayout?: string;
+    customTextContainer?: string;
+    customAboutSubtitle?: string;
+    customTitleSize?: string;
+    customCardSize?: string;
+    customIconColor?: string;
+    noReportsFound?: string;
+    customButtonBackground?: string;
+    customHeroTitleWidth?: string;
+    tagBackground?: string;
+    infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -179,11 +286,13 @@ export class TenantUI {
   private _tacticalStrings?: {
     myBalance?: string;
   };
+  private _dunaDisclaimers?: string;
 
   constructor({
     assets,
     customization,
     delegates,
+    dunaDisclaimers,
     favicon,
     googleAnalytics,
     governanceIssues,
@@ -191,6 +300,7 @@ export class TenantUI {
     hideAgoraBranding,
     links,
     logo,
+    logoSize,
     organization,
     pages,
     smartAccountConfig,
@@ -203,6 +313,7 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
     this._googleAnalytics = googleAnalytics;
     this._governanceIssues = governanceIssues;
@@ -210,6 +321,7 @@ export class TenantUI {
     this._hideAgoraBranding = hideAgoraBranding;
     this._links = links;
     this._logo = logo;
+    this._logoSize = logoSize;
     this._organization = organization;
     this._pages = pages;
     this._smartAccountConfig = smartAccountConfig;
@@ -252,6 +364,10 @@ export class TenantUI {
     return this._logo;
   }
 
+  public get logoSize(): string | undefined {
+    return this._logoSize;
+  }
+
   public get organization(): UIOrganization | undefined {
     return this._organization;
   }
@@ -275,6 +391,29 @@ export class TenantUI {
         font?: string;
         tokenAmountFont?: string;
         letterSpacing?: string;
+        infoSectionBackground?: string;
+        headerBackground?: string;
+        infoTabBackground?: string;
+        buttonBackground?: string;
+        cardBackground?: string;
+        cardBorder?: string;
+        hoverBackground?: string;
+        textSecondary?: string;
+        footerBackground?: string;
+        innerFooterBackground?: string;
+        customHeroImageSize?: string;
+        customInfoTabs?: Array<{ title: string; description: string }>;
+        customIconBackground?: string;
+        customInfoLayout?: string;
+        customTextContainer?: string;
+        customAboutSubtitle?: string;
+        customTitleSize?: string;
+        customCardSize?: string;
+        customIconColor?: string;
+        noReportsFound?: string;
+        customButtonBackground?: string;
+        tagBackground?: string;
+        infoBannerBackground?: string;
       }
     | undefined {
     return this._customization;
@@ -335,5 +474,9 @@ export class TenantUI {
       }
     | undefined {
     return this._tacticalStrings;
+  }
+
+  public get dunaDisclaimers(): string | undefined {
+    return this._dunaDisclaimers;
   }
 }

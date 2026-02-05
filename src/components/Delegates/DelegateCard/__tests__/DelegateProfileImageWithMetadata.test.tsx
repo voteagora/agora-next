@@ -4,9 +4,20 @@ import { DelegateProfileImageWithMetadata } from "../DelegateProfileImage";
 import { useEnsName } from "wagmi";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 
+vi.mock("server-only", () => ({}));
+
 vi.mock("wagmi", () => ({
   useEnsName: vi.fn(),
   useEnsAvatar: vi.fn(() => ({ data: null })),
+}));
+
+vi.mock("@/hooks/useForum", () => ({
+  useForumAdminsList: vi.fn(() => ({
+    admins: [],
+    isLoading: false,
+    error: undefined,
+    refetch: vi.fn(),
+  })),
 }));
 
 vi.mock("@/contexts/ConnectButtonContext", () => ({

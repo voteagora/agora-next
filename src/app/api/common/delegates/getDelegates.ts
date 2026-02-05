@@ -22,7 +22,11 @@ import { DELEGATION_MODEL, TENANT_NAMESPACES } from "@/lib/constants";
 import { getProxyAddress } from "@/lib/alligatorUtils";
 import { calculateBigIntRatio } from "../utils/bigIntRatio";
 import { withMetrics } from "@/lib/metricWrapper";
-import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getDelegateDataFromDaoNode,
+  getDelegatesFromDaoNode,
+  getDelegateVotingPowerFromDaoNode,
+} from "@/app/lib/dao-node/client";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -35,7 +39,9 @@ const cachedGetDelegatesFromDaoNode = unstable_cache(
       delegator?: `0x${string}`;
     };
     withParticipation?: boolean;
-  }) => getDelegatesFromDaoNode(args),
+  }) => {
+    return getDelegatesFromDaoNode(args);
+  },
   ["delegates-dao-node-filters"],
   {
     revalidate: 30, // Cache for 30 seconds
@@ -117,14 +123,6 @@ async function getDelegates({
         filters?.endorsed ||
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
-
-      console.log({
-        filters,
-        isAllowListEnabled,
-        isWeightedRandomSort,
-        sort,
-        seed,
-      });
 
       const daoNodeResult = await cachedGetDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
@@ -249,6 +247,21 @@ async function getDelegates({
             advanced: "0",
           };
 
+          // Sanitize statement payload to remove email if it exists
+          let sanitizedStatement = delegate.statement;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
+            sanitizedStatement = {
+              ...sanitizedStatement,
+              payload: payloadWithoutEmail,
+            };
+          }
+
           return {
             address:
               typeof address === "string"
@@ -260,7 +273,7 @@ async function getDelegates({
               advanced: votingPower.advanced || "0",
             },
             citizen: false,
-            statement: delegate.statement || null,
+            statement: sanitizedStatement,
             numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
             mostRecentDelegationBlock: BigInt(
               String(delegate.mostRecentDelegationBlock || 0)
@@ -596,17 +609,34 @@ async function getDelegates({
       // components
       return {
         meta,
-        data: delegates.map((delegate) => ({
-          address: delegate.delegate,
-          votingPower: {
-            total: delegate.voting_power?.toFixed(0) || "0",
-            direct: delegate.direct_vp?.toFixed(0) || "0",
-            advanced: delegate.advanced_vp?.toFixed(0) || "0",
-          },
-          statement: delegate.statement,
-          numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
-          participation: 0,
-        })),
+        data: delegates.map((delegate) => {
+          // Sanitize statement payload to remove email if it exists
+          let sanitizedStatement = delegate.statement;
+          if (
+            sanitizedStatement &&
+            sanitizedStatement.payload &&
+            typeof sanitizedStatement.payload === "object"
+          ) {
+            const { email: _, ...payloadWithoutEmail } =
+              sanitizedStatement.payload as any;
+            sanitizedStatement = {
+              ...sanitizedStatement,
+              payload: payloadWithoutEmail,
+            };
+          }
+
+          return {
+            address: delegate.delegate,
+            votingPower: {
+              total: delegate.voting_power?.toFixed(0) || "0",
+              direct: delegate.direct_vp?.toFixed(0) || "0",
+              advanced: delegate.advanced_vp?.toFixed(0) || "0",
+            },
+            statement: sanitizedStatement,
+            numOfDelegators: BigInt(delegate.num_of_delegators || "0"),
+            participation: 0,
+          };
+        }),
         seed,
       };
     },
@@ -616,10 +646,11 @@ async function getDelegates({
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return withMetrics("getDelegate", async () => {
-    const { namespace, contracts, slug } = Tenant.current();
+    const { namespace, contracts, slug, ui } = Tenant.current();
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
+    const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
@@ -639,7 +670,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
           advanced_vp,
           num_of_delegators,
           proposals_proposed,
-          citizen.citizen,
           statement.statement,
           COALESCE(total_proposals.count, 0) as total_proposals
         FROM
@@ -665,7 +695,6 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 signature,
                 payload,
                 twitter,
-                email,
                 discord,
                 created_at,
                 updated_at,
@@ -675,6 +704,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
                 notification_preferences
               FROM agora.delegate_statements s
               WHERE s.address = LOWER($1) AND s.dao_slug = $3::config.dao_slug
+              ORDER BY s.updated_at_ts DESC
               LIMIT 1
             ) sub
           ) AS statement ON TRUE;
@@ -686,11 +716,19 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
-    const [delegate, votableSupply, quorum] = await Promise.all([
-      delegateQuery.then((result) => result?.[0] || undefined),
-      fetchVotableSupply(),
-      fetchCurrentQuorum(),
-    ]);
+    const daoNodeVotingPowerPromise = includeL3Staking
+      ? getDelegateVotingPowerFromDaoNode(address)
+      : Promise.resolve<string | null>(null);
+
+    const [delegate, votableSupply, quorum, daoNodeVotingPower] =
+      await Promise.all([
+        delegateQuery.then((result) => result?.[0] || undefined),
+        fetchVotableSupply(),
+        fetchCurrentQuorum(),
+        daoNodeVotingPowerPromise,
+      ]);
+
+    const daoNodeDelegate = await getDelegateDataFromDaoNode(address);
 
     const numOfAdvancedDelegationsQuery = `SELECT count(*) as num_of_delegators
             FROM ${namespace + ".advanced_delegatees"}
@@ -724,58 +762,69 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     } else {
       throw new Error("Token contract is neither ERC20 nor ERC721?");
     }
-    var numOfDelegationsQuery;
 
-    const partialDelegationContract = contracts.alligator
-      ? contracts.alligator.address
-      : contracts.token.address;
+    let numOfDelegationsQuery;
 
-    if (contracts.alligator) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(
-        `
-          SELECT
-            SUM(num_of_delegators) as num_of_delegators
-          FROM (
-            ${numOfAdvancedDelegationsQuery}
-            UNION ALL
-            ${numOfDirectDelegationsQuery}
-          ) t;
-          `,
-        address,
-        partialDelegationContract
-      );
-    } else if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfAdvancedDelegationsQuery, address, partialDelegationContract);
+    if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
+      numOfDelegationsQuery = numOfAdvancedDelegationsQuery;
     } else {
-      numOfDelegationsQuery = prismaWeb3Client.$queryRawUnsafe<
-        { num_of_delegators: BigInt }[]
-      >(numOfDirectDelegationsQuery, address, partialDelegationContract);
+      numOfDelegationsQuery = numOfDirectDelegationsQuery;
     }
 
-    const totalVotingPower =
-      BigInt(delegate?.voting_power || 0) +
-      BigInt(delegate?.advanced_vp?.toFixed(0) || 0);
+    const numOfDelegationsResult = prismaWeb3Client.$queryRawUnsafe<
+      { num_of_delegators: BigInt }[]
+    >(numOfDirectDelegationsQuery, address, contracts.token.address);
+
+    const fallbackDirectVotingPower = delegate?.voting_power?.toString() || "0";
+    const fallbackAdvancedVotingPower =
+      delegate?.advanced_vp?.toFixed(0) || "0";
+    const directVotingPower = daoNodeVotingPower ?? fallbackDirectVotingPower;
+    const advancedVotingPower = daoNodeVotingPower
+      ? "0"
+      : fallbackAdvancedVotingPower;
+    const totalVotingPower = daoNodeVotingPower
+      ? BigInt(directVotingPower)
+      : BigInt(fallbackDirectVotingPower) + BigInt(fallbackAdvancedVotingPower);
 
     const cachedNumOfDelegators = BigInt(
-      delegate.num_of_delegators?.toFixed() || "0"
+      delegate?.num_of_delegators?.toFixed() || "0"
     );
 
+    const daoNodeNumOfDelegators =
+      daoNodeDelegate?.delegate?.from_cnt !== undefined
+        ? BigInt(daoNodeDelegate.delegate.from_cnt)
+        : null;
+
     const usedNumOfDelegators =
-      cachedNumOfDelegators < 1000n
-        ? BigInt(
-            (await numOfDelegationsQuery)?.[0]?.num_of_delegators?.toString() ||
-              "0"
-          )
-        : cachedNumOfDelegators;
+      daoNodeNumOfDelegators !== null
+        ? daoNodeNumOfDelegators
+        : cachedNumOfDelegators < 1000n
+          ? BigInt(
+              (
+                await numOfDelegationsResult
+              )?.[0]?.num_of_delegators?.toString() || "0"
+            )
+          : cachedNumOfDelegators;
 
     const relativeVotingPowerToVotableSupply = calculateBigIntRatio(
       totalVotingPower,
       BigInt(votableSupply)
     );
+
+    // Sanitize statement payload to remove email if it exists
+    let sanitizedStatement = delegate?.statement;
+    if (
+      sanitizedStatement &&
+      sanitizedStatement.payload &&
+      typeof sanitizedStatement.payload === "object"
+    ) {
+      const { email: _, ...payloadWithoutEmail } =
+        sanitizedStatement.payload as any;
+      sanitizedStatement = {
+        ...sanitizedStatement,
+        payload: payloadWithoutEmail,
+      };
+    }
 
     // Build out delegate JSON response
     return {
@@ -783,8 +832,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       citizen: false,
       votingPower: {
         total: totalVotingPower.toString(),
-        direct: delegate?.voting_power?.toString() || "0",
-        advanced: delegate?.advanced_vp?.toFixed(0) || "0",
+        direct: directVotingPower,
+        advanced: advancedVotingPower,
       },
       votingPowerRelativeToVotableSupply:
         votableSupply && BigInt(votableSupply) > 0n
@@ -803,7 +852,7 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       lastTenProps: delegate?.last_10_props?.toFixed() || "0",
       numOfDelegators: usedNumOfDelegators,
       totalProposals: delegate?.total_proposals || 0,
-      statement: delegate?.statement || null,
+      statement: sanitizedStatement,
       relativeVotingPowerToVotableSupply,
       vpChange7d: 0n,
       participation: 0,

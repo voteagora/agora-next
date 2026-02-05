@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { time_this } from "@/app/lib/logging";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 // if (process.env.NODE_ENV === "production" && process.env.NEXT_PHASE === "phase-production-build") {
 //   throw new Error("🚨 Prisma query during build!");
@@ -29,53 +30,34 @@ const resolveDbUrl = (type: "WEB2" | "WEB3") => {
     return databaseUrl;
   }
 
-  return process.env[
-    `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`
-  ];
+  const envVarName = `${type === "WEB2" ? "READ_WRITE_WEB2" : "READ_ONLY_WEB3"}_DATABASE_URL_${envSuffix}`;
+  const url = process.env[envVarName];
+  return url;
 };
 
 const readWriteWeb2Url = resolveDbUrl("WEB2");
 const readOnlyWeb3Url = resolveDbUrl("WEB3");
-
 let prismaWeb2Client: PrismaClient;
 let prismaWeb3Client: PrismaClient;
 
-// Logging middleware
-const makePrismaClient = (databaseUrl: string) => {
-  const execRaw = async (
-    query: (args: any) => Promise<any>,
-    args: any,
-    operation: string
-  ) => {
-    const maxRetries = 2;
-    let lastError: Error | null = null;
+// Allows tuning connection pool size without code changes
+const configuredPoolMax = Number(process.env.PG_ADAPTER_POOL_MAX ?? "2");
+const POOL_MAX = Number.isFinite(configuredPoolMax) ? configuredPoolMax : 2;
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        return await time_this(async () => await query(args), {
-          operation,
-          args,
-        });
-      } catch (error) {
-        lastError = error as Error;
-        if (error instanceof Error && error.message.includes("P1017")) {
-          if (attempt < maxRetries) {
-            await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-            continue;
-          }
-        }
-        throw error;
-      }
-    }
-    throw lastError;
-  };
+const makePrismaClient = (databaseUrl: string) => {
+  const pool = new Pool({
+    connectionString: databaseUrl,
+    max: POOL_MAX,
+    connectionTimeoutMillis: 5000, // return an error after 5 seconds if connection could not be established
+  });
+
+  pool.on("error", (err) => {
+    console.error("Unexpected error on idle client", err);
+    process.exit(-1);
+  });
 
   return new PrismaClient({
-    datasources: {
-      db: {
-        url: databaseUrl,
-      },
-    },
+    adapter: new PrismaPg(pool),
   });
 };
 

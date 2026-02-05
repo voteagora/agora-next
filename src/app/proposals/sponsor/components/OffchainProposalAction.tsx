@@ -5,23 +5,27 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Tenant from "@/lib/tenant/tenant";
 import {
   DraftProposal,
+  PLMConfig,
   ProposalScope,
   ProposalType,
 } from "../../../proposals/draft/types";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
-import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ProposalType as LibProposalType } from "@/lib/types.d";
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { getPublicClient } from "@/lib/viem";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
+import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
 
-const { contracts } = Tenant.current();
+const { contracts, ui } = Tenant.current();
+const plmToggle = ui.toggle("proposal-lifecycle");
+const config = plmToggle?.config as PLMConfig;
 const governorContract = contracts.governor;
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const OffchainProposalAction = ({
   draftProposal,
@@ -36,6 +40,7 @@ const OffchainProposalAction = ({
   const [isOffchainSubmitting, setIsOffchainSubmitting] = useState(false);
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -58,6 +63,14 @@ const OffchainProposalAction = ({
       );
       return;
     }
+
+    if (!address || !config.offchainProposalCreator?.includes(address)) {
+      setOffchainSubmitError(
+        "You are not authorized to submit offchain proposals."
+      );
+      return;
+    }
+
     setIsOffchainSubmitting(true);
     setOffchainSubmitError(null);
 
@@ -170,66 +183,55 @@ const OffchainProposalAction = ({
         calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
       });
 
-      const apiKey = process.env.NEXT_PUBLIC_AGORA_API_KEY;
-
-      if (!apiKey) {
-        throw new Error("AGORA_API_KEY is not set");
-      }
-
-      const response = await fetch("/api/offchain-proposals/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
+      const result = await createOffchainProposal({
+        proposalData: {
+          proposer: rawProposalDataForBackend.proposer,
+          description: rawProposalDataForBackend.description,
+          choices: rawProposalDataForBackend.choices,
+          proposal_type_id: rawProposalDataForBackend.proposal_type_id,
+          start_block: rawProposalDataForBackend.start_block.toString(),
+          end_block: rawProposalDataForBackend.end_block.toString(),
+          proposal_type:
+            rawProposalDataForBackend.proposal_type as LibProposalType,
+          tiers: rawProposalDataForBackend.tiers,
+          maxApprovals: rawProposalDataForBackend.maxApprovals,
+          criteria: rawProposalDataForBackend.criteria,
+          criteriaValue: rawProposalDataForBackend.criteriaValue,
+          calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
         },
-        body: JSON.stringify({
-          proposalData: {
-            proposer: rawProposalDataForBackend.proposer,
-            description: rawProposalDataForBackend.description,
-            choices: rawProposalDataForBackend.choices,
-            proposal_type_id: rawProposalDataForBackend.proposal_type_id,
-            start_block: rawProposalDataForBackend.start_block.toString(),
-            end_block: rawProposalDataForBackend.end_block.toString(),
-            proposal_type: rawProposalDataForBackend.proposal_type,
-            tiers: rawProposalDataForBackend.tiers,
-            maxApprovals: rawProposalDataForBackend.maxApprovals,
-            criteria: rawProposalDataForBackend.criteria,
-            criteriaValue: rawProposalDataForBackend.criteriaValue,
-            calculationOptions:
-              rawProposalDataForBackend.calculationOptions ?? 0,
-          },
-          id: id.toString(),
-          transactionHash,
-          onchainProposalId: onchainProposalId?.toString(),
-        }),
+        id: id.toString(),
+        transactionHash,
+        onchainProposalId: onchainProposalId?.toString() ?? null,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error(errorData);
-        toast.error(errorData.message || `API Error: ${response.status}`);
-      } else {
-        toast.success("Proposal submitted successfully");
-        openDialog({
-          type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL",
-          params: {
-            redirectUrl: "/",
-            txHash: transactionHash as `0x${string}`,
-          },
-        });
-        await sponsorDraftProposal({
-          draftProposalId: draftProposal.id,
-          onchain_transaction_hash: transactionHash,
-          is_offchain_submission: true,
-          proposal_scope: draftProposal.proposal_scope,
-        });
-        trackEvent({
-          event_name: ANALYTICS_EVENT_NAMES.CREATE_OFFCHAIN_PROPOSAL,
-          event_data: {
-            proposal_id: id.toString(),
-          },
-        });
-      }
+      toast.success("Proposal submitted successfully");
+      openDialog({
+        type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL",
+        params: {
+          redirectUrl: "/",
+          txHash: transactionHash as `0x${string}`,
+        },
+      });
+      const messagePayload = {
+        action: "sponsorDraft",
+        draftProposalId: draftProposal.id,
+        creatorAddress: address,
+        timestamp: new Date().toISOString(),
+      };
+
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) throw new Error("Authentication failed");
+
+      await sponsorDraftProposal({
+        draftProposalId: draftProposal.id,
+        onchain_transaction_hash: transactionHash,
+        is_offchain_submission: true,
+        proposal_scope: draftProposal.proposal_scope,
+        creatorAddress: address as `0x${string}`,
+        message: auth.message,
+        signature: auth.signature,
+        jwt: auth.jwt,
+      });
     } catch (e: any) {
       console.error("Off-chain proposal submission error:", e);
       setOffchainSubmitError(

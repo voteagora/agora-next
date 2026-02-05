@@ -9,12 +9,12 @@ import Tenant from "@/lib/tenant/tenant";
 
 export function ConnectButton() {
   const { contracts } = Tenant.current();
-  const { chain, address } = useAccount();
+  const { chainId, address } = useAccount();
   const openDialog = useOpenDialog();
 
   useEffect(() => {
     if (!address) return;
-    if (!chain || (chain?.id && chain.id !== contracts.token.chain.id)) {
+    if (chainId !== contracts.token.chain.id) {
       openDialog({
         type: "SWITCH_NETWORK",
         params: {
@@ -22,7 +22,13 @@ export function ConnectButton() {
         },
       });
     }
-  }, [chain?.id, contracts.token.chain.id, openDialog]);
+  }, [
+    address,
+    chainId,
+    contracts.token.chain,
+    contracts.token.chain.id,
+    openDialog,
+  ]);
 
   return (
     <div>
