@@ -326,7 +326,7 @@ export const townsTenantUIConfig = new TenantUI({
     },
     {
       name: "tax-form",
-      enabled: true,
+      enabled: false,
       config: {
         payeeFormUrl: "http://cowrie.io/tax",
         provider: "cowrie",
