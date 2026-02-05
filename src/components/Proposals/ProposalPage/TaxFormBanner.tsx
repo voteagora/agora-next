@@ -172,16 +172,26 @@ export function TaxFormBanner({ proposal }: Props) {
 
   const isWaitingForPayment = proposal.status === PROPOSAL_STATUS.SUCCEEDED;
   const isSignedIn = Boolean(address);
+
+  // Check if this is an onchain governance proposal
+  // Can be identified by tag or by proposal type
   const rawTag =
     proposal.archiveMetadata?.rawTag ??
     (Array.isArray((proposal as unknown as { tags?: string[] }).tags)
       ? (proposal as unknown as { tags?: string[] }).tags?.[0]
       : undefined);
   const normalizedTag = rawTag?.toLowerCase();
-  const isGovProposal =
+  const hasGovTag =
     normalizedTag === "gov-proposal" || normalizedTag === "govproposal";
+
+  const onchainProposalTypes = ["STANDARD", "APPROVAL", "OPTIMISTIC"];
+  const hasOnchainType = proposal.proposalType
+    ? onchainProposalTypes.includes(proposal.proposalType)
+    : false;
+
+  const isOnchainProposal = hasGovTag || hasOnchainType;
   const requiresTaxForm =
-    isEnabled && isWaitingForPayment && isGovProposal && !isFormCompleted;
+    isEnabled && isWaitingForPayment && isOnchainProposal && !isFormCompleted;
 
   // Skip when globally off or non-gov proposals
   if (!requiresTaxForm) {
@@ -195,21 +205,21 @@ export function TaxFormBanner({ proposal }: Props) {
   const payeeButtonClass =
     "px-7 py-3.5 text-sm font-semibold rounded-lg bg-black text-neutral hover:shadow-newHover outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0";
 
-  // Pre-login: always show generic banner
+  // Pre-login: show generic banner only if a payee_recipient is set
   if (!isSignedIn) {
+    if (!hasPayeeKey) {
+      return null;
+    }
     return (
       <div className={bannerClass}>
         <div className={contentClass}>
           <div className="bg-wash rounded-md p-1.5">
             <CheckCircleBrokenIcon className="w-4 h-4" stroke="#7A7A7A" />
           </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-secondary text-sm md:text-sm">
-              This proposal has passed. If you are the payee, please sign in to
-              complete your payment information.
-            </p>
-            <CountdownTimer endTime={proposal.endTime} />
-          </div>
+          <p className="text-secondary text-sm md:text-sm">
+            This proposal has passed. If you are the payee, please sign in to
+            complete your payment information.
+          </p>
         </div>
       </div>
     );
