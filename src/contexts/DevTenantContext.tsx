@@ -146,6 +146,7 @@ export function DevTenantProvider({ children }: { children: React.ReactNode }) {
     typeof window !== "undefined" &&
     process.env.NEXT_PUBLIC_AGORA_ENV !== "prod" &&
     process.env.NEXT_PUBLIC_TENANT_SWITCHER_ENABLED !== "false";
+
   const [selectedTenant, setSelectedTenantState] =
     useState<TenantNamespace | null>(null);
   const [overrideUI, setOverrideUI] = useState<TenantUI | null>(null);
