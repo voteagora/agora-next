@@ -201,6 +201,7 @@ type TenantUIParams = {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -268,6 +269,7 @@ export class TenantUI {
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
+    heroCardGradient?: { from: string; to: string };
   };
   private _theme: "light" | "dark";
   private _favicon?: {

@@ -6,6 +6,15 @@ import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import React from "react";
 
+// Mock environment variables for tests
+process.env.NEXT_PUBLIC_ALCHEMY_ID = "test-alchemy-key";
+process.env.NEXT_PUBLIC_AGORA_ENV = "dev";
+process.env.DATABASE_URL = "dev";
+process.env.READ_WRITE_WEB2_DATABASE_URL_DEV =
+  "postgresql://test:test@localhost:5432/test";
+process.env.READ_ONLY_WEB3_DATABASE_URL_DEV =
+  "postgresql://test:test@localhost:5432/test";
+
 vi.mock("next/font/google", async () => {
   const fonts = await import("@/__mocks__/fonts");
   return {
@@ -17,6 +26,23 @@ vi.mock("next/font/google", async () => {
 
 vi.mock("server-only", () => ({
   default: {},
+}));
+
+vi.mock("@/app/lib/prisma", () => ({
+  prismaWeb2Client: {
+    delegate: {
+      findMany: vi.fn(),
+    },
+  },
+  prismaWeb3Client: {
+    delegate: {
+      findMany: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("@/lib/alchemyConfig", () => ({
+  getAlchemyId: () => "test-alchemy-key",
 }));
 
 vi.mock("@/lib/pinata", () => ({

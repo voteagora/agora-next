@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { resolveENSTextRecords, resolveEFPStats } from "../ENSUtils";
 
+// Mock environment variables for tests
+process.env.NEXT_PUBLIC_ALCHEMY_ID = "test-alchemy-key";
+process.env.NEXT_PUBLIC_AGORA_ENV = "dev";
+
 vi.mock("ethers", () => {
   const mockGetText = vi.fn();
   const mockGetResolver = vi.fn();

@@ -38,7 +38,7 @@ export const InfoHero = () => {
                 <svg
                   width="14"
                   height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
                   viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +57,7 @@ export const InfoHero = () => {
                     strokeLinecap="round"
                   />
                 </svg>
-                <span className="whitespace-normal">
+                <span className="whitespace-normal text-red-500 font-bold">
                   View Towns Lodge DUNA Member{" "}
                   <span className="underline">Disclosure</span>
                 </span>
@@ -122,6 +122,7 @@ export const InfoHero = () => {
           <Card
             className={rotationClasses[idx % rotationClasses.length]}
             image={link.image || ""}
+            index={idx}
             key={`card-${idx}`}
             link={link.url}
             linkText={link.title}
@@ -135,12 +136,14 @@ export const InfoHero = () => {
 
 const Card = ({
   className,
+  index = 0,
   link,
   linkText,
   image,
   ui,
 }: {
   className?: string;
+  index?: number;
   link: string;
   linkText: string;
   image: StaticImageData | string;
@@ -158,12 +161,21 @@ const Card = ({
         <div
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
         >
-          <Image
-            src={image}
-            className="w-full rounded scale"
-            fill={true}
-            alt=""
-          />
+          {image ? (
+            <Image
+              src={image}
+              className="w-full rounded scale"
+              fill={true}
+              alt=""
+            />
+          ) : ui.customization?.heroCardGradient ? (
+            <div
+              className="absolute inset-0 rounded"
+              style={{
+                background: `linear-gradient(${135 + index * 90}deg, ${ui.customization.heroCardGradient.from}, ${ui.customization.heroCardGradient.to})`,
+              }}
+            />
+          ) : null}
         </div>
         <div className="w-full flex flex-row justify-between gap-1 items-center text-xs font-medium text-secondary mt-1.5">
           <span>{linkText}</span>

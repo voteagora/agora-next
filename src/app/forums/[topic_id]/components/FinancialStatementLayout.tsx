@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -23,6 +23,38 @@ export default function FinancialStatementLayout({
   pdfUrl,
   isOnArticlePage = false,
 }: FinancialStatementLayoutProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const resizeIframe = () => {
+      try {
+        const iframeDocument =
+          iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDocument) {
+          const height = iframeDocument.documentElement.scrollHeight;
+          iframe.style.height = `${height}px`;
+        }
+      } catch (error) {
+        console.error("Error resizing iframe:", error);
+      }
+    };
+
+    iframe.addEventListener("load", resizeIframe);
+
+    const resizeObserver = new ResizeObserver(resizeIframe);
+    if (iframe.contentDocument?.documentElement) {
+      resizeObserver.observe(iframe.contentDocument.documentElement);
+    }
+
+    return () => {
+      iframe.removeEventListener("load", resizeIframe);
+      resizeObserver.disconnect();
+    };
+  }, [content]);
+
   const handleScrollToComments = () => {
     const commentsSection = document.getElementById("forum-thread-section");
     if (commentsSection) {
@@ -30,7 +62,9 @@ export default function FinancialStatementLayout({
     }
   };
 
-  const { namespace } = Tenant.current();
+  const tenant = Tenant.current();
+  const { namespace } = tenant;
+  const mode = tenant.ui.theme;
   const hideDiscussButton =
     namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
 
@@ -44,7 +78,8 @@ export default function FinancialStatementLayout({
     300,
     "transparent",
     "#000000",
-    9
+    9,
+    mode
   );
 
   return (
@@ -87,13 +122,12 @@ export default function FinancialStatementLayout({
         </div>
 
         <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10">
-          <div
-            className={`text-secondary text-sm leading-relaxed break-words ${
-              isOnArticlePage
-                ? "overflow-x-auto"
-                : "overflow-x-hidden max-w-full [&_*]:max-w-full [&_*]:break-words"
-            }`}
-            dangerouslySetInnerHTML={{ __html: content }}
+          <iframe
+            ref={iframeRef}
+            srcDoc={content}
+            className="w-full border-0 min-h-[1000px]"
+            title="Financial Statement"
+            sandbox="allow-same-origin allow-scripts"
           />
         </div>
       </div>

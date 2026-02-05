@@ -167,7 +167,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         },
         {
           name: "Document Archive",
-          title: "Document Archive*",
+          title: "Document Archive",
           url: "/document-archive",
           image: syndicateInfoCard3,
         },
@@ -709,6 +709,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       config: {
         title: "Syndicate Collective Updates",
       },
+    },
+    {
+      name: "notifications",
+      enabled: true,
     },
   ],
 });
