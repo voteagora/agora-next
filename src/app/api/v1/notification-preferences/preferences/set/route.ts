@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
 import { ensureNotificationRecipient } from "@/app/api/v1/notification-preferences/recipient";
 import { notificationCenterClient } from "@/lib/notification-center/client";
+import { resolveEventTypes } from "@/lib/notification-center/eventTypes.server";
 import { PermissionService } from "@/server/services/permission.service";
 import Tenant from "@/lib/tenant/tenant";
 import type { DaoSlug } from "@prisma/client";
@@ -36,8 +37,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Gate grants_* events to users with grants admin permission
-  if (parsed.data.eventType.startsWith("grants_")) {
+  // Gate grants events to users with grants admin permission
+  // Use category attribute
+  const eventTypes = await resolveEventTypes();
+  const eventTypeConfig = eventTypes.find(
+    (et) => et.event_type === parsed.data.eventType
+  );
+  if (eventTypeConfig?.category === "grants") {
     const { slug } = Tenant.current();
     const permissionService = new PermissionService();
     const hasGrantsPermission = await permissionService.checkPermission(
@@ -47,7 +53,9 @@ export async function POST(request: NextRequest) {
 
     if (!hasGrantsPermission) {
       return NextResponse.json(
-        { message: "You do not have permission to manage grants notifications" },
+        {
+          message: "You do not have permission to manage grants notifications",
+        },
         { status: 403 }
       );
     }

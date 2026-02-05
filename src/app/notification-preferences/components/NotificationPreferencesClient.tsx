@@ -802,9 +802,10 @@ export default function NotificationPreferencesClient() {
 
   // Filter out grants events for non-admin users
   // Grants notifications are admin-only; regular users cannot opt in/out
+  // Use category attribute
   const eventTypes = isGrantsAdmin
     ? rawEventTypes
-    : rawEventTypes.filter((et) => !et.event_type.startsWith("grants_"));
+    : rawEventTypes.filter((et) => et.category !== "grants");
 
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 

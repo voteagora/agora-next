@@ -5,7 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { z } from "zod";
 import { sendGrantConfirmationEmail } from "@/lib/email/mailgun";
 import { getGrant } from "@/app/api/common/grants/getGrant";
-import { emitDirectEvent } from "@/lib/notification-center/emitter";
+import { emitBroadcastEvent } from "@/lib/notification-center/emitter";
 import { PermissionService } from "@/server/services/permission.service";
 
 export const revalidate = 0;
@@ -406,14 +406,12 @@ export async function POST(
             admin_link: adminLink,
           };
 
-          for (const recipient of adminRecipients) {
-            emitDirectEvent(
-              "grants_application_submitted",
-              recipient,
-              applicationId,
-              notificationData
-            );
-          }
+          emitBroadcastEvent(
+            "grants_application_submitted",
+            applicationId,
+            { recipient_ids: adminRecipients },
+            notificationData
+          );
         } catch (notifyError) {
           console.error(
             "Failed to emit grant submission notification",
