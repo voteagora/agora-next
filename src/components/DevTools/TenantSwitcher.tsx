@@ -37,9 +37,10 @@ const TENANT_DISPLAY_NAMES: Record<string, string> = {
 };
 
 export function TenantSwitcher() {
-  const { selectedTenant, setSelectedTenant, isDevMode } = useDevTenant();
+  const { selectedTenant, setSelectedTenant, isTenantSwitcherEnabled } =
+    useDevTenant();
 
-  if (!isDevMode) {
+  if (!isTenantSwitcherEnabled) {
     return null;
   }
 

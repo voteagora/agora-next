@@ -11,7 +11,7 @@ type DevTenantContextType = {
   selectedTenant: TenantNamespace | null;
   setSelectedTenant: (tenant: TenantNamespace) => void;
   overrideUI: TenantUI | null;
-  isDevMode: boolean;
+  isTenantSwitcherEnabled: boolean;
 };
 
 const DevTenantContext = createContext<DevTenantContextType | undefined>(
@@ -142,16 +142,16 @@ function applyThemeColors(ui: TenantUI) {
 }
 
 export function DevTenantProvider({ children }: { children: React.ReactNode }) {
-  const isDevMode =
+  const isTenantSwitcherEnabled =
     typeof window !== "undefined" &&
-    process.env.NEXT_PUBLIC_AGORA_ENV !== "prod";
-
+    process.env.NEXT_PUBLIC_AGORA_ENV !== "prod" &&
+    process.env.NEXT_PUBLIC_TENANT_SWITCHER_ENABLED !== "false";
   const [selectedTenant, setSelectedTenantState] =
     useState<TenantNamespace | null>(null);
   const [overrideUI, setOverrideUI] = useState<TenantUI | null>(null);
 
   const setSelectedTenant = (tenant: TenantNamespace) => {
-    if (!isDevMode) return;
+    if (!isTenantSwitcherEnabled) return;
 
     setSelectedTenantState(tenant);
     const newUI = TenantUIFactory.create(tenant);
@@ -165,7 +165,7 @@ export function DevTenantProvider({ children }: { children: React.ReactNode }) {
         selectedTenant,
         setSelectedTenant,
         overrideUI,
-        isDevMode,
+        isTenantSwitcherEnabled,
       }}
     >
       {children}
