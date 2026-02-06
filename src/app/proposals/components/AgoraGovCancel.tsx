@@ -5,17 +5,25 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { Button } from "@/components/ui/button";
-import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+
+import { Button } from "@/components/ui/button";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
+import {
+  getProposalCallArgs,
+  getProposalFunctionName,
+} from "@/app/proposals/utils/moduleProposalUtils";
 
 interface Props {
   proposal: Proposal;
+  useOptimismStyling?: boolean;
 }
 
-export const AgoraGovCancel = ({ proposal }: Props) => {
+export const AgoraGovCancel = ({
+  proposal,
+  useOptimismStyling = false,
+}: Props) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
 
@@ -54,13 +62,20 @@ export const AgoraGovCancel = ({ proposal }: Props) => {
     <>
       {!isFetched && (
         <Button
-          className="bg-neutral hover:bg-neutral border-line"
+          className={
+            useOptimismStyling
+              ? undefined
+              : "bg-neutral hover:bg-neutral border-line"
+          }
           onClick={() =>
             write({
               address: contracts.governor.address as `0x${string}`,
               abi: contracts.governor.abi,
-              functionName: "cancel",
-              args: proposalToCallArgs(proposal),
+              functionName: getProposalFunctionName(
+                proposal.proposalType!,
+                "cancel"
+              ),
+              args: getProposalCallArgs(proposal),
             })
           }
           variant="outline"

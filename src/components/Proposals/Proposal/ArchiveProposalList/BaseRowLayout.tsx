@@ -30,7 +30,6 @@ export function BaseRowLayout({
     status: data.statusLabel,
     id: data.id,
   } as const;
-
   return (
     <Link href={data.href}>
       <div className="border-b border-line items-center flex flex-row bg-neutral">

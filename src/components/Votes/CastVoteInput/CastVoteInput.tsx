@@ -432,13 +432,6 @@ export function SuccessMessage({
     newVote,
   });
 
-  const supportColor =
-    support?.toLowerCase() === "for"
-      ? "text-positive"
-      : support?.toLowerCase() === "against"
-        ? "text-negative"
-        : "text-tertiary";
-
   return (
     <div
       className={cn(

@@ -144,6 +144,7 @@ export function parseParams(
   if (params === null || proposalData.key !== "APPROVAL") {
     return null;
   }
+
   const parsedParams =
     typeof params === "string" && params.startsWith("[")
       ? JSON.parse(params)

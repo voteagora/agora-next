@@ -8,6 +8,7 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
+import { EasApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -19,6 +20,7 @@ import {
 } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
+import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
@@ -45,10 +47,12 @@ import ReportModal from "@/app/duna/components/ReportModal";
 export type DialogType =
   | AdvancedDelegateDialogType
   | ApprovalCastVoteDialogType
+  | EasApprovalCastVoteDialogType
   | CastVoteDialogType
   | CreateDraftProposalDialog
   | DelegateDialogType
   | DeleteDraftProposalDialog
+  | DeleteAllDraftProposalsDialog
   | OpenGithubPRDialog
   | PartialDelegateDialogType
   | RetroPGFShareCardDialog
@@ -224,9 +228,25 @@ export type ApprovalCastVoteDialogType = {
   params: Omit<ApprovalCastVoteDialogProps, "closeDialog">;
 };
 
+export type EasApprovalCastVoteDialogProps = {
+  proposal: Proposal;
+  votingPower: string | null;
+  closeDialog: () => void;
+};
+
+export type EasApprovalCastVoteDialogType = {
+  type: "EAS_APPROVAL_CAST_VOTE";
+  params: Omit<EasApprovalCastVoteDialogProps, "closeDialog">;
+};
+
 export type DeleteDraftProposalDialog = {
   type: "DELETE_DRAFT_PROPOSAL";
-  params: { proposalId: number };
+  params: { proposalId: number; onDeleteSuccess?: () => void };
+};
+
+export type DeleteAllDraftProposalsDialog = {
+  type: "DELETE_ALL_DRAFT_PROPOSALS";
+  params: { draftCount: number; onSuccess?: () => void };
 };
 
 export type CreateDraftProposalDialog = {
@@ -409,6 +429,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
+  EAS_APPROVAL_CAST_VOTE: ({ proposal, votingPower }, closeDialog) => {
+    return (
+      <EasApprovalCastVoteDialog
+        proposal={proposal}
+        votingPower={votingPower}
+        closeDialog={closeDialog}
+      />
+    );
+  },
   SHARE_VOTE: ({
     forPercentage,
     againstPercentage,
@@ -473,10 +502,18 @@ export const dialogs: DialogDefinitions<DialogType> = {
   SWITCH_NETWORK: ({ chain }: { chain: Chain }, closeDialog) => (
     <SwitchNetwork chain={chain} closeDialog={closeDialog} />
   ),
-  DELETE_DRAFT_PROPOSAL: ({ proposalId }, closeDialog) => (
+  DELETE_DRAFT_PROPOSAL: ({ proposalId, onDeleteSuccess }, closeDialog) => (
     <DeleteDraftProposalDialog
       closeDialog={closeDialog}
       proposalId={proposalId}
+      onDeleteSuccess={onDeleteSuccess}
+    />
+  ),
+  DELETE_ALL_DRAFT_PROPOSALS: ({ draftCount, onSuccess }, closeDialog) => (
+    <DeleteAllDraftProposalsDialogComponent
+      closeDialog={closeDialog}
+      draftCount={draftCount}
+      onSuccess={onSuccess}
     />
   ),
   CREATE_DRAFT_PROPOSAL: ({ redirectUrl, githubUrl }) => (

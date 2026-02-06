@@ -23,6 +23,10 @@ const CHECK_PROPOSAL_SCHEMA_ID: Record<number, string> = {
     "0x08df8e6e629077cabef4ed15cd4ff4f2359c2a60ad65b8355ac1f905b8f23a6f",
   8453: "0xe8d4638f7eb0d8d480f81365b9fe99a9826dd42a012f0ecd3e3621bfe1602b41",
 };
+const easV2 =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "dev"
+    ? new EAS("0xC2679fBD37d54388Ce493F1DB75320D236e1815e")
+    : new EAS("0xA1207F3BBa224E2c9c3c6D5aF63D0eb1582Ce587");
 
 export const attestByDelegationServer = async ({
   recipient,

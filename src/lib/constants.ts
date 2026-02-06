@@ -268,10 +268,32 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   demo3: ["dao-node"],
 };
 
+// EAS Voting Types for governorless voting
+export const EAS_VOTING_TYPES = {
+  STANDARD: 0, // for/against/abstain
+  APPROVAL: 1, // multi-choice selection
+  OPTIMISTIC: 2, // veto-based
+} as const;
+
+export type EASVotingType =
+  (typeof EAS_VOTING_TYPES)[keyof typeof EAS_VOTING_TYPES];
+
+// EAS Approval Criteria
+export const EAS_APPROVAL_CRITERIA = {
+  THRESHOLD: 0, // votes must exceed threshold
+  TOP_CHOICES: 1, // top N choices win
+} as const;
+
+export type EASApprovalCriteria =
+  (typeof EAS_APPROVAL_CRITERIA)[keyof typeof EAS_APPROVAL_CRITERIA];
+
+// Default tiers for optimistic voting (percentages)
+export const EAS_DEFAULT_OPTIMISTIC_TIERS = [20, 20, 20];
+
 export const ARCHIVE_GCS_BUCKET =
   process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
-    : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
+    : "https://storage.googleapis.com/cpls-usmr-dev-test-25q4";
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   console.log("namespace", namespace, ARCHIVE_GCS_BUCKET);
@@ -281,6 +303,23 @@ export const getArchiveSlugGCSbucket = (namespace: string) => {
 // =============================================================================
 // Proposal List URL Getters
 // =============================================================================
+
+export const getArchiveSlugAllProposals = (namespace: string): string[] => {
+  if (namespace === "optimism") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveEasAtlas(namespace),
+    ];
+  } else if (namespace === "ens") {
+    return [
+      getArchiveDaoNodeProposals(namespace),
+      getArchiveSnapshotProposals(namespace),
+    ];
+  } else if (namespace === "derive") {
+    return [getArchiveSnapshotProposals(namespace)];
+  }
+  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson.gz`];
+};
 
 export const getArchiveDaoNodeProposals = (namespace: string) => {
   return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/dao_node/raw.ndjson.gz`;
@@ -357,20 +396,6 @@ const SOURCE_TO_PROPOSAL_URL: Record<
   "eas-atlas": getArchiveSlugForEasAtlasProposal,
   "eas-oodao": getArchiveSlugForEasOodaoProposal,
   snapshot: getArchiveForSnapshotProposal,
-};
-
-/**
- * Generates archive URLs for all proposal sources for a given namespace
- */
-export const getArchiveSlugAllProposals = (namespace: string): string[] => {
-  const sources = TENANT_PROPOSAL_SOURCES[namespace as TenantNamespace];
-  // if (!sources || sources.length === 0) {
-  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson.gz`];
-  // }
-
-  // return sources
-  //   .map((source) => SOURCE_TO_LIST_URL[source]?.(namespace))
-  //   .filter((url): url is string => !!url);
 };
 
 /**

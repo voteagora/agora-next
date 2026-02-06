@@ -227,7 +227,6 @@ const useAdvancedVoting = ({
      */
     isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
     resetError: () => {
-      // console.log('[useAdvancedVoting] resetError called');
       if (missingVote === "DIRECT") {
         setStandardVoteError(false);
         setStandardVoteErrorDetails(null);

@@ -28,6 +28,7 @@ import {
   scroll,
   sepolia,
 } from "viem/chains";
+import { getAlchemyId } from "./alchemyConfig";
 
 const { token } = Tenant.current();
 
@@ -490,48 +491,43 @@ export function toNumericChainId(
 }
 
 export const getTransportForChain = (chainId: number) => {
+  const alchemyId = getAlchemyId();
+
   switch (chainId) {
     // mainnet
     case 1:
       return http(
-        FORK_NODE_URL ||
-          `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // optimism
     case 10:
       return http(
-        FORK_NODE_URL ||
-          `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://opt-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // optimism sepolia
     case 11155420:
       return http(
-        FORK_NODE_URL ||
-          `https://opt-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://opt-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // base
     case 8453:
       return http(
-        FORK_NODE_URL ||
-          `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://base-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // arbitrum one
     case 42161:
       return http(
-        FORK_NODE_URL ||
-          `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://arb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
     // arbitrum sepolia
     case 421614:
       return http(
-        FORK_NODE_URL ||
-          `https://arb-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://arb-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // sepolia
     case 11155111:
       return http(
-        FORK_NODE_URL ||
-          `https://eth-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://eth-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
     // cyber
     case 7560:
@@ -545,7 +541,7 @@ export const getTransportForChain = (chainId: number) => {
       return fallback([
         http(
           FORK_NODE_URL ||
-            `https://scroll-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+            `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
         ),
         http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
@@ -561,22 +557,19 @@ export const getTransportForChain = (chainId: number) => {
     // linea
     case 59144:
       return http(
-        FORK_NODE_URL ||
-          `https://linea-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://linea-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
     // linea sepolia
     case 59141:
       return http(
-        FORK_NODE_URL ||
-          `https://linea-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://linea-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
 
     // bsc (binance smart chain)
     case 56:
       return http(
-        FORK_NODE_URL ||
-          `https://bnb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+        FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
     // for each new dao with a new chainId add them here

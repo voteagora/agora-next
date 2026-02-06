@@ -1518,8 +1518,8 @@ export function calculateHybridStandardTallies(
     const forVotes = category?.for ? Number(category.for) : 0;
     const againstVotes = category?.against ? Number(category.against) : 0;
     const abstainVotes = category?.abstain ? Number(category.abstain) : 0;
-    const totalVotes = forVotes + againstVotes;
-    let quorumVotes = forVotes + abstainVotes;
+    const totalVotes = forVotes + againstVotes + abstainVotes;
+    let quorumVotes = forVotes + againstVotes + abstainVotes;
 
     if (calculationOptions === 1) {
       quorumVotes = forVotes;

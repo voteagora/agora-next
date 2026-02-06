@@ -47,12 +47,30 @@ This project uses various environment variables for configuration. Below is a co
 
 #### **NEXT_PUBLIC_ALCHEMY_ID**
 
-- **Purpose**: Alchemy API key for blockchain RPC access
+- **Purpose**: Alchemy API key for client-side blockchain RPC access (browser)
 - **Required**: YES (unless using `NEXT_PUBLIC_FORK_NODE_URL`)
-- **Usage**: Used across all chain interactions for reading blockchain data
-- **Security**: Public but sensitive - monitor usage in Alchemy dashboard
+- **Usage**: Used for client-side chain interactions (wagmi, Web3Provider, hooks)
+- **Security**: Public but sensitive - **MUST be domain-whitelisted** in Alchemy dashboard
 - **Fallback**: Can be overridden by `NEXT_PUBLIC_FORK_NODE_URL` for local development
-- **Example**: `NEXT_PUBLIC_ALCHEMY_ID=your_alchemy_api_key`
+- **Example**: `NEXT_PUBLIC_ALCHEMY_ID=your_client_alchemy_api_key`
+
+#### **SERVERSIDE_ALCHEMY_ID_DEV**
+
+- **Purpose**: Alchemy API key for server-side blockchain RPC access in development (Node.js)
+- **Required**: RECOMMENDED for development (falls back to `NEXT_PUBLIC_ALCHEMY_ID` if not set)
+- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=dev` via `getAlchemyId()` helper
+- **Security**: Private - never exposed to browser, no domain restrictions needed
+- **Example**: `SERVERSIDE_ALCHEMY_ID_DEV=your_dev_server_alchemy_api_key`
+
+#### **SERVERSIDE_ALCHEMY_ID_PROD**
+
+- **Purpose**: Alchemy API key for server-side blockchain RPC access in production (Node.js)
+- **Required**: RECOMMENDED for production (falls back to `NEXT_PUBLIC_ALCHEMY_ID` if not set)
+- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=prod` via `getAlchemyId()` helper
+- **Security**: Private - never exposed to browser, no domain restrictions needed
+- **Why separate?**: Prevents leaked client keys from being used for server-side operations
+- **Auto-detection**: Code automatically uses the right key based on execution context and environment
+- **Example**: `SERVERSIDE_ALCHEMY_ID_PROD=your_prod_server_alchemy_api_key`
 
 ### 📊 Database Configuration
 
