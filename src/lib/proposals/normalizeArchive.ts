@@ -392,20 +392,62 @@ function normalizeApprovalProposal(
     abstain: BigInt(voteTotals["2"] ?? "0"),
   };
 
-  // For HYBRID_APPROVAL, add totals.vote_counts structure
+  // For HYBRID_APPROVAL, add DELEGATES + per-type per-option vote maps and totals
   if (proposal.hybrid && proposal.govless_proposal) {
-    // Use num_of_votes from govless_proposal as the total unique citizen voters
-    // This represents the total number of unique voters across all citizen types
-    const totalCitizenVoters = proposal.govless_proposal.num_of_votes || 0;
+    // Build DELEGATES per-option vote map from onchain totals
+    // Keys are option description names, values are delegate vote counts
+    const delegatesOptions: Record<string, bigint> = {};
+    for (const choice of metrics.choices) {
+      const optionTotals = (
+        proposal.totals as Record<string, Record<string, string>>
+      )?.[choice.index.toString()];
+      delegatesOptions[choice.text] = BigInt(optionTotals?.["1"] ?? "0");
+    }
+    (proposalResults as any).DELEGATES = delegatesOptions;
 
-    // Add totals structure for HYBRID_APPROVAL
-    // Note: We use the total citizen voters for all types since we don't have
-    // per-type unique voter counts in the data
+    const outcome = (proposal.govless_proposal.outcome ?? {}) as Record<
+      string,
+      Record<string, Record<string, number>>
+    >;
+
+    // Build per-type per-option vote maps from outcome
+    // Keys must be option description names (matching DELEGATES keys)
+    const citizenTypes = ["APP", "USER", "CHAIN"] as const;
+    for (const citizenType of citizenTypes) {
+      const typeOutcome = outcome[citizenType];
+      if (!typeOutcome) continue;
+
+      const optionVotes: Record<string, bigint> = {};
+      for (const [optionIndex, votes] of Object.entries(typeOutcome)) {
+        const choiceText = metrics.choices.find(
+          (c) => c.index === Number(optionIndex)
+        )?.text;
+        if (choiceText) {
+          optionVotes[choiceText] = BigInt(votes["1"] ?? 0);
+        }
+      }
+      (proposalResults as any)[citizenType] = optionVotes;
+    }
+
+    // Build totals.vote_counts with per-type unique voter counts
+    // Since the archive doesn't provide per-type unique voter counts directly,
+    // we derive them by finding the max votes any single option received per type
+    // (a lower bound for unique voters, since each voter votes at least once)
+    const getMaxVotesForType = (
+      typeOutcome: Record<string, Record<string, number>> | undefined
+    ): number => {
+      if (!typeOutcome) return 0;
+      return Math.max(
+        0,
+        ...Object.values(typeOutcome).map((v) => Number(v["1"] ?? 0))
+      );
+    };
+
     (proposalResults as any).totals = {
       vote_counts: {
-        APP: totalCitizenVoters,
-        USER: totalCitizenVoters,
-        CHAIN: totalCitizenVoters,
+        APP: getMaxVotesForType(outcome.APP),
+        USER: getMaxVotesForType(outcome.USER),
+        CHAIN: getMaxVotesForType(outcome.CHAIN),
       },
     };
   }

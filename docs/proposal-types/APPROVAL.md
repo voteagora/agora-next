@@ -40,6 +40,7 @@ Multi-choice onchain approval voting where voters can approve multiple options.
     [13, 1, "0x0000000000000000000000000000000000000000", 7, 0]
   ],
   "totals": {
+    "no-param": { "1": "55000000000000000000000000" },
     "0": { "1": "35538355389398193048445174" },
     "1": { "1": "13235132909566200664986311" },
     "2": { "1": "5397766239707764388812984" },
@@ -93,10 +94,12 @@ source === "dao_node" && voting_module_name === "approval" && hybrid === false;
 
 ```typescript
 // Per-option vote totals (keyed by option index)
+// "no-param" contains aggregate for/against/abstain used for quorum
 totals: {
-  "0": { "1": string },   // Option 0 votes (wei)
-  "1": { "1": string },   // Option 1 votes (wei)
-  "2": { "1": string },   // Option 2 votes (wei)
+  "no-param": { "1": string },  // Aggregate for votes (wei) — used for quorum
+  "0": { "1": string },         // Option 0 approval votes (wei)
+  "1": { "1": string },         // Option 1 approval votes (wei)
+  "2": { "1": string },         // Option 2 approval votes (wei)
   // ... etc
 }
 ```

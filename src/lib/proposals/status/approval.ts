@@ -2,6 +2,11 @@ import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { convertToNumber } from "../converters";
 import { isDaoNodeSource, isEasOodaoSource } from "../extractors/guards";
 import { extractApprovalMetrics } from "../extractors/approval";
+import {
+  HYBRID_VOTE_WEIGHTS,
+  HYBRID_PROPOSAL_QUORUM,
+  OFFCHAIN_THRESHOLDS,
+} from "@/lib/constants";
 
 // Criteria types for approval voting (raw values from decoded_proposal_data)
 // See toApprovalVotingCriteria() in proposalUtils.ts
@@ -53,19 +58,15 @@ export const deriveApprovalStatus = (
   const { choices, criteria, criteriaValue } = approvalMetrics;
 
   if (proposalType === "OFFCHAIN_APPROVAL") {
-    const totalApprovals = choices.reduce((sum, c) => sum + c.approvals, 0);
+    // Use unique voter count (num_of_votes) for quorum check
+    // totalApprovals would be inflated since one voter can vote for multiple options
+    const totalVoters = approvalMetrics.totalVoters || 0;
 
-    if (totalApprovals < quorumValue) {
-      return "DEFEATED";
-    }
-    return "SUCCEEDED";
-  } else if (proposalType === "HYBRID_APPROVAL") {
-    // Fallback: simple quorum + criteria check (may not match old behavior exactly)
-    const totalApprovals = choices.reduce((sum, c) => sum + c.approvals, 0);
-    if (totalApprovals < quorumValue) {
+    if (totalVoters < quorumValue) {
       return "DEFEATED";
     }
 
+    // Criteria check
     if (criteria === CRITERIA_THRESHOLD) {
       const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
       for (const choice of choices) {
@@ -76,30 +77,115 @@ export const deriveApprovalStatus = (
       return "DEFEATED";
     }
     return "SUCCEEDED";
+  } else if (proposalType === "HYBRID_APPROVAL") {
+    // Weighted participation across delegates + citizen types (APP, USER, CHAIN)
+    const weights = HYBRID_VOTE_WEIGHTS;
+    const quorumThreshold = HYBRID_PROPOSAL_QUORUM * 100; // 30% quorum
+    const quorumRaw = Number(proposal.quorum || 0);
+
+    // Eligible voters per group
+    // Delegates: quorum is 30% of votable supply, so total eligible = quorum * (100/30)
+    const eligibleVoters = {
+      delegates:
+        quorumRaw > 0
+          ? convertToNumber(String(quorumRaw), decimals) * (100 / 30)
+          : 1,
+      apps: OFFCHAIN_THRESHOLDS.APP,
+      users: OFFCHAIN_THRESHOLDS.USER,
+      chains: OFFCHAIN_THRESHOLDS.CHAIN,
+    };
+
+    // Delegate for/against from onchain totals
+    const voteTotals = proposal.totals?.["no-param"] || {};
+    const delegateFor = convertToNumber(
+      String(voteTotals["1"] ?? "0"),
+      decimals
+    );
+    const delegateAgainst = convertToNumber(
+      String(voteTotals["0"] ?? "0"),
+      decimals
+    );
+    const delegateTotal = delegateFor + delegateAgainst;
+
+    // Citizen outcome from govless_proposal
+    const outcome = (proposal.govless_proposal?.outcome ?? {}) as Record<
+      string,
+      Record<string, Record<string, number>>
+    >;
+
+    // Get max votes any single option received per citizen type (unique voter proxy)
+    const getMaxVotesForType = (
+      typeOutcome: Record<string, Record<string, number>> | undefined
+    ): number => {
+      if (!typeOutcome) return 0;
+      return Math.max(
+        0,
+        ...Object.values(typeOutcome).map((v) => Number(v["1"] ?? 0))
+      );
+    };
+
+    const citizenVoters = {
+      apps: getMaxVotesForType(outcome.APP),
+      users: getMaxVotesForType(outcome.USER),
+      chains: getMaxVotesForType(outcome.CHAIN),
+    };
+
+    // Calculate weighted unique participation percentage
+    let uniqueParticipation = 0;
+    uniqueParticipation +=
+      (delegateTotal / eligibleVoters.delegates) * 100 * weights.delegates;
+    uniqueParticipation +=
+      (citizenVoters.apps / eligibleVoters.apps) * 100 * weights.apps;
+    uniqueParticipation +=
+      (citizenVoters.users / eligibleVoters.users) * 100 * weights.users;
+    uniqueParticipation +=
+      (citizenVoters.chains / eligibleVoters.chains) * 100 * weights.chains;
+
+    if (uniqueParticipation < quorumThreshold) {
+      return "DEFEATED";
+    }
+
+    if (criteria === CRITERIA_THRESHOLD) {
+      // Build per-option weighted percentages across all voter types
+      // and check if any option meets the threshold
+      const delegateTotals = proposal.totals as Record<
+        string,
+        Record<string, string>
+      >;
+
+      for (const choice of choices) {
+        const delegateVotes = convertToNumber(
+          String(delegateTotals?.[choice.index.toString()]?.["1"] ?? "0"),
+          decimals
+        );
+        const appVotes = Number(
+          outcome?.APP?.[choice.index.toString()]?.["1"] ?? 0
+        );
+        const userVotes = Number(
+          outcome?.USER?.[choice.index.toString()]?.["1"] ?? 0
+        );
+        const chainVotes = Number(
+          outcome?.CHAIN?.[choice.index.toString()]?.["1"] ?? 0
+        );
+
+        let weightedPct = 0;
+        weightedPct +=
+          (delegateVotes / eligibleVoters.delegates) * weights.delegates * 100;
+        weightedPct += (appVotes / eligibleVoters.apps) * weights.apps * 100;
+        weightedPct += (userVotes / eligibleVoters.users) * weights.users * 100;
+        weightedPct +=
+          (chainVotes / eligibleVoters.chains) * weights.chains * 100;
+
+        // criteriaValue is in basis points (10000 = 100%)
+        const thresholdPct = Number(criteriaValue) / 10000;
+        if (weightedPct >= thresholdPct) {
+          return "SUCCEEDED";
+        }
+      }
+      return "DEFEATED";
+    }
+    return "SUCCEEDED";
   }
-  //  else if (proposalType === "APPROVAL") {
-  //   // Matches proposalStatus.ts APPROVAL case
-  //   const totalApprovals = choices.reduce((sum, c) => sum + c.approvals, 0);
-
-  //   // Quorum check: for + abstain (approvals count as "for" in approval voting)
-  //   if (totalApprovals < quorumValue) {
-  //     return "DEFEATED";
-  //   }
-
-  //   // Criteria check
-  //   if (criteria === CRITERIA_THRESHOLD) {
-  //     const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
-  //     for (const choice of choices) {
-  //       if (choice.approvals > thresholdVotes) {
-  //         return "SUCCEEDED";
-  //       }
-  //     }
-  //     return "DEFEATED";
-  //   } else {
-  //     // TOP_CHOICES: auto-succeeds if quorum met
-  //     return "SUCCEEDED";
-  //   }
-  // }
   // Fallback for standard APPROVAL (onchain only): check quorum and criteria
   let forVotes: bigint;
   let abstainVotes: bigint;

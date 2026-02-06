@@ -49,6 +49,7 @@ Onchain approval voting with linked offchain citizen voting (Joint House).
     [10, 1, "0x0000000000000000000000000000000000000000", 7, 0]
   ],
   "totals": {
+    "no-param": { "1": "59655538138136287707433453" },
     "0": { "1": "494840720339937380604174" },
     "1": { "1": "43249974562603763880275149" },
     "2": { "1": "1291526107852067992108479" },
@@ -254,33 +255,56 @@ function calculateOptionWeightedPercentage(optionIndex: string) {
 const totalWeightedParticipation = calculateUniqueParticipation();
 ```
 
-### Quorum Check
+### Unique Participation Check (Quorum)
 
 ```typescript
 const QUORUM_THRESHOLD = 30; // 30%
 
-const quorumMet = totalWeightedParticipation >= QUORUM_THRESHOLD;
+// Delegate for/against from onchain totals
+const voteTotals = proposal.totals?.["no-param"] || {};
+const delegateFor = convertToNumber(String(voteTotals["1"] ?? "0"), decimals);
+const delegateAgainst = convertToNumber(
+  String(voteTotals["0"] ?? "0"),
+  decimals
+);
+const delegateTotal = delegateFor + delegateAgainst;
+
+// Citizen voter counts (max votes any single option received per type)
+const citizenVoters = {
+  apps: Math.max(...Object.values(outcome.APP || {}).map((v) => v["1"] ?? 0)),
+  users: Math.max(...Object.values(outcome.USER || {}).map((v) => v["1"] ?? 0)),
+  chains: Math.max(
+    ...Object.values(outcome.CHAIN || {}).map((v) => v["1"] ?? 0)
+  ),
+};
+
+// Calculate weighted unique participation
+let participation = 0;
+participation += (delegateTotal / eligibleDelegates) * 100 * 0.5;
+participation += (citizenVoters.apps / 100) * 100 * (1 / 6);
+participation += (citizenVoters.users / 1000) * 100 * (1 / 6);
+participation += (citizenVoters.chains / 15) * 100 * (1 / 6);
+
+if (participation < QUORUM_THRESHOLD) return "DEFEATED";
 ```
 
 ### Criteria-Based Status
 
 ```typescript
-// From proposalStatus.ts - uses calculateHybridApprovalProposalMetrics
-const metrics = calculateHybridApprovalProposalMetrics({
-  proposalResults: kind,
-  proposalData: proposalData.kind,
-  quorum: Number(quorum!),
-  createdTime,
-});
+if (criteria === "THRESHOLD") {
+  // Per-option weighted percentage must meet criteriaValue (basis points)
+  const thresholdPct = criteriaValue / 10000;
 
-// Check if weighted quorum is met first
-if (!metrics.quorumMet) {
+  for (const option of options) {
+    let weightedPct = 0;
+    weightedPct += (delegateVotes[option] / eligibleDelegates) * 0.5 * 100;
+    weightedPct += (appVotes[option] / 100) * (1 / 6) * 100;
+    weightedPct += (userVotes[option] / 1000) * (1 / 6) * 100;
+    weightedPct += (chainVotes[option] / 15) * (1 / 6) * 100;
+
+    if (weightedPct >= thresholdPct) return "SUCCEEDED";
+  }
   return "DEFEATED";
-}
-
-// THRESHOLD: Check if any option passes threshold
-if (kind.criteria === "THRESHOLD") {
-  return metrics.thresholdMet ? "SUCCEEDED" : "DEFEATED";
 } else {
   // TOP_CHOICES: Auto-succeeds if quorum met
   return "SUCCEEDED";
