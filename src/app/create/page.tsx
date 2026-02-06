@@ -70,6 +70,30 @@ async function getInitialFormData(
             description: proposalType.description,
             quorum: proposalType.quorum / 100,
             approvalThreshold: proposalType.approval_threshold / 100,
+            type: proposalType.class,
+          }
+        : undefined;
+
+    // Extract approval-specific data from kwargs or direct fields
+    const kwargs = fetchedProposal.kwargs || {};
+    const approvalData =
+      proposalTypeData?.type?.toUpperCase() === "APPROVAL"
+        ? {
+            choices:
+              (kwargs.choices as string[]) || fetchedProposal.choices || [],
+            maxApprovals:
+              typeof kwargs.max_approvals === "number"
+                ? kwargs.max_approvals
+                : fetchedProposal.max_approvals || 1,
+            criteria:
+              typeof kwargs.criteria === "number"
+                ? kwargs.criteria
+                : fetchedProposal.criteria || 0,
+            criteriaValue:
+              typeof kwargs.criteria_value === "number"
+                ? kwargs.criteria_value
+                : fetchedProposal.criteria_value || 0,
+            budget: typeof kwargs.budget === "number" ? kwargs.budget : 0,
           }
         : undefined;
 
@@ -87,6 +111,7 @@ async function getInitialFormData(
         status: deriveStatus(fetchedProposal, 18),
         proposer: fetchedProposal.proposer,
         proposalType: proposalTypeData,
+        approvalData,
       },
     ];
   }
@@ -132,6 +157,7 @@ export default async function CreatePostPage({
           description: proposalType.description,
           quorum: proposalType.quorum / 100,
           approvalThreshold: proposalType.approval_threshold / 100,
+          module: proposalType.module,
         },
       ];
     }
@@ -147,6 +173,7 @@ export default async function CreatePostPage({
           description: type.description,
           quorum: type.quorum / 100,
           approvalThreshold: type.approval_threshold / 100,
+          module: type.module,
         }))
       : [
           {
@@ -155,6 +182,7 @@ export default async function CreatePostPage({
             description: "No proposal type created yet",
             quorum: 0,
             approvalThreshold: 0,
+            module: "STANDARD",
           },
         ];
   }

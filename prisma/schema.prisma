@@ -1864,6 +1864,7 @@ view syndicateProposalTypes {
   approval_threshold String
   name               String
   inputs             Json
+  module             String
 
   @@map("proposal_types")
   @@schema("syndicate")

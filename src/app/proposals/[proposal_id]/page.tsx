@@ -25,8 +25,14 @@ import { redirect } from "next/navigation";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import {
   isArchiveStandardProposal,
+  isArchiveOptimisticProposal,
+  isArchiveApprovalProposal,
+  normalizeArchiveOptimisticProposal,
+  normalizeArchiveApprovalProposal,
   normalizeArchiveStandardProposal,
 } from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
+import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";
 import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
 
 export const maxDuration = 60;
@@ -45,18 +51,44 @@ async function loadProposal(
     ]);
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
-    if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
-      const normalizedProposal = normalizeArchiveStandardProposal(
-        archiveProposal,
-        {
-          namespace,
-          tokenDecimals: token.decimals ?? 18,
-        }
-      );
-      return {
-        ...normalizedProposal,
-        taxFormMetadata,
+    if (archiveProposal) {
+      const normalizeOptions = {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
       };
+
+      if (isArchiveOptimisticProposal(archiveProposal)) {
+        const formatedProposal = normalizeArchiveOptimisticProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
+      }
+
+      if (isArchiveApprovalProposal(archiveProposal)) {
+        const formatedProposal = normalizeArchiveApprovalProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
+      }
+
+      if (isArchiveStandardProposal(archiveProposal)) {
+        const formatedProposal = normalizeArchiveStandardProposal(
+          archiveProposal,
+          normalizeOptions
+        );
+        return {
+          ...formatedProposal,
+          taxFormMetadata,
+        };
+      }
     }
 
     throw new Error("Proposal not found in archive");
@@ -235,7 +267,11 @@ export default async function Page({
       break;
 
     case "OPTIMISTIC":
-      RenderComponent = OPProposalOptimisticPage;
+      if (useArchiveForProposals) {
+        RenderComponent = ArchiveOptimisticProposalPage;
+      } else {
+        RenderComponent = OPProposalOptimisticPage;
+      }
       break;
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
@@ -243,7 +279,11 @@ export default async function Page({
       RenderComponent = HybridOptimisticProposalPage;
       break;
     case "APPROVAL":
-      RenderComponent = OPProposalApprovalPage;
+      if (useArchiveForProposals) {
+        RenderComponent = ArchiveApprovalProposalPage;
+      } else {
+        RenderComponent = OPProposalApprovalPage;
+      }
       break;
     case "HYBRID_APPROVAL":
       RenderComponent = HybridApprovalProposalPage;

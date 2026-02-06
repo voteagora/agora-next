@@ -42,7 +42,6 @@ export function extractDisplayData(
   const normalizedStatus = STATUS_LABEL_MAP[status] ? status : "UNKNOWN";
   const proposalTag = deriveProposalTag(proposal);
   const votingData = getVotingData(proposal);
-
   // Get proposer info
   const proposerAddress =
     proposal.proposer ||
