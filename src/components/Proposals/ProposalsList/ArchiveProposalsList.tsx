@@ -38,7 +38,7 @@ export default function ArchiveProposalsList({
     if (filter === proposalsFilterOptions.everything.filter) {
       return proposals.map((proposal) => ({
         ...proposal,
-        kwargs: proposal.kwargs ? JSON.parse(proposal.kwargs) : {},
+        kwargs: proposal.kwargs,
       }));
     }
 
@@ -57,10 +57,7 @@ export default function ArchiveProposalsList({
       )
       .map((proposal) => ({
         ...proposal,
-        kwargs:
-          typeof proposal.kwargs === "string"
-            ? JSON.parse(proposal.kwargs.replace(/'/g, '"'))
-            : proposal.kwargs,
+        kwargs: proposal.kwargs,
       }));
   }, [filter, proposals]);
 

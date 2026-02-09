@@ -21,8 +21,14 @@ function getApprovalQuorum(
   proposal: ArchiveListProposal,
   decimals: number
 ): number {
-  // First check if quorum is directly specified (including explicit 0)
+  if (
+    proposal.id ===
+    "16633367863894036056841722161407059007904922838583677995599242776177398115322"
+  ) {
+    console.log(proposal);
+  }
   if (proposal.quorum && Number(proposal.quorum) > 0) {
+    // First check if quorum is directly specified (including explicit 0)
     return convertToNumber(String(proposal.quorum), decimals);
   }
   if (proposal.quorumVotes && Number(proposal.quorumVotes) > 0) {
@@ -34,6 +40,7 @@ function getApprovalQuorum(
     String(proposal.total_voting_power_at_start ?? "0"),
     decimals
   );
+
   return totalVotingPower * 0.3;
 }
 
@@ -190,26 +197,18 @@ export const deriveApprovalStatus = (
   let forVotes: bigint;
   let abstainVotes: bigint;
 
-  if (isEasOodaoSource(proposal)) {
-    const outcome = proposal.outcome as
-      | { "token-holders"?: Record<string, string> }
-      | undefined;
-    const voteTotals = outcome?.["token-holders"] || {};
-    forVotes = BigInt(voteTotals["1"] ?? "0");
-    abstainVotes = BigInt(voteTotals["2"] ?? "0");
-  } else if (isDaoNodeSource(proposal)) {
-    const voteTotals = proposal.totals?.["no-param"] || {};
-    forVotes = BigInt(voteTotals["1"] ?? "0");
-    abstainVotes = BigInt(voteTotals["2"] ?? "0");
-  } else {
-    return "DEFEATED";
-  }
+  const voteTotals = proposal.totals?.["no-param"] || {};
+  forVotes = BigInt(voteTotals["1"] ?? "0");
+  abstainVotes = BigInt(voteTotals["2"] ?? "0");
 
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;
 
   // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
-  if (convertToNumber(String(quorumVotes), decimals) < quorumValue) {
+  if (
+    convertToNumber(String(quorumVotes), decimals) < quorumValue &&
+    quorumValue > 0
+  ) {
     return "DEFEATED";
   }
 

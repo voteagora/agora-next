@@ -88,21 +88,27 @@ function calcHybridPercentage(
       100;
   }
 
-  weightedPct +=
-    (appAgainst / OFFCHAIN_THRESHOLDS.APP) * HYBRID_VOTE_WEIGHTS.apps * 100;
-  weightedPct +=
-    (userAgainst / OFFCHAIN_THRESHOLDS.USER) * HYBRID_VOTE_WEIGHTS.users * 100;
-  weightedPct +=
-    (chainAgainst / OFFCHAIN_THRESHOLDS.CHAIN) *
-    HYBRID_VOTE_WEIGHTS.chains *
-    100;
-  return weightedPct;
+  weightedPct += (appAgainst / OFFCHAIN_THRESHOLDS.APP) * 100;
+  weightedPct += (userAgainst / OFFCHAIN_THRESHOLDS.USER) * 100;
+  weightedPct += (chainAgainst / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
+  return weightedPct / 4;
 }
 
 /**
  * Extract defeat threshold from decoded_proposal_data
  */
-function extractDefeatThreshold(proposal: ArchiveProposalInput): number {
+function extractDefeatThreshold(proposal: ArchiveListProposal): number {
+  if (proposal.data_eng_properties?.source === "eas-oodao") {
+    // Type guard to ensure proposal_type is FixedProposalType
+    if (
+      typeof proposal.proposal_type === "object" &&
+      proposal.proposal_type !== null &&
+      "approval_threshold" in proposal.proposal_type
+    ) {
+      return Number(proposal.proposal_type.approval_threshold) / 100;
+    }
+    return Number(proposal.approval_threshold) / 100;
+  }
   const votingData = getVotingData(proposal);
   const decodedData =
     "decoded_proposal_data" in votingData
@@ -218,7 +224,7 @@ export function extractOptimisticMetrics(
       );
       againstPercentage =
         totalPower > 0
-          ? Math.round((againstCount / totalPower) * 100 * 10) / 10
+          ? Math.round((againstCount / totalPower) * 100 * 100) / 100
           : 0;
     }
 
@@ -292,15 +298,15 @@ export function extractOptimisticTieredMetrics(
       chainAgainst
     );
   }
-
+  const sortedTiers = tiers.sort((a, b) => b - a);
   // Current tier is the last one
-  const currentTier = tiers.length > 0 ? tiers[tiers.length - 1] : 1700;
+  const currentTier = sortedTiers.length > 0 ? sortedTiers[0] : 1700;
 
   return {
     againstCount,
     supportCount,
-    againstPercentage: Math.round(weightedAgainstPercentage * 10) / 10,
-    tiers,
+    againstPercentage: Math.round(weightedAgainstPercentage * 100) / 100,
+    tiers: sortedTiers,
     currentTier,
     isDefeated: status === "DEFEATED",
   };

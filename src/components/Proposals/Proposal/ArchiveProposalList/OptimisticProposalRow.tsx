@@ -31,7 +31,6 @@ export function OptimisticProposalRow({
       metrics,
     };
   }, [proposal, decimals, proposalType]);
-
   const status = metrics.isDefeated ? "defeated" : "approved";
 
   return (

@@ -119,7 +119,7 @@ export async function generateMetadata({
     params.proposal_id,
     fetchProposalUnstableCache
   );
-  console.log("proposal", proposal.proposalResults);
+
   const title = truncateString(cleanString(proposal.markdowntitle), 40);
   const description = truncateString(
     cleanString(proposal.description || ""),

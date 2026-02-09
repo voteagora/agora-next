@@ -291,7 +291,7 @@ export type EasOodaoProposalFields = {
   // Vote outcome
   outcome?: EasOodaoVoteOutcome;
   kwargs?: Record<string, unknown>;
-  voting_module?: string;
+  voting_module: "approval" | "optimistic" | "standard" | 1;
 };
 
 // =============================================================================
@@ -403,7 +403,10 @@ export function deriveProposalType(
     }
   } else if (source === "eas-oodao") {
     const oodaoProposal = proposal as EasOodaoProposal;
-    baseClass = oodaoProposal.proposal_type.class;
+    baseClass =
+      oodaoProposal.voting_module === 1
+        ? "STANDARD"
+        : (oodaoProposal.voting_module.toUpperCase() as ProposalClass);
   } else {
     baseClass = "STANDARD";
   }
@@ -416,8 +419,8 @@ export function deriveProposalType(
     return `HYBRID_${baseClass}` as ProposalType;
   }
 
-  // Offchain-only proposals (eas-atlas without onchain link, or eas-oodao)
-  if (source === "eas-atlas" || source === "eas-oodao") {
+  // Offchain-only proposals (eas-atlas without onchain link)
+  if (source === "eas-atlas") {
     const hasOnchainId =
       "onchain_proposalid" in proposal &&
       proposal.onchain_proposalid &&

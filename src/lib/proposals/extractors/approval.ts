@@ -7,7 +7,10 @@
  */
 
 import { CITIZEN_TYPES } from "@/lib/constants";
-import type { EasAtlasVoteOutcome } from "@/lib/types/archiveProposal";
+import type {
+  EasAtlasVoteOutcome,
+  EasOodaoProposal,
+} from "@/lib/types/archiveProposal";
 import type {
   ArchiveProposalInput,
   ApprovalChoice,
@@ -111,8 +114,16 @@ function extractChoicesFromDaoNode(
     if (Array.isArray(optionsArray)) {
       optionsArray.forEach((opt: unknown, idx: number) => {
         const optArr = opt as unknown[];
-        const description =
-          typeof optArr?.[4] === "string" ? optArr[4] : `Option ${idx + 1}`;
+        let description;
+        if (optArr.length === 4) {
+          // For older OP proposals
+          description =
+            typeof optArr?.[3] === "string" ? optArr[3] : `Option ${idx + 1}`;
+        } else {
+          // For newer OP proposals
+          description =
+            typeof optArr?.[4] === "string" ? optArr[4] : `Option ${idx + 1}`;
+        }
         const budgetTokensSpent = optArr?.[5]
           ? BigInt(String(optArr[5]))
           : null;
@@ -189,7 +200,7 @@ export function extractApprovalMetrics(
   let criteriaValue = 0n;
   let budgetToken = "";
   let budgetAmount = 0n;
-
+  const kwargs = (votingData as EasOodaoProposal)?.kwargs;
   // Extract choices based on source
   if (isDaoNodeSource(proposal)) {
     decodedData = extractChoicesFromDaoNode(
@@ -201,20 +212,19 @@ export function extractApprovalMetrics(
     criteriaValue = decodedData.criteriaValue;
     budgetToken = decodedData.budgetToken;
     budgetAmount = decodedData.budgetAmount;
-  } else if ("choices" in votingData && Array.isArray(votingData.choices)) {
+  } else if (kwargs && "choices" in kwargs && Array.isArray(kwargs.choices)) {
     // eas-atlas/eas-oodao format: choices is a string array
-    choices = votingData.choices as string[];
+    choices = kwargs.choices as string[];
     maxApprovals =
-      ("max_approvals" in votingData && Number(votingData.max_approvals)) || 0;
-    criteria = ("criteria" in votingData && Number(votingData.criteria)) || 0;
+      ("max_approvals" in kwargs && Number(kwargs.max_approvals)) || 0;
+    criteria = ("criteria" in kwargs && Number(kwargs.criteria)) || 0;
     criteriaValue = BigInt(
-      ("criteria_value" in votingData && String(votingData.criteria_value)) ||
-        "0"
+      ("criteria_value" in kwargs && String(kwargs.criteria_value)) || "0"
     );
     budgetToken =
-      ("budget_token" in votingData && String(votingData.budget_token)) || "";
+      ("budget_token" in kwargs && String(kwargs.budget_token)) || "";
     budgetAmount = BigInt(
-      ("budget_amount" in votingData && String(votingData.budget_amount)) || "0"
+      ("budget_amount" in kwargs && String(kwargs.budget_amount)) || "0"
     );
   }
 

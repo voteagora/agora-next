@@ -615,7 +615,7 @@ function normalizeOptimisticTieredProposal(
       source?: string;
     } = {
       options: [],
-      tiers: metrics.tiers.map((tier) => tier / 100),
+      tiers: metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100),
       source,
     };
 
@@ -653,7 +653,7 @@ function normalizeOptimisticTieredProposal(
       source?: string;
     } = {
       options: [],
-      tiers: metrics.tiers.map((tier) => tier / 100),
+      tiers: metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100),
       source,
     };
 
@@ -763,13 +763,11 @@ export function archiveToProposal(
 
     case "HYBRID_OPTIMISTIC_TIERED":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
-      console.log("archiveProposal", proposalType, archiveProposal);
       normalizedProposal = normalizeOptimisticTieredProposal(
         archiveProposal,
         base,
         proposalType
       );
-      console.log("normalizedProposal", normalizedProposal);
       normalizedProposal.proposalType = proposalType;
       break;
 

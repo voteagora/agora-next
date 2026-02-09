@@ -48,6 +48,7 @@ export {
 // Converters
 export {
   convertToNumber,
+  extractVoteValue,
   safeBigInt,
   safeBigIntOrNull,
   toDate,

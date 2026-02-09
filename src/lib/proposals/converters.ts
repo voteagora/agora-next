@@ -23,6 +23,20 @@ export const convertToNumber = (
 };
 
 /**
+ * Extract a vote value from a vote totals entry.
+ * Handles both flat string values (standard voting) and nested objects (approval voting).
+ * For nested objects, returns the "1" (for) support type value.
+ */
+export const extractVoteValue = (
+  value: string | { [supportType: string]: string } | undefined
+): string | undefined => {
+  if (value === undefined) return undefined;
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value !== null) return value["1"];
+  return undefined;
+};
+
+/**
  * Convert values to BigInt for blockchain data
  * Returns 0n for invalid/null values
  */

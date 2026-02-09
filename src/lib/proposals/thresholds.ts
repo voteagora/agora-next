@@ -26,7 +26,6 @@ export const extractThresholds = (
 ): ProposalThresholds => {
   // Handle eas-oodao proposals
   if (isEasOodaoSource(proposal)) {
-    console.log(proposal);
     // Check for pending approval ranges
     if (proposal.default_proposal_type_ranges) {
       return {
@@ -70,14 +69,27 @@ export const resolveArchiveThresholds = (
   if (isEasOodaoSource(proposal)) {
     if (proposal.default_proposal_type_ranges) {
       //standard awaiting approval easOodao proposals
+      // Values are in basis points (e.g. 10 = 0.1%, 5000 = 50%)
+      // Use same pattern as non-pending branch: integer math to compute absolute quorum
+      const quorumBp = BigInt(
+        proposal.default_proposal_type_ranges.min_quorum_pct
+      );
+      const totalVotingPower = safeBigInt(
+        proposal.total_voting_power_at_start ?? 0
+      );
+
+      // Convert basis points to absolute quorum: (totalVotingPower * bps) / 10000
+      let quorumValue = quorumBp;
+      if (quorumValue > 0n && totalVotingPower > 0n) {
+        quorumValue = (totalVotingPower * quorumBp) / 10000n;
+      }
+
       return {
-        quorum: BigInt(
-          proposal.default_proposal_type_ranges.min_quorum_pct / 100
-        ),
+        quorum: quorumValue,
         approvalThreshold: BigInt(
-          proposal.default_proposal_type_ranges.min_approval_threshold_pct / 100
+          proposal.default_proposal_type_ranges.min_approval_threshold_pct
         ),
-        votableSupply: safeBigInt(proposal.total_voting_power_at_start ?? 0),
+        votableSupply: totalVotingPower,
       };
     }
     const propType = proposal.proposal_type as {
@@ -90,14 +102,14 @@ export const resolveArchiveThresholds = (
       proposal.total_voting_power_at_start ?? 0
     );
 
-    // Convert basis points to actual quorum value
-    let quorumValue = quorumBp / 100n;
+    // Convert basis points to absolute quorum: (totalVotingPower * bps) / 10000
+    let quorumValue = quorumBp;
     if (quorumValue > 0n && totalVotingPower > 0n) {
-      quorumValue = (totalVotingPower * quorumValue) / 100n;
+      quorumValue = (totalVotingPower * quorumBp) / 10000n;
     }
 
     return {
-      quorum: BigInt(quorumValue),
+      quorum: quorumValue,
       approvalThreshold: BigInt(approvalThresholdBp),
       votableSupply: totalVotingPower,
     };

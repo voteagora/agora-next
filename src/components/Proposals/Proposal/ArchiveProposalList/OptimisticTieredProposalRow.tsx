@@ -30,10 +30,7 @@ export function OptimisticTieredProposalRow({
   }, [proposal, decimals, proposalType]);
 
   const statusText = metrics.isDefeated ? "defeated" : "approved";
-  const highestTierPct =
-    metrics.tiers.length > 0
-      ? metrics.tiers[metrics.tiers.length - 1] / 100
-      : 17;
+  const highestTierPct = metrics.tiers.length > 0 ? metrics.tiers[0] / 100 : 17;
 
   const infoText = `${metrics.againstPercentage}% / ${highestTierPct}% against needed to defeat`;
 
@@ -46,6 +43,7 @@ export function OptimisticTieredProposalRow({
           statusText={statusText}
         />
       }
+      proposalTypeName={proposalType}
     />
   );
 }

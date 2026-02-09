@@ -11,6 +11,7 @@
 export {
   // Converters
   convertToNumber,
+  extractVoteValue,
   safeBigInt,
   safeBigIntOrNull,
   toDate,
