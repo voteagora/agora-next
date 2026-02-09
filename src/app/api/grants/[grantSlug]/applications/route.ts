@@ -392,11 +392,10 @@ export async function POST(
             return;
           }
 
-          const adminLinkBase = process.env.AGORA_ADMIN_URL;
+          const adminLinkBase =
+            process.env.AGORA_ADMIN_URL || "https://admin.agora.xyz";
           const adminLinkPath = `/admin/grants/applications?dao_slug=${daoSlug}`;
-          const adminLink = adminLinkBase
-            ? `${adminLinkBase.replace(/\/+$/, "")}${adminLinkPath}`
-            : adminLinkPath;
+          const adminLink = `${adminLinkBase.replace(/\/+$/, "")}${adminLinkPath}`;
 
           const notificationData = {
             dao_slug: daoSlug,
