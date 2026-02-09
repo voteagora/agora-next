@@ -5,6 +5,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { z } from "zod";
 import { sendGrantConfirmationEmail } from "@/lib/email/mailgun";
 import { getGrant } from "@/app/api/common/grants/getGrant";
+import { emitBroadcastEvent } from "@/lib/notification-center/emitter";
+import { PermissionService } from "@/server/services/permission.service";
 
 export const revalidate = 0;
 
@@ -201,6 +203,8 @@ export async function POST(
       );
     }
 
+    const { slug: daoSlug } = Tenant.current();
+
     // Parse request body
     const contentType = req.headers.get("content-type") || "";
     let payload: any;
@@ -369,6 +373,57 @@ export async function POST(
     );
 
     const applicationId = applicationResult[0].id;
+
+    // Notify grant admins about the new application (fire and forget)
+    {
+      const permissionService = new PermissionService();
+      void (async () => {
+        try {
+          const adminRecipients =
+            await permissionService.getAddressesWithPermission(
+              "grants",
+              "applications",
+              "read",
+              daoSlug
+            );
+
+          if (adminRecipients.length === 0) {
+            console.log("No grant admins found to notify");
+            return;
+          }
+
+          // Ensure admin link base has protocol (Discord/Slack require valid URLs)
+          let adminLinkBase =
+            process.env.AGORA_ADMIN_URL || "https://admin.agora.xyz";
+          // Add https:// if protocol is missing
+          if (!adminLinkBase.match(/^https?:\/\//i)) {
+            adminLinkBase = `https://${adminLinkBase}`;
+          }
+          const adminLinkPath = `/admin/grants/applications?dao_slug=${daoSlug}`;
+          const adminLink = `${adminLinkBase.replace(/\/+$/, "")}${adminLinkPath}`;
+
+          const notificationData = {
+            dao_slug: daoSlug,
+            grant_slug: grant.slug,
+            grant_id: grantId,
+            application_id: applicationId,
+            admin_link: adminLink,
+          };
+
+          emitBroadcastEvent(
+            "grants_application_submitted",
+            applicationId,
+            { recipient_ids: adminRecipients },
+            notificationData
+          );
+        } catch (notifyError) {
+          console.error(
+            "Failed to emit grant submission notification",
+            notifyError
+          );
+        }
+      })();
+    }
 
     // Send confirmation email (don't block the response if email fails)
     // Only send if email field exists in the form and is not empty
