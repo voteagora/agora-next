@@ -392,8 +392,13 @@ export async function POST(
             return;
           }
 
-          const adminLinkBase =
+          // Ensure admin link base has protocol (Discord/Slack require valid URLs)
+          let adminLinkBase =
             process.env.AGORA_ADMIN_URL || "https://admin.agora.xyz";
+          // Add https:// if protocol is missing
+          if (!adminLinkBase.match(/^https?:\/\//i)) {
+            adminLinkBase = `https://${adminLinkBase}`;
+          }
           const adminLinkPath = `/admin/grants/applications?dao_slug=${daoSlug}`;
           const adminLink = `${adminLinkBase.replace(/\/+$/, "")}${adminLinkPath}`;
 
