@@ -68,7 +68,7 @@ const OptimisticProposalVotesCard = ({
   const renderVoteButton = () => {
     if (isOffchain) {
       return <OffchainCastVoteInput />;
-    } else if (proposal.archiveMetadata.source === "eas-oodao") {
+    } else if (proposal.archiveMetadata?.source === "eas-oodao") {
       return (
         <CastEasOptimisticVoteInput
           proposal={proposal}
