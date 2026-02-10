@@ -5,6 +5,7 @@ import {
   paginateResult,
   PaginationParams,
 } from "@/app/lib/pagination";
+import { TENANT_NAMESPACES, GOVERNOR_TYPE } from "@/lib/constants";
 import {
   parseProposal,
   isTimestampBasedProposal,
@@ -50,10 +51,16 @@ async function fetchProposalsFromDaoNode(
   contracts: any
 ): Promise<ProposalPayload[]> {
   try {
-    const [data, typesFromApi] = await Promise.all([
-      getCachedAllProposalsFromDaoNode(),
-      getProposalTypesFromDaoNode(),
-    ]);
+    const data = await getCachedAllProposalsFromDaoNode();
+    let proposalTypes = {};
+
+    if (
+      contracts.governorType === GOVERNOR_TYPE.AGORA ||
+      contracts.governorType === GOVERNOR_TYPE.ALLIGATOR
+    ) {
+      const typesData = await getProposalTypesFromDaoNode();
+      proposalTypes = typesData?.proposal_types || {};
+    }
 
     let proposals = data;
 
@@ -64,7 +71,7 @@ async function fetchProposalsFromDaoNode(
 
     // Adapt DAO Node response format
     proposals = proposals.map((proposal) =>
-      adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
+      adaptDAONodeResponse(proposal, proposalTypes)
     );
 
     // Include snapshot proposals if enabled
@@ -115,18 +122,15 @@ async function fetchOnchainProposalsByIds(
   }
 
   try {
-    const onchainProposals = await findProposalsByIds({
+    const onchainProposals = (await findProposalsByIds({
       namespace,
       proposalIds,
       contract: contracts.governor.address,
-    });
+    })) as ProposalPayload[];
 
-    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
+    onchainProposals.forEach((proposal) => {
       if (proposal) {
-        onchainProposalsMap.set(
-          proposal.proposal_id,
-          proposal as ProposalPayload
-        );
+        onchainProposalsMap.set(proposal.proposal_id, proposal);
       }
     });
   } catch (error) {
