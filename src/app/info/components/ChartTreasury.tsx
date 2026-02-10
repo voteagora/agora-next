@@ -91,7 +91,7 @@ export const ChartTreasury = ({ getData, initialData }: Props) => {
               <YAxis
                 axisLine={false}
                 className="text-xs font-medium text-gray-4f"
-                dataKey="balance_usd"
+                dataKey="value"
                 domain={[0, max]}
                 interval={"preserveStartEnd"}
                 tickFormatter={(value) =>
@@ -103,7 +103,7 @@ export const ChartTreasury = ({ getData, initialData }: Props) => {
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="linear"
-                dataKey="balance_usd"
+                dataKey="value"
                 stroke={primary}
                 fill="url(#colorAllDelegates)"
               />
