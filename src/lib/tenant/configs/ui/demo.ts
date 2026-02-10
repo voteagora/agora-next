@@ -178,6 +178,17 @@ export const demoTenantUIConfig = new TenantUI({
         imageDescription: "",
       },
     },
+    {
+      route: "grants",
+      title: "Canopy Grants Program",
+      description: "Apply for grants to support the Canopy ecosystem",
+      meta: {
+        title: "Canopy Grants Program",
+        description: "Apply for grants to support the Canopy ecosystem",
+        imageTitle: "Canopy Grants Program",
+        imageDescription: "Apply for grants to support the Canopy ecosystem",
+      },
+    },
   ],
 
   toggles: [
@@ -294,7 +305,15 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "grants",
+      enabled: true,
+    },
+    {
+      name: "grants/intake-form",
+      enabled: true,
     },
     {
       name: "tax-form",
