@@ -212,10 +212,7 @@ export default async function Page({
   const specialComponent = requiresSpecialHandling(loadedProposal);
   const RenderComponent =
     specialComponent ||
-    getProposalPageComponent(
-      loadedProposal.proposalType ?? "STANDARD",
-      useArchiveForProposals
-    );
+    getProposalPageComponent(loadedProposal, useArchiveForProposals);
 
   return (
     <div className="flex justify-between mt-12">

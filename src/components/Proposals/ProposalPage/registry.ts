@@ -30,8 +30,8 @@ const StandardProposalPage = dynamic(
   () => import("./OPProposalPage/StandardProposalPage")
 );
 
-const ArchiveStandardProposalPage = dynamic(
-  () => import("./OPProposalPage/ArchiveStandardProposalPage")
+const OODaoStandardProposalPage = dynamic(
+  () => import("./OPProposalPage/OODaoStandardProposalPage")
 );
 
 const HybridStandardProposalPage = dynamic(
@@ -50,12 +50,20 @@ const OPProposalOptimisticPage = dynamic(
   () => import("./OPProposalPage/OPProposalOptimisticPage")
 );
 
+const OODaoOptimisticProposalPage = dynamic(
+  () => import("./OPProposalPage/OODaoOptimisticProposalPage")
+);
+
 const HybridOptimisticProposalPage = dynamic(
   () => import("./OPProposalPage/HybridOptimisticProposalPage")
 );
 
 const CopelandProposalPage = dynamic(
   () => import("./CopelandProposalPage/CopelandProposalPage")
+);
+
+const OODaoApprovalProposalPage = dynamic(
+  () => import("./OPProposalApprovalPage/OODaoApprovalProposalPage")
 );
 
 // =============================================================================
@@ -85,7 +93,7 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
   OFFCHAIN_APPROVAL: HybridApprovalProposalPage,
 
   // Optimistic variants
-  OPTIMISTIC: OPProposalOptimisticPage,
+  OPTIMISTIC: OODaoOptimisticProposalPage,
   HYBRID_OPTIMISTIC: HybridOptimisticProposalPage,
   OFFCHAIN_OPTIMISTIC: HybridOptimisticProposalPage,
   HYBRID_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
@@ -96,14 +104,15 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
 };
 
 /**
- * Archive-specific registry for when archive mode is enabled.
+ * OODao-specific registry for eas-oodao proposals.
  * Falls back to regular registry if not specified.
  */
-export const ARCHIVE_PROPOSAL_PAGE_REGISTRY: Partial<
+export const OODAO_PROPOSAL_PAGE_REGISTRY: Partial<
   Record<ProposalType, ProposalPageComponent>
 > = {
-  STANDARD: ArchiveStandardProposalPage,
-  // Add more archive-specific pages as they are created
+  STANDARD: OODaoStandardProposalPage,
+  OPTIMISTIC: OODaoOptimisticProposalPage,
+  APPROVAL: OODaoApprovalProposalPage,
 };
 
 // =============================================================================
@@ -113,17 +122,24 @@ export const ARCHIVE_PROPOSAL_PAGE_REGISTRY: Partial<
 /**
  * Get the appropriate page component for a proposal.
  *
- * @param proposalType - The type of proposal
+ * @param proposal - The proposal object
  * @param useArchive - Whether to use archive-specific components
  * @returns The page component to render
  */
 export function getProposalPageComponent(
-  proposalType: ProposalType,
+  proposal: Proposal,
   useArchive: boolean = false
 ): ProposalPageComponent {
-  // Check archive registry first if archive mode is enabled
-  if (useArchive && ARCHIVE_PROPOSAL_PAGE_REGISTRY[proposalType]) {
-    return ARCHIVE_PROPOSAL_PAGE_REGISTRY[proposalType]!;
+  const proposalType = proposal.proposalType ?? "STANDARD";
+  const isOOdaoProposal = proposal.archiveMetadata?.source === "eas-oodao";
+
+  // Check OODao registry first if archive mode is enabled and proposal is from eas-oodao
+  if (
+    useArchive &&
+    isOOdaoProposal &&
+    OODAO_PROPOSAL_PAGE_REGISTRY[proposalType]
+  ) {
+    return OODAO_PROPOSAL_PAGE_REGISTRY[proposalType]!;
   }
 
   // Fall back to regular registry

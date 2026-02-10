@@ -61,9 +61,9 @@ function safeBigInt(value: unknown): bigint {
 }
 
 /**
- * Aggregate approval votes across citizen types for a specific choice
+ * Aggregate approval votes across citizen types for a specific choice (eas-atlas)
  */
-function aggregateApprovalVotes(
+function aggregateCitizenApprovalVotes(
   outcome: Record<string, unknown>,
   choiceIndex: string
 ): number {
@@ -75,6 +75,24 @@ function aggregateApprovalVotes(
     total += Number(typeOutcome?.[choiceIndex]?.["1"] ?? 0);
   }
   return total;
+}
+
+/**
+ * Extract approval votes for a specific choice from eas-oodao token-holders outcome
+ */
+function extractOodaoApprovalVotes(
+  outcome: Record<string, unknown>,
+  choiceIndex: string,
+  tokenDecimals: number
+): { approvals: number; approvalsRaw: bigint } {
+  const tokenHolders = outcome?.["token-holders"] as
+    | Record<string, Record<string, string>>
+    | undefined;
+  const rawValue = tokenHolders?.[choiceIndex]?.["1"] ?? "0";
+  return {
+    approvals: convertToNumber(String(rawValue), tokenDecimals),
+    approvalsRaw: safeBigInt(rawValue),
+  };
 }
 
 /**
@@ -229,10 +247,16 @@ export function extractApprovalMetrics(
   }
 
   // Extract votes from outcome or totals
-  const outcome = ("outcome" in votingData && votingData.outcome) || {};
+  // For eas-oodao, outcome and num_of_votes are on the proposal directly
+  const outcome =
+    source === "eas-oodao"
+      ? ("outcome" in proposal && proposal.outcome) || {}
+      : ("outcome" in votingData && votingData.outcome) || {};
   const totals = ("totals" in votingData && votingData.totals) || {};
   const totalVoters =
-    ("num_of_votes" in votingData && votingData.num_of_votes) || 0;
+    source === "eas-oodao"
+      ? ("num_of_votes" in proposal && proposal.num_of_votes) || 0
+      : ("num_of_votes" in votingData && votingData.num_of_votes) || 0;
 
   // Extract approval votes per option
   const approvalVotesMap: Record<string, number> = {};
@@ -262,8 +286,16 @@ export function extractApprovalMetrics(
       let approvals = 0;
       let approvalsRaw: bigint | undefined;
 
-      if (source === "eas-atlas" || source === "eas-oodao") {
-        approvals = aggregateApprovalVotes(
+      if (source === "eas-oodao") {
+        const oodaoVotes = extractOodaoApprovalVotes(
+          outcome as Record<string, unknown>,
+          index.toString(),
+          tokenDecimals
+        );
+        approvals = oodaoVotes.approvals;
+        approvalsRaw = oodaoVotes.approvalsRaw;
+      } else if (source === "eas-atlas") {
+        approvals = aggregateCitizenApprovalVotes(
           outcome as Record<string, unknown>,
           index.toString()
         );

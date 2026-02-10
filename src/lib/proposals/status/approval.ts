@@ -21,26 +21,30 @@ function getApprovalQuorum(
   proposal: ArchiveListProposal,
   decimals: number
 ): number {
-  if (
-    proposal.id ===
-    "16633367863894036056841722161407059007904922838583677995599242776177398115322"
-  ) {
-    console.log(proposal);
-  }
   if (proposal.quorum && Number(proposal.quorum) > 0) {
-    // First check if quorum is directly specified (including explicit 0)
     return convertToNumber(String(proposal.quorum), decimals);
   }
   if (proposal.quorumVotes && Number(proposal.quorumVotes) > 0) {
     return convertToNumber(String(proposal.quorumVotes), decimals);
   }
 
-  // Otherwise use total_voting_power_at_start * 0.3
   const totalVotingPower = convertToNumber(
     String(proposal.total_voting_power_at_start ?? "0"),
     decimals
   );
 
+  // For eas-oodao, use proposal_type.quorum (basis points) as percentage of VP
+  if (
+    isEasOodaoSource(proposal) &&
+    typeof proposal.proposal_type === "object" &&
+    proposal.proposal_type !== null &&
+    "quorum" in proposal.proposal_type &&
+    Number(proposal.proposal_type.quorum) > 0
+  ) {
+    return totalVotingPower * (Number(proposal.proposal_type.quorum) / 10000);
+  }
+
+  // Fallback: use total_voting_power_at_start * 0.3
   return totalVotingPower * 0.3;
 }
 
@@ -193,13 +197,15 @@ export const deriveApprovalStatus = (
     }
     return "SUCCEEDED";
   }
-  // Fallback for standard APPROVAL (onchain only): check quorum and criteria
-  let forVotes: bigint;
-  let abstainVotes: bigint;
-
-  const voteTotals = proposal.totals?.["no-param"] || {};
-  forVotes = BigInt(voteTotals["1"] ?? "0");
-  abstainVotes = BigInt(voteTotals["2"] ?? "0");
+  // Fallback for standard APPROVAL (onchain/eas-oodao): check quorum and criteria
+  // For eas-oodao, vote totals are in outcome["no-param"], not totals["no-param"]
+  const voteTotals = isEasOodaoSource(proposal)
+    ? (proposal.outcome as Record<string, Record<string, string>>)?.[
+        "no-param"
+      ] || {}
+    : proposal.totals?.["no-param"] || {};
+  const forVotes = BigInt(voteTotals["1"] ?? "0");
+  const abstainVotes = BigInt(voteTotals["2"] ?? "0");
 
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;

@@ -46,15 +46,6 @@ export function ArchiveProposalRow({
           proposalType={proposalType}
         />
       );
-    case "APPROVAL":
-      return (
-        <ApprovalProposalRow
-          proposal={proposal}
-          tokenDecimals={tokenDecimals}
-          proposalType={proposalType}
-        />
-      );
-
     // Approval variants
     case "APPROVAL":
     case "HYBRID_APPROVAL":

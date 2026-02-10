@@ -27,7 +27,6 @@ import {
 } from "@/lib/types/archiveProposal";
 import type { ArchiveProposalInput } from "./extractors/types";
 import {
-  extractStandardMetrics,
   extractApprovalMetrics,
   extractOptimisticMetrics,
   extractOptimisticTieredMetrics,
@@ -302,7 +301,7 @@ function normalizeStandardProposal(
     // Pure STANDARD: Only delegate/onchain votes
     const voteTotals =
       source === "eas-oodao"
-        ? ((proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {})
+        ? ((proposal.outcome as EasOodaoVoteOutcome)?.["no-param"] ?? {})
         : ((proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {});
 
     const forVotes = safeBigInt(voteTotals["1"]);
@@ -376,8 +375,14 @@ function normalizeApprovalProposal(
     source,
   };
 
-  // Extract vote totals from totals["no-param"] for approval proposals
-  const voteTotals = proposal.totals?.["no-param"] || {};
+  // Extract vote totals from totals["no-param"] or outcome["no-param"] depending on source
+  // For eas-oodao, vote data is in outcome, not totals
+  const voteTotals =
+    source === "eas-oodao"
+      ? (proposal.outcome as Record<string, Record<string, string>>)?.[
+          "no-param"
+        ] || {}
+      : proposal.totals?.["no-param"] || {};
 
   const proposalResults = {
     options: metrics.choices.map((c) => ({
@@ -387,9 +392,9 @@ function normalizeApprovalProposal(
     })),
     criteria: criteriaType,
     criteriaValue: metrics.criteriaValue,
-    for: BigInt(voteTotals["1"] ?? "0"),
-    against: BigInt(voteTotals["0"] ?? "0"),
-    abstain: BigInt(voteTotals["2"] ?? "0"),
+    for: safeBigInt(voteTotals["1"]),
+    against: safeBigInt(voteTotals["0"]),
+    abstain: safeBigInt(voteTotals["2"]),
   };
 
   // For HYBRID_APPROVAL, add DELEGATES + per-type per-option vote maps and totals
@@ -471,7 +476,6 @@ function normalizeOptimisticProposal(
   const metrics = extractOptimisticMetrics(proposal, {
     tokenDecimals: decimals,
   });
-
   // Extract delegate votes (for hybrid and pure optimistic)
   const delegateTotals =
     (proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {};
@@ -727,11 +731,6 @@ export function archiveToProposal(
   };
 
   let normalizedProposal: Proposal;
-  // assign the proposal_type to archiveProposal
-  archiveProposal = {
-    ...archiveProposal,
-    proposal_type: proposalType,
-  };
 
   switch (proposalType) {
     case "STANDARD":

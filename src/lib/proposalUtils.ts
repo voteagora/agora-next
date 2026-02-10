@@ -1165,20 +1165,24 @@ export function calculateOptimisticProposalMetrics(
 ) {
   const tokenDecimals = Tenant.current().token.decimals;
 
+  const votableSupplyBigInt = BigInt(votableSupply || "0");
   const formattedVotableSupply = Number(
-    BigInt(votableSupply || "0") / BigInt(10 ** tokenDecimals)
+    votableSupplyBigInt / BigInt(10 ** tokenDecimals)
   );
 
   const proposalResults = proposal.proposalResults as {
-    against?: string;
+    against?: string | bigint;
   } | null;
-  const againstAmount = proposalResults?.against || "0";
+  // Handle both string (live) and BigInt (archive) against values
+  const againstAmount = String(proposalResults?.against ?? "0");
 
   const againstLength = Number(formatUnits(againstAmount, tokenDecimals));
 
+  // Use BigInt math for percentage to avoid precision loss with large wei values
+  const againstBigInt = BigInt(againstAmount);
   const againstRelativeAmount =
-    formattedVotableSupply > 0
-      ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
+    votableSupplyBigInt > 0n
+      ? Number((againstBigInt * 10000n) / votableSupplyBigInt) / 100
       : 0;
 
   const proposalData =

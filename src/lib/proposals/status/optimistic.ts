@@ -26,7 +26,7 @@ export const deriveOptimisticStatus = (
   proposalType: string,
   decimals: number
 ): string => {
-  // For simple OPTIMISTIC (dao_node only): veto if against > threshold
+  // For simple OPTIMISTIC (dao_node): veto if against > threshold
   if (proposalType === "OPTIMISTIC" && isDaoNodeSource(proposal)) {
     const votableSupply = BigInt(
       proposal.votableSupply ?? proposal.total_voting_power_at_start ?? "0"
@@ -58,6 +58,31 @@ export const deriveOptimisticStatus = (
     }
 
     // Proposal is defeated if veto votes exceed threshold
+    if (againstVotes > threshold) {
+      return "DEFEATED";
+    }
+    return "SUCCEEDED";
+  }
+
+  // For simple OPTIMISTIC (eas-oodao): veto if against > threshold % of votable supply
+  if (proposalType === "OPTIMISTIC" && isEasOodaoSource(proposal)) {
+    const votableSupply = BigInt(proposal.total_voting_power_at_start ?? "0");
+    const tokenHolders =
+      (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {};
+    const againstVotes = BigInt(
+      (tokenHolders["0"] as string | undefined) ?? "0"
+    );
+
+    // Threshold from proposal_type.approval_threshold (basis points)
+    const thresholdBps =
+      typeof proposal.proposal_type === "object" && proposal.proposal_type
+        ? Number(proposal.proposal_type.approval_threshold ?? 0)
+        : 0;
+    const threshold =
+      thresholdBps > 0
+        ? (votableSupply * BigInt(thresholdBps)) / 10000n
+        : votableSupply / 2n;
+
     if (againstVotes > threshold) {
       return "DEFEATED";
     }

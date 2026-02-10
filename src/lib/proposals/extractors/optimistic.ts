@@ -16,6 +16,7 @@ import type {
   ArchiveListProposal,
   DaoNodeVoteTotals,
   EasAtlasVoteOutcome,
+  EasOodaoVoteOutcome,
 } from "@/lib/types/archiveProposal";
 import type {
   ArchiveProposalInput,
@@ -205,7 +206,7 @@ export function extractOptimisticMetrics(
     // Pure OPTIMISTIC: Only delegate votes matter
     const voteTotals = hasDaoNodeTotals(proposal)
       ? (proposal.totals as DaoNodeVoteTotals)["no-param"]
-      : {};
+      : (proposal.outcome as EasOodaoVoteOutcome)["token-holders"];
 
     const againstVal = voteTotals["0"];
     const againstVotesRaw =
