@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -28,6 +28,7 @@ import {
   ApprovalProposalSettings,
   defaultApprovalSettings,
 } from "../types";
+import { filterProposalTypesByType } from "../utils/proposalTypeUtils";
 import {
   Dialog,
   DialogContent,
@@ -60,27 +61,16 @@ export function CreatePostClient({
   const hasInitialTempCheck =
     (initialFormData.relatedTempChecks?.length || 0) > 0;
 
-  // Calculate initial proposal type and voting type from temp check
-  const getInitialProposalType = () => {
-    if (
-      hasInitialTempCheck &&
-      initialFormData.relatedTempChecks?.[0]?.proposalType
-    ) {
-      return initialFormData.relatedTempChecks[0].proposalType;
-    }
-    return proposalTypes[0];
-  };
-
   const getInitialVotingType = (): EASVotingType => {
     if (
       hasInitialTempCheck &&
-      initialFormData.relatedTempChecks?.[0]?.proposalType?.type
+      initialFormData.relatedTempChecks?.[0]?.votingModule
     ) {
-      const proposalClass =
-        initialFormData.relatedTempChecks[0].proposalType.type.toUpperCase();
-      if (proposalClass === "OPTIMISTIC") return "optimistic";
-      if (proposalClass === "APPROVAL") return "approval";
-      if (proposalClass === "STANDARD") return "standard";
+      const votingModule =
+        initialFormData.relatedTempChecks[0].votingModule.toUpperCase();
+      if (votingModule === "OPTIMISTIC") return "optimistic";
+      if (votingModule === "APPROVAL") return "approval";
+      if (votingModule === "STANDARD") return "standard";
     }
     return "standard";
   };
@@ -108,8 +98,14 @@ export function CreatePostClient({
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
+  const filteredProposalTypes = useMemo(
+    () => filterProposalTypesByType(proposalTypes, selectedPostType),
+    [proposalTypes, selectedPostType]
+  );
+
   const [selectedProposalType, setSelectedProposalType] =
-    useState<ProposalType>(getInitialProposalType());
+    useState<ProposalType>(filteredProposalTypes[0]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
 
@@ -227,11 +223,12 @@ export function CreatePostClient({
 
   const changeSelectedVotingType = (type: EASVotingType) => {
     setSelectedVotingType(type);
-    const filteredProposalsTypes = proposalTypes.filter(
-      (pType) => pType.module?.toLowerCase() === type.toLowerCase()
+    const filteredByPostType = filterProposalTypesByType(
+      proposalTypes,
+      selectedPostType
     );
 
-    setSelectedProposalType(filteredProposalsTypes[0]);
+    setSelectedProposalType(filteredByPostType[0] || proposalTypes[0]);
   };
 
   const handleAddRelatedItem =
@@ -272,10 +269,8 @@ export function CreatePostClient({
   };
 
   useEffect(() => {
-    if (proposalTypes.length > 0 && !selectedProposalType) {
-      setSelectedProposalType(proposalTypes[0]);
-    }
-  }, [proposalTypes, selectedProposalType]);
+    setSelectedProposalType(filteredProposalTypes[0]);
+  }, [selectedPostType]);
 
   useEffect(() => {
     if (
@@ -284,41 +279,36 @@ export function CreatePostClient({
       !hasInitialTempCheck
     ) {
       const tempCheck = relatedTempChecks[0];
-      if (tempCheck.proposalType) {
-        setSelectedProposalType(tempCheck.proposalType);
+      if (tempCheck.votingModule) {
         // Automatically set voting type based on temp check's proposal type class
-        if (tempCheck.proposalType.type) {
-          const proposalClass = tempCheck.proposalType.type.toUpperCase();
-          if (proposalClass === "OPTIMISTIC") {
-            setSelectedVotingType("optimistic");
-          } else if (proposalClass === "APPROVAL") {
-            setSelectedVotingType("approval");
+        const proposalClass = tempCheck.votingModule.toUpperCase();
+        if (proposalClass === "OPTIMISTIC") {
+          setSelectedVotingType("optimistic");
+        } else if (proposalClass === "APPROVAL") {
+          setSelectedVotingType("approval");
 
-            // Auto-fill approval settings from temp check data
-            if (tempCheck.approvalData) {
-              setApprovalSettings({
-                budget: tempCheck.approvalData.budget,
-                maxApprovals: tempCheck.approvalData.maxApprovals,
-                criteria:
-                  tempCheck.approvalData.criteria === 0
-                    ? "threshold"
-                    : "top-choices",
-                criteriaValue: tempCheck.approvalData.criteriaValue,
-                choices: tempCheck.approvalData.choices.map(
-                  (choice, index) => ({
-                    id: `choice-${index}`,
-                    title: choice,
-                  })
-                ),
-              });
-            }
-          } else if (proposalClass === "STANDARD") {
-            setSelectedVotingType("standard");
+          // Auto-fill approval settings from temp check data
+          if (tempCheck.approvalData) {
+            setApprovalSettings({
+              budget: tempCheck.approvalData.budget,
+              maxApprovals: tempCheck.approvalData.maxApprovals,
+              criteria:
+                tempCheck.approvalData.criteria === 0
+                  ? "threshold"
+                  : "top-choices",
+              criteriaValue: tempCheck.approvalData.criteriaValue,
+              choices: tempCheck.approvalData.choices.map((choice, index) => ({
+                id: `choice-${index}`,
+                title: choice,
+              })),
+            });
           }
+        } else {
+          setSelectedVotingType("standard");
         }
       }
     }
-  }, [relatedTempChecks, selectedPostType, hasInitialTempCheck]);
+  }, [relatedTempChecks, selectedPostType, proposalTypes]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -368,15 +358,11 @@ export function CreatePostClient({
         <div className="space-y-6">
           <ProposalSettingsCard
             selectedProposalType={selectedProposalType}
-            proposalTypes={proposalTypes}
+            proposalTypes={filterProposalTypesByType(
+              proposalTypes,
+              selectedPostType
+            )}
             onProposalTypeChange={handleProposalTypeChange}
-            postType={selectedPostType}
-            isGovProposal={
-              selectedPostType === "gov-proposal" &&
-              relatedTempChecks.length > 0
-            }
-            relatedTempChecks={relatedTempChecks}
-            selectedVotingType={selectedVotingType}
           />
         </div>
       </div>

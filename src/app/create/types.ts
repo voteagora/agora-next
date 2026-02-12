@@ -77,6 +77,7 @@ export interface RelatedItem {
     criteriaValue: number;
     budget: number;
   };
+  votingModule?: string;
 }
 
 export interface ProposalType {
