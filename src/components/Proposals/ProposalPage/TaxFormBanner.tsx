@@ -1,7 +1,7 @@
 "use client";
 
 import { addDays, isPast, differenceInMilliseconds } from "date-fns";
-import { Clock } from "lucide-react";
+import { CheckCircle, Clock, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -12,13 +12,23 @@ import Tenant from "@/lib/tenant/tenant";
 import {
   addressesMatch,
   COWRIE_VERIFICATION_COMPLETED_KEY,
+  EXECUTION_TRANSACTIONS_KEY,
   extractPayeeFromMetadata,
   FORM_COMPLETED_KEY,
+  getExplorerTxUrl,
   normalizeBoolean,
   PAYEE_FORM_URL_KEY,
 } from "@/lib/taxFormUtils";
 
 const TAX_FORM_DEADLINE_DAYS = 15;
+
+type ExecutionTransaction = {
+  id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+};
 
 function useTaxFormDeadline(endTime: Date | null, enabled: boolean) {
   const deadline = useMemo(() => {
@@ -72,17 +82,21 @@ function CountdownTimer({
   deadline,
   isExpired,
   now,
+  compact = false,
 }: {
   deadline: Date | null;
   isExpired: boolean;
   now: Date;
+  compact?: boolean;
 }) {
   if (!deadline) return null;
 
   if (isExpired) {
+    if (compact) {
+      return <span className="text-negative font-medium">Passed</span>;
+    }
     return (
       <div className="flex items-center gap-1.5 text-negative text-sm">
-        <Clock className="w-3.5 h-3.5" />
         <span className="font-medium">Deadline passed</span>
       </div>
     );
@@ -93,6 +107,16 @@ function CountdownTimer({
 
   const isUrgent = timeLeft.days < 3;
   const colorClass = isUrgent ? "text-negative" : "text-positive";
+
+  if (compact) {
+    return (
+      <span className={`tabular-nums font-medium ${colorClass}`}>
+        {timeLeft.days > 0 && `${timeLeft.days}d `}
+        {String(timeLeft.hours).padStart(2, "0")}h{" "}
+        {String(timeLeft.minutes).padStart(2, "0")}m
+      </span>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-1.5 text-sm ${colorClass}`}>
@@ -105,6 +129,10 @@ function CountdownTimer({
       <span className="font-normal">left to complete form</span>
     </div>
   );
+}
+
+function truncateAddress(address: string) {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
 type Props = {
@@ -128,6 +156,7 @@ export function TaxFormBanner({ proposal }: Props) {
     currentUserIsPayee,
     isFormCompleted,
     payeeFormUrl,
+    executionTransactions,
   } = useMemo(() => {
     const metadata = proposal.taxFormMetadata ?? {};
     const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
@@ -142,6 +171,9 @@ export function TaxFormBanner({ proposal }: Props) {
       ? isCowrieComplete
       : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
 
+    const executionTransactions = (metadata[EXECUTION_TRANSACTIONS_KEY] ??
+      []) as ExecutionTransaction[];
+
     return {
       hasPayeeKey,
       payeeAddress,
@@ -151,11 +183,13 @@ export function TaxFormBanner({ proposal }: Props) {
       payeeFormUrl:
         (metadata[PAYEE_FORM_URL_KEY] as string | undefined) ??
         togglePayeeFormUrl,
+      executionTransactions,
     };
   }, [address, proposal.taxFormMetadata, togglePayeeFormUrl]);
 
   const isWaitingForPayment = proposal.status === PROPOSAL_STATUS.SUCCEEDED;
   const isSignedIn = Boolean(address);
+  const hasPaymentBeenMade = executionTransactions.length > 0;
 
   // Check if this is an onchain governance proposal (not a temp check)
   // Can be identified by tag or by proposal type
@@ -179,87 +213,150 @@ export function TaxFormBanner({ proposal }: Props) {
     : false;
 
   const isOnchainProposal = hasGovTag || hasOnchainType;
-  const requiresTaxForm =
+
+  // Show banner if: enabled, succeeded proposal, onchain, not temp check, has payee set
+  const shouldShowBanner =
     isEnabled &&
     isWaitingForPayment &&
     isOnchainProposal &&
     !isTempCheck &&
-    !isFormCompleted;
+    hasPayeeKey;
 
   const {
     deadline,
     isExpired: isDeadlinePassed,
     now,
-  } = useTaxFormDeadline(proposal.endTime, requiresTaxForm);
+  } = useTaxFormDeadline(proposal.endTime, shouldShowBanner);
 
-  // Skip when globally off or non-gov proposals
-  if (!requiresTaxForm) {
+  // Hide banner if basic conditions not met
+  if (!shouldShowBanner) {
     return null;
   }
 
-  const bannerClass =
-    "flex items-center justify-between gap-4 rounded-lg bg-neutral px-4 py-3 shadow-newDefault mb-6 min-h-[64px]";
-  const contentClass = "flex items-center gap-2 flex-1";
+  // Only show the payee-specific CTA to the payee themselves
+  const showPayeeCTA =
+    isSignedIn && currentUserIsPayee && !isFormCompleted && !isDeadlinePassed;
+  const showSignInPrompt = !isSignedIn && !isFormCompleted && !isDeadlinePassed;
 
-  // Pre-login: show generic banner only if a payee_recipient is set
-  if (!isSignedIn) {
-    if (!hasPayeeKey) {
-      return null;
-    }
-    return (
-      <div className={bannerClass}>
-        <div className={contentClass}>
-          <div className="bg-wash rounded-md p-1.5 text-tertiary">
-            <CheckCircleBrokenIcon className="w-4 h-4" stroke="currentColor" />
-          </div>
-          <p className="text-secondary text-sm md:text-sm">
-            This proposal has passed. If you are the payee, please sign in to
-            complete your payment information.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Post-login: only show for the designated payee with a known address
-  if (!hasPayeeKey || !payeeAddress || !currentUserIsPayee) {
-    return null;
-  }
+  const hasSecondRow = showSignInPrompt || showPayeeCTA;
 
   return (
-    <div className={bannerClass}>
-      <div className={contentClass}>
-        <div className="bg-wash rounded-md p-1.5 text-tertiary">
-          <CheckCircleBrokenIcon className="w-4 h-4" stroke="currentColor" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-secondary text-sm md:text-sm">
-            You&apos;re almost ready to receive the funds from this proposal.
-            Please complete your payment information to proceed.
-          </p>
-          <CountdownTimer
-            deadline={deadline}
-            isExpired={isDeadlinePassed}
-            now={now}
-          />
+    <>
+      <div className="rounded-lg bg-neutral px-4 py-3 shadow-newDefault mb-6">
+        <div
+          className={`flex gap-6 text-sm ${hasSecondRow ? "items-start" : "items-center"}`}
+        >
+          {/* Left: Icon + Title */}
+          <div
+            className={`flex items-center gap-2 shrink-0 ${hasSecondRow ? "pt-0.5" : ""}`}
+          >
+            <div className="bg-wash rounded-md p-1.5 text-tertiary">
+              <CheckCircleBrokenIcon
+                className="w-4 h-4"
+                stroke="currentColor"
+              />
+            </div>
+            <span className="font-semibold text-primary">Payment Status</span>
+          </div>
+
+          {/* Right: Content stacked vertically */}
+          <div className="flex flex-col gap-2">
+            {/* Top row: Status items */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Payee */}
+              {payeeAddress && (
+                <>
+                  <span>
+                    <span className="font-medium text-primary">Payee:</span>{" "}
+                    <span className="font-mono text-secondary">
+                      {payeeAddress}
+                    </span>
+                  </span>
+                  <span className="text-line">·</span>
+                </>
+              )}
+
+              {/* Deadline */}
+              <span>
+                <span className="font-medium text-primary">Deadline:</span>{" "}
+                <CountdownTimer
+                  deadline={deadline}
+                  isExpired={isDeadlinePassed}
+                  now={now}
+                  compact
+                />
+              </span>
+
+              <span className="text-line">·</span>
+
+              {/* Tax Form */}
+              <span>
+                <span className="font-medium text-primary">Tax Form:</span>{" "}
+                {isFormCompleted ? (
+                  <span className="text-positive inline-flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Done
+                  </span>
+                ) : (
+                  <span className="text-secondary">Pending</span>
+                )}
+              </span>
+
+              <span className="text-line">·</span>
+
+              {/* Payment */}
+              <span>
+                <span className="font-medium text-primary">Payment:</span>{" "}
+                {hasPaymentBeenMade ? (
+                  <a
+                    href={getExplorerTxUrl(
+                      executionTransactions[0].chain_id,
+                      executionTransactions[0].transaction_hash
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-positive inline-flex items-center gap-1 hover:underline"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Paid
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  <span className="text-secondary">Pending</span>
+                )}
+              </span>
+            </div>
+
+            {/* Bottom row: Payee CTA text or Sign-in prompt */}
+            {showPayeeCTA && (
+              <p className="text-secondary">
+                You&apos;re almost ready to receive the funds from this
+                proposal. Please complete your payment information to proceed.
+              </p>
+            )}
+
+            {showSignInPrompt && (
+              <p className="text-secondary">
+                This proposal has passed. If you are the payee, please sign in
+                to complete your payment information.
+              </p>
+            )}
+          </div>
         </div>
       </div>
-      {payeeFormUrl ? (
+
+      {/* Full-width CTA button below banner */}
+      {showPayeeCTA && payeeFormUrl && (
         <UpdatedButton
-          href={isDeadlinePassed ? undefined : payeeFormUrl}
+          href={payeeFormUrl}
           type="primary"
-          className={
-            isDeadlinePassed
-              ? "opacity-50 cursor-not-allowed pointer-events-none"
-              : undefined
-          }
           target="_blank"
           rel="noreferrer"
-          aria-disabled={isDeadlinePassed}
+          className="w-full rounded-lg mb-6 text-sm flex items-center justify-center"
         >
-          Complete payee form
+          Complete Payee Form →
         </UpdatedButton>
-      ) : null}
-    </div>
+      )}
+    </>
   );
 }

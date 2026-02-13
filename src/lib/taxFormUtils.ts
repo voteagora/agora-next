@@ -4,6 +4,31 @@ export const FORM_COMPLETED_KEY = "form_completed";
 export const PAYEE_FORM_URL_KEY = "payee_form_url";
 export const COWRIE_VERIFICATION_COMPLETED_KEY =
   "cowrie_verification_completed";
+export const EXECUTION_TRANSACTIONS_KEY = "execution_transactions";
+
+// Chain ID to block explorer URL mapping
+export const CHAIN_EXPLORERS: Record<number, string> = {
+  1: "https://etherscan.io",
+  11155111: "https://sepolia.etherscan.io",
+  10: "https://optimistic.etherscan.io",
+  42161: "https://arbiscan.io",
+  137: "https://polygonscan.com",
+  8453: "https://basescan.org",
+};
+
+export const CHAIN_NAMES: Record<number, string> = {
+  1: "Ethereum",
+  11155111: "Sepolia",
+  10: "Optimism",
+  42161: "Arbitrum",
+  137: "Polygon",
+  8453: "Base",
+};
+
+export const getExplorerTxUrl = (chainId: number, txHash: string): string => {
+  const baseUrl = CHAIN_EXPLORERS[chainId] || CHAIN_EXPLORERS[1];
+  return `${baseUrl}/tx/${txHash}`;
+};
 
 const hasOwn = (metadata: Record<string, unknown>, key: string) =>
   Object.prototype.hasOwnProperty.call(metadata, key);

@@ -2,6 +2,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { checkCowrieVerification } from "@/lib/cowrie";
 import {
   COWRIE_VERIFICATION_COMPLETED_KEY,
+  EXECUTION_TRANSACTIONS_KEY,
   extractPayeeFromMetadata,
   FORM_COMPLETED_KEY,
   normalizeBoolean,
@@ -9,6 +10,14 @@ import {
 import Tenant from "@/lib/tenant/tenant";
 
 export type ProposalTaxFormMetadata = Record<string, unknown>;
+
+export type ExecutionTransaction = {
+  id: string;
+  transaction_hash: string;
+  chain_id: number;
+  executed_by: string;
+  executed_at: string;
+};
 
 export async function fetchProposalTaxFormMetadata(
   proposalId: string
@@ -22,21 +31,61 @@ export async function fetchProposalTaxFormMetadata(
     return {};
   }
 
-  const rows = await (prismaWeb2Client as any).proposalMetadataKv.findMany({
-    where: {
-      dao_slug: slug,
-      proposalId,
-    },
-    select: {
-      key: true,
-      value: true,
-    },
-  });
+  // Fetch metadata and execution transactions in parallel
+  const [metadataRows, executionTransactions] = await Promise.all([
+    (prismaWeb2Client as any).proposalMetadataKv.findMany({
+      where: {
+        dao_slug: slug,
+        proposalId,
+      },
+      select: {
+        key: true,
+        value: true,
+      },
+    }),
+    (prismaWeb2Client as any).proposalExecutionTransaction.findMany({
+      where: {
+        tenant: slug.toLowerCase(),
+        proposal_id: proposalId,
+      },
+      select: {
+        id: true,
+        transaction_hash: true,
+        chain_id: true,
+        executed_by: true,
+        executed_at: true,
+      },
+      orderBy: {
+        executed_at: "desc",
+      },
+    }),
+  ]);
 
   const metadata: ProposalTaxFormMetadata = {};
-  rows.forEach(({ key, value }: { key: string; value: string | null }) => {
-    metadata[key] = value;
-  });
+  metadataRows.forEach(
+    ({ key, value }: { key: string; value: string | null }) => {
+      metadata[key] = value;
+    }
+  );
+
+  // Add execution transactions to metadata
+  if (executionTransactions && executionTransactions.length > 0) {
+    metadata[EXECUTION_TRANSACTIONS_KEY] = executionTransactions.map(
+      (tx: {
+        id: string;
+        transaction_hash: string;
+        chain_id: number;
+        executed_by: string;
+        executed_at: Date;
+      }) => ({
+        id: tx.id,
+        transaction_hash: tx.transaction_hash,
+        chain_id: tx.chain_id,
+        executed_by: tx.executed_by,
+        executed_at: tx.executed_at.toISOString(),
+      })
+    );
+  }
 
   const provider = (taxFormToggle?.config as { provider?: string } | undefined)
     ?.provider;
