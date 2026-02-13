@@ -56,7 +56,7 @@ export function normalizeArchiveOptimisticProposal(
   const abstainVotes = safeBigInt(extractVoteValue(voteTotals["2"]));
 
   const {
-    quorumVotes: quorumValue,
+    quorum: quorumValue,
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
@@ -135,8 +135,7 @@ export function normalizeArchiveOptimisticProposal(
     description,
     quorum: quorumValue,
     votableSupply: votableSupplyValue,
-    approvalThreshold:
-      approvalThresholdValue > 0 ? BigInt(approvalThresholdValue) : 0n,
+    approvalThreshold: approvalThresholdValue,
     proposalData,
     unformattedProposalData: proposal.proposal_data
       ? proposal.proposal_data.startsWith("0x")

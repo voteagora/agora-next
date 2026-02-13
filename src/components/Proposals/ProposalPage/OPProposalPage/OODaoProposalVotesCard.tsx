@@ -9,13 +9,13 @@ import { icons } from "@/assets/icons/icons";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 
-type ArchiveProposalVotesCardProps = {
+type OODaoProposalVotesCardProps = {
   proposal: Proposal;
 };
 
-export default function ArchiveProposalVotesCard({
+export default function OODaoProposalVotesCard({
   proposal,
-}: ArchiveProposalVotesCardProps) {
+}: OODaoProposalVotesCardProps) {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
   const now = new Date();

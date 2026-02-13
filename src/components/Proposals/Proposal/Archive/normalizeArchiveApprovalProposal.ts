@@ -43,7 +43,7 @@ export function normalizeArchiveApprovalProposal(
   const source = proposal.data_eng_properties?.source;
 
   const {
-    quorumVotes: quorumValue,
+    quorum: quorumValue,
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
@@ -169,7 +169,7 @@ export function normalizeArchiveApprovalProposal(
     description,
     quorum: quorumValue,
     votableSupply: votableSupplyValue,
-    approvalThreshold: BigInt(approvalThresholdValue),
+    approvalThreshold: approvalThresholdValue,
     proposalData,
     unformattedProposalData: proposal.proposal_data
       ? proposal.proposal_data.startsWith("0x")
