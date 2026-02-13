@@ -20,6 +20,8 @@ interface FinancialStatement {
   archived?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
+  topicId?: number;
+  topicTitle?: string;
 }
 
 interface FinancialStatementsSectionProps {

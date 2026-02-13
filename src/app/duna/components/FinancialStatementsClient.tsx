@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import FinancialStatementsSection from "./FinancialStatementsSection";
+import { buildForumArticlePath } from "@/lib/forumUtils";
 
 interface FinancialStatement {
   id: number;
@@ -12,6 +14,8 @@ interface FinancialStatement {
   archived?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
+  topicId?: number;
+  topicTitle?: string;
 }
 
 interface FinancialStatementsClientProps {
@@ -23,9 +27,13 @@ export default function FinancialStatementsClient({
   statements,
   title,
 }: FinancialStatementsClientProps) {
+  const router = useRouter();
+
   const handleStatementClick = (statement: FinancialStatement) => {
-    if (statement.url) {
-      window.open(statement.url, "_blank");
+    if (statement.topicId && statement.topicTitle) {
+      router.push(
+        buildForumArticlePath(statement.topicId, statement.topicTitle)
+      );
     }
   };
 
