@@ -18,6 +18,7 @@ import {
   getExplorerTxUrl,
   normalizeBoolean,
   PAYEE_FORM_URL_KEY,
+  TAX_FORM_MANUAL_STATUS_KEY,
 } from "@/lib/taxFormUtils";
 
 const TAX_FORM_DEADLINE_DAYS = 15;
@@ -160,16 +161,30 @@ export function TaxFormBanner({ proposal }: Props) {
   } = useMemo(() => {
     const metadata = proposal.taxFormMetadata ?? {};
     const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
-    const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
-      metadata,
-      COWRIE_VERIFICATION_COMPLETED_KEY
-    );
-    const isCowrieComplete = normalizeBoolean(
-      metadata[COWRIE_VERIFICATION_COMPLETED_KEY]
-    );
-    const isFormCompleted = hasCowrieStatus
-      ? isCowrieComplete
-      : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
+    
+    // Tax form status logic: manual override > API result > default
+    // This matches the logic in agora-admin
+    let isFormCompleted = false;
+    
+    // Check for manual override first (takes precedence)
+    const manualStatus = metadata[TAX_FORM_MANUAL_STATUS_KEY];
+    if (manualStatus === "complete" || manualStatus === "done") {
+      isFormCompleted = true;
+    } else if (manualStatus === "pending" || manualStatus === "not_done") {
+      isFormCompleted = false;
+    } else {
+      // Fall back to API results (Cowrie or form_completed)
+      const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
+        metadata,
+        COWRIE_VERIFICATION_COMPLETED_KEY
+      );
+      const isCowrieComplete = normalizeBoolean(
+        metadata[COWRIE_VERIFICATION_COMPLETED_KEY]
+      );
+      isFormCompleted = hasCowrieStatus
+        ? isCowrieComplete
+        : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
+    }
 
     const executionTransactions = (metadata[EXECUTION_TRANSACTIONS_KEY] ??
       []) as ExecutionTransaction[];
