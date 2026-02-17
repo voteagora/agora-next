@@ -20,6 +20,8 @@ interface FinancialStatement {
   archived?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
+  topicId?: number;
+  topicTitle?: string;
 }
 
 interface FinancialStatementsSectionProps {
@@ -65,6 +67,7 @@ export default function FinancialStatementsSection({
                   document={statement}
                   onCardClick={() => onStatementClick(statement)}
                   isRecentlyReleased={index === 0 && isRecentlyReleased}
+                  index={index}
                 />
               </CarouselItem>
             );

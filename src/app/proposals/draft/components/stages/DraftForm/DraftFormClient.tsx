@@ -38,7 +38,8 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { TENANT_NAMESPACES, LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui, namespace } = Tenant.current();
@@ -234,14 +235,8 @@ const DraftFormClient = ({
         return;
       }
       // Guard: require SIWE JWT before prompting signature for this action
-      try {
-        const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-        if (!session) {
-          toast("Session expired. Please sign in to continue.");
-          window.location.reload();
-          return;
-        }
-      } catch {
+      const jwt = getStoredSiweJwt({ expectedAddress: address });
+      if (!jwt) {
         toast("Session expired. Please sign in to continue.");
         window.location.reload();
         return;
@@ -303,7 +298,7 @@ const DraftFormClient = ({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SwitchInput
                     control={control}
-                    label="Voting module"
+                    label=""
                     required={true}
                     options={enabledProposalTypesFromConfigAndAPI}
                     name="type"

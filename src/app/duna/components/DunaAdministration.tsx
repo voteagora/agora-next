@@ -26,6 +26,7 @@ const DunaDescription = () => {
 const DunaAdministration = async () => {
   let dunaReports: ForumTopic[] = [];
   let documents: any[] = [];
+  let topicsResult: any = null;
 
   try {
     const dunaCategoryId = await getDunaCategoryId();
@@ -39,11 +40,12 @@ const DunaAdministration = async () => {
         </div>
       );
     }
-    const [topicsResult, documentsResult] = await Promise.all([
+    const [topics, documentsResult] = await Promise.all([
       getForumTopics({ categoryId: dunaCategoryId }),
       getForumCategoryAttachments({ categoryId: dunaCategoryId }),
     ]);
 
+    topicsResult = topics;
     if (topicsResult.success) {
       dunaReports = transformForumTopics(topicsResult.data, {
         mergePostAttachments: true,
@@ -64,7 +66,23 @@ const DunaAdministration = async () => {
     financialStatementsToggle?.config as UIFinancialStatementsConfig;
 
   const financialStatements = isFinancialStatementsEnabled
-    ? documents.filter((doc) => doc.isFinancialStatement ?? false)
+    ? topicsResult.success
+      ? topicsResult.data
+          .filter((topic: any) => topic.isFinancialStatement === true)
+          .map((topic: any) => ({
+            id: topic.id,
+            name: topic.title,
+            url: "",
+            ipfsCid: "",
+            createdAt: topic.createdAt,
+            uploadedBy: topic.address,
+            archived: topic.deletedAt !== null,
+            revealTime: topic.revealTime,
+            expirationTime: topic.expirationTime,
+            topicId: topic.id,
+            topicTitle: topic.title,
+          }))
+      : []
     : [];
   const otherDocuments = isFinancialStatementsEnabled
     ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))

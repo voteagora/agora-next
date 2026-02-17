@@ -67,7 +67,7 @@ export const HybridStandardVotesSummaryTooltip = ({
 
         {proposal.approvalThreshold && (
           <div className="flex justify-between">
-            <span className="text-secondary">Threshold</span>
+            <span className="text-secondary">Approval</span>
             <div className="flex items-center gap-1">
               {finalApproval * 100 >=
               Number(proposal.approvalThreshold) / 100 ? (

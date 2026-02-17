@@ -266,7 +266,19 @@ async function processAndParseProposals(
     })
   );
 
-  return resolvedProposals.filter((p) => p !== null) as Proposal[];
+  const uniqueProposals: Proposal[] = [];
+  const seenProposalIds = new Set<string>();
+
+  resolvedProposals.forEach((proposal) => {
+    if (!proposal || seenProposalIds.has(proposal.id)) {
+      return;
+    }
+
+    seenProposalIds.add(proposal.id);
+    uniqueProposals.push(proposal);
+  });
+
+  return uniqueProposals;
 }
 
 // Is this working? Not sure, but i don't think so.
@@ -474,7 +486,6 @@ async function getProposalTypes() {
     let types = [];
 
     const typesFromApi = await getProposalTypesFromDaoNode();
-
     if (typesFromApi) {
       const parsedTypes = Object.entries(typesFromApi.proposal_types)
         ?.filter(([proposalTypeId, type]: any) => !!type.name)

@@ -243,11 +243,7 @@ export const optimismTenantUIConfig = new TenantUI({
         // Temporary: allow public draft sharing via ?share=AuthorAddress
         allowDraftSharing: true,
         offchainProposalCreator: [
-          "0xcC0B26236AFa80673b0859312a7eC16d2b72C1ea",
           "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
-          "0x011B83250067782A4435FAb0B0119Ec835404E60",
-          "0x77a1c4669D642E8A25B1da8bAE4a7466f0f3a7c3",
-          "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
         ],
         stages: [
           {
@@ -303,13 +299,20 @@ Proposal types set the quorum and approval thresholds for your proposal. You can
 
 **2. Choose your vote type**
 
-This determines if your proposal will be a simple yes/no or a multiple choice.
+This determines if your proposal will be a simple yes/no or a multiple choice or an optimistic proposal.
 
 **3. Create your proposal draft**
 
 Now that the vote and proposal type are set, you can use this form to create your proposal. Proposed transactions are optional, as the Token House governor is not executable for now.
 
-**4. Get signatures for your SAFE**
+**4. Choose your proposal scope**
+
+Select how your proposal will be voted on:
+- **On-Chain Only**: Standard Token House voting via smart contract
+- **Off-Chain Only**: Citizen House voting via EAS (requires offchain proposal creator privileges)
+- **Hybrid**: Both Token House and Citizen House vote in parallel. Requires two separate submissions: first on-chain to the governor contract, then off-chain for Citizen House.
+
+**5. Get signatures for your SAFE**
 
 If you're using the OP Foundation multisig, you can queue several proposals at once so that your co-signers can sign all the transactions in one sitting. Proposals will appear in chronological order in the final UI, so the last proposal you put in will show up on top for voters. Note that the order is not guaranteed if you batch all the proposal creation transactions into a single block, as then there is no timing difference.
 `.trim(),

@@ -1,4 +1,4 @@
-import { TenantUI } from "@/lib/tenant/tenantUI";
+import { TenantUI, UITaxFormConfig } from "@/lib/tenant/tenantUI";
 import demoHero from "@/assets/tenant/demo_hero.png";
 import demoHeroV2 from "@/assets/tenant/demo_logo.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
@@ -178,6 +178,17 @@ export const demoTenantUIConfig = new TenantUI({
         imageDescription: "",
       },
     },
+    {
+      route: "grants",
+      title: "Canopy Grants Program",
+      description: "Apply for grants to support the Canopy ecosystem",
+      meta: {
+        title: "Canopy Grants Program",
+        description: "Apply for grants to support the Canopy ecosystem",
+        imageTitle: "Canopy Grants Program",
+        imageDescription: "Apply for grants to support the Canopy ecosystem",
+      },
+    },
   ],
 
   toggles: [
@@ -294,7 +305,27 @@ If you meet the proposal threshold or are the manager of the governor, then you 
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "grants",
+      enabled: true,
+    },
+    {
+      name: "grants/intake-form",
+      enabled: true,
+    },
+    {
+      name: "tax-form",
+      enabled: true,
+      config: {
+        payeeFormUrl: "http://cowrie.io/tax",
+        provider: "cowrie",
+      } as UITaxFormConfig,
+    },
+    {
+      name: "notifications",
+      enabled: true,
     },
   ],
 });

@@ -7,6 +7,7 @@ import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import { getForumTopic } from "@/lib/actions/forum/topics";
 import Tenant from "@/lib/tenant/tenant";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
+import { filterProposalTypesByType } from "./utils/proposalTypeUtils";
 
 const { namespace, ui } = Tenant.current();
 
@@ -59,17 +60,26 @@ async function getInitialFormData(
     data.title = fetchedProposal.title || "";
     data.description = fetchedProposal.description || "";
 
-    const proposalType = fetchedProposal.proposal_type;
-    const proposalTypeData =
-      proposalType &&
-      typeof proposalType === "object" &&
-      "quorum" in proposalType
+    // Extract approval-specific data from kwargs or direct fields
+    const kwargs = fetchedProposal.kwargs || {};
+    const approvalData =
+      fetchedProposal?.voting_module?.toUpperCase() === "APPROVAL"
         ? {
-            id: proposalType.eas_uid,
-            name: proposalType.name,
-            description: proposalType.description,
-            quorum: proposalType.quorum / 100,
-            approvalThreshold: proposalType.approval_threshold / 100,
+            choices:
+              (kwargs.choices as string[]) || fetchedProposal.choices || [],
+            maxApprovals:
+              typeof kwargs.max_approvals === "number"
+                ? kwargs.max_approvals
+                : fetchedProposal.max_approvals || 1,
+            criteria:
+              typeof kwargs.criteria === "number"
+                ? kwargs.criteria
+                : fetchedProposal.criteria || 0,
+            criteriaValue:
+              typeof kwargs.criteria_value === "number"
+                ? kwargs.criteria_value
+                : fetchedProposal.criteria_value || 0,
+            budget: typeof kwargs.budget === "number" ? kwargs.budget : 0,
           }
         : undefined;
 
@@ -86,7 +96,8 @@ async function getInitialFormData(
         url: `/proposals/${fromTempCheckId}`,
         status: deriveStatus(fetchedProposal, 18),
         proposer: fetchedProposal.proposer,
-        proposalType: proposalTypeData,
+        approvalData,
+        votingModule: fetchedProposal.voting_module,
       },
     ];
   }
@@ -121,23 +132,6 @@ export default async function CreatePostPage({
 
   let proposalTypes: ProposalType[] = [];
 
-  if (tempCheckProposal?.proposal_type && initialPostType === "gov-proposal") {
-    const proposalType = tempCheckProposal.proposal_type;
-
-    if (typeof proposalType === "object" && "quorum" in proposalType) {
-      proposalTypes = [
-        {
-          id: proposalType.eas_uid,
-          name: proposalType.name,
-          description: proposalType.description,
-          quorum: proposalType.quorum / 100,
-          approvalThreshold: proposalType.approval_threshold / 100,
-        },
-      ];
-    }
-  }
-
-  // Fallback: fetch all proposal types if not from temp check or if fetch failed
   if (proposalTypes.length === 0) {
     const proposalTypesData = await fetchProposalTypes();
     proposalTypes = Array.isArray(proposalTypesData)
@@ -147,6 +141,7 @@ export default async function CreatePostPage({
           description: type.description,
           quorum: type.quorum / 100,
           approvalThreshold: type.approval_threshold / 100,
+          module: type.module,
         }))
       : [
           {
@@ -155,6 +150,7 @@ export default async function CreatePostPage({
             description: "No proposal type created yet",
             quorum: 0,
             approvalThreshold: 0,
+            module: "STANDARD",
           },
         ];
   }

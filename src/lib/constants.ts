@@ -242,10 +242,32 @@ export const ADMIN_TYPES: Record<string, string> = {
   super_admin: "SUPER_ADMIN",
 };
 
+// EAS Voting Types for governorless voting
+export const EAS_VOTING_TYPES = {
+  STANDARD: 0, // for/against/abstain
+  APPROVAL: 1, // multi-choice selection
+  OPTIMISTIC: 2, // veto-based
+} as const;
+
+export type EASVotingType =
+  (typeof EAS_VOTING_TYPES)[keyof typeof EAS_VOTING_TYPES];
+
+// EAS Approval Criteria
+export const EAS_APPROVAL_CRITERIA = {
+  THRESHOLD: 0, // votes must exceed threshold
+  TOP_CHOICES: 1, // top N choices win
+} as const;
+
+export type EASApprovalCriteria =
+  (typeof EAS_APPROVAL_CRITERIA)[keyof typeof EAS_APPROVAL_CRITERIA];
+
+// Default tiers for optimistic voting (percentages)
+export const EAS_DEFAULT_OPTIMISTIC_TIERS = [20, 20, 20];
+
 export const ARCHIVE_GCS_BUCKET =
   process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
-    : "https://storage.googleapis.com/cpls-usmr-dev-25q3";
+    : "https://storage.googleapis.com/cpls-usmr-dev-test-26q1";
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
@@ -265,7 +287,7 @@ export const getArchiveSlugAllProposals = (namespace: string): string[] => {
   } else if (namespace === "derive") {
     return [getArchiveSnapshotProposals(namespace)];
   }
-  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson`];
+  return [`${getArchiveSlugGCSbucket(namespace)}/proposal_list.full.ndjson.gz`];
 };
 
 export const getArchiveDaoNodeProposals = (namespace: string) => {

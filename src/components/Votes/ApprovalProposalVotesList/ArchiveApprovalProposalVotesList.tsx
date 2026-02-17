@@ -97,7 +97,7 @@ export default function ArchiveApprovalProposalVotesList({
         transactionHash: vote.transactionHash,
         address: vote.address,
         proposalId: proposal.id,
-        support: vote.support,
+        support: "FOR",
         weight: vote.weight,
         reason: vote.reason,
         params: paramsAsLabels,
@@ -112,10 +112,7 @@ export default function ArchiveApprovalProposalVotesList({
     });
   }, [votes, proposal.id, proposal.markdowntitle, approvalOptionLabels]);
 
-  const connectedAddressLower = useMemo(
-    () => connectedAddress?.toLowerCase(),
-    [connectedAddress]
-  );
+  const connectedAddressLower = connectedAddress?.toLowerCase();
 
   const userVotes = useMemo(() => {
     if (!connectedAddressLower) {
