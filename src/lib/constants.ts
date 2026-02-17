@@ -444,3 +444,6 @@ export const getEASAddress = (chainId: number) => {
   }
   return "0x0000000000000000000000000000000000000000";
 };
+
+export const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
+export const CRITERIA_TOP_CHOICES = 1; // Top N options win

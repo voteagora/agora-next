@@ -20,7 +20,6 @@ export default function ApprovedTransactions({
   };
 
   const { ui } = Tenant.current();
-
   const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
   if (!tenantHaseasOO) {
     return null;
@@ -34,6 +33,7 @@ export default function ApprovedTransactions({
       proposalData.options[0].calldatas[0] === "0x") ||
     (proposalType === "HYBRID_STANDARD" &&
       proposalData.options[0].calldatas[0] === "0x");
+
   return (
     <div className="flex flex-col gap-1 border border-line rounded-lg bg-wash py-4">
       <div className="flex items-center justify-between px-4 mb-2">

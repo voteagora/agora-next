@@ -125,27 +125,27 @@ function normalizeBase(
       ? proposal.description
       : ARCHIVE_PROPOSAL_DEFAULTS.description;
 
-  const proposerEns =
-    typeof proposal.proposer_ens === "string"
-      ? proposal.proposer_ens
-      : proposal.proposer_ens?.detail;
-
   const proposalTypeData =
     typeof proposal.proposal_type === "object" && proposal.proposal_type
       ? {
           proposal_type_id: Number(proposal.proposal_type.eas_uid || 0),
           name: proposal.proposal_type.name || "Standard",
-          quorum: safeBigInt(proposal.proposal_type.quorum || 0),
-          approval_threshold: safeBigInt(
-            proposal.proposal_type.approval_threshold
-          ),
+          quorum: quorumValue,
+          approval_threshold: approvalThresholdValue,
         }
-      : {
-          proposal_type_id: 0,
-          name: "Standard",
-          quorum: 0n,
-          approval_threshold: 0n,
-        };
+      : proposal.proposal_type_info
+        ? {
+            proposal_type_id: Number(proposal.proposal_type || 0),
+            name: proposal.proposal_type_info.name || "Standard",
+            quorum: quorumValue,
+            approval_threshold: approvalThresholdValue,
+          }
+        : {
+            proposal_type_id: 0,
+            name: "Standard",
+            quorum: quorumValue,
+            approval_threshold: approvalThresholdValue,
+          };
 
   return {
     id: String(proposal.id),
@@ -223,7 +223,6 @@ function normalizeStandardProposal(
     const delegateFor = safeBigInt(delegateTotals["1"]);
     const delegateAgainst = safeBigInt(delegateTotals["0"]);
     const delegateAbstain = safeBigInt(delegateTotals["2"]);
-
     const govlessOutcome = (proposal.govless_proposal?.outcome ?? {}) as Record<
       string,
       Record<string, number | string>
@@ -383,7 +382,6 @@ function normalizeApprovalProposal(
           "no-param"
         ] || {}
       : proposal.totals?.["no-param"] || {};
-
   const proposalResults = {
     options: metrics.choices.map((c) => ({
       option: c.text,
@@ -752,7 +750,7 @@ export function archiveToProposal(
 
     case "OPTIMISTIC":
     case "HYBRID_OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC":
+      console.log("proposalType", proposalType);
       normalizedProposal = normalizeOptimisticProposal(
         archiveProposal,
         base,
@@ -762,6 +760,8 @@ export function archiveToProposal(
 
     case "HYBRID_OPTIMISTIC_TIERED":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
+    case "OFFCHAIN_OPTIMISTIC":
+      console.log("proposalType", proposalType);
       normalizedProposal = normalizeOptimisticTieredProposal(
         archiveProposal,
         base,

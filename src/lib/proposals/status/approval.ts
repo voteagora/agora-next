@@ -6,12 +6,8 @@ import {
   HYBRID_VOTE_WEIGHTS,
   HYBRID_PROPOSAL_QUORUM,
   OFFCHAIN_THRESHOLDS,
+  CRITERIA_THRESHOLD,
 } from "@/lib/constants";
-
-// Criteria types for approval voting (raw values from decoded_proposal_data)
-// See toApprovalVotingCriteria() in proposalUtils.ts
-const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
-const CRITERIA_TOP_CHOICES = 1; // Top N options win
 
 /**
  * Get quorum value for approval proposals
@@ -206,10 +202,8 @@ export const deriveApprovalStatus = (
     : proposal.totals?.["no-param"] || {};
   const forVotes = BigInt(voteTotals["1"] ?? "0");
   const abstainVotes = BigInt(voteTotals["2"] ?? "0");
-
   // Quorum for approval = for + abstain
   const quorumVotes = forVotes + abstainVotes;
-
   // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
   if (
     convertToNumber(String(quorumVotes), decimals) < quorumValue &&
@@ -222,7 +216,6 @@ export const deriveApprovalStatus = (
   if (criteria === CRITERIA_THRESHOLD) {
     // THRESHOLD: at least one option must have votes > criteriaValue
     const thresholdVotes = convertToNumber(String(criteriaValue), decimals);
-
     for (const choice of choices) {
       if (choice.approvals > thresholdVotes) {
         return "SUCCEEDED";

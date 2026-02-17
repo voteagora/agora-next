@@ -176,7 +176,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <VotesBar
                       forVotes={0}
                       againstVotes={totalAgainstVotes}
-                      quorumPercentage={proposalQuorum[0] || 65}
+                      quorumPercentage={proposalQuorum[0] || 20}
                       showVotesPercentage
                     />
                   </div>

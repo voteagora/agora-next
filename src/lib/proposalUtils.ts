@@ -1165,24 +1165,20 @@ export function calculateOptimisticProposalMetrics(
 ) {
   const tokenDecimals = Tenant.current().token.decimals;
 
-  const votableSupplyBigInt = BigInt(votableSupply || "0");
   const formattedVotableSupply = Number(
-    votableSupplyBigInt / BigInt(10 ** tokenDecimals)
+    BigInt(votableSupply || "0") / BigInt(10 ** tokenDecimals)
   );
 
   const proposalResults = proposal.proposalResults as {
-    against?: string | bigint;
+    against?: string;
   } | null;
-  // Handle both string (live) and BigInt (archive) against values
-  const againstAmount = String(proposalResults?.against ?? "0");
+  const againstAmount = proposalResults?.against || "0";
 
   const againstLength = Number(formatUnits(againstAmount, tokenDecimals));
 
-  // Use BigInt math for percentage to avoid precision loss with large wei values
-  const againstBigInt = BigInt(againstAmount);
   const againstRelativeAmount =
-    votableSupplyBigInt > 0n
-      ? Number((againstBigInt * 10000n) / votableSupplyBigInt) / 100
+    formattedVotableSupply > 0
+      ? Number(((againstLength / formattedVotableSupply) * 100).toFixed(2))
       : 0;
 
   const proposalData =
@@ -1667,10 +1663,7 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
     finalApproval: talliesData.finalApproval,
     totalForVotesPercentage: Number(calculatedTotalForVotes.toFixed(2)),
     totalAgainstVotesPercentage: Number(calculatedTotalAgainstVotes.toFixed(2)),
-    totalAbstainVotesPercentage:
-      calculationOptions === 0
-        ? Number(calculatedTotalAbstainVotes.toFixed(2))
-        : 0,
+    totalAbstainVotesPercentage: Number(calculatedTotalAbstainVotes.toFixed(2)),
   };
 }
 
