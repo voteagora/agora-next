@@ -161,11 +161,11 @@ export function TaxFormBanner({ proposal }: Props) {
   } = useMemo(() => {
     const metadata = proposal.taxFormMetadata ?? {};
     const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
-    
+
     // Tax form status logic: manual override > API result > default
     // This matches the logic in agora-admin
     let isFormCompleted = false;
-    
+
     // Check for manual override first (takes precedence)
     const manualStatus = metadata[TAX_FORM_MANUAL_STATUS_KEY];
     if (manualStatus === "complete" || manualStatus === "done") {
