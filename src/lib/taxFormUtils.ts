@@ -5,6 +5,7 @@ export const PAYEE_FORM_URL_KEY = "payee_form_url";
 export const COWRIE_VERIFICATION_COMPLETED_KEY =
   "cowrie_verification_completed";
 export const EXECUTION_TRANSACTIONS_KEY = "execution_transactions";
+export const TAX_FORM_MANUAL_STATUS_KEY = "tax_form_manual_status";
 
 // Chain ID to block explorer URL mapping
 export const CHAIN_EXPLORERS: Record<number, string> = {
