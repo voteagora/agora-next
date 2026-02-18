@@ -269,12 +269,18 @@ export const deriveStatus = (
 
     return "SUCCEEDED";
   } else if (proposal.total_voting_power_at_start) {
+    const totalPower = convertToNumber(
+      proposal.total_voting_power_at_start,
+      decimals
+    );
+
+    quorumMet = forVotes > quorum;
     hasMetThreshold =
       forVotes / (forVotes + againstVotes) >= approvalThreshold / 100;
   }
 
-  if (!quorumMet) {
-    return "DEFEATED";
+  if (quorumMet) {
+    return "SUCCEEDED";
   }
 
   return "DEFEATED";
