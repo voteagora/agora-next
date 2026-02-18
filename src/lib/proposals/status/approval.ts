@@ -200,10 +200,22 @@ export const deriveApprovalStatus = (
         "no-param"
       ] || {}
     : proposal.totals?.["no-param"] || {};
-  const forVotes = BigInt(voteTotals["1"] ?? "0");
-  const abstainVotes = BigInt(voteTotals["2"] ?? "0");
+
+  // Check if this is an older proposal format (decoded_proposal_data.length === 4)
+  // For older proposals, "for" votes are stored under key "0" instead of "1"
+  const isOlderFormat =
+    isDaoNodeSource(proposal) &&
+    Array.isArray(proposal.decoded_proposal_data) &&
+    Array.isArray(proposal.decoded_proposal_data[0]) &&
+    proposal.decoded_proposal_data[0].length > 0 &&
+    Array.isArray(proposal.decoded_proposal_data[0][0]) &&
+    proposal.decoded_proposal_data[0][0].length === 4;
+
+  const forVotes = BigInt(voteTotals[isOlderFormat ? "0" : "1"] ?? "0");
+  const abstainVotes = BigInt(voteTotals[isOlderFormat ? "1" : "2"] ?? "0");
+  const againstVotes = BigInt(voteTotals[isOlderFormat ? "2" : "0"] ?? "0");
   // Quorum for approval = for + abstain
-  const quorumVotes = forVotes + abstainVotes;
+  const quorumVotes = forVotes + abstainVotes + againstVotes;
   // Check quorum - use quorumValue calculated from proposal.quorum or VP/3
   if (
     convertToNumber(String(quorumVotes), decimals) < quorumValue &&

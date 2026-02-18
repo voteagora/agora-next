@@ -361,7 +361,6 @@ export type ArchiveProposalBySource =
 export function deriveProposalType(
   proposal: ArchiveProposalBySource | ArchiveListProposal
 ): ProposalType {
-  console.log(proposal);
   const source = proposal.data_eng_properties.source;
   const hybrid = "hybrid" in proposal && proposal.hybrid === true;
 

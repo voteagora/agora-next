@@ -21,7 +21,7 @@ export default function ApprovedTransactions({
 
   const { ui } = Tenant.current();
   const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
-  if (!tenantHaseasOO) {
+  if (tenantHaseasOO) {
     return null;
   }
 

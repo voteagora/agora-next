@@ -30,7 +30,6 @@ import {
   extractApprovalMetrics,
   extractOptimisticMetrics,
   extractOptimisticTieredMetrics,
-  isHybridProposal,
 } from "./extractors";
 import { ProposalType } from "../types";
 
@@ -90,6 +89,7 @@ function normalizeBase(
 } {
   const decimals = options.tokenDecimals ?? 18;
   const statusKey = deriveStatus(proposal, decimals);
+
   const normalizedStatusKey = STATUS_LABEL_MAP[statusKey]
     ? statusKey
     : "ACTIVE";
@@ -750,7 +750,6 @@ export function archiveToProposal(
 
     case "OPTIMISTIC":
     case "HYBRID_OPTIMISTIC":
-      console.log("proposalType", proposalType);
       normalizedProposal = normalizeOptimisticProposal(
         archiveProposal,
         base,
@@ -761,7 +760,6 @@ export function archiveToProposal(
     case "HYBRID_OPTIMISTIC_TIERED":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
     case "OFFCHAIN_OPTIMISTIC":
-      console.log("proposalType", proposalType);
       normalizedProposal = normalizeOptimisticTieredProposal(
         archiveProposal,
         base,
