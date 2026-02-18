@@ -5,10 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
 import { unstable_cache } from "next/cache";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import {
-  isArchiveStandardProposal,
-  normalizeArchiveStandardProposal,
-} from "@/components/Proposals/Proposal/Archive/normalizeArchiveProposalDetail";
+import { archiveToProposal } from "@/lib/proposals";
 
 export const runtime = "nodejs";
 
@@ -46,14 +43,12 @@ async function loadProposal(proposalId: string): Promise<Proposal> {
     );
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
-    if (archiveProposal && isArchiveStandardProposal(archiveProposal)) {
-      const normalizedProposal = normalizeArchiveStandardProposal(
-        archiveProposal,
-        {
-          namespace,
-          tokenDecimals: token.decimals ?? 18,
-        }
-      );
+    if (archiveProposal) {
+      const normalizedProposal = archiveToProposal(archiveProposal, {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
+      });
+
       return normalizedProposal;
     }
 

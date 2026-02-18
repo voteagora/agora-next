@@ -28,7 +28,7 @@ type RangeProposalType = {
   max_approval_threshold_pct: number;
 };
 
-export default function ArchiveProposalTypeApproval({
+export default function OODaoProposalTypeApproval({
   proposal,
 }: {
   proposal: Proposal;

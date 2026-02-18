@@ -1,10 +1,10 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import ArchiveProposalVotesCard from "./ArchiveProposalVotesCard";
-import ArchiveProposalTypeApproval from "./ArchiveProposalTypeApproval";
+import OODaoProposalVotesCard from "./OODaoProposalVotesCard";
+import OODaoProposalTypeApproval from "./OODaoProposalTypeApproval";
 import { TaxFormBanner } from "../TaxFormBanner";
 
-export default function ArchiveStandardProposalPage({
+export default function OODaoStandardProposalPage({
   proposal,
 }: {
   proposal: Proposal;
@@ -17,8 +17,8 @@ export default function ArchiveStandardProposalPage({
           <ProposalDescription proposal={proposal} />
         </div>
         <div className="w-full md:max-w-[24rem]">
-          <ArchiveProposalTypeApproval proposal={proposal} />
-          <ArchiveProposalVotesCard proposal={proposal} />
+          <OODaoProposalTypeApproval proposal={proposal} />
+          <OODaoProposalVotesCard proposal={proposal} />
         </div>
       </div>
       <div className="block md:hidden" style={{ height: 65 }} />

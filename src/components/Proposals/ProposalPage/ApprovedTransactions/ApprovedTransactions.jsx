@@ -5,6 +5,7 @@ import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ApprovedTransactions({
   proposalData,
@@ -18,15 +19,21 @@ export default function ApprovedTransactions({
       : setDisplayedOptions(1);
   };
 
-  if (proposalData.options.length === 0) {
+  const { ui } = Tenant.current();
+  const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
+  if (tenantHaseasOO) {
     return null;
   }
 
+  if (proposalData.options.length === 0) {
+    return null;
+  }
   const isNoProposedTransactions =
     (proposalType === "STANDARD" &&
       proposalData.options[0].calldatas[0] === "0x") ||
     (proposalType === "HYBRID_STANDARD" &&
       proposalData.options[0].calldatas[0] === "0x");
+
   return (
     <div className="flex flex-col gap-1 border border-line rounded-lg bg-wash py-4">
       <div className="flex items-center justify-between px-4 mb-2">

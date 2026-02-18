@@ -2,45 +2,45 @@
 
 import { useMemo } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { OPOptimisticArchiveStatusView } from "./OPOptimisticArchiveStatusView";
+import { OPOptimisticTieredArchiveStatusView } from "./OPOptimisticTieredArchiveStatusView";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
 import { extractDisplayData } from "./utils";
-import { extractOptimisticMetrics } from "@/lib/proposals/extractors";
+import { extractOptimisticTieredMetrics } from "@/lib/proposals/extractors";
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 
 /**
- * Row component for OPTIMISTIC, HYBRID_OPTIMISTIC, OFFCHAIN_OPTIMISTIC proposals
+ * Row component for HYBRID_OPTIMISTIC_TIERED, OFFCHAIN_OPTIMISTIC_TIERED proposals
  */
-export function OptimisticProposalRow({
+export function OptimisticTieredProposalRow({
   proposal,
   tokenDecimals,
 }: ArchiveRowProps) {
   const { token } = Tenant.current();
   const decimals = tokenDecimals ?? token.decimals ?? 18;
   const proposalType = deriveProposalType(proposal);
+
   // Compute display data and metrics
   const { displayData, metrics } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
-    const metrics = extractOptimisticMetrics(proposal, {
+    const metrics = extractOptimisticTieredMetrics(proposal, {
       tokenDecimals: decimals,
     });
-
-    return {
-      displayData,
-      metrics,
-    };
+    return { displayData, metrics };
   }, [proposal, decimals, proposalType]);
-  const status = metrics.isDefeated ? "defeated" : "approved";
+
+  const statusText = metrics.isDefeated ? "defeated" : "approved";
+  const highestTierPct = metrics.tiers.length > 0 ? metrics.tiers[0] / 100 : 17;
+
+  const infoText = `${metrics.againstPercentage}% / ${highestTierPct}% against needed to defeat`;
 
   return (
     <BaseRowLayout
       data={displayData}
       metricsContent={
-        <OPOptimisticArchiveStatusView
-          againstRelativeAmount={metrics.againstPercentage}
-          disapprovalThreshold={metrics.defeatThreshold}
-          status={status}
+        <OPOptimisticTieredArchiveStatusView
+          infoText={infoText}
+          statusText={statusText}
         />
       }
       proposalTypeName={proposalType}

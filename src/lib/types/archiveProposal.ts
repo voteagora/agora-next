@@ -40,7 +40,7 @@ export type DataEngProperties = {
 // Proposal Class (base voting mechanism)
 // =============================================================================
 
-export type ProposalClass = "STANDARD";
+export type ProposalClass = "STANDARD" | "OPTIMISTIC" | "APPROVAL";
 
 // =============================================================================
 // Lifecycle Events
@@ -152,7 +152,25 @@ export type StandardVotingFields = {
   voting_module_name?: "standard";
 };
 
-export type VotingModuleFields = StandardVotingFields;
+/** Approval voting fields (multi-choice) */
+export type ApprovalVotingFields = {
+  voting_module_name?: "approval";
+  choices?: string[];
+  max_approvals?: number;
+  criteria?: number; // 1 = top N winners, 99 = threshold
+  criteria_value?: number;
+};
+
+/** Optimistic voting fields (veto-based) */
+export type OptimisticVotingFields = {
+  voting_module_name?: "optimistic";
+  tiers?: number[]; // basis points for tiered thresholds [1100, 1400, 1700]
+};
+
+export type VotingModuleFields =
+  | StandardVotingFields
+  | ApprovalVotingFields
+  | OptimisticVotingFields;
 
 // =============================================================================
 // Source-Specific Proposal Types
@@ -173,10 +191,11 @@ export type DaoNodeProposalFields = {
   description?: string;
   proposal_data?: string;
   decoded_proposal_data?: unknown[][] | DecodedStandardProposalData;
-
+  proposal_type_info: FixedProposalType;
   // Voting module
   voting_module?: string;
-  voting_module_name?: "standard";
+
+  voting_module_name?: "standard" | "approval" | "optimistic";
 
   // Quorum/threshold
   quorum?: string | number;
@@ -225,7 +244,7 @@ export type EasAtlasProposalFields = {
 
   // Proposal type info
   proposal_type_id: number;
-  proposal_type: "STANDARD";
+  proposal_type: "STANDARD" | "OPTIMISTIC" | "OPTIMISTIC_TIERED" | "APPROVAL";
 
   // Voting configuration
   choices?: string[];
@@ -272,7 +291,7 @@ export type EasOodaoProposalFields = {
   // Vote outcome
   outcome?: EasOodaoVoteOutcome;
   kwargs?: Record<string, unknown>;
-  voting_module?: string;
+  voting_module: "approval" | "optimistic" | "standard" | 1;
 };
 
 // =============================================================================
@@ -343,29 +362,64 @@ export function deriveProposalType(
   proposal: ArchiveProposalBySource | ArchiveListProposal
 ): ProposalType {
   const source = proposal.data_eng_properties.source;
+  const hybrid = "hybrid" in proposal && proposal.hybrid === true;
 
-  // Snapshot proposals are identified purely by source
+  // Handle snapshot proposals
   if (source === "snapshot") {
     return "SNAPSHOT";
   }
 
-  // For now we only support:
-  // - STANDARD onchain proposals (dao_node)
-  // - OFFCHAIN_STANDARD proposals from eas-atlas / eas-oodao without onchain link
-  // - HYBRID_STANDARD proposals (dao_node with govless_proposal)
+  // Determine base class
+  let baseClass: ProposalClass;
+  let isTiered = false;
 
   if (source === "dao_node") {
     const daoProposal = proposal as DaoNodeProposal;
+    const votingModule = daoProposal.voting_module_name;
 
-    // Hybrid proposals with nested govless_proposal
-    if (daoProposal.hybrid && daoProposal.govless_proposal) {
-      return "HYBRID_STANDARD";
+    if (votingModule === "approval") {
+      baseClass = "APPROVAL";
+    } else if (votingModule === "optimistic") {
+      baseClass = "OPTIMISTIC";
+      // Check govless_proposal for tiered info
+      if (daoProposal.govless_proposal?.tiers?.length) {
+        isTiered = true;
+      }
+    } else {
+      baseClass = "STANDARD";
     }
+  } else if (source === "eas-atlas") {
+    const atlasProposal = proposal as EasAtlasProposal;
+    const propType = atlasProposal.proposal_type;
 
-    // Plain onchain standard proposals
-    return "STANDARD";
+    if (propType === "APPROVAL") {
+      baseClass = "APPROVAL";
+    } else if (propType === "OPTIMISTIC" || propType === "OPTIMISTIC_TIERED") {
+      baseClass = "OPTIMISTIC";
+      isTiered =
+        propType === "OPTIMISTIC_TIERED" || !!atlasProposal.tiers?.length;
+    } else {
+      baseClass = "STANDARD";
+    }
+  } else if (source === "eas-oodao") {
+    const oodaoProposal = proposal as EasOodaoProposal;
+    baseClass =
+      oodaoProposal.voting_module === 1
+        ? "STANDARD"
+        : (oodaoProposal.voting_module.toUpperCase() as ProposalClass);
+  } else {
+    baseClass = "STANDARD";
   }
 
+  // Determine final type based on hybrid/offchain status
+  if (hybrid) {
+    if (baseClass === "OPTIMISTIC" && isTiered) {
+      return "HYBRID_OPTIMISTIC_TIERED";
+    }
+    return `HYBRID_${baseClass}` as ProposalType;
+  }
+
+  // Offchain-only proposals (eas-atlas without onchain link)
   if (source === "eas-atlas") {
     const hasOnchainId =
       "onchain_proposalid" in proposal &&
@@ -373,71 +427,22 @@ export function deriveProposalType(
       proposal.onchain_proposalid !== 0;
 
     if (!hasOnchainId) {
-      return "OFFCHAIN_STANDARD";
+      if (baseClass === "OPTIMISTIC" && isTiered) {
+        return "OFFCHAIN_OPTIMISTIC_TIERED";
+      }
+      return `OFFCHAIN_${baseClass}` as ProposalType;
     }
-
-    // If there is an onchain id, treat it as hybrid-standard
-    return "HYBRID_STANDARD";
   }
 
-  if (source === "eas-oodao") {
-    const easOodaoProposal = proposal as EasOodaoProposal;
-    if (easOodaoProposal.voting_module === "approval") {
-      return "APPROVAL";
-    }
-    if (easOodaoProposal.voting_module === "optimistic") {
-      return "OPTIMISTIC";
-    }
-    return "STANDARD";
-  }
-
-  // Fallback: treat unknown sources as STANDARD
-  return "STANDARD";
+  // Onchain dao_node proposals
+  return baseClass as ProposalType;
 }
 
-// =============================================================================
-// Type Guards
-// =============================================================================
-
-export function isDaoNodeProposal(
-  proposal: ArchiveProposalBySource
-): proposal is DaoNodeProposal & {
-  data_eng_properties: { source: "dao_node" };
-} {
-  return proposal.data_eng_properties.source === "dao_node";
-}
-
-export function isEasAtlasProposal(
-  proposal: ArchiveProposalBySource
-): proposal is EasAtlasProposal & {
-  data_eng_properties: { source: "eas-atlas" };
-} {
-  return proposal.data_eng_properties.source === "eas-atlas";
-}
-
-export function isEasOodaoProposal(
-  proposal: ArchiveProposalBySource
-): proposal is EasOodaoProposal & {
-  data_eng_properties: { source: "eas-oodao" };
-} {
-  return proposal.data_eng_properties.source === "eas-oodao";
-}
-
-export function isHybridProposal(
-  proposal: ArchiveProposalBySource
-): proposal is DaoNodeProposal & {
-  data_eng_properties: { source: "dao_node" };
-  hybrid: true;
-  govless_proposal: GovlessProposal;
-} {
-  return (
-    isDaoNodeProposal(proposal) &&
-    proposal.hybrid === true &&
-    !!proposal.govless_proposal
-  );
-}
-
-// We only support standard-style proposals in the archive list (no approval/optimistic routing)
+export type ProposalTypeInfo = {
+  quorum: number;
+  approval_threshold: number;
+  name: string;
+};
 
 // =============================================================================
 // Legacy Compatibility (ArchiveListProposal)
@@ -459,7 +464,6 @@ export type ArchiveListProposal = {
   end_block: number;
   lifecycle_stage?: string;
   data_eng_properties: DataEngProperties;
-
   // Vote data - different keys for different sources
   totals?: DaoNodeVoteTotals;
   outcome?: EasAtlasVoteOutcome | EasOodaoVoteOutcome;
@@ -498,7 +502,7 @@ export type ArchiveListProposal = {
   voting_module_name?: "standard" | "approval" | "optimistic";
   decoded_proposal_data?: unknown[][] | DecodedStandardProposalData;
   proposal_data?: string;
-  quorum?: string | number;
+  quorum: string;
   quorumVotes?: string | number;
   votableSupply?: string | number;
   votable_supply?: string | number;
@@ -538,5 +542,6 @@ export type ArchiveListProposal = {
   quorum_check?: boolean;
   approval_check?: boolean;
   total_voting_power_at_start?: string;
+  proposal_type_info?: ProposalTypeInfo;
   kwargs?: Record<string, unknown>;
 };

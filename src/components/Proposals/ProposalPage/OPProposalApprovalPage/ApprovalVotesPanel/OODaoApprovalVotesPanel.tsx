@@ -16,7 +16,7 @@ type Props = {
   proposal: Proposal;
 };
 
-export default function ArchiveApprovalVotesPanel({ proposal }: Props) {
+export default function OODaoApprovalVotesPanel({ proposal }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
