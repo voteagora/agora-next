@@ -33,8 +33,11 @@ export function StandardProposalRow({
     const metrics = extractStandardMetrics(proposal, {
       tokenDecimals: decimals,
     });
-    return { displayData, metrics, proposalTypeName:
-      (proposal.proposal_type as FixedProposalType)?.name ?? proposalType,
+    return {
+      displayData,
+      metrics,
+      proposalTypeName:
+        (proposal.proposal_type as FixedProposalType)?.name ?? proposalType,
     };
   }, [proposal, decimals, proposalType, isHybrid]);
 
