@@ -269,27 +269,15 @@ export const deriveStatus = (
 
     return "SUCCEEDED";
   } else if (proposal.total_voting_power_at_start) {
-    const totalPower = convertToNumber(
-      proposal.total_voting_power_at_start,
-      decimals
-    );
-
-    quorumMet = forVotes > quorum;
-
     hasMetThreshold =
       forVotes / (forVotes + againstVotes) >= approvalThreshold / 100;
   }
 
-  if (!quorumMet || !hasMetThreshold) {
+  if (!quorumMet) {
     return "DEFEATED";
   }
 
-  // Succeeded if for > against
-  if (forVotes > againstVotes) {
-    return "SUCCEEDED";
-  }
-
-  return "FAILED";
+  return "DEFEATED";
 };
 
 export const formatArchiveTagLabel = (tag?: string | null): string | null => {
