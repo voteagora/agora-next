@@ -341,7 +341,7 @@ class WebMCP {
         });
 
         const title = document.createElement('div');
-        title.textContent = 'WebMCP';
+        title.textContent = 'Agora WebMCP';
         Object.assign(title.style, {
             fontWeight: 'bold',
             fontSize: '16px'
