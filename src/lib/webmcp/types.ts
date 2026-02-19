@@ -69,5 +69,3 @@ export type PromptDefinition = {
     args: Record<string, string>
   ) => McpPromptResult | Promise<McpPromptResult>;
 };
-
-

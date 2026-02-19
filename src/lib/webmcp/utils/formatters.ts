@@ -31,15 +31,10 @@ export function formatPercentage(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-export function mdTable(
-  headers: string[],
-  rows: string[][]
-): string {
+export function mdTable(headers: string[], rows: string[][]): string {
   const headerRow = `| ${headers.join(" | ")} |`;
   const separator = `| ${headers.map(() => "---").join(" | ")} |`;
-  const dataRows = rows
-    .map((row) => `| ${row.join(" | ")} |`)
-    .join("\n");
+  const dataRows = rows.map((row) => `| ${row.join(" | ")} |`).join("\n");
   return `${headerRow}\n${separator}\n${dataRows}`;
 }
 

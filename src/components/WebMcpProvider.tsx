@@ -23,6 +23,8 @@ export default function WebMcpProvider() {
         forums: ui.toggle("forums")?.enabled ?? false,
         retropgf: ui.toggle("retropgf")?.enabled ?? false,
       },
+    }).catch((err) => {
+      console.error("[WebMCP] Provider initialization error:", err);
     });
   }, []);
 

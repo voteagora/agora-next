@@ -70,14 +70,9 @@ export function createGetProposalVotesTool(baseUrl: string): ToolDefinition {
           ]
         );
 
-        const table = mdTable(
-          ["Voter", "Support", "Weight", "Reason"],
-          rows
-        );
+        const table = mdTable(["Voter", "Support", "Weight", "Reason"], rows);
 
-        return textResult(
-          `# Votes for Proposal \`${proposalId}\`\n\n${table}`
-        );
+        return textResult(`# Votes for Proposal \`${proposalId}\`\n\n${table}`);
       } catch (e) {
         return errorResult(
           `Failed to fetch votes: ${e instanceof Error ? e.message : String(e)}`

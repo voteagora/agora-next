@@ -1,9 +1,5 @@
 import type { ToolDefinition } from "../../types";
-import {
-  textResult,
-  errorResult,
-  mdTable,
-} from "../../utils/formatters";
+import { textResult, errorResult, mdTable } from "../../utils/formatters";
 
 export function createGetForumTopicsTool(baseUrl: string): ToolDefinition {
   return {
@@ -19,9 +15,7 @@ export function createGetForumTopicsTool(baseUrl: string): ToolDefinition {
     handler: async (args) => {
       try {
         const limit = args.limit ? Number(args.limit) : 10;
-        const res = await fetch(
-          `${baseUrl}/api/v1/forum?limit=${limit}`
-        );
+        const res = await fetch(`${baseUrl}/api/v1/forum?limit=${limit}`);
         if (!res.ok) return errorResult(`API returned ${res.status}`);
 
         const data = await res.json();

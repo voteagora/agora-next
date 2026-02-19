@@ -41,9 +41,7 @@ export function createGetDelegateStatementTool(
         }
 
         const payload = statement.payload;
-        const lines = [
-          `# Delegate Statement: ${formatFullAddress(address)}`,
-        ];
+        const lines = [`# Delegate Statement: ${formatFullAddress(address)}`];
 
         const delegateStatement =
           payload.delegateStatement ?? payload.delegate_statement;

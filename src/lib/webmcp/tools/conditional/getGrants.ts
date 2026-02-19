@@ -20,9 +20,7 @@ export function createGetGrantsTool(baseUrl: string): ToolDefinition {
     handler: async (args) => {
       try {
         const limit = args.limit ? Number(args.limit) : 10;
-        const res = await fetch(
-          `${baseUrl}/api/v1/grants?limit=${limit}`
-        );
+        const res = await fetch(`${baseUrl}/api/v1/grants?limit=${limit}`);
         if (!res.ok) return errorResult(`API returned ${res.status}`);
 
         const data = await res.json();

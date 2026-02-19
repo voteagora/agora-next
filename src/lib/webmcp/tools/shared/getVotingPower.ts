@@ -40,9 +40,7 @@ export function createGetVotingPowerTool(
         ];
 
         if (vp.direct !== undefined) {
-          lines.push(
-            `- ${mdBold("Direct")}: ${vp.direct} ${tokenSymbol}`
-          );
+          lines.push(`- ${mdBold("Direct")}: ${vp.direct} ${tokenSymbol}`);
         }
         if (vp.advanced !== undefined) {
           lines.push(

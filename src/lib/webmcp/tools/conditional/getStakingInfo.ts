@@ -38,10 +38,7 @@ export function createGetStakingInfoTool(
           );
         }
 
-        const lines = [
-          `# Staking Info: ${formatFullAddress(address)}`,
-          "",
-        ];
+        const lines = [`# Staking Info: ${formatFullAddress(address)}`, ""];
 
         deposits.forEach(
           (

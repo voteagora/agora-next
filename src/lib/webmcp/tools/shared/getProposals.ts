@@ -68,10 +68,7 @@ export function createGetProposalsTool(baseUrl: string): ToolDefinition {
           ]
         );
 
-        const table = mdTable(
-          ["ID", "Title", "Status", "Proposer"],
-          rows
-        );
+        const table = mdTable(["ID", "Title", "Status", "Proposer"], rows);
 
         const total = data?.meta?.total_returned ?? proposals.length;
         const header = `# Proposals (${total} results)\n\n`;
