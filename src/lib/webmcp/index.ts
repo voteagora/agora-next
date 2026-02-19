@@ -1,4 +1,4 @@
-import type { WebMCPInstance } from "./types";
+import WebMCP from "@jason.today/webmcp/src/webmcp";
 import { getToolsForTenant, registerCustomTool } from "./registry";
 import { createDaoOverviewResource } from "./resources/daoOverview";
 import { createActiveProposalsResource } from "./resources/activeProposals";
@@ -6,12 +6,6 @@ import { createProposalAnalysisPrompt } from "./prompts/proposalAnalysis";
 import { createDelegateComparisonPrompt } from "./prompts/delegateComparison";
 import { createTimedLogger } from "./utils/logger";
 import type { TenantNamespace } from "@/lib/types";
-
-declare global {
-  interface Window {
-    WebMCP?: new (options?: Record<string, unknown>) => WebMCPInstance;
-  }
-}
 
 type InitOptions = {
   namespace: TenantNamespace;
@@ -25,22 +19,20 @@ type InitOptions = {
   };
 };
 
-let mcpInstance: WebMCPInstance | null = null;
+let mcpInstance: WebMCP | null = null;
 
-export function getWebMCPInstance(): WebMCPInstance | null {
+export function getWebMCPInstance(): WebMCP | null {
   return mcpInstance;
 }
 
-export function initWebMCP(options: InitOptions): WebMCPInstance | null {
-  if (typeof window === "undefined" || !window.WebMCP) {
-    console.warn(
-      "[WebMCP] WebMCP script not loaded. Skipping initialization."
-    );
+export function initWebMCP(options: InitOptions): WebMCP | null {
+  if (typeof window === "undefined") {
+    console.warn("[WebMCP] Not in a browser. Skipping initialization.");
     return null;
   }
 
   try {
-    const mcp = new window.WebMCP({
+    const mcp = new WebMCP({
       color: "#6366f1",
       position: "bottom-right",
       size: "36px",
@@ -62,7 +54,10 @@ export function initWebMCP(options: InitOptions): WebMCPInstance | null {
       mcp.registerTool(
         tool.name,
         tool.description,
-        tool.schema,
+        {
+          type: "object",
+          properties: tool.schema,
+        },
         async (args: Record<string, unknown>) => {
           const logger = createTimedLogger(tool.name, args, namespace);
           try {

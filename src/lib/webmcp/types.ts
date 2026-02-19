@@ -70,25 +70,4 @@ export type PromptDefinition = {
   ) => McpPromptResult | Promise<McpPromptResult>;
 };
 
-export interface WebMCPInstance {
-  registerTool: (
-    name: string,
-    description: string,
-    schema: McpToolSchema,
-    handler: McpToolHandler
-  ) => void;
-  registerResource: (
-    name: string,
-    description: string,
-    options: { uri?: string; uriTemplate?: string; mimeType: string },
-    handler: (uri: string) => McpResourceResult | Promise<McpResourceResult>
-  ) => void;
-  registerPrompt: (
-    name: string,
-    description: string,
-    args: PromptArgument[],
-    handler: (
-      args: Record<string, string>
-    ) => McpPromptResult | Promise<McpPromptResult>
-  ) => void;
-}
+
