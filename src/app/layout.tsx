@@ -11,6 +11,7 @@ import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
 import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
 import { DevTenantProvider } from "@/contexts/DevTenantContext";
 import { TenantSwitcher } from "@/components/DevTools/TenantSwitcher";
+import WebMcpProvider from "@/components/WebMcpProvider";
 
 declare global {
   interface BigInt {
@@ -163,6 +164,7 @@ export default async function RootLayout({
               <DAOMetricsHeader />
             </ForumPermissionsProvider>
             <TenantSwitcher />
+            <WebMcpProvider />
           </ClientLayout>
         </DevTenantProvider>
       </NuqsAdapter>
