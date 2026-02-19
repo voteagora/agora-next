@@ -1,4 +1,4 @@
-import WebMCP from "@jason.today/webmcp/src/webmcp";
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { getToolsForTenant, registerCustomTool } from "./registry";
 import { createDaoOverviewResource } from "./resources/daoOverview";
 import { createActiveProposalsResource } from "./resources/activeProposals";
@@ -6,6 +6,32 @@ import { createProposalAnalysisPrompt } from "./prompts/proposalAnalysis";
 import { createDelegateComparisonPrompt } from "./prompts/delegateComparison";
 import { createTimedLogger } from "./utils/logger";
 import type { TenantNamespace } from "@/lib/types";
+import type { McpToolResult, McpResourceResult, McpPromptResult, PromptArgument } from "./types";
+
+/**
+ * Minimal interface for the WebMCP class instance.
+ * The package is pure CommonJS JS — no upstream types available.
+ */
+interface WebMCPInstance {
+  registerTool(
+    name: string,
+    description: string,
+    schema: { type: string; properties: Record<string, unknown> },
+    handler: (args: Record<string, unknown>) => McpToolResult | Promise<McpToolResult>
+  ): void;
+  registerResource(
+    name: string,
+    description: string,
+    options: { uri?: string; uriTemplate?: string; mimeType: string },
+    handler: (uri: string) => McpResourceResult | Promise<McpResourceResult>
+  ): void;
+  registerPrompt(
+    name: string,
+    description: string,
+    args: PromptArgument[],
+    handler: (args: Record<string, string>) => McpPromptResult | Promise<McpPromptResult>
+  ): void;
+}
 
 type InitOptions = {
   namespace: TenantNamespace;
@@ -19,20 +45,24 @@ type InitOptions = {
   };
 };
 
-let mcpInstance: WebMCP | null = null;
+let mcpInstance: WebMCPInstance | null = null;
 
-export function getWebMCPInstance(): WebMCP | null {
+export function getWebMCPInstance(): WebMCPInstance | null {
   return mcpInstance;
 }
 
-export function initWebMCP(options: InitOptions): WebMCP | null {
+export function initWebMCP(options: InitOptions): WebMCPInstance | null {
   if (typeof window === "undefined") {
     console.warn("[WebMCP] Not in a browser. Skipping initialization.");
     return null;
   }
 
   try {
-    const mcp = new WebMCP({
+    // CommonJS require — the package uses `module.exports = WebMCP`
+    // and cannot be statically imported as an ES module.
+    const WebMCPClass = require("@jason.today/webmcp/src/webmcp");
+
+    const mcp: WebMCPInstance = new WebMCPClass({
       color: "#6366f1",
       position: "bottom-right",
       size: "36px",
@@ -124,4 +154,4 @@ export function initWebMCP(options: InitOptions): WebMCP | null {
 }
 
 export { registerCustomTool };
-export type { InitOptions };
+export type { InitOptions, WebMCPInstance };
