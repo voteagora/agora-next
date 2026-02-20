@@ -129,6 +129,7 @@ const formDataByType = (
       };
 
     case ProposalType.OPTIMISTIC:
+    case ProposalType.OPTMISTIC_EXECUTABLE:
       // nothing specific to optimistic
       return;
   }
