@@ -109,10 +109,6 @@ export const deriveTenantConfig = ({
     ? "0x3CdCbB7dBfb4BC02009f2879dAd7620619046b1A"
     : "0x79CA2f1450Ba61Daa13a56a679E3148eEf96b1Ee";
 
-  const APPROVAL_MODULE = isProd
-    ? "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6"
-    : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";
-
   const TIMELOCK = isProd
     ? "0x239dcb72dF956e27a64f458cB49FEf0732B1f291"
     : "0x53767D56c782D0479Fa7283E2A1A38B1aaEd2DCE";
@@ -164,8 +160,6 @@ export const deriveTenantConfig = ({
       contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
-
-    governorApprovalModule: APPROVAL_MODULE,
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     governorType: GOVERNOR_TYPE.AGORA,

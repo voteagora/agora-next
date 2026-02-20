@@ -113,7 +113,7 @@ export default class TenantTokenFactory {
           name: "Demo",
           symbol: "DEMO",
           decimals: 18,
-          address: "0xd5741323b3ddfe5556C3477961B5160600C29c53",
+          address: "0xCeF36E1Cff76c957e68e42817b71cdCDa270ACD5",
         };
       case TENANT_NAMESPACES.LINEA:
         return {

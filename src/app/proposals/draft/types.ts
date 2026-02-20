@@ -174,6 +174,7 @@ export enum ProposalType {
   BASIC = "basic",
   APPROVAL = "approval",
   OPTIMISTIC = "optimistic",
+  OPTMISTIC_EXECUTABLE = "optimistic_executable",
 }
 
 export enum TransactionType {
