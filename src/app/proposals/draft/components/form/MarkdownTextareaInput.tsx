@@ -23,7 +23,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Markdown from "@/components/shared/Markdown/Markdown";
-import { sanitizeContent } from "@/lib/sanitizationUtils";
 
 type MarkdownTextareaInputProps = {
   label: string;
@@ -175,7 +174,7 @@ function MarkdownTextareaInput<
                     <div
                       className={`h-full py-3 px-4 rounded-t-lg max-w-full bg-transparent prose ${selectedMode === "write" ? "hidden" : "visible"}`}
                     >
-                      <Markdown content={sanitizeContent(value)} />
+                      <Markdown content={value} />
                     </div>
                   </div>
                 </div>
