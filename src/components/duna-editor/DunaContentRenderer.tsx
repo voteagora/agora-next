@@ -153,6 +153,10 @@ function parseContentWithEmbeds(htmlContent: string): React.ReactNode {
 
 function looksLikeHtml(text: string): boolean {
   const t = text.trim();
+  if (t.startsWith("#") || /^\s*#+\s/m.test(t)) return false;
+  if (/^\s*>\s/m.test(t) || /^\s*[-*]\s/m.test(t)) return false;
+  if (t.includes("**") || t.includes("![")) return false;
+  if (/^\s*\d+\.\s/m.test(t)) return false;
   return t.startsWith("<") || t.includes("</");
 }
 
