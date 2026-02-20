@@ -6,7 +6,12 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { SnapshotVote, Vote } from "@/app/api/common/votes/vote";
+import {
+  SnapshotVote,
+  Vote,
+  VotesSort,
+  VotesSortOrder,
+} from "@/app/api/common/votes/vote";
 
 interface Props {
   enabled: boolean;
@@ -14,6 +19,9 @@ interface Props {
   offset?: number;
   proposalId: string;
   offchainProposalId?: string;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: string;
 }
 
 const QK = "votes";
@@ -24,10 +32,13 @@ export const useProposalVotes = ({
   offset,
   proposalId,
   offchainProposalId,
+  sort,
+  sortOrder,
+  voterType,
 }: Props) => {
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
-    queryKey: [QK, proposalId, offset],
+    queryKey: [QK, proposalId, offset, sort, sortOrder, voterType],
     queryFn: async () => {
       return (await fetchProposalVotes(
         proposalId,
@@ -35,8 +46,10 @@ export const useProposalVotes = ({
           limit: limit || 20,
           offset: offset || 0,
         },
-        undefined,
-        offchainProposalId
+        sort,
+        offchainProposalId,
+        sortOrder,
+        voterType
       )) as PaginatedResult<Vote[]>;
     },
     staleTime: 60000, // 1 minute cache

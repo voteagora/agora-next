@@ -13,6 +13,7 @@ import {
   VotePayload,
   VoterTypes,
   VotesSort,
+  VotesSortOrder,
 } from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
@@ -445,11 +446,15 @@ async function getVotersWhoHaveNotVotedForProposal({
   pagination = { offset: 0, limit: 20 },
   offchainProposalId,
   type = "TH",
+  sort = "weight",
+  sortOrder = "desc",
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   offchainProposalId?: string;
   type?: VoterTypes["type"];
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
@@ -498,7 +503,7 @@ async function getVotersWhoHaveNotVotedForProposal({
           LEFT JOIN agora.delegate_statements ds ON 
             del.delegate = ds.address
             AND ds.dao_slug = 'OP'
-          ORDER BY del.delegate, del.voting_power DESC
+          ORDER BY del.delegate, ${sort === "block_number" ? "del.delegate" : "del.voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}
         )
         SELECT 
           delegate, 
@@ -509,7 +514,7 @@ async function getVotersWhoHaveNotVotedForProposal({
           discord,
           warpcast
         FROM unique_delegates
-        ORDER BY voting_power DESC
+        ORDER BY ${sort === "block_number" ? "delegate" : "voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}
         OFFSET $4 LIMIT $5`;
 
       const params = [
@@ -587,11 +592,15 @@ async function getVotesForProposal({
   pagination = { offset: 0, limit: 20 },
   sort = "weight",
   offchainProposalId,
+  sortOrder = "desc",
+  voterType = "ALL",
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   sort?: VotesSort;
   offchainProposalId?: string;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 }): Promise<PaginatedResult<Vote[]>> {
   return withMetrics(
     "getVotesForProposal",
@@ -687,6 +696,7 @@ async function getVotesForProposal({
               WHERE proposal_id = $1 AND contract = $2
               ${includeCitizens ? citizenQuery : ""}
             ) t
+            ${voterType !== "ALL" && voterType ? `WHERE ${voterType === "TH" ? "citizen_type IS NULL" : getCitizenTypeFilter(voterType)}` : ""}
             GROUP BY 2,3,4,8,9
             ) av
             LEFT JOIN LATERAL (
@@ -697,7 +707,7 @@ async function getVotesForProposal({
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY citizen_type IS NOT NULL DESC, ${sort} DESC
+          ORDER BY ${sort === "block_number" ? "block_number" : "weight"} ${sortOrder === "asc" ? "ASC" : "DESC"}
           OFFSET $3
           LIMIT $4;`;
 

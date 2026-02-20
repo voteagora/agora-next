@@ -9,50 +9,67 @@ import {
 import { Listbox } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
-import { FilterIcon } from "@/icons/filter";
+import { ArrowDownAZ } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
-interface ProposalVoterListFilterProps {
-  selectedVoterType: VoterTypes;
-  onVoterTypeChange: (type: VoterTypes) => void;
-  isOffchain?: boolean;
+export type SortParams = {
+  sortKey: VotesSort;
+  sortOrder: VotesSortOrder;
+  label: string;
+};
+
+const sortOptions: SortParams[] = [
+  {
+    sortKey: "block_number",
+    sortOrder: "desc",
+    label: "Most Recent",
+  },
+  {
+    sortKey: "block_number",
+    sortOrder: "asc",
+    label: "Oldest",
+  },
+  {
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  },
+  {
+    sortKey: "weight",
+    sortOrder: "asc",
+    label: "Least Voting Power",
+  },
+];
+
+interface ProposalVotesSortProps {
+  sortOption: SortParams;
+  onSortChange: (option: SortParams) => void;
 }
 
-export default function ProposalVoterListFilter({
-  selectedVoterType,
-  onVoterTypeChange,
-  isOffchain = false,
-}: ProposalVoterListFilterProps) {
-  const availableVoterTypes = [
-    { type: "ALL", value: "All" },
-    ...(isOffchain
-      ? VOTER_TYPES.filter((type) => type.type !== "TH")
-      : VOTER_TYPES),
-  ];
-
+export default function ProposalVotesSort({
+  sortOption,
+  onSortChange,
+}: ProposalVotesSortProps) {
   return (
     <div className="relative text-primary">
       <Listbox
-        value={selectedVoterType.type}
+        value={sortOption.label}
         onChange={(value: string) => {
-          const selectedType = availableVoterTypes.find(
-            (type) => type.type === value
-          );
-          if (selectedType) onVoterTypeChange(selectedType);
+          const selected = sortOptions.find((opt) => opt.label === value);
+          if (selected) onSortChange(selected);
         }}
       >
         <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border border-line rounded-lg py-2 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
-          <FilterIcon className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
+          <ArrowDownAZ className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-left leading-tight break-words max-w-[100px] sm:max-w-none">
-            {selectedVoterType.value}
+            {sortOption.label}
           </span>
           <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
         </Listbox.Button>
-        <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max shadow-xl">
-          {availableVoterTypes.map((type) => (
-            <Listbox.Option key={type.value} value={type.type}>
+        <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max right-0 shadow-xl">
+          {sortOptions.map((option) => (
+            <Listbox.Option key={option.label} value={option.label}>
               {({ selected }) => (
                 <div
                   className={cn(
@@ -62,7 +79,7 @@ export default function ProposalVoterListFilter({
                       : "text-tertiary border-transparent hover:bg-wash"
                   )}
                 >
-                  {type.value}
+                  {option.label}
                 </div>
               )}
             </Listbox.Option>
