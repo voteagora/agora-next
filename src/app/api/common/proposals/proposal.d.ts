@@ -152,4 +152,8 @@ export type Proposal = {
   proposalTypeApproval?: string;
   kwargs?: Record<string, any>;
   taxFormMetadata?: Record<string, unknown>;
+  block_number?: string;
+  transaction_index?: number;
+  executedTransactionIndex?: number;
+  log_index?: number;
 };

@@ -17,7 +17,11 @@ import {
   resolveArchiveThresholds,
 } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
-import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
+import {
+  decodeCalldata,
+  ParsedProposalData,
+  ParsedProposalResults,
+} from "@/lib/proposalUtils";
 import {
   ArchiveListProposal,
   DaoNodeVoteTotals,
@@ -190,6 +194,11 @@ function normalizeBase(
     proposalTypeApproval: proposal.proposal_type_approval,
     decimals,
     source,
+    block_number: proposal.block_number,
+    transaction_index: proposal.transaction_index,
+    log_index: proposal.log_index,
+    executedTransactionIndex:
+      proposal.execute_event?.transaction_index ?? undefined,
   };
 }
 
@@ -339,10 +348,7 @@ function normalizeApprovalProposal(
     metrics.options.length > 0
       ? metrics.options.map((opt) => ({
           ...opt,
-          functionArgsName: [] as {
-            functionName: string;
-            functionArgs: string[];
-          }[],
+          functionArgsName: decodeCalldata(opt.calldatas as `0x${string}`[]),
         }))
       : metrics.choices.map((c) => ({
           targets: [] as string[],

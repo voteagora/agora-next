@@ -381,7 +381,15 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
     },
     {
       name: "duna-description",

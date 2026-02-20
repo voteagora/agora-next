@@ -405,7 +405,10 @@ export const demo4TenantUIConfig = new TenantUI({
 
       enabled: true,
     },
-
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
     {
       name: "use-archive-for-proposal-details",
 

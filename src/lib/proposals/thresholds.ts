@@ -116,17 +116,10 @@ export const resolveArchiveThresholds = (
   }
 
   if (isDaoNodeSource(proposal)) {
-    if (!proposal.proposal_type_info) {
-      return {
-        quorum: 0n,
-        approvalThreshold: 0n,
-        votableSupply: safeBigInt(proposal.total_voting_power_at_start),
-      };
-    }
     return {
       quorum: safeBigInt(proposal.quorum ?? proposal.quorumVotes ?? 0),
       approvalThreshold: BigInt(
-        proposal.proposal_type_info.approval_threshold ?? 0
+        proposal.proposal_type_info?.approval_threshold ?? 0
       ),
       votableSupply: safeBigInt(proposal.total_voting_power_at_start ?? 0),
     };

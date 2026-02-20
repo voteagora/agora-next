@@ -171,7 +171,7 @@ const knownAbis: Record<string, Abi> = {
   ],
 };
 
-const decodeCalldata = (calldatas: `0x${string}`[]) => {
+export const decodeCalldata = (calldatas: `0x${string}`[]) => {
   return calldatas.map((calldata) => {
     const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
       ? calldata

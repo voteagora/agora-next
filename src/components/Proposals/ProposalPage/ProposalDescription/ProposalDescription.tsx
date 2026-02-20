@@ -11,6 +11,7 @@ import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
 import ENSName from "@/components/shared/ENSName";
+import useBlockCacheTransactionDetails from "@/hooks/useBlockCacheTransactionDetails";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -41,6 +42,11 @@ export default function ProposalDescription({
     : proposal.description?.replace(/\n\n ## Description \n/, "");
 
   const title = proposal.markdowntitle;
+  const { data: executedTxnDetails } = useBlockCacheTransactionDetails({
+    chainId: Number(contracts.governor.chain.id),
+    blockNumber: proposal.executedBlock?.toString(),
+    transactionIndex: proposal.executedTransactionIndex,
+  });
 
   const shortTitle = proposalsWithBadFormatting.includes(proposal.id)
     ? title.split("-")[0].split("(")[0]
@@ -155,7 +161,7 @@ export default function ProposalDescription({
             targets={option.targets}
             calldatas={option.calldatas}
             values={option.values}
-            executedTransactionHash={proposal.executedTransactionHash}
+            executedTransactionHash={executedTxnDetails?.tx}
             network={contracts.governor.chain.name}
             signatures={option.signatures}
             proposal={proposal}
@@ -164,7 +170,7 @@ export default function ProposalDescription({
           <ApprovedTransactions
             proposalData={proposal.proposalData}
             proposalType={proposal.proposalType}
-            executedTransactionHash={proposal.executedTransactionHash}
+            executedTransactionHash={executedTxnDetails?.tx}
           />
         )}
         <RelatedProposalLinks proposalId={proposal.id} />

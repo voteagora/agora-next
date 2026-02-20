@@ -303,6 +303,14 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
       name: "use-archive-for-vote-history",
       enabled: false,
     },

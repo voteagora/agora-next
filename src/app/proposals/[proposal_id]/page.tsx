@@ -41,6 +41,7 @@ async function loadProposal(
         namespace,
         tokenDecimals: token.decimals ?? 18,
       });
+
       return {
         ...normalizedProposal,
         taxFormMetadata,

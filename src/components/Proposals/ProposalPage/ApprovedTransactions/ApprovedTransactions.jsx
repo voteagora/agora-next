@@ -24,7 +24,6 @@ export default function ApprovedTransactions({
   if (tenantHaseasOO) {
     return null;
   }
-
   if (proposalData.options.length === 0) {
     return null;
   }

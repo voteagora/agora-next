@@ -447,3 +447,5 @@ export const getEASAddress = (chainId: number) => {
 
 export const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
 export const CRITERIA_TOP_CHOICES = 1; // Top N options win
+
+export const BLOCKCACHEURL = "https://blockcache-production.up.railway.app";
