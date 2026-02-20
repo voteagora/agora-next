@@ -31,10 +31,12 @@ export default function Markdown({
   content,
   className,
   wrapperClassName,
+  originalHierarchy = false,
 }: {
   content: string;
   className?: string;
   wrapperClassName?: string;
+  originalHierarchy?: boolean;
 }) {
   const { ui } = Tenant.current();
   const primary = ui?.customization?.primary ?? defaults.primary;
@@ -65,35 +67,35 @@ export default function Markdown({
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
-        className={
-          (cn(
-            `
-          h-full
-          py-3
-          max-w-full
-          bg-transparent
-          prose
-          prose-code:bg-wash
-          prose-code:text-tertiary
-          prose-pre:text-tertiary
-          prose-table:overflow-x-auto
-          prose-td:min-w-[140px]
-          prose-h1:text-primary
-          prose-h2:text-primary
-          prose-h3:text-secondary
-          prose-h4:text-secondary
-          prose-h5:text-secondary
-          prose-h6:text-secondary
-          `
-          ),
-          className)
-        }
+        className={cn(
+          "h-full",
+          "py-3",
+          "max-w-full",
+          "bg-transparent",
+          "prose",
+          "prose-code:bg-wash",
+          "prose-code:text-tertiary",
+          "prose-pre:text-tertiary",
+          "prose-table:overflow-x-auto",
+          "prose-td:min-w-[140px]",
+          "prose-h1:text-primary",
+          "prose-h2:text-primary",
+          "prose-h3:text-secondary",
+          "prose-h4:text-secondary",
+          "prose-h5:text-secondary",
+          "prose-h6:text-secondary",
+          className
+        )}
         wrapperElement={{ "data-color-mode": "light" }}
         rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
-          h2: ({ node, ...props }) => (
-            <h1 className="text-primary" {...props} />
-          ),
+          ...(!originalHierarchy
+            ? {
+                h2: ({ node, ...props }) => (
+                  <h1 className="text-primary" {...props} />
+                ),
+              }
+            : {}),
         }}
       />
     </div>
