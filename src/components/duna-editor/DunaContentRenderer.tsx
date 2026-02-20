@@ -4,6 +4,7 @@ import React, { useMemo, useState, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 // Function to decode HTML entities
 function decodeHtmlEntities(text: string): string {
@@ -150,6 +151,11 @@ function parseContentWithEmbeds(htmlContent: string): React.ReactNode {
   return <>{elements}</>;
 }
 
+function looksLikeHtml(text: string): boolean {
+  const t = text.trim();
+  return t.startsWith("<") || t.includes("</");
+}
+
 export default function DunaContentRenderer({
   content,
   className,
@@ -164,15 +170,22 @@ export default function DunaContentRenderer({
     setMounted(true);
   }, []);
 
-  // Decode HTML entities if they exist
   const decodedContent = decodeHtmlEntities(content);
+  const isMarkdown = !looksLikeHtml(decodedContent);
 
   const renderedContent = useMemo(() => {
+    if (isMarkdown) {
+      return (
+        <div className="p-4 prose prose-sm max-w-none">
+          <Markdown content={decodedContent} originalHierarchy />
+        </div>
+      );
+    }
     if (!enableEmbeds || !mounted) {
       return <div dangerouslySetInnerHTML={{ __html: decodedContent }} />;
     }
     return parseContentWithEmbeds(decodedContent);
-  }, [decodedContent, enableEmbeds, mounted]);
+  }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
 
   return (
     <div

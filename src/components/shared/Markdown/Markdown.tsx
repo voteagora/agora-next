@@ -31,10 +31,12 @@ export default function Markdown({
   content,
   className,
   wrapperClassName,
+  originalHierarchy = false,
 }: {
   content: string;
   className?: string;
   wrapperClassName?: string;
+  originalHierarchy?: boolean;
 }) {
   const { ui } = Tenant.current();
   const primary = ui?.customization?.primary ?? defaults.primary;
@@ -91,9 +93,13 @@ export default function Markdown({
         wrapperElement={{ "data-color-mode": "light" }}
         rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
-          h2: ({ node, ...props }) => (
-            <h1 className="text-primary" {...props} />
-          ),
+          ...(!originalHierarchy
+            ? {
+                h2: ({ node, ...props }) => (
+                  <h1 className="text-primary" {...props} />
+                ),
+              }
+            : {}),
         }}
       />
     </div>
