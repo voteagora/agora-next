@@ -35,6 +35,11 @@ export const ProposalTypeMetadata: Record<
     description:
       "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals.",
   },
+  [ProposalType.OPTMISTIC_EXECUTABLE]: {
+    title: "Optimistic Executable Proposal",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. Transactions can be proposed for optimistic executable proposals.",
+  },
 };
 
 export const getProposalMetadataDescription = (
@@ -75,9 +80,14 @@ export const getValidProposalTypesForVotingType = (
 ): FormattedProposalType[] => {
   let optimisticModuleAddress: string | null = null;
   let approvalModuleAddress: string | null = null;
+  let optimisticExecutableModuleAddress: string | null = null;
   try {
     optimisticModuleAddress =
       getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+    optimisticExecutableModuleAddress =
+      getProposalTypeAddress(
+        ProposalType.OPTMISTIC_EXECUTABLE
+      )?.toLowerCase() || null;
     approvalModuleAddress =
       getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
   } catch {
@@ -100,6 +110,14 @@ export const getValidProposalTypesForVotingType = (
           type.module?.toLowerCase() ===
             optimisticModuleAddress?.toLowerCase() ||
           type.name.toLowerCase().includes("optimistic")
+      );
+
+    case ProposalType.OPTMISTIC_EXECUTABLE:
+      return withModule.filter(
+        (type) =>
+          type.module?.toLowerCase() ===
+            optimisticExecutableModuleAddress?.toLowerCase() ||
+          type.name.toLowerCase().includes("optimistic executable")
       );
     case ProposalType.BASIC:
       return withModule.filter(

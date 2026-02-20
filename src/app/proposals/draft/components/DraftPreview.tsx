@@ -200,6 +200,18 @@ const DraftPreview = ({
           </div>
         );
 
+      case ProposalType.OPTMISTIC_EXECUTABLE:
+        return (
+          <div>
+            <p className="text-secondary mt-2">
+              This is an <PreText text="optimistic executable" /> proposal
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }

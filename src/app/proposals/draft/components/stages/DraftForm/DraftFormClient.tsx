@@ -242,6 +242,8 @@ const DraftFormClient = ({
                   return <ApprovalProposalForm />;
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
+                case ProposalType.OPTMISTIC_EXECUTABLE:
+                  return <OptimisticProposalForm />;
                 default:
                   const exhaustiveCheck: never = votingModuleType;
                   return exhaustiveCheck;
