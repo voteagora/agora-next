@@ -174,6 +174,7 @@ export enum ProposalType {
   BASIC = "basic",
   APPROVAL = "approval",
   OPTIMISTIC = "optimistic",
+  OPTMISTIC_EXECUTABLE = "optimistic_executable",
 }
 
 export enum TransactionType {
@@ -258,11 +259,16 @@ export type OptimisticProposal = BaseProposal & {
   voting_module_type: ProposalType.OPTIMISTIC;
 };
 
+export type OptimisticExecutableProposal = BaseProposal & {
+  voting_module_type: ProposalType.OPTMISTIC_EXECUTABLE;
+};
+
 export type DraftProposal =
   | BasicProposal
   | SocialProposal
   | ApprovalProposal
-  | OptimisticProposal;
+  | OptimisticProposal
+  | OptimisticExecutableProposal;
 
 // TODO: move this to a shared location
 const parseTransaction = (t: ProposalDraftTransaction) => {
@@ -346,6 +352,7 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         ...baseFields,
       };
     case ProposalType.OPTIMISTIC:
+    case ProposalType.OPTMISTIC_EXECUTABLE:
       return {
         type: ProposalType.OPTIMISTIC,
         title: proposal.title,

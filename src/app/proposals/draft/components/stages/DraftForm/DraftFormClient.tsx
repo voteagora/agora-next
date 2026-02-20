@@ -66,6 +66,11 @@ const ProposalTypeMetadata = {
     description:
       "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
   },
+  [ProposalType.OPTMISTIC_EXECUTABLE]: {
+    title: "Optimistic Executable Proposal",
+    description:
+      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. Transactions can be proposed for optimistic executable proposals.",
+  },
 } as {
   [key in ProposalType]: {
     title: string;
@@ -112,10 +117,15 @@ const getValidProposalTypesForVotingType = (
 ) => {
   let optimisticModuleAddress: string | null = null;
   let approvalModuleAddress: string | null = null;
+  let optimisticExecutableModuleAddress: string | null = null;
 
   try {
     optimisticModuleAddress =
       getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+    optimisticExecutableModuleAddress =
+      getProposalTypeAddress(
+        ProposalType.OPTMISTIC_EXECUTABLE
+      )?.toLowerCase() || null;
 
     approvalModuleAddress =
       getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
@@ -131,6 +141,16 @@ const getValidProposalTypesForVotingType = (
             type.module.toLowerCase() ===
               approvalModuleAddress?.toLowerCase()) ||
           type.name.toLowerCase().includes("approval")
+        );
+      });
+
+    case ProposalType.OPTMISTIC_EXECUTABLE:
+      return proposalTypes.filter((type) => {
+        return (
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              optimisticExecutableModuleAddress?.toLowerCase()) &&
+          !type.name.toLowerCase().includes("optimistic executable")
         );
       });
 
@@ -366,6 +386,8 @@ const DraftFormClient = ({
                 case ProposalType.APPROVAL:
                   return <ApprovalProposalForm />;
                 case ProposalType.OPTIMISTIC:
+                  return <OptimisticProposalForm />;
+                case ProposalType.OPTMISTIC_EXECUTABLE:
                   return <OptimisticProposalForm />;
                 default:
                   const exhaustiveCheck: never = votingModuleType;

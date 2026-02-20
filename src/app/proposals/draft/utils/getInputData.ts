@@ -292,6 +292,46 @@ export function getInputData(proposal: DraftProposal): {
       return { inputData: optimisticInputData };
     }
 
+    case ProposalType.OPTMISTIC_EXECUTABLE: {
+      const calldata = encodeAbiParameters(
+        [
+          {
+            name: "settings",
+            type: "tuple",
+            components: [
+              { name: "againstThreshold", type: "uint248" },
+              { name: "isRelativeToVotableSupply", type: "bool" },
+            ],
+          },
+        ],
+        [
+          {
+            againstThreshold: BigInt(disapprovalThreshold * 100),
+            isRelativeToVotableSupply: true,
+          },
+        ]
+      );
+
+      const optimisticExecutableModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTMISTIC_EXECUTABLE
+      );
+
+      if (!optimisticExecutableModuleAddress) {
+        throw new Error(
+          `Optimistic executable module address not found for tenant ${namespace}`
+        );
+      }
+
+      const optimisticExecutableInputData: ApprovalInputData = [
+        optimisticExecutableModuleAddress,
+        calldata,
+        description,
+        parseInt(proposal.proposal_type || "0"),
+      ];
+
+      return { inputData: optimisticExecutableInputData };
+    }
+
     default:
       return {
         inputData: null,
