@@ -29,6 +29,7 @@ export type RowDisplayData = {
     proposalStatus: string;
     proposalStartTime: Date | null;
     proposalEndTime: Date | null;
+    proposalCreatedTime: Date | null;
     proposalCancelledTime: Date | null;
     proposalExecutedTime: Date | null;
   };

@@ -6,6 +6,7 @@
  */
 
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import Tenant from "@/lib/tenant/tenant";
 import {
   deriveStatus,
   deriveTimeStatus,
@@ -84,13 +85,18 @@ const normalizeOption = (proposal: ArchiveListProposal) => {
 // Base Normalization (common to all proposal types)
 // =============================================================================
 
-function normalizeBase(
-  proposal: ArchiveListProposal,
-  options: NormalizeArchiveOptions
-): Omit<Proposal, "proposalType" | "proposalData" | "proposalResults"> & {
+type NormalizedBase = Omit<
+  Proposal,
+  "proposalType" | "proposalData" | "proposalResults"
+> & {
   decimals: number;
   source: string | undefined;
-} {
+};
+
+async function normalizeBase(
+  proposal: ArchiveListProposal,
+  options: NormalizeArchiveOptions
+): Promise<NormalizedBase> {
   const decimals = options.tokenDecimals ?? 18;
   const statusKey = deriveStatus(proposal, decimals);
 
@@ -98,14 +104,18 @@ function normalizeBase(
     ? statusKey
     : "ACTIVE";
 
-  const timeStatus = deriveTimeStatus(proposal, normalizedStatusKey);
+  const { contracts } = Tenant.current();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
+  const timeStatus = deriveTimeStatus(
+    proposal,
+    normalizedStatusKey,
+    latestBlock
+  );
 
   const createdTime =
     toDate(proposal.created_event?.blocktime) ||
     toDate(proposal.blocktime) ||
-    timeStatus.proposalStartTime ||
-    timeStatus.proposalEndTime ||
-    null;
+    timeStatus.proposalCreatedTime;
   const startTime = timeStatus.proposalStartTime || createdTime;
   const endTime = timeStatus.proposalEndTime || startTime;
   const queuedTime = toDate(proposal.queue_event?.blocktime) || null;
@@ -208,7 +218,7 @@ function normalizeBase(
 
 function normalizeStandardProposal(
   proposal: ArchiveListProposal,
-  base: ReturnType<typeof normalizeBase>,
+  base: NormalizedBase,
   proposalType: ProposalType = "STANDARD"
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
@@ -336,7 +346,7 @@ function normalizeStandardProposal(
 
 function normalizeApprovalProposal(
   proposal: ArchiveListProposal,
-  base: ReturnType<typeof normalizeBase>
+  base: NormalizedBase
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
 
@@ -471,7 +481,7 @@ function normalizeApprovalProposal(
 
 function normalizeOptimisticProposal(
   proposal: ArchiveListProposal,
-  base: ReturnType<typeof normalizeBase>,
+  base: NormalizedBase,
   proposalType: ProposalType
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
@@ -590,7 +600,7 @@ function normalizeOptimisticProposal(
 
 function normalizeOptimisticTieredProposal(
   proposal: ArchiveListProposal,
-  base: ReturnType<typeof normalizeBase>,
+  base: NormalizedBase,
   proposalType: ProposalType
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
@@ -706,13 +716,13 @@ function normalizeOptimisticTieredProposal(
  * @param options - Normalization options (namespace, tokenDecimals)
  * @returns Normalized Proposal object
  */
-export function archiveToProposal(
+export async function archiveToProposal(
   proposal: ArchiveProposalInput,
   options: NormalizeArchiveOptions = {}
-): Proposal {
+): Promise<Proposal> {
   let archiveProposal = proposal as ArchiveListProposal;
   const proposalType = deriveProposalType(archiveProposal);
-  const base = normalizeBase(archiveProposal, options);
+  const base = await normalizeBase(archiveProposal, options);
 
   // Add archive metadata
   const rawTag = Array.isArray(archiveProposal.tags)

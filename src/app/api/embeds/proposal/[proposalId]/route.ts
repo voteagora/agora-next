@@ -44,7 +44,7 @@ async function loadProposal(proposalId: string): Promise<Proposal> {
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
     if (archiveProposal) {
-      const normalizedProposal = archiveToProposal(archiveProposal, {
+      const normalizedProposal = await archiveToProposal(archiveProposal, {
         namespace,
         tokenDecimals: token.decimals ?? 18,
       });

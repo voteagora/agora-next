@@ -37,7 +37,7 @@ async function loadProposal(
     ]);
 
     if (archiveProposal) {
-      const normalizedProposal = archiveToProposal(archiveProposal, {
+      const normalizedProposal = await archiveToProposal(archiveProposal, {
         namespace,
         tokenDecimals: token.decimals ?? 18,
       });
