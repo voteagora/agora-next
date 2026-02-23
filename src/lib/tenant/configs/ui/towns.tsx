@@ -1,6 +1,6 @@
 import React from "react";
 import { TenantUI, type UITaxFormConfig } from "@/lib/tenant/tenantUI";
-import townsLogo from "@/assets/tenant/towns_logo.png";
+import townsLogo from "@/assets/tenant/towns_logo.svg";
 import townsHero from "@/assets/tenant/towns_hero.svg";
 import townsSuccess from "@/assets/tenant/towns_success.svg";
 import townsPending from "@/assets/tenant/towns_pending.svg";
