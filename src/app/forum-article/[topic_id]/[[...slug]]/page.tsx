@@ -187,7 +187,7 @@ export default async function ForumArticlePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 pt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
         <FinancialStatementLayout
           topicId={topicId}
           title={transformed.title}

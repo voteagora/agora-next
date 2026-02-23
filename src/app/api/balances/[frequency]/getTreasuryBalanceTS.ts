@@ -25,7 +25,7 @@ async function getTreasuryBalanceTS(
 
   const QRY = `SELECT day,
                 TO_CHAR(day, 'YYYY-MM-DD') date,
-                ROUND(SUM(balance_usd)::numeric,0) balance_usd
+                ROUND(SUM(balance_usd)::numeric,0) value
               FROM   dune.token_balances tb
               WHERE  chain_id = ${chainId}
                 AND day >= (CURRENT_DATE - INTERVAL '${lookback} day')
