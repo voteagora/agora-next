@@ -42,6 +42,7 @@ export function findDelagatee({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaDelegatees.findFirst(condition);
@@ -102,6 +103,7 @@ export function findAdvancedDelegatee({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedDelegatees.findMany(condition);
@@ -159,6 +161,7 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoVotableSupply.findFirst({});
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotableSupply.findFirst({});
@@ -216,6 +219,7 @@ export function findSnapshotProposalsQueryFromDb({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
@@ -322,6 +326,7 @@ export function findProposalsQueryFromDB({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
@@ -378,6 +383,7 @@ export function findProposal({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
@@ -432,6 +438,7 @@ export function findProposalsByIds({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
@@ -496,6 +503,7 @@ export function findOffchainProposal({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findFirst(condition);
@@ -553,6 +561,7 @@ export function findOffchainProposalsByOnchainIds({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.findMany(condition);
@@ -603,6 +612,7 @@ export function findProposalType({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposalTypes.findMany(condition);
@@ -659,6 +669,7 @@ export function findVotes({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoVotes.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotes.findMany(condition);
@@ -718,6 +729,7 @@ export function findVotingPower({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3VotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaVotingPower.findFirst(condition);
@@ -768,6 +780,7 @@ export function findAdvancedVotingPower({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaAdvancedVotingPower.findFirst(condition);
@@ -824,6 +837,7 @@ export async function findStakedDeposit({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3StakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findFirst(condition);
@@ -883,6 +897,7 @@ export function findStakedDeposits({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaStakedDeposits.findMany(condition);
@@ -940,6 +955,7 @@ export function getProposalsCount({
     case TENANT_NAMESPACES.B3:
       return prismaWeb3Client.b3Proposals.count(condition);
     case TENANT_NAMESPACES.DEMO:
+    case TENANT_NAMESPACES.SHAPE:
       return prismaWeb3Client.demoProposals.count(condition);
     case TENANT_NAMESPACES.LINEA:
       return prismaWeb3Client.lineaProposals.count(condition);
