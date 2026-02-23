@@ -14,11 +14,11 @@ import { b3TenantUIConfig } from "@/lib/tenant/configs/ui/b3";
 import { demoTenantUIConfig } from "@/lib/tenant/configs/ui/demo";
 import { lineaTenantUIConfig } from "@/lib/tenant/configs/ui/linea";
 import { townsTenantUIConfig } from "@/lib/tenant/configs/ui/towns";
+import { shapeTenantUIConfig } from "@/lib/tenant/configs/ui/shape";
 import { syndicateTenantUIConfig } from "@/lib/tenant/configs/ui/syndicate";
 import { demo2TenantUIConfig } from "@/lib/tenant/configs/ui/demo2";
 import { demo4TenantUIConfig } from "@/lib/tenant/configs/ui/demo4";
 import { demo3TenantUIConfig } from "@/lib/tenant/configs/ui/demo3";
-import { shapeTenantUIConfig } from "@/lib/tenant/configs/ui/shape";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -64,6 +64,10 @@ export default class TenantUIFactory {
 
       case TENANT_NAMESPACES.TOWNS:
         return townsTenantUIConfig;
+
+      case TENANT_NAMESPACES.SHAPE:
+        return shapeTenantUIConfig;
+
       case TENANT_NAMESPACES.SYNDICATE:
         return syndicateTenantUIConfig;
       case TENANT_NAMESPACES.DEMO2:
@@ -72,8 +76,6 @@ export default class TenantUIFactory {
         return demo4TenantUIConfig;
       case TENANT_NAMESPACES.DEMO3:
         return demo3TenantUIConfig;
-      case TENANT_NAMESPACES.SHAPE:
-        return shapeTenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
