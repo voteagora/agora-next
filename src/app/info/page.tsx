@@ -8,9 +8,7 @@ import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
-import DunaDisclosures from "@/app/duna/components/DunaDisclosures";
-import SyndicateDunaDisclosures from "@/app/duna/components/SyndicateDunaDisclosures";
-import ShapeDunaDisclosures from "@/app/duna/components/ShapeDunaDisclosures";
+import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
 import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
@@ -115,16 +113,8 @@ export default async function Page() {
             }}
           />
         )}
-        {hasDunaAdministration ? (
-          ui.toggle("towns-duna-administration")?.enabled ? null : ui.toggle(
-              "syndicate-duna-disclosures"
-            )?.enabled ? (
-            <SyndicateDunaDisclosures />
-          ) : ui.toggle("shape-duna-disclosures")?.enabled ? (
-            <ShapeDunaDisclosures />
-          ) : (
-            <DunaDisclosures />
-          )
+        {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
+          <DunaDisclosuresContent />
         ) : null}
       </div>
     );
