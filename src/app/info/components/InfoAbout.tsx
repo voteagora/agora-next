@@ -75,7 +75,10 @@ const InfoAbout = () => {
   return (
     <>
       <h3 className="text-2xl font-black text-primary mt-12">{sectionTitle}</h3>
-      <div className="mt-4 rounded-xl border border-line shadow-sm bg-infoSectionBackground">
+      <div
+        className="mt-4 rounded-xl border border-line shadow-sm"
+        style={{ backgroundColor: "var(--info-section-background)" }}
+      >
         <div
           className={`p-6 flex flex-row flex-wrap sm:flex-nowrap ${ui.customization?.customInfoLayout ? ui.customization.customInfoLayout : "gap-6"}`}
         >
@@ -100,11 +103,23 @@ const InfoAbout = () => {
               <h3 className="text-lg font-bold text-primary">
                 {ui.customization?.customAboutSubtitle || "About " + brandName}
               </h3>
-              <p
-                className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
-              >
-                {page.description}
-              </p>
+
+              {(() => {
+                const desc = page.description;
+                const paragraphClass = `text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`;
+
+                if (Array.isArray(desc)) {
+                  return (
+                    <ul className="text-secondary mt-3 list-disc pl-5">
+                      {desc.map((d, i) => (
+                        <li key={i}>{d}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                return <p className={paragraphClass}>{String(desc)}</p>;
+              })()}
             </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
