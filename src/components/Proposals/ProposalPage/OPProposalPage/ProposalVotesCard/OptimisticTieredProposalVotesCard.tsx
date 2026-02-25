@@ -25,22 +25,22 @@ const BAR_FILL_COLOR = "#7B8FAF";
 
 const TIER_STYLES = {
   fourGroups: {
-    badge: "bg-green-100 text-green-700 border border-green-200",
-    badgeActive: "bg-green-600 text-white border border-green-600",
-    dot: "bg-green-500",
-    label: "text-green-700",
+    badge: "bg-teal-100 text-teal-700 border border-teal-200",
+    badgeActive: "bg-teal-600 text-white border border-teal-600",
+    dot: "bg-teal-500",
+    label: "text-teal-700",
   },
   threeGroups: {
-    badge: "bg-amber-100 text-amber-700 border border-amber-200",
-    badgeActive: "bg-amber-600 text-white border border-amber-600",
-    dot: "bg-amber-500",
-    label: "text-amber-700",
+    badge: "bg-violet-100 text-violet-700 border border-violet-200",
+    badgeActive: "bg-violet-600 text-white border border-violet-600",
+    dot: "bg-violet-500",
+    label: "text-violet-700",
   },
   twoGroups: {
-    badge: "bg-red-100 text-red-700 border border-red-200",
-    badgeActive: "bg-red-600 text-white border border-red-600",
-    dot: "bg-red-500",
-    label: "text-red-700",
+    badge: "bg-pink-100 text-pink-700 border border-pink-200",
+    badgeActive: "bg-pink-600 text-white border border-pink-600",
+    dot: "bg-pink-500",
+    label: "text-pink-700",
   },
 } as const;
 
@@ -61,6 +61,31 @@ function formatVetoPercentage(value: number): string {
   if (value === 0) return "0%";
   if (value > 0 && value < 1) return `${value.toFixed(1)}%`;
   return `${Math.round(value)}%`;
+}
+
+function TierDots({
+  count,
+  tierKey,
+  isTripped,
+}: {
+  count: number;
+  tierKey: TierKey;
+  isTripped: boolean;
+}) {
+  const styles = TIER_STYLES[tierKey];
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: count }).map((_, i) => (
+        <span
+          key={i}
+          className={cn(
+            "inline-block w-1.5 h-1.5 rounded-full",
+            isTripped ? styles.dot : "bg-secondary/30"
+          )}
+        />
+      ))}
+    </div>
+  );
 }
 
 function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
@@ -143,12 +168,12 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       : "Proposal Vetoed"
     : proposal.status === "ACTIVE"
       ? "Veto threshold not reached"
-      : "Proposal Approved";
+      : "Proposal Passing";
 
   return (
-    <div className="p-4">
+    <div className="px-3 py-3 sm:px-4 sm:py-4">
       {/* Header */}
-      <div className="mb-3">
+      <div className="mb-2.5">
         <p
           className={cn("text-sm font-bold", {
             "text-negative": vetoThresholdMet,
@@ -158,13 +183,13 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           {outcomeLabel}
         </p>
         <p className="text-xs text-secondary mt-1 font-normal leading-relaxed">
-          The veto threshold changes depending on the % of each group that votes
-          to veto.
+          One of three thresholds are applied, based on the number of groups
+          signaling to veto.
         </p>
       </div>
 
       {/* Threshold badges — absolutely positioned at column offsets */}
-      <div className="relative h-7 mb-1">
+      <div className="relative h-6 mb-1">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
           const styles = TIER_STYLES[tier.key];
@@ -172,7 +197,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           return (
             <div
               key={tier.key}
-              className="absolute top-0"
+              className={cn("absolute top-0", !isTripped && "opacity-40")}
               style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
             >
               <span
@@ -180,7 +205,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                   "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
                   isTripped ? styles.badgeActive : styles.badge
                 )}
-                aria-label={`${tier.groupsRequired}/${totalGroups} Groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
               >
                 {tier.threshold}%
               </span>
@@ -200,7 +225,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
               key={tier.key}
               className={cn(
                 "absolute top-0 bottom-0 w-px border-l border-dashed",
-                isTripped ? "border-secondary/60" : "border-secondary/20"
+                isTripped ? "border-secondary/60" : "border-secondary/15"
               )}
               style={{ left: `${pos}%` }}
               aria-hidden="true"
@@ -209,7 +234,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         })}
 
         {/* Group rows */}
-        <div className="relative flex flex-col gap-3">
+        <div className="relative flex flex-col gap-2.5">
           {groups.map((group) => {
             const pct = Math.min(group.vetoPercentage, 100);
             return (
@@ -244,68 +269,29 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         </div>
       </div>
 
-      {/* Tier labels — absolutely positioned at column offsets, color-coded */}
-      <div className="relative h-10 mt-1">
+      {/* Tier dots — positioned at column offsets + shared label */}
+      <div className="relative h-5 mt-1.5">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
-          const styles = TIER_STYLES[tier.key];
           const isTripped = trippedTiers.has(tier.key);
           return (
             <div
               key={tier.key}
-              className="absolute top-0 flex flex-col items-center"
+              className="absolute top-0"
               style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
             >
-              <span
-                className={cn(
-                  "text-xs font-semibold whitespace-nowrap leading-tight",
-                  isTripped ? styles.label : "text-tertiary"
-                )}
-              >
-                {tier.groupsRequired}/{totalGroups}
-              </span>
-              <span
-                className={cn(
-                  "text-xs font-semibold whitespace-nowrap leading-tight",
-                  isTripped ? styles.label : "text-tertiary"
-                )}
-              >
-                Groups
-              </span>
+              <TierDots
+                count={tier.groupsRequired}
+                tierKey={tier.key}
+                isTripped={isTripped}
+              />
             </div>
           );
         })}
       </div>
-
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-secondary">
-        <div className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 rounded-full bg-line shrink-0" />
-          <span>Below threshold</span>
-        </div>
-        {tiers
-          .sort((a, b) => a.groupsRequired - b.groupsRequired)
-          .map((tier) => {
-            const styles = TIER_STYLES[tier.key];
-            const exceeding = groupsExceedingByTier[tier.key];
-            const remaining = tier.groupsRequired - exceeding;
-            const label =
-              remaining <= 0
-                ? `${tier.groupsRequired}/${totalGroups} exceeded`
-                : `${remaining} group${remaining !== 1 ? "s" : ""} needed`;
-            return (
-              <div key={tier.key} className="flex items-center gap-1.5">
-                <span
-                  className={cn(
-                    "inline-block w-2 h-2 rounded-full shrink-0",
-                    styles.dot
-                  )}
-                />
-                <span>{label}</span>
-              </div>
-            );
-          })}
-      </div>
+      <p className="text-xs text-tertiary text-center -mt-1">
+        # of signaling groups
+      </p>
     </div>
   );
 }
