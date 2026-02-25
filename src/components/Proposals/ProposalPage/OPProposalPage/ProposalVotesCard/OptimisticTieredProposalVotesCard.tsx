@@ -75,7 +75,7 @@ function TierDots({
   const styles = TIER_STYLES[tierKey];
   const filledCount = Math.min(Math.max(0, filled), total);
   return (
-    <div className="flex items-center gap-0.5 shrink-0">
+    <div className="flex items-center gap-0.5 shrink-0 whitespace-nowrap">
       {Array.from({ length: total }).map((_, i) => (
         <span
           key={i}
@@ -158,9 +158,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
   }, [tiers, groupsExceedingByTier]);
 
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  const maxPercentage = Math.max(...groups.map((g) => g.vetoPercentage));
-  const scaleMax = Math.max(maxThreshold, maxPercentage) * 1.15;
-
+  // Scale is always based on thresholds so badges and dots have room.
+  // Bars that exceed the scale fill to 100% (capped); exact value is in the text label.
+  const scaleMax = maxThreshold * 1.3;
   const toPosition = (value: number) => Math.min((value / scaleMax) * 100, 100);
 
   const outcomeLabel = vetoThresholdMet
@@ -284,7 +284,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
               return (
                 <div
                   key={tier.key}
-                  className="absolute top-0"
+                  className="absolute top-0 px-0.5"
                   style={{
                     left: `${pos}%`,
                     transform: "translateX(-50%)",
