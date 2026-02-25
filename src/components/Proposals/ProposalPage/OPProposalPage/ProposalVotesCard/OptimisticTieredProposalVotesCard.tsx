@@ -194,10 +194,14 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         {/* Vertical dotted threshold lines spanning all bars */}
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
+          const isTripped = trippedTiers.has(tier.key);
           return (
             <div
               key={tier.key}
-              className="absolute top-0 bottom-0 w-px border-l border-dashed border-secondary/20"
+              className={cn(
+                "absolute top-0 bottom-0 w-px border-l border-dashed",
+                isTripped ? "border-secondary/60" : "border-secondary/20"
+              )}
               style={{ left: `${pos}%` }}
               aria-hidden="true"
             />
