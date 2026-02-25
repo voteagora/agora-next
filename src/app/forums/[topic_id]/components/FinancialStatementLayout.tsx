@@ -7,6 +7,7 @@ import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import Markdown from "@/components/shared/Markdown/Markdown";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -14,6 +15,11 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+}
+
+function looksLikeHtml(text: string): boolean {
+  const t = text.trim();
+  return t.startsWith("<") || t.includes("</");
 }
 
 export default function FinancialStatementLayout({
@@ -232,14 +238,20 @@ export default function FinancialStatementLayout({
         </div>
 
         <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
-          <iframe
-            ref={iframeRef}
-            srcDoc={content}
-            className="w-full border-0"
-            title="Financial Statement"
-            sandbox="allow-same-origin allow-scripts"
-            style={{ display: "block" }}
-          />
+          {looksLikeHtml(content) ? (
+            <iframe
+              ref={iframeRef}
+              srcDoc={content}
+              className="w-full border-0"
+              title="Financial Statement"
+              sandbox="allow-same-origin allow-scripts"
+              style={{ display: "block" }}
+            />
+          ) : (
+            <div className="p-4 prose prose-sm max-w-none">
+              <Markdown content={content} originalHierarchy />
+            </div>
+          )}
         </div>
       </div>
     </>
