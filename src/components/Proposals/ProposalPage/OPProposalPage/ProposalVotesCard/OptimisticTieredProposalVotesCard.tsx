@@ -25,19 +25,22 @@ const BAR_FILL_COLOR = "#7B8FAF";
 
 const TIER_STYLES = {
   fourGroups: {
-    badge: "bg-green-200 text-green-600",
-    badgeActive: "bg-green-600 text-white",
-    dot: "bg-green-600",
+    badge: "bg-green-100 text-green-700 border border-green-200",
+    badgeActive: "bg-green-600 text-white border border-green-600",
+    dot: "bg-green-500",
+    label: "text-green-700",
   },
   threeGroups: {
-    badge: "bg-amber-200 text-amber-600",
-    badgeActive: "bg-amber-600 text-white",
-    dot: "bg-amber-600",
+    badge: "bg-amber-100 text-amber-700 border border-amber-200",
+    badgeActive: "bg-amber-600 text-white border border-amber-600",
+    dot: "bg-amber-500",
+    label: "text-amber-700",
   },
   twoGroups: {
-    badge: "bg-red-200 text-red-600",
-    badgeActive: "bg-red-600 text-white",
-    dot: "bg-red-600",
+    badge: "bg-red-100 text-red-700 border border-red-200",
+    badgeActive: "bg-red-600 text-white border border-red-600",
+    dot: "bg-red-500",
+    label: "text-red-700",
   },
 } as const;
 
@@ -47,12 +50,17 @@ interface TierInfo {
   key: TierKey;
   threshold: number;
   groupsRequired: number;
-  label: string;
 }
 
 interface GroupData {
   name: string;
   vetoPercentage: number;
+}
+
+function formatVetoPercentage(value: number): string {
+  if (value === 0) return "0%";
+  if (value > 0 && value < 1) return `${value.toFixed(1)}%`;
+  return `${Math.round(value)}%`;
 }
 
 function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
@@ -67,19 +75,16 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         key: "fourGroups" as const,
         threshold: thresholds.fourGroups,
         groupsRequired: 4,
-        label: "4/4",
       },
       {
         key: "threeGroups" as const,
         threshold: thresholds.threeGroups,
         groupsRequired: 3,
-        label: "3/4",
       },
       {
         key: "twoGroups" as const,
         threshold: thresholds.twoGroups,
         groupsRequired: 2,
-        label: "2/4",
       },
     ],
     [thresholds]
@@ -99,6 +104,8 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       };
     });
   }, [proposal.proposalType, groupTallies]);
+
+  const totalGroups = groups.length;
 
   const groupsExceedingByTier = useMemo(() => {
     const result: Record<TierKey, number> = {
@@ -124,7 +131,6 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
-  const minThreshold = Math.min(...tiers.map((t) => t.threshold));
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
   const maxPercentage = Math.max(...groups.map((g) => g.vetoPercentage));
   const scaleMax = Math.max(maxThreshold, maxPercentage) * 1.15;
@@ -157,7 +163,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         </p>
       </div>
 
-      {/* Threshold badges positioned at their column locations */}
+      {/* Threshold badges — absolutely positioned at column offsets */}
       <div className="relative h-7 mb-1">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
@@ -174,7 +180,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                   "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
                   isTripped ? styles.badgeActive : styles.badge
                 )}
-                aria-label={`${tier.groupsRequired}/4 Groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                aria-label={`${tier.groupsRequired}/${totalGroups} Groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
               >
                 {tier.threshold}%
               </span>
@@ -209,7 +215,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                     {group.name}
                   </span>
                   <span className="text-xs font-semibold tabular-nums text-primary">
-                    {pct.toFixed(0)}%
+                    {formatVetoPercentage(pct)}
                   </span>
                 </div>
                 <div
@@ -234,10 +240,11 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         </div>
       </div>
 
-      {/* Tier labels positioned below, aligned with columns */}
+      {/* Tier labels — absolutely positioned at column offsets, color-coded */}
       <div className="relative h-10 mt-1">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
+          const styles = TIER_STYLES[tier.key];
           const isTripped = trippedTiers.has(tier.key);
           return (
             <div
@@ -248,15 +255,15 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
               <span
                 className={cn(
                   "text-xs font-semibold whitespace-nowrap leading-tight",
-                  isTripped ? "text-primary" : "text-tertiary"
+                  isTripped ? styles.label : "text-tertiary"
                 )}
               >
-                {tier.label}
+                {tier.groupsRequired}/{totalGroups}
               </span>
               <span
                 className={cn(
                   "text-xs font-semibold whitespace-nowrap leading-tight",
-                  isTripped ? "text-primary" : "text-tertiary"
+                  isTripped ? styles.label : "text-tertiary"
                 )}
               >
                 Groups
@@ -280,7 +287,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             const remaining = tier.groupsRequired - exceeding;
             const label =
               remaining <= 0
-                ? `${tier.groupsRequired}/4 exceeded`
+                ? `${tier.groupsRequired}/${totalGroups} exceeded`
                 : `${remaining} group${remaining !== 1 ? "s" : ""} needed`;
             return (
               <div key={tier.key} className="flex items-center gap-1.5">
@@ -345,11 +352,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                 />
               </div>
 
-              <div className="flex-1 bg-neutral border-line mb-[196px]">
-                <OptimisticTieredResultsView proposal={proposal} />
-              </div>
+              <OptimisticTieredResultsView proposal={proposal} />
 
-              <div className="absolute bottom-0 w-full right-0 bg-neutral border rounded-bl-xl rounded-br-xl">
+              <div className="border-t border-line">
                 <CastVoteInput proposal={proposal} isOptimistic />
               </div>
             </>
