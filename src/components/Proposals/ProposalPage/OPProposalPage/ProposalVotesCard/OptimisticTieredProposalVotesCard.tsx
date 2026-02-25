@@ -21,28 +21,27 @@ interface Props {
   proposal: Proposal;
 }
 
-const TIER_COLORS = {
+const BAR_FILL_COLOR = "#7B8FAF";
+
+const TIER_STYLES = {
   fourGroups: {
     badge: "bg-green-200 text-green-600",
     badgeActive: "bg-green-600 text-white",
     dot: "bg-green-600",
-    line: "border-green-600",
   },
   threeGroups: {
     badge: "bg-amber-200 text-amber-600",
     badgeActive: "bg-amber-600 text-white",
     dot: "bg-amber-600",
-    line: "border-amber-600",
   },
   twoGroups: {
     badge: "bg-red-200 text-red-600",
     badgeActive: "bg-red-600 text-white",
     dot: "bg-red-600",
-    line: "border-red-600",
   },
 } as const;
 
-type TierKey = keyof typeof TIER_COLORS;
+type TierKey = keyof typeof TIER_STYLES;
 
 interface TierInfo {
   key: TierKey;
@@ -54,160 +53,6 @@ interface TierInfo {
 interface GroupData {
   name: string;
   vetoPercentage: number;
-  exceedsThreshold: boolean;
-}
-
-function VetoThresholdBadge({
-  tier,
-  isTripped,
-}: {
-  tier: TierInfo;
-  isTripped: boolean;
-}) {
-  const colors = TIER_COLORS[tier.key];
-
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-        isTripped ? colors.badgeActive : colors.badge
-      )}
-      aria-label={`${tier.label} threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-    >
-      {tier.threshold}%
-    </span>
-  );
-}
-
-function VetoProgressBar({
-  group,
-  tiers,
-  trippedTiers,
-  scaleMax,
-}: {
-  group: GroupData;
-  tiers: TierInfo[];
-  trippedTiers: Set<TierKey>;
-  scaleMax: number;
-}) {
-  const percentage = Math.min(group.vetoPercentage, 100);
-
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-baseline justify-between">
-        <div className="text-xs font-semibold text-primary">{group.name}</div>
-        <div className="text-xs font-semibold tabular-nums text-primary">
-          {percentage.toFixed(0)}%
-        </div>
-      </div>
-      <div
-        className="relative h-[6px] rounded-[10px] bg-line overflow-visible"
-        role="progressbar"
-        aria-valuenow={Number(percentage.toFixed(1))}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`${group.name} veto percentage: ${percentage.toFixed(1)}%`}
-      >
-        <div
-          className="absolute inset-y-0 left-0 rounded-[10px] bg-tertiary transition-all duration-500"
-          style={{
-            width: `${Math.min((percentage / scaleMax) * 100, 100)}%`,
-          }}
-        />
-        {tiers.map((tier) => {
-          const position = (tier.threshold / scaleMax) * 100;
-          if (position > 100) return null;
-          const isTripped = trippedTiers.has(tier.key);
-          const colors = TIER_COLORS[tier.key];
-          return (
-            <div
-              key={tier.key}
-              className={cn(
-                "absolute top-[-4px] bottom-[-4px] w-px border-l border-dashed",
-                isTripped ? colors.line : "border-secondary/30"
-              )}
-              style={{ left: `${position}%` }}
-              aria-hidden="true"
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function VetoTierLabels({
-  tiers,
-  trippedTiers,
-  scaleMax,
-}: {
-  tiers: TierInfo[];
-  trippedTiers: Set<TierKey>;
-  scaleMax: number;
-}) {
-  return (
-    <div className="relative h-7">
-      {tiers.map((tier) => {
-        const position = (tier.threshold / scaleMax) * 100;
-        if (position > 100) return null;
-        const isTripped = trippedTiers.has(tier.key);
-        return (
-          <div
-            key={tier.key}
-            className="absolute top-0 flex flex-col items-center"
-            style={{ left: `${position}%`, transform: "translateX(-50%)" }}
-          >
-            <span
-              className={cn(
-                "text-xs font-semibold whitespace-nowrap leading-tight",
-                isTripped ? "text-primary" : "text-tertiary"
-              )}
-            >
-              {tier.label}
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function VetoLegend({
-  tiers,
-  groupsExceedingByTier,
-}: {
-  tiers: TierInfo[];
-  groupsExceedingByTier: Record<TierKey, number>;
-}) {
-  const sortedTiers = [...tiers].sort(
-    (a, b) => a.groupsRequired - b.groupsRequired
-  );
-
-  return (
-    <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-secondary">
-      <div className="flex items-center gap-1.5">
-        <span className="inline-block w-2 h-2 rounded-full bg-line" />
-        <span>Below threshold</span>
-      </div>
-      {sortedTiers.map((tier) => {
-        const colors = TIER_COLORS[tier.key];
-        const exceedingCount = groupsExceedingByTier[tier.key];
-        const remaining = tier.groupsRequired - exceedingCount;
-        const label =
-          remaining <= 0
-            ? `${tier.label} exceeded`
-            : `${remaining} group${remaining !== 1 ? "s" : ""} needed`;
-        return (
-          <div key={tier.key} className="flex items-center gap-1.5">
-            <span
-              className={cn("inline-block w-2 h-2 rounded-full", colors.dot)}
-            />
-            <span>{label}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
 }
 
 function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
@@ -251,7 +96,6 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       return {
         name: name.charAt(0).toUpperCase() + name.slice(1),
         vetoPercentage: tally?.vetoPercentage || 0,
-        exceedsThreshold: tally?.exceedsThreshold || false,
       };
     });
   }, [proposal.proposalType, groupTallies]);
@@ -282,7 +126,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
 
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
   const maxPercentage = Math.max(...groups.map((g) => g.vetoPercentage));
-  const scaleMax = Math.max(maxThreshold * 1.3, maxPercentage * 1.1, 25);
+  const scaleMax = Math.max(maxThreshold, maxPercentage) * 1.15;
+
+  const toPosition = (value: number) => Math.min((value / scaleMax) * 100, 100);
 
   const outcomeLabel = vetoThresholdMet
     ? proposal.status === "ACTIVE"
@@ -294,6 +140,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
 
   return (
     <div className="p-4 space-y-4">
+      {/* Header */}
       <div>
         <p
           className={cn("text-sm font-bold", {
@@ -309,35 +156,137 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        {tiers.map((tier) => (
-          <VetoThresholdBadge
-            key={tier.key}
-            tier={tier}
-            isTripped={trippedTiers.has(tier.key)}
-          />
-        ))}
+      {/* Threshold badges positioned at their column locations */}
+      <div className="relative h-6">
+        {tiers.map((tier) => {
+          const pos = toPosition(tier.threshold);
+          const styles = TIER_STYLES[tier.key];
+          const isTripped = trippedTiers.has(tier.key);
+          return (
+            <div
+              key={tier.key}
+              className="absolute top-0"
+              style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
+            >
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                  isTripped ? styles.badgeActive : styles.badge
+                )}
+                aria-label={`${tier.label} threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+              >
+                {tier.threshold}%
+              </span>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="space-y-4">
-        {groups.map((group) => (
-          <VetoProgressBar
-            key={group.name}
-            group={group}
-            tiers={tiers}
-            trippedTiers={trippedTiers}
-            scaleMax={scaleMax}
-          />
-        ))}
+      {/* Group bars with shared dotted column lines */}
+      <div className="relative">
+        {/* Vertical dotted threshold lines spanning all bars */}
+        {tiers.map((tier) => {
+          const pos = toPosition(tier.threshold);
+          return (
+            <div
+              key={tier.key}
+              className="absolute top-0 bottom-0 w-px border-l border-dashed border-secondary/20"
+              style={{ left: `${pos}%` }}
+              aria-hidden="true"
+            />
+          );
+        })}
+
+        {/* Group rows */}
+        <div className="relative space-y-4">
+          {groups.map((group) => {
+            const pct = Math.min(group.vetoPercentage, 100);
+            return (
+              <div key={group.name}>
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <span className="text-xs font-semibold text-primary">
+                    {group.name}
+                  </span>
+                  <span className="text-xs font-semibold tabular-nums text-primary">
+                    {pct.toFixed(0)}%
+                  </span>
+                </div>
+                <div
+                  className="relative h-[6px] rounded-[10px] bg-line"
+                  role="progressbar"
+                  aria-valuenow={Number(pct.toFixed(1))}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`${group.name} veto percentage: ${pct.toFixed(1)}%`}
+                >
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-[10px]"
+                    style={{
+                      width: `${toPosition(pct)}%`,
+                      backgroundColor: BAR_FILL_COLOR,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      <VetoTierLabels
-        tiers={tiers}
-        trippedTiers={trippedTiers}
-        scaleMax={scaleMax}
-      />
+      {/* Tier labels positioned below, aligned with columns */}
+      <div className="relative h-8">
+        {tiers.map((tier) => {
+          const pos = toPosition(tier.threshold);
+          const isTripped = trippedTiers.has(tier.key);
+          return (
+            <div
+              key={tier.key}
+              className="absolute top-0 flex flex-col items-center"
+              style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
+            >
+              <span
+                className={cn(
+                  "text-xs font-semibold whitespace-nowrap",
+                  isTripped ? "text-primary" : "text-tertiary"
+                )}
+              >
+                {tier.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
 
-      <VetoLegend tiers={tiers} groupsExceedingByTier={groupsExceedingByTier} />
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-secondary">
+        <div className="flex items-center gap-1.5">
+          <span className="inline-block w-2 h-2 rounded-full bg-line" />
+          <span>Below threshold</span>
+        </div>
+        {tiers
+          .filter((t) => t.groupsRequired < groups.length + 1)
+          .sort((a, b) => b.groupsRequired - a.groupsRequired)
+          .map((tier) => {
+            const styles = TIER_STYLES[tier.key];
+            const exceeding = groupsExceedingByTier[tier.key];
+            const remaining = tier.groupsRequired - exceeding;
+            const label =
+              remaining <= 0
+                ? `${tier.label} exceeded`
+                : `${remaining} group${remaining !== 1 ? "s" : ""} needed`;
+            return (
+              <div key={tier.key} className="flex items-center gap-1.5">
+                <span
+                  className={cn(
+                    "inline-block w-2 h-2 rounded-full",
+                    styles.dot
+                  )}
+                />
+                <span>{label}</span>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }
