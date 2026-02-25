@@ -67,19 +67,19 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         key: "fourGroups" as const,
         threshold: thresholds.fourGroups,
         groupsRequired: 4,
-        label: "4/4 Groups",
+        label: "4/4",
       },
       {
         key: "threeGroups" as const,
         threshold: thresholds.threeGroups,
         groupsRequired: 3,
-        label: "3/4 Groups",
+        label: "3/4",
       },
       {
         key: "twoGroups" as const,
         threshold: thresholds.twoGroups,
         groupsRequired: 2,
-        label: "2/4 Groups",
+        label: "2/4",
       },
     ],
     [thresholds]
@@ -124,6 +124,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
+  const minThreshold = Math.min(...tiers.map((t) => t.threshold));
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
   const maxPercentage = Math.max(...groups.map((g) => g.vetoPercentage));
   const scaleMax = Math.max(maxThreshold, maxPercentage) * 1.15;
@@ -139,9 +140,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       : "Proposal Approved";
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4">
       {/* Header */}
-      <div>
+      <div className="mb-3">
         <p
           className={cn("text-sm font-bold", {
             "text-negative": vetoThresholdMet,
@@ -157,7 +158,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       </div>
 
       {/* Threshold badges positioned at their column locations */}
-      <div className="relative h-6">
+      <div className="relative h-7 mb-1">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
           const styles = TIER_STYLES[tier.key];
@@ -173,7 +174,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                   "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
                   isTripped ? styles.badgeActive : styles.badge
                 )}
-                aria-label={`${tier.label} threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                aria-label={`${tier.groupsRequired}/4 Groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
               >
                 {tier.threshold}%
               </span>
@@ -198,12 +199,12 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         })}
 
         {/* Group rows */}
-        <div className="relative space-y-4">
+        <div className="relative flex flex-col gap-3">
           {groups.map((group) => {
             const pct = Math.min(group.vetoPercentage, 100);
             return (
               <div key={group.name}>
-                <div className="flex items-baseline justify-between mb-1.5">
+                <div className="flex items-baseline justify-between mb-1">
                   <span className="text-xs font-semibold text-primary">
                     {group.name}
                   </span>
@@ -212,7 +213,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                   </span>
                 </div>
                 <div
-                  className="relative h-[6px] rounded-[10px] bg-line"
+                  className="relative h-2 rounded-[10px] bg-line"
                   role="progressbar"
                   aria-valuenow={Number(pct.toFixed(1))}
                   aria-valuemin={0}
@@ -234,7 +235,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       </div>
 
       {/* Tier labels positioned below, aligned with columns */}
-      <div className="relative h-8">
+      <div className="relative h-10 mt-1">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
           const isTripped = trippedTiers.has(tier.key);
@@ -246,11 +247,19 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             >
               <span
                 className={cn(
-                  "text-xs font-semibold whitespace-nowrap",
+                  "text-xs font-semibold whitespace-nowrap leading-tight",
                   isTripped ? "text-primary" : "text-tertiary"
                 )}
               >
                 {tier.label}
+              </span>
+              <span
+                className={cn(
+                  "text-xs font-semibold whitespace-nowrap leading-tight",
+                  isTripped ? "text-primary" : "text-tertiary"
+                )}
+              >
+                Groups
               </span>
             </div>
           );
@@ -258,27 +267,26 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-secondary">
+      <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-xs text-secondary">
         <div className="flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 rounded-full bg-line" />
+          <span className="inline-block w-2 h-2 rounded-full bg-line shrink-0" />
           <span>Below threshold</span>
         </div>
         {tiers
-          .filter((t) => t.groupsRequired < groups.length + 1)
-          .sort((a, b) => b.groupsRequired - a.groupsRequired)
+          .sort((a, b) => a.groupsRequired - b.groupsRequired)
           .map((tier) => {
             const styles = TIER_STYLES[tier.key];
             const exceeding = groupsExceedingByTier[tier.key];
             const remaining = tier.groupsRequired - exceeding;
             const label =
               remaining <= 0
-                ? `${tier.label} exceeded`
+                ? `${tier.groupsRequired}/4 exceeded`
                 : `${remaining} group${remaining !== 1 ? "s" : ""} needed`;
             return (
               <div key={tier.key} className="flex items-center gap-1.5">
                 <span
                   className={cn(
-                    "inline-block w-2 h-2 rounded-full",
+                    "inline-block w-2 h-2 rounded-full shrink-0",
                     styles.dot
                   )}
                 />
