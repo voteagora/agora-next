@@ -64,23 +64,23 @@ function formatVetoPercentage(value: number): string {
 }
 
 function TierDots({
-  count,
+  total,
+  filled,
   tierKey,
-  isTripped,
 }: {
-  count: number;
+  total: number;
+  filled: number;
   tierKey: TierKey;
-  isTripped: boolean;
 }) {
   const styles = TIER_STYLES[tierKey];
   return (
     <div className="flex items-center gap-0.5">
-      {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: total }).map((_, i) => (
         <span
           key={i}
           className={cn(
             "inline-block w-1.5 h-1.5 rounded-full",
-            isTripped ? styles.dot : "bg-secondary/30"
+            i < filled ? styles.dot : "bg-gray-300"
           )}
         />
       ))}
@@ -273,7 +273,6 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       <div className="relative h-5 mt-1.5">
         {tiers.map((tier) => {
           const pos = toPosition(tier.threshold);
-          const isTripped = trippedTiers.has(tier.key);
           return (
             <div
               key={tier.key}
@@ -281,9 +280,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
               style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
             >
               <TierDots
-                count={tier.groupsRequired}
+                total={tier.groupsRequired}
+                filled={groupsExceedingByTier[tier.key]}
                 tierKey={tier.key}
-                isTripped={isTripped}
               />
             </div>
           );
