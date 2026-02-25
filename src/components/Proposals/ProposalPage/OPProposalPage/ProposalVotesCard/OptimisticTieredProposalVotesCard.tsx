@@ -21,7 +21,7 @@ interface Props {
   proposal: Proposal;
 }
 
-const BAR_FILL_COLOR = "#7B8FAF";
+const BAR_FILL_CLASS = "bg-tertiary";
 
 const TIER_STYLES = {
   fourGroups: {
@@ -73,14 +73,15 @@ function TierDots({
   tierKey: TierKey;
 }) {
   const styles = TIER_STYLES[tierKey];
+  const filledCount = Math.min(Math.max(0, filled), total);
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex items-center gap-0.5 shrink-0">
       {Array.from({ length: total }).map((_, i) => (
         <span
           key={i}
           className={cn(
-            "inline-block w-1.5 h-1.5 rounded-full",
-            i < filled ? styles.dot : "bg-gray-300"
+            "inline-block w-1.5 h-1.5 rounded-full shrink-0",
+            i < filledCount ? styles.dot : "bg-line"
           )}
         />
       ))}
@@ -171,126 +172,139 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       : "Proposal Passing";
 
   return (
-    <div className="px-3 py-3 sm:px-4 sm:py-4">
-      {/* Header */}
-      <div className="mb-2.5">
-        <p
-          className={cn("text-sm font-bold", {
-            "text-negative": vetoThresholdMet,
-            "text-positive": !vetoThresholdMet,
-          })}
-        >
-          {outcomeLabel}
-        </p>
-        <p className="text-xs text-secondary mt-1 font-normal leading-relaxed">
-          One of three thresholds are applied, based on the number of groups
-          signaling to veto.
-        </p>
-      </div>
+    <div className="p-4">
+      <div className="border border-line rounded-lg p-3">
+        {/* Header */}
+        <div className="mb-3">
+          <p
+            className={cn("text-xs font-bold", {
+              "text-negative": vetoThresholdMet,
+              "text-positive": !vetoThresholdMet,
+            })}
+          >
+            {outcomeLabel}
+          </p>
+          <p className="text-xs text-secondary mt-1 font-normal">
+            One of three thresholds are applied, based on the number of groups
+            signaling to veto.
+          </p>
+        </div>
 
-      {/* Threshold badges — absolutely positioned at column offsets */}
-      <div className="relative h-6 mb-1">
-        {tiers.map((tier) => {
-          const pos = toPosition(tier.threshold);
-          const styles = TIER_STYLES[tier.key];
-          const isTripped = trippedTiers.has(tier.key);
-          return (
-            <div
-              key={tier.key}
-              className={cn("absolute top-0", !isTripped && "opacity-40")}
-              style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
-            >
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-                  isTripped ? styles.badgeActive : styles.badge
-                )}
-                aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-              >
-                {tier.threshold}%
-              </span>
-            </div>
-          );
-        })}
-      </div>
+        {/* Single wrapper so badges, lines, and dots share the same width for alignment */}
+        <div className="relative w-full min-w-0">
+          {/* Spacer reserves vertical space for badges */}
+          <div className="h-6 w-full" aria-hidden="true" />
 
-      {/* Group bars with shared dotted column lines */}
-      <div className="relative">
-        {/* Vertical dotted threshold lines spanning all bars */}
-        {tiers.map((tier) => {
-          const pos = toPosition(tier.threshold);
-          const isTripped = trippedTiers.has(tier.key);
-          return (
-            <div
-              key={tier.key}
-              className={cn(
-                "absolute top-0 bottom-0 w-px border-l border-dashed",
-                isTripped ? "border-secondary/60" : "border-secondary/15"
-              )}
-              style={{ left: `${pos}%` }}
-              aria-hidden="true"
-            />
-          );
-        })}
-
-        {/* Group rows */}
-        <div className="relative flex flex-col gap-2.5">
-          {groups.map((group) => {
-            const pct = Math.min(group.vetoPercentage, 100);
-            return (
-              <div key={group.name}>
-                <div className="flex items-baseline justify-between mb-1">
-                  <span className="text-xs font-semibold text-primary">
-                    {group.name}
-                  </span>
-                  <span className="text-xs font-semibold tabular-nums text-primary">
-                    {formatVetoPercentage(pct)}
+          {/* Threshold badges — same width as bars, aligned above dotted lines */}
+          <div className="absolute top-0 left-0 w-full h-6 pointer-events-none">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              const styles = TIER_STYLES[tier.key];
+              const isTripped = trippedTiers.has(tier.key);
+              return (
+                <div
+                  key={tier.key}
+                  className={cn("absolute top-0", !isTripped && "opacity-40")}
+                  style={{
+                    left: `${pos}%`,
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                      isTripped ? styles.badgeActive : styles.badge
+                    )}
+                    aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                  >
+                    {tier.threshold}%
                   </span>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Group bars with shared dotted column lines */}
+          <div className="relative w-full">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              const isTripped = trippedTiers.has(tier.key);
+              return (
                 <div
-                  className="relative h-2 rounded-[10px] bg-line"
-                  role="progressbar"
-                  aria-valuenow={Number(pct.toFixed(1))}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`${group.name} veto percentage: ${pct.toFixed(1)}%`}
+                  key={tier.key}
+                  className={cn(
+                    "absolute top-0 bottom-0 w-px border-l border-dashed",
+                    isTripped ? "border-secondary/60" : "border-secondary/15"
+                  )}
+                  style={{ left: `${pos}%` }}
+                  aria-hidden="true"
+                />
+              );
+            })}
+
+            <div className="relative flex flex-col gap-2.5">
+              {groups.map((group) => {
+                const pct = Math.min(group.vetoPercentage, 100);
+                return (
+                  <div key={group.name}>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className="text-xs leading-none text-primary">
+                        {group.name}
+                      </span>
+                      <span className="text-xs tabular-nums text-tertiary">
+                        {formatVetoPercentage(pct)}
+                      </span>
+                    </div>
+                    <div
+                      className="relative h-[6px] rounded-[10px] bg-line"
+                      role="progressbar"
+                      aria-valuenow={Number(pct.toFixed(1))}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`${group.name} veto percentage: ${pct.toFixed(1)}%`}
+                    >
+                      <div
+                        className={cn(
+                          "absolute inset-y-0 left-0 rounded-[10px]",
+                          BAR_FILL_CLASS
+                        )}
+                        style={{ width: `${toPosition(pct)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tier dots — same coordinate system, one column per threshold */}
+          <div className="relative w-full h-5 mt-1.5">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              return (
+                <div
+                  key={tier.key}
+                  className="absolute top-0"
+                  style={{
+                    left: `${pos}%`,
+                    transform: "translateX(-50%)",
+                  }}
                 >
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-[10px]"
-                    style={{
-                      width: `${toPosition(pct)}%`,
-                      backgroundColor: BAR_FILL_COLOR,
-                    }}
+                  <TierDots
+                    total={tier.groupsRequired}
+                    filled={groupsExceedingByTier[tier.key]}
+                    tierKey={tier.key}
                   />
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <p className="text-[9px] font-semibold uppercase leading-none text-tertiary text-center -mt-1">
+            # of signaling groups
+          </p>
         </div>
       </div>
-
-      {/* Tier dots — positioned at column offsets + shared label */}
-      <div className="relative h-5 mt-1.5">
-        {tiers.map((tier) => {
-          const pos = toPosition(tier.threshold);
-          return (
-            <div
-              key={tier.key}
-              className="absolute top-0"
-              style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
-            >
-              <TierDots
-                total={tier.groupsRequired}
-                filled={groupsExceedingByTier[tier.key]}
-                tierKey={tier.key}
-              />
-            </div>
-          );
-        })}
-      </div>
-      <p className="text-xs text-tertiary text-center -mt-1">
-        # of signaling groups
-      </p>
     </div>
   );
 }
