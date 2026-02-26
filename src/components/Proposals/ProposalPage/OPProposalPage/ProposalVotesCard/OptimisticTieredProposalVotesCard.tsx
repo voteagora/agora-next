@@ -186,8 +186,23 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
       ? "Veto threshold reached"
       : "Proposal Vetoed"
     : proposal.status === "ACTIVE"
-      ? "Veto threshold not reached"
-      : "Proposal Passing";
+      ? "Proposal will pass"
+      : "Proposal has passed";
+
+  // When vetoed (after ended), show which tier caused it: "Because X groups tripped the Y%-threshold."
+  const vetoExplanation =
+    vetoThresholdMet && proposal.status !== "ACTIVE"
+      ? (() => {
+          const tripped = tiers.find((t) => trippedTiers.has(t.key));
+          const count = tripped ? groupsExceedingByTier[tripped.key] : 0;
+          const pct = tripped?.threshold ?? 0;
+          return `Because ${count} groups tripped the ${pct}%-threshold, the proposal has been vetoed.`;
+        })()
+      : null;
+
+  const subtitle =
+    "One of three thresholds are applied, based on the number of groups signaling to veto." +
+    (vetoExplanation ? ` ${vetoExplanation}` : "");
 
   return (
     <div className="p-4">
@@ -202,10 +217,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           >
             {outcomeLabel}
           </p>
-          <p className="text-xs text-secondary mt-1 font-normal">
-            One of three thresholds are applied, based on the number of groups
-            signaling to veto.
-          </p>
+          <p className="text-xs text-secondary mt-1 font-normal">{subtitle}</p>
         </div>
 
         {/* Single container for consistent coordinate system */}
