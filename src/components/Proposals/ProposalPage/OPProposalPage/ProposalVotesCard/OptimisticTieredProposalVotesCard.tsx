@@ -166,12 +166,11 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
-  // Scale: maxThreshold * 1.5 gives visual separation for near-miss cases.
-  // E.g., with thresholds 11/14/17 → scaleMax ≈ 25.5
-  // 10% → 39.2%, 11% → 43.1%, 14% → 54.9%, 17% → 66.7%
-  // Gap between 10% and 11% line ≈ 4% of bar width (visible gap)
+  // Scale: maxThreshold * 1.25 spreads badges/lines more across the bar.
+  // E.g., with thresholds 11/14/17 → scaleMax ≈ 21.25
+  // 11% → 51.8%, 14% → 65.9%, 17% → 80%
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  const scaleMax = maxThreshold * 1.5;
+  const scaleMax = maxThreshold * 1.25;
 
   const toPosition = (value: number) => {
     return Math.min((value / scaleMax) * 100, 100);
@@ -212,22 +211,23 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         {/* Single container for consistent coordinate system */}
         <div className="relative w-full min-w-0">
           {/* Threshold badges — absolutely positioned to align with lines */}
-          <TooltipProvider delayDuration={0}>
-            <div className="relative h-5 mb-1">
-              {tiers.map((tier) => {
-                const pos = toPosition(tier.threshold);
-                const styles = TIER_STYLES[tier.key];
-                const isTripped = trippedTiers.has(tier.key);
-                const tooltipText =
-                  tier.groupsRequired === 4
-                    ? `Vetoed if all ${totalGroups} groups exceed ${tier.threshold}%`
-                    : `Vetoed if any ${tier.groupsRequired} groups exceed ${tier.threshold}%`;
-                return (
-                  <Tooltip key={tier.key}>
-                    <TooltipTrigger>
-                      <span
+          <div className="relative h-5 mb-1">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              const styles = TIER_STYLES[tier.key];
+              const isTripped = trippedTiers.has(tier.key);
+              const tooltipText =
+                tier.groupsRequired === 4
+                  ? `Vetoed if all ${totalGroups} groups exceed ${tier.threshold}%`
+                  : `Vetoed if any ${tier.groupsRequired} groups exceed ${tier.threshold}%`;
+              return (
+                <TooltipProvider key={tier.key} delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
                         className={cn(
-                          "absolute top-0 inline-flex items-center rounded-sm px-1 py-px text-[10px] font-semibold tabular-nums cursor-help",
+                          "absolute top-0 inline-flex items-center rounded-sm px-1 py-px text-[10px] font-semibold tabular-nums",
                           isTripped ? styles.badgeActive : styles.badge,
                           !isTripped && "opacity-50"
                         )}
@@ -238,16 +238,16 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                         aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
                       >
                         {tier.threshold}%
-                      </span>
+                      </button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-[200px] p-2 text-xs">
                       {tooltipText}
                     </TooltipContent>
                   </Tooltip>
-                );
-              })}
-            </div>
-          </TooltipProvider>
+                </TooltipProvider>
+              );
+            })}
+          </div>
 
           {/* Group bars with color-coded dotted threshold lines */}
           <div className="relative w-full">
