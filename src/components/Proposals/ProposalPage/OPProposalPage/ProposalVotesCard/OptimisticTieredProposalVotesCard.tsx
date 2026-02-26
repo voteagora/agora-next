@@ -190,35 +190,34 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           </p>
         </div>
 
-        <div className="relative w-full min-w-0">
-          {/* Spacer for badge height */}
-          <div className="h-6 w-full" aria-hidden="true" />
+        {/* Threshold badges — evenly spread across the threshold zone */}
+        <div
+          className="flex items-center justify-between mb-2"
+          style={{
+            paddingLeft: `${toPosition(tiers[0].threshold) - 8}%`,
+            paddingRight: `${100 - toPosition(tiers[tiers.length - 1].threshold) - 8}%`,
+          }}
+        >
+          {tiers.map((tier) => {
+            const styles = TIER_STYLES[tier.key];
+            const isTripped = trippedTiers.has(tier.key);
+            return (
+              <span
+                key={tier.key}
+                className={cn(
+                  "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                  isTripped ? styles.badgeActive : styles.badge,
+                  !isTripped && "opacity-50"
+                )}
+                aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+              >
+                {tier.threshold}%
+              </span>
+            );
+          })}
+        </div>
 
-          {/* Threshold badges — positioned above their dotted lines */}
-          <div className="absolute top-0 left-0 w-full h-6">
-            {tiers.map((tier) => {
-              const pos = toPosition(tier.threshold);
-              const styles = TIER_STYLES[tier.key];
-              const isTripped = trippedTiers.has(tier.key);
-              return (
-                <span
-                  key={tier.key}
-                  className={cn(
-                    "absolute top-0 inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-                    isTripped ? styles.badgeActive : styles.badge,
-                    !isTripped && "opacity-50"
-                  )}
-                  style={{
-                    left: `${pos}%`,
-                    transform: "translateX(-50%)",
-                  }}
-                  aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-                >
-                  {tier.threshold}%
-                </span>
-              );
-            })}
-          </div>
+        <div className="relative w-full min-w-0">
           {/* Group bars with shared dotted column lines */}
           <div className="relative w-full">
             {tiers.map((tier) => {
