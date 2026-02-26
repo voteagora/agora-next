@@ -157,11 +157,18 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
+  // Map thresholds to evenly spread positions (20% / 50% / 80%) for better spacing.
+  // Bar fill positions are also mapped to this scale so they stay proportional.
+  const minThreshold = Math.min(...tiers.map((t) => t.threshold));
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  // Scale so dotted lines have breathing room (50% / 64% / 77% for 11/14/17).
-  // Bars that exceed the scale fill to 100% (capped); exact value is in the text label.
-  const scaleMax = maxThreshold * 1.3;
-  const toPosition = (value: number) => Math.min((value / scaleMax) * 100, 100);
+  const thresholdRange = maxThreshold - minThreshold || 1;
+
+  // Thresholds map to 20%–80% of bar width; values outside that range extrapolate.
+  const toPosition = (value: number) => {
+    const normalized = (value - minThreshold) / thresholdRange; // 0 to 1 for threshold range
+    const position = 20 + normalized * 60; // 20% to 80%
+    return Math.max(0, Math.min(position, 100));
+  };
 
   const outcomeLabel = vetoThresholdMet
     ? proposal.status === "ACTIVE"
@@ -190,14 +197,8 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           </p>
         </div>
 
-        {/* Threshold badges — evenly spread across the threshold zone */}
-        <div
-          className="flex items-center justify-between mb-2"
-          style={{
-            paddingLeft: `${toPosition(tiers[0].threshold) - 8}%`,
-            paddingRight: `${100 - toPosition(tiers[tiers.length - 1].threshold) - 8}%`,
-          }}
-        >
+        {/* Threshold badges — evenly spread (positions: 20% / 50% / 80%) */}
+        <div className="flex items-center justify-between mb-2 px-[10%]">
           {tiers.map((tier) => {
             const styles = TIER_STYLES[tier.key];
             const isTripped = trippedTiers.has(tier.key);
