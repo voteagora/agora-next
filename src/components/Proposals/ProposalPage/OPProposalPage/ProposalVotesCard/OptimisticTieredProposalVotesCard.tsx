@@ -160,7 +160,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
   // Scale is always based on thresholds so badges and dots have room.
   // Bars that exceed the scale fill to 100% (capped); exact value is in the text label.
-  const scaleMax = maxThreshold * 1.3;
+  const scaleMax = maxThreshold * 1.08;
   const toPosition = (value: number) => Math.min((value / scaleMax) * 100, 100);
 
   const outcomeLabel = vetoThresholdMet
