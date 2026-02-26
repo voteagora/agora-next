@@ -158,9 +158,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
   }, [tiers, groupsExceedingByTier]);
 
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  // Scale is always based on thresholds so badges and dots have room.
+  // Scale so dotted lines have breathing room (50% / 64% / 77% for 11/14/17).
   // Bars that exceed the scale fill to 100% (capped); exact value is in the text label.
-  const scaleMax = maxThreshold * 1.08;
+  const scaleMax = maxThreshold * 1.3;
   const toPosition = (value: number) => Math.min((value / scaleMax) * 100, 100);
 
   const outcomeLabel = vetoThresholdMet
@@ -190,40 +190,28 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           </p>
         </div>
 
-        {/* Single wrapper so badges, lines, and dots share the same width for alignment */}
+        {/* Threshold badges — centered row, color links them to dotted lines */}
+        <div className="flex items-center justify-center gap-2 mb-2">
+          {tiers.map((tier) => {
+            const styles = TIER_STYLES[tier.key];
+            const isTripped = trippedTiers.has(tier.key);
+            return (
+              <span
+                key={tier.key}
+                className={cn(
+                  "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                  isTripped ? styles.badgeActive : styles.badge,
+                  !isTripped && "opacity-50"
+                )}
+                aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+              >
+                {tier.threshold}%
+              </span>
+            );
+          })}
+        </div>
+
         <div className="relative w-full min-w-0">
-          {/* Spacer reserves vertical space for badges */}
-          <div className="h-6 w-full" aria-hidden="true" />
-
-          {/* Threshold badges — same width as bars, aligned above dotted lines */}
-          <div className="absolute top-0 left-0 w-full h-6 pointer-events-none">
-            {tiers.map((tier) => {
-              const pos = toPosition(tier.threshold);
-              const styles = TIER_STYLES[tier.key];
-              const isTripped = trippedTiers.has(tier.key);
-              return (
-                <div
-                  key={tier.key}
-                  className={cn("absolute top-0", !isTripped && "opacity-40")}
-                  style={{
-                    left: `${pos}%`,
-                    transform: "translateX(-50%)",
-                  }}
-                >
-                  <span
-                    className={cn(
-                      "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-                      isTripped ? styles.badgeActive : styles.badge
-                    )}
-                    aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-                  >
-                    {tier.threshold}%
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
           {/* Group bars with shared dotted column lines */}
           <div className="relative w-full">
             {tiers.map((tier) => {
