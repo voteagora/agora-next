@@ -28,19 +28,22 @@ const TIER_STYLES = {
     badge: "bg-teal-100 text-teal-700 border border-teal-200",
     badgeActive: "bg-teal-600 text-white border border-teal-600",
     dot: "bg-teal-500",
-    label: "text-teal-700",
+    line: "border-teal-400",
+    lineMuted: "border-teal-300/40",
   },
   threeGroups: {
     badge: "bg-violet-100 text-violet-700 border border-violet-200",
     badgeActive: "bg-violet-600 text-white border border-violet-600",
     dot: "bg-violet-500",
-    label: "text-violet-700",
+    line: "border-violet-400",
+    lineMuted: "border-violet-300/40",
   },
   twoGroups: {
     badge: "bg-pink-100 text-pink-700 border border-pink-200",
     badgeActive: "bg-pink-600 text-white border border-pink-600",
     dot: "bg-pink-500",
-    label: "text-pink-700",
+    line: "border-pink-400",
+    lineMuted: "border-pink-300/40",
   },
 } as const;
 
@@ -157,19 +160,21 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
-  // Fixed positions for the 3 thresholds: 25%, 50%, 75% — evenly spread.
-  // Bar fill uses proportional scale based on max threshold.
+  // Scale: maxThreshold * 1.5 gives visual separation for near-miss cases.
+  // E.g., with thresholds 11/14/17 → scaleMax ≈ 25.5
+  // 10% → 39.2%, 11% → 43.1%, 14% → 54.9%, 17% → 66.7%
+  // Gap between 10% and 11% line ≈ 4% of bar width (visible gap)
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  const tierPositions: Record<TierKey, number> = {
-    fourGroups: 25,
-    threeGroups: 50,
-    twoGroups: 75,
-  };
+  const scaleMax = maxThreshold * 1.5;
 
   const toPosition = (value: number) => {
-    // For bar fills: scale proportionally, max threshold = 75%
-    return Math.min((value / maxThreshold) * 75, 100);
+    return Math.min((value / scaleMax) * 100, 100);
   };
+
+  // Calculate threshold positions for badge alignment
+  const thresholdPositions = tiers.map((t) => toPosition(t.threshold));
+  const firstThresholdPos = Math.min(...thresholdPositions);
+  const lastThresholdPos = Math.max(...thresholdPositions);
 
   const outcomeLabel = vetoThresholdMet
     ? proposal.status === "ACTIVE"
@@ -198,26 +203,27 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           </p>
         </div>
 
-        {/* Everything in one relative container for alignment */}
+        {/* Single container for consistent coordinate system */}
         <div className="relative w-full min-w-0">
-          {/* Threshold badges — absolutely positioned at 25% / 50% / 75% */}
-          <div className="relative h-6 mb-1">
+          {/* Threshold badges — flex row with dynamic padding to align with lines */}
+          <div
+            className="flex items-center justify-between mb-2"
+            style={{
+              paddingLeft: `${Math.max(0, firstThresholdPos - 6)}%`,
+              paddingRight: `${Math.max(0, 100 - lastThresholdPos - 6)}%`,
+            }}
+          >
             {tiers.map((tier) => {
-              const pos = tierPositions[tier.key];
               const styles = TIER_STYLES[tier.key];
               const isTripped = trippedTiers.has(tier.key);
               return (
                 <span
                   key={tier.key}
                   className={cn(
-                    "absolute top-0 inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                    "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
                     isTripped ? styles.badgeActive : styles.badge,
                     !isTripped && "opacity-50"
                   )}
-                  style={{
-                    left: `${pos}%`,
-                    transform: "translateX(-50%)",
-                  }}
                   aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
                 >
                   {tier.threshold}%
@@ -226,17 +232,19 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             })}
           </div>
 
-          {/* Group bars with dotted column lines at same positions */}
+          {/* Group bars with color-coded dotted threshold lines */}
           <div className="relative w-full">
+            {/* Threshold lines — color matches tier badges */}
             {tiers.map((tier) => {
-              const pos = tierPositions[tier.key];
+              const pos = toPosition(tier.threshold);
+              const styles = TIER_STYLES[tier.key];
               const isTripped = trippedTiers.has(tier.key);
               return (
                 <div
                   key={tier.key}
                   className={cn(
                     "absolute top-0 bottom-0 w-px border-l border-dashed",
-                    isTripped ? "border-secondary/60" : "border-secondary/15"
+                    isTripped ? styles.line : styles.lineMuted
                   )}
                   style={{ left: `${pos}%` }}
                   aria-hidden="true"
@@ -279,14 +287,14 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             </div>
           </div>
 
-          {/* Tier dots — same fixed positions as badges and lines */}
-          <div className="relative w-full h-5 mt-1.5">
+          {/* Tier dots — positioned at same threshold positions */}
+          <div className="relative w-full h-5 mt-2">
             {tiers.map((tier) => {
-              const pos = tierPositions[tier.key];
+              const pos = toPosition(tier.threshold);
               return (
                 <div
                   key={tier.key}
-                  className="absolute top-0 px-0.5"
+                  className="absolute top-0"
                   style={{
                     left: `${pos}%`,
                     transform: "translateX(-50%)",
@@ -302,7 +310,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             })}
           </div>
 
-          <p className="text-[9px] font-semibold uppercase leading-none text-tertiary text-center -mt-1">
+          <p className="text-[9px] font-semibold uppercase leading-none text-tertiary text-center mt-0.5">
             # of signaling groups
           </p>
         </div>
