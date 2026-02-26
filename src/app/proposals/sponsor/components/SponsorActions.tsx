@@ -28,6 +28,8 @@ const SponsorActions = ({
         return <ApprovalProposalAction draftProposal={proposal} />;
       case ProposalType.OPTIMISTIC:
         return <OptimisticProposalAction draftProposal={proposal} />;
+      case ProposalType.OPTMISTIC_EXECUTABLE:
+        return <OptimisticProposalAction draftProposal={proposal as any} />;
       default:
         // ensures that we've handled all cases
         const _exhaustiveCheck: never = proposal;

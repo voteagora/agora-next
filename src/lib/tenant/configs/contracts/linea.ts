@@ -42,10 +42,6 @@ export const lineaTenantConfig = ({
     ? "0xc5624d0Bc88A1C654cc968f9E741F1B448c1B897"
     : "0xc5624d0Bc88A1C654cc968f9E741F1B448c1B897";
 
-  const APPROVAL_MODULE = isProd
-    ? "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7"
-    : "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7";
-
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
   const provider = usingForkedNode
@@ -93,8 +89,6 @@ export const lineaTenantConfig = ({
       contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
-
-    governorApprovalModule: APPROVAL_MODULE,
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     governorType: GOVERNOR_TYPE.AGORA,
