@@ -12,6 +12,12 @@ import Tenant from "@/lib/tenant/tenant";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
@@ -206,31 +212,46 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         {/* Single container for consistent coordinate system */}
         <div className="relative w-full min-w-0">
           {/* Threshold badges — flex row with dynamic padding to align with lines */}
-          <div
-            className="flex items-center justify-between mb-2"
-            style={{
-              paddingLeft: `${Math.max(0, firstThresholdPos - 6)}%`,
-              paddingRight: `${Math.max(0, 100 - lastThresholdPos - 6)}%`,
-            }}
-          >
-            {tiers.map((tier) => {
-              const styles = TIER_STYLES[tier.key];
-              const isTripped = trippedTiers.has(tier.key);
-              return (
-                <span
-                  key={tier.key}
-                  className={cn(
-                    "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-                    isTripped ? styles.badgeActive : styles.badge,
-                    !isTripped && "opacity-50"
-                  )}
-                  aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-                >
-                  {tier.threshold}%
-                </span>
-              );
-            })}
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <div
+              className="flex items-center justify-between mb-2"
+              style={{
+                paddingLeft: `${Math.max(0, firstThresholdPos - 6)}%`,
+                paddingRight: `${Math.max(0, 100 - lastThresholdPos - 6)}%`,
+              }}
+            >
+              {tiers.map((tier) => {
+                const styles = TIER_STYLES[tier.key];
+                const isTripped = trippedTiers.has(tier.key);
+                const tooltipText =
+                  tier.groupsRequired === 4
+                    ? `Vetoed if all ${totalGroups} groups exceed ${tier.threshold}%`
+                    : `Vetoed if any ${tier.groupsRequired} groups exceed ${tier.threshold}%`;
+                return (
+                  <Tooltip key={tier.key}>
+                    <TooltipTrigger asChild>
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-sm px-0.5 text-[9px] font-semibold tabular-nums leading-tight cursor-help",
+                          isTripped ? styles.badgeActive : styles.badge,
+                          !isTripped && "opacity-50"
+                        )}
+                        aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                      >
+                        {tier.threshold}%
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      className="max-w-[200px] text-xs"
+                    >
+                      {tooltipText}
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </TooltipProvider>
 
           {/* Group bars with color-coded dotted threshold lines */}
           <div className="relative w-full">
