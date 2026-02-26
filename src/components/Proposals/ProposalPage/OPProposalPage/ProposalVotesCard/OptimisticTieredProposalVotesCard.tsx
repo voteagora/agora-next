@@ -157,16 +157,18 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return tripped;
   }, [tiers, groupsExceedingByTier]);
 
-  // Map thresholds to spread positions (40% / 55% / 70%) — balanced spacing.
-  const minThreshold = Math.min(...tiers.map((t) => t.threshold));
+  // Fixed positions for the 3 thresholds: 25%, 50%, 75% — evenly spread.
+  // Bar fill uses proportional scale based on max threshold.
   const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
-  const thresholdRange = maxThreshold - minThreshold || 1;
+  const tierPositions: Record<TierKey, number> = {
+    fourGroups: 25,
+    threeGroups: 50,
+    twoGroups: 75,
+  };
 
-  // Thresholds map to 40%–70% of bar width; values below/above extrapolate.
   const toPosition = (value: number) => {
-    const normalized = (value - minThreshold) / thresholdRange;
-    const position = 40 + normalized * 30; // 40% to 70%
-    return Math.max(0, Math.min(position, 100));
+    // For bar fills: scale proportionally, max threshold = 75%
+    return Math.min((value / maxThreshold) * 75, 100);
   };
 
   const outcomeLabel = vetoThresholdMet
@@ -196,32 +198,38 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           </p>
         </div>
 
-        {/* Threshold badges — spread across positions 40% / 55% / 70% */}
-        <div className="flex items-center justify-between mb-2 px-[28%]">
-          {tiers.map((tier) => {
-            const styles = TIER_STYLES[tier.key];
-            const isTripped = trippedTiers.has(tier.key);
-            return (
-              <span
-                key={tier.key}
-                className={cn(
-                  "inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
-                  isTripped ? styles.badgeActive : styles.badge,
-                  !isTripped && "opacity-50"
-                )}
-                aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
-              >
-                {tier.threshold}%
-              </span>
-            );
-          })}
-        </div>
-
+        {/* Everything in one relative container for alignment */}
         <div className="relative w-full min-w-0">
-          {/* Group bars with shared dotted column lines */}
+          {/* Threshold badges — absolutely positioned at 25% / 50% / 75% */}
+          <div className="relative h-6 mb-1">
+            {tiers.map((tier) => {
+              const pos = tierPositions[tier.key];
+              const styles = TIER_STYLES[tier.key];
+              const isTripped = trippedTiers.has(tier.key);
+              return (
+                <span
+                  key={tier.key}
+                  className={cn(
+                    "absolute top-0 inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-semibold tabular-nums",
+                    isTripped ? styles.badgeActive : styles.badge,
+                    !isTripped && "opacity-50"
+                  )}
+                  style={{
+                    left: `${pos}%`,
+                    transform: "translateX(-50%)",
+                  }}
+                  aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                >
+                  {tier.threshold}%
+                </span>
+              );
+            })}
+          </div>
+
+          {/* Group bars with dotted column lines at same positions */}
           <div className="relative w-full">
             {tiers.map((tier) => {
-              const pos = toPosition(tier.threshold);
+              const pos = tierPositions[tier.key];
               const isTripped = trippedTiers.has(tier.key);
               return (
                 <div
@@ -271,10 +279,10 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
             </div>
           </div>
 
-          {/* Tier dots — same coordinate system, one column per threshold */}
+          {/* Tier dots — same fixed positions as badges and lines */}
           <div className="relative w-full h-5 mt-1.5">
             {tiers.map((tier) => {
-              const pos = toPosition(tier.threshold);
+              const pos = tierPositions[tier.key];
               return (
                 <div
                   key={tier.key}
