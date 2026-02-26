@@ -211,16 +211,11 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
 
         {/* Single container for consistent coordinate system */}
         <div className="relative w-full min-w-0">
-          {/* Threshold badges — flex row with dynamic padding to align with lines */}
-          <TooltipProvider delayDuration={100}>
-            <div
-              className="flex items-center justify-between mb-2"
-              style={{
-                paddingLeft: `${Math.max(0, firstThresholdPos - 6)}%`,
-                paddingRight: `${Math.max(0, 100 - lastThresholdPos - 6)}%`,
-              }}
-            >
+          {/* Threshold badges — absolutely positioned to align with lines */}
+          <TooltipProvider delayDuration={0}>
+            <div className="relative h-5 mb-1">
               {tiers.map((tier) => {
+                const pos = toPosition(tier.threshold);
                 const styles = TIER_STYLES[tier.key];
                 const isTripped = trippedTiers.has(tier.key);
                 const tooltipText =
@@ -229,22 +224,23 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                     : `Vetoed if any ${tier.groupsRequired} groups exceed ${tier.threshold}%`;
                 return (
                   <Tooltip key={tier.key}>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger>
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-sm px-0.5 text-[9px] font-semibold tabular-nums leading-tight cursor-help",
+                          "absolute top-0 inline-flex items-center rounded-sm px-1 py-px text-[10px] font-semibold tabular-nums cursor-help",
                           isTripped ? styles.badgeActive : styles.badge,
                           !isTripped && "opacity-50"
                         )}
+                        style={{
+                          left: `${pos}%`,
+                          transform: "translateX(-50%)",
+                        }}
                         aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
                       >
                         {tier.threshold}%
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent
-                      side="top"
-                      className="max-w-[200px] text-xs"
-                    >
+                    <TooltipContent className="max-w-[200px] p-2 text-xs">
                       {tooltipText}
                     </TooltipContent>
                   </Tooltip>
