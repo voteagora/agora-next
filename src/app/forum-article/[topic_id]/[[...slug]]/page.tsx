@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { getForumTopic } from "@/lib/actions/forum";
+import { hasUnpublishedTopicAccess } from "@/lib/actions/forum/unpublishedTopic";
+import UnpublishedTopicGate from "@/app/forums/[topic_id]/components/UnpublishedTopicGate";
 import {
   transformForumTopics,
   buildForumArticlePath,
@@ -100,10 +102,26 @@ export async function generateMetadata({
   }
 
   const { topicId, topicData, transformed } = topicBundle;
-  const baseUrl = getRequestBaseUrl();
-  const canonicalPath = buildForumArticlePath(topicId, transformed.title);
   const tenant = Tenant.current();
   const brandName = tenant.brandName || "Agora";
+  const revealTime = topicData.revealTime
+    ? new Date(
+        topicData.revealTime instanceof Date
+          ? topicData.revealTime
+          : topicData.revealTime
+      )
+    : null;
+  const isUnpublished =
+    revealTime !== null && revealTime.getTime() > Date.now();
+  if (isUnpublished && !(await hasUnpublishedTopicAccess())) {
+    return {
+      title: `Preview | ${brandName}`,
+      robots: "noindex, nofollow",
+    };
+  }
+
+  const baseUrl = getRequestBaseUrl();
+  const canonicalPath = buildForumArticlePath(topicId, transformed.title);
 
   const description = " ";
   const suffix = ` | ${brandName}`;
@@ -184,6 +202,31 @@ export default async function ForumArticlePage({ params }: PageProps) {
     (att: any) => att.contentType === "application/pdf"
   );
   const pdfUrl = pdfAttachment?.url ?? null;
+
+  const revealTime = topicData.revealTime
+    ? new Date(
+        topicData.revealTime instanceof Date
+          ? topicData.revealTime
+          : topicData.revealTime
+      )
+    : null;
+  const isUnpublished =
+    revealTime !== null && revealTime.getTime() > Date.now();
+  const canAccessUnpublished = isUnpublished
+    ? await hasUnpublishedTopicAccess()
+    : true;
+
+  if (isUnpublished && !canAccessUnpublished) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
+          <UnpublishedTopicGate
+            redirectPath={buildForumArticlePath(topicId, transformed.title)}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">

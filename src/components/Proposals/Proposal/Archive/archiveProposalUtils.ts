@@ -275,21 +275,15 @@ export const deriveStatus = (
     );
 
     quorumMet = forVotes > quorum;
-
     hasMetThreshold =
       forVotes / (forVotes + againstVotes) >= approvalThreshold / 100;
   }
 
-  if (!quorumMet || !hasMetThreshold) {
-    return "DEFEATED";
-  }
-
-  // Succeeded if for > against
-  if (forVotes > againstVotes) {
+  if (quorumMet) {
     return "SUCCEEDED";
   }
 
-  return "FAILED";
+  return "DEFEATED";
 };
 
 export const formatArchiveTagLabel = (tag?: string | null): string | null => {
