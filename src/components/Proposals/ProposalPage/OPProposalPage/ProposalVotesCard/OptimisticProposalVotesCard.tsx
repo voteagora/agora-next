@@ -23,6 +23,7 @@ import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import CastEasOptimisticVoteInput from "@/components/Votes/CastVoteInput/CastEasOptimisticVoteInput";
+import { useEffect } from "react";
 
 interface Props {
   proposal: Proposal;
@@ -58,6 +59,21 @@ const OptimisticProposalVotesCard = ({
   // Get voting data to check if user has already voted
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
+
   const { data: votingData, isSuccess: isVotingDataLoaded } =
     useFetchAllForVoting({
       proposal,
@@ -167,6 +183,7 @@ const OptimisticProposalVotesCard = ({
               <ProposalVotesSort
                 sortOption={sortOption}
                 onSortChange={setSortOption}
+                hideTimeSortOptions={hideTimeSortOptions}
               />
             )}
           </div>

@@ -20,6 +20,12 @@ import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
+import { useEffect } from "react";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
+import { VoterTypes } from "@/app/api/common/votes/vote";
 
 type Props = {
   proposal: Proposal;
@@ -33,6 +39,30 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  });
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
+
   const hybridApprovalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];
 
@@ -102,6 +132,20 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
                     setShowVoters(value === "Voters");
                   }}
                 />
+                <div className="flex justify-between items-center border-t border-line pt-2 mt-2">
+                  <ProposalVoterListFilter
+                    selectedVoterType={selectedVoterType}
+                    onVoterTypeChange={setSelectedVoterType}
+                    isOffchain={true}
+                  />
+                  {showVoters && (
+                    <ProposalVotesSort
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                      hideTimeSortOptions={hideTimeSortOptions}
+                    />
+                  )}
+                </div>
               </div>
               {useArchiveVoteHistory ? (
                 showVoters ? (
@@ -110,17 +154,26 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
                     isThresholdCriteria={isThresholdCriteria}
                   />
                 ) : (
-                  <ArchiveProposalNonVoterList proposal={proposal} />
+                  <ArchiveProposalNonVoterList
+                    proposal={proposal}
+                    selectedVoterType={selectedVoterType}
+                  />
                 )
               ) : showVoters ? (
                 <ProposalVotesList
                   proposalId={proposal.id}
                   offchainProposalId={proposal.offchainProposalId}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  voterType={selectedVoterType.type}
                 />
               ) : (
                 <ProposalNonVoterList
                   proposal={proposal}
                   offchainProposalId={proposal.offchainProposalId}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  selectedVoterType={selectedVoterType}
                 />
               )}
             </>

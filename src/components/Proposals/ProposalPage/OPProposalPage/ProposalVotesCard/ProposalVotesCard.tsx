@@ -19,6 +19,7 @@ import { VoterTypes } from "@/app/api/common/votes/vote";
 import { VOTER_TYPES } from "@/lib/constants";
 import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 import Tenant from "@/lib/tenant/tenant";
+import { useEffect } from "react";
 
 const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
@@ -37,6 +38,20 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -73,10 +88,13 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
                 onVoterTypeChange={setSelectedVoterType}
                 isOffchain={isOffchain}
               />
-              <ProposalVotesSort
-                sortOption={sortOption}
-                onSortChange={setSortOption}
-              />
+              {showVoters && (
+                <ProposalVotesSort
+                  sortOption={sortOption}
+                  onSortChange={setSortOption}
+                  hideTimeSortOptions={hideTimeSortOptions}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -90,7 +108,10 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
               voterType={selectedVoterType.type}
             />
           ) : (
-            <ArchiveProposalNonVoterList proposal={proposal} />
+            <ArchiveProposalNonVoterList
+              proposal={proposal}
+              selectedVoterType={selectedVoterType}
+            />
           )
         ) : showVoters ? (
           <ProposalVotesList

@@ -38,6 +38,7 @@ import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/Archi
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import { useEffect } from "react";
 
 interface Props {
   proposal: Proposal;
@@ -157,6 +158,20 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   )?.enabled;
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
 
   const { vetoThresholdMet, groupTallies } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
@@ -336,6 +351,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                     <ProposalVotesSort
                       sortOption={sortOption}
                       onSortChange={setSortOption}
+                      hideTimeSortOptions={hideTimeSortOptions}
                     />
                   )}
                 </div>

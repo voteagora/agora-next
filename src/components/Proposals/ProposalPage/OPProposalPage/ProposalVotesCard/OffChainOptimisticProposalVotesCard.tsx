@@ -32,6 +32,7 @@ import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/Ar
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import Tenant from "@/lib/tenant/tenant";
+import { useEffect } from "react";
 
 interface Props {
   proposal: Proposal;
@@ -118,6 +119,20 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
 
   const { totalAgainstVotes } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
@@ -220,6 +235,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <ProposalVotesSort
                       sortOption={sortOption}
                       onSortChange={setSortOption}
+                      hideTimeSortOptions={hideTimeSortOptions}
                     />
                   )}
                 </div>

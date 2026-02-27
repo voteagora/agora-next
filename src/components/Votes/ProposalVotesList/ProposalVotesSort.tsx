@@ -45,12 +45,18 @@ const sortOptions: SortParams[] = [
 interface ProposalVotesSortProps {
   sortOption: SortParams;
   onSortChange: (option: SortParams) => void;
+  hideTimeSortOptions?: boolean;
 }
 
 export default function ProposalVotesSort({
   sortOption,
   onSortChange,
+  hideTimeSortOptions = false,
 }: ProposalVotesSortProps) {
+  const visibleOptions = hideTimeSortOptions
+    ? sortOptions.filter((opt) => opt.sortKey !== "block_number")
+    : sortOptions;
+
   return (
     <div className="relative text-primary">
       <Listbox
@@ -68,7 +74,7 @@ export default function ProposalVotesSort({
           <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
         </Listbox.Button>
         <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max right-0 shadow-xl">
-          {sortOptions.map((option) => (
+          {visibleOptions.map((option) => (
             <Listbox.Option key={option.label} value={option.label}>
               {({ selected }) => (
                 <div

@@ -18,6 +18,7 @@ import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import { HStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
+import { useEffect } from "react";
 
 const HybridStandardProposalVotesCard = ({
   proposal,
@@ -40,6 +41,20 @@ const HybridStandardProposalVotesCard = ({
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -98,6 +113,7 @@ const HybridStandardProposalVotesCard = ({
                     <ProposalVotesSort
                       sortOption={sortOption}
                       onSortChange={setSortOption}
+                      hideTimeSortOptions={hideTimeSortOptions}
                     />
                   )}
                 </div>
