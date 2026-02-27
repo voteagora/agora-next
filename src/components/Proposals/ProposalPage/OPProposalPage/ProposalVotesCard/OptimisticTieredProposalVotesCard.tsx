@@ -176,11 +176,6 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
     return Math.min((value / scaleMax) * 100, 100);
   };
 
-  // Calculate threshold positions for badge alignment
-  const thresholdPositions = tiers.map((t) => toPosition(t.threshold));
-  const firstThresholdPos = Math.min(...thresholdPositions);
-  const lastThresholdPos = Math.max(...thresholdPositions);
-
   const outcomeLabel = vetoThresholdMet
     ? proposal.status === "ACTIVE"
       ? "Veto threshold reached"
