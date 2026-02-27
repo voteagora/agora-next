@@ -4,31 +4,20 @@ import { useState, useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesFilter from "./ProposalVotesFilter";
-import VotesGroupTable from "@/components/common/VotesGroupTable";
-import {
-  ParsedProposalData,
-  ParsedProposalResults,
-  calculateHybridOptimisticProposalMetrics,
-} from "@/lib/proposalUtils";
+import { calculateHybridOptimisticProposalMetrics } from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { formatNumber } from "@/lib/tokenUtils";
-import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
-import { CloseIcon } from "@/icons/closeIcon";
-import { InfoIcon } from "@/icons/InfoIcon";
+import { HStack } from "@/components/Layout/Stack";
+import { icons } from "@/assets/icons/icons";
+import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Image from "next/image";
-import checkIcon from "@/icons/check.svg";
-import { HStack } from "@/components/Layout/Stack";
-import { icons } from "@/assets/icons/icons";
-import { cn } from "@/lib/utils";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
@@ -38,100 +27,321 @@ interface Props {
   proposal: Proposal;
 }
 
-const { token } = Tenant.current();
+const BAR_FILL_CLASS = "bg-tertiary";
 
-const OptimisticTieredProposalVotesGroup = ({
-  proposal,
+const TIER_STYLES = {
+  fourGroups: {
+    badge: "bg-teal-100 text-teal-700 border border-teal-200",
+    badgeActive: "bg-teal-600 text-white border border-teal-600",
+    dot: "bg-teal-500",
+    line: "border-teal-400",
+    lineMuted: "border-teal-300/40",
+  },
+  threeGroups: {
+    badge: "bg-violet-100 text-violet-700 border border-violet-200",
+    badgeActive: "bg-violet-600 text-white border border-violet-600",
+    dot: "bg-violet-500",
+    line: "border-violet-400",
+    lineMuted: "border-violet-300/40",
+  },
+  twoGroups: {
+    badge: "bg-pink-100 text-pink-700 border border-pink-200",
+    badgeActive: "bg-pink-600 text-white border border-pink-600",
+    dot: "bg-pink-500",
+    line: "border-pink-400",
+    lineMuted: "border-pink-300/40",
+  },
+} as const;
+
+type TierKey = keyof typeof TIER_STYLES;
+
+interface TierInfo {
+  key: TierKey;
+  threshold: number;
+  groupsRequired: number;
+}
+
+interface GroupData {
+  name: string;
+  vetoPercentage: number;
+}
+
+function formatVetoPercentage(value: number): string {
+  if (value === 0) return "0%";
+  if (value > 0 && value < 1) return `${value.toFixed(1)}%`;
+  return `${Math.round(value)}%`;
+}
+
+function TierDots({
+  total,
+  filled,
+  tierKey,
 }: {
-  proposal: Proposal;
-}) => {
-  const proposalResults =
-    proposal.proposalResults as ParsedProposalResults["HYBRID_OPTIMISTIC_TIERED"]["kind"];
+  total: number;
+  filled: number;
+  tierKey: TierKey;
+}) {
+  const styles = TIER_STYLES[tierKey];
+  const filledCount = Math.min(Math.max(0, filled), total);
+  return (
+    <div className="flex items-center gap-0.5 shrink-0 whitespace-nowrap">
+      {Array.from({ length: total }).map((_, i) => (
+        <span
+          key={i}
+          className={cn(
+            "inline-block w-1.5 h-1.5 rounded-full shrink-0",
+            i < filledCount ? styles.dot : "bg-line"
+          )}
+        />
+      ))}
+    </div>
+  );
+}
 
-  const { groupTallies } = useMemo(
+function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
+  const { vetoThresholdMet, groupTallies, thresholds } = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
 
-  let voteGroups = [
-    {
-      name: "Chains",
-      againstVotes: proposalResults?.CHAIN?.against || "0",
-      vetoPercentage:
-        groupTallies.find((g) => g.name === "chains")?.vetoPercentage || 0,
-      veto:
-        groupTallies.find((g) => g.name === "chains")?.exceedsThreshold ||
-        false,
-    },
-    {
-      name: "Apps",
-      againstVotes: proposalResults?.APP?.against || "0",
-      vetoPercentage:
-        groupTallies.find((g) => g.name === "apps")?.vetoPercentage || 0,
-      veto:
-        groupTallies.find((g) => g.name === "apps")?.exceedsThreshold || false,
-    },
-    {
-      name: "Users",
-      againstVotes: proposalResults?.USER?.against || "0",
-      vetoPercentage:
-        groupTallies.find((g) => g.name === "users")?.vetoPercentage || 0,
-      veto:
-        groupTallies.find((g) => g.name === "users")?.exceedsThreshold || false,
-    },
-  ];
-
-  if (proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED") {
-    voteGroups = [
+  const tiers: TierInfo[] = useMemo(
+    () => [
       {
-        name: "Delegates",
-        againstVotes: formatNumber(
-          (proposalResults?.DELEGATES?.against || "0").toString()
-        ),
-        vetoPercentage:
-          groupTallies.find((g) => g.name === "delegates")?.vetoPercentage || 0,
-        veto:
-          groupTallies.find((g) => g.name === "delegates")?.exceedsThreshold ||
-          false,
+        key: "fourGroups" as const,
+        threshold: thresholds.fourGroups,
+        groupsRequired: 4,
       },
-      ...voteGroups,
-    ];
-  }
+      {
+        key: "threeGroups" as const,
+        threshold: thresholds.threeGroups,
+        groupsRequired: 3,
+      },
+      {
+        key: "twoGroups" as const,
+        threshold: thresholds.twoGroups,
+        groupsRequired: 2,
+      },
+    ],
+    [thresholds]
+  );
+
+  const groups: GroupData[] = useMemo(() => {
+    const order =
+      proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
+        ? ["chains", "apps", "users", "delegates"]
+        : ["chains", "apps", "users"];
+
+    return order.map((name) => {
+      const tally = groupTallies.find((g) => g.name === name);
+      return {
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        vetoPercentage: tally?.vetoPercentage || 0,
+      };
+    });
+  }, [proposal.proposalType, groupTallies]);
+
+  const totalGroups = groups.length;
+
+  const groupsExceedingByTier = useMemo(() => {
+    const result: Record<TierKey, number> = {
+      fourGroups: 0,
+      threeGroups: 0,
+      twoGroups: 0,
+    };
+    for (const tier of tiers) {
+      result[tier.key] = groupTallies.filter(
+        (g) => g.vetoPercentage >= tier.threshold
+      ).length;
+    }
+    return result;
+  }, [groupTallies, tiers]);
+
+  const trippedTiers = useMemo(() => {
+    const tripped = new Set<TierKey>();
+    for (const tier of tiers) {
+      if (groupsExceedingByTier[tier.key] >= tier.groupsRequired) {
+        tripped.add(tier.key);
+      }
+    }
+    return tripped;
+  }, [tiers, groupsExceedingByTier]);
+
+  // Scale: maxThreshold * 1.25 spreads badges/lines more across the bar.
+  // E.g., with thresholds 11/14/17 → scaleMax ≈ 21.25
+  // 11% → 51.8%, 14% → 65.9%, 17% → 80%
+  const maxThreshold = Math.max(...tiers.map((t) => t.threshold));
+  const scaleMax = maxThreshold * 1.25;
+
+  const toPosition = (value: number) => {
+    return Math.min((value / scaleMax) * 100, 100);
+  };
+
+  const outcomeLabel = vetoThresholdMet
+    ? proposal.status === "ACTIVE"
+      ? "Veto threshold reached"
+      : "Proposal Vetoed"
+    : proposal.status === "ACTIVE"
+      ? "Proposal will pass"
+      : "Proposal has passed";
+
+  // When vetoed (after ended), show which tier caused it: "Because X groups tripped the Y%-threshold."
+  const vetoExplanation =
+    vetoThresholdMet && proposal.status !== "ACTIVE"
+      ? (() => {
+          const tripped = tiers.find((t) => trippedTiers.has(t.key));
+          const count = tripped ? groupsExceedingByTier[tripped.key] : 0;
+          const pct = tripped?.threshold ?? 0;
+          return `Because ${count} groups tripped the ${pct}%-threshold, the proposal has been vetoed.`;
+        })()
+      : null;
+
+  const subtitle =
+    "One of three thresholds are applied, based on the number of groups signaling to veto." +
+    (vetoExplanation ? ` ${vetoExplanation}` : "");
 
   return (
-    <VotesGroupTable
-      groups={voteGroups}
-      columns={[
-        {
-          key: "againstVotes",
-          header: "Against",
-          width: "w-[60px]",
-          textColorClass: "text-negative",
-        },
-        {
-          key: "vetoPercentage",
-          header: "% Veto",
-          width: "w-[60px]",
-          formatter: (value) => {
-            return value.toFixed(2);
-          },
-        },
-        {
-          key: "veto",
-          header: "Veto",
-          width: "w-[45px]",
-          formatter: (value) => {
-            return value ? (
-              <CloseIcon className="w-4 h-4 mx-1 my-[1px] text-negative stroke-negative" />
-            ) : (
-              "-"
-            );
-          },
-        },
-      ]}
-    />
+    <div className="p-4">
+      <div className="border border-line rounded-lg p-3">
+        {/* Header */}
+        <div className="mb-3">
+          <p
+            className={cn("text-xs font-bold", {
+              "text-negative": vetoThresholdMet,
+              "text-positive": !vetoThresholdMet,
+            })}
+          >
+            {outcomeLabel}
+          </p>
+          <p className="text-xs text-secondary mt-1 font-normal">{subtitle}</p>
+        </div>
+
+        {/* Single container for consistent coordinate system */}
+        <div className="relative w-full min-w-0">
+          {/* Threshold badges — absolutely positioned to align with lines */}
+          <div className="relative h-5 mb-1">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              const styles = TIER_STYLES[tier.key];
+              const isTripped = trippedTiers.has(tier.key);
+              const tooltipText =
+                tier.groupsRequired === 4
+                  ? `Vetoed if all ${totalGroups} groups exceed ${tier.threshold}%`
+                  : `Vetoed if any ${tier.groupsRequired} groups exceed ${tier.threshold}%`;
+              return (
+                <TooltipProvider key={tier.key} delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className={cn(
+                          "absolute top-0 inline-flex items-center rounded-sm px-1 py-px text-[10px] font-semibold tabular-nums",
+                          isTripped ? styles.badgeActive : styles.badge,
+                          !isTripped && "opacity-50"
+                        )}
+                        style={{
+                          left: `${pos}%`,
+                          transform: "translateX(-50%)",
+                        }}
+                        aria-label={`${tier.groupsRequired}/${totalGroups} groups threshold: ${tier.threshold}%${isTripped ? " (exceeded)" : ""}`}
+                      >
+                        {tier.threshold}%
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[200px] p-2 text-xs">
+                      {tooltipText}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              );
+            })}
+          </div>
+
+          {/* Group bars with color-coded dotted threshold lines */}
+          <div className="relative w-full">
+            {/* Threshold lines — color matches tier badges */}
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              const styles = TIER_STYLES[tier.key];
+              const isTripped = trippedTiers.has(tier.key);
+              return (
+                <div
+                  key={tier.key}
+                  className={cn(
+                    "absolute top-0 bottom-0 w-px border-l border-dashed",
+                    isTripped ? styles.line : styles.lineMuted
+                  )}
+                  style={{ left: `${pos}%` }}
+                  aria-hidden="true"
+                />
+              );
+            })}
+
+            <div className="relative flex flex-col gap-2.5">
+              {groups.map((group) => {
+                const pct = Math.min(group.vetoPercentage, 100);
+                return (
+                  <div key={group.name}>
+                    <div className="flex items-baseline justify-between mb-1">
+                      <span className="text-xs leading-none text-primary">
+                        {group.name}
+                      </span>
+                      <span className="text-xs tabular-nums text-tertiary">
+                        {formatVetoPercentage(pct)}
+                      </span>
+                    </div>
+                    <div
+                      className="relative h-[6px] rounded-[10px] bg-line"
+                      role="progressbar"
+                      aria-valuenow={Number(pct.toFixed(1))}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={`${group.name} veto percentage: ${pct.toFixed(1)}%`}
+                    >
+                      <div
+                        className={cn(
+                          "absolute inset-y-0 left-0 rounded-[10px]",
+                          BAR_FILL_CLASS
+                        )}
+                        style={{ width: `${toPosition(pct)}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Tier dots — positioned at same threshold positions */}
+          <div className="relative w-full h-5 mt-2">
+            {tiers.map((tier) => {
+              const pos = toPosition(tier.threshold);
+              return (
+                <div
+                  key={tier.key}
+                  className="absolute top-0"
+                  style={{
+                    left: `${pos}%`,
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  <TierDots
+                    total={tier.groupsRequired}
+                    filled={groupsExceedingByTier[tier.key]}
+                    tierKey={tier.key}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="text-[9px] font-semibold uppercase leading-none text-tertiary text-center mt-0.5">
+            # of signaling groups
+          </p>
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
@@ -141,50 +351,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
-  const proposalData =
-    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
-
-  const { vetoThresholdMet, groupTallies } = useMemo(
-    () => calculateHybridOptimisticProposalMetrics(proposal),
-    [proposal]
-  );
-
-  const vetoingGroupsCount = useMemo(
-    () => groupTallies.filter((g) => g.exceedsThreshold).length,
-    [groupTallies]
-  );
 
   const handleClick = () => {
     setIsClicked(!isClicked);
-  };
-
-  const renderVoteCriteriaTooltip = () => {
-    return (
-      <div className="flex items-center gap-0.5">
-        <div className="text-black text-xs font-bold leading-[18px]">
-          Veto criteria
-        </div>
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger>
-              <InfoIcon className="w-3 h-3 fill-neutral stroke-tertiary" />
-            </TooltipTrigger>
-            <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
-              <p className="text-primary font-bold mb-2">Veto criteria</p>
-              <p className="line-height-[32px]">
-                2 groups {proposalData?.tiers?.[0] || 55}%
-              </p>
-              <p className="line-height-[32px]">
-                3 groups {proposalData?.tiers?.[1] || 45}%
-              </p>
-              <p className="line-height-[32px]">
-                4 groups {proposalData?.tiers?.[2] || 35}%
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-    );
   };
 
   return (
@@ -220,87 +389,10 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                 />
               </div>
 
-              <div className="flex-1 p-4 bg-white border-line mb-[196px]">
-                <div className="w-full rounded border border-line overflow-hidden">
-                  <div className="border-b border-line">
-                    <div className="px-3 pt-4 pb-3 bg-neutral">
-                      <div className="flex flex-col justify-start items-start">
-                        <div
-                          className={cn(
-                            "self-stretch justify-start text-sm font-bold leading-7",
-                            {
-                              "text-negative": vetoThresholdMet,
-                              "text-positive": !vetoThresholdMet,
-                            }
-                          )}
-                        >
-                          {vetoThresholdMet
-                            ? proposal.status === "ACTIVE"
-                              ? "Veto threshold reached"
-                              : "Proposal vetoed"
-                            : proposal.status === "ACTIVE"
-                              ? "Veto threshold not reached"
-                              : "Proposal approved"}
-                        </div>
-                        <div className="flex justify-between w-full">
-                          {vetoThresholdMet ? (
-                            <>
-                              <div className="text-primary text-xs font-bold">
-                                {vetoingGroupsCount} Group Threshold %
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-1">
-                                  <div className="text-right text-positive text-xs font-semibold leading-none">
-                                    Met
-                                  </div>
-                                  <Image
-                                    width="12"
-                                    height="12"
-                                    src={checkIcon}
-                                    alt="check icon"
-                                  />
-                                  <div className="text-right text-black text-xs font-semibold leading-none">
-                                    {vetoingGroupsCount === 2
-                                      ? proposalData?.tiers?.[0] || 55
-                                      : vetoingGroupsCount === 3
-                                        ? proposalData?.tiers?.[1] || 45
-                                        : proposalData?.tiers?.[2] || 35}
-                                    %
-                                  </div>
-                                </div>
-                              </div>
-                            </>
-                          ) : (
-                            <div className="flex justify-between items-center w-full">
-                              <div className="text-black text-xs font-bold leading-[18px]">
-                                4 Group Threshold %
-                              </div>
-                              <div className="flex justify-end items-center">
-                                <div className="flex items-center gap-1">
-                                  <div className="text-right text-black text-xs font-semibold leading-none">
-                                    {proposalData?.tiers?.[2] || 35}%
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <OptimisticTieredProposalVotesGroup proposal={proposal} />
-                  <div className="w-full h-12 px-3 py-2 bg-wash border-t border-line">
-                    <div className="h-8 flex justify-between items-center">
-                      {renderVoteCriteriaTooltip()}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <OptimisticTieredResultsView proposal={proposal} />
 
-              <div className="absolute bottom-0 w-full right-0 bg-neutral border rounded-bl-xl rounded-br-xl">
-                <div className="">
-                  <CastVoteInput proposal={proposal} isOptimistic />
-                </div>
+              <div className="border-t border-line">
+                <CastVoteInput proposal={proposal} isOptimistic />
               </div>
             </>
           ) : (
