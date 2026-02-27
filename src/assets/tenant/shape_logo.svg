@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 200 200" fill="none">
+  <!-- Outer cube -->
+  <g stroke="#000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="100,30 160,65 160,135 100,170 40,135 40,65"/>
+  </g>
+
+  <!-- Inner lines -->
+  <g stroke="#000" stroke-width="1.2" stroke-linecap="round">
+    <line x1="100" y1="30" x2="100" y2="170"/>
+    <line x1="40" y1="65" x2="160" y2="135"/>
+    <line x1="160" y1="65" x2="40" y2="135"/>
+  </g>
+
+  <!-- Shape-style nodes (ring + core) -->
+  <g>
+    <g fill="#000">
+      <circle cx="100" cy="30" r="7"/>
+      <circle cx="160" cy="65" r="7"/>
+      <circle cx="160" cy="135" r="7"/>
+      <circle cx="100" cy="170" r="7"/>
+      <circle cx="40" cy="135" r="7"/>
+      <circle cx="40" cy="65" r="7"/>
+    </g>
+    <g fill="#fff">
+      <circle cx="100" cy="30" r="5"/>
+      <circle cx="160" cy="65" r="5"/>
+      <circle cx="160" cy="135" r="5"/>
+      <circle cx="100" cy="170" r="5"/>
+      <circle cx="40" cy="135" r="5"/>
+      <circle cx="40" cy="65" r="5"/>
+    </g>
+    <g fill="#000">
+      <circle cx="100" cy="30" r="3"/>
+      <circle cx="160" cy="65" r="3"/>
+      <circle cx="160" cy="135" r="3"/>
+      <circle cx="100" cy="170" r="3"/>
+      <circle cx="40" cy="135" r="3"/>
+      <circle cx="40" cy="65" r="3"/>
+    </g>
+  </g>
+
+  <!-- Center node (yellow) -->
+  <circle cx="100" cy="100" r="8" fill="#000"/>
+  <circle cx="100" cy="100" r="6" fill="#fff"/>
+  <circle cx="100" cy="100" r="4" fill="#FFD400"/>
+</svg>
