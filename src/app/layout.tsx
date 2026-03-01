@@ -11,6 +11,7 @@ import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
 import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
 import { DevTenantProvider } from "@/contexts/DevTenantContext";
 import { TenantSwitcher } from "@/components/DevTools/TenantSwitcher";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 declare global {
   interface BigInt {
@@ -77,48 +78,62 @@ export default async function RootLayout({
       ui?.favicon?.["shortcut-icon"] || defaultFavicons["shortcut-icon"],
   };
 
-  const style = {
-    "--primary": primary,
-    "--secondary": secondary,
-    "--tertiary": tertiary,
-    "--neutral": neutral,
-    "--wash": wash,
-    "--line": line,
-    "--positive": positive,
-    "--negative": negative,
-    "--brand-primary": brandPrimary,
-    "--brand-secondary": brandSecondary,
-    "--info-section-background":
-      ui?.customization?.infoSectionBackground || neutral,
-    "--header-background": ui?.customization?.headerBackground || wash,
-    "--info-tab-background": ui?.customization?.infoTabBackground || neutral,
-    "--button-background": ui?.customization?.buttonBackground || primary,
-    "--card-background": ui?.customization?.cardBackground || "255 255 255",
-    "--card-border": ui?.customization?.cardBorder || line,
-    "--card-background-light":
-      ui?.customization?.cardBackground || "255 255 255",
-    "--card-background-dark": ui?.customization?.cardBackground || "30 26 47",
-    "--hover-background-light":
-      ui?.customization?.hoverBackground || "249 250 251",
-    "--hover-background-dark": ui?.customization?.hoverBackground || "42 35 56",
-    "--modal-background-dark": ui?.customization?.cardBackground || "30 26 47",
-    "--input-background-dark": ui?.customization?.cardBackground || "42 35 56",
-    "--button-primary-dark": ui?.customization?.buttonBackground || "89 75 122",
-    "--button-secondary-dark":
-      ui?.customization?.buttonBackground || "25 16 62",
-    "--hover-background": ui?.customization?.hoverBackground || tertiary,
-    "--text-secondary": ui?.customization?.textSecondary || secondary,
-    "--footer-background": ui?.customization?.footerBackground || neutral,
-    "--inner-footer-background":
-      ui?.customization?.innerFooterBackground || wash,
+  const inlineStyles = {
     fontFamily: font,
     letterSpacing: letterSpacing,
   } as React.CSSProperties;
 
+  const cssVariables = `
+    :root {
+      --primary: ${primary};
+      --secondary: ${secondary};
+      --tertiary: ${tertiary};
+      --neutral: ${neutral};
+      --wash: ${wash};
+      --line: ${line};
+      --positive: ${positive};
+      --negative: ${negative};
+      --brand-primary: ${brandPrimary};
+      --brand-secondary: ${brandSecondary};
+      --info-section-background: ${ui?.customization?.infoSectionBackground || neutral};
+      --header-background: ${ui?.customization?.headerBackground || wash};
+      --info-tab-background: ${ui?.customization?.infoTabBackground || neutral};
+      --button-background: ${ui?.customization?.buttonBackground || primary};
+      --card-background: ${ui?.customization?.cardBackground || "255 255 255"};
+      --card-border: ${ui?.customization?.cardBorder || line};
+      --hover-background: ${ui?.customization?.hoverBackground || tertiary};
+      --text-secondary: ${ui?.customization?.textSecondary || secondary};
+      --footer-background: ${ui?.customization?.footerBackground || neutral};
+      --inner-footer-background: ${ui?.customization?.innerFooterBackground || wash};
+    }
+    
+    .dark {
+      --primary: 255 255 255;
+      --secondary: 156 163 175;
+      --tertiary: 107 114 128;
+      --neutral: 17 17 17;
+      --wash: 0 0 0;
+      --line: 55 65 81;
+      --positive: 0 255 170;
+      --negative: 239 68 68;
+      --brand-primary: 255 255 255;
+      --brand-secondary: 0 0 0;
+      --card-background: ${ui?.customization?.cardBackground || "30 26 47"};
+      --hover-background: ${ui?.customization?.hoverBackground || "42 35 56"};
+      --button-background: ${ui?.customization?.buttonBackground || "89 75 122"};
+      --header-background: 17 17 17;
+      --info-section-background: ${ui?.customization?.cardBackground || "30 26 47"};
+      --info-tab-background: ${ui?.customization?.cardBackground || "30 26 47"};
+      --footer-background: 17 17 17;
+      --inner-footer-background: 0 0 0;
+    }
+  `;
+
   return (
-    <html lang="en" style={style} className={ui.theme === "dark" ? "dark" : ""}>
+    <html lang="en" style={inlineStyles} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <style dangerouslySetInnerHTML={{ __html: cssVariables }} />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -154,14 +169,16 @@ export default async function RootLayout({
       <NuqsAdapter>
         <DevTenantProvider>
           <ClientLayout>
-            <ForumPermissionsProvider>
-              <Header />
-              <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-                <RecentlyReleasedBanner />
-                {children}
-              </div>
-              <DAOMetricsHeader />
-            </ForumPermissionsProvider>
+            <ThemeProvider tenantTheme={ui.theme}>
+              <ForumPermissionsProvider>
+                <Header />
+                <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+                  <RecentlyReleasedBanner />
+                  {children}
+                </div>
+                <DAOMetricsHeader />
+              </ForumPermissionsProvider>
+            </ThemeProvider>
             <TenantSwitcher />
           </ClientLayout>
         </DevTenantProvider>
