@@ -17,17 +17,17 @@ import { VoterTypes } from "@/app/api/common/votes/vote";
 interface ProposalVoterListFilterProps {
   selectedVoterType: VoterTypes;
   onVoterTypeChange: (type: VoterTypes) => void;
-  isOffchain?: boolean;
+  showCitizenHouseFilters?: boolean;
 }
 
 export default function ProposalVoterListFilter({
   selectedVoterType,
   onVoterTypeChange,
-  isOffchain = false,
+  showCitizenHouseFilters = false,
 }: ProposalVoterListFilterProps) {
   const availableVoterTypes = [
     { type: "ALL", value: "All" },
-    ...(isOffchain
+    ...(showCitizenHouseFilters
       ? VOTER_TYPES.filter((type) => type.type !== "TH")
       : VOTER_TYPES),
   ];
@@ -43,7 +43,7 @@ export default function ProposalVoterListFilter({
           if (selectedType) onVoterTypeChange(selectedType);
         }}
       >
-        <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border border-line rounded-lg py-2 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
+        <Listbox.Button className="text-primary w-full sm:w-fit sm:min-w-[170px] bg-neutral font-medium border border-line rounded-lg py-2 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
           <FilterIcon className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-left leading-tight break-words max-w-[100px] sm:max-w-none">
             {selectedVoterType.value}

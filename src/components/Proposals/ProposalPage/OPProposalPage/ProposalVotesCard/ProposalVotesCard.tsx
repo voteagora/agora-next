@@ -86,13 +86,19 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
               <ProposalVoterListFilter
                 selectedVoterType={selectedVoterType}
                 onVoterTypeChange={setSelectedVoterType}
-                isOffchain={isOffchain}
+                showCitizenHouseFilters={proposal.proposalType?.includes("HYBRID") || false}
               />
-              {showVoters && (
+              {showVoters ? (
                 <ProposalVotesSort
                   sortOption={sortOption}
                   onSortChange={setSortOption}
                   hideTimeSortOptions={hideTimeSortOptions}
+                />
+              ) : (
+                <ProposalVotesSort
+                  sortOption={sortOption}
+                  onSortChange={setSortOption}
+                  hideTimeSortOptions={true}
                 />
               )}
             </div>
