@@ -98,7 +98,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "text/css",
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": "public, max-age=60",
     },
   });
 }
