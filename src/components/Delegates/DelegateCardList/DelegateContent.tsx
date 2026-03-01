@@ -3,6 +3,7 @@
 import DelegateCardList from "./DelegateCardList";
 import DelegateTable from "./DelegateTable";
 import DelegatePowerChart from "../DelegatePowerChart";
+import DelegateUniverse3D from "../DelegateUniverse3D";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useQueryState, parseAsString } from "nuqs";
@@ -79,6 +80,7 @@ export default function DelegateContent({
   return (
     <div className="flex flex-col gap-6">
       <DelegatePowerChart delegates={initialDelegates?.data || []} />
+      <DelegateUniverse3D delegates={initialDelegates?.data || []} />
       {layout === "grid" ? (
         <DelegateCardList
           initialDelegates={initialDelegates}

@@ -20,19 +20,35 @@ interface DelegatePowerChartProps {
 export default function DelegatePowerChart({ delegates }: DelegatePowerChartProps) {
   // Process the top 10 delegates
   const chartData = useMemo(() => {
-    if (!delegates || delegates.length === 0) return [];
+    if (!delegates || !Array.isArray(delegates) || delegates.length === 0) return [];
     
+    const parsePower = (d: any) => {
+      if (d?.votingPower && typeof d.votingPower === 'object' && d.votingPower.total) {
+        return Number(d.votingPower.total);
+      }
+      if (d?.votingPower && typeof d.votingPower === 'string') {
+        return Number(d.votingPower);
+      }
+      if (d?.voting_power) {
+        return Number(d.voting_power);
+      }
+      return 0;
+    };
+
     // Create a copy and sort by voting power descending just to be safe
     const sorted = [...delegates].sort(
-      (a, b) => Number(b.votingPower?.total || 0) - Number(a.votingPower?.total || 0)
+      (a, b) => parsePower(b) - parsePower(a)
     );
     
     // Take the top 10
-    return sorted.slice(0, 10).map((d) => ({
+    const topDelegates = sorted.slice(0, 10).map((d) => ({
       name: d.account?.ensName || d.address?.substring(0, 6) + "..." + d.address?.substring(d.address.length - 4),
-      votingPower: Number(d.votingPower?.total || 0),
+      votingPower: parsePower(d),
       rawAddress: d.address,
     }));
+
+    // Filter out delegates with 0 voting power for the chart
+    return topDelegates.filter(d => d.votingPower > 0);
   }, [delegates]);
 
   if (chartData.length === 0) return null;
