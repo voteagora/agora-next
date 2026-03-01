@@ -11,6 +11,7 @@ import { ForumPermissionsProvider } from "@/contexts/ForumPermissionsContext";
 import RecentlyReleasedBanner from "@/components/shared/RecentlyReleasedBanner";
 import { DevTenantProvider } from "@/contexts/DevTenantContext";
 import { TenantSwitcher } from "@/components/DevTools/TenantSwitcher";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 declare global {
   interface BigInt {
@@ -116,7 +117,7 @@ export default async function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="en" style={style} className={ui.theme === "dark" ? "dark" : ""}>
+    <html lang="en" style={style} suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link
@@ -154,14 +155,16 @@ export default async function RootLayout({
       <NuqsAdapter>
         <DevTenantProvider>
           <ClientLayout>
-            <ForumPermissionsProvider>
-              <Header />
-              <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-                <RecentlyReleasedBanner />
-                {children}
-              </div>
-              <DAOMetricsHeader />
-            </ForumPermissionsProvider>
+            <ThemeProvider tenantTheme={ui.theme}>
+              <ForumPermissionsProvider>
+                <Header />
+                <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+                  <RecentlyReleasedBanner />
+                  {children}
+                </div>
+                <DAOMetricsHeader />
+              </ForumPermissionsProvider>
+            </ThemeProvider>
             <TenantSwitcher />
           </ClientLayout>
         </DevTenantProvider>
