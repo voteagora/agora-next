@@ -96,17 +96,6 @@ export default async function RootLayout({
     "--button-background": ui?.customization?.buttonBackground || primary,
     "--card-background": ui?.customization?.cardBackground || "255 255 255",
     "--card-border": ui?.customization?.cardBorder || line,
-    "--card-background-light":
-      ui?.customization?.cardBackground || "255 255 255",
-    "--card-background-dark": ui?.customization?.cardBackground || "30 26 47",
-    "--hover-background-light":
-      ui?.customization?.hoverBackground || "249 250 251",
-    "--hover-background-dark": ui?.customization?.hoverBackground || "42 35 56",
-    "--modal-background-dark": ui?.customization?.cardBackground || "30 26 47",
-    "--input-background-dark": ui?.customization?.cardBackground || "42 35 56",
-    "--button-primary-dark": ui?.customization?.buttonBackground || "89 75 122",
-    "--button-secondary-dark":
-      ui?.customization?.buttonBackground || "25 16 62",
     "--hover-background": ui?.customization?.hoverBackground || tertiary,
     "--text-secondary": ui?.customization?.textSecondary || secondary,
     "--footer-background": ui?.customization?.footerBackground || neutral,

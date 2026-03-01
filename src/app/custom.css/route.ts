@@ -29,7 +29,9 @@ export async function GET() {
   const brandSecondary =
     ui?.customization?.brandSecondary || defaults.brandSecondary;
 
-  const style = {
+
+
+  const style: Record<string, string> = {
     "--primary": primary,
     "--secondary": secondary,
     "--tertiary": tertiary,
@@ -63,13 +65,32 @@ export async function GET() {
     "--footer-background": ui?.customization?.footerBackground || neutral,
     "--inner-footer-background":
       ui?.customization?.innerFooterBackground || wash,
-  } as React.CSSProperties;
+  };
 
   const root = `
     :root {
       ${Object.entries(style)
         .map(([key, value]) => `${key}: rgb(${value});`)
         .join("\n")}
+    }
+
+    .dark {
+      --primary: ${style["--brand-secondary"]}; /* Flips text default to white */
+      --secondary: ${style["--tertiary"]};
+      --tertiary: ${style["--secondary"]};
+      --neutral: ${style["--brand-primary"]}; /* Flips panel to dark */
+      --wash: ${style["--brand-primary"]};
+      --line: ${style["--secondary"]};
+      --brand-primary: ${style["--brand-secondary"]};
+      --brand-secondary: ${style["--brand-primary"]};
+      --card-background: ${style["--card-background-dark"] || "30 26 47"};
+      --hover-background: ${style["--hover-background-dark"] || "42 35 56"};
+      --button-background: ${style["--button-primary-dark"]};
+      --header-background: ${style["--neutral"]};
+      --info-section-background: ${style["--card-background-dark"] || "30 26 47"};
+      --info-tab-background: ${style["--card-background-dark"] || "30 26 47"};
+      --footer-background: ${style["--neutral"]};
+      --inner-footer-background: ${style["--wash"]};
     }
   `;
 
