@@ -26,6 +26,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   const { hasVoted, isLoading } = useUserVotes({
     proposalId: proposal.id,
     address,
+    proposal,
   });
   // Get voting type info from proposal
 

@@ -24,7 +24,12 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
-import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  fetchProposalFromArchive,
+  fetchRawProposalVotesFromArchive,
+} from "@/lib/archiveUtils";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { PROPOSAL_STATUS } from "@/lib/constants";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -788,17 +793,158 @@ async function getUserSnapshotVotesForProposal({
   return data;
 }
 
-async function getUserVotesForProposal({
+async function hasUserVotedForProposal({
   proposalId,
   address,
 }: {
   proposalId: string;
   address: string;
+}): Promise<boolean> {
+  const { namespace } = Tenant.current();
+  try {
+    const result = await prismaWeb3Client.$queryRawUnsafe<any[]>(
+      `SELECT 1 FROM ${namespace + ".votes"} WHERE proposal_id = $1 AND voter = $2 LIMIT 1`,
+      proposalId,
+      address.toLowerCase()
+    );
+    return result.length > 0;
+  } catch (e) {
+    console.error("Error checking vote existence", e);
+    return false;
+  }
+}
+
+async function checkArchiveForUserVote({
+  proposalId,
+  address,
+}: {
+  proposalId: string;
+  address: string;
+}): Promise<VotePayload[]> {
+  const { namespace } = Tenant.current();
+  try {
+    const archiveVotes = await fetchRawProposalVotesFromArchive({
+      namespace,
+      proposalId,
+    });
+
+    const userVote = archiveVotes.find(
+      (v) => v.voter.toLowerCase() === address.toLowerCase()
+    );
+
+    if (userVote) {
+      // Map archive vote to VotePayload shape
+      return [
+        {
+          transaction_hash: userVote.transaction_hash || "",
+          proposal_id: proposalId,
+          proposal_type: "STANDARD" as any, // Archive votes are standard-like (no types usually)
+          proposal_data: null,
+          voter: userVote.voter,
+          support: userVote.support || "ABSTAIN", // fallback
+          weight: BigInt(userVote.weight || 0),
+          reason: userVote.reason || "",
+          block_number: BigInt(userVote.block_number || 0),
+          params: userVote.params || null,
+        } as VotePayload,
+      ];
+    }
+  } catch (e) {
+    console.error("Error checking archive for user vote", e);
+  }
+  return [];
+}
+
+async function getHasUserVotedForProposal({
+  proposalId,
+  address,
+  proposal,
+}: {
+  proposalId: string;
+  address: string;
+  proposal?: Proposal;
+}): Promise<boolean> {
+  return withMetrics("getHasUserVotedForProposal", async () => {
+    // Strategy:
+    // 1. If proposal is closed, check Archive only.
+    // 2. If proposal is active, race lightweight DB check and Archive.
+
+    const isClosed =
+      proposal &&
+      [
+        PROPOSAL_STATUS.CANCELLED,
+        PROPOSAL_STATUS.CLOSED,
+        PROPOSAL_STATUS.DEFEATED,
+        PROPOSAL_STATUS.EXECUTED,
+        PROPOSAL_STATUS.SUCCEEDED,
+        PROPOSAL_STATUS.QUEUED,
+      ].includes(proposal.status as PROPOSAL_STATUS);
+
+    if (isClosed) {
+      const votes = await checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+      return votes.length > 0;
+    } else {
+      // Race lightweight DB existence check against Archive.
+      const dbExistencePromise = hasUserVotedForProposal({
+        proposalId,
+        address,
+      });
+
+      const archivePromise = checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+
+      return await new Promise<boolean>((resolve) => {
+        let settledCount = 0;
+        let resolved = false;
+
+        const handleResult = (result: boolean | VotePayload[]) => {
+          if (resolved) return;
+
+          if (typeof result === "boolean") {
+            // DB Result
+            resolved = true;
+            resolve(result);
+          } else {
+            // Archive Result (VotePayload[])
+            if (result.length > 0) {
+              resolved = true;
+              resolve(true);
+            } else {
+              settledCount++;
+              if (settledCount === 2) {
+                resolve(false);
+              }
+            }
+          }
+        };
+
+        dbExistencePromise.then(handleResult).catch(() => handleResult(false));
+        archivePromise.then(handleResult).catch(() => handleResult([]));
+      });
+    }
+  });
+}
+
+async function getUserVotesForProposal({
+  proposalId,
+  address,
+  proposal,
+}: {
+  proposalId: string;
+  address: string;
+  proposal?: Proposal;
 }) {
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
-    const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
-      `
+
+    const fetchFromDB = async () => {
+      const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
+        `
       SELECT
         STRING_AGG(transaction_hash,'|') as transaction_hash,
         proposal_id,
@@ -811,21 +957,76 @@ async function getUserVotesForProposal({
         MAX(block_number) as block_number,
         params
       FROM ${namespace + ".votes"}
-      WHERE proposal_id = $1AND voter = $2
+      WHERE proposal_id = $1 AND voter = $2
       GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
       `,
-      proposalId,
-      address.toLowerCase()
-    );
+        proposalId,
+        address.toLowerCase()
+      );
 
-    const votes = await doInSpan(
-      { name: "getUserVotesForProposal" },
-      async () => queryFunciton
-    );
+      return await doInSpan(
+        { name: "getUserVotesForProposalQuery" },
+        async () => queryFunciton
+      );
+    };
 
-    const latestBlock = ui.toggle("use-l1-block-number")?.enabled
-      ? await contracts.providerForTime?.getBlock("latest")
-      : await contracts.token.provider.getBlock("latest");
+    const latestBlockPromise = ui.toggle("use-l1-block-number")?.enabled
+      ? contracts.providerForTime?.getBlock("latest")
+      : contracts.token.provider.getBlock("latest");
+
+    const [latestBlock] = await Promise.all([latestBlockPromise]);
+
+    let votes: VotePayload[] = [];
+
+    // Strategy:
+    // 1. If proposal is closed, check Archive only.
+    // 2. If proposal is active, race DB (full data) and Archive.
+
+    const isClosed =
+      proposal &&
+      [
+        PROPOSAL_STATUS.CANCELLED,
+        PROPOSAL_STATUS.CLOSED,
+        PROPOSAL_STATUS.DEFEATED,
+        PROPOSAL_STATUS.EXECUTED,
+        PROPOSAL_STATUS.SUCCEEDED,
+        PROPOSAL_STATUS.QUEUED,
+      ].includes(proposal.status as PROPOSAL_STATUS);
+
+    if (isClosed) {
+      votes = await checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+    } else {
+      // Race DB and Archive. Use the first successful result.
+      const dbPromise = fetchFromDB();
+      const archivePromise = checkArchiveForUserVote({
+        proposalId,
+        address,
+      });
+
+      votes = await new Promise<VotePayload[]>((resolve) => {
+        let settledCount = 0;
+        let resolved = false;
+
+        const handleResult = (result: VotePayload[]) => {
+          if (resolved) return;
+          if (result.length > 0) {
+            resolved = true;
+            resolve(result);
+          } else {
+            settledCount++;
+            if (settledCount === 2) {
+              resolve([]);
+            }
+          }
+        };
+
+        dbPromise.then(handleResult).catch(() => handleResult([]));
+        archivePromise.then(handleResult).catch(() => handleResult([]));
+      });
+    }
 
     const data = Promise.all(
       votes.map((vote) => {
@@ -887,6 +1088,7 @@ export const fetchVotesForDelegate = cache(getVotesForDelegate);
 export const fetchSnapshotVotesForDelegate = cache(getSnapshotVotesForDelegate);
 export const fetchVotesForProposal = cache(getVotesForProposal);
 export const fetchUserVotesForProposal = cache(getUserVotesForProposal);
+export const fetchUserVoteStatus = cache(getHasUserVotedForProposal);
 export const fetchVotesForProposalAndDelegate = cache(
   getVotesForProposalAndDelegate
 );
