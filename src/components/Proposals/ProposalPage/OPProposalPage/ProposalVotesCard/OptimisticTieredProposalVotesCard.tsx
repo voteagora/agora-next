@@ -4,7 +4,17 @@ import { useState, useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesFilter from "./ProposalVotesFilter";
-import { calculateHybridOptimisticProposalMetrics } from "@/lib/proposalUtils";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
+import { VoterTypes } from "@/app/api/common/votes/vote";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
+import VotesGroupTable from "@/components/common/VotesGroupTable";
+import {
+  ParsedProposalData,
+  ParsedProposalResults,
+  calculateHybridOptimisticProposalMetrics,
+} from "@/lib/proposalUtils";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
@@ -22,6 +32,7 @@ import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/Archi
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import { useEffect } from "react";
 
 interface Props {
   proposal: Proposal;
@@ -345,12 +356,47 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
 
 const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const [showVoters, setShowVoters] = useState(true);
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  });
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const { ui } = Tenant.current();
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, sortOption.sortKey]);
+
+  const { vetoThresholdMet, groupTallies } = useMemo(
+    () => calculateHybridOptimisticProposalMetrics(proposal),
+    [proposal]
+  );
+
+  const vetoingGroupsCount = useMemo(
+    () => groupTallies.filter((g) => g.exceedsThreshold).length,
+    [groupTallies]
+  );
 
   const handleClick = () => {
     setIsClicked(!isClicked);
@@ -397,29 +443,63 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
             </>
           ) : (
             <>
-              <div className="px-3 py-[10px]">
+              <div className="flex flex-col gap-4 px-4 py-3">
                 <ProposalVotesFilter
                   initialSelection={showVoters ? "Voters" : "Hasn't voted"}
                   onSelectionChange={(value) => {
                     setShowVoters(value === "Voters");
                   }}
                 />
+                <div className="flex justify-between items-center border-b border-line pb-2">
+                  <ProposalVoterListFilter
+                    selectedVoterType={selectedVoterType}
+                    onVoterTypeChange={setSelectedVoterType}
+                    showCitizenHouseFilters={proposal.proposalType?.includes("HYBRID") || false}
+                  />
+                  {showVoters ? (
+                    <ProposalVotesSort
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                      hideTimeSortOptions={hideTimeSortOptions}
+                    />
+                  ) : (
+                    <ProposalVotesSort
+                      sortOption={sortOption}
+                      onSortChange={setSortOption}
+                      hideTimeSortOptions={true}
+                    />
+                  )}
+                </div>
               </div>
               {useArchiveVoteHistory ? (
                 showVoters ? (
-                  <ArchiveProposalVotesList proposal={proposal} />
+                  <ArchiveProposalVotesList
+                    proposal={proposal}
+                    sort={sortOption.sortKey}
+                    sortOrder={sortOption.sortOrder}
+                    voterType={selectedVoterType.type}
+                  />
                 ) : (
-                  <ArchiveProposalNonVoterList proposal={proposal} />
+                  <ArchiveProposalNonVoterList
+                    proposal={proposal}
+                    selectedVoterType={selectedVoterType}
+                  />
                 )
               ) : showVoters ? (
                 <ProposalVotesList
                   proposalId={proposal.id}
                   offchainProposalId={proposal.offchainProposalId}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  voterType={selectedVoterType.type}
                 />
               ) : (
                 <ProposalNonVoterList
                   proposal={proposal}
                   offchainProposalId={proposal.offchainProposalId}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  selectedVoterType={selectedVoterType}
                 />
               )}
             </>

@@ -14,9 +14,13 @@ import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/Ar
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { PaginationParams } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { PaginatedResult } from "@/app/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
 
 type Props = {
   proposal: Proposal;
@@ -42,6 +46,16 @@ export default function ApprovalVotesPanel({
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;
+
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "weight",
+    sortOrder: "desc",
+    label: "Most Voting Power",
+  });
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
 
   function handleTabsChange(index: number) {
     startTransition(() => {
@@ -95,13 +109,27 @@ export default function ApprovalVotesPanel({
           <OptionsResultsPanel proposal={proposal} />
         ) : (
           <>
-            <div className="px-4">
+            <div className="px-4 py-3 pb-2 flex flex-col gap-4">
               <ProposalVotesFilter
                 initialSelection={showVoters ? "Voters" : "Hasn't voted"}
                 onSelectionChange={(value) => {
                   setShowVoters(value === "Voters");
                 }}
               />
+              {!showVoters && (
+                <div className="flex justify-between items-center border-t border-line pt-2">
+                  <ProposalVoterListFilter
+                    selectedVoterType={selectedVoterType}
+                    onVoterTypeChange={setSelectedVoterType}
+                    showCitizenHouseFilters={proposal.proposalType?.includes("HYBRID") || false}
+                  />
+                  <ProposalVotesSort
+                    sortOption={sortOption}
+                    onSortChange={setSortOption}
+                    hideTimeSortOptions={true}
+                  />
+                </div>
+              )}
             </div>
             {useArchiveVoteHistory ? (
               showVoters ? (
@@ -110,7 +138,10 @@ export default function ApprovalVotesPanel({
                   isThresholdCriteria={isThresholdCriteria}
                 />
               ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
+                <ArchiveProposalNonVoterList
+                  proposal={proposal}
+                  selectedVoterType={selectedVoterType}
+                />
               )
             ) : showVoters ? (
               <ApprovalProposalVotesList
@@ -120,7 +151,12 @@ export default function ApprovalVotesPanel({
                 isThresholdCriteria={isThresholdCriteria}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ProposalNonVoterList
+                proposal={proposal}
+                sort={sortOption.sortKey}
+                sortOrder={sortOption.sortOrder}
+                selectedVoterType={selectedVoterType}
+              />
             )}
           </>
         )}
