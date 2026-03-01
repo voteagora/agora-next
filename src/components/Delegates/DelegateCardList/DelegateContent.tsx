@@ -2,6 +2,7 @@
 
 import DelegateCardList from "./DelegateCardList";
 import DelegateTable from "./DelegateTable";
+import DelegatePowerChart from "../DelegatePowerChart";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useQueryState, parseAsString } from "nuqs";
@@ -75,15 +76,20 @@ export default function DelegateContent({
     }
   }, [address]);
 
-  return layout === "grid" ? (
-    <DelegateCardList
-      initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
-    />
-  ) : (
-    <DelegateTable
-      initialDelegates={initialDelegates}
-      fetchDelegates={fetchDelegates}
-    />
+  return (
+    <div className="flex flex-col gap-6">
+      <DelegatePowerChart delegates={initialDelegates?.data || []} />
+      {layout === "grid" ? (
+        <DelegateCardList
+          initialDelegates={initialDelegates}
+          fetchDelegates={fetchDelegates}
+        />
+      ) : (
+        <DelegateTable
+          initialDelegates={initialDelegates}
+          fetchDelegates={fetchDelegates}
+        />
+      )}
+    </div>
   );
 }
