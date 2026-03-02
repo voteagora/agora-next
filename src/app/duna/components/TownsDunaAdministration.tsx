@@ -1,23 +1,31 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import DocumentsSection from "./DocumentsSection";
+import Link from "next/link";
+import FormationDocumentsList from "./FormationDocumentsList";
+import FinancialStatementsClient from "./FinancialStatementsClient";
 import {
   getForumTopics,
   getForumCategoryAttachments,
   getDunaCategoryId,
 } from "@/lib/actions/forum";
-import { transformForumTopics, ForumTopic } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import {
+  UIFinancialStatementsConfig,
+  UIGovernanceInfoConfig,
+} from "@/lib/tenant/tenantUI";
+import Image from "next/image";
+import { ExternalLink } from "@/icons/ExternalLink";
+import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 
 const TownsDunaAdministration = async () => {
-  let dunaReports: ForumTopic[] = [];
   let documents: any[] = [];
+  let topicsResult: any = null;
 
   try {
     const dunaCategoryId = await getDunaCategoryId();
     if (!dunaCategoryId) {
       console.error("Could not find DUNA category ID");
       return (
-        <div className="mt-12">
+        <div className="mt-8">
           <div className="text-center py-8 text-red-500">
             Error: Could not find DUNA category
           </div>
@@ -25,89 +33,153 @@ const TownsDunaAdministration = async () => {
       );
     }
 
-    const [topicsResult, documentsResult] = await Promise.all([
-      getForumTopics({ categoryId: dunaCategoryId }),
-      getForumCategoryAttachments({ categoryId: dunaCategoryId }),
-    ]);
+    const [topics, documentsResult, archivedDocumentsResult] =
+      await Promise.all([
+        getForumTopics({ categoryId: dunaCategoryId }),
+        getForumCategoryAttachments({ categoryId: dunaCategoryId }),
+        getForumCategoryAttachments({
+          categoryId: dunaCategoryId,
+          archived: true,
+        }),
+      ]);
 
-    if (topicsResult.success) {
-      dunaReports = transformForumTopics(topicsResult.data, {
-        mergePostAttachments: true,
-      });
-    }
+    topicsResult = topics;
     if (documentsResult.success) {
       documents = documentsResult.data;
+    }
+    // Include archived documents for formation documents section
+    if (archivedDocumentsResult.success) {
+      // Merge archived documents, avoiding duplicates by id
+      const archivedDocs = archivedDocumentsResult.data.filter(
+        (archivedDoc: any) =>
+          !documents.some((doc: any) => doc.id === archivedDoc.id)
+      );
+      documents = [...documents, ...archivedDocs];
     }
   } catch (error) {
     console.error("Error fetching forum data:", error);
   }
 
+  const { ui } = Tenant.current();
+  const financialStatementsToggle = ui.toggle("duna/financial-statements");
+  const isFinancialStatementsEnabled =
+    financialStatementsToggle?.enabled ?? false;
+  const financialStatementsConfig =
+    financialStatementsToggle?.config as UIFinancialStatementsConfig;
+
+  const governanceSectionsToggle = ui.toggle("info/governance-sections");
+  const governanceConfig = governanceSectionsToggle?.enabled
+    ? (governanceSectionsToggle.config as UIGovernanceInfoConfig)
+    : null;
+
+  const infoAboutPage = ui.page("info/about");
+  const infoPage = ui.page("info");
+  const communityLinks = infoPage?.links ?? [];
+  const aboutDescription = infoAboutPage?.description;
+
+  const financialStatements = isFinancialStatementsEnabled
+    ? topicsResult?.success
+      ? topicsResult.data
+          .filter((topic: any) => topic.isFinancialStatement === true)
+          .map((topic: any) => ({
+            id: topic.id,
+            name: topic.title,
+            url: "",
+            ipfsCid: "",
+            createdAt: topic.createdAt,
+            uploadedBy: topic.address,
+            archived: topic.deletedAt !== null,
+            revealTime: topic.revealTime,
+            expirationTime: topic.expirationTime,
+            topicId: topic.id,
+            topicTitle: topic.title,
+          }))
+      : []
+    : [];
+
+  const otherDocuments = isFinancialStatementsEnabled
+    ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))
+    : documents;
+
+  const hasFinancialOrFormation =
+    (isFinancialStatementsEnabled && financialStatements.length > 0) ||
+    otherDocuments.length > 0;
+
   return (
-    <div className="mt-12 towns-tenant">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-black text-primary">
-          DUNA Administration
-        </h3>
-      </div>
-
-      {/* Documents Section - EXACT same as Uniswap */}
-      <Card className="border border-line shadow-sm bg-modalBackgroundDark [&_button]:!bg-white [&_button]:!text-black [&_button]:!border-gray-300 [&_button]:hover:!bg-gray-50">
-        <CardContent className="p-6">
-          <DocumentsSection initialDocuments={documents} hideHeader={false} />
-        </CardContent>
-      </Card>
-
-      {/* TOWNS DUNA DISCLOSURES Section */}
-      <div id="duna-administration" className="mt-6">
-        <div className="text-[#87819F] text-[14px] font-medium leading-[19px] mb-4">
-          TOWNS LODGE – DUNA DISCLOSURES
-        </div>
-
-        <div className="space-y-6 text-justify">
-          <div>
-            <div className="text-[#87819F] text-[14px] font-medium leading-[19px]">
-              By owning the token and participating in the governance of Towns
-              Lodge, you acknowledge and agree that you are electing to become a
-              member of a Wyoming Decentralized Unincorporated Nonprofit
-              Association (&ldquo;Association&rdquo;). Your participation is
-              subject to the terms and conditions set forth in the Association
-              Agreement. You further acknowledge and agree that any dispute,
-              claim, or controversy arising out of or relating to the
-              Association Agreement, any governance proposal, or the rights and
-              obligations of members or administrators shall be submitted
-              exclusively to the Wyoming Chancery Court. In the event that the
-              Wyoming Chancery Court declines to exercise jurisdiction over any
-              such dispute, the parties agree that such dispute shall be
-              resolved exclusively in the District Court of Laramie County,
-              Wyoming, or in the United States District Court for the District
-              of Wyoming, as appropriate.
+    <div id="duna-administration" className="mt-8 flex flex-col gap-6">
+      {/* Row 1: About Towns Lodge + Community Resources */}
+      {(aboutDescription || communityLinks.length > 0) && (
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* About Towns Lodge */}
+          {aboutDescription && (
+            <div className="flex-1 border border-line rounded-2xl p-6 bg-cardBackground shadow-sm">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-6">
+                ABOUT TOWNS LODGE
+              </p>
+              <div className="text-secondary text-base leading-relaxed whitespace-pre-line">
+                {aboutDescription}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div>
-            <div className="text-[#87819F] text-[14px] font-medium leading-[19px]">
-              By becoming a member, you further agree that any dispute, claim,
-              or proceeding arising out of or relating to the Association
-              Agreement shall be resolved solely on an individual basis. You
-              expressly waive any right to participate as a plaintiff or class
-              member in any purported class, collective, consolidated, or
-              representative action, whether in arbitration or in court. No
-              class, collective, consolidated, or representative actions or
-              arbitrations shall be permitted, and you expressly waive any right
-              to participate in or recover relief under any such action or
-              proceeding.
+          {/* Community Resources */}
+          {communityLinks.length > 0 && (
+            <div className="lg:w-80 border border-line rounded-2xl p-6 bg-cardBackground shadow-sm flex-shrink-0">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-6">
+                COMMUNITY RESOURCES
+              </p>
+              <div className="flex flex-col gap-1">
+                {communityLinks.map((link, idx) => (
+                  <Link
+                    key={idx}
+                    href={link.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 py-2 text-secondary hover:text-primary transition-colors group"
+                  >
+                    <ExternalLink className="flex-shrink-0 text-secondary group-hover:text-primary transition-colors" />
+                    <span className="text-base font-medium">
+                      {link.title} <span className="text-tertiary">↗</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
-      </div>
+      )}
 
-      {/* Disclaimer */}
-      <div className="mt-12 pt-6 border-t border-line">
-        <p className="text-secondary text-sm opacity-75">
-          * DUNA Administration Docs will archive upon the release of the
-          year-end financial statements and tax update.
-        </p>
-      </div>
+      {/* Row 2: Financial Statements + Formation Documents */}
+      {hasFinancialOrFormation && (
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Financial Statements */}
+          {isFinancialStatementsEnabled && financialStatements.length > 0 && (
+            <div className="border border-line rounded-2xl p-6 bg-cardBackground shadow-sm min-w-0">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-4">
+                {financialStatementsConfig?.title?.toUpperCase() ??
+                  "FINANCIAL STATEMENTS"}
+              </p>
+              <FinancialStatementsClient
+                statements={financialStatements}
+                title=""
+              />
+            </div>
+          )}
+
+          {/* Formation Documents */}
+          {otherDocuments.length > 0 && (
+            <div
+              className={`border border-line rounded-2xl p-6 bg-cardBackground shadow-sm min-w-0 flex-1`}
+            >
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-6">
+                FORMATION DOCUMENTS
+              </p>
+              <FormationDocumentsList initialDocuments={otherDocuments} />
+            </div>
+          )}
+        </div>
+      )}
+      <GovernanceInfoSections />
     </div>
   );
 };

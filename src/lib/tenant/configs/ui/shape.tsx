@@ -242,7 +242,9 @@ export const shapeTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">STRUCTURA DISCLOSURES</div>
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+              STRUCTURA DISCLOSURES
+            </div>
 
             <div className="font-medium">
               <p className="mt-2">

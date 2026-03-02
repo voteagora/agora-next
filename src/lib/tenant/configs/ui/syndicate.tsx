@@ -410,7 +410,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
               SYNDICATE NETWORK COLLECTIVE - DUNA DISCLOSURES
             </div>
 
