@@ -59,6 +59,9 @@ const DunaAdministration = async () => {
   }
 
   const { ui } = Tenant.current();
+  const dunaToggle = ui.toggle("duna");
+  const administrationTitle =
+    (dunaToggle?.config as { title?: string })?.title ?? "DUNA Administration";
   const financialStatementsToggle = ui.toggle("duna/financial-statements");
   const isFinancialStatementsEnabled =
     financialStatementsToggle?.enabled ?? false;
@@ -92,7 +95,7 @@ const DunaAdministration = async () => {
     <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-black text-primary">
-          DUNA Administration
+          {administrationTitle}
         </h3>
       </div>
       <DunaDescription />
