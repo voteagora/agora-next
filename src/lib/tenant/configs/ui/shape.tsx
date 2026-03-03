@@ -119,7 +119,7 @@ export const shapeTenantUIConfig = new TenantUI({
         {
           name: "Governance Forums",
           title: "Governance",
-          url: "/coming-soon",
+          url: "/forums",
           image: shapeInfoCard2,
         },
         {
@@ -215,7 +215,14 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "use-daonode-for-proposals", enabled: false },
     { name: "use-daonode-for-votable-supply", enabled: false },
     { name: "use-daonode-for-proposal-types", enabled: false },
-    { name: "duna", enabled: true },
+    { name: "forums", enabled: true },
+    {
+      name: "duna",
+      enabled: true,
+      config: {
+        title: "Structura",
+      },
+    },
     { name: "coming-soon", enabled: true },
     { name: "hide-governor-settings", enabled: true },
     { name: "hide-hero", enabled: true },
@@ -226,14 +233,16 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "footer/hide-total-supply", enabled: true },
     { name: "coming-soon/show-static-proposals", enabled: true },
     {
+      name: "shape-hero-content",
+      enabled: true,
+    },
+    {
       name: "duna-disclosures",
       enabled: true,
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">
-              SHAPE PROTOCOL - DUNA DISCLOSURES
-            </div>
+            <div className="mb-6 font-medium">STRUCTURA DISCLOSURES</div>
 
             <div className="font-medium">
               <p className="mt-2">
@@ -267,6 +276,12 @@ export const shapeTenantUIConfig = new TenantUI({
               </p>
             </div>
           </>
+        ),
+        disclaimer: (
+          <p className="text-secondary text-sm opacity-75">
+            * Structura Docs will archive upon the release of the year-end
+            financial statements and tax update.
+          </p>
         ),
       },
     },
