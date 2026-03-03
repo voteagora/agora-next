@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ProposalVotesFilter from "./ProposalVotesFilter";
@@ -66,6 +66,35 @@ interface GroupData {
   vetoPercentage: number;
 }
 
+/**
+ * Dev-only: test veto states from Chrome console. Remove before merge.
+ *
+ * Usage (open DevTools → Console on a proposal page):
+ *   __setMockVetoState('passing')   // 0, 1, 10, 0.1% — no tier tripped
+ *   __setMockVetoState('oneOver11') // 1 group over 11% — still passing
+ *   __setMockVetoState('fourOver11') // all 4 over 11% — vetoed (teal)
+ *   __setMockVetoState('twoOver17')  // 2 groups over 17% — vetoed (pink)
+ *   __setMockVetoState('reset')      // back to real data
+ *   __setMockVetoState({ chains: 15, apps: 0, users: 10, delegates: 0 }) // custom %
+ */
+type MockVetoArg =
+  | "reset"
+  | "passing"
+  | "oneOver11"
+  | "fourOver11"
+  | "twoOver17"
+  | { chains?: number; apps?: number; users?: number; delegates?: number };
+
+const MOCK_PRESETS: Record<
+  string,
+  { chains: number; apps: number; users: number; delegates: number }
+> = {
+  passing: { chains: 0, apps: 1, users: 10, delegates: 0.1 },
+  oneOver11: { chains: 12, apps: 0, users: 0, delegates: 0 },
+  fourOver11: { chains: 12, apps: 12, users: 12, delegates: 12 },
+  twoOver17: { chains: 18, apps: 18, users: 0, delegates: 0 },
+};
+
 function formatVetoPercentage(value: number): string {
   if (value === 0) return "0%";
   if (value > 0 && value < 1) return `${value.toFixed(1)}%`;
@@ -98,12 +127,94 @@ function TierDots({
   );
 }
 
-function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
-  const { vetoThresholdMet, groupTallies, thresholds } = useMemo(
+function buildGroupTalliesFromOverride(override: {
+  chains?: number;
+  apps?: number;
+  users?: number;
+  delegates?: number;
+}): {
+  name: string;
+  vetoPercentage: number;
+  againstVotes: number;
+  exceedsThreshold: boolean;
+}[] {
+  const names = ["chains", "apps", "users", "delegates"] as const;
+  return names.map((name) => ({
+    name,
+    vetoPercentage: override[name] ?? 0,
+    againstVotes: 0,
+    exceedsThreshold: false,
+  }));
+}
+
+function useMockVetoState(proposal: Proposal) {
+  const [mockOverride, setMockOverride] = useState<MockVetoArg | null>(null);
+
+  useEffect(() => {
+    (
+      window as unknown as { __setMockVetoState?: (arg: MockVetoArg) => void }
+    ).__setMockVetoState = (arg: MockVetoArg) => setMockOverride(arg);
+    return () => {
+      delete (window as unknown as { __setMockVetoState?: unknown })
+        .__setMockVetoState;
+    };
+  }, []);
+
+  const realMetrics = useMemo(
     () => calculateHybridOptimisticProposalMetrics(proposal),
     [proposal]
   );
+  const { thresholds } = realMetrics;
 
+  const { groupTallies, vetoThresholdMet } = useMemo(() => {
+    let groupTallies = realMetrics.groupTallies;
+    if (mockOverride && mockOverride !== "reset") {
+      const percentages =
+        typeof mockOverride === "string"
+          ? MOCK_PRESETS[mockOverride]
+          : mockOverride;
+      if (percentages) {
+        groupTallies = buildGroupTalliesFromOverride(percentages);
+        const four = groupTallies.filter(
+          (g) => g.vetoPercentage >= thresholds.fourGroups
+        ).length;
+        const three = groupTallies.filter(
+          (g) => g.vetoPercentage >= thresholds.threeGroups
+        ).length;
+        const two = groupTallies.filter(
+          (g) => g.vetoPercentage >= thresholds.twoGroups
+        ).length;
+        const vetoThresholdMet = four >= 4 || three >= 3 || two >= 2;
+        return { groupTallies, vetoThresholdMet };
+      }
+    }
+    return { groupTallies, vetoThresholdMet: realMetrics.vetoThresholdMet };
+  }, [realMetrics, mockOverride, thresholds]);
+
+  const isMockActive = mockOverride !== null && mockOverride !== "reset";
+
+  const effectiveStatus = isMockActive
+    ? vetoThresholdMet
+      ? "DEFEATED"
+      : "SUCCEEDED"
+    : proposal.status;
+
+  return { groupTallies, vetoThresholdMet, thresholds, effectiveStatus };
+}
+
+function OptimisticTieredResultsView({
+  proposal,
+  groupTallies,
+  vetoThresholdMet,
+  thresholds,
+  effectiveStatus,
+}: {
+  proposal: Proposal;
+  groupTallies: ReturnType<typeof buildGroupTalliesFromOverride>;
+  vetoThresholdMet: boolean;
+  thresholds: { fourGroups: number; threeGroups: number; twoGroups: number };
+  effectiveStatus: string;
+}) {
   const tiers: TierInfo[] = useMemo(
     () => [
       {
@@ -177,16 +288,15 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
   };
 
   const outcomeLabel = vetoThresholdMet
-    ? proposal.status === "ACTIVE"
+    ? effectiveStatus === "ACTIVE"
       ? "Veto threshold reached"
       : "Proposal Vetoed"
-    : proposal.status === "ACTIVE"
+    : effectiveStatus === "ACTIVE"
       ? "Proposal will pass"
       : "Proposal has passed";
 
-  // When vetoed (after ended), show which tier caused it: "Because X groups tripped the Y%-threshold."
   const vetoExplanation =
-    vetoThresholdMet && proposal.status !== "ACTIVE"
+    vetoThresholdMet && effectiveStatus !== "ACTIVE"
       ? (() => {
           const tripped = tiers.find((t) => trippedTiers.has(t.key));
           const count = tripped ? groupsExceedingByTier[tripped.key] : 0;
@@ -352,6 +462,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
     "use-archive-for-vote-history"
   )?.enabled;
 
+  const { groupTallies, vetoThresholdMet, thresholds, effectiveStatus } =
+    useMockVetoState(proposal);
+
   const handleClick = () => {
     setIsClicked(!isClicked);
   };
@@ -379,7 +492,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
             <>
               <div className="p-4 border-b border-line">
                 <ProposalStatusDetail
-                  proposalStatus={proposal.status}
+                  proposalStatus={effectiveStatus}
                   proposalEndTime={proposal.endTime}
                   proposalStartTime={proposal.startTime}
                   proposalCancelledTime={proposal.cancelledTime}
@@ -389,7 +502,13 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                 />
               </div>
 
-              <OptimisticTieredResultsView proposal={proposal} />
+              <OptimisticTieredResultsView
+                proposal={proposal}
+                groupTallies={groupTallies}
+                vetoThresholdMet={vetoThresholdMet}
+                thresholds={thresholds}
+                effectiveStatus={effectiveStatus}
+              />
 
               <div className="border-t border-line">
                 <CastVoteInput proposal={proposal} isOptimistic />
