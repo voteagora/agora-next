@@ -58,7 +58,7 @@ export default function ProposalVotesSort({
     : sortOptions;
 
   return (
-    <div className="relative text-primary">
+    <div className="relative text-primary ml-auto">
       <Listbox
         value={sortOption.label}
         onChange={(value: string) => {

@@ -29,8 +29,10 @@ export default function ProposalVoterListFilter({
     { type: "ALL", value: "All" },
     ...(showCitizenHouseFilters
       ? VOTER_TYPES.filter((type) => type.type !== "TH")
-      : VOTER_TYPES),
+      : []),
   ];
+
+  if (availableVoterTypes.length <= 1) return null;
 
   return (
     <div className="relative text-primary">
