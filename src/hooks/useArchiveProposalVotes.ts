@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import type { ProposalType } from "@/lib/types";
 import type { ArchiveVoteRow, ArchiveNonVoterRow } from "@/lib/archiveUtils";
 import { parseSupport } from "@/lib/voteUtils";
+import {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 
 export type ArchiveVote = {
   transactionHash: string | null;
@@ -112,11 +118,6 @@ async function fetchArchiveVotes({
         : String(startBlock)
       : null;
 
-  const parseWeight = (value: string) => {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
   const votes =
     payload.data?.map((row) => {
       const support =
@@ -150,21 +151,23 @@ async function fetchArchiveVotes({
       } satisfies ArchiveVote;
     }) ?? [];
 
-  return sortByCitizenTypeAndValue(
-    votes,
-    (vote) => parseWeight(vote.weight),
-    (vote) => vote.citizenType
-  );
+  return votes;
 }
 
 export function useArchiveVotes({
   proposalId,
   proposalType,
   startBlock,
+  sort = "weight", // Default to weight
+  sortOrder = "desc", // Default to desc
+  voterType = "ALL",
 }: {
   proposalId: string;
   proposalType: ProposalType;
   startBlock: bigint | number | null;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 }) {
   const startBlockString =
     startBlock !== undefined && startBlock !== null
@@ -181,8 +184,53 @@ export function useArchiveVotes({
     retry: 2,
   });
 
+  const processedVotes = useMemo(() => {
+    if (!data) return [];
+
+    let filtered = [...data];
+
+    // 1. Filter by Voter Type
+    if (voterType !== "ALL") {
+      filtered = filtered.filter((vote) => {
+        if (voterType === "TH") {
+          // Token House: citizenType is null or undefined
+          return !vote.citizenType;
+        } else if (voterType === "CH") {
+          // Citizen House: citizenType is present
+          return !!vote.citizenType;
+        } else if (voterType === "USER") {
+          return vote.citizenType === "USER";
+        } else if (voterType === "APP") {
+          return vote.citizenType === "APP";
+        } else if (voterType === "CHAIN") {
+          return vote.citizenType === "CHAIN";
+        }
+        return true;
+      });
+    }
+
+    // 2. Sort
+    return filtered.sort((a, b) => {
+      let comparison = 0;
+
+      if (sort === "weight") {
+        const weightA = BigInt(a.weight || "0");
+        const weightB = BigInt(b.weight || "0");
+        if (weightA < weightB) comparison = -1;
+        if (weightA > weightB) comparison = 1;
+      } else if (sort === "block_number") {
+        const blockA = a.blockNumber;
+        const blockB = b.blockNumber;
+        if (blockA < blockB) comparison = -1;
+        if (blockA > blockB) comparison = 1;
+      }
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+  }, [data, sort, sortOrder, voterType]);
+
   return {
-    votes: data ?? [],
+    votes: processedVotes,
     isLoading,
     error: error ? (error as Error).message : null,
   };
