@@ -158,8 +158,22 @@ export default async function TestPage({
         <h2 className="text-2xl font-bold mb-4">Layout 1</h2>
         {RenderComponent && <RenderComponent proposal={loadedProposal} />}
       </div>
-      <div className="border-t-4 border-dashed border-gray-300 pt-8 mt-8">
-        <h2 className="text-2xl font-bold mb-4">Layout 2 (Comparison Clone)</h2>
+      <div className="border-t-4 border-dashed border-gray-300 pt-8 mt-8 compact-test-layout">
+        <style>{`
+          .compact-test-layout .filter-button,
+          .compact-test-layout .sort-button {
+             background: transparent !important;
+             border: none !important;
+             font-size: 11px !important;
+             padding: 4px 0 !important;
+             min-height: auto !important;
+          }
+          .compact-test-layout .filter-button span,
+          .compact-test-layout .sort-button span {
+             max-width: none !important;
+          }
+        `}</style>
+        <h2 className="text-2xl font-bold mb-4">Layout 2: Compact View (Text-Only Dropdowns)</h2>
         {RenderComponent && <RenderComponent proposal={loadedProposal} />}
       </div>
     </div>
