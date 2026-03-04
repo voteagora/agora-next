@@ -138,6 +138,10 @@ const BasicVoteDialog = ({
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
 
+  const requireStatement =
+    Tenant.current().ui.toggle("delegates/votingRequiresStatement")?.enabled !==
+    false;
+
   useEffect(() => {
     if (isSuccess) {
       if (!hasShownVoteEmailDialog) {
@@ -198,7 +202,7 @@ const BasicVoteDialog = ({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {delegate.statement || !requireStatement ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />
@@ -246,6 +250,10 @@ function AdvancedVoteDialog({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+
+  const requireStatement =
+    Tenant.current().ui.toggle("delegates/votingRequiresStatement")?.enabled !==
+    false;
 
   useEffect(() => {
     if (isSuccess) {
@@ -308,7 +316,7 @@ function AdvancedVoteDialog({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {delegate.statement || !requireStatement ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />

@@ -233,6 +233,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/votingRequiresStatement",
+      enabled: false,
+    },
+    {
       name: "delegates/my-delegates-filter",
       enabled: true,
     },
