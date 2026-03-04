@@ -198,7 +198,9 @@ const BasicVoteDialog = ({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {delegate.statement ||
+            Tenant.current().ui.toggle("delegates/votingRequiresStatement")
+              ?.enabled === false ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />
@@ -308,7 +310,9 @@ function AdvancedVoteDialog({
             )}
           </div>
           <div>
-            {delegate.statement ? (
+            {delegate.statement ||
+            Tenant.current().ui.toggle("delegates/votingRequiresStatement")
+              ?.enabled === false ? (
               <VoteButton onClick={write}>
                 Vote {supportType.toLowerCase()} with{"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />

@@ -90,7 +90,11 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
               type: "APPROVAL_CAST_VOTE",
               params: {
                 proposal: proposal,
-                hasStatement: !!data?.delegate?.statement,
+                hasStatement:
+                  !!data?.delegate?.statement ||
+                  Tenant.current().ui.toggle(
+                    "delegates/votingRequiresStatement"
+                  )?.enabled === false,
                 votingPower: data?.votingPower ?? null,
                 authorityChains: data?.chains ?? null,
                 missingVote,
