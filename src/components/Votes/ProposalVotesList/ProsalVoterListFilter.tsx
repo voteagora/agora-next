@@ -43,7 +43,7 @@ export default function ProposalVoterListFilter({
           if (selectedType) onVoterTypeChange(selectedType);
         }}
       >
-        <Listbox.Button className="filter-button text-primary w-fit bg-transparent font-medium py-1 pr-1 flex items-center justify-between text-[11px] h-auto">
+        <Listbox.Button className="text-primary w-full sm:w-fit sm:min-w-[170px] bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
           <FilterIcon className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-left leading-tight break-words max-w-[100px] sm:max-w-none">
             {selectedVoterType.value}
