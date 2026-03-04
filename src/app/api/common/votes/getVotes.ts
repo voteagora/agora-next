@@ -386,7 +386,8 @@ function buildHasVotedQuery(
   type: VoterTypes["type"],
   offchainProposalId?: string
 ): string {
-  const isTokenHouse = type === "TH";
+  const isTokenHouse =
+    type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
 
   if (isTokenHouse) {
     // Token House: Check onchain votes and snapshot votes
@@ -424,7 +425,8 @@ function buildRelevantDelegatesQuery(
   namespace: string,
   type: VoterTypes["type"]
 ): string {
-  const isTokenHouse = type === "TH";
+  const isTokenHouse =
+    type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
 
   if (isTokenHouse) {
     return `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;

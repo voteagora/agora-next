@@ -271,7 +271,7 @@ export function formatNumber(
     Number(wholePart) + Number(fractionalPart) / Number(divisor);
 
   if (useSpecialFormatting) {
-    if (standardUnitAmount === 0) return "";
+    if (standardUnitAmount === 0) return "0";
     if (standardUnitAmount >= 1.5) {
       const rounded = Math.round(standardUnitAmount);
       return new Intl.NumberFormat("en", {
