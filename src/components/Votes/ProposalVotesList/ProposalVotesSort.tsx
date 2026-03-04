@@ -66,7 +66,7 @@ export default function ProposalVotesSort({
           if (selected) onSortChange(selected);
         }}
       >
-        <Listbox.Button className="sort-button text-primary w-full sm:w-fit bg-neutral font-medium border border-line rounded-lg py-2 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
+        <Listbox.Button className="sort-button text-primary w-fit bg-transparent font-medium py-1 pl-1 flex items-center justify-between text-[11px] h-auto">
           <ArrowDownAZ className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
           <span className="text-left leading-tight break-words max-w-[100px] sm:max-w-none">
             {sortOption.label}
