@@ -66,9 +66,9 @@ export default function ProposalVotesSort({
           if (selected) onSortChange(selected);
         }}
       >
-        <Listbox.Button className="text-primary w-full sm:w-fit bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-3 flex items-center justify-between text-xs h-auto min-h-[32px]">
+        <Listbox.Button className="text-primary w-full sm:w-[140px] bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2.5 flex items-center justify-between text-xs min-h-[32px]">
           <ArrowDownAZ className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
-          <span className="text-left leading-tight break-words max-w-[100px] sm:max-w-none">
+          <span className="text-left truncate flex-1 leading-tight">
             {sortOption.label}
           </span>
           <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
