@@ -86,7 +86,9 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
               <ProposalVoterListFilter
                 selectedVoterType={selectedVoterType}
                 onVoterTypeChange={setSelectedVoterType}
-                showCitizenHouseFilters={proposal.proposalType?.includes("HYBRID") || false}
+                showCitizenHouseFilters={
+                  proposal.proposalType?.includes("HYBRID") || false
+                }
               />
               {showVoters ? (
                 <ProposalVotesSort

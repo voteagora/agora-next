@@ -121,7 +121,9 @@ export default function ApprovalVotesPanel({
                   <ProposalVoterListFilter
                     selectedVoterType={selectedVoterType}
                     onVoterTypeChange={setSelectedVoterType}
-                    showCitizenHouseFilters={proposal.proposalType?.includes("HYBRID") || false}
+                    showCitizenHouseFilters={
+                      proposal.proposalType?.includes("HYBRID") || false
+                    }
                   />
                   <ProposalVotesSort
                     sortOption={sortOption}
