@@ -294,6 +294,11 @@ export default function ProposalVotesSummaryDetails({
             isLastStep={!isProposalExecuted && !isProposalCancelled}
             label="Proposal queued"
             value={formatTime(proposal.queuedTime)}
+            href={
+              proposal.queuedTransactionHash
+                ? getBlockScanUrl(proposal.queuedTransactionHash)
+                : undefined
+            }
           />
         )}
         {isProposalCancelled ? (

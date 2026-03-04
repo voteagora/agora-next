@@ -1,3 +1,5 @@
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+
 interface StepperRowProps {
   label: string;
   value: string;
@@ -37,9 +39,10 @@ export const StepperRow = ({
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="hover:underline"
+                className="hover:underline flex items-center gap-x-1"
               >
                 {label}
+                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
               </a>
             ) : (
               label
