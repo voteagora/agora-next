@@ -6078,6 +6078,7 @@ enum DaoSlug {
   DEMO4
   DEMO3
   SHAPE
+  ZEROG
   @@map("dao_slug")
   @@schema("config")
 }

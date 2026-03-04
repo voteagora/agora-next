@@ -19,6 +19,7 @@ import { demo2TenantConfig } from "./configs/contracts/demo2";
 import { demo4TenantConfig } from "./configs/contracts/demo4";
 import { demo3TenantConfig } from "./configs/contracts/demo3";
 import { shapeTenantConfig } from "./configs/contracts/shape";
+import { zeroGTenantConfig } from "./configs/contracts/zeroG";
 
 export default class TenantContractFactory {
   public static create(
@@ -65,6 +66,8 @@ export default class TenantContractFactory {
         return demo3TenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.SHAPE:
         return shapeTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.ZEROG:
+        return zeroGTenantConfig({ isProd, alchemyId });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

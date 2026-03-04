@@ -14,6 +14,8 @@ export const InfoHero = () => {
   const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
   const isTownsDuna = ui.toggle("towns-hero-content")?.enabled === true;
   const isSyndicateDuna = ui.toggle("syndicate-hero-content")?.enabled === true;
+  const isZeroGDuna = ui.toggle("zeroG-hero-content")?.enabled === true;
+  const isShapeDuna = ui.toggle("shape-hero-content")?.enabled === true;
 
   const rotationClasses = [
     "sm:-rotate-2",
@@ -29,6 +31,12 @@ export const InfoHero = () => {
       disclosureLabel = "View Towns Lodge DUNA Member";
     } else if (isSyndicateDuna) {
       disclosureLabel = "View Syndicate DUNA Member";
+      disclosureLinkText = "Disclosures";
+    } else if (isZeroGDuna) {
+      disclosureLabel = "View 0G DUNA Member";
+      disclosureLinkText = "Disclosures";
+    } else if (isShapeDuna) {
+      disclosureLabel = "View Structura Member";
       disclosureLinkText = "Disclosures";
     }
 
