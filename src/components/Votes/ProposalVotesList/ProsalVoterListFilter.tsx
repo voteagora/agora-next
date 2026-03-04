@@ -35,7 +35,7 @@ export default function ProposalVoterListFilter({
   if (availableVoterTypes.length <= 1) return null;
 
   return (
-    <div className="relative text-primary">
+    <div className="relative text-primary flex-1 min-w-0">
       <Listbox
         value={selectedVoterType.type}
         onChange={(value: string) => {
@@ -45,9 +45,9 @@ export default function ProposalVoterListFilter({
           if (selectedType) onVoterTypeChange(selectedType);
         }}
       >
-        <Listbox.Button className="text-primary w-full sm:w-[140px] bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2.5 flex items-center justify-between text-xs min-h-[32px]">
-          <FilterIcon className="stroke-primary w-4 h-4 mr-2 flex-shrink-0" />
-          <span className="text-left truncate flex-1 leading-tight">
+        <Listbox.Button className="text-primary w-full bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2 flex items-center justify-between text-[11px] min-h-[32px]">
+          <FilterIcon className="stroke-primary w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+          <span className="text-left flex-1 leading-tight break-words">
             {selectedVoterType.value}
           </span>
           <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
