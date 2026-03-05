@@ -58,6 +58,8 @@ export function getActionsLink(
       return executedTransactionHash ?? null;
     case "CANCELLED":
       return proposal?.cancelledTransactionHash ?? null;
+    case "QUEUED":
+      return proposal?.queuedTransactionHash ?? null;
     default:
       return null;
   }
