@@ -19,7 +19,6 @@ import { demo2TenantUIConfig } from "@/lib/tenant/configs/ui/demo2";
 import { demo4TenantUIConfig } from "@/lib/tenant/configs/ui/demo4";
 import { demo3TenantUIConfig } from "@/lib/tenant/configs/ui/demo3";
 import { shapeTenantUIConfig } from "@/lib/tenant/configs/ui/shape";
-import { zeroGTenantUIConfig } from "@/lib/tenant/configs/ui/zeroG";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -75,8 +74,6 @@ export default class TenantUIFactory {
         return demo3TenantUIConfig;
       case TENANT_NAMESPACES.SHAPE:
         return shapeTenantUIConfig;
-      case TENANT_NAMESPACES.ZEROG:
-        return zeroGTenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
