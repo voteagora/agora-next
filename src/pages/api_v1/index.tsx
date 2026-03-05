@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import SwaggerUI from "swagger-ui-react";
+import SwaggerUI from "@/lib/shims/SwaggerUI";
 import "swagger-ui-react/swagger-ui.css";
 
 const inter = Inter({ subsets: ["latin"] });
