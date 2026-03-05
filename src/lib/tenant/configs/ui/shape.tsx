@@ -207,7 +207,7 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "admin", enabled: false },
     { name: "proposals", enabled: false },
     { name: "info", enabled: true },
-    { name: "delegates", enabled: false },
+    { name: "delegates", enabled: true },
     { name: "delegates/edit", enabled: false },
     { name: "snapshotVotes", enabled: false },
     { name: "proposal-execute", enabled: false },
