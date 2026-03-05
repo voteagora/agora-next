@@ -3,7 +3,6 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 interface StepperRowProps {
   label: string;
   value: string;
-  isActive?: boolean;
   isCompleted?: boolean;
   isLastStep?: boolean;
   href?: string;
@@ -12,16 +11,11 @@ interface StepperRowProps {
 export const StepperRow = ({
   label,
   value,
-  isActive,
   isCompleted,
   isLastStep,
   href,
 }: StepperRowProps) => {
-  const colorClass = isCompleted
-    ? "text-primary"
-    : isActive
-      ? "text-blue-600"
-      : "text-secondary";
+  const colorClass = isCompleted ? "text-primary" : "text-secondary";
 
   return (
     <li
@@ -29,7 +23,7 @@ export const StepperRow = ({
     >
       <div className="flex items-center gap-x-3">
         <div
-          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : isActive ? "bg-blue-600" : "bg-primary/30"}`}
+          className={`w-1.5 h-1.5 rounded-full ${isCompleted ? "bg-black" : "bg-primary/30"}`}
         />
 
         <div className="w-full flex items-center justify-between text-xs font-semibold">
