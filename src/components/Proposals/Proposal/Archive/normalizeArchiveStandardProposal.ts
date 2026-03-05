@@ -181,6 +181,7 @@ export function normalizeArchiveStandardProposal(
     status: normalizedStatusKey as Proposal["status"],
     createdTransactionHash: null,
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,
+    queuedTransactionHash: null,
     executedTransactionHash: proposal.execute_event?.transaction_hash ?? null,
     offchainProposalId: undefined,
     proposalTypeApproval: proposal.proposal_type_approval,
