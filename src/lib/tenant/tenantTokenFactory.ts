@@ -136,6 +136,13 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };
+      case TENANT_NAMESPACES.OG:
+        return {
+          name: "0g Protocol",
+          symbol: "0G",
+          decimals: 18,
+          address: "0xd5741323b3ddfe5556C3477961B5160600C29c53",
+        };
       case TENANT_NAMESPACES.DEMO2:
         return {
           name: "Demo Governance Token",

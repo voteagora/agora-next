@@ -22,6 +22,19 @@ export const InfoHero = () => {
     "sm:rotate-1",
   ];
 
+  const renderDesc = (desc: any, className = "whitespace-pre-line") => {
+    if (Array.isArray(desc)) {
+      return (
+        <ul className={`${className} list-disc pl-5`}>
+          {desc.map((d: string, i: number) => (
+            <li key={i}>{d}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <div className={className}>{desc}</div>;
+  };
+
   if (hasDunaAdministration) {
     let disclosureLabel = "View DUNI Member";
     let disclosureLinkText = "Disclosure";
@@ -89,18 +102,131 @@ export const InfoHero = () => {
         >
           {page!.title}
         </h1>
-        <p className="text-base text-secondary mt-4">
-          {page!.description}
-          {namespace === TENANT_NAMESPACES.SCROLL && (
-            <div className="flex flex-row gap-2 mt-4">
-              <Link href={"https://claim.scroll.io/faq"}>
-                <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
-                  FAQ
-                </Button>
-              </Link>
+        {ui.toggle("towns-hero-content")?.enabled ? (
+          <div className="text-base text-secondary mt-4">
+            {renderDesc(page!.description, "whitespace-pre-line")}
+            <div className="mt-4">
+              <a
+                href="#duna-administration"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#3A3454] text-white rounded-[40px] hover:bg-[#3A3454]/90 transition-colors cursor-pointer text-sm sm:text-base"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal">
+                  View Towns Lodge DUNA Member{" "}
+                  <span className="underline">Disclosure</span>
+                </span>
+              </a>
             </div>
-          )}
-        </p>
+          </div>
+        ) : ui.toggle("syndicate-hero-content")?.enabled ? (
+          <div className="text-base text-secondary mt-4">
+            {renderDesc(page!.description, "whitespace-pre-line")}
+            <div className="mt-4">
+              <a
+                href="#duna-administration"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-white text-black rounded-[40px] hover:bg-gray-50 transition-colors cursor-pointer text-sm sm:text-base"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal text-red-500 font-bold">
+                  View Syndicate DUNA Member{" "}
+                  <span className="underline">Disclosures</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        ) : ui.toggle("0g-hero-content")?.enabled ? (
+          <div className="text-base text-secondary mt-4">
+            {renderDesc(page!.description, "whitespace-pre-line")}
+            <div className="mt-4">
+              <a
+                href="#duna-administration"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#F6EAFF] text-black rounded-[40px] hover:bg-[#F6EAFF]/90 transition-colors cursor-pointer text-sm sm:text-base"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal">
+                  View 0G DUNA Member{" "}
+                  <span className="underline">Disclosure</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="text-base text-secondary mt-4">
+            {renderDesc(page!.description)}
+            {namespace === TENANT_NAMESPACES.SCROLL && (
+              <div className="flex flex-row gap-2 mt-4">
+                <Link href={"https://claim.scroll.io/faq"}>
+                  <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
+                    FAQ
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 sm:flex sm:flex-row md:w-fit md:flex-auto md:mx-auto self-start justify-between sm:justify-end w-full gap-4 sm:mt-4 lg:mt-0">
@@ -142,7 +268,8 @@ const Card = ({
       <Link
         target="_blank"
         href={link}
-        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 bg-cardBackground ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        style={{ backgroundColor: "var(--card-background)" }}
       >
         <div
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}

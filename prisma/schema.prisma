@@ -6074,6 +6074,7 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
+  ZEROG
   DEMO2
   DEMO4
   DEMO3
