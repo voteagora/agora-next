@@ -352,11 +352,18 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         ...baseFields,
       };
     case ProposalType.OPTIMISTIC:
-    case ProposalType.OPTMISTIC_EXECUTABLE:
       return {
         type: ProposalType.OPTIMISTIC,
         title: proposal.title,
         abstract: proposal.abstract,
+        ...baseFields,
+      };
+    case ProposalType.OPTMISTIC_EXECUTABLE:
+      return {
+        type: ProposalType.OPTMISTIC_EXECUTABLE,
+        title: proposal.title,
+        abstract: proposal.abstract,
+        transactions: proposal.transactions.map((t) => parseTransaction(t)),
         ...baseFields,
       };
   }

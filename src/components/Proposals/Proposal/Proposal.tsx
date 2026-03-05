@@ -108,7 +108,8 @@ export default function Proposal({
               proposal.proposalResults && (
                 <OPStandardProposalStatus proposal={proposal} />
               )}
-            {proposal.proposalType === "OPTIMISTIC" &&
+            {(proposal.proposalType === "OPTIMISTIC" ||
+              proposal.proposalType === "OPTIMISTIC_EXECUTABLE") &&
               proposal.proposalResults && (
                 <OPOptimisticProposalStatus
                   proposal={proposal}

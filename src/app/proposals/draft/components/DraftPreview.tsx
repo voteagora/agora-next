@@ -395,7 +395,9 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {proposalDraft.voting_module_type === ProposalType.BASIC &&
+          {(proposalDraft.voting_module_type === ProposalType.BASIC ||
+            proposalDraft.voting_module_type ===
+              ProposalType.OPTMISTIC_EXECUTABLE) &&
             proposalDraft.proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
               <ProposalTransactionDisplay
                 descriptions={description as string[]}

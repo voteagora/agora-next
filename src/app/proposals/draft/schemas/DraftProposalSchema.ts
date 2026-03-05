@@ -167,6 +167,7 @@ export const OptimisticProposalSchema = BaseProposalSchema.extend({
 
 export const OptimisticExecutableProposalSchema = BaseProposalSchema.extend({
   type: z.literal(ProposalType.OPTMISTIC_EXECUTABLE),
+  transactions: z.array(transaction),
 });
 
 export const DraftProposalSchema = z.discriminatedUnion("type", [

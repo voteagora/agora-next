@@ -128,6 +128,9 @@ export const getValidProposalTypesForVotingType = (
           (!type.module ||
             type.module?.toLowerCase() !==
               optimisticModuleAddress?.toLowerCase()) &&
+          (!type.module ||
+            type.module?.toLowerCase() !==
+              optimisticExecutableModuleAddress?.toLowerCase()) &&
           !type.name.toLowerCase().includes("approval") &&
           !type.name.toLowerCase().includes("optimistic")
       );

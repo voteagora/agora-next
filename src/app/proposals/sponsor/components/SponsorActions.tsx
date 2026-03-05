@@ -2,6 +2,7 @@ import BasicProposalAction from "./BasicProposalAction";
 import SocialProposalAction from "./SocialProposalAction";
 import ApprovalProposalAction from "./ApprovalProposalAction";
 import OptimisticProposalAction from "./OptimisticProposalAction";
+import OptimisticExecutableProposalAction from "./OptimisticExecutableProposalAction";
 import {
   DraftProposal,
   ProposalScope,
@@ -29,7 +30,7 @@ const SponsorActions = ({
       case ProposalType.OPTIMISTIC:
         return <OptimisticProposalAction draftProposal={proposal} />;
       case ProposalType.OPTMISTIC_EXECUTABLE:
-        return <OptimisticProposalAction draftProposal={proposal as any} />;
+        return <OptimisticExecutableProposalAction draftProposal={proposal} />;
       default:
         // ensures that we've handled all cases
         const _exhaustiveCheck: never = proposal;
