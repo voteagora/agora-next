@@ -33,8 +33,8 @@ export default function DAOMetricsHeader() {
     : undefined;
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
-  const twitterLink = ui.link("townstwitter");
-  const farcasterLink = ui.link("townsfarcaster");
+  const twitterLink = ui.link("twitter");
+  const farcasterLink = ui.link("farcaster");
   const agoraLink = ui.link("agora");
 
   const links = [
