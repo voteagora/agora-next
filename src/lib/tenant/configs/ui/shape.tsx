@@ -248,7 +248,7 @@ export const shapeTenantUIConfig = new TenantUI({
 
             <div className="font-medium">
               <p className="mt-2">
-                By owning the token and participating in the governance of Shape
+                By owning the token and participating in the governance of Structura
                 on this forum, you acknowledge and agree that you are electing
                 to become a member of a Wyoming Decentralized Unincorporated
                 Nonprofit Association (&quot;Association&quot;). Your
