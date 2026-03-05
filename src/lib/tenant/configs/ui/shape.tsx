@@ -66,9 +66,9 @@ export const shapeTenantUIConfig = new TenantUI({
 
   links: [
     {
-      name: "shape-twitter",
+      name: "twitter",
       title: "Twitter",
-      url: "#",
+      url: "https://x.com/Shape",
     },
     {
       name: "shape-website",
@@ -80,9 +80,9 @@ export const shapeTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Shape Protocol Governance",
+      title: "Structura Protocol Governance",
       description:
-        "Shape is experimenting with minimal, onchain governance. This page is the canonical home for Shape governance info.",
+        "Structura is experimenting with minimal, onchain governance. This page is the canonical home for Structura governance information.",
       hero: shapeHero,
       meta: {
         title: "Shape Protocol Agora",
@@ -105,9 +105,9 @@ export const shapeTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Welcome to\nShape",
+      title: "Welcome to\nStructura",
       description:
-        "Your home for information about Shape governance and community. Member dashboard for documents, onchain proposals, voting and governance.",
+        "Your home for information about Structura governance and community. Member dashboard for documents, onchain proposals, voting and governance.",
       hero: shapeHero,
       links: [
         {
@@ -153,7 +153,7 @@ export const shapeTenantUIConfig = new TenantUI({
       title: "Shape Roadmap",
       hero: shapeInfoHero,
       description:
-        "This dashboard is a focal point for Shape governance information and roadmap.",
+        "This dashboard is a focal point for Structura governance information and roadmap.",
       sectionTitle: "Shape Roadmap",
       tabs: [
         {
@@ -190,7 +190,7 @@ export const shapeTenantUIConfig = new TenantUI({
     },
     {
       route: "coming-soon",
-      title: "Shape governance is\ncoming soon",
+      title: "Structura governance is\ncoming soon",
       description:
         "Shape voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       hero: shapeHero,
