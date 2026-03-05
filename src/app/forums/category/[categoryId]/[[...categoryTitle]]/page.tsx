@@ -93,6 +93,14 @@ export default async function ForumsCategoryPage({
 }: {
   params: CategoryPageParams;
 }) {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("forums")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
   const categoryBundle = await loadCategory(params.categoryId);
   if (!categoryBundle) {
     return notFound();
