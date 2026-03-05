@@ -163,6 +163,13 @@ export default class TenantTokenFactory {
             ? ZERO_ADDRESS
             : "0xf1f9686d8144c7c5f16feffc8fdf93ec64058dec",
         };
+      case TENANT_NAMESPACES.SHAPE:
+        return {
+          name: "Shape",
+          symbol: "SHAPE",
+          decimals: 18,
+          address: "0x0000000000000000000000000000000000000000",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
