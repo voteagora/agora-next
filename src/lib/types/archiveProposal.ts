@@ -544,4 +544,5 @@ export type ArchiveListProposal = {
   total_voting_power_at_start?: string;
   proposal_type_info?: ProposalTypeInfo;
   kwargs?: Record<string, unknown>;
+  created_blocktime?: number;
 };

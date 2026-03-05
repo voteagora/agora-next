@@ -114,9 +114,9 @@ async function normalizeBase(
 
   const createdTime =
     toDate(proposal.created_event?.blocktime) ||
-    toDate(proposal.blocktime) ||
+    toDate(proposal.created_blocktime) ||
     timeStatus.proposalCreatedTime;
-  const startTime = timeStatus.proposalStartTime || createdTime;
+  const startTime = createdTime || timeStatus.proposalStartTime;
   const endTime = timeStatus.proposalEndTime || startTime;
   const queuedTime = toDate(proposal.queue_event?.blocktime) || null;
 
@@ -175,6 +175,7 @@ async function normalizeBase(
     startBlock: safeBigIntOrNull(proposal.start_block),
     endTime,
     endBlock: safeBigIntOrNull(proposal.end_block),
+
     cancelledTime:
       timeStatus.proposalCancelledTime ||
       toDate(proposal.delete_event?.attestation_time) ||

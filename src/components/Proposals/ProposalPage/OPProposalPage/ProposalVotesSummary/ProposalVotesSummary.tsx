@@ -30,7 +30,6 @@ type RangeProposalType = {
 
 export default function ProposalVotesSummary({ proposal }: Props) {
   const [showDetails, setShowDetails] = useState(false);
-  console.log("proposal", proposal);
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 

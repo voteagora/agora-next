@@ -246,7 +246,8 @@ export default function ProposalVotesSummaryDetails({
             </div>
           </div>
         ) : !hasPendingRanges ? (
-          proposal.approvalThreshold && (
+          proposal.approvalThreshold &&
+          apprThresholdPercent !== 0 && (
             <div className="flex justify-between">
               <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
                 Threshold
