@@ -59,7 +59,7 @@ export function getActionsLink(
     case "CANCELLED":
       return proposal?.cancelledTransactionHash ?? null;
     default:
-      return proposal?.createdTransactionHash ?? null;
+      return null;
   }
 }
 
