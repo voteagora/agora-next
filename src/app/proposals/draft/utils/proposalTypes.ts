@@ -17,11 +17,16 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
     const moduleAddress = proposalType.module?.toLowerCase();
 
     let optimisticModuleAddress: string | null = null;
+    let optimisticExecutableModuleAddress: string | null = null;
     let approvalModuleAddress: string | null = null;
 
     try {
       optimisticModuleAddress =
         getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+      optimisticExecutableModuleAddress =
+        getProposalTypeAddress(
+          ProposalType.OPTMISTIC_EXECUTABLE
+        )?.toLowerCase() || null;
 
       approvalModuleAddress =
         getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
@@ -41,6 +46,11 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
       name.includes("optimistic")
     ) {
       proposalTypeMap.set("optimistic", true);
+    } else if (
+      (moduleAddress && moduleAddress === optimisticExecutableModuleAddress) ||
+      name.includes("optimistic executable")
+    ) {
+      proposalTypeMap.set("optimistic executable", true);
     } else {
       proposalTypeMap.set("basic", true);
     }

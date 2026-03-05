@@ -37,6 +37,7 @@ export function parseProposalResults(
     }
     case "STANDARD":
     case "OPTIMISTIC":
+    case "OPTIMISTIC_EXECUTABLE":
     case "OFFCHAIN_STANDARD": {
       const parsedProposalResults = JSON.parse(proposalResults).standard;
 

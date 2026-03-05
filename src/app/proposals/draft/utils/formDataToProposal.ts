@@ -84,6 +84,29 @@ export function formDataToProposal(data: FormData): DraftProposal {
         tiers: data.tiers ?? [],
       } as unknown as DraftProposal;
 
+    case ProposalType.OPTMISTIC_EXECUTABLE:
+      return {
+        id: 0,
+        author_address: "" as `0x${string}`,
+        title: data.title,
+        abstract: data.abstract,
+        voting_module_type: ProposalType.OPTMISTIC_EXECUTABLE,
+        proposal_type: proposalType,
+        transactions: (data.transactions ?? []).map((t, idx) => ({
+          id: 0,
+          order: idx,
+          target: t.target,
+          value: t.value,
+          calldata: t.calldata,
+          signature: t.signature ?? null,
+          description: t.description,
+          proposal_id: 0,
+        })),
+        checklist_items: [],
+        proposal_scope: data.proposal_scope,
+        tiers: data.tiers ?? [],
+      } as unknown as DraftProposal;
+
     case ProposalType.SOCIAL:
       return {
         id: 0,
