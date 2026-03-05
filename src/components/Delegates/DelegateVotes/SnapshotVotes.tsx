@@ -78,7 +78,7 @@ export default function SnapshotVotes({
         </div>
       }
       element="main"
-      className="divide-y divide-line overflow-hidden bg-white shadow-newDefault ring-1 ring-line rounded-xl"
+      className="divide-y divide-line overflow-hidden bg-neutral shadow-newDefault ring-1 ring-line rounded-xl"
     >
       {snapshotVotes.map(
         (vote, idx) =>
