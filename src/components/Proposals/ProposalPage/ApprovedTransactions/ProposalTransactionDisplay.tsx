@@ -36,6 +36,35 @@ import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
 
+function getActionsLabel(status: string | null | undefined): string {
+  switch (status) {
+    case "EXECUTED":
+      return "Executed Actions";
+    case "CANCELLED":
+      return "Cancelled Actions";
+    case "QUEUED":
+      return "Queued Actions";
+    default:
+      return "Proposed Actions";
+  }
+}
+
+export function getActionsLink(
+  proposal: Proposal | undefined,
+  executedTransactionHash: string | null | undefined
+): string | null {
+  switch (proposal?.status) {
+    case "EXECUTED":
+      return executedTransactionHash ?? null;
+    case "CANCELLED":
+      return proposal?.cancelledTransactionHash ?? null;
+    case "QUEUED":
+      return proposal?.queuedTransactionHash ?? null;
+    default:
+      return null;
+  }
+}
+
 const tokenSymbolsToCheck = {
   [`${contracts.token.address.toLowerCase()}`]: {
     symbol: token.symbol,
@@ -86,12 +115,25 @@ const ProposalTransactionDisplay = ({
   const hasRealActions =
     hasRealCalldatas || hasNonEmptySignatures || hasNonEmptyValues;
 
+  const actionsLabel = getActionsLabel(proposal?.status);
+  const actionsLink = getActionsLink(proposal, executedTransactionHash);
+
   if (targets.length === 0) {
     return (
       <div>
         <div className="flex flex-col border rounded-lg border-line p-4 text-xs text-secondary break-words overflow-hidden">
           <div className="w-full flex items-center justify-between">
-            <span className="text-xs text-tertiary">Actions</span>
+            <span className="text-xs text-tertiary">{actionsLabel}</span>
+            {actionsLink && (
+              <a
+                href={getBlockScanUrl(actionsLink)}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="text-tertiary hover:text-primary transition-colors"
+              >
+                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+              </a>
+            )}
           </div>
           <div className="text-xs text-tertiary mt-1">
             This proposal does not execute any transactions.
@@ -192,11 +234,11 @@ const ProposalTransactionDisplay = ({
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-primary">
-                    Actions
+                    {actionsLabel}
                   </span>
-                  {executedTransactionHash && (
+                  {actionsLink && (
                     <a
-                      href={getBlockScanUrl(executedTransactionHash)}
+                      href={getBlockScanUrl(actionsLink)}
                       target="_blank"
                       rel="noreferrer noopener"
                       className="text-primary hover:text-primary/80 transition-colors"
