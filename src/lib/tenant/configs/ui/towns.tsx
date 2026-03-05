@@ -89,12 +89,12 @@ export const townsTenantUIConfig = new TenantUI({
 
   links: [
     {
-      name: "townstwitter",
+      name: "twitter",
       title: "Twitter",
       url: "https://x.com/TownsProtocol",
     },
     {
-      name: "townsfarcaster",
+      name: "farcaster",
       title: "Farcaster",
       url: "https://farcaster.xyz/towns",
     },

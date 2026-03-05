@@ -32,8 +32,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
-  const twitterLink = ui.link("townstwitter");
-  const farcasterLink = ui.link("townsfarcaster");
+  const twitterLink = ui.link("twitter");
+  const farcasterLink = ui.link("farcaster");
   const agoraLink = ui.link("agora");
 
   const proposalsToggle = ui.toggle("proposals");
