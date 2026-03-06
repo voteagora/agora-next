@@ -13,6 +13,7 @@ import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
+import { isContractWallet as isContractWalletUtil } from "@/lib/utils";
 
 const CreateProposalDraftButton = ({
   address,
@@ -73,6 +74,11 @@ const CreateProposalDraftButton = ({
       onClick={async () => {
         if (isPending) return;
         setIsPending(true);
+        const isContractWallet = await isContractWalletUtil(address);
+        if (isContractWallet) {
+          router.push(`/proposals/create-proposal`);
+          return;
+        }
         try {
           // Require SIWE JWT session before proceeding (middleware enforces it)
           let jwt = getStoredSiweJwt({ expectedAddress: address });

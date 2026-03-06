@@ -2,6 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { hasUnpublishedTopicAccess } from "@/lib/actions/forum/unpublishedTopic";
+import UnpublishedTopicGate from "../components/UnpublishedTopicGate";
 import TopicHeader from "../components/TopicHeader";
 import PostAttachments from "../components/PostAttachments";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
@@ -137,10 +139,26 @@ export async function generateMetadata({
   }
 
   const { topicId, topicData, transformed } = topicBundle;
-  const baseUrl = getRequestBaseUrl();
-  const canonicalPath = buildForumTopicPath(topicId, transformed.title);
   const tenant = Tenant.current();
   const brandName = tenant.brandName || "Agora";
+  const revealTime = topicData.revealTime
+    ? new Date(
+        topicData.revealTime instanceof Date
+          ? topicData.revealTime
+          : topicData.revealTime
+      )
+    : null;
+  const isUnpublished =
+    revealTime !== null && revealTime.getTime() > Date.now();
+  if (isUnpublished && !(await hasUnpublishedTopicAccess())) {
+    return {
+      title: `Preview | ${brandName} Forum`,
+      robots: "noindex, nofollow",
+    };
+  }
+
+  const baseUrl = getRequestBaseUrl();
+  const canonicalPath = buildForumTopicPath(topicId, transformed.title);
 
   const postId = extractPostId(searchParams?.post);
   const specificPost = postId
@@ -299,9 +317,9 @@ export default async function ForumTopicPage({ params }: PageProps) {
   };
 
   const rootPost = topicData.posts?.[0];
-  const rootAttachments = (rootPost?.attachments as any[]) || [];
+  const rootAttachments = rootPost?.attachments || [];
 
-  const isFinancialStatement = (topicData as any).isFinancialStatement ?? false;
+  const isFinancialStatement = topicData.isFinancialStatement ?? false;
   const pdfAttachment = rootAttachments.find(
     (att: any) => att.contentType === "application/pdf"
   );
@@ -340,6 +358,35 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const uncategorizedCount = uncategorizedCountResult.success
     ? uncategorizedCountResult.data
     : 0;
+
+  const revealTime = topicData.revealTime
+    ? new Date(
+        topicData.revealTime instanceof Date
+          ? topicData.revealTime
+          : topicData.revealTime
+      )
+    : null;
+  const isUnpublished =
+    revealTime !== null && revealTime.getTime() > Date.now();
+  const canAccessUnpublished = isUnpublished
+    ? await hasUnpublishedTopicAccess()
+    : true;
+
+  if (isUnpublished && !canAccessUnpublished) {
+    return (
+      <div className="min-h-screen">
+        <ForumsHeader
+          breadcrumbs={[{ label: "Discussions", href: "/forums" }]}
+          isDuna={false}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+          <UnpublishedTopicGate
+            redirectPath={buildForumTopicPath(topicId, transformed.title)}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
