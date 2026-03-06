@@ -9,7 +9,6 @@ import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
-import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -80,11 +79,7 @@ export default async function Page() {
       return (
         <div className="flex flex-col">
           <InfoHero />
-          {ui.toggle("towns-duna-administration")?.enabled ? (
-            <TownsDunaAdministration />
-          ) : (
-            <DunaAdministration />
-          )}
+          <DunaAdministration />
           {treasuryData.result.length > 0 && (
             <ChartTreasury
               initialData={treasuryData.result}

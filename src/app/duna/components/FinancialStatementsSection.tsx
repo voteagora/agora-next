@@ -43,7 +43,7 @@ export default function FinancialStatementsSection({
   title,
 }: FinancialStatementsSectionProps) {
   if (statements.length === 0) return null;
-
+  console.log(statements);
   const sortedStatements = [...statements].sort((a, b) => {
     const dateA = new Date(a.revealTime ?? a.createdAt);
     const dateB = new Date(b.revealTime ?? b.createdAt);
@@ -85,17 +85,32 @@ export default function FinancialStatementsSection({
                   <ArrowCircle className="w-5 h-5" />
                 </button>
                 {statement.url && (
-                  <a
-                    href={statement.url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const response = await fetch(statement.url);
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const link = window.document.createElement("a");
+                        link.href = url;
+                        link.download = statement.name;
+                        window.document.body.appendChild(link);
+                        link.click();
+                        window.document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      } catch (error) {
+                        console.error("Download failed:", error);
+                        // Fallback to opening in new tab
+                        window.open(statement.url, "_blank");
+                      }
+                    }}
                     className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-primary"
                     title="Download"
                     aria-label="Download statement"
-                    onClick={(e) => e.stopPropagation()}
                   >
                     <DownloadCloud className="w-5 h-5" />
-                  </a>
+                  </button>
                 )}
               </div>
             </div>

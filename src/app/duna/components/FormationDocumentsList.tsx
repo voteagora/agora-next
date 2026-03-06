@@ -3,9 +3,6 @@
 import React, { useState } from "react";
 import { ArrowCircle } from "@/icons/ArrowCircle";
 import { DownloadCloud } from "@/icons/DownloadCloud";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import useRequireLogin from "@/hooks/useRequireLogin";
-import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumDocument {
   id: number;
@@ -54,8 +51,6 @@ export default function FormationDocumentsList({
   const [documents, setDocuments] = useState<ForumDocument[]>(
     initialDocuments || []
   );
-  const openDialog = useOpenDialog();
-  const requireLogin = useRequireLogin();
 
   const handleDocumentClick = (document: ForumDocument) => {
     if (onDocumentOpen) {
@@ -65,10 +60,28 @@ export default function FormationDocumentsList({
     }
   };
 
-  const handleDownload = (e: React.MouseEvent, document: ForumDocument) => {
+  const handleDownload = async (
+    e: React.MouseEvent,
+    document: ForumDocument
+  ) => {
     e.stopPropagation();
     if (document.url) {
-      window.open(document.url, "_blank");
+      try {
+        const response = await fetch(document.url);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = window.document.createElement("a");
+        link.href = url;
+        link.download = document.name;
+        window.document.body.appendChild(link);
+        link.click();
+        window.document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Download failed:", error);
+        // Fallback to opening in new tab
+        window.open(document.url, "_blank");
+      }
     }
   };
 

@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import DocumentsSection from "./DocumentsSection";
 import FinancialStatementsClient from "./FinancialStatementsClient";
 import {
   getForumTopics,
@@ -16,7 +15,6 @@ import {
 import { ExternalLink } from "@/icons/ExternalLink";
 import FormationDocumentsList from "./FormationDocumentsList";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
-import { cn } from "@/lib/utils";
 
 const DunaAdministration = async () => {
   let documents: any[] = [];
@@ -97,6 +95,7 @@ const DunaAdministration = async () => {
           }))
       : []
     : [];
+
   const otherDocuments = isFinancialStatementsEnabled
     ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))
     : documents;
@@ -106,6 +105,9 @@ const DunaAdministration = async () => {
       ? dunaDescriptionContent
       : (infoAboutPage?.description ?? null);
   const hasAboutContent = !!aboutContent;
+  const aboutTitle =
+    ui.customization?.customAboutSubtitle || administrationTitle;
+
   const hasFinancialOrFormation =
     (isFinancialStatementsEnabled && financialStatements.length > 0) ||
     otherDocuments.length > 0;
@@ -115,11 +117,11 @@ const DunaAdministration = async () => {
       {/* Row 1: About + Community Resources */}
       {(hasAboutContent || communityLinks.length > 0) && (
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* About DUNI */}
+          {/* About */}
           {hasAboutContent && (
-            <div className="flex-1 border border-line rounded-2xl p-6 bg-wash shadow-sm">
-              <p className="text-base font-semibold text-tertiary uppercase tracking-wide mb-6">
-                {ui.customization?.customAboutSubtitle || administrationTitle}
+            <div className="flex-1 border border-line rounded-2xl p-6 bg-cardBackground shadow-sm">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-6">
+                {aboutTitle}
               </p>
               <div className="text-secondary text-base leading-relaxed whitespace-pre-line">
                 {aboutContent}
@@ -129,8 +131,8 @@ const DunaAdministration = async () => {
 
           {/* Community Resources */}
           {communityLinks.length > 0 && (
-            <div className="lg:w-80 border border-line rounded-2xl p-6 bg-wash shadow-sm flex-shrink-0">
-              <p className="text-base font-semibold text-tertiary uppercase tracking-wide mb-6">
+            <div className="lg:w-80 border border-line rounded-2xl p-6 bg-cardBackground shadow-sm flex-shrink-0">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide mb-6">
                 COMMUNITY RESOURCES
               </p>
               <div className="flex flex-col gap-1">
@@ -142,7 +144,7 @@ const DunaAdministration = async () => {
                     rel="noreferrer"
                     className="flex items-center gap-2 py-2 text-secondary hover:text-primary transition-colors group"
                   >
-                    <ExternalLink className="flex-shrink-0 text-tertiary group-hover:text-primary transition-colors" />
+                    <ExternalLink className="flex-shrink-0 text-secondary group-hover:text-primary transition-colors" />
                     <span className="text-base font-medium">
                       {link.title} <span className="text-tertiary">↗</span>
                     </span>
@@ -153,18 +155,14 @@ const DunaAdministration = async () => {
           )}
         </div>
       )}
+
       {/* Row 2: Financial Statements + Formation Documents */}
       {hasFinancialOrFormation && (
-        <div
-          className={cn(
-            "flex-col lg:flex-row gap-6",
-            otherDocuments.length === 0 ? "flex-1" : "flex"
-          )}
-        >
+        <div className="lg:flex-row gap-6 lg:items-start flex-1">
           {/* Financial Statements */}
           {isFinancialStatementsEnabled && financialStatements.length > 0 && (
-            <div className="border border-line rounded-2xl p-6 bg-wash cardBackground shadow-sm min-w-0">
-              <p className="text-base font-semibold text-tertiary uppercase tracking-wide">
+            <div className="border border-line rounded-2xl p-6 bg-cardBackground shadow-sm min-w-0">
+              <p className="text-base font-semibold text-primary uppercase tracking-wide">
                 {financialStatementsConfig?.title?.toUpperCase() ??
                   "FINANCIAL STATEMENTS"}
               </p>
@@ -174,18 +172,15 @@ const DunaAdministration = async () => {
               />
             </div>
           )}
-
-          {/* Formation Documents */}
-          {otherDocuments.length > 0 && (
-            <div
-              className={`border border-line rounded-2xl p-6 bg-wash shadow-sm min-w-0 flex-1`}
-            >
-              <p className="text-base font-semibold text-tertiary uppercase tracking-wide">
-                FORMATION DOCUMENTS
-              </p>
-              <FormationDocumentsList initialDocuments={otherDocuments} />
-            </div>
-          )}
+        </div>
+      )}
+      {/* Formation Documents */}
+      {otherDocuments.length > 0 && (
+        <div className="border border-line rounded-2xl p-6 bg-cardBackground shadow-sm min-w-0 flex-1">
+          <p className="text-base font-semibold text-primary uppercase tracking-wide">
+            FORMATION DOCUMENTS
+          </p>
+          <FormationDocumentsList initialDocuments={otherDocuments} />
         </div>
       )}
       <GovernanceInfoSections />
