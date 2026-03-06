@@ -14,8 +14,8 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   // UNI Token
   "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984": "UNI Token",
 
-  // Burn Address
-  "0x000000000000000000000000000000000000dead": "Burn Address",
+  // Burn address (dead address)
+  "0x000000000000000000000000000000000000dead": "Burn address",
 
   // Uniswap V3 Factory
   "0x1f98431c8ad98523631ae4a59f267346ea31f984": "Uniswap V3 Factory",

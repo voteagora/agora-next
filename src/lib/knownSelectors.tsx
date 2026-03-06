@@ -224,9 +224,9 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <span className="text-sm text-primary">
           Approve {maybeFriendlyAddress(spender)} to spend{" "}
-          {amount ? formatTokenAmount(amount) : "0"} tokens from{" "}
+          {amount ? formatTokenAmount(amount) : "0"}{" "}
           <LabelWithTooltip
-            label="UNI Token"
+            label="UNI"
             tooltip="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
           />
           .
@@ -244,15 +244,19 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       const amounts = collectByType(decodedData.parameters, "uint256");
       const recipient = addresses[0];
       const amount = amounts[0];
+      const BURN_ADDRESS = "0x000000000000000000000000000000000000dead";
+      const isBurn = recipient?.toLowerCase() === BURN_ADDRESS.toLowerCase();
+      const toPrefix = isBurn ? "to the " : "to ";
 
       return (
         <span className="text-sm text-primary">
           Send {amount ? formatTokenAmount(amount) : "0"}{" "}
           <LabelWithTooltip
-            label="UNI Token"
+            label="UNI"
             tooltip="0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"
           />{" "}
-          to {maybeFriendlyAddress(recipient)}.
+          {toPrefix}
+          {maybeFriendlyAddress(recipient)}.
         </span>
       );
     },
