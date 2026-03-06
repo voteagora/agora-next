@@ -30,7 +30,6 @@ type RangeProposalType = {
 
 export default function ProposalVotesSummary({ proposal }: Props) {
   const [showDetails, setShowDetails] = useState(false);
-
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -131,7 +130,8 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                       <p>{`Threshold ${minApprovalThreshold}% – ${maxApprovalThreshold}%`}</p>
                     </div>
                   ) : !hasPendingRanges ? (
-                    proposal.approvalThreshold && (
+                    proposal.approvalThreshold &&
+                    Number(proposal.approvalThreshold) !== 0 && (
                       <div>
                         <p>{`Threshold ${
                           Number(proposal.approvalThreshold) / 100

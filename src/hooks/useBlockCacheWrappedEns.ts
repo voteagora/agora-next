@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAlchemyId } from "@/lib/alchemyConfig";
+import { BLOCKCACHEURL } from "@/lib/constants";
 
 interface UseBlockCacheWrappedEnsProps {
   address: `0x${string}`;
@@ -31,7 +32,7 @@ const useBlockCacheWrappedEns = ({
       }
 
       const response = await fetch(
-        `https://blockcache-production.up.railway.app/ens_avatar/${chainId}/${address}`,
+        `${BLOCKCACHEURL}/ens_avatar/${chainId}/${address}`,
         {
           headers,
         }

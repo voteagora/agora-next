@@ -20,21 +20,21 @@ export default function ProposalTimeStatus({
   proposalExecutedTime,
 }) {
   const activeProposalEndTime = proposalEndTime
-    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
+    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy", finishOptions)
     : null;
   const pendingProposalStartTime = proposalStartTime
-    ? format(proposalStartTime, "h:mm aaa MMM dd, yyyy")
+    ? format(proposalStartTime, "h:mm aaa MMM dd, yyyy", finishOptions)
     : null;
   const _proposalCancelledTime = proposalCancelledTime
-    ? format(proposalCancelledTime, "h:mm aaa MMM dd, yyyy")
+    ? format(proposalCancelledTime, "h:mm aaa MMM dd, yyyy", finishOptions)
     : null;
   const finishProposalEndTime = proposalEndTime
-    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy")
+    ? format(proposalEndTime, "h:mm aaa MMM dd, yyyy", finishOptions)
     : null;
 
   const _proposalExecutedTime =
     proposalExecutedTime &&
-    format(proposalExecutedTime, "h:mm aaa MMM dd, yyyy");
+    format(proposalExecutedTime, "h:mm aaa MMM dd, yyyy", finishOptions);
 
   switch (proposalStatus) {
     case "PENDING":

@@ -305,6 +305,10 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       enabled: false,
     },
     {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
       name: "show-participation",
       enabled: true,
     },

@@ -56,7 +56,7 @@ export function normalizeArchiveOptimisticProposal(
   const abstainVotes = safeBigInt(extractVoteValue(voteTotals["2"]));
 
   const {
-    quorumVotes: quorumValue,
+    quorum: quorumValue,
     approvalThreshold: approvalThresholdValue,
     votableSupply: votableSupplyValue,
   } = resolveArchiveThresholds(proposal);
@@ -147,7 +147,7 @@ export function normalizeArchiveOptimisticProposal(
     proposalType: "OPTIMISTIC",
     proposalTypeData,
     status: normalizedStatusKey as Proposal["status"],
-    createdTransactionHash: null,
+    createdTransactionHash: proposal.transaction_hash ?? null,
     cancelledTransactionHash: proposal.cancel_event?.transaction_hash ?? null,
     queuedTransactionHash: null,
     executedTransactionHash: proposal.execute_event?.transaction_hash ?? null,

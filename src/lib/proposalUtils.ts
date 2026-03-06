@@ -171,7 +171,7 @@ const knownAbis: Record<string, Abi> = {
   ],
 };
 
-const decodeCalldata = (calldatas: `0x${string}`[]) => {
+export const decodeCalldata = (calldatas: `0x${string}`[]) => {
   return calldatas.map((calldata) => {
     const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
       ? calldata
@@ -1284,7 +1284,6 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
   const proposalForVotes = BigInt(proposalResults?.for || 0);
   const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
   const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
-
   const totalUniqueVoters = {
     ["delegates"]: proposalTotalVotes,
     ["apps"]: proposalResults.totals.vote_counts.APP,
@@ -1665,10 +1664,7 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
     finalApproval: talliesData.finalApproval,
     totalForVotesPercentage: Number(calculatedTotalForVotes.toFixed(2)),
     totalAgainstVotesPercentage: Number(calculatedTotalAgainstVotes.toFixed(2)),
-    totalAbstainVotesPercentage:
-      calculationOptions === 0
-        ? Number(calculatedTotalAbstainVotes.toFixed(2))
-        : 0,
+    totalAbstainVotesPercentage: Number(calculatedTotalAbstainVotes.toFixed(2)),
   };
 }
 
