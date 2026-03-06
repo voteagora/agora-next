@@ -33,8 +33,8 @@ export default function DAOMetricsHeader() {
     : undefined;
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
-  const twitterLink = ui.link("townstwitter");
-  const farcasterLink = ui.link("townsfarcaster");
+  const twitterLink = ui.link("twitter");
+  const farcasterLink = ui.link("farcaster");
   const agoraLink = ui.link("agora");
 
   const links = [
@@ -69,6 +69,18 @@ export default function DAOMetricsHeader() {
     totalSupply: formatNumber(totalSupply),
   };
   const hideVotableSupply = ui.toggle("footer/hide-votable-supply")?.enabled;
+
+  // Light footer (e.g. Shape) = dark icon; dark footer (e.g. Towns) = white icon
+  const footerBg = ui.customization?.footerBackground;
+  const isLightFooter =
+    footerBg &&
+    (() => {
+      const parts = footerBg.split(/\s+/).map(Number);
+      if (parts.length !== 3) return false;
+      const [r, g, b] = parts;
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+      return luminance > 200;
+    })();
 
   if (!isClient) {
     return null;
@@ -177,7 +189,11 @@ export default function DAOMetricsHeader() {
                         width={16}
                         height={16}
                         className="w-4 h-4"
-                        style={{ filter: "brightness(0) invert(1)" }}
+                        style={
+                          isLightFooter
+                            ? undefined
+                            : { filter: "brightness(0) invert(1)" }
+                        }
                       />
                     </a>
                   )}
@@ -194,7 +210,11 @@ export default function DAOMetricsHeader() {
                         width={16}
                         height={16}
                         className="w-4 h-4"
-                        style={{ filter: "brightness(0) invert(1)" }}
+                        style={
+                          isLightFooter
+                            ? undefined
+                            : { filter: "brightness(0) invert(1)" }
+                        }
                       />
                     </a>
                   )}

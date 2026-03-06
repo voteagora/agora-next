@@ -89,12 +89,12 @@ export const townsTenantUIConfig = new TenantUI({
 
   links: [
     {
-      name: "townstwitter",
+      name: "twitter",
       title: "Twitter",
       url: "https://x.com/TownsProtocol",
     },
     {
-      name: "townsfarcaster",
+      name: "farcaster",
       title: "Farcaster",
       url: "https://farcaster.xyz/towns",
     },
@@ -366,6 +366,10 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "towns-duna-administration",
+      enabled: true,
+    },
+    {
       name: "duna/use-community-dialogue-label",
       enabled: true,
     },
@@ -563,13 +567,13 @@ export const townsTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="text-[#87819F] text-[14px] font-medium leading-[19px] mb-4">
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
               TOWNS LODGE – DUNA DISCLOSURES
             </div>
 
             <div className="space-y-6 text-justify">
               <div>
-                <div className="text-[#87819F] text-[14px] font-medium leading-[19px]">
+                <div className="text-[14px] font-medium leading-[19px]">
                   By owning the token and participating in the governance of
                   Towns Lodge, you acknowledge and agree that you are electing
                   to become a member of a Wyoming Decentralized Unincorporated
@@ -590,7 +594,7 @@ export const townsTenantUIConfig = new TenantUI({
               </div>
 
               <div>
-                <div className="text-[#87819F] text-[14px] font-medium leading-[19px]">
+                <div className="text-[14px] font-medium leading-[19px]">
                   By becoming a member, you further agree that any dispute,
                   claim, or proceeding arising out of or relating to the
                   Association Agreement shall be resolved solely on an
@@ -618,7 +622,7 @@ export const townsTenantUIConfig = new TenantUI({
       name: "duna/financial-statements",
       enabled: true,
       config: {
-        title: "TOWNS Lodge Updates",
+        title: "Financial Statements",
       },
     },
     {

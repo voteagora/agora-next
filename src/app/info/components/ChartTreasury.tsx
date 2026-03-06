@@ -14,6 +14,7 @@ import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 import { humanizeNumber, humanizeNumberContact } from "@/lib/utils";
+import { instrumentSerif } from "@/styles/fonts";
 
 interface Props {
   getData: (frequency: string) => Promise<{ result: MetricTimeSeriesValue[] }>;
@@ -57,9 +58,20 @@ export const ChartTreasury = ({ getData, initialData }: Props) => {
   const max = Math.max(...data.map((d) => parseInt(d.value)));
 
   return (
-    <div>
-      <h3 className="text-2xl font-black text-black mt-10">Treasury value</h3>
-      <div className="border border-gray-300 rounded-lg w-full mt-4">
+    <div className="mt-6">
+      <div className="border border-line rounded-2xl w-full bg-cardBackground shadow-sm overflow-hidden">
+        <div className="px-6 pt-6 pb-2">
+          <p className="text-xs font-semibold text-tertiary uppercase tracking-wide">
+            Treasury Value
+          </p>
+          {data.length > 0 && (
+            <p
+              className={`${instrumentSerif.className} font-normal text-[40px] leading-tight text-primary mt-1`}
+            >
+              ${humanizeNumber(parseInt(data[data.length - 1]?.value ?? "0"))}
+            </p>
+          )}
+        </div>
         <div className="p-4 sm:p-8 pb-6 !w-full">
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart

@@ -14,22 +14,17 @@ export default function DunaDisclosuresContent() {
   const disclosuresConfig = config.config as UIDunaDisclosuresConfig;
 
   return (
-    <div id="duna-administration" className="mt-8">
-      <div
-        style={{
-          color: "var(--stone-700, #4F4F4F)",
-          fontSize: "14px",
-          lineHeight: "19px",
-        }}
-      >
-        {disclosuresConfig.content}
-      </div>
-
-      {disclosuresConfig.disclaimer && (
-        <div className="mt-12 pt-6 border-t border-line">
-          {disclosuresConfig.disclaimer}
+    <div className="mt-6">
+      <div className="border border-line rounded-2xl p-6 bg-wash shadow-sm text-primary">
+        <div className="text-base leading-relaxed">
+          {disclosuresConfig.content}
         </div>
-      )}
+        {disclosuresConfig.disclaimer && (
+          <div className="mt-6 pt-6 border-t border-line text-sm">
+            {disclosuresConfig.disclaimer}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

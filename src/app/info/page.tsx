@@ -9,7 +9,6 @@ import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAdministration from "@/app/duna/components/DunaAdministration";
 import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
-import TownsDunaAdministration from "@/app/duna/components/TownsDunaAdministration";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -76,17 +75,30 @@ export default async function Page() {
       FREQUENCY_FILTERS.YEAR
     );
 
+    if (hasDunaAdministration) {
+      return (
+        <div className="flex flex-col">
+          <InfoHero />
+          <DunaAdministration />
+          {treasuryData.result.length > 0 && (
+            <ChartTreasury
+              initialData={treasuryData.result}
+              getData={async (frequency: string) => {
+                "use server";
+                return apiFetchTreasuryBalanceTS(frequency);
+              }}
+            />
+          )}
+          {ui.toggle("duna-disclosures")?.enabled && <DunaDisclosuresContent />}
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col">
         <InfoHero />
         <InfoAbout />
         {!ui.toggle("hide-governor-settings")?.enabled && <GovernorSettings />}
-        {hasDunaAdministration &&
-        ui.toggle("towns-duna-administration")?.enabled ? (
-          <TownsDunaAdministration />
-        ) : (
-          hasDunaAdministration && <DunaAdministration />
-        )}
         <GovernanceInfoSections />
         {treasuryData.result.length > 0 && (
           <ChartTreasury
@@ -113,6 +125,7 @@ export default async function Page() {
             }}
           />
         )}
+
         {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
           <DunaDisclosuresContent />
         ) : null}

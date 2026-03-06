@@ -6074,10 +6074,12 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
-  @@map("dao_slug")
+  ZEROG
   DEMO2
   DEMO4
   DEMO3
+  SHAPE
+  @@map("dao_slug")
   @@schema("config")
 }
 
