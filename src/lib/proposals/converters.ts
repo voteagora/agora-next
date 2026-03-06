@@ -88,12 +88,18 @@ export const deriveTimeStatus = (
   normalizedStatus: string,
   latestBlock?: Block | null
 ) => {
+  const getProposalCreatedTimestamp = () => {
+    if (proposal.created_blocktime) return new Date(proposal.created_blocktime);
+    if (proposal.block_number && latestBlock) {
+      return getHumanBlockTime(proposal.block_number, latestBlock);
+    }
+    return null;
+  };
+
   const proposalStartTime = toDate(proposal.start_blocktime);
   const proposalEndTime = toDate(proposal.end_blocktime);
-  const proposalCreatedTime =
-    proposal.block_number && latestBlock
-      ? getHumanBlockTime(proposal.block_number, latestBlock)
-      : null;
+  const proposalCreatedTime = getProposalCreatedTimestamp();
+
   // Get cancelled time based on source
   let proposalCancelledTime: Date | null = null;
   if (isEasOodaoSource(proposal) && proposal.delete_event) {
