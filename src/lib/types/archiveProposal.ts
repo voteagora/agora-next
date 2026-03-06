@@ -54,7 +54,7 @@ export type ArchiveProposalEvent = {
   timestamp?: number;
   blocktime?: number;
   eta?: number;
-  transaction_hash?: string;
+  transaction_hash: string;
 };
 
 export type ArchiveProposalDeleteEvent = {

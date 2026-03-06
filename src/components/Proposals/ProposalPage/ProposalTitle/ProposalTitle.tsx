@@ -5,7 +5,6 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import ENSName from "@/components/shared/ENSName";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import useBlockCacheTransactionDetails from "@/hooks/useBlockCacheTransactionDetails";
 
 export default function ProposalTitle({
   title,
@@ -23,14 +22,9 @@ export default function ProposalTitle({
     proposal.proposalType ?? "",
     proposalData
   );
-  const { ui, contracts } = Tenant.current();
+  const { ui } = Tenant.current();
   const useIsEasOOProposal = ui.toggle("has-eas-oodao")?.enabled ?? false;
 
-  const { data: txnDetails } = useBlockCacheTransactionDetails({
-    chainId: Number(contracts.governor.chain.id),
-    blockNumber: proposal.block_number,
-    transactionIndex: proposal.transaction_index,
-  });
   return (
     <div className="flex-col items-start">
       {!useIsEasOOProposal && (
@@ -48,7 +42,10 @@ export default function ProposalTitle({
             href={
               proposal.proposalType === "SNAPSHOT"
                 ? proposalData?.link
-                : getBlockScanUrl(txnDetails?.tx ?? "", isOffchain)
+                : getBlockScanUrl(
+                    proposal.createdTransactionHash ?? "",
+                    isOffchain
+                  )
             }
             target="_blank"
             rel="noreferrer noopener"
