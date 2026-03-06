@@ -106,26 +106,44 @@ function collectByType(
 }
 
 /**
- * Extract contentHash from EAS attest parameters.
- * For DUNI Agreement schema (protocol-fees), contentHash is ABI-encoded in the
- * inner `data` bytes of AttestationRequestData: data = abi.encode(contentHash).
- * Structure: AttestationRequest(schema, AttestationRequestData(..., data, ...))
+ * Recursively find bytes32 (66-char hex) in decoded params.
+ * Content hash is in AttestationRequestData.data = abi.encode(contentHash).
  */
+function findContentHashInParams(
+  value: DecodedDataParam | Record<string, DecodedDataParam> | undefined
+): string | null {
+  if (!value) return null;
+
+  const walk = (param: DecodedDataParam): string | null => {
+    if (param.type === "bytes" && param.value) {
+      const bytesVal = String(param.value);
+      if (bytesVal.startsWith("0x") && bytesVal.length === 66) {
+        return bytesVal;
+      }
+    }
+    if (param.components) {
+      for (const v of Object.values(param.components)) {
+        const found = walk(v);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  if ("type" in value) {
+    return walk(value as DecodedDataParam);
+  }
+  for (const v of Object.values(value)) {
+    const found = findContentHashInParams(v);
+    if (found) return found;
+  }
+  return null;
+}
+
 function getAttestContentHash(
   parameters: Record<string, DecodedDataParam>
 ): string | null {
-  const dataParam = parameters.data ?? parameters.details;
-  if (!dataParam?.components) return null;
-
-  const innerData = dataParam.components.data;
-  if (!innerData || innerData.type !== "bytes" || !innerData.value) return null;
-
-  const bytesVal = String(innerData.value);
-  // DUNI schema: abi.encode(bytes32) = 32 bytes = 64 hex chars + 0x
-  if (bytesVal.startsWith("0x") && bytesVal.length === 66) {
-    return bytesVal;
-  }
-  return null;
+  return findContentHashInParams(parameters);
 }
 
 function extractSelector(calldata: string): string | null {
@@ -160,7 +178,11 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Call <code className="font-semibold">attest</code> on the{" "}
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              attest
+            </code>{" "}
+            on the{" "}
             <LabelWithTooltip
               label="EAS Attestation Service"
               tooltip="0xa1207f3bba224e2c9c3c6d5af63d0eb1582ce587"
@@ -180,10 +202,7 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             {contentHash && (
               <div>
                 Content Hash:{" "}
-                <LabelWithTooltip
-                  label={shortAddress(contentHash)}
-                  tooltip={contentHash}
-                />
+                <span className="font-mono text-xs">{contentHash}</span>
               </div>
             )}
           </div>
@@ -248,7 +267,11 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Call <code className="font-semibold">setOwner</code> on the{" "}
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              setOwner
+            </code>{" "}
+            on the{" "}
             <LabelWithTooltip
               label="Uniswap V3 Factory"
               tooltip="0x1f98431c8ad98523631ae4a59f267346ea31f984"
@@ -270,7 +293,11 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Call <code className="font-semibold">setFeeToSetter</code> on the{" "}
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              setFeeToSetter
+            </code>{" "}
+            on the{" "}
             <LabelWithTooltip
               label="Uniswap V2 FeeToSetter"
               tooltip="0x18e433c7bf8a2e1d0197ce5d8f9afada1a771360"
@@ -294,7 +321,11 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Call <code className="font-semibold">setFeeTo</code> on the{" "}
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              setFeeTo
+            </code>{" "}
+            on the{" "}
             <LabelWithTooltip
               label="Uniswap V2 Factory"
               tooltip="0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f"
