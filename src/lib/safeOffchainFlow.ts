@@ -22,6 +22,7 @@ export type SafeProposalOffchainFlowState = {
   safeAddress: `0x${string}`;
   chainId: number;
   messageHash?: `0x${string}`;
+  message?: string;
   startedAt?: number;
   expiresAt?: number;
   status: SafeProposalOffchainFlowStatus;
@@ -162,6 +163,7 @@ export function markSafeProposalOffchainMessageCreated(params: {
   safeAddress: `0x${string}`;
   chainId: number;
   messageHash: `0x${string}`;
+  message: string;
   timeoutMs?: number;
 }) {
   const now = Date.now();
@@ -169,6 +171,7 @@ export function markSafeProposalOffchainMessageCreated(params: {
     safeAddress: params.safeAddress,
     chainId: params.chainId,
     messageHash: params.messageHash,
+    message: params.message,
     startedAt: now,
     expiresAt: now + (params.timeoutMs ?? SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS),
     status: "waiting_for_signatures",

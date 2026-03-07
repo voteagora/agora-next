@@ -15,6 +15,7 @@ import { UpdatedButton } from "@/components/Button";
 import { Button } from "@/components/ui/button";
 import { useSafeMessageStatus } from "@/hooks/useSafeMessageStatus";
 import { useSafeOwnersAndThreshold } from "@/hooks/useSafeOwnersAndThreshold";
+import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import {
   closeStoredProposalCreationTrace,
   getProposalCreationTraceHeaders,
@@ -23,6 +24,7 @@ import {
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
 import {
+  encodeSafeMessageConfirmations,
   clearStoredSafeProposalOffchainFlowState,
   getStoredSafeProposalOffchainFlowState,
   initializeSafeProposalOffchainFlow,
@@ -93,6 +95,7 @@ export function SafeProposalChoiceDialog({
   const activeChainId = flowState?.chainId ?? providedChainId ?? chain?.id;
   const submitStartedRef = useRef(false);
   const timeoutHandledRef = useRef(false);
+  const manualVerifyStartedRef = useRef(false);
   const lastSignedCountRef = useRef<number | null>(null);
   const thresholdLoadedRef = useRef(false);
   const pathnameRef = useRef(pathname);
@@ -100,6 +103,7 @@ export function SafeProposalChoiceDialog({
   const resetLocalProgressRefs = useCallback(() => {
     submitStartedRef.current = false;
     timeoutHandledRef.current = false;
+    manualVerifyStartedRef.current = false;
     lastSignedCountRef.current = null;
     thresholdLoadedRef.current = false;
   }, []);
@@ -570,6 +574,56 @@ export function SafeProposalChoiceDialog({
     flowState?.messageHash,
     ownersAndThresholdQuery.data?.threshold,
     safeAddress,
+    signedCount,
+  ]);
+
+  useEffect(() => {
+    if (
+      !flowState?.message ||
+      !flowState.messageHash ||
+      !ownersAndThresholdQuery.data?.threshold ||
+      flowState.status === "verifying" ||
+      flowState.status === "draft_creating" ||
+      signedCount < ownersAndThresholdQuery.data.threshold ||
+      manualVerifyStartedRef.current
+    ) {
+      return;
+    }
+
+    if (getStoredSiweJwt({ expectedAddress: safeAddress })) {
+      return;
+    }
+
+    const encodedSignatures = encodeSafeMessageConfirmations(
+      safeMessageStatusQuery.data?.confirmations ?? []
+    );
+    if (encodedSignatures === "0x") {
+      return;
+    }
+
+    manualVerifyStartedRef.current = true;
+    setSafeProposalOffchainFlowStatus("verifying");
+
+    void siweProviderConfig
+      .verifyMessage({
+        message: flowState.message,
+        signature: encodedSignatures,
+      })
+      .then((verified) => {
+        if (!verified) {
+          manualVerifyStartedRef.current = false;
+        }
+      })
+      .catch(() => {
+        manualVerifyStartedRef.current = false;
+      });
+  }, [
+    flowState?.message,
+    flowState?.messageHash,
+    flowState?.status,
+    ownersAndThresholdQuery.data?.threshold,
+    safeAddress,
+    safeMessageStatusQuery.data?.confirmations,
     signedCount,
   ]);
 

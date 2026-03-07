@@ -124,6 +124,7 @@ export const siweProviderConfig: SIWEConfig = {
           safeAddress: address as `0x${string}`,
           chainId,
           messageHash: safeMessageHash,
+          message,
         });
       } catch (error) {
         addMiradorEvent(trace, "safe_message_hash_failed", {

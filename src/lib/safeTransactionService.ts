@@ -14,6 +14,25 @@ export type SafeMessageStatus = {
   signedOwners: `0x${string}`[];
 };
 
+export function encodeSafeMessageConfirmations(
+  confirmations: SafeMessageConfirmation[]
+): `0x${string}` {
+  const encoded = confirmations
+    .filter(
+      (
+        confirmation
+      ): confirmation is SafeMessageConfirmation & {
+        signature: `0x${string}`;
+      } => Boolean(confirmation.signature)
+    )
+    .slice()
+    .sort((left, right) => left.owner.localeCompare(right.owner))
+    .map((confirmation) => confirmation.signature.slice(2))
+    .join("");
+
+  return `0x${encoded}` as `0x${string}`;
+}
+
 type SafeMessageStatusApiResponse = {
   safe?: Address;
   messageHash?: `0x${string}`;

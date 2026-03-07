@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  encodeSafeMessageConfirmations,
   fetchSafeMessageStatus,
   getSafeTransactionServiceBaseUrl,
 } from "@/lib/safeTransactionService";
@@ -84,5 +85,24 @@ describe("safeTransactionService", () => {
       ],
       signedOwners: ["0xabcdefabcdefabcdefabcdefabcdefabcdefabcd"],
     });
+  });
+
+  it("encodes Safe confirmation signatures in owner order", () => {
+    expect(
+      encodeSafeMessageConfirmations([
+        {
+          owner: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          signature:
+            "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        },
+        {
+          owner: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          signature:
+            "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        },
+      ])
+    ).toBe(
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    );
   });
 });
