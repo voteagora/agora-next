@@ -3,7 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useSIWE } from "connectkit";
+import {
+  SIWE_NONCE_QUERY_KEY,
+  SIWE_SESSION_QUERY_KEY,
+  useSIWE,
+} from "connectkit";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 
 import { UpdatedButton } from "@/components/Button";
@@ -14,7 +19,6 @@ import {
   closeStoredProposalCreationTrace,
   getProposalCreationTraceHeaders,
   markProposalCreationBranch,
-  persistProposalCreationTraceState,
   startOrResumeProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
@@ -83,7 +87,8 @@ export function SafeProposalChoiceDialog({
 
   const router = useRouter();
   const pathname = usePathname();
-  const { signIn } = useSIWE();
+  const queryClient = useQueryClient();
+  const { isSignedIn, reset, signIn, signOut } = useSIWE();
   const { chain } = useAccount();
   const activeChainId = flowState?.chainId ?? providedChainId ?? chain?.id;
   const submitStartedRef = useRef(false);
@@ -132,6 +137,40 @@ export function SafeProposalChoiceDialog({
     );
     closeDialog();
   }, [closeDialog, closeSafeProposalTrace, resetOffchainUi]);
+
+  const prepareFreshSafeSiweAttempt = useCallback(async () => {
+    clearStoredSiweSession();
+    clearStoredSiweStage();
+    reset();
+
+    if (isSignedIn) {
+      try {
+        await signOut();
+      } catch {}
+    }
+
+    await Promise.allSettled([
+      queryClient.invalidateQueries({
+        queryKey: [SIWE_SESSION_QUERY_KEY],
+        exact: true,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: [SIWE_NONCE_QUERY_KEY],
+        exact: true,
+      }),
+    ]);
+
+    await Promise.allSettled([
+      queryClient.refetchQueries({
+        queryKey: [SIWE_SESSION_QUERY_KEY],
+        exact: true,
+      }),
+      queryClient.refetchQueries({
+        queryKey: [SIWE_NONCE_QUERY_KEY],
+        exact: true,
+      }),
+    ]);
+  }, [isSignedIn, queryClient, reset, signOut]);
 
   const submitDraftCreation = useCallback(
     async (jwt: string) => {
@@ -262,27 +301,9 @@ export function SafeProposalChoiceDialog({
     }
   }, [activeChainId, closeDialog, resetOffchainUi, router, safeAddress]);
 
-  const handleStartOver = useCallback(async () => {
-    clearStoredSiweSession();
-    resetOffchainUi();
-
-    const trace = startOrResumeProposalCreationTrace({
-      walletAddress: safeAddress,
-      chainId: activeChainId,
-    });
-    addMiradorEvent(trace, "safe_offchain_restart_selected");
-    addMiradorEvent(trace, "safe_proposal_choice_modal_opened", {
-      restarted: true,
-    });
-    flushMiradorTrace(trace);
-    await persistProposalCreationTraceState(trace, {
-      walletAddress: safeAddress,
-      chainId: activeChainId,
-      safeAddress,
-    });
-  }, [activeChainId, resetOffchainUi, safeAddress]);
-
-  const handleCreateDraftOffchain = useCallback(async () => {
+  const handleCreateDraftOffchain = useCallback(async (options?: {
+    restarted?: boolean;
+  }) => {
     if (!activeChainId) {
       toast("Unable to determine the connected chain.");
       return;
@@ -295,7 +316,12 @@ export function SafeProposalChoiceDialog({
         walletAddress: safeAddress,
         chainId: activeChainId,
       });
-      addMiradorEvent(trace, "safe_proposal_choice_offchain_selected");
+      if (options?.restarted) {
+        addMiradorEvent(trace, "safe_offchain_restart_selected");
+      }
+      addMiradorEvent(trace, "safe_proposal_choice_offchain_selected", {
+        restarted: options?.restarted === true,
+      });
       flushMiradorTrace(trace);
 
       await markProposalCreationBranch("safe_offchain_draft", trace, {
@@ -312,35 +338,42 @@ export function SafeProposalChoiceDialog({
         return;
       }
 
-      clearStoredSiweStage();
+      await prepareFreshSafeSiweAttempt();
       initializeSafeProposalOffchainFlow({
         safeAddress,
         chainId: activeChainId,
       });
-      addMiradorEvent(trace, "safe_offchain_flow_started");
+      addMiradorEvent(trace, "safe_offchain_flow_started", {
+        restarted: options?.restarted === true,
+      });
       flushMiradorTrace(trace);
 
-      void signIn().catch(async (error: unknown) => {
-        const latestState = getStoredSafeProposalOffchainFlowState();
-        if (!latestState || !isSafeProposalOffchainFlowActive(latestState)) {
-          return;
-        }
+      const signInResult = await signIn();
+      if (signInResult !== false) {
+        return;
+      }
 
-        setSafeProposalOffchainFlowStatus(
-          "failed",
-          "Sign-in cancelled or failed."
-        );
-        await closeSafeProposalTrace(
-          "safe_proposal_siwe_cancelled",
-          {
-            message:
-              error instanceof Error
-                ? error.message
-                : "Sign-in cancelled or failed.",
-          },
-          "safe_proposal_siwe_cancelled"
-        );
-      });
+      const latestState = getStoredSafeProposalOffchainFlowState();
+      if (
+        !latestState ||
+        !isSafeProposalOffchainFlowActive(latestState) ||
+        latestState.status !== "pending_wallet" ||
+        Boolean(latestState.messageHash)
+      ) {
+        return;
+      }
+
+      setSafeProposalOffchainFlowStatus(
+        "failed",
+        "Sign-in cancelled or failed."
+      );
+      await closeSafeProposalTrace(
+        "safe_proposal_siwe_cancelled",
+        {
+          restarted: options?.restarted === true,
+        },
+        "safe_proposal_siwe_cancelled"
+      );
     } catch (error) {
       toast(
         error instanceof Error ? error.message : "Failed to create draft"
@@ -351,10 +384,16 @@ export function SafeProposalChoiceDialog({
   }, [
     activeChainId,
     closeSafeProposalTrace,
+    prepareFreshSafeSiweAttempt,
     safeAddress,
     signIn,
     submitDraftCreation,
   ]);
+
+  const handleStartOver = useCallback(async () => {
+    resetOffchainUi();
+    await handleCreateDraftOffchain({ restarted: true });
+  }, [handleCreateDraftOffchain, resetOffchainUi]);
 
   useEffect(() => {
     return subscribeToSafeProposalOffchainFlowState((nextState) => {

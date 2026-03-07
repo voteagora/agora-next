@@ -229,6 +229,49 @@ export const siweProviderConfig: SIWEConfig = {
         return false;
       }
 
+      if (safeOffchainFlowState) {
+        if (!safeOffchainFlowState.messageHash) {
+          try {
+            localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+          } catch {}
+          addMiradorEvent(trace, "siwe_verify_ignored_without_message_hash");
+          flushMiradorTrace(trace);
+          return false;
+        }
+
+        try {
+          const safeMessageHash = await getCanonicalSafeMessageHash({
+            safeAddress: safeOffchainFlowState.safeAddress,
+            chainId: safeOffchainFlowState.chainId,
+            message,
+          });
+
+          if (
+            safeMessageHash.toLowerCase() !==
+            safeOffchainFlowState.messageHash.toLowerCase()
+          ) {
+            try {
+              localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+            } catch {}
+            addMiradorEvent(trace, "siwe_verify_ignored_stale_safe_message", {
+              expectedMessageHash: safeOffchainFlowState.messageHash,
+              receivedMessageHash: safeMessageHash,
+            });
+            flushMiradorTrace(trace);
+            return false;
+          }
+        } catch (error) {
+          try {
+            localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+          } catch {}
+          addMiradorEvent(trace, "siwe_verify_safe_message_hash_failed", {
+            reason: error instanceof Error ? error.message : "unknown",
+          });
+          flushMiradorTrace(trace);
+          return false;
+        }
+      }
+
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
