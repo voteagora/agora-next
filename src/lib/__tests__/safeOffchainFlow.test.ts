@@ -7,6 +7,7 @@ import {
   initializeSafeProposalOffchainFlow,
   isSafeProposalOffchainFlowActive,
   isSafeProposalOffchainFlowExpired,
+  isSafeProposalOffchainFlowTerminal,
   markSafeProposalOffchainMessageCreated,
   setSafeProposalOffchainFlowStatus,
 } from "@/lib/safeOffchainFlow";
@@ -52,6 +53,7 @@ describe("safeOffchainFlow", () => {
     expect(getStoredSafeProposalOffchainFlowState()).toEqual(state);
     expect(isSafeProposalOffchainFlowActive(state)).toBe(true);
     expect(isSafeProposalOffchainFlowExpired(state)).toBe(false);
+    expect(isSafeProposalOffchainFlowTerminal(state)).toBe(false);
   });
 
   it("marks the flow as expired after the deadline passes", () => {
@@ -72,5 +74,30 @@ describe("safeOffchainFlow", () => {
     const state = getStoredSafeProposalOffchainFlowState();
     expect(state?.status).toBe("verifying");
     expect(isSafeProposalOffchainFlowExpired(state)).toBe(true);
+    expect(isSafeProposalOffchainFlowTerminal(state)).toBe(false);
+  });
+
+  it("treats expired, cancelled, and failed flows as terminal", () => {
+    expect(
+      isSafeProposalOffchainFlowTerminal({
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        chainId: 1,
+        status: "expired",
+      })
+    ).toBe(true);
+    expect(
+      isSafeProposalOffchainFlowTerminal({
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        chainId: 1,
+        status: "cancelled",
+      })
+    ).toBe(true);
+    expect(
+      isSafeProposalOffchainFlowTerminal({
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        chainId: 1,
+        status: "failed",
+      })
+    ).toBe(true);
   });
 });

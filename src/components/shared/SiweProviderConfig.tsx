@@ -26,6 +26,7 @@ import {
   clearStoredSafeProposalOffchainFlowState,
   getStoredSafeProposalOffchainFlowState,
   isSafeProposalOffchainFlowExpired,
+  isSafeProposalOffchainFlowTerminal,
   markSafeProposalOffchainMessageCreated,
   setSafeProposalOffchainFlowStatus,
 } from "@/lib/safeOffchainFlow";
@@ -48,13 +49,30 @@ const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
 
-function getSafeOffchainProposalFlowState() {
-  const traceState = getStoredProposalCreationTraceState();
-  if (traceState?.branch !== "safe_offchain_draft") {
+function getSafeOffchainProposalFlowState(params?: {
+  safeAddress?: string;
+  chainId?: number;
+}) {
+  const flowState = getStoredSafeProposalOffchainFlowState();
+  if (!flowState) {
     return null;
   }
 
-  return getStoredSafeProposalOffchainFlowState();
+  if (
+    params?.safeAddress &&
+    flowState.safeAddress.toLowerCase() !== params.safeAddress.toLowerCase()
+  ) {
+    return null;
+  }
+
+  if (
+    typeof params?.chainId === "number" &&
+    flowState.chainId !== params.chainId
+  ) {
+    return null;
+  }
+
+  return flowState;
 }
 
 export const siweProviderConfig: SIWEConfig = {
@@ -213,12 +231,14 @@ export const siweProviderConfig: SIWEConfig = {
         return false;
       }
 
-      const safeOffchainFlowState = getSafeOffchainProposalFlowState();
+      const siweMessage = new SiweMessage(message);
+      const safeOffchainFlowState = getSafeOffchainProposalFlowState({
+        safeAddress: siweMessage.address,
+        chainId: siweMessage.chainId,
+      });
       if (
         safeOffchainFlowState &&
-        (safeOffchainFlowState.status === "expired" ||
-          safeOffchainFlowState.status === "cancelled" ||
-          safeOffchainFlowState.status === "failed" ||
+        (isSafeProposalOffchainFlowTerminal(safeOffchainFlowState) ||
           isSafeProposalOffchainFlowExpired(safeOffchainFlowState))
       ) {
         try {

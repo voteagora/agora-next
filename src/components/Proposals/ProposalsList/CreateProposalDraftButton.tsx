@@ -21,7 +21,13 @@ import {
   startOrResumeProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
-import { clearStoredSafeProposalOffchainFlowState } from "@/lib/safeOffchainFlow";
+import {
+  clearStoredSafeProposalOffchainFlowState,
+  getStoredSafeProposalOffchainFlowState,
+  isSafeProposalOffchainFlowExpired,
+  isSafeProposalOffchainFlowTerminal,
+} from "@/lib/safeOffchainFlow";
+import { clearStoredSiweSession } from "@/lib/siweSession";
 
 const CreateProposalDraftButton = ({
   address,
@@ -145,6 +151,16 @@ const CreateProposalDraftButton = ({
   };
 
   const openSafeProposalChoiceDialog = async () => {
+    const previousSafeFlowState = getStoredSafeProposalOffchainFlowState();
+    if (
+      previousSafeFlowState?.safeAddress?.toLowerCase() ===
+        address.toLowerCase() &&
+      (isSafeProposalOffchainFlowTerminal(previousSafeFlowState) ||
+        isSafeProposalOffchainFlowExpired(previousSafeFlowState))
+    ) {
+      clearStoredSiweSession();
+    }
+
     clearStoredSafeProposalOffchainFlowState();
 
     const trace = startOrResumeProposalCreationTrace({

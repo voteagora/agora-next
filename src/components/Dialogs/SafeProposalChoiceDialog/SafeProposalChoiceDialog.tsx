@@ -3,16 +3,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Loader2, Wallet, AlertTriangle, CheckCircle2, Clock, ShieldAlert, ArrowRight, ShieldCheck, CheckCircle } from "lucide-react";
 import {
   SIWE_NONCE_QUERY_KEY,
   SIWE_SESSION_QUERY_KEY,
   useSIWE,
 } from "connectkit";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 
 import { UpdatedButton } from "@/components/Button";
 import { Button } from "@/components/ui/button";
+import ENSAvatar from "@/components/shared/ENSAvatar";
+import ENSName from "@/components/shared/ENSName";
 import { useSafeMessageStatus } from "@/hooks/useSafeMessageStatus";
 import { useSafeOwnersAndThreshold } from "@/hooks/useSafeOwnersAndThreshold";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
@@ -24,7 +27,6 @@ import {
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
 import {
-  encodeSafeMessageConfirmations,
   clearStoredSafeProposalOffchainFlowState,
   getStoredSafeProposalOffchainFlowState,
   initializeSafeProposalOffchainFlow,
@@ -35,6 +37,7 @@ import {
   setSafeProposalOffchainFlowStatus,
   subscribeToSafeProposalOffchainFlowState,
 } from "@/lib/safeOffchainFlow";
+import { encodeSafeMessageConfirmations } from "@/lib/safeTransactionService";
 import { clearStoredSiweSession, getStoredSiweJwt } from "@/lib/siweSession";
 import { LOCAL_STORAGE_SIWE_STAGE_KEY } from "@/lib/constants";
 import { shortAddress } from "@/lib/utils";
@@ -68,6 +71,43 @@ function clearStoredSiweStage() {
   try {
     localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
   } catch {}
+}
+
+function SafeOwnerRow({ owner, signed }: { owner: `0x${string}`; signed: boolean }) {
+  const { data: ensName } = useEnsName({
+    chainId: 1,
+    address: owner,
+  });
+
+  return (
+    <div className="flex items-center justify-between rounded-xl border border-line bg-neutral px-4 py-3 shadow-sm transition-all hover:border-primary/20">
+      <div className="flex items-center gap-3">
+        <ENSAvatar ensName={ensName ?? undefined} className="h-8 w-8 rounded-full border border-line" size={32} />
+        <span className="font-medium text-primary">
+          <ENSName address={owner} />
+        </span>
+      </div>
+      <span
+        className={
+          signed
+            ? "flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
+            : "flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20"
+        }
+      >
+        {signed ? (
+          <>
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            Signed
+          </>
+        ) : (
+          <>
+            <Clock className="h-3.5 w-3.5" />
+            Pending
+          </>
+        )}
+      </span>
+    </div>
+  );
 }
 
 export function SafeProposalChoiceDialog({
@@ -635,6 +675,13 @@ export function SafeProposalChoiceDialog({
       signed: signedOwnersSet.has(owner),
     }));
   }, [ownersAndThresholdQuery.data?.owners, signedOwnersSet]);
+  const requiredSignersCount =
+    ownersAndThresholdQuery.data?.threshold ??
+    ownersAndThresholdQuery.data?.owners.length;
+  const remainingRequiredSigners =
+    typeof requiredSignersCount === "number"
+      ? Math.max(0, requiredSignersCount - signedCount)
+      : null;
 
   const remainingMs = flowState?.expiresAt
     ? Math.max(0, flowState.expiresAt - now)
@@ -642,6 +689,7 @@ export function SafeProposalChoiceDialog({
   const isProgressScreen = Boolean(flowState);
   const isExpired = flowState?.status === "expired";
   const isFailed = flowState?.status === "failed";
+  const isDraftCreating = flowState?.status === "draft_creating";
   const progressTitle =
     flowState?.status === "pending_wallet"
       ? "Open Safe and start signing"
@@ -664,43 +712,55 @@ export function SafeProposalChoiceDialog({
     <div className="flex w-full max-w-[40rem] flex-col gap-6">
       {!isProgressScreen ? (
         <>
-          <div className="flex flex-col gap-3">
-            <h2 className="text-xl font-bold text-primary">
-              Safe wallet detected
-            </h2>
-            <p className="text-secondary">
-              Creating a draft offchain uses a Safe message signature flow before
-              the proposal is submitted onchain.
-            </p>
+          <div className="flex flex-col items-center justify-center gap-4 text-center pb-2">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 ring-1 ring-primary/10">
+              <Wallet className="h-8 w-8 text-primary" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-2xl font-semibold tracking-tight text-primary">
+                Safe Wallet Detected
+              </h2>
+              <p className="text-secondary max-w-[24rem]">
+                Creating a draft offchain requires a Safe message signature flow before
+                the proposal is submitted onchain.
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            <p className="font-semibold">Warning</p>
-            <p className="mt-2">
-              Creating a draft offchain requires all Safe signers to approve
-              within 3 minutes. Stay on this page and do not switch tabs until
-              the flow is complete.
-            </p>
+          <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 shadow-sm">
+            <div className="flex gap-3">
+              <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600" />
+              <div className="flex flex-col gap-1">
+                <p className="text-sm font-semibold text-amber-900">Important Warning</p>
+                <p className="text-sm text-amber-800/90 leading-relaxed">
+                  Creating a draft offchain requires all Safe signers to approve
+                  within <span className="font-semibold">3 minutes</span>. Please stay on this page and do not switch tabs until the flow completes.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <label className="flex items-start gap-3 text-sm text-primary">
+          <label className="flex items-center gap-3 rounded-xl border border-line bg-muted/50 p-4 cursor-pointer transition-colors hover:bg-muted">
             <input
               type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-line"
+              className="h-5 w-5 rounded-md border-line text-primary focus:ring-primary/20 cursor-pointer"
               checked={acknowledged}
               onChange={(event) => setAcknowledged(event.target.checked)}
             />
-            <span>I understand the risks of the offchain Safe signature flow.</span>
+            <span className="text-sm font-medium text-primary select-none">
+              I understand the risks of the offchain Safe signature flow
+            </span>
           </label>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 pt-2">
             <UpdatedButton
               onClick={() => void handleCreateDraftOffchain()}
               isLoading={pendingAction === "offchain"}
               disabled={!acknowledged || pendingAction !== null}
               type="primary"
+              className="w-full text-base font-medium h-12 flex justify-center items-center"
             >
-              Create Draft Offchain Quickly
+              Create Draft Offchain
             </UpdatedButton>
 
             <UpdatedButton
@@ -708,14 +768,17 @@ export function SafeProposalChoiceDialog({
               isLoading={pendingAction === "onchain"}
               disabled={pendingAction !== null}
               type="secondary"
+              className="w-full text-base font-medium h-12 flex justify-center items-center gap-2"
             >
-              Skip and Go Direct to Onchain
+              Skip & Go Direct to Onchain
+              <ArrowRight className="h-4 w-4" />
             </UpdatedButton>
 
             <Button
               onClick={() => void handleCloseChoiceScreen()}
-              variant="outline"
+              variant="ghost"
               disabled={pendingAction !== null}
+              className="w-full text-secondary hover:text-primary h-12"
             >
               Cancel
             </Button>
@@ -723,131 +786,195 @@ export function SafeProposalChoiceDialog({
         </>
       ) : isExpired || isFailed ? (
         <>
-          <div className="flex flex-col gap-3">
-            <h2 className="text-xl font-bold text-primary">
-              {isExpired ? "Safe signing timed out" : "Safe signing failed"}
-            </h2>
-            <p className="text-secondary">
-              {flowState?.errorMessage ??
-                "This offchain Safe flow did not complete successfully."}
-            </p>
+          <div className="flex flex-col items-center justify-center gap-4 text-center pb-2">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 ring-1 ring-red-100">
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-2xl font-semibold tracking-tight text-primary">
+                {isExpired ? "Safe signing timed out" : "Safe signing failed"}
+              </h2>
+              <p className="text-secondary max-w-[24rem]">
+                {flowState?.errorMessage ??
+                  "This offchain Safe flow did not complete successfully."}
+              </p>
+            </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-muted p-4 text-sm text-secondary">
-            <p className="font-semibold text-primary">
-              Safe: {shortAddress(safeAddress)}
+          <div className="rounded-xl border border-line bg-muted/50 p-4 shadow-sm flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-sm text-secondary">
+              <Wallet className="h-4 w-4" />
+              <span>Safe Account</span>
+            </div>
+            <p className="font-mono font-medium text-primary">
+              <ENSName address={safeAddress} />
             </p>
             {flowState?.messageHash ? (
-              <p className="mt-2 break-all">Message hash: {flowState.messageHash}</p>
+              <>
+                <div className="h-px w-full bg-line my-1" />
+                <div className="flex items-center gap-2 text-sm text-secondary">
+                  <ShieldAlert className="h-4 w-4" />
+                  <span>Message Hash</span>
+                </div>
+                <p className="mt-1 break-all font-mono text-xs text-secondary">
+                  {flowState.messageHash}
+                </p>
+              </>
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-3">
-            <UpdatedButton onClick={() => void handleStartOver()} type="primary">
+          <div className="flex flex-col gap-3 pt-2">
+            <UpdatedButton onClick={() => void handleStartOver()} type="primary" className="w-full text-base font-medium h-12 flex justify-center items-center">
               Start Over
             </UpdatedButton>
-            <UpdatedButton onClick={() => void handleSkipToOnchain()} type="secondary">
-              Skip and Go Direct to Onchain
+            <UpdatedButton onClick={() => void handleSkipToOnchain()} type="secondary" className="w-full text-base font-medium h-12 flex justify-center items-center gap-2">
+              Skip & Go Direct to Onchain
+              <ArrowRight className="h-4 w-4" />
             </UpdatedButton>
             <Button
               onClick={() => {
                 resetOffchainUi();
                 closeDialog();
               }}
-              variant="outline"
+              variant="ghost"
+              className="w-full text-secondary hover:text-primary h-12"
             >
               Close
             </Button>
           </div>
         </>
+      ) : isDraftCreating ? (
+        <div className="flex min-h-[22rem] flex-col items-center justify-center gap-6 text-center animate-in fade-in duration-500">
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 ring-1 ring-primary/10">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <div className="absolute inset-0 rounded-full animate-ping ring-1 ring-primary/20" />
+          </div>
+          <div className="flex max-w-[20rem] flex-col gap-3">
+            <h2 className="text-2xl font-semibold tracking-tight text-primary">
+              Finalizing Draft
+            </h2>
+            <p className="text-secondary leading-relaxed">
+              Safe confirmations are complete. Agora is saving your draft
+              and will redirect you automatically.
+            </p>
+          </div>
+        </div>
       ) : (
         <>
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-bold text-primary">{progressTitle}</h2>
-              <p className="text-secondary">{progressDescription}</p>
-            </div>
-            <div className="rounded-xl border border-line bg-muted px-4 py-3 text-right">
-              <p className="text-xs uppercase tracking-wide text-secondary">
-                Time Remaining
-              </p>
-              <p className="text-2xl font-bold text-primary">
+          <div className="flex flex-col gap-1.5 pb-4 border-b border-line">
+            <h2 className="text-xl font-semibold tracking-tight text-primary">
+              {progressTitle}
+            </h2>
+            <p className="text-sm text-secondary">{progressDescription}</p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-secondary" />
+                <p className="text-sm font-medium text-secondary">
+                  Time Left
+                </p>
+              </div>
+              <p className="font-mono text-2xl font-bold text-primary tracking-tight">
                 {flowState?.expiresAt ? formatCountdown(remainingMs) : "--:--"}
               </p>
             </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl border border-line bg-neutral p-4">
-              <p className="text-xs uppercase tracking-wide text-secondary">
-                Safe Threshold
-              </p>
-              <p className="mt-2 text-2xl font-bold text-primary">
+            
+            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="h-4 w-4 text-secondary" />
+                <p className="text-sm font-medium text-secondary">
+                  Threshold
+                </p>
+              </div>
+              <p className="text-2xl font-bold text-primary">
                 {ownersAndThresholdQuery.data?.threshold ?? "--"}
               </p>
             </div>
-            <div className="rounded-xl border border-line bg-neutral p-4">
-              <p className="text-xs uppercase tracking-wide text-secondary">
-                Signers Collected
-              </p>
-              <p className="mt-2 text-2xl font-bold text-primary">
-                {signedCount}/
+
+            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-4 w-4 text-secondary" />
+                <p className="text-sm font-medium text-secondary">
+                  Collected
+                </p>
+              </div>
+              <p className="text-2xl font-bold text-primary">
+                <span className={signedCount >= (ownersAndThresholdQuery.data?.threshold ?? Infinity) ? "text-emerald-600" : ""}>
+                  {signedCount}
+                </span>
+                <span className="text-secondary opacity-50 mx-1">/</span>
                 {ownersAndThresholdQuery.data?.threshold ?? ownersAndThresholdQuery.data?.owners.length ?? "--"}
               </p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-neutral p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="font-semibold text-primary">Safe owners</p>
-                <p className="text-sm text-secondary">
+          <div className="flex flex-col gap-3 rounded-xl border border-line bg-muted/30 p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <p className="font-semibold text-primary">Safe Owners</p>
+                <p className="text-xs text-secondary mt-0.5">
                   {safeMessageStatusQuery.data === null && flowState?.messageHash
-                    ? "Waiting for Safe to register the message."
+                    ? "Waiting for Safe to register the message..."
                     : "Signer progress updates every few seconds."}
                 </p>
               </div>
               {ownersAndThresholdQuery.isLoading ? (
-                <span className="text-sm text-secondary">Loading owners...</span>
+                <div className="flex items-center gap-2 text-xs font-medium text-secondary bg-neutral px-2.5 py-1 rounded-full ring-1 ring-line">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Loading...
+                </div>
               ) : null}
             </div>
 
-            <div className="mt-4 flex flex-col gap-3">
+            <div className="mt-2 flex flex-col gap-2">
               {ownerRows.length > 0 ? (
                 ownerRows.map(({ owner, signed }) => (
-                  <div
-                    key={owner}
-                    className="flex items-center justify-between rounded-lg border border-line px-3 py-2"
-                  >
-                    <span className="font-mono text-sm text-primary">
-                      {shortAddress(owner)}
-                    </span>
-                    <span
-                      className={
-                        signed
-                          ? "rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700"
-                          : "rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700"
-                      }
-                    >
-                      {signed ? "Signed" : "Pending"}
-                    </span>
-                  </div>
+                  <SafeOwnerRow key={owner} owner={owner as `0x${string}`} signed={signed} />
                 ))
               ) : (
-                <div className="rounded-lg border border-dashed border-line px-3 py-4 text-sm text-secondary">
-                  {ownersAndThresholdQuery.isError
-                    ? "Unable to load Safe owners and threshold."
-                    : "Waiting for Safe owner details."}
+                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-neutral py-8 text-center">
+                  <Wallet className="h-8 w-8 text-secondary opacity-50 mb-3" />
+                  <p className="text-sm font-medium text-secondary">
+                    {ownersAndThresholdQuery.isError
+                      ? "Unable to load Safe owners and threshold."
+                      : "Waiting for Safe owner details..."}
+                  </p>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-muted p-4 text-sm text-secondary">
-            <p className="font-semibold text-primary">Safe message</p>
-            <p className="mt-2 break-all">
-              {flowState?.messageHash ?? "Preparing Safe message hash..."}
-            </p>
+          <div className="rounded-xl border border-line bg-neutral p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <ShieldCheck className="h-4 w-4 text-secondary" />
+              <p className="text-sm font-semibold text-primary">
+                What Happens Next
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 rounded-lg bg-muted/50 p-3 ring-1 ring-inset ring-line/50">
+              <p className="text-sm text-secondary leading-relaxed">
+                {flowState?.status === "pending_wallet"
+                  ? "Approve the Safe request to start the offchain sign-in flow for this draft."
+                  : flowState?.status === "verifying"
+                  ? "All required Safe signers have approved. Agora is validating the message now."
+                  : remainingRequiredSigners === null
+                  ? "Agora is waiting for the remaining Safe approvals before it can create the draft."
+                  : remainingRequiredSigners === 0
+                  ? "All required Safe approvals are in. Agora is moving to verification."
+                  : `${remainingRequiredSigners} more signer${
+                      remainingRequiredSigners === 1 ? "" : "s"
+                    } still need to approve this message in Safe.`}
+              </p>
+              <div className="flex items-start gap-2 text-sm text-secondary">
+                <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" />
+                <p>
+                  This step only authenticates the Safe so Agora can create a
+                  draft. It does not submit a proposal onchain.
+                </p>
+              </div>
+            </div>
           </div>
 
           <Button
@@ -859,10 +986,11 @@ export function SafeProposalChoiceDialog({
                 { close: true }
               )
             }
-            variant="outline"
+            variant="ghost"
             disabled={flowState?.status === "draft_creating"}
+            className="w-full text-secondary hover:text-primary h-12 mt-2"
           >
-            Cancel flow
+            Cancel Flow
           </Button>
         </>
       )}

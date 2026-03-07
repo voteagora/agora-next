@@ -215,3 +215,17 @@ export function isSafeProposalOffchainFlowExpired(
 
   return Date.now() >= state.expiresAt;
 }
+
+export function isSafeProposalOffchainFlowTerminal(
+  state: SafeProposalOffchainFlowState | null | undefined
+) {
+  if (!state) {
+    return false;
+  }
+
+  return (
+    state.status === "expired" ||
+    state.status === "cancelled" ||
+    state.status === "failed"
+  );
+}
