@@ -342,10 +342,11 @@ export type ReportModalDialogType = {
 
 export type SafeProposalChoiceDialogType = {
   type: "SAFE_PROPOSAL_CHOICE";
+  className?: string;
+  disableDismiss?: boolean;
   params: {
-    onClose?: () => void;
-    onCreateDraftOffchain: () => Promise<void> | void;
-    onSkipToOnchain: () => Promise<void> | void;
+    safeAddress: `0x${string}`;
+    chainId?: number;
   };
 };
 
@@ -626,16 +627,12 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  SAFE_PROPOSAL_CHOICE: (
-    { onClose, onCreateDraftOffchain, onSkipToOnchain },
-    closeDialog
-  ) => {
+  SAFE_PROPOSAL_CHOICE: ({ safeAddress, chainId }, closeDialog) => {
     return (
       <SafeProposalChoiceDialog
         closeDialog={closeDialog}
-        onCancel={onClose}
-        onCreateDraftOffchain={onCreateDraftOffchain}
-        onSkipToOnchain={onSkipToOnchain}
+        safeAddress={safeAddress}
+        chainId={chainId}
       />
     );
   },

@@ -17,14 +17,11 @@ import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
-  closeStoredProposalCreationTrace,
-  getProposalCreationTraceHeaders,
-  isMiradorProposalCreationEnabled,
-  markProposalCreationBranch,
   persistProposalCreationTraceState,
   startOrResumeProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
+import { clearStoredSafeProposalOffchainFlowState } from "@/lib/safeOffchainFlow";
 
 const CreateProposalDraftButton = ({
   address,
@@ -83,23 +80,7 @@ const CreateProposalDraftButton = ({
     return null;
   }
 
-  const closeSafeProposalTrace = async (
-    eventName: string,
-    details?: Record<string, unknown> | string,
-    reason?: string
-  ) => {
-    if (!isMiradorProposalCreationEnabled()) {
-      return;
-    }
-
-    await closeStoredProposalCreationTrace({
-      eventName,
-      details,
-      reason,
-    });
-  };
-
-  const createDraftProposal = async (traceSafeOffchainFlow = false) => {
+  const createDraftProposal = async () => {
     setIsPending(true);
 
     try {
@@ -113,25 +94,11 @@ const CreateProposalDraftButton = ({
             intervalMs: 200,
           });
         } catch (error) {
-          if (traceSafeOffchainFlow) {
-            await closeSafeProposalTrace(
-              "safe_proposal_siwe_cancelled",
-              "Sign-in cancelled or failed.",
-              "safe_proposal_siwe_cancelled"
-            );
-          }
           toast("Sign-in cancelled or failed. Please try again.");
           return;
         }
 
         if (!jwt) {
-          if (traceSafeOffchainFlow) {
-            await closeSafeProposalTrace(
-              "safe_proposal_session_missing",
-              "Session expired before draft creation.",
-              "safe_proposal_session_missing"
-            );
-          }
           toast("Session expired. Please sign in to continue.");
           return;
         }
@@ -145,24 +112,7 @@ const CreateProposalDraftButton = ({
 
       const auth = await getAuthenticationData(messagePayload);
       if (!auth) {
-        if (traceSafeOffchainFlow) {
-          await closeSafeProposalTrace(
-            "safe_proposal_action_auth_cancelled",
-            "Draft authorization was not completed.",
-            "safe_proposal_action_auth_cancelled"
-          );
-        }
         return;
-      }
-
-      if (traceSafeOffchainFlow) {
-        const trace = startOrResumeProposalCreationTrace({
-          branch: "safe_offchain_draft",
-          walletAddress: address,
-          chainId: chain?.id,
-        });
-        addMiradorEvent(trace, "proposal_draft_create_requested");
-        flushMiradorTrace(trace);
       }
 
       const res = await fetch("/api/v1/drafts", {
@@ -170,7 +120,6 @@ const CreateProposalDraftButton = ({
         headers: {
           "Content-Type": "application/json",
           Authorization: auth.jwt ? `Bearer ${auth.jwt}` : "",
-          ...(traceSafeOffchainFlow ? getProposalCreationTraceHeaders() : {}),
         },
         body: JSON.stringify({
           creatorAddress: address,
@@ -181,28 +130,10 @@ const CreateProposalDraftButton = ({
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         const errMsg = body?.message || "Failed to create draft";
-
-        if (traceSafeOffchainFlow) {
-          await closeSafeProposalTrace(
-            "proposal_draft_create_failed_client",
-            { message: errMsg, status: res.status },
-            "proposal_draft_create_failed"
-          );
-        }
-
         throw new Error(errMsg);
       }
 
       const proposal = await res.json();
-
-      if (traceSafeOffchainFlow) {
-        await closeSafeProposalTrace(
-          "proposal_draft_created_client",
-          { draftId: proposal.uuid },
-          "proposal_draft_created"
-        );
-      }
-
       router.push(`/proposals/draft/${proposal.uuid}`);
     } catch (error) {
       console.error("Error creating draft proposal:", error);
@@ -214,6 +145,8 @@ const CreateProposalDraftButton = ({
   };
 
   const openSafeProposalChoiceDialog = async () => {
+    clearStoredSafeProposalOffchainFlowState();
+
     const trace = startOrResumeProposalCreationTrace({
       walletAddress: address,
       chainId: chain?.id,
@@ -236,54 +169,11 @@ const CreateProposalDraftButton = ({
 
     openDialog({
       type: "SAFE_PROPOSAL_CHOICE",
+      className: "sm:w-[42rem]",
+      disableDismiss: true,
       params: {
-        onClose: () => {
-          void closeSafeProposalTrace(
-            "safe_proposal_choice_closed",
-            "User dismissed the Safe proposal choice dialog.",
-            "safe_proposal_choice_closed"
-          );
-        },
-        onCreateDraftOffchain: async () => {
-          const branchTrace = startOrResumeProposalCreationTrace({
-            walletAddress: address,
-            chainId: chain?.id,
-          });
-
-          addMiradorEvent(
-            branchTrace,
-            "safe_proposal_choice_offchain_selected"
-          );
-          flushMiradorTrace(branchTrace);
-
-          await markProposalCreationBranch("safe_offchain_draft", branchTrace, {
-            walletAddress: address,
-            chainId: chain?.id,
-            safeAddress: address,
-          });
-
-          await createDraftProposal(true);
-        },
-        onSkipToOnchain: async () => {
-          const branchTrace = startOrResumeProposalCreationTrace({
-            walletAddress: address,
-            chainId: chain?.id,
-          });
-
-          addMiradorEvent(
-            branchTrace,
-            "safe_proposal_choice_direct_onchain_selected"
-          );
-          flushMiradorTrace(branchTrace);
-
-          await markProposalCreationBranch("safe_direct_onchain", branchTrace, {
-            walletAddress: address,
-            chainId: chain?.id,
-            safeAddress: address,
-          });
-
-          router.push("/proposals/create-proposal");
-        },
+        safeAddress: address,
+        chainId: chain?.id,
       },
     });
   };
@@ -315,7 +205,7 @@ const CreateProposalDraftButton = ({
           return;
         }
 
-        await createDraftProposal(false);
+        await createDraftProposal();
       }}
     >
       Create proposal

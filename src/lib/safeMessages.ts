@@ -19,11 +19,35 @@ const SAFE_DOMAIN_SEPARATOR_ABI = [
   },
 ] as const;
 
+const SAFE_OWNERS_AND_THRESHOLD_ABI = [
+  {
+    type: "function",
+    name: "getOwners",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "address[]" }],
+  },
+  {
+    type: "function",
+    name: "getThreshold",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as const;
+
 const SAFE_MESSAGE_TYPEHASH = keccak256(
   stringToHex("SafeMessage(bytes message)")
 );
 
 const safeDomainSeparatorCache = new Map<string, `0x${string}`>();
+const safeOwnersAndThresholdCache = new Map<
+  string,
+  {
+    owners: `0x${string}`[];
+    threshold: number;
+  }
+>();
 
 type GetCanonicalSafeMessageHashParams = {
   safeAddress: Address;
@@ -53,6 +77,43 @@ async function getSafeDomainSeparator({
 
   safeDomainSeparatorCache.set(cacheKey, domainSeparator);
   return domainSeparator;
+}
+
+export async function getSafeOwnersAndThreshold(params: {
+  safeAddress: Address;
+  chainId: number;
+}) {
+  const cacheKey = `${params.chainId}:${params.safeAddress.toLowerCase()}`;
+  const cached = safeOwnersAndThresholdCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const chain = getChainById(params.chainId);
+  if (!chain) {
+    throw new Error(`Unsupported Safe chain: ${params.chainId}`);
+  }
+
+  const publicClient = getPublicClient(chain);
+  const [owners, threshold] = await Promise.all([
+    publicClient.readContract({
+      address: params.safeAddress,
+      abi: SAFE_OWNERS_AND_THRESHOLD_ABI,
+      functionName: "getOwners",
+    }),
+    publicClient.readContract({
+      address: params.safeAddress,
+      abi: SAFE_OWNERS_AND_THRESHOLD_ABI,
+      functionName: "getThreshold",
+    }),
+  ]);
+
+  const result = {
+    owners: owners.map((owner) => owner.toLowerCase() as `0x${string}`),
+    threshold: Number(threshold),
+  };
+  safeOwnersAndThresholdCache.set(cacheKey, result);
+  return result;
 }
 
 export async function getCanonicalSafeMessageHash({

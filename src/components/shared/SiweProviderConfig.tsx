@@ -22,6 +22,13 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getCanonicalSafeMessageHash } from "@/lib/safeMessages";
+import {
+  clearStoredSafeProposalOffchainFlowState,
+  getStoredSafeProposalOffchainFlowState,
+  isSafeProposalOffchainFlowExpired,
+  markSafeProposalOffchainMessageCreated,
+  setSafeProposalOffchainFlowStatus,
+} from "@/lib/safeOffchainFlow";
 
 const API_AUTH_PREFIX = "/api/v1/auth";
 
@@ -40,6 +47,15 @@ const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 //
 // JWT tokens for SIWE should therefore be issued with a short expiry time.
 */
+
+function getSafeOffchainProposalFlowState() {
+  const traceState = getStoredProposalCreationTraceState();
+  if (traceState?.branch !== "safe_offchain_draft") {
+    return null;
+  }
+
+  return getStoredSafeProposalOffchainFlowState();
+}
 
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () => {
@@ -104,10 +120,21 @@ export const siweProviderConfig: SIWEConfig = {
           miradorChain,
           "Create proposal SIWE"
         );
+        markSafeProposalOffchainMessageCreated({
+          safeAddress: address as `0x${string}`,
+          chainId,
+          messageHash: safeMessageHash,
+        });
       } catch (error) {
         addMiradorEvent(trace, "safe_message_hash_failed", {
           reason: error instanceof Error ? error.message : "unknown",
         });
+        setSafeProposalOffchainFlowStatus(
+          "failed",
+          error instanceof Error
+            ? error.message
+            : "Unable to compute Safe message hash"
+        );
       }
     }
 
@@ -123,6 +150,9 @@ export const siweProviderConfig: SIWEConfig = {
     try {
       localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "awaiting_response");
     } catch {}
+    if (shouldTrace) {
+      setSafeProposalOffchainFlowStatus("verifying");
+    }
     addMiradorEvent(trace, "siwe_verify_requested");
     flushMiradorTrace(trace);
     const res = await fetch(`${API_AUTH_PREFIX}/verify`, {
@@ -141,6 +171,12 @@ export const siweProviderConfig: SIWEConfig = {
         status: res.status,
       });
       flushMiradorTrace(trace);
+      if (shouldTrace) {
+        setSafeProposalOffchainFlowStatus(
+          "failed",
+          `Verification failed (${res.status})`
+        );
+      }
       if (shouldTrace) {
         await closeStoredProposalCreationTrace({
           eventName: "siwe_verify_failed_client_closed",
@@ -161,6 +197,12 @@ export const siweProviderConfig: SIWEConfig = {
         });
         flushMiradorTrace(trace);
         if (shouldTrace) {
+          setSafeProposalOffchainFlowStatus(
+            "failed",
+            "Verification returned no token"
+          );
+        }
+        if (shouldTrace) {
           await closeStoredProposalCreationTrace({
             eventName: "siwe_verify_failed_client_closed",
             details: { reason: "missing_token" },
@@ -169,6 +211,24 @@ export const siweProviderConfig: SIWEConfig = {
         }
         return false;
       }
+
+      const safeOffchainFlowState = getSafeOffchainProposalFlowState();
+      if (
+        safeOffchainFlowState &&
+        (safeOffchainFlowState.status === "expired" ||
+          safeOffchainFlowState.status === "cancelled" ||
+          safeOffchainFlowState.status === "failed" ||
+          isSafeProposalOffchainFlowExpired(safeOffchainFlowState))
+      ) {
+        try {
+          localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
+        } catch {}
+        addMiradorEvent(trace, "siwe_verify_ignored_after_timeout");
+        flushMiradorTrace(trace);
+        clearStoredSafeProposalOffchainFlowState();
+        return false;
+      }
+
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
@@ -184,6 +244,12 @@ export const siweProviderConfig: SIWEConfig = {
         reason: "invalid_json",
       });
       flushMiradorTrace(trace);
+      if (shouldTrace) {
+        setSafeProposalOffchainFlowStatus(
+          "failed",
+          "Verification returned invalid JSON"
+        );
+      }
       if (shouldTrace) {
         await closeStoredProposalCreationTrace({
           eventName: "siwe_verify_failed_client_closed",
