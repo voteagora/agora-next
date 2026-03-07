@@ -133,15 +133,7 @@ describe("Safe Transaction Utils", () => {
     it("should handle regular (non-safe) transactions", async () => {
       const mockPublicClient = {
         chain: { id: 1 },
-        transport: {
-          request: vi.fn(({ method }) => {
-            if (method === "eth_getCode") {
-              return Promise.resolve("0x");
-            }
-            return Promise.resolve(null);
-          }),
-        },
-        getCode: vi.fn().mockResolvedValue("0x"),
+        readContract: vi.fn().mockRejectedValue(new Error("not a safe")),
         waitForTransactionReceipt: vi
           .fn()
           .mockResolvedValue({ status: "success" }),
@@ -165,15 +157,7 @@ describe("Safe Transaction Utils", () => {
     it("should handle safe transactions", async () => {
       const mockPublicClient = {
         chain: { id: 1 },
-        transport: {
-          request: vi.fn(({ method }) => {
-            if (method === "eth_getCode") {
-              return Promise.resolve("0xcontractcode");
-            }
-            return Promise.resolve(null);
-          }),
-        },
-        getCode: vi.fn().mockResolvedValue("0xcontractcode"),
+        readContract: vi.fn().mockResolvedValue(2n),
         waitForTransactionReceipt: vi
           .fn()
           .mockResolvedValue({ status: "success" }),

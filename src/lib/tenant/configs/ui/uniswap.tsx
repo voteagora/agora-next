@@ -352,6 +352,18 @@ export const uniswapTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        proposalCreationSiwe: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },

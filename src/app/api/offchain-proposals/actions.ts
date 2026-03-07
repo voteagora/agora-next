@@ -5,6 +5,9 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
+import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
+import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import { MiradorTraceContext } from "@/lib/mirador/types";
 
 interface OffchainProposalData {
   proposer: string;
@@ -26,6 +29,7 @@ interface CreateOffchainProposalParams {
   id: string;
   transactionHash?: string;
   onchainProposalId: string | null;
+  traceContext?: MiradorTraceContext;
 }
 
 export async function createOffchainProposal({
@@ -33,10 +37,14 @@ export async function createOffchainProposal({
   onchainProposalId,
   id,
   transactionHash,
+  traceContext,
 }: CreateOffchainProposalParams) {
   try {
     const { slug, contracts } = Tenant.current();
     const governor = contracts.governor.address as `0x${string}`;
+    const miradorChain = getMiradorChainNameFromChainId(
+      contracts.governor.chain.id
+    );
 
     const {
       proposer,
@@ -85,6 +93,22 @@ export async function createOffchainProposal({
       },
     });
 
+    await appendServerTraceEvent({
+      traceContext: traceContext
+        ? {
+            ...traceContext,
+            step: "offchain_proposal_record",
+            source: "backend",
+          }
+        : undefined,
+      eventName: "offchain_proposal_recorded",
+      details: { proposalId: dbProposal.id },
+      txHashHints:
+        transactionHash && miradorChain
+          ? [{ txHash: transactionHash, chain: miradorChain }]
+          : undefined,
+    });
+
     return {
       success: true,
       proposalId: dbProposal.id,
@@ -92,6 +116,17 @@ export async function createOffchainProposal({
     };
   } catch (error: any) {
     console.error("Error creating off-chain proposal:", error);
+    await appendServerTraceEvent({
+      traceContext: traceContext
+        ? {
+            ...traceContext,
+            step: "offchain_proposal_record",
+            source: "backend",
+          }
+        : undefined,
+      eventName: "offchain_proposal_record_failed",
+      details: { message: error.message },
+    });
     throw new Error("Failed to create off-chain proposal: " + error.message);
   }
 }

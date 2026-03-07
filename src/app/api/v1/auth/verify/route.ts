@@ -1,6 +1,8 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
+import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
+import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
 
 export async function POST(request: NextRequest) {
   const { SiweMessage } = await import("siwe");
@@ -9,11 +11,26 @@ export async function POST(request: NextRequest) {
     "@/app/lib/auth/serverAuth"
   );
   const { EIP1271_MAGIC_VALUE } = await import("@/lib/constants");
+  const baseTraceContext = getMiradorTraceContextFromHeaders(request);
 
   try {
     const { message, signature } = await request.json();
     // Parse the exact message signed by the client (EIP-4361)
     const siweObject = new SiweMessage(message);
+    const traceContext = baseTraceContext
+      ? {
+          ...baseTraceContext,
+          step: "siwe_verify",
+          source: "api" as const,
+          walletAddress: siweObject.address as `0x${string}`,
+          chainId: siweObject.chainId,
+        }
+      : undefined;
+
+    await appendServerTraceEvent({
+      traceContext,
+      eventName: "siwe_verify_started",
+    });
 
     let verification = false;
     try {
@@ -26,8 +43,19 @@ export async function POST(request: NextRequest) {
       verification = false;
     }
 
+    if (verification) {
+      await appendServerTraceEvent({
+        traceContext,
+        eventName: "siwe_eoa_verify_succeeded",
+      });
+    }
+
     // If EOA check failed, try EIP-1271 (SCW / multisig) fallback
     if (!verification) {
+      await appendServerTraceEvent({
+        traceContext,
+        eventName: "siwe_1271_fallback_attempted",
+      });
       try {
         const { getPublicClient } = await import("@/lib/viem");
         const { hashMessage } = await import("viem");
@@ -59,6 +87,12 @@ export async function POST(request: NextRequest) {
             args: [msgHash, signature as `0x${string}`],
           })) as `0x${string}`;
           verification = res?.toLowerCase() === EIP1271_MAGIC_VALUE;
+          if (verification) {
+            await appendServerTraceEvent({
+              traceContext,
+              eventName: "siwe_1271_fallback_succeeded",
+            });
+          }
         }
       } catch (e) {
         // ignore
@@ -66,6 +100,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!verification) {
+      await appendServerTraceEvent({
+        traceContext,
+        eventName: "siwe_verify_failed",
+      });
       return NextResponse.json(
         { message: "Invalid signature" },
         { status: 401 }
@@ -86,8 +124,19 @@ export async function POST(request: NextRequest) {
       token_type: "JWT",
       expires_in: ttl,
     };
+    await appendServerTraceEvent({
+      traceContext,
+      eventName: "siwe_jwt_issued",
+    });
     return NextResponse.json(responseBody);
   } catch (e) {
+    await appendServerTraceEvent({
+      traceContext: baseTraceContext
+        ? { ...baseTraceContext, step: "siwe_verify", source: "api" }
+        : undefined,
+      eventName: "siwe_verify_failed",
+      details: { message: "Internal server error" },
+    });
     return new Response("Internal server error", { status: 500 });
   }
 }

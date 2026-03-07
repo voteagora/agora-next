@@ -32,6 +32,16 @@ vi.mock("@/components/Button", () => ({
   }) => <button {...props}>{children}</button>,
 }));
 
+vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
+  useOpenDialog: () => vi.fn(),
+}));
+
+vi.mock("connectkit", () => ({
+  useSIWE: () => ({
+    signIn: vi.fn(),
+  }),
+}));
+
 const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   data,
   isEnabled: true,
@@ -56,7 +66,6 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
   isPaused: false,
   isPlaceholderData: false,
   isStale: false,
-  isEnabled: true,
   fetchStatus: "idle",
   refetch: vi.fn(),
   promise: Promise.resolve(data),

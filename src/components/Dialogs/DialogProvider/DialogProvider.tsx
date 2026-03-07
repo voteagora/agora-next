@@ -72,6 +72,15 @@ const Modal: FC<
 export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
 
+  const closeCurrentDialog = () => {
+    const onClose = (currentDialog as { params?: { onClose?: () => void } })?.params
+      ?.onClose;
+    if (typeof onClose === "function") {
+      onClose();
+    }
+    setCurrentDialog(null);
+  };
+
   useEffect(() => {
     if (currentDialog) {
       document.body.style.overflow = "hidden";
@@ -94,7 +103,7 @@ export const DialogProvider: FC<Props> = ({ children }) => {
       <Modal
         open={!!currentDialog}
         onClose={() =>
-          currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
+          currentDialog?.type !== "SWITCH_NETWORK" && closeCurrentDialog()
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
         className={cn(

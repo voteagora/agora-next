@@ -43,6 +43,7 @@ import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { ForumPost, ForumTopic } from "@/lib/forumUtils";
 import ReportModal from "@/app/duna/components/ReportModal";
+import { SafeProposalChoiceDialog } from "../SafeProposalChoiceDialog/SafeProposalChoiceDialog";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -70,7 +71,8 @@ export type DialogType =
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
-  | ReportModalDialogType;
+  | ReportModalDialogType
+  | SafeProposalChoiceDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -335,6 +337,15 @@ export type ReportModalDialogType = {
     onCommentAdded?: (newComment: ForumPost) => void;
     onCommentDeleted?: (commentId: number) => void;
     onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
+  };
+};
+
+export type SafeProposalChoiceDialogType = {
+  type: "SAFE_PROPOSAL_CHOICE";
+  params: {
+    onClose?: () => void;
+    onCreateDraftOffchain: () => Promise<void> | void;
+    onSkipToOnchain: () => Promise<void> | void;
   };
 };
 
@@ -612,6 +623,19 @@ export const dialogs: DialogDefinitions<DialogType> = {
         onCommentDeleted={onCommentDeleted}
         onCommentUpdated={onCommentUpdated}
         closeDialog={closeDialog}
+      />
+    );
+  },
+  SAFE_PROPOSAL_CHOICE: (
+    { onClose, onCreateDraftOffchain, onSkipToOnchain },
+    closeDialog
+  ) => {
+    return (
+      <SafeProposalChoiceDialog
+        closeDialog={closeDialog}
+        onCancel={onClose}
+        onCreateDraftOffchain={onCreateDraftOffchain}
+        onSkipToOnchain={onSkipToOnchain}
       />
     );
   },

@@ -606,6 +606,32 @@ export const isContractWallet = async (address: Address) => {
   return bytecode && bytecode !== "0x" ? true : false;
 };
 
+const SAFE_THRESHOLD_ABI = [
+  {
+    type: "function",
+    name: "getThreshold",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as const;
+
+export const isSafeWallet = async (address: Address) => {
+  const publicClient = getPublicClient();
+
+  try {
+    const threshold = await publicClient.readContract({
+      address,
+      abi: SAFE_THRESHOLD_ABI,
+      functionName: "getThreshold",
+    });
+
+    return typeof threshold === "bigint" && threshold > 0n;
+  } catch {
+    return false;
+  }
+};
+
 export function delay(milliseconds: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
@@ -690,7 +716,7 @@ export const wrappedWaitForTransactionReceipt = async (
     throw new Error("no chain on public client");
   }
 
-  const isSafe = await isContractWallet(params.address);
+  const isSafe = await isSafeWallet(params.address);
 
   if (isSafe) {
     //try to resolve the underlying transaction

@@ -16,6 +16,8 @@ import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
+import { MiradorProvider } from "@/components/providers/MiradorProvider";
+import { UIMiradorConfig } from "@/lib/tenant/tenantUI";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,33 +70,46 @@ export const config =
         },
       });
 
-const Web3Provider: FC<PropsWithChildren<{}>> = ({ children }) => {
+const miradorConfig = ui.toggle("mirador")?.config as
+  | UIMiradorConfig
+  | undefined;
+
+const Web3Provider: FC<
+  PropsWithChildren<{
+    miradorWebApiKey?: string;
+  }>
+> = ({ children, miradorWebApiKey }) => {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <SIWEProvider
-          {...siweProviderConfig}
-          enabled={siweProviderConfig.enabled}
+        <MiradorProvider
+          apiKey={miradorWebApiKey}
+          enabled={miradorConfig?.proposalCreation === true}
         >
-          <ConnectKitProvider options={{ enforceSupportedChains: false }}>
-            <body className={inter.variable}>
-              <noscript>
-                You need to enable JavaScript to run this app.
-              </noscript>
-              {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
+          <SIWEProvider
+            {...siweProviderConfig}
+            enabled={siweProviderConfig.enabled}
+          >
+            <ConnectKitProvider options={{ enforceSupportedChains: false }}>
+              <body className={inter.variable}>
+                <noscript>
+                  You need to enable JavaScript to run this app.
+                </noscript>
+                {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
 
-              {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-              <ConnectButtonProvider>
-                <PageContainer>
-                  <Toaster />
-                  <AgoraProvider>{children}</AgoraProvider>
-                </PageContainer>
-              </ConnectButtonProvider>
-              {!shouldHideAgoraBranding && <Footer />}
-              <SpeedInsights />
-            </body>
-          </ConnectKitProvider>
-        </SIWEProvider>
+                {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
+                <ConnectButtonProvider>
+                  <PageContainer>
+                    <Toaster />
+                    <AgoraProvider>{children}</AgoraProvider>
+                  </PageContainer>
+                </ConnectButtonProvider>
+                {!shouldHideAgoraBranding && <Footer />}
+                <SpeedInsights />
+              </body>
+            </ConnectKitProvider>
+          </SIWEProvider>
+        </MiradorProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

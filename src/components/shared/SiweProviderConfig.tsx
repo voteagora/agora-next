@@ -8,6 +8,20 @@ import {
   clearStoredSiweSession,
   getStoredSiweSession,
 } from "@/lib/siweSession";
+import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import {
+  closeStoredProposalCreationTrace,
+  getProposalCreationTraceHeaders,
+  getStoredProposalCreationTraceState,
+  isMiradorProposalCreationSiweEnabled,
+  startOrResumeProposalCreationTrace,
+} from "@/lib/mirador/proposalCreationTrace";
+import {
+  addMiradorEvent,
+  addMiradorSafeMsgHint,
+  flushMiradorTrace,
+} from "@/lib/mirador/webTrace";
+import { getCanonicalSafeMessageHash } from "@/lib/safeMessages";
 
 const API_AUTH_PREFIX = "/api/v1/auth";
 
@@ -28,12 +42,32 @@ const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 */
 
 export const siweProviderConfig: SIWEConfig = {
-  getNonce: async () =>
-    fetch(`${API_AUTH_PREFIX}/nonce`)
-      .then((res) => res.json())
-      .then((data) => data?.nonce ?? ""),
-  createMessage: ({ nonce, address, chainId }) =>
-    new SiweMessage({
+  getNonce: async () => {
+    const shouldTrace =
+      isMiradorProposalCreationSiweEnabled() &&
+      getStoredProposalCreationTraceState()?.branch === "safe_offchain_draft";
+    const trace = shouldTrace ? startOrResumeProposalCreationTrace() : null;
+
+    addMiradorEvent(trace, "siwe_nonce_requested");
+    flushMiradorTrace(trace);
+
+    const res = await fetch(`${API_AUTH_PREFIX}/nonce`, {
+      headers: shouldTrace ? getProposalCreationTraceHeaders() : undefined,
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      addMiradorEvent(trace, "siwe_nonce_failed_client", { status: res.status });
+      flushMiradorTrace(trace);
+      return "";
+    }
+
+    addMiradorEvent(trace, "siwe_nonce_received");
+    flushMiradorTrace(trace);
+    return data?.nonce ?? "";
+  },
+  createMessage: async ({ nonce, address, chainId }) => {
+    const message = new SiweMessage({
       version: "1",
       domain: window.location.host,
       uri: window.location.origin,
@@ -41,20 +75,79 @@ export const siweProviderConfig: SIWEConfig = {
       address,
       chainId,
       nonce,
-    }).prepareMessage(),
+    }).prepareMessage();
+
+    const shouldTrace =
+      isMiradorProposalCreationSiweEnabled() &&
+      getStoredProposalCreationTraceState()?.branch === "safe_offchain_draft";
+    const trace = shouldTrace
+      ? startOrResumeProposalCreationTrace({
+          walletAddress: address as `0x${string}`,
+          chainId,
+        })
+      : null;
+
+    addMiradorEvent(trace, "siwe_message_created");
+
+    const miradorChain = getMiradorChainNameFromChainId(chainId);
+    if (trace && miradorChain) {
+      try {
+        const safeMessageHash = await getCanonicalSafeMessageHash({
+          safeAddress: address as `0x${string}`,
+          chainId,
+          message,
+        });
+
+        addMiradorSafeMsgHint(
+          trace,
+          safeMessageHash,
+          miradorChain,
+          "Create proposal SIWE"
+        );
+      } catch (error) {
+        addMiradorEvent(trace, "safe_message_hash_failed", {
+          reason: error instanceof Error ? error.message : "unknown",
+        });
+      }
+    }
+
+    flushMiradorTrace(trace);
+    return message;
+  },
   verifyMessage: async ({ message, signature }) => {
+    const shouldTrace =
+      isMiradorProposalCreationSiweEnabled() &&
+      getStoredProposalCreationTraceState()?.branch === "safe_offchain_draft";
+    const trace = shouldTrace ? startOrResumeProposalCreationTrace() : null;
+
     try {
       localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "awaiting_response");
     } catch {}
+    addMiradorEvent(trace, "siwe_verify_requested");
+    flushMiradorTrace(trace);
     const res = await fetch(`${API_AUTH_PREFIX}/verify`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(shouldTrace ? getProposalCreationTraceHeaders() : {}),
+      },
       body: JSON.stringify({ message, signature }),
     });
     if (!res.ok) {
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
+      addMiradorEvent(trace, "siwe_verify_failed_client", {
+        status: res.status,
+      });
+      flushMiradorTrace(trace);
+      if (shouldTrace) {
+        await closeStoredProposalCreationTrace({
+          eventName: "siwe_verify_failed_client_closed",
+          details: { status: res.status },
+          reason: "siwe_verify_failed",
+        });
+      }
       return false;
     }
     try {
@@ -63,17 +156,41 @@ export const siweProviderConfig: SIWEConfig = {
         try {
           localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
         } catch {}
+        addMiradorEvent(trace, "siwe_verify_failed_client", {
+          reason: "missing_token",
+        });
+        flushMiradorTrace(trace);
+        if (shouldTrace) {
+          await closeStoredProposalCreationTrace({
+            eventName: "siwe_verify_failed_client_closed",
+            details: { reason: "missing_token" },
+            reason: "siwe_verify_failed",
+          });
+        }
         return false;
       }
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
       } catch {}
+      addMiradorEvent(trace, "siwe_verify_succeeded_client");
+      flushMiradorTrace(trace);
       return true;
     } catch {
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
+      addMiradorEvent(trace, "siwe_verify_failed_client", {
+        reason: "invalid_json",
+      });
+      flushMiradorTrace(trace);
+      if (shouldTrace) {
+        await closeStoredProposalCreationTrace({
+          eventName: "siwe_verify_failed_client_closed",
+          details: { reason: "invalid_json" },
+          reason: "siwe_verify_failed",
+        });
+      }
       return false;
     }
   },
