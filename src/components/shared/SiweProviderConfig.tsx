@@ -25,6 +25,7 @@ import { getCanonicalSafeMessageHash } from "@/lib/safeMessages";
 import {
   clearStoredSafeProposalOffchainFlowState,
   getStoredSafeProposalOffchainFlowState,
+  isSafeProposalOffchainFlowActive,
   isSafeProposalOffchainFlowExpired,
   isSafeProposalOffchainFlowTerminal,
   markSafeProposalOffchainMessageCreated,
@@ -93,12 +94,20 @@ export const siweProviderConfig: SIWEConfig = {
     if (!res.ok) {
       addMiradorEvent(trace, "siwe_nonce_failed_client", { status: res.status });
       flushMiradorTrace(trace);
-      return "";
+      throw new Error(`Failed to fetch SIWE nonce (${res.status})`);
+    }
+
+    if (typeof data?.nonce !== "string" || data.nonce.length === 0) {
+      addMiradorEvent(trace, "siwe_nonce_failed_client", {
+        reason: "missing_nonce",
+      });
+      flushMiradorTrace(trace);
+      throw new Error("SIWE nonce response was missing a nonce");
     }
 
     addMiradorEvent(trace, "siwe_nonce_received");
     flushMiradorTrace(trace);
-    return data?.nonce ?? "";
+    return data.nonce;
   },
   createMessage: async ({ nonce, address, chainId }) => {
     const message = new SiweMessage({
@@ -120,24 +129,33 @@ export const siweProviderConfig: SIWEConfig = {
           chainId,
         })
       : null;
+    const safeOffchainFlowState = getSafeOffchainProposalFlowState({
+      safeAddress: address,
+      chainId,
+    });
+    const shouldPersistSafeMessageState =
+      safeOffchainFlowState?.status === "pending_wallet" &&
+      isSafeProposalOffchainFlowActive(safeOffchainFlowState);
 
     addMiradorEvent(trace, "siwe_message_created");
 
-    const miradorChain = getMiradorChainNameFromChainId(chainId);
-    if (trace && miradorChain) {
+    if (shouldPersistSafeMessageState) {
       try {
         const safeMessageHash = await getCanonicalSafeMessageHash({
           safeAddress: address as `0x${string}`,
           chainId,
           message,
         });
+        const miradorChain = getMiradorChainNameFromChainId(chainId);
 
-        addMiradorSafeMsgHint(
-          trace,
-          safeMessageHash,
-          miradorChain,
-          "Create proposal SIWE"
-        );
+        if (trace && miradorChain) {
+          addMiradorSafeMsgHint(
+            trace,
+            safeMessageHash,
+            miradorChain,
+            "Create proposal SIWE"
+          );
+        }
         markSafeProposalOffchainMessageCreated({
           safeAddress: address as `0x${string}`,
           chainId,

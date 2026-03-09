@@ -42,6 +42,7 @@ describe("safeOffchainFlow", () => {
       chainId: 1,
       messageHash:
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      message: "Safe message",
     });
 
     expect(state.status).toBe("waiting_for_signatures");
@@ -65,6 +66,7 @@ describe("safeOffchainFlow", () => {
       chainId: 1,
       messageHash:
         "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      message: "Safe message",
       timeoutMs: 5_000,
     });
     setSafeProposalOffchainFlowStatus("verifying");

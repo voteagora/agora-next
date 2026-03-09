@@ -436,7 +436,40 @@ export function SafeProposalChoiceDialog({
       });
       flushMiradorTrace(trace);
 
-      const signInResult = await signIn();
+      let signInResult: Awaited<ReturnType<typeof signIn>>;
+      try {
+        signInResult = await signIn();
+      } catch (error) {
+        const latestState = getStoredSafeProposalOffchainFlowState();
+        if (
+          latestState &&
+          isSafeProposalOffchainFlowActive(latestState) &&
+          latestState.status === "pending_wallet" &&
+          !latestState.messageHash
+        ) {
+          setSafeProposalOffchainFlowStatus(
+            "failed",
+            error instanceof Error
+              ? error.message
+              : "Sign-in cancelled or failed."
+          );
+          await closeSafeProposalTrace(
+            "safe_proposal_siwe_failed",
+            {
+              restarted: options?.restarted === true,
+              message:
+                error instanceof Error
+                  ? error.message
+                  : "Sign-in cancelled or failed.",
+            },
+            "safe_proposal_siwe_failed"
+          );
+          return;
+        }
+
+        throw error;
+      }
+
       if (signInResult !== false) {
         return;
       }
@@ -456,11 +489,12 @@ export function SafeProposalChoiceDialog({
         "Sign-in cancelled or failed."
       );
       await closeSafeProposalTrace(
-        "safe_proposal_siwe_cancelled",
+        "safe_proposal_siwe_failed",
         {
           restarted: options?.restarted === true,
+          message: "Sign-in cancelled or failed.",
         },
-        "safe_proposal_siwe_cancelled"
+        "safe_proposal_siwe_failed"
       );
     } catch (error) {
       toast(
