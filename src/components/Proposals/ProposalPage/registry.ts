@@ -100,7 +100,7 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
   OFFCHAIN_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
 
   // Snapshot - handled specially for Copeland
-  SNAPSHOT: StandardProposalPage,
+  SNAPSHOT: CopelandProposalPage,
 };
 
 /**
