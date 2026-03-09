@@ -73,6 +73,48 @@ function clearStoredSiweStage() {
   } catch {}
 }
 
+function SignerProgress({ signed, threshold }: { signed: number; threshold: number }) {
+  const radius = 40;
+  const strokeWidth = 8;
+  const normalizedRadius = radius - strokeWidth / 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const safeThreshold = threshold || 1;
+  const progressPercent = Math.min(signed, safeThreshold) / safeThreshold;
+  const strokeDashoffset = circumference - progressPercent * circumference;
+
+  return (
+    <div className="relative flex items-center justify-center">
+      <svg height={radius * 2} width={radius * 2} className="-rotate-90 transform drop-shadow-md">
+        <circle
+          stroke="currentColor"
+          fill="transparent"
+          strokeWidth={strokeWidth}
+          r={normalizedRadius}
+          cx={radius}
+          cy={radius}
+          className="text-line opacity-30"
+        />
+        <circle
+          stroke="currentColor"
+          fill="transparent"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference + " " + circumference}
+          style={{ strokeDashoffset, transition: "stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)" }}
+          strokeLinecap="round"
+          r={normalizedRadius}
+          cx={radius}
+          cy={radius}
+          className={signed >= safeThreshold ? "text-emerald-500" : "text-primary"}
+        />
+      </svg>
+      <div className="absolute flex items-baseline justify-center gap-0.5">
+        <span className="text-3xl font-extrabold text-primary tracking-tighter leading-none">{signed}</span>
+        <span className="text-sm font-bold text-secondary opacity-50">/{safeThreshold}</span>
+      </div>
+    </div>
+  );
+}
+
 function SafeOwnerRow({ owner, signed }: { owner: `0x${string}`; signed: boolean }) {
   const { data: ensName } = useEnsName({
     chainId: 1,
@@ -80,32 +122,34 @@ function SafeOwnerRow({ owner, signed }: { owner: `0x${string}`; signed: boolean
   });
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-line bg-neutral px-4 py-3 shadow-sm transition-all hover:border-primary/20">
-      <div className="flex items-center gap-3">
-        <ENSAvatar ensName={ensName ?? undefined} className="h-8 w-8 rounded-full border border-line" size={32} />
-        <span className="font-medium text-primary">
-          <ENSName address={owner} />
-        </span>
+    <div className="flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-muted/50 transition-colors group">
+      <div className="flex items-center gap-4">
+        <div className="relative flex-shrink-0">
+          <ENSAvatar ensName={ensName ?? undefined} className="h-10 w-10 rounded-full ring-2 ring-neutral shadow-sm" size={40} />
+          {signed && (
+            <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-full p-0.5 ring-2 ring-neutral z-10 shadow-sm animate-in zoom-in duration-300">
+              <CheckCircle2 className="h-3 w-3" />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm text-primary tracking-tight">
+            <ENSName address={owner} />
+          </span>
+          <span className="text-[11px] text-secondary/60 font-mono tracking-wider mt-0.5">
+            {shortAddress(owner)}
+          </span>
+        </div>
       </div>
-      <span
-        className={
-          signed
-            ? "flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20"
-            : "flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20"
-        }
-      >
-        {signed ? (
-          <>
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Signed
-          </>
-        ) : (
-          <>
-            <Clock className="h-3.5 w-3.5" />
-            Pending
-          </>
-        )}
-      </span>
+      {signed ? (
+        <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full ring-1 ring-inset ring-emerald-500/20">
+          Signed
+        </span>
+      ) : (
+        <span className="text-xs font-bold uppercase tracking-wider text-secondary/40 group-hover:text-secondary/70 transition-colors px-3 py-1.5">
+          Pending
+        </span>
+      )}
     </div>
   );
 }
@@ -785,168 +829,158 @@ export function SafeProposalChoiceDialog({
           </div>
         </>
       ) : isExpired || isFailed ? (
-        <>
-          <div className="flex flex-col items-center justify-center gap-4 text-center pb-2">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 ring-1 ring-red-100">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-semibold tracking-tight text-primary">
-                {isExpired ? "Safe signing timed out" : "Safe signing failed"}
-              </h2>
-              <p className="text-secondary max-w-[24rem]">
-                {flowState?.errorMessage ??
-                  "This offchain Safe flow did not complete successfully."}
-              </p>
-            </div>
+        <div className="flex flex-col gap-8 text-center items-center w-full animate-in fade-in duration-500">
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-red-500 to-red-600 shadow-2xl shadow-red-500/20 -rotate-3">
+            <AlertTriangle className="h-10 w-10 text-white" />
+            <div className="absolute inset-0 rounded-3xl animate-ping ring-2 ring-red-500/20 duration-1000" />
           </div>
 
-          <div className="rounded-xl border border-line bg-muted/50 p-4 shadow-sm flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-sm text-secondary">
-              <Wallet className="h-4 w-4" />
-              <span>Safe Account</span>
-            </div>
-            <p className="font-mono font-medium text-primary">
-              <ENSName address={safeAddress} />
+          <div className="flex flex-col gap-3 max-w-[24rem]">
+            <h2 className="text-3xl font-bold tracking-tight text-primary">
+              {isExpired ? "Time Expired" : "Signing Failed"}
+            </h2>
+            <p className="text-secondary text-base leading-relaxed">
+              {flowState?.errorMessage ?? "The offchain Safe signature flow could not be completed in time."}
             </p>
-            {flowState?.messageHash ? (
-              <>
-                <div className="h-px w-full bg-line my-1" />
-                <div className="flex items-center gap-2 text-sm text-secondary">
-                  <ShieldAlert className="h-4 w-4" />
-                  <span>Message Hash</span>
-                </div>
-                <p className="mt-1 break-all font-mono text-xs text-secondary">
-                  {flowState.messageHash}
-                </p>
-              </>
-            ) : null}
           </div>
 
-          <div className="flex flex-col gap-3 pt-2">
-            <UpdatedButton onClick={() => void handleStartOver()} type="primary" className="w-full text-base font-medium h-12 flex justify-center items-center">
-              Start Over
-            </UpdatedButton>
-            <UpdatedButton onClick={() => void handleSkipToOnchain()} type="secondary" className="w-full text-base font-medium h-12 flex justify-center items-center gap-2">
-              Skip & Go Direct to Onchain
-              <ArrowRight className="h-4 w-4" />
-            </UpdatedButton>
-            <Button
-              onClick={() => {
-                resetOffchainUi();
-                closeDialog();
-              }}
-              variant="ghost"
-              className="w-full text-secondary hover:text-primary h-12"
-            >
-              Close
-            </Button>
+          <div className="w-full rounded-2xl border border-line bg-muted/30 p-5 shadow-inner text-left flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <Wallet className="h-5 w-5 text-secondary" />
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-secondary uppercase tracking-wider">Safe Account</span>
+                <span className="font-mono font-medium text-primary"><ENSName address={safeAddress} /></span>
+              </div>
+            </div>
+            {flowState?.messageHash && (
+              <>
+                <div className="h-px w-full bg-line/50" />
+                <div className="flex items-start gap-3">
+                  <ShieldAlert className="h-5 w-5 text-secondary mt-0.5" />
+                  <div className="flex flex-col overflow-hidden">
+                    <span className="text-xs font-semibold text-secondary uppercase tracking-wider">Message Hash</span>
+                    <span className="break-all font-mono text-[11px] text-secondary/80 mt-1">{flowState.messageHash}</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </>
+
+          <div className="flex flex-col w-full gap-3 pt-2">
+            <UpdatedButton onClick={() => void handleStartOver()} type="primary" className="w-full text-base font-semibold h-14 rounded-xl shadow-lg">
+              Try Again
+            </UpdatedButton>
+            <UpdatedButton onClick={() => void handleSkipToOnchain()} type="secondary" className="w-full text-base font-semibold h-14 rounded-xl group flex items-center justify-center gap-2">
+              Go Direct Onchain
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </UpdatedButton>
+            <div className="flex justify-center mt-2">
+              <button
+                onClick={() => {
+                  resetOffchainUi();
+                  closeDialog();
+                }}
+                className="text-sm font-semibold text-secondary hover:text-primary transition-colors py-2 px-4 rounded-lg hover:bg-muted"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
       ) : isDraftCreating ? (
-        <div className="flex min-h-[22rem] flex-col items-center justify-center gap-6 text-center animate-in fade-in duration-500">
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary/5 ring-1 ring-primary/10">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <div className="absolute inset-0 rounded-full animate-ping ring-1 ring-primary/20" />
+        <div className="flex min-h-[28rem] flex-col items-center justify-center gap-8 text-center animate-in fade-in zoom-in duration-700 relative w-full">
+          <div className="absolute inset-0 bg-primary/5 rounded-full blur-[100px] opacity-50 animate-pulse" />
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full animate-ping ring-2 ring-primary/20 duration-1000" />
+            <div className="absolute inset-[-10px] rounded-full animate-ping ring-1 ring-primary/10 duration-1000 delay-150" />
+            <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary/80 shadow-2xl shadow-primary/20 rotate-3">
+              <Loader2 className="h-10 w-10 animate-spin text-neutral" />
+            </div>
           </div>
-          <div className="flex max-w-[20rem] flex-col gap-3">
-            <h2 className="text-2xl font-semibold tracking-tight text-primary">
+          <div className="flex max-w-[22rem] flex-col gap-3 relative z-10">
+            <h2 className="text-3xl font-bold tracking-tight text-primary bg-clip-text text-transparent bg-gradient-to-b from-primary to-primary/70">
               Finalizing Draft
             </h2>
-            <p className="text-secondary leading-relaxed">
-              Safe confirmations are complete. Agora is saving your draft
-              and will redirect you automatically.
+            <p className="text-secondary/90 leading-relaxed text-base">
+              Signatures verified successfully. Agora is securely storing your draft and will redirect you momentarily.
             </p>
           </div>
         </div>
       ) : (
-        <>
-          <div className="flex flex-col gap-1.5 pb-4 border-b border-line">
-            <h2 className="text-xl font-semibold tracking-tight text-primary">
-              {progressTitle}
-            </h2>
-            <p className="text-sm text-secondary">{progressDescription}</p>
+        <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative w-full">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-[3xl] opacity-50 pointer-events-none animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-[3xl] opacity-50 pointer-events-none animate-pulse delay-1000" />
+
+          {/* Header Status */}
+          <div className="flex flex-col items-center justify-center text-center gap-3 pb-2">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary text-sm font-semibold ring-1 ring-primary/10 mb-1 shadow-sm">
+              {flowState?.status === "pending_wallet" && <Wallet className="h-4 w-4" />}
+              {flowState?.status === "waiting_for_signatures" && <Loader2 className="h-4 w-4 animate-spin" />}
+              {flowState?.status === "verifying" && <ShieldCheck className="h-4 w-4 text-emerald-500" />}
+              <span>{progressTitle}</span>
+            </div>
+            <p className="text-secondary max-w-[24rem] text-sm leading-relaxed">{progressDescription}</p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-secondary" />
-                <p className="text-sm font-medium text-secondary">
-                  Time Left
-                </p>
-              </div>
-              <p className="font-mono text-2xl font-bold text-primary tracking-tight">
-                {flowState?.expiresAt ? formatCountdown(remainingMs) : "--:--"}
+          {/* Main Stats Row */}
+          <div className="flex gap-4 items-stretch justify-center relative z-10">
+            {/* Circular Progress */}
+            <div className="flex-1 rounded-3xl bg-neutral ring-1 ring-line shadow-xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:ring-primary/20 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-5 z-10">Signatures</p>
+              <SignerProgress signed={signedCount} threshold={ownersAndThresholdQuery.data?.threshold ?? 1} />
+            </div>
+
+            {/* Timer */}
+            <div className="flex-1 rounded-3xl bg-neutral ring-1 ring-line shadow-xl p-6 flex flex-col items-center justify-center relative overflow-hidden group hover:ring-amber-500/20 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <p className="text-xs font-bold uppercase tracking-widest text-secondary mb-4 z-10 flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" /> Time Left
               </p>
+              <div className="flex items-baseline justify-center gap-1 z-10">
+                <span className="font-mono text-5xl font-extrabold tracking-tighter text-primary">
+                  {flowState?.expiresAt ? formatCountdown(remainingMs).split(':')[0] : "--"}
+                </span>
+                <span className="text-3xl font-bold text-secondary/30 animate-pulse pb-1">:</span>
+                <span className="font-mono text-5xl font-extrabold tracking-tighter text-primary">
+                  {flowState?.expiresAt ? formatCountdown(remainingMs).split(':')[1] : "--"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Owners List */}
+          <div className="rounded-3xl bg-neutral ring-1 ring-line shadow-xl overflow-hidden flex flex-col relative z-10">
+            <div className="bg-muted/30 px-6 py-4 border-b border-line flex justify-between items-center">
+              <p className="text-sm font-bold text-primary tracking-tight">Safe Owners</p>
+              {safeMessageStatusQuery.data === null && flowState?.messageHash ? (
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-600 bg-amber-500/10 px-2.5 py-1 rounded-full">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Pending API
+                </span>
+              ) : (
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-full">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live Status
+                </span>
+              )}
             </div>
             
-            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldCheck className="h-4 w-4 text-secondary" />
-                <p className="text-sm font-medium text-secondary">
-                  Threshold
-                </p>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                {ownersAndThresholdQuery.data?.threshold ?? "--"}
-              </p>
-            </div>
-
-            <div className="flex flex-col rounded-xl border border-line bg-neutral p-4 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="h-4 w-4 text-secondary" />
-                <p className="text-sm font-medium text-secondary">
-                  Collected
-                </p>
-              </div>
-              <p className="text-2xl font-bold text-primary">
-                <span className={signedCount >= (ownersAndThresholdQuery.data?.threshold ?? Infinity) ? "text-emerald-600" : ""}>
-                  {signedCount}
-                </span>
-                <span className="text-secondary opacity-50 mx-1">/</span>
-                {ownersAndThresholdQuery.data?.threshold ?? ownersAndThresholdQuery.data?.owners.length ?? "--"}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 rounded-xl border border-line bg-muted/30 p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <p className="font-semibold text-primary">Safe Owners</p>
-                <p className="text-xs text-secondary mt-0.5">
-                  {safeMessageStatusQuery.data === null && flowState?.messageHash
-                    ? "Waiting for Safe to register the message..."
-                    : "Signer progress updates every few seconds."}
-                </p>
-              </div>
-              {ownersAndThresholdQuery.isLoading ? (
-                <div className="flex items-center gap-2 text-xs font-medium text-secondary bg-neutral px-2.5 py-1 rounded-full ring-1 ring-line">
-                  <Loader2 className="h-3 w-3 animate-spin" />
-                  Loading...
-                </div>
-              ) : null}
-            </div>
-
-            <div className="mt-2 flex flex-col gap-2">
+            <div className="flex flex-col max-h-[16rem] overflow-y-auto custom-scrollbar p-2 gap-1">
               {ownerRows.length > 0 ? (
                 ownerRows.map(({ owner, signed }) => (
                   <SafeOwnerRow key={owner} owner={owner as `0x${string}`} signed={signed} />
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-neutral py-8 text-center">
-                  <Wallet className="h-8 w-8 text-secondary opacity-50 mb-3" />
+                <div className="flex flex-col items-center justify-center py-10 text-center">
+                  <Wallet className="h-10 w-10 text-secondary/20 mb-3" />
                   <p className="text-sm font-medium text-secondary">
-                    {ownersAndThresholdQuery.isError
-                      ? "Unable to load Safe owners and threshold."
-                      : "Waiting for Safe owner details..."}
+                    {ownersAndThresholdQuery.isError ? "Error loading owners." : "Fetching owner details..."}
                   </p>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-neutral p-4 shadow-sm">
+          <div className="rounded-xl border border-line bg-neutral p-4 shadow-sm relative z-10">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck className="h-4 w-4 text-secondary" />
               <p className="text-sm font-semibold text-primary">
@@ -959,13 +993,7 @@ export function SafeProposalChoiceDialog({
                   ? "Approve the Safe request to start the offchain sign-in flow for this draft."
                   : flowState?.status === "verifying"
                   ? "All required Safe signers have approved. Agora is validating the message now."
-                  : remainingRequiredSigners === null
-                  ? "Agora is waiting for the remaining Safe approvals before it can create the draft."
-                  : remainingRequiredSigners === 0
-                  ? "All required Safe approvals are in. Agora is moving to verification."
-                  : `${remainingRequiredSigners} more signer${
-                      remainingRequiredSigners === 1 ? "" : "s"
-                    } still need to approve this message in Safe.`}
+                  : "Agora is waiting for the remaining Safe approvals before it can create the draft."}
               </p>
               <div className="flex items-start gap-2 text-sm text-secondary">
                 <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" />
@@ -977,22 +1005,23 @@ export function SafeProposalChoiceDialog({
             </div>
           </div>
 
-          <Button
-            onClick={() =>
-              void cancelActiveFlow(
-                "safe_offchain_cancelled",
-                "User cancelled the Safe offchain signing flow.",
-                "safe_offchain_cancelled",
-                { close: true }
-              )
-            }
-            variant="ghost"
-            disabled={flowState?.status === "draft_creating"}
-            className="w-full text-secondary hover:text-primary h-12 mt-2"
-          >
-            Cancel Flow
-          </Button>
-        </>
+          <div className="flex justify-center mt-2 relative z-10">
+            <button
+              onClick={() =>
+                void cancelActiveFlow(
+                  "safe_offchain_cancelled",
+                  "User cancelled the Safe offchain signing flow.",
+                  "safe_offchain_cancelled",
+                  { close: true }
+                )
+              }
+              disabled={flowState?.status === "draft_creating"}
+              className="text-sm font-semibold text-secondary hover:text-red-500 transition-colors py-2 px-4 rounded-lg hover:bg-red-500/10"
+            >
+              Cancel Signing Flow
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
