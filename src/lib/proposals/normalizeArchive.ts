@@ -112,13 +112,10 @@ async function normalizeBase(
     latestBlock
   );
 
-  const createdTime =
-    toDate(proposal.created_event?.blocktime) ||
-    toDate(proposal.created_blocktime) ||
-    timeStatus.proposalCreatedTime;
+  const createdTime = timeStatus.proposalCreatedTime;
   const startTime = timeStatus.proposalStartTime;
   const endTime = timeStatus.proposalEndTime;
-  const queuedTime = toDate(proposal.queue_event?.blocktime) || null;
+  const queuedTime = timeStatus.proposalQueueTime;
 
   const source = proposal.data_eng_properties?.source;
 
@@ -176,14 +173,8 @@ async function normalizeBase(
     endTime,
     endBlock: safeBigIntOrNull(proposal.end_block),
 
-    cancelledTime:
-      timeStatus.proposalCancelledTime ||
-      toDate(proposal.delete_event?.attestation_time) ||
-      null,
-    executedTime:
-      timeStatus.proposalExecutedTime ||
-      toDate(proposal.execute_event?.blocktime) ||
-      null,
+    cancelledTime: timeStatus.proposalCancelledTime,
+    executedTime: timeStatus.proposalExecutedTime,
     executedBlock: safeBigIntOrNull(proposal.execute_event?.block_number),
     queuedTime,
     markdowntitle,

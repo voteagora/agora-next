@@ -9,7 +9,6 @@ import {
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
-import Link from "next/link";
 import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -306,7 +305,7 @@ export default function ProposalVotesSummaryDetails({
           <StepperRow
             isLastStep
             label="Proposal cancelled"
-            value={formatTime(proposal.cancelledTime)}
+            value={formatTime(proposal.cancelledTime, "cancel")}
             href={
               proposal.cancelledTransactionHash
                 ? getBlockScanUrl(proposal.cancelledTransactionHash)
@@ -317,7 +316,7 @@ export default function ProposalVotesSummaryDetails({
           <StepperRow
             isLastStep
             label="Proposal executed"
-            value={formatTime(proposal.executedTime)}
+            value={formatTime(proposal.executedTime, "exec")}
             href={
               proposal.executedTransactionHash
                 ? getBlockScanUrl(proposal.executedTransactionHash)

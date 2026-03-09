@@ -109,9 +109,12 @@ export const deriveTimeStatus = (
   // Get executed time (dao_node only)
   let proposalExecutedTime: Date | null = null;
   if (isDaoNodeSource(proposal) && proposal.execute_event) {
-    proposalExecutedTime = toDate(
-      proposal.execute_event.timestamp ?? proposal.execute_event.blocktime
-    );
+    proposalExecutedTime = toDate(proposal.execute_event.timestamp);
+  }
+
+  let proposalQueueTime: Date | null = null;
+  if (isDaoNodeSource(proposal) && proposal.queue_event) {
+    proposalQueueTime = toDate(proposal.queue_event.timestamp);
   }
 
   return {
@@ -121,5 +124,6 @@ export const deriveTimeStatus = (
     proposalCreatedTime,
     proposalCancelledTime,
     proposalExecutedTime,
+    proposalQueueTime,
   } as const;
 };
