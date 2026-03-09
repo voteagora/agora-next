@@ -150,38 +150,40 @@ const CreateProposalDraftButton = ({
     }
   };
 
-  const openSafeProposalChoiceDialog = async () => {
-    const previousSafeFlowState = getStoredSafeProposalOffchainFlowState();
-    if (
-      previousSafeFlowState?.safeAddress?.toLowerCase() ===
-        address.toLowerCase() &&
-      (isSafeProposalOffchainFlowTerminal(previousSafeFlowState) ||
-        isSafeProposalOffchainFlowExpired(previousSafeFlowState))
-    ) {
-      clearStoredSiweSession();
+  const openProposalChoiceDialog = async (isSafe: boolean) => {
+    if (isSafe) {
+      const previousSafeFlowState = getStoredSafeProposalOffchainFlowState();
+      if (
+        previousSafeFlowState?.safeAddress?.toLowerCase() ===
+          address.toLowerCase() &&
+        (isSafeProposalOffchainFlowTerminal(previousSafeFlowState) ||
+          isSafeProposalOffchainFlowExpired(previousSafeFlowState))
+      ) {
+        clearStoredSiweSession();
+      }
+
+      clearStoredSafeProposalOffchainFlowState();
+
+      const trace = startOrResumeProposalCreationTrace({
+        walletAddress: address,
+        chainId: chain?.id,
+      });
+
+      addMiradorEvent(trace, "proposal_creation_clicked", {
+        entrypoint: "create_proposal_button",
+      });
+      addMiradorEvent(trace, "safe_wallet_detected", {
+        safeAddress: address,
+      });
+      addMiradorEvent(trace, "safe_proposal_choice_modal_opened");
+      flushMiradorTrace(trace);
+
+      await persistProposalCreationTraceState(trace, {
+        walletAddress: address,
+        chainId: chain?.id,
+        safeAddress: address,
+      });
     }
-
-    clearStoredSafeProposalOffchainFlowState();
-
-    const trace = startOrResumeProposalCreationTrace({
-      walletAddress: address,
-      chainId: chain?.id,
-    });
-
-    addMiradorEvent(trace, "proposal_creation_clicked", {
-      entrypoint: "create_proposal_button",
-    });
-    addMiradorEvent(trace, "safe_wallet_detected", {
-      safeAddress: address,
-    });
-    addMiradorEvent(trace, "safe_proposal_choice_modal_opened");
-    flushMiradorTrace(trace);
-
-    await persistProposalCreationTraceState(trace, {
-      walletAddress: address,
-      chainId: chain?.id,
-      safeAddress: address,
-    });
 
     openDialog({
       type: "SAFE_PROPOSAL_CHOICE",
@@ -190,6 +192,8 @@ const CreateProposalDraftButton = ({
       params: {
         safeAddress: address,
         chainId: chain?.id,
+        isSafeWallet: isSafe,
+        onCreateDraftProposal: isSafe ? undefined : createDraftProposal,
       },
     });
   };
@@ -209,9 +213,9 @@ const CreateProposalDraftButton = ({
         setIsPending(true);
         const isSafe = await isSafeWallet(address);
 
-        if (isSafe && safeProposalChoiceEnabled) {
+        if (safeProposalChoiceEnabled) {
           setIsPending(false);
-          await openSafeProposalChoiceDialog();
+          await openProposalChoiceDialog(isSafe);
           return;
         }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import CreateProposalDraftButton from "../CreateProposalDraftButton";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
@@ -8,6 +8,10 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+import { isSafeWallet } from "@/lib/utils";
+
+const openDialogMock = vi.fn();
 
 // Mock Next.js App Router (next/navigation) to avoid "expected app router to be mounted"
 vi.mock("next/navigation", () => {
@@ -33,7 +37,7 @@ vi.mock("@/components/Button", () => ({
 }));
 
 vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
-  useOpenDialog: () => vi.fn(),
+  useOpenDialog: () => openDialogMock,
 }));
 
 vi.mock("connectkit", () => ({
@@ -74,6 +78,9 @@ const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
 vi.mock("@/hooks/useGetVotes");
 vi.mock("@/hooks/useManager");
 vi.mock("@/hooks/useProposalThreshold");
+vi.mock("@/lib/utils", () => ({
+  isSafeWallet: vi.fn(),
+}));
 const testWagmiConfig = createConfig({
   chains: [mainnet],
   transports: {
@@ -93,14 +100,27 @@ const renderWithProviders = (ui: React.ReactElement) =>
 const mockConfig = {
   protocolLevelCreateProposalButtonCheck: true,
 };
+let mockSafeProposalChoiceEnabled = true;
 
 vi.mock("@/lib/tenant/tenant", () => ({
   default: {
     current: () => ({
       ui: {
-        toggle: () => ({
-          config: mockConfig,
-        }),
+        toggle: (name: string) => {
+          if (name === "proposal-lifecycle") {
+            return {
+              config: mockConfig,
+            };
+          }
+
+          if (name === "safe-proposal-choice") {
+            return {
+              enabled: mockSafeProposalChoiceEnabled,
+            };
+          }
+
+          return undefined;
+        },
       },
     }),
   },
@@ -111,6 +131,9 @@ describe("CreateProposalDraftButton", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockConfig.protocolLevelCreateProposalButtonCheck = true;
+    mockSafeProposalChoiceEnabled = true;
+    vi.mocked(isSafeWallet).mockResolvedValue(false);
   });
 
   afterEach(() => {
@@ -165,5 +188,30 @@ describe("CreateProposalDraftButton", () => {
     renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
 
     expect(screen.getByText("Create proposal")).toBeInTheDocument();
+  });
+
+  it("opens the proposal choice dialog for non-safe wallets when enabled", async () => {
+    vi.mocked(useManager).mockReturnValue(createMockQueryResult(mockAddress));
+    vi.mocked(useGetVotes).mockReturnValue(createMockQueryResult(0n));
+    vi.mocked(useProposalThreshold).mockReturnValue(
+      createMockQueryResult(100n)
+    );
+
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
+
+    fireEvent.click(screen.getByText("Create proposal"));
+
+    await waitFor(() =>
+      expect(openDialogMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "SAFE_PROPOSAL_CHOICE",
+          params: expect.objectContaining({
+            safeAddress: mockAddress,
+            isSafeWallet: false,
+            onCreateDraftProposal: expect.any(Function),
+          }),
+        })
+      )
+    );
   });
 });

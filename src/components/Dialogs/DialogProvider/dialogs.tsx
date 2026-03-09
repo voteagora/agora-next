@@ -347,6 +347,8 @@ export type SafeProposalChoiceDialogType = {
   params: {
     safeAddress: `0x${string}`;
     chainId?: number;
+    isSafeWallet: boolean;
+    onCreateDraftProposal?: () => Promise<void>;
   };
 };
 
@@ -627,12 +629,17 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  SAFE_PROPOSAL_CHOICE: ({ safeAddress, chainId }, closeDialog) => {
+  SAFE_PROPOSAL_CHOICE: (
+    { safeAddress, chainId, isSafeWallet, onCreateDraftProposal },
+    closeDialog
+  ) => {
     return (
       <SafeProposalChoiceDialog
         closeDialog={closeDialog}
         safeAddress={safeAddress}
         chainId={chainId}
+        isSafeWallet={isSafeWallet}
+        onCreateDraftProposal={onCreateDraftProposal}
       />
     );
   },

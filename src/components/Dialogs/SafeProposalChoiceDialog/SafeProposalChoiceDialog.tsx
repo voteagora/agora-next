@@ -46,6 +46,8 @@ type SafeProposalChoiceDialogProps = {
   closeDialog: () => void;
   safeAddress: `0x${string}`;
   chainId?: number;
+  isSafeWallet: boolean;
+  onCreateDraftProposal?: () => Promise<void>;
 };
 
 function formatCountdown(remainingMs: number) {
@@ -158,6 +160,8 @@ export function SafeProposalChoiceDialog({
   closeDialog,
   safeAddress,
   chainId: providedChainId,
+  isSafeWallet,
+  onCreateDraftProposal,
 }: SafeProposalChoiceDialogProps) {
   const [acknowledged, setAcknowledged] = useState(false);
   const [pendingAction, setPendingAction] = useState<
@@ -216,6 +220,11 @@ export function SafeProposalChoiceDialog({
   );
 
   const handleCloseChoiceScreen = useCallback(async () => {
+    if (!isSafeWallet) {
+      closeDialog();
+      return;
+    }
+
     clearStoredSiweStage();
     resetOffchainUi();
     await closeSafeProposalTrace(
@@ -224,7 +233,7 @@ export function SafeProposalChoiceDialog({
       "safe_proposal_choice_cancelled"
     );
     closeDialog();
-  }, [closeDialog, closeSafeProposalTrace, resetOffchainUi]);
+  }, [closeDialog, closeSafeProposalTrace, isSafeWallet, resetOffchainUi]);
 
   const prepareFreshSafeSiweAttempt = useCallback(async () => {
     clearStoredSiweSession();
@@ -366,6 +375,12 @@ export function SafeProposalChoiceDialog({
     setPendingAction("onchain");
 
     try {
+      if (!isSafeWallet) {
+        closeDialog();
+        router.push("/proposals/create-proposal");
+        return;
+      }
+
       clearStoredSiweStage();
       resetOffchainUi();
 
@@ -387,11 +402,29 @@ export function SafeProposalChoiceDialog({
     } finally {
       setPendingAction(null);
     }
-  }, [activeChainId, closeDialog, resetOffchainUi, router, safeAddress]);
+  }, [
+    activeChainId,
+    closeDialog,
+    isSafeWallet,
+    resetOffchainUi,
+    router,
+    safeAddress,
+  ]);
 
   const handleCreateDraftOffchain = useCallback(async (options?: {
     restarted?: boolean;
   }) => {
+    if (!isSafeWallet) {
+      if (!onCreateDraftProposal) {
+        toast("Unable to start the draft flow.");
+        return;
+      }
+
+      closeDialog();
+      await onCreateDraftProposal();
+      return;
+    }
+
     if (!activeChainId) {
       toast("Unable to determine the connected chain.");
       return;
@@ -506,6 +539,8 @@ export function SafeProposalChoiceDialog({
   }, [
     activeChainId,
     closeSafeProposalTrace,
+    isSafeWallet,
+    onCreateDraftProposal,
     prepareFreshSafeSiweAttempt,
     safeAddress,
     signIn,
@@ -764,7 +799,7 @@ export function SafeProposalChoiceDialog({
   const remainingMs = flowState?.expiresAt
     ? Math.max(0, flowState.expiresAt - now)
     : SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS;
-  const isProgressScreen = Boolean(flowState);
+  const isProgressScreen = isSafeWallet && Boolean(flowState);
   const isExpired = flowState?.status === "expired";
   const isFailed = flowState?.status === "failed";
   const isDraftCreating = flowState?.status === "draft_creating";
@@ -796,45 +831,63 @@ export function SafeProposalChoiceDialog({
             </div>
             <div className="flex flex-col gap-2">
               <h2 className="text-2xl font-semibold tracking-tight text-primary">
-                Safe Wallet Detected
+                {isSafeWallet
+                  ? "Safe Wallet Detected"
+                  : "Choose Proposal Flow"}
               </h2>
               <p className="text-secondary max-w-[24rem]">
-                Creating a draft offchain requires a Safe message signature flow before
-                the proposal is submitted onchain.
+                {isSafeWallet
+                  ? "Creating a draft offchain requires a Safe message signature flow before the proposal is submitted onchain."
+                  : "Choose whether to go straight to onchain proposal creation or start with the offchain draft flow."}
               </p>
             </div>
           </div>
 
-          <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 shadow-sm">
-            <div className="flex gap-3">
-              <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600" />
-              <div className="flex flex-col gap-1">
-                <p className="text-sm font-semibold text-amber-900">Important Warning</p>
-                <p className="text-sm text-amber-800/90 leading-relaxed">
-                  Creating a draft offchain requires all Safe signers to approve
-                  within <span className="font-semibold">3 minutes</span>. Please stay on this page and do not switch tabs until the flow completes.
-                </p>
+          {isSafeWallet ? (
+            <>
+              <div className="rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 shadow-sm">
+                <div className="flex gap-3">
+                  <AlertTriangle className="h-5 w-5 flex-shrink-0 text-amber-600" />
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-semibold text-amber-900">Important Warning</p>
+                    <p className="text-sm text-amber-800/90 leading-relaxed">
+                      Creating a draft offchain requires all Safe signers to approve
+                      within <span className="font-semibold">3 minutes</span>. Please stay on this page and do not switch tabs until the flow completes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <label className="flex items-center gap-3 rounded-xl border border-line bg-muted/50 p-4 cursor-pointer transition-colors hover:bg-muted">
+                <input
+                  type="checkbox"
+                  className="h-5 w-5 rounded-md border-line text-primary focus:ring-primary/20 cursor-pointer"
+                  checked={acknowledged}
+                  onChange={(event) => setAcknowledged(event.target.checked)}
+                />
+                <span className="text-sm font-medium text-primary select-none">
+                  I understand the risks of the offchain Safe signature flow
+                </span>
+              </label>
+            </>
+          ) : (
+            <div className="rounded-xl border border-line bg-muted/40 p-4 shadow-sm">
+              <div className="flex gap-3">
+                <Wallet className="h-5 w-5 flex-shrink-0 text-primary" />
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-semibold text-primary">Two ways to proceed</p>
+                  <p className="text-sm text-secondary leading-relaxed">
+                    Direct onchain takes you straight to proposal creation. The offchain draft flow creates a draft first so you can continue working from the draft page.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <label className="flex items-center gap-3 rounded-xl border border-line bg-muted/50 p-4 cursor-pointer transition-colors hover:bg-muted">
-            <input
-              type="checkbox"
-              className="h-5 w-5 rounded-md border-line text-primary focus:ring-primary/20 cursor-pointer"
-              checked={acknowledged}
-              onChange={(event) => setAcknowledged(event.target.checked)}
-            />
-            <span className="text-sm font-medium text-primary select-none">
-              I understand the risks of the offchain Safe signature flow
-            </span>
-          </label>
+          )}
 
           <div className="flex flex-col gap-3 pt-2">
             <UpdatedButton
               onClick={() => void handleCreateDraftOffchain()}
               isLoading={pendingAction === "offchain"}
-              disabled={!acknowledged || pendingAction !== null}
+              disabled={(isSafeWallet && !acknowledged) || pendingAction !== null}
               type="primary"
               className="w-full text-base font-medium h-12 flex justify-center items-center"
             >
@@ -848,7 +901,7 @@ export function SafeProposalChoiceDialog({
               type="secondary"
               className="w-full text-base font-medium h-12 flex justify-center items-center gap-2"
             >
-              Skip & Go Direct to Onchain
+              {isSafeWallet ? "Skip & Go Direct to Onchain" : "Go Direct Onchain"}
               <ArrowRight className="h-4 w-4" />
             </UpdatedButton>
 
