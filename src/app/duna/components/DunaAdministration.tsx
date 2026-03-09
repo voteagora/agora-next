@@ -15,6 +15,7 @@ import {
 import { ExternalLink } from "@/icons/ExternalLink";
 import FormationDocumentsList from "./FormationDocumentsList";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
+import DunaMetricsCards from "./DunaMetricsCards";
 
 const DunaAdministration = async () => {
   let documents: any[] = [];
@@ -114,7 +115,9 @@ const DunaAdministration = async () => {
 
   return (
     <div id="duna-administration" className="mt-8 flex flex-col gap-6">
-      {/* Row 1: About + Community Resources */}
+      {/* Metrics Cards */}
+      <DunaMetricsCards />
+      {/* Row 2: About + Community Resources */}
       {(hasAboutContent || communityLinks.length > 0) && (
         <div className="flex flex-col lg:flex-row gap-6">
           {/* About */}
