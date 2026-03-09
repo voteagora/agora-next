@@ -93,7 +93,7 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
   OFFCHAIN_APPROVAL: HybridApprovalProposalPage,
 
   // Optimistic variants
-  OPTIMISTIC: OODaoOptimisticProposalPage,
+  OPTIMISTIC: OPProposalOptimisticPage,
   HYBRID_OPTIMISTIC: HybridOptimisticProposalPage,
   OFFCHAIN_OPTIMISTIC: HybridOptimisticProposalPage,
   HYBRID_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,

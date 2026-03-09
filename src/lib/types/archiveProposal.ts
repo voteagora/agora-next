@@ -545,4 +545,19 @@ export type ArchiveListProposal = {
   proposal_type_info?: ProposalTypeInfo;
   kwargs?: Record<string, unknown>;
   created_blocktime?: number;
+
+  // snapshot-specific fields (source === "snapshot")
+  author?: string;
+  type?: string; // e.g. "copeland", "single-choice", "approval"
+  scores?: number[];
+  scores_total?: number;
+  scores_state?: string;
+  scores_updated?: number;
+  state?: string; // "pending" | "active" | "closed"
+  link?: string;
+  created?: number;
+  start?: number;
+  end?: number;
+  network?: string;
+  snapshot?: number;
 };

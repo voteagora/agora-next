@@ -1,9 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchProposalUnstableCache } from "@/app/api/common/proposals/getProposals";
-import { fetchSnapshotVotesForProposal } from "@/app/api/common/votes/getVotes";
 import { calculateCopelandVote } from "@/lib/copelandCalculation";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
+import {
+  fetchProposalFromArchive,
+  fetchRawProposalVotesFromArchive,
+} from "@/lib/archiveUtils";
+import { archiveToProposal } from "@/lib/proposals";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { SnapshotVote } from "@/app/api/common/votes/vote";
+import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
+
+async function loadProposal(proposalId: string): Promise<Proposal> {
+  const { namespace, token, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
+
+  if (useArchive) {
+    const [archiveProposal, taxFormMetadata] = await Promise.all([
+      fetchProposalFromArchive(namespace, proposalId),
+      fetchProposalTaxFormMetadata(proposalId),
+    ]);
+
+    if (archiveProposal) {
+      const normalizedProposal = await archiveToProposal(archiveProposal, {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
+      });
+
+      return {
+        ...normalizedProposal,
+        taxFormMetadata,
+      };
+    }
+
+    throw new Error("Proposal not found in archive");
+  }
+
+  return await fetchProposalUnstableCache(proposalId);
+}
 
 const FUNDING_VALUES_PROD = {
   "eth.limo": { ext: 100000, std: 700000, isEligibleFor2Y: true },
@@ -60,18 +95,27 @@ export async function GET(
   route: { params: { proposalId: string } }
 ) {
   try {
-    const [proposal, snapshotVotes] = await Promise.all([
-      fetchProposalUnstableCache(route.params.proposalId),
-      fetchSnapshotVotesForProposal({
-        proposalId: route.params.proposalId,
-        pagination: {
-          offset: 0,
-          limit: 100000,
-        },
-      }),
+    const { namespace } = Tenant.current();
+    const proposalId = route.params.proposalId;
+
+    const [proposal, rawVotes] = await Promise.all([
+      loadProposal(proposalId),
+      fetchRawProposalVotesFromArchive({ namespace, proposalId }),
     ]);
+
+    const votes: SnapshotVote[] = rawVotes.map((row) => ({
+      id: row.transaction_hash ?? `${row.voter}-${row.block_number}`,
+      address: row.voter.toLowerCase(),
+      createdAt: row.ts ? new Date(Number(row.ts) * 1000) : new Date(),
+      choice: JSON.stringify(row.choice ?? []),
+      votingPower: Number(row.vp ?? row.weight ?? 0),
+      title: "",
+      reason: row.reason ?? "",
+      choiceLabels: {},
+    }));
+
     const result = calculateCopelandVote(
-      snapshotVotes.data,
+      votes,
       (
         proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
       ).choices,

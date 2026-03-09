@@ -19,6 +19,7 @@ export const STATUS_LABEL_MAP: Record<string, string> = {
   CANCELLED: "Cancelled",
   PASSED: "Passed",
   FAILED: "Failed",
+  CLOSED: "Closed",
   UNKNOWN: "Unknown",
 };
 

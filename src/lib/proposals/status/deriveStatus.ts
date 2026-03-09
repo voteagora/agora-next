@@ -18,6 +18,15 @@ export const deriveStatus = (
   proposal: ArchiveListProposal,
   decimals: number
 ): string => {
+  // Snapshot proposals use their own state field
+  if (proposal.data_eng_properties?.source === "snapshot") {
+    const snapshotState = proposal.state?.toLowerCase();
+    if (snapshotState === "closed") return "CLOSED";
+    if (snapshotState === "active") return "ACTIVE";
+    if (snapshotState === "pending") return "PENDING";
+    return "CLOSED";
+  }
+
   // Check terminal states first
   if (proposal.cancel_event || proposal.lifecycle_stage === "CANCELLED") {
     return "CANCELLED";

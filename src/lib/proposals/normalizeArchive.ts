@@ -158,14 +158,18 @@ async function normalizeBase(
             approval_threshold: approvalThresholdValue,
           };
 
+  // For snapshot proposals, use author as proposer fallback and snapshot as block number
+  const isSnapshotSource = source === "snapshot";
+  const proposerAddress = isSnapshotSource
+    ? (proposal.author ?? proposal.proposer ?? "")
+    : (proposal.proposer ?? "");
+
   return {
     id: String(proposal.id),
     proposer:
-      typeof proposal.proposer === "string"
-        ? proposal.proposer.toLowerCase()
-        : "",
+      typeof proposerAddress === "string" ? proposerAddress.toLowerCase() : "",
     snapshotBlockNumber: Number(
-      proposal.start_block ?? proposal.block_number ?? 0
+      proposal.start_block ?? proposal.snapshot ?? proposal.block_number ?? 0
     ),
     createdTime,
     startTime,
@@ -695,6 +699,44 @@ function normalizeOptimisticTieredProposal(
   }
 }
 
+function normalizeSnapshotProposal(
+  proposal: ArchiveListProposal,
+  base: NormalizedBase
+): Proposal {
+  const { decimals, source, ...baseFields } = base;
+
+  // Map archive snapshot data to ParsedProposalData["SNAPSHOT"]["kind"]
+  const proposalData = {
+    title: proposal.title ?? "",
+    start_ts: Number(proposal.start ?? proposal.start_blocktime ?? 0),
+    end_ts: Number(proposal.end ?? proposal.end_blocktime ?? 0),
+    created_ts: Number(proposal.created ?? proposal.created_blocktime ?? 0),
+    link: proposal.link ?? "",
+    scores: (proposal.scores ?? []).map(String),
+    type: proposal.type ?? "",
+    votes: String(proposal.num_of_votes ?? 0),
+    state: (proposal.state?.toLowerCase() ?? "closed") as
+      | "pending"
+      | "active"
+      | "closed",
+    body: proposal.description ?? "",
+    choices: proposal.choices ?? [],
+  };
+
+  const proposalResults = {
+    for: 0n,
+    against: 0n,
+    abstain: 0n,
+  };
+
+  return {
+    ...baseFields,
+    proposalType: "SNAPSHOT",
+    proposalData,
+    proposalResults,
+  } as Proposal;
+}
+
 // =============================================================================
 // Main Entry Point
 // =============================================================================
@@ -778,9 +820,7 @@ export async function archiveToProposal(
       break;
 
     case "SNAPSHOT":
-      // Snapshot proposals use standard normalization
-      normalizedProposal = normalizeStandardProposal(archiveProposal, base);
-      normalizedProposal.proposalType = "SNAPSHOT";
+      normalizedProposal = normalizeSnapshotProposal(archiveProposal, base);
       break;
 
     default:
