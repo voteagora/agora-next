@@ -37,6 +37,29 @@ import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
 
+const PrettyButtonDisabled = () => {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className="px-2 py-1 text-xs font-semibold text-secondary opacity-50 cursor-not-allowed"
+            type="button"
+            disabled
+          >
+            Pretty
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="text-xs">
+            Pretty view is not yet available for this proposal.
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 function getActionsLabel(status: string | null | undefined): string {
   switch (status) {
     case "EXECUTED":
@@ -293,25 +316,7 @@ const ProposalTransactionDisplay = ({
                       Pretty
                     </button>
                   ) : (
-                    <TooltipProvider delayDuration={300}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            className="px-2 py-1 text-xs font-semibold text-secondary opacity-50 cursor-not-allowed"
-                            type="button"
-                            disabled
-                          >
-                            Pretty
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <div className="text-xs max-w-[250px]">
-                            Pretty view is only available when all actions have
-                            known adapters
-                          </div>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <PrettyButtonDisabled />
                   )}
                 </div>
               </div>
@@ -568,7 +573,8 @@ const PrettyView = ({
     return (
       <>
         {adapter.prettyRender(
-          decodedData as Parameters<typeof adapter.prettyRender>[0]
+          decodedData as Parameters<typeof adapter.prettyRender>[0],
+          target
         )}
       </>
     );
