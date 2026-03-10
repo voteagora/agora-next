@@ -4,6 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatNumber } from "@/lib/utils";
 import {
   getFriendlyName,
   getSchemaName,
@@ -32,17 +33,20 @@ interface DecodedData {
   parameters: Record<string, DecodedDataParam>;
 }
 
+/** Format raw 18-decimal token amount for display using shared utils. */
+function formatTokenAmount(amount: string | number | bigint): string {
+  const raw =
+    amount == null
+      ? 0n
+      : typeof amount === "number"
+        ? BigInt(Math.floor(amount))
+        : BigInt(amount);
+  return formatNumber(raw, 18);
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Formatting helpers
 // ────────────────────────────────────────────────────────────────────────────
-
-function formatTokenAmount(amount: string | number | bigint): string {
-  let raw: bigint;
-  if (typeof amount === "bigint") raw = amount;
-  else if (typeof amount === "number") raw = BigInt(Math.floor(amount));
-  else raw = BigInt(amount);
-  return (raw / 10n ** 18n).toLocaleString();
-}
 
 function LabelWithTooltip({
   label,
