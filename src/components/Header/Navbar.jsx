@@ -189,7 +189,20 @@ export default function Navbar() {
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
         >
-          Info
+          About
+        </HeaderLink>
+      )}
+
+      {ui.toggle("duna") && ui.toggle("duna").enabled && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current.financials = el;
+          }}
+          href="/financials"
+          isActive={activeNavItem === "financials"}
+          onClick={() => handleNavClick("financials")}
+        >
+          Financials
         </HeaderLink>
       )}
     </div>

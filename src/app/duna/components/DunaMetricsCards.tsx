@@ -1,6 +1,24 @@
+"use client";
+
 import React from "react";
+import { useFinancialMetrics } from "@/hooks/useFinancialMetrics";
+import { DaoSlug } from "@prisma/client";
 
 type TrendDirection = "up" | "down";
+
+function formatNumber(num: string): string {
+  const value = parseInt(num, 10);
+
+  if (value >= 1000000000) {
+    return `$${(value / 1000000000).toFixed(1)}B`;
+  } else if (value >= 1000000) {
+    return `$${(value / 1000000).toFixed(1)}M`;
+  } else if (value >= 1000) {
+    return `$${(value / 1000).toFixed(1)}K`;
+  } else {
+    return `$${value.toLocaleString()}`;
+  }
+}
 
 type MetricCardProps = {
   title: string;
@@ -75,7 +93,7 @@ function MetricCard({ title, value, trend, trendDirection }: MetricCardProps) {
         className="text-[clamp(2rem,3.5vw,3.375rem)] leading-tight text-primary"
         style={{ fontFamily: "'Instrument Serif', serif" }}
       >
-        {value}
+        {formatNumber(value)}
       </p>
       <div className="inline-flex items-center gap-2 px-[10px] py-1 rounded-full border border-line self-start">
         {trendDirection === "up" ? <TrendUpIcon /> : <TrendDownIcon />}
@@ -85,31 +103,95 @@ function MetricCard({ title, value, trend, trendDirection }: MetricCardProps) {
   );
 }
 
+function calculateTrend(
+  current: number | null | undefined,
+  previous: number | null | undefined
+): { trend: string; trendDirection: TrendDirection } {
+  if (!current || !previous) {
+    return { trend: "N/A", trendDirection: "up" };
+  }
+
+  const percentChange = ((current - previous) / previous) * 100;
+  const direction: TrendDirection = percentChange >= 0 ? "up" : "down";
+  const sign = percentChange >= 0 ? "+" : "";
+
+  return {
+    trend: `${sign}${percentChange.toFixed(1)}% vs previous`,
+    trendDirection: direction,
+  };
+}
+
 export default function DunaMetricsCards() {
+  const { data, isLoading, error } = useFinancialMetrics(DaoSlug.SYNDICATE);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex flex-col gap-3 p-6 rounded-[20px] bg-wash border border-line flex-1 min-w-0 animate-pulse"
+          >
+            <div className="h-4 bg-line rounded w-1/2" />
+            <div className="h-12 bg-line rounded w-3/4" />
+            <div className="h-6 bg-line rounded w-1/3" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error || !data?.metrics || data.metrics.length === 0) {
+    return (
+      <div className="p-6 rounded-[20px] bg-wash border border-line text-center">
+        <p className="text-secondary">No financial metrics available</p>
+      </div>
+    );
+  }
+
+  const [latest, previous] = data.metrics;
+  const latestData = latest.data;
+  const previousData = previous?.data;
+
+  const netProfitOrLoss = latestData.NET_PROFIT
+    ? { title: "Net Profit", value: latestData.NET_PROFIT }
+    : latestData.NET_LOSS
+      ? { title: "Net Loss", value: latestData.NET_LOSS }
+      : null;
+
+  const previousNetProfitOrLoss =
+    previousData?.NET_PROFIT || previousData?.NET_LOSS;
+
   const metrics: MetricCardProps[] = [
     {
       title: "Total Assets",
-      value: "$70,800,012",
-      trend: "-12.4% vs Q2",
-      trendDirection: "down",
+      value: String(latestData.TOTAL_ASSETS || 0),
+      ...calculateTrend(latestData.TOTAL_ASSETS, previousData?.TOTAL_ASSETS),
     },
-    {
-      title: "Net Loss",
-      value: "$1,980,000",
-      trend: "+10.2% vs Q2",
-      trendDirection: "up",
-    },
+    ...(netProfitOrLoss
+      ? [
+          {
+            title: netProfitOrLoss.title,
+            value: String(netProfitOrLoss.value),
+            ...calculateTrend(netProfitOrLoss.value, previousNetProfitOrLoss),
+          },
+        ]
+      : []),
     {
       title: "Total Operating Expenses",
-      value: "$174,700",
-      trend: "+10.2% vs Q2",
-      trendDirection: "up",
+      value: String(latestData.TOTAL_OPERATING_EXPENSES || 0),
+      ...calculateTrend(
+        latestData.TOTAL_OPERATING_EXPENSES,
+        previousData?.TOTAL_OPERATING_EXPENSES
+      ),
     },
     {
       title: "Cash & Cash Equivalents",
-      value: "$10,600,000",
-      trend: "+10.2% vs Q2",
-      trendDirection: "up",
+      value: String(latestData.CASH_AND_CASH_EQUIVALENTS || 0),
+      ...calculateTrend(
+        latestData.CASH_AND_CASH_EQUIVALENTS,
+        previousData?.CASH_AND_CASH_EQUIVALENTS
+      ),
     },
   ];
 

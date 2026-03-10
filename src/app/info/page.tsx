@@ -7,7 +7,7 @@ import { InfoHero } from "@/app/info/components/InfoHero";
 import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
-import DunaAdministration from "@/app/duna/components/DunaAdministration";
+import DunaAbout from "@/app/duna/components/DunaAbout";
 import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
@@ -71,28 +71,19 @@ export default async function Page() {
   const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
 
   if (namespace !== TENANT_NAMESPACES.ETHERFI) {
-    const treasuryData = await apiFetchTreasuryBalanceTS(
-      FREQUENCY_FILTERS.YEAR
-    );
-
     if (hasDunaAdministration) {
       return (
         <div className="flex flex-col">
           <InfoHero />
-          <DunaAdministration />
-          {treasuryData.result.length > 0 && (
-            <ChartTreasury
-              initialData={treasuryData.result}
-              getData={async (frequency: string) => {
-                "use server";
-                return apiFetchTreasuryBalanceTS(frequency);
-              }}
-            />
-          )}
+          <DunaAbout />
           {ui.toggle("duna-disclosures")?.enabled && <DunaDisclosuresContent />}
         </div>
       );
     }
+
+    const treasuryData = await apiFetchTreasuryBalanceTS(
+      FREQUENCY_FILTERS.YEAR
+    );
 
     return (
       <div className="flex flex-col">
@@ -125,10 +116,6 @@ export default async function Page() {
             }}
           />
         )}
-
-        {hasDunaAdministration && ui.toggle("duna-disclosures")?.enabled ? (
-          <DunaDisclosuresContent />
-        ) : null}
       </div>
     );
   } else {

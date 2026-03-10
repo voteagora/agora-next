@@ -6537,3 +6537,16 @@ model ForumRoleChangeAudit {
     @@map("forum_role_change_audit")
     @@schema("alltenant")
 }
+
+model DaoFinancialMetrics {
+    id        Int      @id @default(autoincrement())
+    dao_slug  DaoSlug
+    data      Json
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+    @@index([dao_slug], name: "idx_dao_financial_metrics_dao_slug")
+    @@index([createdAt(sort: Desc)], name: "idx_dao_financial_metrics_created_at")
+    @@map("dao_financial_metrics")
+    @@schema("alltenant")
+}

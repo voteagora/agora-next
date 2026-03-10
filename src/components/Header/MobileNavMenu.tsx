@@ -52,6 +52,9 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
 
+  const dunaToggle = ui.toggle("duna");
+  const hasDuna = dunaToggle !== undefined && dunaToggle.enabled;
+
   const comingSoonToggle = ui.toggle("coming-soon");
   const hasComingSoon =
     comingSoonToggle !== undefined && comingSoonToggle.enabled;
@@ -136,10 +139,20 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasInfo
       ? [
           {
-            name: "Info",
+            name: "About",
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),
+          },
+        ]
+      : []),
+    ...(hasDuna
+      ? [
+          {
+            name: "Financials",
+            href: "/financials",
+            target: "_self",
+            isActive: pathname.includes("financials"),
           },
         ]
       : []),
