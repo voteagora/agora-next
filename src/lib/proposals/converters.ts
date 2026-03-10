@@ -89,7 +89,8 @@ export const deriveTimeStatus = (
   latestBlock?: Block | null
 ) => {
   const getProposalCreatedTimestamp = () => {
-    if (proposal.created_blocktime) return new Date(proposal.created_blocktime);
+    if (proposal.created_blocktime)
+      return new Date(proposal.created_blocktime * 1000);
     if (proposal.block_number && latestBlock) {
       return getHumanBlockTime(proposal.block_number, latestBlock);
     }

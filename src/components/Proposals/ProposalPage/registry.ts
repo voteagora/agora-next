@@ -123,22 +123,16 @@ export const OODAO_PROPOSAL_PAGE_REGISTRY: Partial<
  * Get the appropriate page component for a proposal.
  *
  * @param proposal - The proposal object
- * @param useArchive - Whether to use archive-specific components
  * @returns The page component to render
  */
 export function getProposalPageComponent(
-  proposal: Proposal,
-  useArchive: boolean = false
+  proposal: Proposal
 ): ProposalPageComponent {
   const proposalType = proposal.proposalType ?? "STANDARD";
   const isOOdaoProposal = proposal.archiveMetadata?.source === "eas-oodao";
 
-  // Check OODao registry first if archive mode is enabled and proposal is from eas-oodao
-  if (
-    useArchive &&
-    isOOdaoProposal &&
-    OODAO_PROPOSAL_PAGE_REGISTRY[proposalType]
-  ) {
+  // Check OODao registry first if proposal is from eas-oodao
+  if (isOOdaoProposal && OODAO_PROPOSAL_PAGE_REGISTRY[proposalType]) {
     return OODAO_PROPOSAL_PAGE_REGISTRY[proposalType]!;
   }
 

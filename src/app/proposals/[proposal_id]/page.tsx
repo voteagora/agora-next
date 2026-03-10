@@ -204,16 +204,10 @@ export default async function Page({
     redirect(`/proposals/${proposalData.onchainProposalId}`);
   }
 
-  const { ui } = Tenant.current();
-  const useArchiveForProposals = ui.toggle(
-    "use-archive-for-proposal-details"
-  )?.enabled;
-
   // Check for special handling (e.g., Copeland)
   const specialComponent = requiresSpecialHandling(loadedProposal);
   const RenderComponent =
-    specialComponent ||
-    getProposalPageComponent(loadedProposal, useArchiveForProposals);
+    specialComponent || getProposalPageComponent(loadedProposal);
 
   return (
     <div className="flex justify-between mt-12">

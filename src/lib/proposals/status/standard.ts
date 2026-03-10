@@ -11,7 +11,9 @@ import {
   CITIZEN_TYPES,
   HYBRID_VOTE_WEIGHTS,
   OFFCHAIN_THRESHOLDS,
+  TENANT_NAMESPACES,
 } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 type CitizenOutcome = Record<string, Record<string, number | string>>;
 
@@ -62,6 +64,55 @@ function calcWeightedPercentage(
 }
 
 /**
+ * Calculate quorum based on tenant-specific rules (for number-based votes)
+ */
+function calculateQuorumNumber(
+  forVotes: number,
+  againstVotes: number,
+  abstainVotes: number,
+  calculationOptions?: 0 | 1
+): number {
+  const { namespace } = Tenant.current();
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.UNISWAP:
+      return forVotes;
+    case TENANT_NAMESPACES.SCROLL:
+      return forVotes + againstVotes + abstainVotes;
+    case TENANT_NAMESPACES.OPTIMISM:
+      if (calculationOptions === 1) {
+        return forVotes;
+      } else {
+        return forVotes + abstainVotes + againstVotes;
+      }
+    default:
+      return forVotes + abstainVotes;
+  }
+}
+
+/**
+ * Calculate quorum based on tenant-specific rules (for BigInt-based votes)
+ */
+function calculateQuorumBigInt(
+  forVotes: bigint,
+  againstVotes: bigint,
+  abstainVotes: bigint
+): bigint {
+  const { namespace } = Tenant.current();
+
+  switch (namespace) {
+    case TENANT_NAMESPACES.UNISWAP:
+      return forVotes;
+    case TENANT_NAMESPACES.SCROLL:
+      return forVotes + againstVotes + abstainVotes;
+    case TENANT_NAMESPACES.OPTIMISM:
+      return forVotes + abstainVotes + againstVotes;
+    default:
+      return forVotes + abstainVotes;
+  }
+}
+
+/**
  * Derive status for STANDARD proposal types
  */
 export const deriveStandardStatus = (
@@ -73,8 +124,6 @@ export const deriveStandardStatus = (
     proposalType === "HYBRID_STANDARD" || isHybridProposal(proposal);
   const isOffchain =
     proposalType === "OFFCHAIN_STANDARD" || isEasAtlasSource(proposal);
-
-  const calculationOptions = proposal.calculationOptions ?? 0;
 
   // Handle hybrid/offchain with numbers
   if (isHybrid) {
@@ -134,23 +183,17 @@ export const deriveStandardStatus = (
       voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
       Number(thresholds.approvalThreshold) === 0;
 
-    const quorumVotes =
-      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumVotes = calculateQuorumNumber(
+      forVotes,
+      againstVotes,
+      abstainVotes
+    );
 
-    // For hybrid, quorum is always met
-    if (!hasMetThreshold) {
-      return "DEFEATED";
-    }
-
-    if (forVotes > againstVotes) {
+    if (hasMetThreshold || quorumVotes >= Number(thresholds.quorum)) {
       return "SUCCEEDED";
     }
 
-    if (forVotes < againstVotes) {
-      return "DEFEATED";
-    }
-
-    return "FAILED";
+    return "DEFEATED";
   } else if (isOffchain) {
     // OFFCHAIN_STANDARD: Aggregate citizen votes from eas-atlas
     const outcome = proposal.outcome as CitizenOutcome | undefined;
@@ -168,23 +211,18 @@ export const deriveStandardStatus = (
       voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
       Number(thresholds.approvalThreshold) === 0;
 
-    const quorumVotes =
-      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumVotes = calculateQuorumNumber(
+      forVotes,
+      againstVotes,
+      abstainVotes
+    );
     const quorumMet = quorumVotes >= Number(thresholds.quorum);
 
-    if (!quorumMet || !hasMetThreshold) {
+    if (quorumMet && hasMetThreshold) {
       return "DEFEATED";
     }
 
-    if (forVotes > againstVotes) {
-      return "SUCCEEDED";
-    }
-
-    if (forVotes < againstVotes) {
-      return "DEFEATED";
-    }
-
-    return "FAILED";
+    return "SUCCEEDED";
   } else if (isEasOodaoSource(proposal)) {
     // eas-oodao: token-holders outcome - use BigInt
     const outcome = proposal.outcome as
@@ -206,23 +244,18 @@ export const deriveStandardStatus = (
       voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
       Number(thresholds.approvalThreshold) === 0;
 
-    const quorumVotes =
-      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumVotes = calculateQuorumBigInt(
+      forVotes,
+      againstVotes,
+      abstainVotes
+    );
     const quorumMet = quorumVotes >= thresholds.quorum;
 
-    if (!quorumMet || !hasMetThreshold) {
-      return "DEFEATED";
-    }
-
-    if (forVotes > againstVotes) {
+    if (quorumMet && hasMetThreshold) {
       return "SUCCEEDED";
     }
 
-    if (forVotes < againstVotes) {
-      return "DEFEATED";
-    }
-
-    return "FAILED";
+    return "DEFEATED";
   } else if (isDaoNodeSource(proposal)) {
     // dao_node: standard onchain votes - use BigInt
     const voteTotals = proposal.totals?.["no-param"] || {};
@@ -241,24 +274,31 @@ export const deriveStandardStatus = (
       voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
       Number(thresholds.approvalThreshold) === 0;
 
-    const quorumVotes =
-      calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
+    const quorumVotes = calculateQuorumBigInt(
+      forVotes,
+      againstVotes,
+      abstainVotes
+    );
+
     const quorumMet = quorumVotes >= thresholds.quorum;
 
-    if (!quorumMet || !hasMetThreshold) {
-      return "DEFEATED";
-    }
-
-    if (forVotes > againstVotes) {
+    if (quorumMet && hasMetThreshold) {
+      const { namespace } = Tenant.current();
+      // this is just as backwards compatibility for optimism old governor where we dont
+      // have quorum set
+      if (
+        namespace === TENANT_NAMESPACES.OPTIMISM &&
+        thresholds.quorum === 0n
+      ) {
+        if (forVotes < againstVotes) {
+          return "DEFEATED";
+        }
+      }
       return "SUCCEEDED";
     }
 
-    if (forVotes < againstVotes) {
-      return "DEFEATED";
-    }
-
-    return "FAILED";
+    return "DEFEATED";
   }
 
-  return "FAILED";
+  return "DEFEATED";
 };
