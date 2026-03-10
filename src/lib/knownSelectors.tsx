@@ -467,6 +467,28 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
     },
   },
 
+  // removeAsset(address)
+  "0x4a5e42b1": {
+    name: "removeAsset",
+    prettyName: "Remove Asset",
+    prettyRender: (decodedData, target) => {
+      const asset = collectByType(decodedData.parameters, "address")[0];
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              removeAsset
+            </code>{" "}
+            on the {maybeFriendlyAddress(target)} contract with the following
+            parameter:
+          </div>
+          <div className="pl-4">Asset: {maybeFriendlyAddress(asset)}</div>
+        </div>
+      );
+    },
+  },
+
   // setFactoryOwner(address) — V3FeeAdapter
   "0xf3cc660c": {
     name: "setFactoryOwner",
