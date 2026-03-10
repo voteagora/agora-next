@@ -425,6 +425,28 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
     },
   },
 
+  // setOwner(bytes32,address)
+  "0x5b0fc9c3": {
+    name: "setOwner",
+    prettyName: "Set Owner (Registry)",
+    prettyRender: (decodedData, target) => {
+      const owner = collectByType(decodedData.parameters, "address")[0];
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              setOwner
+            </code>{" "}
+            on the {maybeFriendlyAddress(target)} contract with the following
+            parameter:
+          </div>
+          <div className="pl-4">Owner: {maybeFriendlyAddress(owner)}</div>
+        </div>
+      );
+    },
+  },
+
   // setFeeToSetter(address)
   "0xa2e74af6": {
     name: "setFeeToSetter",
@@ -567,6 +589,38 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
   },
 
   // ── ENS ──
+
+  // setSubnodeRecord(bytes32,bytes32,address,address,uint64)
+  "0x5ef2c7f0": {
+    name: "setSubnodeRecord",
+    prettyName: "Set ENS Subnode Record",
+    prettyRender: (decodedData, target) => {
+      const addresses = collectByType(decodedData.parameters, "address");
+      const owner = addresses[0];
+      const resolver = addresses[1];
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              setSubnodeRecord
+            </code>{" "}
+            on the {maybeFriendlyAddress(target)} contract to set a subnode
+            record.
+          </div>
+          <div className="space-y-1 pl-4">
+            {owner && (
+              <div>Owner: {maybeFriendlyAddress(owner)}</div>
+            )}
+            {resolver && (
+              <div>Resolver: {maybeFriendlyAddress(resolver)}</div>
+            )}
+          </div>
+        </div>
+      );
+    },
+  },
 
   // setText(bytes32,string,string)
   "0x10f13a8c": {
