@@ -610,12 +610,8 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             record.
           </div>
           <div className="space-y-1 pl-4">
-            {owner && (
-              <div>Owner: {maybeFriendlyAddress(owner)}</div>
-            )}
-            {resolver && (
-              <div>Resolver: {maybeFriendlyAddress(resolver)}</div>
-            )}
+            {owner && <div>Owner: {maybeFriendlyAddress(owner)}</div>}
+            {resolver && <div>Resolver: {maybeFriendlyAddress(resolver)}</div>}
           </div>
         </div>
       );
