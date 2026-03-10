@@ -125,12 +125,11 @@ const ProposalTransactionDisplay = ({
   proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
-  const [viewMode, setViewMode] = useState<"summary" | "raw" | "pretty">(
-    "summary"
+  const allActionsSupported = areAllActionsSupported(calldatas);
+  const [viewMode, setViewMode] = useState<"decoded" | "raw" | "pretty">(() =>
+    allActionsSupported ? "pretty" : "decoded"
   );
   const [isSimulating, setIsSimulating] = useState(false);
-
-  const allActionsSupported = areAllActionsSupported(calldatas);
   const openDialog = useOpenDialog();
   const [showBenignExplanation, setShowBenignExplanation] = useState(false);
 
@@ -294,11 +293,11 @@ const ProposalTransactionDisplay = ({
                 </div>
                 <div className="flex">
                   <button
-                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-                    onClick={() => setViewMode("summary")}
+                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "decoded" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                    onClick={() => setViewMode("decoded")}
                     type="button"
                   >
-                    Summary
+                    Decoded
                   </button>
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
@@ -338,7 +337,7 @@ const ProposalTransactionDisplay = ({
             </div>
 
             <div className="p-4 pt-2">
-              {viewMode === "summary" && (
+              {viewMode === "decoded" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -445,7 +444,7 @@ const TransactionItem = ({
   network,
   index,
   signature,
-  viewMode = "summary",
+  viewMode = "decoded",
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -455,7 +454,7 @@ const TransactionItem = ({
   network: string;
   index: number;
   signature?: string;
-  viewMode?: "summary" | "raw" | "pretty";
+  viewMode?: "decoded" | "raw" | "pretty";
 }) => {
   const {
     data: decodedData,
@@ -509,7 +508,7 @@ const TransactionItem = ({
           />
         ) : (
           <>
-            <ActionSummary
+            <DecodedActionView
               decodedData={decodedData}
               target={target}
               value={value}
@@ -643,7 +642,7 @@ const safelyFormatEther = (val: string) => {
   return `${BigInt(val).toString()}`;
 };
 
-const ActionSummary = ({
+const DecodedActionView = ({
   decodedData,
   target,
   value,
