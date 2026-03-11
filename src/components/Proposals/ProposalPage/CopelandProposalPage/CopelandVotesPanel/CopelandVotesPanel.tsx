@@ -137,7 +137,7 @@ export default function CopelandVotesPanel({
           proposalCancelledTime={proposal.cancelledTime}
           proposalExecutedTime={proposal.executedTime}
           cancelledTransactionHash={proposal.cancelledTransactionHash}
-          className="bg-white rounded-none border-b mb-1 py-4 mx-0"
+          className="bg-neutral rounded-none border-b mb-1 py-4 mx-0"
         />
         {activeTab === 1 ? (
           <OptionsResultsPanel proposal={proposal} />
