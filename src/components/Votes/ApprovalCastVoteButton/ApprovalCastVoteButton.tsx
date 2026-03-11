@@ -85,18 +85,22 @@ export default function ApprovalCastVoteButton({ proposal }: Props) {
           </div>
         )}
         <VoteButton
-          onClick={(missingVote: MissingVote) =>
+          onClick={(missingVote: MissingVote) => {
+            const requireStatement =
+              Tenant.current().ui.toggle("delegates/votingRequiresStatement")
+                ?.enabled !== false;
+
             openDialog({
               type: "APPROVAL_CAST_VOTE",
               params: {
                 proposal: proposal,
-                hasStatement: !!data?.delegate?.statement,
+                hasStatement: !!data?.delegate?.statement || !requireStatement,
                 votingPower: data?.votingPower ?? null,
                 authorityChains: data?.chains ?? null,
                 missingVote,
               },
-            })
-          }
+            });
+          }}
           proposalStatus={proposal.status}
           proposal={proposal}
           delegateVotes={data?.votes ?? []}
