@@ -9,6 +9,7 @@ import { ChartTreasury } from "@/app/info/components/ChartTreasury";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaFinancials from "@/app/duna/components/DunaFinancials";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
+import FinancialsComingSoon from "./FinancialsComingSoon";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,12 @@ export default async function Page() {
     ui.toggle("info/governance-charts")?.enabled === true;
 
   const treasuryData = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
+
+  const areFinancialsComingSoon = ui.toggle("financials-coming-soon");
+
+  if (areFinancialsComingSoon) {
+    return <FinancialsComingSoon />;
+  }
 
   return (
     <div className="flex flex-col">

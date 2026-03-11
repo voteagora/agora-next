@@ -1,13 +1,8 @@
 import React from "react";
 import FinancialStatementsClient from "./FinancialStatementsClient";
-import {
-  getForumTopics,
-  getDunaCategoryId,
-} from "@/lib/actions/forum";
+import { getForumTopics, getDunaCategoryId } from "@/lib/actions/forum";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  UIFinancialStatementsConfig,
-} from "@/lib/tenant/tenantUI";
+import { UIFinancialStatementsConfig } from "@/lib/tenant/tenantUI";
 import DunaMetricsCards from "./DunaMetricsCards";
 
 const DunaFinancials = async () => {

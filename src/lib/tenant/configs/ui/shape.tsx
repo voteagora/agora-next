@@ -201,6 +201,18 @@ export const shapeTenantUIConfig = new TenantUI({
         imageDescription: "Shape Protocol governance coming soon",
       },
     },
+    {
+      route: "financials-coming-soon",
+      title: "Structura financials are\ncoming soon",
+      description: "",
+      hero: shapeHero,
+      meta: {
+        title: "Shape Protocol Financials",
+        description: "Shape Protocol financials coming soon",
+        imageTitle: "Shape Protocol Financials",
+        imageDescription: "Shape Protocol financials coming soon",
+      },
+    },
   ],
 
   toggles: [
@@ -232,6 +244,7 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "footer/hide-votable-supply", enabled: true },
     { name: "footer/hide-total-supply", enabled: true },
     { name: "coming-soon/show-static-proposals", enabled: true },
+    { name: "financials-coming-soon", enabled: true },
     {
       name: "shape-hero-content",
       enabled: true,
@@ -248,13 +261,13 @@ export const shapeTenantUIConfig = new TenantUI({
 
             <div className="font-medium">
               <p className="mt-2">
-                By owning the token and participating in the governance of Structura
-                on this forum, you acknowledge and agree that you are electing
-                to become a member of a Wyoming Decentralized Unincorporated
-                Nonprofit Association (&quot;Association&quot;). Your
-                participation is subject to the terms and conditions set forth
-                in the Association Agreement. You further acknowledge and agree
-                that any dispute, claim, or controversy arising out of or
+                By owning the token and participating in the governance of
+                Structura on this forum, you acknowledge and agree that you are
+                electing to become a member of a Wyoming Decentralized
+                Unincorporated Nonprofit Association (&quot;Association&quot;).
+                Your participation is subject to the terms and conditions set
+                forth in the Association Agreement. You further acknowledge and
+                agree that any dispute, claim, or controversy arising out of or
                 relating to the Association Agreement, any governance proposal,
                 or the rights and obligations of members or administrators shall
                 be submitted exclusively to the Wyoming Chancery Court. In the
