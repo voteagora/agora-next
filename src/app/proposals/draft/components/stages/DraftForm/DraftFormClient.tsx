@@ -15,10 +15,8 @@ import { onSubmitAction as draftProposalAction } from "../../../actions/createDr
 import { invalidatePath } from "../../../actions/revalidatePath";
 import {
   ProposalType,
-  SocialProposalType,
   parseProposalToForm,
   DraftProposal,
-  ProposalScope,
 } from "../../../types";
 import BasicProposalForm from "../../BasicProposalForm";
 import SocialProposalForm from "../../SocialProposalForm";
@@ -27,143 +25,23 @@ import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  getProposalTypeAddress,
-  getStageIndexForTenant,
-} from "@/app/proposals/draft/utils/stages";
+import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
+import {
+  DEFAULT_FORM,
+  getProposalMetadataDescription,
+  getValidProposalTypesForVotingType,
+} from "@/app/proposals/draft/utils/formConstants";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { TENANT_NAMESPACES, LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
-const { ui, namespace } = Tenant.current();
-
-const ProposalTypeMetadata = {
-  [ProposalType.SOCIAL]: {
-    title: "Social Proposal",
-    description: "A proposal that resolves via a snapshot vote.",
-  },
-  [ProposalType.BASIC]: {
-    title: "Basic Proposal",
-    description:
-      namespace === "optimism"
-        ? "Voters are asked to vote for, against, or abstain. The proposal passes if the for votes exceed quorum AND if the for votes exceed the approval threshold."
-        : "Voters are asked to vote for, against, or abstain. The proposal passes if the abstain and for votes exceeed quorum AND if the for votes exceed the approval threshold.",
-  },
-  [ProposalType.APPROVAL]: {
-    title: "Approval Proposal",
-    description:
-      "Voters are asked to choose among multiple options. If the proposal passes quorum, options will be approved according to the approval criteria.",
-  },
-  [ProposalType.OPTIMISTIC]: {
-    title: "Optimistic Proposal",
-    description:
-      "Voters are asked to vote for, against, or abstain. The proposal automatically passes unless 12% vote against. No transactions can be proposed for optimistic proposals, it can only be used for social signaling.",
-  },
-} as {
-  [key in ProposalType]: {
-    title: string;
-    description: string;
-  };
-};
-
-const getProposalMetadataDescription = (
-  proposalType: ProposalType,
-  includeAbstain = true
-) => {
-  if (
-    proposalType === ProposalType.BASIC &&
-    namespace === TENANT_NAMESPACES.OPTIMISM
-  ) {
-    if (!includeAbstain) {
-      return "Voters are asked to vote for, against, or abstain. The proposal passes if the for votes exceed quorum AND if the for votes, relative to the total votes, exceed the approval threshold. ⚠️ This option is currently not supported by the governor contract. This warning can be ignored (and will be removed) after the governor contract is upgraded. ⚠️";
-    } else {
-      return "Voters are asked to vote for, against, or abstain. The proposal passes if the for and abstain votes exceed quorum AND if the for votes, relative to the total votes, exceed the approval threshold. This option is currently supported by the governor contract.";
-    }
-  }
-  return ProposalTypeMetadata[proposalType].description;
-};
-
-const DEFAULT_FORM = {
-  type: ProposalType.BASIC,
-  title: "",
-  abstract: "",
-  transactions: [],
-  socialProposal: {
-    type: SocialProposalType.BASIC,
-    start_date: undefined,
-    end_date: undefined,
-    options: [],
-  },
-  proposal_scope: ProposalScope.ONCHAIN_ONLY,
-  budget: 0,
-  calculationOptions: 0,
-};
-
-const getValidProposalTypesForVotingType = (
-  proposalTypes: any[],
-  proposalType: ProposalType
-) => {
-  let optimisticModuleAddress: string | null = null;
-  let approvalModuleAddress: string | null = null;
-
-  try {
-    optimisticModuleAddress =
-      getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
-
-    approvalModuleAddress =
-      getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
-  } catch (error) {
-    // ignore
-  }
-
-  switch (proposalType) {
-    case ProposalType.APPROVAL:
-      return proposalTypes.filter((type) => {
-        return (
-          (type.module &&
-            type.module.toLowerCase() ===
-              approvalModuleAddress?.toLowerCase()) ||
-          type.name.toLowerCase().includes("approval")
-        );
-      });
-
-    case ProposalType.OPTIMISTIC:
-      return proposalTypes.filter((type) => {
-        return (
-          (type.module &&
-            type.module.toLowerCase() ===
-              optimisticModuleAddress?.toLowerCase()) ||
-          type.name.toLowerCase().includes("optimistic")
-        );
-      });
-
-    case ProposalType.BASIC:
-      return proposalTypes.filter((type) => {
-        return (
-          (!type.module ||
-            type.module?.toLowerCase() !==
-              approvalModuleAddress?.toLowerCase()) &&
-          (!type.module ||
-            type.module?.toLowerCase() !==
-              optimisticModuleAddress?.toLowerCase()) &&
-          !type.name.toLowerCase().includes("approval") &&
-          !type.name.toLowerCase().includes("optimistic")
-        );
-      });
-
-    // currently no constraints on these voting modules
-    case ProposalType.SOCIAL:
-    default:
-      return proposalTypes;
-  }
-};
-
+const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
 
 const DraftFormClient = ({
@@ -174,9 +52,9 @@ const DraftFormClient = ({
   proposalTypes: FormattedProposalType[];
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
-  const [validProposalTypes, setValidProposalTypes] = useState<any[]>(
-    getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC)
-  );
+  const [validProposalTypes, setValidProposalTypes] = useState<
+    FormattedProposalType[]
+  >(getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC));
   const router = useRouter();
   const searchParams = useSearchParams();
   const shareParam = searchParams?.get("share");
@@ -216,7 +94,7 @@ const DraftFormClient = ({
     if (!current && validProposalTypes.length > 0) {
       methods.setValue(
         "proposalConfigType",
-        validProposalTypes[0].proposal_type_id
+        validProposalTypes[0].proposal_type_id.toString()
       );
     }
   }, [validProposalTypes, methods]);
@@ -234,14 +112,8 @@ const DraftFormClient = ({
         return;
       }
       // Guard: require SIWE JWT before prompting signature for this action
-      try {
-        const session = localStorage.getItem(LOCAL_STORAGE_SIWE_JWT_KEY);
-        if (!session) {
-          toast("Session expired. Please sign in to continue.");
-          window.location.reload();
-          return;
-        }
-      } catch {
+      const jwt = getStoredSiweJwt({ expectedAddress: address });
+      if (!jwt) {
         toast("Session expired. Please sign in to continue.");
         window.location.reload();
         return;
@@ -303,7 +175,7 @@ const DraftFormClient = ({
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SwitchInput
                     control={control}
-                    label="Voting module"
+                    label=""
                     required={true}
                     options={enabledProposalTypesFromConfigAndAPI}
                     name="type"
@@ -322,12 +194,10 @@ const DraftFormClient = ({
                   control={control}
                   label="Proposal type"
                   required={true}
-                  options={validProposalTypes.map((typeConfig) => {
-                    return {
-                      label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
-                      value: typeConfig.proposal_type_id,
-                    };
-                  })}
+                  options={validProposalTypes.map((typeConfig) => ({
+                    label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
+                    value: typeConfig.proposal_type_id.toString(),
+                  }))}
                   name="proposalConfigType"
                   emptyCopy="Default"
                 />

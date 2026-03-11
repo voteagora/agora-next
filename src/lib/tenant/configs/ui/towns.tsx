@@ -1,6 +1,6 @@
 import React from "react";
 import { TenantUI, type UITaxFormConfig } from "@/lib/tenant/tenantUI";
-import townsLogo from "@/assets/tenant/towns_logo.svg";
+import townsLogo from "@/assets/tenant/towns_logo.png";
 import townsHero from "@/assets/tenant/towns_hero.svg";
 import townsSuccess from "@/assets/tenant/towns_success.svg";
 import townsPending from "@/assets/tenant/towns_pending.svg";
@@ -18,6 +18,7 @@ export const townsTenantUIConfig = new TenantUI({
   title: "Towns Lodge",
   logo: townsLogo,
   logoSize: "36px",
+  documentColors: ["#9C8AED", "#4E4672", "#9991BA", "#918DA1"],
   tokens: [
     {
       address: "0x000000Fa00b200406de700041CFc6b19BbFB4d13",
@@ -146,7 +147,7 @@ export const townsTenantUIConfig = new TenantUI({
         },
         {
           name: "Protocol Docs",
-          title: "Document Archive*",
+          title: "Document Archive",
           url: "/document-archive",
           image: townsInfoCard3,
         },
@@ -619,6 +620,10 @@ export const townsTenantUIConfig = new TenantUI({
       config: {
         title: "TOWNS Lodge Updates",
       },
+    },
+    {
+      name: "notifications",
+      enabled: true,
     },
   ],
 });

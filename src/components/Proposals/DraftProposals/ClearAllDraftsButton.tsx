@@ -6,10 +6,10 @@ import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { onSubmitAction as deleteAllAction } from "@/app/proposals/draft/actions/deleteAllDraftProposals";
 import toast from "react-hot-toast";
-import { LOCAL_STORAGE_SIWE_JWT_KEY } from "@/lib/constants";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { useSIWE } from "connectkit";
+import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 const ClearAllDraftsButton = ({
   draftCount,
@@ -84,35 +84,15 @@ export const DeleteAllDraftProposalsDialog = ({
             if (isPending) return;
             setIsPending(true);
             try {
-              // Require SIWE JWT before prompting for action signature
-              let jwt: string | undefined;
-              try {
-                const session = localStorage.getItem(
-                  LOCAL_STORAGE_SIWE_JWT_KEY
-                );
-                const parsed = session ? JSON.parse(session) : null;
-                jwt = parsed?.access_token as string | undefined;
-              } catch {}
+              let jwt = getStoredSiweJwt({ expectedAddress: address });
               if (!jwt) {
-                // Try to initiate SIWE sign-in and then proceed
                 try {
                   await signIn();
-
-                  // Retry fetching the session for up to 10 seconds to handle potential race conditions
-                  // specifically observed with Brave Wallet
-                  let retries = 0;
-                  while (!jwt && retries < 50) {
-                    const session = localStorage.getItem(
-                      LOCAL_STORAGE_SIWE_JWT_KEY
-                    );
-                    const parsed = session ? JSON.parse(session) : null;
-                    jwt = parsed?.access_token as string | undefined;
-
-                    if (jwt) break;
-
-                    await new Promise((resolve) => setTimeout(resolve, 200));
-                    retries++;
-                  }
+                  jwt = await waitForStoredSiweJwt({
+                    expectedAddress: address,
+                    timeoutMs: 10_000,
+                    intervalMs: 200,
+                  });
                 } catch (e) {
                   toast("Sign-in cancelled or failed. Please try again.");
                   setIsPending(false);

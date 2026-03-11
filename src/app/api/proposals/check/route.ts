@@ -9,6 +9,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DaoSlug } from "@prisma/client";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { erc721Abi } from "viem";
+import { checkPermission } from "@/lib/rbac";
 
 export const maxDuration = 60;
 
@@ -66,7 +67,13 @@ async function checkProposal(attester: string, tags: string[]) {
 
   const isTempCheck = postType === "tempcheck";
   const isGovProposal = postType === "gov-proposal";
-  const adminStatus = await isAdmin(attester, slug);
+  const adminStatus = await checkPermission(
+    attester,
+    slug,
+    "proposals",
+    "proposals",
+    "create"
+  );
 
   if (isGovProposal) {
     if (namespace === TENANT_NAMESPACES.TOWNS) {
@@ -107,7 +114,12 @@ async function checkProposal(attester: string, tags: string[]) {
       ) {
         isAuthorOfTempCheck = true;
       }
-      if (tempCheckProposal.lifecycle_stage === "PASSED") {
+      if (
+        tempCheckProposal.lifecycle_stage === "PASSED" ||
+        tempCheckProposal.lifecycle_stage === "SUCCEEDED" ||
+        tempCheckProposal.lifecycle_stage === "QUEUED" ||
+        tempCheckProposal.lifecycle_stage === "EXECUTED"
+      ) {
         hasApprovedTempCheck = true;
         break;
       }

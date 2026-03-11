@@ -14,7 +14,7 @@ export default function ShareDraftLink({
 
   const shareUrl =
     typeof window !== "undefined"
-      ? `${window.location.origin}/proposals/draft/${draftUuid}?share=${authorAddress}`
+      ? `${window.location.origin}/proposals/draft/${draftUuid}?share=${authorAddress}&stage=1`
       : "";
 
   const handleCopy = useCallback(async () => {

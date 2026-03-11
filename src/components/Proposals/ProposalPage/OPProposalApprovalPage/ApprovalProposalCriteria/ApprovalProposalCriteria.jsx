@@ -11,9 +11,9 @@ export default function ApprovalProposalCriteria({ proposal }) {
   const proposalData = proposal.proposalData;
   const currentQuorum = getProposalCurrentQuorum(proposal.proposalResults);
   const proposalSettings = proposalData.proposalSettings;
-
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
+  const source = proposal.archiveMetadata?.source;
 
   return (
     <VStack className="p-4 pb-2 border-t border-line">
@@ -68,12 +68,33 @@ export default function ApprovalProposalCriteria({ proposal }) {
           <p>
             In this threshold-based proposal, all options passing the approval
             threshold of{" "}
-            <TokenAmountDecorated amount={proposalSettings.criteriaValue} />{" "}
-            votes will be executed in order from most to least popular, until
-            the total budget of{" "}
-            <TokenAmountDecorated amount={proposalSettings.budgetAmount} /> runs
-            out. Voters can select up to {proposalSettings.maxApprovals}{" "}
-            options. If the quorum is not met, no options will be executed.
+            {source === "eas-oodao" ? (
+              <>{proposalSettings.criteriaValue} </>
+            ) : (
+              <TokenAmountDecorated amount={proposalSettings.criteriaValue} />
+            )}{" "}
+            votes will be executed in order from most to least popular,
+            {source === "eas-oodao" ? (
+              <>
+                {proposalSettings.budgetAmount > 0 && (
+                  <>
+                    {" "}
+                    until the total budget of {
+                      proposalSettings.budgetAmount
+                    }{" "}
+                    runs out.
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                until the total budget of{" "}
+                <TokenAmountDecorated amount={proposalSettings.budgetAmount} />{" "}
+                runs out.
+              </>
+            )}{" "}
+            Voters can select up to {proposalSettings.maxApprovals} options. If
+            the quorum is not met, no options will be executed.
           </p>
         )}
       </div>

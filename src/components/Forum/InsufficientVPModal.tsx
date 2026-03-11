@@ -60,32 +60,32 @@ export function InsufficientVPModal({
         <div className="space-y-6 py-4">
           {/* Headline */}
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-primary">
               Oh no, you don&apos;t have enough tokens to {ACTION_TEXT[action]}
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-secondary">
               It&apos;s important that conversations are aligned only to token
               holders
             </p>
           </div>
 
           {/* VP Stats */}
-          <div className="bg-gray-50 rounded-lg p-4 flex justify-between items-center">
+          <div className="bg-wash rounded-lg p-4 flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600 inline-flex items-center">
+              <p className="text-sm text-secondary inline-flex items-center">
                 Your voting power and token balance
                 <VotingPowerInfoTooltip />
               </p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-primary">
                 {currentVP.toLocaleString()}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600 inline-flex items-center justify-end">
+              <p className="text-sm text-secondary inline-flex items-center justify-end">
                 Required voting power
                 <VotingPowerInfoTooltip />
               </p>
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-primary">
                 {requiredVP.toLocaleString()}
               </p>
             </div>
@@ -93,7 +93,7 @@ export function InsufficientVPModal({
 
           {/* How to get tokens */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-primary">
               How can I get tokens?
             </h3>
 
@@ -142,10 +142,10 @@ export function InsufficientVPModal({
                     <Coins className="w-5 h-5 text-green-600" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">
+                    <h4 className="font-semibold text-primary mb-1">
                       Buy {token.symbol} tokens
                     </h4>
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-sm text-secondary mb-3">
                       Purchase {token.symbol} tokens to gain voting power. Your
                       token balance counts as voting power, even without
                       delegation. You can also delegate to yourself or others
@@ -171,7 +171,7 @@ export function InsufficientVPModal({
           <div className="flex justify-end pt-4">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              className="px-4 py-2 bg-wash text-secondary rounded-lg hover:bg-wash transition-colors font-medium"
             >
               Got it
             </button>

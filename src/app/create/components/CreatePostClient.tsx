@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,6 @@ import toast from "react-hot-toast";
 import { PostTypeSelector } from "./PostTypeSelector";
 import { CreatePostForm } from "./CreatePostForm";
 import { ProposalSettingsCard } from "./ProposalSettingsCard";
-import { CommunityGuidelinesCard } from "./CommunityGuidelinesCard";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import {
   canCreateTempCheck as canCreateTempCheckUtil,
@@ -25,7 +24,11 @@ import {
   ProposalType,
   CreatePostFormData,
   RelatedItem,
+  EASVotingType,
+  ApprovalProposalSettings,
+  defaultApprovalSettings,
 } from "../types";
+import { filterProposalTypesByType } from "../utils/proposalTypeUtils";
 import {
   Dialog,
   DialogContent,
@@ -51,26 +54,75 @@ export function CreatePostClient({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { ui, contracts } = Tenant.current();
-  const { createProposal } = useEASV2();
+  const { createProposalWithVotingType } = useEASV2();
   const permissions = useForumPermissionsContext();
   const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
 
   const hasInitialTempCheck =
     (initialFormData.relatedTempChecks?.length || 0) > 0;
 
+  const getInitialVotingType = (): EASVotingType => {
+    if (
+      hasInitialTempCheck &&
+      initialFormData.relatedTempChecks?.[0]?.votingModule
+    ) {
+      const votingModule =
+        initialFormData.relatedTempChecks[0].votingModule.toUpperCase();
+      if (votingModule === "OPTIMISTIC") return "optimistic";
+      if (votingModule === "APPROVAL") return "approval";
+      if (votingModule === "STANDARD") return "standard";
+    }
+    return "standard";
+  };
+
+  const getInitialApprovalSettings = (): ApprovalProposalSettings => {
+    if (
+      hasInitialTempCheck &&
+      initialFormData.relatedTempChecks?.[0]?.approvalData
+    ) {
+      const approvalData = initialFormData.relatedTempChecks[0].approvalData;
+      return {
+        budget: approvalData.budget,
+        maxApprovals: approvalData.maxApprovals,
+        criteria: approvalData.criteria === 0 ? "threshold" : "top-choices",
+        criteriaValue: approvalData.criteriaValue,
+        choices: approvalData.choices.map((choice, index) => ({
+          id: `choice-${index}`,
+          title: choice,
+        })),
+      };
+    }
+    return defaultApprovalSettings;
+  };
+
   const [selectedPostType, setSelectedPostType] =
     useState<PostType>(initialPostType);
 
+  const filteredProposalTypes = useMemo(
+    () => filterProposalTypesByType(proposalTypes, selectedPostType),
+    [proposalTypes, selectedPostType]
+  );
+
   const [selectedProposalType, setSelectedProposalType] =
-    useState<ProposalType>(proposalTypes[0]);
+    useState<ProposalType>(filteredProposalTypes[0]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);
+
+  // Voting type state
+  const [selectedVotingType, setSelectedVotingType] = useState<EASVotingType>(
+    getInitialVotingType()
+  );
+  const [approvalSettings, setApprovalSettings] =
+    useState<ApprovalProposalSettings>(getInitialApprovalSettings());
 
   const form = useForm<CreatePostFormData>({
     defaultValues: initialFormData,
   });
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+  // Check if extended voting types are enabled for this tenant
+  const isExtendedVotingEnabled = ui.toggle("easv2-extended-voting")?.enabled;
 
   const relatedTempChecks = form.watch("relatedTempChecks") || [];
   const canCreateTempCheck = canCreateTempCheckUtil(permissions);
@@ -121,7 +173,7 @@ export function CreatePostClient({
       const tagsArray = [selectedPostType, ...relatedLinks];
       const tagsString = tagsArray.join(",");
 
-      const proposal = await createProposal({
+      await createProposalWithVotingType({
         title: data.title,
         description: data.description,
         startts: BigInt(Math.floor(Date.now() / 1000) + votingDelaySeconds),
@@ -135,6 +187,22 @@ export function CreatePostClient({
         ),
         tags: tagsString,
         proposal_type_uid: selectedProposalType.id || undefined,
+        votingType: selectedVotingType,
+        choices:
+          selectedVotingType === "approval"
+            ? approvalSettings.choices.map((c) => c.title)
+            : [],
+        maxApprovals:
+          selectedVotingType === "approval" ? approvalSettings.maxApprovals : 1,
+        criteria:
+          selectedVotingType === "approval"
+            ? approvalSettings.criteria
+            : "threshold",
+        criteriaValue:
+          selectedVotingType === "approval"
+            ? approvalSettings.criteriaValue
+            : 0,
+        budget: selectedVotingType === "approval" ? approvalSettings.budget : 0,
       });
 
       await queryClient.invalidateQueries({ queryKey: ["forumTopics"] });
@@ -153,6 +221,16 @@ export function CreatePostClient({
     }
   };
 
+  const changeSelectedVotingType = (type: EASVotingType) => {
+    setSelectedVotingType(type);
+    const filteredByPostType = filterProposalTypesByType(
+      proposalTypes,
+      selectedPostType
+    );
+
+    setSelectedProposalType(filteredByPostType[0] || proposalTypes[0]);
+  };
+
   const handleAddRelatedItem =
     (field: "relatedDiscussions" | "relatedTempChecks") =>
     (item: RelatedItem) => {
@@ -163,15 +241,20 @@ export function CreatePostClient({
   const handleRemoveRelatedItem =
     (field: "relatedDiscussions" | "relatedTempChecks") => (id: string) => {
       const current = form.getValues(field) || [];
-      form.setValue(
-        field,
-        current.filter((d) => d.id !== id)
-      );
+      const filtered = current.filter((d) => d.id !== id);
+      form.setValue(field, filtered);
+
+      // Reset approval settings if removing a temp check with approval data
+      if (field === "relatedTempChecks" && filtered.length === 0) {
+        setApprovalSettings(defaultApprovalSettings);
+      }
     };
 
   const handleRemoveAllRelatedItems = () => {
     form.setValue("relatedDiscussions", []);
     form.setValue("relatedTempChecks", []);
+    // Reset approval settings when all temp checks are removed
+    setApprovalSettings(defaultApprovalSettings);
   };
 
   const handleProposalTypeChange = (typeId: string) => {
@@ -186,19 +269,46 @@ export function CreatePostClient({
   };
 
   useEffect(() => {
-    if (proposalTypes.length > 0 && !selectedProposalType) {
-      setSelectedProposalType(proposalTypes[0]);
-    }
-  }, [proposalTypes, selectedProposalType]);
+    setSelectedProposalType(filteredProposalTypes[0]);
+  }, [selectedPostType]);
 
   useEffect(() => {
-    if (selectedPostType === "gov-proposal" && relatedTempChecks.length > 0) {
+    if (
+      selectedPostType === "gov-proposal" &&
+      relatedTempChecks.length > 0 &&
+      !hasInitialTempCheck
+    ) {
       const tempCheck = relatedTempChecks[0];
-      if (tempCheck.proposalType) {
-        setSelectedProposalType(tempCheck.proposalType);
+      if (tempCheck.votingModule) {
+        // Automatically set voting type based on temp check's proposal type class
+        const proposalClass = tempCheck.votingModule.toUpperCase();
+        if (proposalClass === "OPTIMISTIC") {
+          setSelectedVotingType("optimistic");
+        } else if (proposalClass === "APPROVAL") {
+          setSelectedVotingType("approval");
+
+          // Auto-fill approval settings from temp check data
+          if (tempCheck.approvalData) {
+            setApprovalSettings({
+              budget: tempCheck.approvalData.budget,
+              maxApprovals: tempCheck.approvalData.maxApprovals,
+              criteria:
+                tempCheck.approvalData.criteria === 0
+                  ? "threshold"
+                  : "top-choices",
+              criteriaValue: tempCheck.approvalData.criteriaValue,
+              choices: tempCheck.approvalData.choices.map((choice, index) => ({
+                id: `choice-${index}`,
+                title: choice,
+              })),
+            });
+          }
+        } else {
+          setSelectedVotingType("standard");
+        }
       }
     }
-  }, [relatedTempChecks, selectedPostType]);
+  }, [relatedTempChecks, selectedPostType, proposalTypes]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -207,7 +317,6 @@ export function CreatePostClient({
           <h1 className="text-2xl font-bold text-primary">
             Create {postTypeOptions[selectedPostType].toLowerCase()}
           </h1>
-
           <PostTypeSelector
             value={selectedPostType}
             onChange={setSelectedPostType}
@@ -237,20 +346,23 @@ export function CreatePostClient({
               "relatedTempChecks"
             )}
             onRemoveRelatedItems={handleRemoveAllRelatedItems}
+            // Voting type settings - now in the form
+            showVotingTypeSettings={isExtendedVotingEnabled}
+            selectedVotingType={selectedVotingType}
+            onVotingTypeChange={changeSelectedVotingType}
+            approvalSettings={approvalSettings}
+            onApprovalSettingsChange={setApprovalSettings}
           />
         </div>
 
         <div className="space-y-6">
           <ProposalSettingsCard
             selectedProposalType={selectedProposalType}
-            proposalTypes={proposalTypes}
+            proposalTypes={filterProposalTypesByType(
+              proposalTypes,
+              selectedPostType
+            )}
             onProposalTypeChange={handleProposalTypeChange}
-            postType={selectedPostType}
-            isGovProposal={
-              selectedPostType === "gov-proposal" &&
-              relatedTempChecks.length > 0
-            }
-            relatedTempChecks={relatedTempChecks}
           />
         </div>
       </div>

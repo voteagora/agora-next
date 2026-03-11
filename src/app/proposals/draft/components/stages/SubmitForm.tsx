@@ -58,20 +58,7 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
   const stableAccountVotes =
     accountVotes !== undefined ? accountVotes : lastValidVotes;
 
-  const canAddressSponsor = useMemo(() => {
-    if (
-      offchainToggle?.enabled &&
-      ((proposalDraft.proposal_scope === ProposalScope.HYBRID &&
-        !!proposalDraft.onchain_transaction_hash) ||
-        proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY)
-    ) {
-      return (
-        address &&
-        (plmToggle?.config as PLMConfig)?.offchainProposalCreator?.includes(
-          address
-        )
-      );
-    }
+  const canAddressSponsorOnchain = useMemo(() => {
     switch (gatingType) {
       case ProposalGatingType.MANAGER:
         return manager === address;
@@ -90,6 +77,19 @@ const Actions = ({ proposalDraft }: { proposalDraft: DraftProposal }) => {
         return false;
     }
   }, [gatingType, manager, address, stableAccountVotes, threshold]);
+
+  const canAddressSponsorOffchain = useMemo(() => {
+    return (
+      offchainToggle?.enabled &&
+      (proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+        proposalDraft.proposal_scope === ProposalScope.HYBRID)
+    );
+  }, [offchainToggle?.enabled, proposalDraft.proposal_scope]);
+
+  const canAddressSponsor = useMemo(() => {
+    return canAddressSponsorOnchain || canAddressSponsorOffchain;
+  }, [canAddressSponsorOnchain, canAddressSponsorOffchain]);
+
   return (
     <div className="mt-6">
       {contracts.votableSupplyOracle?.address && (

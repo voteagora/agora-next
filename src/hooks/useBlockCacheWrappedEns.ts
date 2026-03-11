@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { getAlchemyId } from "@/lib/alchemyConfig";
 
 interface UseBlockCacheWrappedEnsProps {
   address: `0x${string}`;
@@ -22,8 +23,11 @@ const useBlockCacheWrappedEns = ({
       const headers: HeadersInit = {};
 
       // Add Alchemy API key header if available
-      if (process.env.NEXT_PUBLIC_ALCHEMY_ID) {
-        headers["alchemy-api-key"] = process.env.NEXT_PUBLIC_ALCHEMY_ID;
+      try {
+        const alchemyId = getAlchemyId();
+        headers["alchemy-api-key"] = alchemyId;
+      } catch (error) {
+        // Key not available, continue without it
       }
 
       const response = await fetch(

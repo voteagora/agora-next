@@ -147,8 +147,10 @@ export type Proposal = {
   status: ProposalStatus | null;
   createdTransactionHash: string | null;
   cancelledTransactionHash: string | null;
+  queuedTransactionHash: string | null;
   executedTransactionHash: string | null;
   offchainProposalId?: string;
   proposalTypeApproval?: string;
+  kwargs?: Record<string, any>;
   taxFormMetadata?: Record<string, unknown>;
 };

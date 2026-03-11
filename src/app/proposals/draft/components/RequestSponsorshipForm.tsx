@@ -53,7 +53,7 @@ const RequestSponsorshipForm = ({
     enabled: true,
   });
 
-  const canSponsor = () => {
+  const canSponsorOnchain = () => {
     if (votingModuleType === ProposalType.SOCIAL) {
       const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
         ?.snapshotConfig?.requiredTokens;
@@ -61,17 +61,6 @@ const RequestSponsorshipForm = ({
         accountVotesData !== undefined &&
         requiredTokensForSnapshot !== undefined &&
         accountVotesData >= requiredTokensForSnapshot
-      );
-    }
-    if (
-      draftProposal.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
-      (draftProposal.proposal_scope === ProposalScope.HYBRID &&
-        !!draftProposal.onchain_transaction_hash)
-    ) {
-      const config = plmToggle?.config as PLMConfig;
-      return (
-        !!config.offchainProposalCreator &&
-        config.offchainProposalCreator.includes(address || "")
       );
     }
     switch (gatingType) {
@@ -93,7 +82,17 @@ const RequestSponsorshipForm = ({
     }
   };
 
-  const canAddressSponsor = canSponsor();
+  const canSponsorOffchain = () => {
+    const config = plmToggle?.config as PLMConfig;
+    return (
+      (draftProposal.proposal_scope === ProposalScope.OFFCHAIN_ONLY ||
+        draftProposal.proposal_scope === ProposalScope.HYBRID) &&
+      !!config.offchainProposalCreator &&
+      config.offchainProposalCreator.includes(address || "")
+    );
+  };
+
+  const canAddressSponsor = canSponsorOnchain() || canSponsorOffchain();
 
   return (
     <>

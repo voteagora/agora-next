@@ -3,9 +3,13 @@ import { isAddress } from "viem";
 import { AlchemyProvider } from "ethers";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import { getAlchemyId } from "@/lib/alchemyConfig";
 
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID;
-const mainnetProvider = new AlchemyProvider("mainnet", alchemyId);
+// Lazy initialization to avoid issues in tests
+const getMainnetProvider = () => {
+  const alchemyId = getAlchemyId();
+  return new AlchemyProvider("mainnet", alchemyId);
+};
 
 export const ensNameToAddress = unstable_cache(
   async (nameOrAddress) => {
@@ -13,6 +17,7 @@ export const ensNameToAddress = unstable_cache(
       return nameOrAddress;
     }
 
+    const mainnetProvider = getMainnetProvider();
     const address = await mainnetProvider.resolveName(nameOrAddress);
 
     if (!address) {
@@ -33,6 +38,7 @@ export async function resolveENSName(nameOrAddress: string) {
     return nameOrAddress;
   }
 
+  const mainnetProvider = getMainnetProvider();
   const address = await cache((name: string) =>
     mainnetProvider.resolveName(name)
   )(nameOrAddress);
@@ -48,6 +54,7 @@ export async function reverseResolveENSName(
   address: string
 ): Promise<string | null> {
   try {
+    const mainnetProvider = getMainnetProvider();
     const ensName = await mainnetProvider.lookupAddress(address);
 
     return ensName || null;
@@ -70,6 +77,7 @@ export async function resolveENSProfileImage(
   }
 
   try {
+    const mainnetProvider = getMainnetProvider();
     return await mainnetProvider.getAvatar(lowerCaseAddress);
   } catch (error) {
     console.error("ENS Avatar error", error);
@@ -108,7 +116,8 @@ export const resolveENSTextRecords: (
     try {
       let name;
       if (isAddress(addressOrENSName)) {
-        name = await reverseResolveENSName(addressOrENSName);
+        const mainnetProvider = getMainnetProvider();
+        name = await mainnetProvider.lookupAddress(addressOrENSName);
       } else {
         name = addressOrENSName;
       }
@@ -117,6 +126,7 @@ export const resolveENSTextRecords: (
         return null;
       }
 
+      const mainnetProvider = getMainnetProvider();
       const resolver = await mainnetProvider.getResolver(name);
 
       if (!resolver) {

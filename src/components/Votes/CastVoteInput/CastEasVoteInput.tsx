@@ -8,29 +8,16 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
-import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";
+import { parseVoteError } from "@/lib/voteErrorUtils";
+import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
+import { DisabledVoteButton } from "../components/DisabledVoteButton";
+import CastEasApprovalVoteInput from "./CastEasApprovalVoteInput";
+import CastEasOptimisticVoteInput from "./CastEasOptimisticVoteInput";
 
 type VoteOption = "for" | "against" | "abstain" | null;
-
-function VoteSuccessMessage() {
-  return (
-    <div className="w-full rounded-lg border border-line bg-neutral p-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <CheckCircleIcon className="h-6 w-6 text-positive flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-primary">
-              Vote submitted successfully!
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   const { isConnected } = useAgoraContext();
@@ -40,6 +27,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     proposalId: proposal.id,
     address,
   });
+  // Get voting type info from proposal
 
   // Check if proposal hasn't started yet
   const now = new Date();
@@ -77,6 +65,30 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
     return <VoteSuccessMessage />;
   }
 
+  // Route to appropriate vote input based on voting type
+  if (proposal.proposalType === "APPROVAL") {
+    return (
+      <CastEasApprovalVoteInput
+        proposal={proposal}
+        options={(proposal.proposalData as any).options.map(
+          (option: any, index: number) => ({
+            index,
+            title: option.description,
+          })
+        )}
+        maxApprovals={
+          (proposal.proposalData as any).proposalSettings.maxApprovals
+        }
+      />
+    );
+  }
+  if (proposal.proposalType === "OPTIMISTIC") {
+    return (
+      <CastEasOptimisticVoteInput proposal={proposal} vetoThreshold={20} />
+    );
+  }
+
+  // Default to standard voting
   return <CastEasVoteInputContent proposal={proposal} />;
 }
 
@@ -128,22 +140,7 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting vote:", err);
-
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      if (errorMessage.includes("0xb8daf542")) {
-        setError(
-          "Invalid attester - you are not authorized to vote on this proposal"
-        );
-      } else if (errorMessage.includes("0x7c9a1cf9")) {
-        setError("You have already voted on this proposal");
-      } else if (errorMessage.includes("0x7fa01202")) {
-        setError("Voting has not started yet");
-      } else if (errorMessage.includes("0x7a19ed05")) {
-        setError("Voting has ended for this proposal");
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to submit vote");
-      }
+      setError(parseVoteError(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -224,13 +221,5 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         )}
       </button>
     </div>
-  );
-}
-
-function DisabledVoteButton({ reason }: { reason: string }) {
-  return (
-    <Button className="w-full" disabled>
-      {reason}
-    </Button>
   );
 }
