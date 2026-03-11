@@ -174,6 +174,7 @@ const ApprovalProposalForm = () => {
     watch,
     setValue,
     getValues,
+    trigger,
     formState: { defaultValues },
   } = useFormContext<FormType>();
   const [simulationPending, setSimulationPending] = useState(false);
@@ -270,6 +271,9 @@ const ApprovalProposalForm = () => {
   }, [criteria, optionsWatched, topChoices]);
 
   const simulateAllPossibleCombinations = async () => {
+    const isValid = await trigger("approvalProposal.options");
+    if (!isValid) return;
+
     setSimulationPending(true);
     const combinations = generateWinningCombinations();
 
