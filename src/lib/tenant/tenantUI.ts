@@ -161,6 +161,7 @@ type TenantUIParams = {
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
   title: string;
+  dunaTitle?: string;
   toggles?: UIToggle[];
   tokens?: TenantToken[];
   customization?: {
@@ -232,6 +233,7 @@ export class TenantUI {
   private _title: string;
   private _toggles?: UIToggle[];
   private _tokens?: TenantToken[];
+  private _dunaTitle?: string;
   private _customization?: {
     primary?: string;
     secondary?: string;
@@ -312,6 +314,7 @@ export class TenantUI {
     tacticalStrings,
     theme,
     tokens,
+    dunaTitle,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -334,6 +337,7 @@ export class TenantUI {
     this._tacticalStrings = tacticalStrings;
     this._theme = theme ?? "light";
     this._tokens = tokens;
+    this._dunaTitle = dunaTitle;
   }
 
   public get assets(): UIAssets {
@@ -362,6 +366,10 @@ export class TenantUI {
 
   public get title(): string {
     return this._title;
+  }
+
+  public get dunaTitle(): string | undefined {
+    return this._dunaTitle;
   }
 
   public get logo(): string {
