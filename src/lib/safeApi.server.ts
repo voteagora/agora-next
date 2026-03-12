@@ -730,7 +730,10 @@ export async function getSafeMultisigTransactionForClient(
           typeof createdAtMs === "number" &&
           Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
 
-        if (options?.safeAddress && (hasSeenTransactionBefore || isPastGracePeriod)) {
+        if (
+          options?.safeAddress &&
+          (hasSeenTransactionBefore || isPastGracePeriod)
+        ) {
           try {
             recentListContainsTransaction =
               await hasSafeMultisigTransactionInRecentListForClient({

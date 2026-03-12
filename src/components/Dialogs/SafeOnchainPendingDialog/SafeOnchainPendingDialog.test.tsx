@@ -70,9 +70,9 @@ describe("SafeOnchainPendingDialog", () => {
     );
 
     const queryOptions = useQueryMock.mock.calls[0][0] as {
-      refetchInterval: (query: { state: { data?: { found?: boolean } } }) =>
-        | false
-        | number;
+      refetchInterval: (query: {
+        state: { data?: { found?: boolean } };
+      }) => false | number;
       refetchIntervalInBackground: boolean;
       refetchOnWindowFocus: boolean;
     };
@@ -102,9 +102,9 @@ describe("SafeOnchainPendingDialog", () => {
     );
 
     const mediumQueryOptions = useQueryMock.mock.calls[0][0] as {
-      refetchInterval: (query: { state: { data?: { found?: boolean } } }) =>
-        | false
-        | number;
+      refetchInterval: (query: {
+        state: { data?: { found?: boolean } };
+      }) => false | number;
     };
 
     expect(
@@ -127,9 +127,9 @@ describe("SafeOnchainPendingDialog", () => {
     );
 
     const slowQueryOptions = useQueryMock.mock.calls[1][0] as {
-      refetchInterval: (query: { state: { data?: { found?: boolean } } }) =>
-        | false
-        | number;
+      refetchInterval: (query: {
+        state: { data?: { found?: boolean } };
+      }) => false | number;
       refetchIntervalInBackground: boolean;
     };
 
