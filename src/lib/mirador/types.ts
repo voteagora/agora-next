@@ -7,14 +7,17 @@ export type MiradorChainName =
   | "bsc";
 
 export type MiradorTraceSource = "frontend" | "backend" | "api";
+export type MiradorFlow =
+  (typeof import("./constants").MIRADOR_FLOW)[keyof typeof import("./constants").MIRADOR_FLOW];
 
 export type ProposalCreationBranch =
   | "safe_offchain_draft"
-  | "safe_direct_onchain";
+  | "safe_direct_onchain"
+  | "draft_onchain_publish";
 
 export type MiradorTraceContext = {
   traceId?: string | null;
-  flow?: string;
+  flow?: MiradorFlow;
   step?: string;
   source?: MiradorTraceSource;
   walletAddress?: string;

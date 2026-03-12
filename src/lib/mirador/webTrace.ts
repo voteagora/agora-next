@@ -6,17 +6,18 @@ import {
   MIRADOR_DEFAULT_TRACE_ID_WAIT_INTERVAL_MS,
   MIRADOR_DEFAULT_TRACE_ID_WAIT_TIMEOUT_MS,
 } from "./constants";
+import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import {
   MiradorAttributeMap,
-  MiradorAttributeValue,
   MiradorChainName,
+  MiradorFlow,
   MiradorTraceContext,
 } from "./types";
 import { getMiradorWebClient } from "./webClient";
 
 type StartMiradorTraceOptions = {
   name: string;
-  flow: string;
+  flow: MiradorFlow;
   context?: MiradorTraceContext;
   tags?: string[];
   attributes?: MiradorAttributeMap;
@@ -26,26 +27,6 @@ type StartMiradorTraceOptions = {
   maxRetries?: number;
   retryBackoff?: number;
 };
-
-function toAttributeString(value: MiradorAttributeValue): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}
 
 function applyContextAttributes(trace: Trace, context?: MiradorTraceContext) {
   if (!context) {
@@ -62,11 +43,10 @@ function applyContextAttributes(trace: Trace, context?: MiradorTraceContext) {
     "session.id": context.sessionId,
   };
 
-  for (const [key, value] of Object.entries(mapped)) {
-    if (value === undefined || value === null || value === "") {
-      continue;
-    }
-    trace.addAttribute(key, toAttributeString(value));
+  for (const [key, value] of Object.entries(
+    normalizeMiradorAttributePayload(mapped)
+  )) {
+    trace.addAttribute(key, value);
   }
 }
 
@@ -75,11 +55,10 @@ function applyAttributes(trace: Trace, attributes?: MiradorAttributeMap) {
     return;
   }
 
-  for (const [key, value] of Object.entries(attributes)) {
-    if (value === undefined || value === null) {
-      continue;
-    }
-    trace.addAttribute(key, toAttributeString(value));
+  for (const [key, value] of Object.entries(
+    normalizeMiradorAttributePayload(attributes)
+  )) {
+    trace.addAttribute(key, value);
   }
 }
 
@@ -92,12 +71,14 @@ export function startMiradorTrace(
   }
 
   try {
+    const autoKeepAlive =
+      options.autoKeepAlive ?? (options.context?.traceId ? false : true);
     const trace = client.trace({
       name: options.name,
       traceId: options.context?.traceId ?? undefined,
       includeUserMeta: options.includeUserMeta,
       autoClose: options.autoClose,
-      autoKeepAlive: options.autoKeepAlive ?? true,
+      autoKeepAlive,
       maxRetries: options.maxRetries,
       retryBackoff: options.retryBackoff,
     });
@@ -204,6 +185,27 @@ export function addMiradorSafeMsgHint(
   }
 }
 
+export function addMiradorSafeTxHint(
+  trace: Trace | null | undefined,
+  safeTxHash: string,
+  chain: MiradorChainName,
+  details?: string
+) {
+  if (!trace || !safeTxHash) {
+    return;
+  }
+
+  try {
+    trace.addSafeTxHint(safeTxHash, chain, details);
+  } catch (error) {
+    console.error("Failed to add Mirador safe tx hint", {
+      safeTxHash,
+      chain,
+      error,
+    });
+  }
+}
+
 export function flushMiradorTrace(trace: Trace | null | undefined) {
   if (!trace) {
     return;
@@ -252,9 +254,70 @@ export async function closeMiradorTrace(
     return;
   }
 
+  const traceId = trace.getTraceId();
+  const CLOSE_STEP_TIMEOUT_MS = 1_500;
+  const CLOSE_TIMEOUT = Symbol("mirador-close-timeout");
+
+  const awaitWithTimeout = async <T,>(
+    value: Promise<T>,
+    step: "flushQueue" | "close"
+  ) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+      const result = await Promise.race([
+        value,
+        new Promise<typeof CLOSE_TIMEOUT>((resolve) => {
+          timeoutId = setTimeout(() => resolve(CLOSE_TIMEOUT), CLOSE_STEP_TIMEOUT_MS);
+        }),
+      ]);
+
+      if (result === CLOSE_TIMEOUT) {
+        console.warn("[mirador-close] client close timed out", {
+          traceId,
+          reason,
+          step,
+          timeoutMs: CLOSE_STEP_TIMEOUT_MS,
+        });
+      }
+
+      return result;
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
+  };
+
   try {
-    await trace.close(reason);
+    const traceWithInternals = trace as any as {
+      autoKeepAlive?: boolean;
+      flushQueue?: Promise<void>;
+      stopKeepAlive?: () => void;
+      close: (reason?: string) => Promise<void>;
+    };
+
+    if ("autoKeepAlive" in traceWithInternals) {
+      traceWithInternals.autoKeepAlive = false;
+    }
+    if (typeof traceWithInternals.stopKeepAlive === "function") {
+      traceWithInternals.stopKeepAlive();
+    }
+    if (traceWithInternals.flushQueue) {
+      await awaitWithTimeout(traceWithInternals.flushQueue, "flushQueue");
+    }
+
+    const closeResult = await awaitWithTimeout(trace.close(reason), "close");
+    if (closeResult === CLOSE_TIMEOUT) {
+      return;
+    }
+
+    console.info("[mirador-close] client close sent", { traceId, reason });
   } catch (error) {
-    console.error("Failed to close Mirador trace", { reason, error });
+    console.error("[mirador-close] client close failed", {
+      traceId,
+      reason,
+      error,
+    });
   }
 }

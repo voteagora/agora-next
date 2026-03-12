@@ -1,14 +1,16 @@
 "use client";
 
-import Tenant from "@/lib/tenant/tenant";
-import { UIMiradorConfig } from "@/lib/tenant/tenantUI";
-
+import {
+  isMiradorProposalCreationEnabled,
+  isMiradorSiweTracingEnabled,
+} from "./config";
 import {
   MIRADOR_FLOW,
   PROPOSAL_CREATION_TRACE_NAME,
   PROPOSAL_CREATION_TRACE_STORAGE_KEY,
 } from "./constants";
 import { getMiradorTraceHeaders } from "./headers";
+import { getMiradorFlowTags } from "./tags";
 import {
   MiradorTraceContext,
   ProposalCreationBranch,
@@ -23,28 +25,84 @@ import {
   startMiradorTrace,
 } from "./webTrace";
 
-type ProposalCreationTraceLike = ReturnType<typeof startMiradorTrace>;
+export { isMiradorProposalCreationEnabled } from "./config";
 
-function getMiradorConfig(): UIMiradorConfig | null {
-  const toggle = Tenant.current().ui.toggle("mirador");
-  if (!toggle?.enabled) {
+type ProposalCreationTraceLike = ReturnType<typeof startMiradorTrace>;
+let activeProposalCreationTrace: ProposalCreationTraceLike = null;
+let activeProposalCreationTraceId: string | null = null;
+
+function clearActiveProposalCreationTrace() {
+  activeProposalCreationTrace = null;
+  activeProposalCreationTraceId = null;
+}
+
+function syncActiveProposalCreationTrace(
+  trace: ProposalCreationTraceLike,
+  traceId?: string | null
+) {
+  if (!trace) {
+    clearActiveProposalCreationTrace();
+    return;
+  }
+
+  activeProposalCreationTrace = trace;
+  activeProposalCreationTraceId =
+    traceId ??
+    (typeof trace.getTraceId === "function" ? trace.getTraceId() : null) ??
+    null;
+}
+
+function getReusableProposalCreationTrace(
+  traceState?: ProposalCreationTraceState | null
+): ProposalCreationTraceLike {
+  if (!activeProposalCreationTrace) {
     return null;
   }
 
-  return (toggle.config as UIMiradorConfig | undefined) ?? null;
+  const currentTraceId =
+    activeProposalCreationTraceId ??
+    (typeof activeProposalCreationTrace.getTraceId === "function"
+      ? activeProposalCreationTrace.getTraceId()
+      : null);
+
+  if (!traceState?.traceId) {
+    return currentTraceId ? null : activeProposalCreationTrace;
+  }
+
+  if (currentTraceId && currentTraceId === traceState.traceId) {
+    activeProposalCreationTraceId = currentTraceId;
+    return activeProposalCreationTrace;
+  }
+
+  return null;
 }
 
-export function isMiradorProposalCreationEnabled(): boolean {
-  return getMiradorConfig()?.proposalCreation === true;
+function applyProposalCreationTraceContext(
+  trace: ProposalCreationTraceLike,
+  options: {
+    branch?: ProposalCreationBranch;
+    walletAddress?: `0x${string}`;
+    chainId?: number | string;
+    traceId?: string;
+  }
+) {
+  if (!trace) {
+    return;
+  }
+
+  addMiradorAttributes(trace, {
+    "proposal.branch": options.branch,
+    "wallet.address": options.walletAddress,
+    "wallet.chainId": options.chainId,
+    "session.id": options.traceId,
+  });
 }
 
 export function isMiradorProposalCreationSiweEnabled(): boolean {
-  return getMiradorConfig()?.proposalCreationSiwe === true;
+  return isMiradorSiweTracingEnabled();
 }
 
-export function getStoredProposalCreationTraceState():
-  | ProposalCreationTraceState
-  | null {
+export function getStoredProposalCreationTraceState(): ProposalCreationTraceState | null {
   if (typeof window === "undefined") {
     return null;
   }
@@ -80,12 +138,14 @@ export function setStoredProposalCreationTraceState(
 
 export function clearStoredProposalCreationTraceState() {
   if (typeof window === "undefined") {
+    clearActiveProposalCreationTrace();
     return;
   }
 
   try {
     window.sessionStorage.removeItem(PROPOSAL_CREATION_TRACE_STORAGE_KEY);
   } catch {}
+  clearActiveProposalCreationTrace();
 }
 
 export function getProposalCreationTraceContext():
@@ -123,10 +183,22 @@ export function startOrResumeProposalCreationTrace(
   }
 
   const storedTrace = getStoredProposalCreationTraceState();
-  return startMiradorTrace({
+  const reusableTrace = getReusableProposalCreationTrace(storedTrace);
+  if (reusableTrace) {
+    applyProposalCreationTraceContext(reusableTrace, {
+      traceId: storedTrace?.traceId,
+      branch: options.branch ?? storedTrace?.branch,
+      walletAddress: options.walletAddress ?? storedTrace?.walletAddress,
+      chainId: options.chainId ?? storedTrace?.chainId,
+    });
+    return reusableTrace;
+  }
+
+  const trace = startMiradorTrace({
     name: PROPOSAL_CREATION_TRACE_NAME,
     flow: MIRADOR_FLOW.proposalCreation,
     autoClose: true,
+    tags: getMiradorFlowTags(MIRADOR_FLOW.proposalCreation),
     context: {
       traceId: storedTrace?.traceId,
       branch: options.branch ?? storedTrace?.branch,
@@ -135,6 +207,44 @@ export function startOrResumeProposalCreationTrace(
       sessionId: storedTrace?.traceId ?? undefined,
     },
   });
+  syncActiveProposalCreationTrace(trace, storedTrace?.traceId);
+  return trace;
+}
+
+export function startFreshProposalCreationTrace(
+  options: {
+    branch?: ProposalCreationBranch;
+    walletAddress?: `0x${string}`;
+    chainId?: number | string;
+  } = {}
+): ProposalCreationTraceLike {
+  if (!isMiradorProposalCreationEnabled()) {
+    return null;
+  }
+
+  if (activeProposalCreationTrace) {
+    void closeMiradorTrace(
+      activeProposalCreationTrace,
+      "proposal_creation_restarted"
+    );
+    clearActiveProposalCreationTrace();
+  }
+
+  clearStoredProposalCreationTraceState();
+
+  const trace = startMiradorTrace({
+    name: PROPOSAL_CREATION_TRACE_NAME,
+    flow: MIRADOR_FLOW.proposalCreation,
+    autoClose: true,
+    tags: getMiradorFlowTags(MIRADOR_FLOW.proposalCreation),
+    context: {
+      branch: options.branch,
+      walletAddress: options.walletAddress,
+      chainId: options.chainId,
+    },
+  });
+  syncActiveProposalCreationTrace(trace);
+  return trace;
 }
 
 export async function persistProposalCreationTraceState(
@@ -168,6 +278,7 @@ export async function persistProposalCreationTraceState(
   };
 
   setStoredProposalCreationTraceState(traceState);
+  syncActiveProposalCreationTrace(trace, traceId);
   return traceState;
 }
 
@@ -204,23 +315,33 @@ export async function closeStoredProposalCreationTrace(options?: {
   const storedTrace = getStoredProposalCreationTraceState();
   if (!storedTrace?.traceId) {
     clearStoredProposalCreationTraceState();
+    clearActiveProposalCreationTrace();
     return;
   }
 
-  const trace = startMiradorTrace({
-    name: PROPOSAL_CREATION_TRACE_NAME,
-    flow: MIRADOR_FLOW.proposalCreation,
-    autoClose: true,
-    context: {
-      traceId: storedTrace.traceId,
-      branch: storedTrace.branch,
-      walletAddress: storedTrace.walletAddress,
-      chainId: storedTrace.chainId,
-      sessionId: storedTrace.traceId,
-    },
-  });
+  const activeTrace = getReusableProposalCreationTrace(storedTrace);
+
+  let trace = activeTrace;
+  if (!trace) {
+    trace = startMiradorTrace({
+      name: PROPOSAL_CREATION_TRACE_NAME,
+      flow: MIRADOR_FLOW.proposalCreation,
+      autoClose: true,
+      autoKeepAlive: false,
+      tags: getMiradorFlowTags(MIRADOR_FLOW.proposalCreation),
+      context: {
+        traceId: storedTrace.traceId,
+        branch: storedTrace.branch,
+        walletAddress: storedTrace.walletAddress,
+        chainId: storedTrace.chainId,
+        sessionId: storedTrace.traceId,
+      },
+    });
+  }
+
   if (!trace) {
     clearStoredProposalCreationTraceState();
+    clearActiveProposalCreationTrace();
     return;
   }
 
@@ -228,6 +349,7 @@ export async function closeStoredProposalCreationTrace(options?: {
     addMiradorEvent(trace, options.eventName, options.details);
   }
   flushMiradorTrace(trace);
-  await closeMiradorTrace(trace, options?.reason);
   clearStoredProposalCreationTraceState();
+  clearActiveProposalCreationTrace();
+  await closeMiradorTrace(trace, options?.reason);
 }

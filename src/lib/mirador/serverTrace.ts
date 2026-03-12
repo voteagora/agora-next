@@ -1,9 +1,9 @@
 import "server-only";
 
+import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import { getMiradorServerClient } from "./serverClient";
 import {
   MiradorAttributeMap,
-  MiradorAttributeValue,
   MiradorChainName,
   MiradorTraceContext,
 } from "./types";
@@ -20,6 +20,12 @@ type MiradorSafeMessageHint = {
   details?: string;
 };
 
+type MiradorSafeTxHint = {
+  safeTxHash: string;
+  chain: MiradorChainName;
+  details?: string;
+};
+
 type AppendServerTraceEventArgs = {
   traceContext?: MiradorTraceContext | null;
   eventName: string;
@@ -28,6 +34,7 @@ type AppendServerTraceEventArgs = {
   tags?: string[];
   txHashHints?: MiradorTxHashHint[];
   safeMessageHints?: MiradorSafeMessageHint[];
+  safeTxHints?: MiradorSafeTxHint[];
   txInputData?: string | string[];
 };
 
@@ -35,26 +42,6 @@ const MIRADOR_SERVER_UPDATE_MAX_RETRIES = 3;
 const MIRADOR_SERVER_UPDATE_RETRY_BASE_MS = 200;
 const MIRADOR_SERVER_DEFAULT_TRACE_NAME = "AgoraServerTrace";
 let hasWarnedMissingTraceId = false;
-
-function toAttributeString(value: MiradorAttributeValue): string {
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  if (typeof value === "string") {
-    return value;
-  }
-
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
-}
 
 function buildContextAttributes(
   traceContext?: MiradorTraceContext | null
@@ -77,19 +64,7 @@ function buildContextAttributes(
 function buildAttributePayload(
   attributes?: MiradorAttributeMap
 ): Record<string, string> {
-  if (!attributes) {
-    return {};
-  }
-
-  const normalized: Record<string, string> = {};
-  for (const [key, value] of Object.entries(attributes)) {
-    if (value === undefined || value === null) {
-      continue;
-    }
-    normalized[key] = toAttributeString(value);
-  }
-
-  return normalized;
+  return normalizeMiradorAttributePayload(attributes);
 }
 
 function toEventDetails(
@@ -143,6 +118,16 @@ function normalizeSafeMessageHints(
   );
 }
 
+function normalizeSafeTxHints(
+  safeTxHints?: MiradorSafeTxHint[]
+): MiradorSafeTxHint[] {
+  if (!safeTxHints) {
+    return [];
+  }
+
+  return safeTxHints.filter((hint) => Boolean(hint?.safeTxHash && hint?.chain));
+}
+
 export async function appendServerTraceEvent({
   traceContext,
   eventName,
@@ -151,6 +136,7 @@ export async function appendServerTraceEvent({
   tags,
   txHashHints,
   safeMessageHints,
+  safeTxHints,
   txInputData,
 }: AppendServerTraceEventArgs): Promise<void> {
   const traceId = traceContext?.traceId;
@@ -213,6 +199,10 @@ export async function appendServerTraceEvent({
         hint.chain,
         hint.details ?? undefined
       );
+    }
+
+    for (const hint of normalizeSafeTxHints(safeTxHints)) {
+      trace.addSafeTxHint(hint.safeTxHash, hint.chain, hint.details);
     }
 
     trace.flush();

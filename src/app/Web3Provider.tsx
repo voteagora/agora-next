@@ -17,7 +17,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
 import { MiradorProvider } from "@/components/providers/MiradorProvider";
-import { UIMiradorConfig } from "@/lib/tenant/tenantUI";
+import { shouldEnableMiradorWebClient } from "@/lib/mirador/config";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,10 +70,6 @@ export const config =
         },
       });
 
-const miradorConfig = ui.toggle("mirador")?.config as
-  | UIMiradorConfig
-  | undefined;
-
 const Web3Provider: FC<
   PropsWithChildren<{
     miradorWebApiKey?: string;
@@ -84,7 +80,7 @@ const Web3Provider: FC<
       <QueryClientProvider client={queryClient}>
         <MiradorProvider
           apiKey={miradorWebApiKey}
-          enabled={miradorConfig?.proposalCreation === true}
+          enabled={shouldEnableMiradorWebClient()}
         >
           <SIWEProvider
             {...siweProviderConfig}

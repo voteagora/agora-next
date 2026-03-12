@@ -3,6 +3,8 @@ export const MIRADOR_FLOW_HEADER = "x-mirador-flow";
 
 export const MIRADOR_FLOW = {
   proposalCreation: "proposal_creation",
+  notificationPreferences: "notification_preferences",
+  delegateStatement: "delegate_statement",
 } as const;
 
 export const MIRADOR_DEFAULT_TRACE_ID_WAIT_TIMEOUT_MS = 3000;
@@ -11,3 +13,9 @@ export const MIRADOR_DEFAULT_TRACE_ID_WAIT_INTERVAL_MS = 50;
 export const PROPOSAL_CREATION_TRACE_NAME = "proposal_creation";
 export const PROPOSAL_CREATION_TRACE_STORAGE_KEY =
   "agora:proposal-creation-trace";
+export const MIRADOR_SIWE_LOGIN_TRACE_STORAGE_KEY =
+  "agora:mirador-siwe-login-trace";
+
+export const MIRADOR_TRACE_TAG = {
+  siweLogin: "siwe_login",
+} as const;
