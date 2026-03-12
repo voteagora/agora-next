@@ -476,9 +476,5 @@ export const uniswapTenantUIConfig = new TenantUI({
         title: "DUNI Updates",
       },
     },
-    {
-      name: "notifications",
-      enabled: true,
-    },
   ],
 });
