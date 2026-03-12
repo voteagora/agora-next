@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getSafeOwnersAndThreshold } from "@/lib/safeMessages";
+import {
+  getSafeOwnersAndThreshold,
+  SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS,
+} from "@/lib/safeMessages";
 
 export const SAFE_OWNERS_AND_THRESHOLD_QK = "safeOwnersAndThreshold";
 
@@ -21,5 +24,6 @@ export function useSafeOwnersAndThreshold({
         safeAddress: safeAddress!,
         chainId: chainId!,
       }),
+    staleTime: SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS,
   });
 }

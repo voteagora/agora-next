@@ -19,6 +19,12 @@ const SAFE_DOMAIN_SEPARATOR_ABI = [
   },
 ] as const;
 
+const SAFE_MESSAGE_TYPEHASH = keccak256(
+  stringToHex("SafeMessage(bytes message)")
+);
+
+const safeDomainSeparatorCache = new Map<string, `0x${string}`>();
+
 const SAFE_OWNERS_AND_THRESHOLD_ABI = [
   {
     type: "function",
@@ -36,18 +42,36 @@ const SAFE_OWNERS_AND_THRESHOLD_ABI = [
   },
 ] as const;
 
-const SAFE_MESSAGE_TYPEHASH = keccak256(
-  stringToHex("SafeMessage(bytes message)")
-);
+export const SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS = 30_000;
 
-const safeDomainSeparatorCache = new Map<string, `0x${string}`>();
 const safeOwnersAndThresholdCache = new Map<
   string,
   {
+    cachedAt: number;
     owners: `0x${string}`[];
     threshold: number;
   }
 >();
+
+type SafeSettingsRpcClient = {
+  request?: unknown;
+};
+
+function isUnsupportedSafeSettingsError(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("safe_setsettings") ||
+    message.includes("method not found") ||
+    message.includes("unsupported method") ||
+    message.includes("unsupported request") ||
+    message.includes("does not exist") ||
+    message.includes("not implemented")
+  );
+}
 
 type GetCanonicalSafeMessageHashParams = {
   safeAddress: Address;
@@ -61,7 +85,9 @@ async function getSafeDomainSeparator({
 }: Pick<GetCanonicalSafeMessageHashParams, "safeAddress" | "chainId">) {
   const cacheKey = `${chainId}:${safeAddress.toLowerCase()}`;
   const cached = safeDomainSeparatorCache.get(cacheKey);
-  if (cached) return cached;
+  if (cached) {
+    return cached;
+  }
 
   const chain = getChainById(chainId);
   if (!chain) {
@@ -85,8 +111,14 @@ export async function getSafeOwnersAndThreshold(params: {
 }) {
   const cacheKey = `${params.chainId}:${params.safeAddress.toLowerCase()}`;
   const cached = safeOwnersAndThresholdCache.get(cacheKey);
-  if (cached) {
-    return cached;
+  if (
+    cached &&
+    Date.now() - cached.cachedAt < SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS
+  ) {
+    return {
+      owners: cached.owners,
+      threshold: cached.threshold,
+    };
   }
 
   const chain = getChainById(params.chainId);
@@ -112,7 +144,10 @@ export async function getSafeOwnersAndThreshold(params: {
     owners: owners.map((owner) => owner.toLowerCase() as `0x${string}`),
     threshold: Number(threshold),
   };
-  safeOwnersAndThresholdCache.set(cacheKey, result);
+  safeOwnersAndThresholdCache.set(cacheKey, {
+    ...result,
+    cachedAt: Date.now(),
+  });
   return result;
 }
 
@@ -121,7 +156,10 @@ export async function getCanonicalSafeMessageHash({
   chainId,
   message,
 }: GetCanonicalSafeMessageHashParams) {
-  const domainSeparator = await getSafeDomainSeparator({ safeAddress, chainId });
+  const domainSeparator = await getSafeDomainSeparator({
+    safeAddress,
+    chainId,
+  });
   const dataHash = hashMessage(message);
   const encodedDataHash = encodeAbiParameters(
     [{ type: "bytes32" }],
@@ -140,4 +178,31 @@ export async function getCanonicalSafeMessageHash({
   return keccak256(
     concatHex(["0x1901", domainSeparator, safeMessageStructHash])
   );
+}
+
+export async function ensureSafeOffchainSigningEnabled(
+  walletClient: SafeSettingsRpcClient | null | undefined
+) {
+  if (!walletClient || typeof walletClient.request !== "function") {
+    return "unavailable" as const;
+  }
+
+  try {
+    await (
+      walletClient.request as (args: {
+        method: string;
+        params?: unknown[];
+      }) => Promise<unknown>
+    )({
+      method: "safe_setSettings",
+      params: [{ offChainSigning: true }],
+    });
+    return "enabled" as const;
+  } catch (error) {
+    if (isUnsupportedSafeSettingsError(error)) {
+      return "unsupported" as const;
+    }
+
+    throw error;
+  }
 }
