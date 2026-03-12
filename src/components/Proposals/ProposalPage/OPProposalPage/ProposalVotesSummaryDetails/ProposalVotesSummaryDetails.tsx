@@ -305,7 +305,7 @@ export default function ProposalVotesSummaryDetails({
           <StepperRow
             isLastStep
             label="Proposal cancelled"
-            value={formatTime(proposal.cancelledTime, "cancel")}
+            value={formatTime(proposal.cancelledTime)}
             href={
               proposal.cancelledTransactionHash
                 ? getBlockScanUrl(proposal.cancelledTransactionHash)
@@ -316,7 +316,7 @@ export default function ProposalVotesSummaryDetails({
           <StepperRow
             isLastStep
             label="Proposal executed"
-            value={formatTime(proposal.executedTime, "exec")}
+            value={formatTime(proposal.executedTime)}
             href={
               proposal.executedTransactionHash
                 ? getBlockScanUrl(proposal.executedTransactionHash)
