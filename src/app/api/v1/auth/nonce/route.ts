@@ -3,13 +3,16 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
+import { storeSiweNonce } from "@/lib/siweNonce.server";
 
 export async function GET(request: NextRequest) {
   const { generateNonce } = await import("siwe");
   const traceContext = getMiradorTraceContextFromHeaders(request);
+  const requestUrl = new URL(request.url);
 
   try {
     const nonce = generateNonce();
+    await storeSiweNonce(nonce, requestUrl.host);
     await appendServerTraceEvent({
       traceContext: traceContext
         ? { ...traceContext, step: "siwe_nonce", source: "api" }

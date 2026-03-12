@@ -83,7 +83,7 @@ describe("handleDraftOnchainPublishResult", () => {
         chainId: 1,
         draftProposal: {
           id: 42,
-          proposal_scope: ProposalScope.ONCHAIN,
+          proposal_scope: ProposalScope.ONCHAIN_ONLY,
         } as any,
         inputData: [],
         txHash:
@@ -128,7 +128,7 @@ describe("handleDraftOnchainPublishResult", () => {
       chainId: 1,
       draftProposal: {
         id: 42,
-        proposal_scope: ProposalScope.ONCHAIN,
+        proposal_scope: ProposalScope.ONCHAIN_ONLY,
       } as any,
       inputData: [],
       txHash:

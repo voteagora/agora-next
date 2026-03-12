@@ -10,12 +10,17 @@ import {
   SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE,
 } from "@/lib/safeFeatures";
 import {
-  enforceUnauthenticatedSafeStatusRateLimit,
-  getOptionalSafeJwtAddress,
-  safeAddressesMatch,
+  enforceAuthenticatedSafeRateLimit,
+  requireSafeJwtForAddress,
 } from "@/lib/safeInternalApiAuth.server";
 import { discoverSafeTrackedTransaction } from "@/lib/safeTrackedTransactions.server";
 import type { DiscoverSafeTrackedTransactionRequest } from "@/lib/safeTrackedTransactions";
+import {
+  isSafeTrackedTransactionKind,
+  normalizeHexData,
+  normalizePositiveInteger,
+  normalizeSafeAddress,
+} from "@/lib/safeValidation";
 
 export async function POST(request: NextRequest) {
   if (!isSafeOnchainTransactionTrackingEnabled()) {
@@ -39,11 +44,10 @@ export async function POST(request: NextRequest) {
 
   if (
     !body?.kind ||
+    !isSafeTrackedTransactionKind(body.kind) ||
     !body.safeAddress ||
     !body.to ||
-    !body.data ||
-    !Number.isFinite(body.chainId) ||
-    !Number.isFinite(body.createdAfter)
+    !body.data
   ) {
     return NextResponse.json(
       { message: "Missing Safe discovery fields." },
@@ -51,32 +55,49 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const authResult = await getOptionalSafeJwtAddress(request);
-  if (authResult?.response) {
-    return authResult.response;
-  }
+  const normalizedSafeAddress = normalizeSafeAddress(body.safeAddress);
+  const normalizedTo = normalizeSafeAddress(body.to);
+  const normalizedData = normalizeHexData(body.data);
+  const chainId = normalizePositiveInteger(body.chainId);
+  const createdAfter = normalizePositiveInteger(body.createdAfter);
   if (
-    authResult?.address &&
-    !safeAddressesMatch(authResult.address, body.safeAddress)
+    !normalizedSafeAddress ||
+    !normalizedTo ||
+    !normalizedData ||
+    !chainId ||
+    !createdAfter
   ) {
     return NextResponse.json(
-      { message: "Safe session does not match the requested Safe." },
-      { status: 403 }
+      { message: "Missing Safe discovery fields." },
+      { status: 400 }
     );
   }
-  if (!authResult?.address) {
-    const rateLimitResponse = enforceUnauthenticatedSafeStatusRateLimit(
-      request,
-      "safe-tracked-transactions-discover"
-    );
-    if (rateLimitResponse) {
-      return rateLimitResponse;
-    }
+
+  const authResult = await requireSafeJwtForAddress(
+    request,
+    normalizedSafeAddress
+  );
+  if ("response" in authResult) {
+    return authResult.response;
+  }
+  const rateLimitResponse = await enforceAuthenticatedSafeRateLimit(
+    request,
+    "safe-tracked-transactions-discover",
+    authResult.address,
+    30
+  );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
   }
 
   try {
     const transaction = await discoverSafeTrackedTransaction({
       ...body,
+      safeAddress: normalizedSafeAddress,
+      to: normalizedTo,
+      data: normalizedData,
+      chainId,
+      createdAfter,
       daoSlug: Tenant.current().slug,
       traceContext,
     });
@@ -89,14 +110,19 @@ export async function POST(request: NextRequest) {
       transaction,
     });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to discover Safe transaction.";
     const statusCode =
       typeof (error as { statusCode?: unknown })?.statusCode === "number"
         ? (error as { statusCode: number }).statusCode
         : 500;
-    return NextResponse.json({ message }, { status: statusCode });
+    console.error("[safe-tracked-transactions] discover failed", {
+      safeAddress: normalizedSafeAddress,
+      to: normalizedTo,
+      chainId,
+      error,
+    });
+    return NextResponse.json(
+      { message: "Failed to discover Safe transaction." },
+      { status: statusCode }
+    );
   }
 }

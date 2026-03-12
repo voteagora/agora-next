@@ -1,8 +1,10 @@
 import { SIWEConfig } from "connectkit";
 import { SiweMessage } from "siwe";
 import {
+  AGORA_SIGN_IN_MESSAGE,
   LOCAL_STORAGE_SIWE_JWT_KEY,
   LOCAL_STORAGE_SIWE_STAGE_KEY,
+  SIWE_LOGIN_TTL_SECONDS,
 } from "@/lib/constants";
 import {
   clearStoredSiweSession,
@@ -41,7 +43,6 @@ import {
 const API_AUTH_PREFIX = "/api/v1/auth";
 
 const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
-export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 const SAFE_DEBUG_LOGS = process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true";
@@ -376,6 +377,10 @@ export const siweProviderConfig: SIWEConfig = {
     return data.nonce;
   },
   createMessage: async ({ nonce, address, chainId }) => {
+    const issuedAt = new Date().toISOString();
+    const expirationTime = new Date(
+      Date.now() + SIWE_LOGIN_TTL_SECONDS * 1_000
+    ).toISOString();
     const message = new SiweMessage({
       version: "1",
       domain: window.location.host,
@@ -384,6 +389,8 @@ export const siweProviderConfig: SIWEConfig = {
       address,
       chainId,
       nonce,
+      issuedAt,
+      expirationTime,
     }).prepareMessage();
 
     const safeSiweFlowState = getActiveSafeSiweFlowState({

@@ -71,6 +71,7 @@ import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
 import { createSafeTrackedTransaction } from "@/lib/safeTrackedTransactions";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -90,6 +91,7 @@ export default function CreateProposalFormClient({
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address, chain } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
   const safeWalletStatusQuery = useSafeWalletStatus({
     address: address as `0x${string}` | undefined,
     chainId: chain?.id,
@@ -345,6 +347,16 @@ export default function CreateProposalFormClient({
       calculationOptions: proposal.calculationOptions ?? 0,
     };
 
+    const messagePayload = {
+      action: "createOffchainProposal",
+      creatorAddress: address,
+      timestamp: new Date().toISOString(),
+    };
+    const auth = await getAuthenticationData(messagePayload);
+    if (!auth) {
+      throw new Error("Authentication failed");
+    }
+
     const network = { chainId: chain.id, name: chain.name };
     const provider = new BrowserProvider(walletClient.transport, network);
     const signer = new JsonRpcSigner(provider, address);
@@ -374,6 +386,7 @@ export default function CreateProposalFormClient({
     });
 
     await createOffchainProposal({
+      authJwt: auth.jwt,
       proposalData: {
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
@@ -464,6 +477,21 @@ export default function CreateProposalFormClient({
         );
         toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
         return;
+      }
+      if (isSafeConnectedWallet && safeOnchainTrackingEnabled) {
+        const auth = await getAuthenticationData({
+          action: "trackSafeProposalPublish",
+          creatorAddress: address,
+          timestamp: new Date().toISOString(),
+        });
+        if (!auth) {
+          await finalizeProposalCreationTrace(
+            "proposal_onchain_auth_cancelled_closed",
+            { chainId: connectedChainId },
+            "proposal_onchain_auth_cancelled"
+          );
+          return;
+        }
       }
       if (isSafeConnectedWallet) {
         const createdAfter = Date.now();

@@ -11,10 +11,16 @@ import {
   SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE,
 } from "@/lib/safeFeatures";
 import {
+  enforceAuthenticatedSafeRateLimit,
   enforceUnauthenticatedSafeStatusRateLimit,
   getOptionalSafeJwtAddress,
   safeAddressesMatch,
 } from "@/lib/safeInternalApiAuth.server";
+import {
+  normalizePositiveInteger,
+  normalizeSafeAddress,
+  normalizeSafeMessageHash,
+} from "@/lib/safeValidation";
 
 export async function GET(request: NextRequest) {
   if (!isSafeOffchainMessageTrackingEnabled()) {
@@ -27,9 +33,17 @@ export async function GET(request: NextRequest) {
   const chainIdParam = request.nextUrl.searchParams.get("chainId");
   const messageHashParam = request.nextUrl.searchParams.get("messageHash");
   const safeAddressParam = request.nextUrl.searchParams.get("safeAddress");
-  const chainId = Number(chainIdParam);
+  const chainId = chainIdParam
+    ? normalizePositiveInteger(chainIdParam)
+    : null;
+  const messageHash = messageHashParam
+    ? normalizeSafeMessageHash(messageHashParam)
+    : null;
+  const safeAddress = safeAddressParam
+    ? normalizeSafeAddress(safeAddressParam)
+    : null;
 
-  if (!Number.isFinite(chainId) || !messageHashParam || !safeAddressParam) {
+  if (!chainId || !messageHash || !safeAddress) {
     return NextResponse.json(
       { message: "Missing or invalid Safe message status parameters." },
       { status: 400 }
@@ -42,21 +56,27 @@ export async function GET(request: NextRequest) {
   }
   if (
     authResult?.address &&
-    !safeAddressesMatch(authResult.address, safeAddressParam)
+    !safeAddressesMatch(authResult.address, safeAddress)
   ) {
     return NextResponse.json(
       { message: "Safe session does not match the requested Safe." },
       { status: 403 }
     );
   }
-  if (!authResult?.address) {
-    const rateLimitResponse = enforceUnauthenticatedSafeStatusRateLimit(
-      request,
-      "safe-message-status"
-    );
-    if (rateLimitResponse) {
-      return rateLimitResponse;
-    }
+  const rateLimitResponse = authResult?.address
+    ? await enforceAuthenticatedSafeRateLimit(
+        request,
+        "safe-message-status",
+        authResult.address,
+        120
+      )
+    : await enforceUnauthenticatedSafeStatusRateLimit(
+        request,
+        "safe-message-status",
+        30
+      );
+  if (rateLimitResponse) {
+    return rateLimitResponse;
   }
 
   const miradorTraceId = request.headers.get(MIRADOR_TRACE_ID_HEADER);
@@ -67,17 +87,21 @@ export async function GET(request: NextRequest) {
   try {
     const result = await getSafeMessageStatusForClient(
       chainId,
-      messageHashParam as `0x${string}`,
-      safeAddressParam as `0x${string}`
+      messageHash,
+      safeAddress
     );
 
     return NextResponse.json(result);
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to load Safe message status.";
-
-    return NextResponse.json({ message }, { status: 500 });
+    console.error("[safe-message-status] lookup failed", {
+      chainId,
+      messageHash,
+      safeAddress,
+      error,
+    });
+    return NextResponse.json(
+      { message: "Failed to load Safe message status." },
+      { status: 500 }
+    );
   }
 }

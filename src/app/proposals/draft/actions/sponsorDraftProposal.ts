@@ -9,7 +9,7 @@ import {
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
 import type { FormState } from "@/app/types";
-import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
+import { verifyJwtAndGetAddress } from "./siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import type { MiradorTraceContext } from "@/lib/mirador/types";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
@@ -21,9 +21,7 @@ export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    message?: string;
-    signature?: `0x${string}`;
-    jwt?: string;
+    jwt: string;
     safeAddress?: `0x${string}`;
     traceContext?: MiradorTraceContext;
   }
@@ -38,45 +36,30 @@ export async function onSubmitAction(
       }
     : undefined;
 
-  if (data.jwt) {
-    const jwtAddress = await verifyJwtAndGetAddress(data.jwt);
-    if (!jwtAddress) {
-      await appendServerTraceEvent({
-        traceContext,
-        eventName: "draft_publish_auth_failed",
-        details: { reason: "invalid_token" },
-      });
-      return { ok: false, message: "Invalid token" };
-    }
-    if (jwtAddress.toLowerCase() !== data.creatorAddress.toLowerCase()) {
-      await appendServerTraceEvent({
-        traceContext,
-        eventName: "draft_publish_auth_failed",
-        details: { reason: "token_address_mismatch" },
-      });
-      return { ok: false, message: "Token address mismatch" };
-    }
-  } else if (data.message && data.signature) {
-    const isValidSig = await verifySiwe({
-      address: data.creatorAddress as `0x${string}`,
-      message: data.message,
-      signature: data.signature,
-    });
-    if (!isValidSig) {
-      await appendServerTraceEvent({
-        traceContext,
-        eventName: "draft_publish_auth_failed",
-        details: { reason: "invalid_signature" },
-      });
-      return { ok: false, message: "Invalid signature" };
-    }
-  } else {
+  if (!data.jwt) {
     await appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_auth_failed",
       details: { reason: "missing_auth" },
     });
     return { ok: false, message: "Missing authentication" };
+  }
+  const jwtAddress = await verifyJwtAndGetAddress(data.jwt);
+  if (!jwtAddress) {
+    await appendServerTraceEvent({
+      traceContext,
+      eventName: "draft_publish_auth_failed",
+      details: { reason: "invalid_token" },
+    });
+    return { ok: false, message: "Invalid token" };
+  }
+  if (jwtAddress.toLowerCase() !== data.creatorAddress.toLowerCase()) {
+    await appendServerTraceEvent({
+      traceContext,
+      eventName: "draft_publish_auth_failed",
+      details: { reason: "token_address_mismatch" },
+    });
+    return { ok: false, message: "Token address mismatch" };
   }
 
   // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)

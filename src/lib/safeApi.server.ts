@@ -11,6 +11,12 @@ import {
   type SafeMultisigTransactionStatusApiResponse,
 } from "@/lib/safeTransactionService";
 import { getSafeTxServiceBaseUrls } from "@/lib/safeChains";
+import {
+  normalizeSafeAddress,
+  normalizeHexData,
+  normalizeSafeMessageHash,
+  normalizeSafeTxHash,
+} from "@/lib/safeValidation";
 
 const SAFE_DEFAULT_POLL_MS = 5_000;
 const SAFE_ACTIVE_CONFIRMATION_POLL_MS = 3_000;
@@ -19,6 +25,8 @@ const SAFE_CACHE_TTL_MS = 2_000;
 const SAFE_TERMINAL_CACHE_TTL_MS = 30_000;
 const SAFE_DISCOVERY_LOOKBACK_BUFFER_MS = 60_000;
 const SAFE_MISSING_MULTISIG_GRACE_MS = 30_000;
+const SAFE_STATUS_CACHE_MAX_ENTRIES = 1_000;
+const SAFE_MULTISIG_CACHE_MAX_ENTRIES = 1_000;
 const SAFE_DEBUG_LOGS = process.env.SAFE_DEBUG_LOGS === "true";
 
 type SafeCacheEntry<T> = {
@@ -124,6 +132,42 @@ function formatSafeApiAddress(address: `0x${string}`) {
   }
 }
 
+function requireSafeAddress(address: `0x${string}` | string) {
+  const normalizedAddress = normalizeSafeAddress(address);
+  if (!normalizedAddress) {
+    throw new Error("Invalid Safe address.");
+  }
+
+  return normalizedAddress;
+}
+
+function requireSafeMessageHash(messageHash: `0x${string}` | string) {
+  const normalizedMessageHash = normalizeSafeMessageHash(messageHash);
+  if (!normalizedMessageHash) {
+    throw new Error("Invalid Safe message hash.");
+  }
+
+  return normalizedMessageHash;
+}
+
+function requireSafeTxHash(safeTxHash: `0x${string}` | string) {
+  const normalizedSafeTxHash = normalizeSafeTxHash(safeTxHash);
+  if (!normalizedSafeTxHash) {
+    throw new Error("Invalid Safe transaction hash.");
+  }
+
+  return normalizedSafeTxHash;
+}
+
+function requireHexData(data: `0x${string}` | string) {
+  const normalizedData = normalizeHexData(data);
+  if (!normalizedData) {
+    throw new Error("Invalid Safe transaction calldata.");
+  }
+
+  return normalizedData;
+}
+
 function parseRetryAfterMs(
   headers: Headers,
   fallbackMs = SAFE_RATE_LIMIT_BACKOFF_MS
@@ -150,6 +194,7 @@ function cacheResolvedValue<T>(
   cache: Map<string, SafeCacheEntry<T>>,
   key: string,
   value: T,
+  maxEntries: number,
   {
     ttlMs,
     nextAllowedAt,
@@ -158,16 +203,45 @@ function cacheResolvedValue<T>(
     nextAllowedAt?: number;
   }
 ) {
-  cache.set(key, {
+  setBoundedCacheEntry(cache, key, {
     value,
     expiresAt: Date.now() + ttlMs,
     nextAllowedAt,
-  });
+  }, maxEntries);
+}
+
+function setBoundedCacheEntry<T>(
+  cache: Map<string, SafeCacheEntry<T>>,
+  key: string,
+  value: SafeCacheEntry<T>,
+  maxEntries: number
+) {
+  const now = Date.now();
+
+  for (const [existingKey, existingValue] of cache.entries()) {
+    if (!existingValue.pending && existingValue.expiresAt <= now) {
+      cache.delete(existingKey);
+    }
+  }
+
+  if (cache.has(key)) {
+    cache.delete(key);
+  }
+  cache.set(key, value);
+
+  while (cache.size > maxEntries) {
+    const oldestKey = cache.keys().next().value;
+    if (!oldestKey) {
+      break;
+    }
+    cache.delete(oldestKey);
+  }
 }
 
 async function getCachedSafeValue<T>(
   cache: Map<string, SafeCacheEntry<T>>,
   key: string,
+  maxEntries: number,
   load: (previousValue?: T) => Promise<{
     value: T;
     ttlMs: number;
@@ -191,7 +265,7 @@ async function getCachedSafeValue<T>(
 
   const pending = load(cached?.value)
     .then((result) => {
-      cacheResolvedValue(cache, key, result.value, {
+      cacheResolvedValue(cache, key, result.value, maxEntries, {
         ttlMs: result.ttlMs,
         nextAllowedAt: result.nextAllowedAt,
       });
@@ -199,11 +273,11 @@ async function getCachedSafeValue<T>(
     })
     .catch((error) => {
       if (cached?.value) {
-        cache.set(key, {
+        setBoundedCacheEntry(cache, key, {
           value: cached.value,
           expiresAt: cached.expiresAt,
           nextAllowedAt: cached.nextAllowedAt,
-        });
+        }, maxEntries);
       } else {
         cache.delete(key);
       }
@@ -211,12 +285,12 @@ async function getCachedSafeValue<T>(
       throw error;
     });
 
-  cache.set(key, {
+  setBoundedCacheEntry(cache, key, {
     value: cached?.value,
     expiresAt: cached?.expiresAt ?? 0,
     nextAllowedAt: cached?.nextAllowedAt,
     pending,
-  });
+  }, maxEntries);
 
   return pending;
 }
@@ -288,7 +362,9 @@ export async function getRecentSafeMessagesForClient(
   chainId: number,
   safeAddress: `0x${string}`
 ): Promise<SafeDebugListResult<SafeRecentMessageLookup>> {
-  const normalizedSafeAddress = formatSafeApiAddress(safeAddress);
+  const normalizedSafeAddress = formatSafeApiAddress(
+    requireSafeAddress(safeAddress)
+  );
   const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
     chainId,
     `/safes/${normalizedSafeAddress}/messages/?limit=5&ordering=-modified`
@@ -340,7 +416,9 @@ export async function getRecentSafeMultisigTransactionsForClient(
     limit?: number;
   }
 ): Promise<SafeDebugListResult<SafeRecentMultisigTransactionLookup>> {
-  const normalizedSafeAddress = formatSafeApiAddress(safeAddress);
+  const normalizedSafeAddress = formatSafeApiAddress(
+    requireSafeAddress(safeAddress)
+  );
   const limit = options?.limit ?? 5;
   const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
     chainId,
@@ -417,7 +495,8 @@ async function hasSafeMultisigTransactionInRecentListForClient(params: {
 
   return recentTransactions.items.some(
     (transaction) =>
-      transaction.safeTxHash?.toLowerCase() === params.safeTxHash.toLowerCase()
+      transaction.safeTxHash?.toLowerCase() ===
+      requireSafeTxHash(params.safeTxHash).toLowerCase()
   );
 }
 
@@ -426,7 +505,9 @@ async function getSafeMultisigTransactionsForDiscovery(params: {
   safeAddress: `0x${string}`;
   limit?: number;
 }): Promise<SafeDebugListResult<SafeMultisigTransactionListItemApiResponse>> {
-  const normalizedSafeAddress = formatSafeApiAddress(params.safeAddress);
+  const normalizedSafeAddress = formatSafeApiAddress(
+    requireSafeAddress(params.safeAddress)
+  );
   const limit = params.limit ?? 20;
   const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
     params.chainId,
@@ -465,12 +546,15 @@ export async function getSafeDebugSnapshotForClient(
   safeAddress: `0x${string}`,
   trackedMessageHash?: `0x${string}`
 ): Promise<SafeDebugSnapshotResult> {
+  const normalizedSafeAddress = requireSafeAddress(safeAddress);
+  const normalizedTrackedMessageHash = trackedMessageHash
+    ? requireSafeMessageHash(trackedMessageHash)
+    : undefined;
   const [recentMessages, recentMultisigTransactions] = await Promise.all([
-    getRecentSafeMessagesForClient(chainId, safeAddress),
-    getRecentSafeMultisigTransactionsForClient(chainId, safeAddress),
+    getRecentSafeMessagesForClient(chainId, normalizedSafeAddress),
+    getRecentSafeMultisigTransactionsForClient(chainId, normalizedSafeAddress),
   ]);
 
-  const normalizedTrackedMessageHash = trackedMessageHash?.toLowerCase();
   const matchingRecentMessage =
     recentMessages.items.find(
       (message) =>
@@ -480,8 +564,8 @@ export async function getSafeDebugSnapshotForClient(
   logSafeLookup({
     event: "safe_debug_snapshot",
     chainId,
-    safeAddress,
-    trackedMessageHash,
+    safeAddress: normalizedSafeAddress,
+    trackedMessageHash: normalizedTrackedMessageHash,
     matchingRecentMessageHash: matchingRecentMessage?.messageHash ?? null,
     recentMessageCount: recentMessages.items.length,
     recentMultisigTransactionCount: recentMultisigTransactions.items.length,
@@ -491,8 +575,8 @@ export async function getSafeDebugSnapshotForClient(
 
   return {
     chainId,
-    safeAddress,
-    trackedMessageHash,
+    safeAddress: normalizedSafeAddress,
+    trackedMessageHash: normalizedTrackedMessageHash,
     matchingRecentMessage,
     recentMessages,
     recentMultisigTransactions,
@@ -509,11 +593,14 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
   safeTxHash: `0x${string}`;
   txId: string;
 } | null> {
+  const normalizedSafeAddress = requireSafeAddress(params.safeAddress);
+  const normalizedTo = requireSafeAddress(params.to);
+  const normalizedData = requireHexData(params.data);
   const createdAfterCutoff =
     params.createdAfter - SAFE_DISCOVERY_LOOKBACK_BUFFER_MS;
   const transactionList = await getSafeMultisigTransactionsForDiscovery({
     chainId: params.chainId,
-    safeAddress: params.safeAddress,
+    safeAddress: normalizedSafeAddress,
     limit: 20,
   });
 
@@ -541,16 +628,16 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
       if (
         transaction.safe &&
         normalizeAddress(transaction.safe) !==
-          normalizeAddress(params.safeAddress)
+          normalizeAddress(normalizedSafeAddress)
       ) {
         return false;
       }
 
-      if (normalizeAddress(transaction.to) !== normalizeAddress(params.to)) {
+      if (normalizeAddress(transaction.to) !== normalizeAddress(normalizedTo)) {
         return false;
       }
 
-      if (transaction.data?.toLowerCase() !== params.data.toLowerCase()) {
+      if (transaction.data?.toLowerCase() !== normalizedData.toLowerCase()) {
         return false;
       }
 
@@ -590,27 +677,32 @@ export async function getSafeMessageStatusForClient(
   messageHash: `0x${string}`,
   safeAddress?: `0x${string}`
 ): Promise<SafeMessageStatusResult> {
-  const cacheKey = `${chainId}:${messageHash}`;
+  const normalizedMessageHash = requireSafeMessageHash(messageHash);
+  const normalizedSafeAddress = safeAddress
+    ? requireSafeAddress(safeAddress)
+    : undefined;
+  const cacheKey = `${chainId}:${normalizedMessageHash}`;
 
   return getCachedSafeValue(
     safeMessageStatusCache,
     cacheKey,
+    SAFE_STATUS_CACHE_MAX_ENTRIES,
     async (previousValue) => {
       const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
         chainId,
-        `/messages/${messageHash}`
+        `/messages/${normalizedMessageHash}`
       );
 
       if (response.status === 404) {
         const recentMessages =
-          safeAddress && SAFE_DEBUG_LOGS
-            ? await getRecentSafeMessagesForClient(chainId, safeAddress)
+          normalizedSafeAddress && SAFE_DEBUG_LOGS
+            ? await getRecentSafeMessagesForClient(chainId, normalizedSafeAddress)
             : null;
         logSafeLookup({
           event: "safe_message_status_lookup",
           chainId,
-          messageHash,
-          safeAddress,
+          messageHash: normalizedMessageHash,
+          safeAddress: normalizedSafeAddress,
           outcome: "not_found",
           attempts,
           cachedConfirmationCount:
@@ -633,7 +725,7 @@ export async function getSafeMessageStatusForClient(
         logSafeLookup({
           event: "safe_message_status_lookup",
           chainId,
-          messageHash,
+          messageHash: normalizedMessageHash,
           outcome: "rate_limited",
           attempts,
           nextPollMs,
@@ -655,7 +747,7 @@ export async function getSafeMessageStatusForClient(
         logSafeLookup({
           event: "safe_message_status_lookup",
           chainId,
-          messageHash,
+          messageHash: normalizedMessageHash,
           outcome: "error",
           attempts,
           status: response.status,
@@ -669,13 +761,13 @@ export async function getSafeMessageStatusForClient(
         (await response.json()) as SafeMessageStatusApiResponse | null;
       const status = normalizeSafeMessageStatusApiResponse(
         payload,
-        messageHash
+        normalizedMessageHash
       );
       const hasConfirmations = status.confirmations.length > 0;
       logSafeLookup({
         event: "safe_message_status_lookup",
         chainId,
-        messageHash,
+        messageHash: normalizedMessageHash,
         outcome: "ok",
         attempts,
         confirmationCount: status.confirmations.length,
@@ -704,20 +796,25 @@ export async function getSafeMultisigTransactionForClient(
     createdAt?: number | string;
   }
 ): Promise<SafeMultisigTransactionLookupResult> {
+  const normalizedSafeTxHash = requireSafeTxHash(safeTxHash);
+  const normalizedSafeAddress = options?.safeAddress
+    ? requireSafeAddress(options.safeAddress)
+    : undefined;
   const cacheKey = [
     chainId,
-    safeTxHash.toLowerCase(),
-    normalizeAddress(options?.safeAddress) ?? "no-safe",
+    normalizedSafeTxHash.toLowerCase(),
+    normalizeAddress(normalizedSafeAddress) ?? "no-safe",
     String(getNormalizedCreatedAtMs(options?.createdAt) ?? "no-created-at"),
   ].join(":");
 
   return getCachedSafeValue(
     safeMultisigTransactionCache,
     cacheKey,
+    SAFE_MULTISIG_CACHE_MAX_ENTRIES,
     async (previousValue) => {
       const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
         chainId,
-        `/multisig-transactions/${safeTxHash}`
+        `/multisig-transactions/${normalizedSafeTxHash}`
       );
 
       if (response.status === 404) {
@@ -731,22 +828,22 @@ export async function getSafeMultisigTransactionForClient(
           Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
 
         if (
-          options?.safeAddress &&
+          normalizedSafeAddress &&
           (hasSeenTransactionBefore || isPastGracePeriod)
         ) {
           try {
             recentListContainsTransaction =
               await hasSafeMultisigTransactionInRecentListForClient({
                 chainId,
-                safeAddress: options.safeAddress,
-                safeTxHash,
+                safeAddress: normalizedSafeAddress,
+                safeTxHash: normalizedSafeTxHash,
               });
           } catch (error) {
             logSafeLookup({
               event: "safe_multisig_transaction_lookup",
               chainId,
-              safeTxHash,
-              safeAddress: options.safeAddress,
+              safeTxHash: normalizedSafeTxHash,
+              safeAddress: normalizedSafeAddress,
               outcome: "recent_list_lookup_error",
               attempts,
               error:
@@ -770,10 +867,10 @@ export async function getSafeMultisigTransactionForClient(
         logSafeLookup({
           event: "safe_multisig_transaction_lookup",
           chainId,
-          safeTxHash,
+          safeTxHash: normalizedSafeTxHash,
           outcome: "not_found",
           attempts,
-          safeAddress: options?.safeAddress,
+          safeAddress: normalizedSafeAddress,
           recentListContainsTransaction,
           missingReason,
           hasSeenTransactionBefore,
@@ -799,7 +896,7 @@ export async function getSafeMultisigTransactionForClient(
         logSafeLookup({
           event: "safe_multisig_transaction_lookup",
           chainId,
-          safeTxHash,
+          safeTxHash: normalizedSafeTxHash,
           outcome: "rate_limited",
           attempts,
           nextPollMs,
@@ -823,7 +920,7 @@ export async function getSafeMultisigTransactionForClient(
         logSafeLookup({
           event: "safe_multisig_transaction_lookup",
           chainId,
-          safeTxHash,
+          safeTxHash: normalizedSafeTxHash,
           outcome: "error",
           attempts,
           status: response.status,
@@ -837,14 +934,14 @@ export async function getSafeMultisigTransactionForClient(
         (await response.json()) as SafeMultisigTransactionStatusApiResponse;
       const status = normalizeSafeMultisigTransactionApiResponse(
         payload,
-        safeTxHash
+        normalizedSafeTxHash
       );
       const hasConfirmations = status.confirmations.length > 0;
       const isTerminal = status.isSuccessful !== null;
       logSafeLookup({
         event: "safe_multisig_transaction_lookup",
         chainId,
-        safeTxHash,
+        safeTxHash: normalizedSafeTxHash,
         outcome: "ok",
         attempts,
         isSuccessful: status.isSuccessful,

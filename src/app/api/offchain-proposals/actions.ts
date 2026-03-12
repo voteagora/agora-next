@@ -8,6 +8,8 @@ import { getPublicClient } from "@/lib/viem";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
 import { MiradorTraceContext } from "@/lib/mirador/types";
+import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 interface OffchainProposalData {
   proposer: string;
@@ -25,6 +27,7 @@ interface OffchainProposalData {
 }
 
 interface CreateOffchainProposalParams {
+  authJwt: string;
   proposalData: OffchainProposalData;
   id: string;
   transactionHash?: string;
@@ -33,6 +36,7 @@ interface CreateOffchainProposalParams {
 }
 
 export async function createOffchainProposal({
+  authJwt,
   proposalData,
   onchainProposalId,
   id,
@@ -41,6 +45,22 @@ export async function createOffchainProposal({
 }: CreateOffchainProposalParams) {
   try {
     const { slug, contracts } = Tenant.current();
+    const verifiedAddress = await verifyJwtAndGetAddress(authJwt);
+    if (!verifiedAddress) {
+      throw new Error("Invalid token");
+    }
+
+    const plmConfig = Tenant.current().ui.toggle("proposal-lifecycle")
+      ?.config as PLMConfig | undefined;
+    const offchainProposalCreator = plmConfig?.offchainProposalCreator ?? [];
+    const normalizedVerifiedAddress = verifiedAddress.toLowerCase();
+    const isAllowedCreator = offchainProposalCreator.some(
+      (creator) => creator.toLowerCase() === normalizedVerifiedAddress
+    );
+    if (!isAllowedCreator) {
+      throw new Error("Unauthorized");
+    }
+
     const governor = contracts.governor.address as `0x${string}`;
     const miradorChain = getMiradorChainNameFromChainId(
       contracts.governor.chain.id
@@ -60,6 +80,10 @@ export async function createOffchainProposal({
       criteriaValue,
       calculationOptions,
     } = proposalData;
+
+    if (proposer.toLowerCase() !== normalizedVerifiedAddress) {
+      throw new Error("Token address mismatch");
+    }
 
     const latestBlock = await getPublicClient().getBlockNumber();
 
@@ -132,16 +156,32 @@ export async function createOffchainProposal({
 }
 
 interface CancelOffchainProposalParams {
+  authJwt: string;
   proposalId: string;
   transactionHash: string;
 }
 
 export async function cancelOffchainProposal({
+  authJwt,
   proposalId,
   transactionHash,
 }: CancelOffchainProposalParams) {
   try {
     const { slug } = Tenant.current();
+    const verifiedAddress = await verifyJwtAndGetAddress(authJwt);
+    if (!verifiedAddress) {
+      throw new Error("Invalid token");
+    }
+
+    const plmConfig = Tenant.current().ui.toggle("proposal-lifecycle")
+      ?.config as PLMConfig | undefined;
+    const offchainProposalCreator = plmConfig?.offchainProposalCreator ?? [];
+    const isAllowedCreator = offchainProposalCreator.some(
+      (creator) => creator.toLowerCase() === verifiedAddress.toLowerCase()
+    );
+    if (!isAllowedCreator) {
+      throw new Error("Unauthorized");
+    }
 
     if (!proposalId) {
       throw new Error("Missing proposalId");

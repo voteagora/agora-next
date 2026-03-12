@@ -136,8 +136,6 @@ const DraftFormClient = ({
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
-        message: auth.message,
-        signature: auth.signature,
         jwt: auth.jwt,
       });
       if (!res.ok) {

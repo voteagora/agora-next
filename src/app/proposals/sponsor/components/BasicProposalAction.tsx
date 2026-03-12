@@ -118,6 +118,20 @@ const BasicProposalAction = ({
               draftProposalId: draftProposal.id,
             });
             if (safeWallet && safeOnchainTrackingEnabled) {
+              const auth = await getAuthenticationData({
+                action: "trackSafeProposalPublish",
+                creatorAddress: address,
+                draftProposalId: draftProposal.id,
+                timestamp: new Date().toISOString(),
+              });
+              if (!auth) {
+                await closeStoredProposalCreationTrace({
+                  eventName: "draft_onchain_publish_auth_cancelled",
+                  details: { draftProposalId: draftProposal.id },
+                  reason: "draft_onchain_publish_auth_cancelled",
+                });
+                return;
+              }
               const createdAfter = Date.now();
               openDialog({
                 type: "SAFE_ONCHAIN_PENDING",

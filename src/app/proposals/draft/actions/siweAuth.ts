@@ -3,13 +3,9 @@
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
-import {
-  verifyJwtAndGetAddress,
-  verifySiwe,
-  type SiweAuthParams,
-} from "@/lib/siweAuth.server";
+import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 
-export { verifyJwtAndGetAddress, verifySiwe };
+export { verifyJwtAndGetAddress };
 
 function isAddressAuthorizedForDraft(
   address: string,
@@ -30,31 +26,6 @@ function isAddressAuthorizedForDraft(
   return offchainCreators.some(
     (creator) => creator.toLowerCase() === addressLower
   );
-}
-
-export async function verifyOwnerAndSiweForDraft(
-  draftProposalId: number,
-  { address, message, signature }: SiweAuthParams
-) {
-  const isValid = await verifySiwe({ address, message, signature });
-  if (!isValid) {
-    return { ok: false as const, reason: "Invalid signature" };
-  }
-
-  const draft = await prismaWeb2Client.proposalDraft.findUnique({
-    where: { id: draftProposalId },
-    select: { id: true, author_address: true },
-  });
-
-  if (!draft) {
-    return { ok: false as const, reason: "Draft not found" };
-  }
-
-  if (!isAddressAuthorizedForDraft(address, draft.author_address)) {
-    return { ok: false as const, reason: "Unauthorized" };
-  }
-
-  return { ok: true as const };
 }
 
 export async function verifyOwnerAndJwtForDraft(

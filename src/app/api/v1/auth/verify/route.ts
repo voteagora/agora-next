@@ -3,18 +3,18 @@ export const dynamic = "force-dynamic";
 import { NextResponse, type NextRequest } from "next/server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
+import { verifySiweLogin } from "@/lib/siweAuth.server";
 
 export async function POST(request: NextRequest) {
-  const { SiweMessage } = await import("siwe");
-  const { default: verifyMessage } = await import("@/lib/serverVerifyMessage");
   const { generateJwt, getRolesForUser, getExpiry } = await import(
     "@/app/lib/auth/serverAuth"
   );
   const baseTraceContext = getMiradorTraceContextFromHeaders(request);
+  const requestUrl = new URL(request.url);
 
   try {
     const { message, signature } = await request.json();
-    // Parse the exact message signed by the client (EIP-4361)
+    const { SiweMessage } = await import("siwe");
     const siweObject = new SiweMessage(message);
     const traceContext = baseTraceContext
       ? {
@@ -31,39 +31,39 @@ export async function POST(request: NextRequest) {
       eventName: "siwe_verify_started",
     });
 
-    const verification = await verifyMessage({
-      address: siweObject.address as `0x${string}`,
+    const verification = await verifySiweLogin({
+      expectedHost: requestUrl.host,
       message,
       signature,
-      chainId: siweObject.chainId,
-      allowSafeContractSignature: true,
     });
 
-    if (verification) {
+    if (verification.ok) {
       await appendServerTraceEvent({
         traceContext,
         eventName: "siwe_verify_succeeded",
       });
     }
 
-    if (!verification) {
+    if (!verification.ok) {
       await appendServerTraceEvent({
         traceContext,
         eventName: "siwe_verify_failed",
+        details: { reason: verification.reason },
       });
       return NextResponse.json(
-        { message: "Invalid signature" },
+        { message: verification.reason },
         { status: 401 }
       );
     }
 
     // create JWT
-    const scope = await getRolesForUser(siweObject.address, siweObject);
+    const verifiedMessage = verification.siweMessage;
+    const scope = await getRolesForUser(verifiedMessage.address, verifiedMessage);
     const ttl = await getExpiry();
-    const jwt = await generateJwt(siweObject.address, scope, ttl, {
-      address: siweObject.address,
-      chainId: `${siweObject.chainId}`,
-      nonce: siweObject.nonce,
+    const jwt = await generateJwt(verifiedMessage.address, scope, ttl, {
+      address: verifiedMessage.address,
+      chainId: `${verifiedMessage.chainId}`,
+      nonce: verifiedMessage.nonce,
     });
 
     const responseBody = {

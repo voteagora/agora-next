@@ -4,14 +4,12 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { verifyJwtAndGetAddress, verifySiwe } from "@/lib/siweAuth.server";
+import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
 
 type CreateDraftBody = {
   creatorAddress?: `0x${string}` | string;
-  message?: string;
-  signature?: `0x${string}` | string;
 };
 
 export async function POST(request: NextRequest) {
@@ -21,8 +19,6 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as CreateDraftBody | null;
 
     const creatorAddress = body?.creatorAddress as `0x${string}` | undefined;
-    const message = body?.message as string | undefined;
-    const signature = body?.signature as `0x${string}` | undefined;
     const traceContext = baseTraceContext
       ? {
           ...baseTraceContext,
@@ -58,51 +54,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!jwtAddress && (!message || !signature)) {
+    if (!jwtAddress) {
       await appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
         details: { reason: "missing_auth" },
       });
       return NextResponse.json(
-        {
-          message: "Missing required fields: message, signature (or valid JWT)",
-        },
+        { message: "A valid SIWE session is required." },
         { status: 400 }
       );
     }
 
-    // Verify SIWE signature (EOA, with 1271 fallback handled by verifySiwe stack)
-    if (jwtAddress) {
-      if (jwtAddress.toLowerCase() !== creatorAddress.toLowerCase()) {
-        await appendServerTraceEvent({
-          traceContext,
-          eventName: "proposal_draft_create_failed",
-          details: { reason: "token_address_mismatch" },
-        });
-        return NextResponse.json(
-          { message: "Token address mismatch" },
-          { status: 401 }
-        );
-      }
-    } else {
-      const isValid = await verifySiwe({
-        address: creatorAddress,
-        message: message!,
-        signature: signature!,
+    if (jwtAddress.toLowerCase() !== creatorAddress.toLowerCase()) {
+      await appendServerTraceEvent({
+        traceContext,
+        eventName: "proposal_draft_create_failed",
+        details: { reason: "token_address_mismatch" },
       });
-
-      if (!isValid) {
-        await appendServerTraceEvent({
-          traceContext,
-          eventName: "proposal_draft_create_failed",
-          details: { reason: "invalid_signature" },
-        });
-        return NextResponse.json(
-          { message: "Invalid signature" },
-          { status: 401 }
-        );
-      }
+      return NextResponse.json(
+        { message: "Token address mismatch" },
+        { status: 401 }
+      );
     }
 
     // Resolve tenant config and initial stage

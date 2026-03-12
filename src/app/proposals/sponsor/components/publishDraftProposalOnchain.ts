@@ -68,9 +68,7 @@ export async function handleDraftOnchainPublishResult(params: {
   txHash: `0x${string}`;
   isSafeWallet: boolean;
   getAuthenticationData: (messagePayload: Record<string, unknown>) => Promise<{
-    jwt?: string;
-    message?: string;
-    signature?: `0x${string}`;
+    jwt: string;
   } | null>;
   openDialog: (dialog: any) => void;
 }) {
@@ -107,8 +105,6 @@ export async function handleDraftOnchainPublishResult(params: {
     is_offchain_submission: false,
     proposal_scope: params.draftProposal.proposal_scope,
     creatorAddress: params.address,
-    message: auth.message,
-    signature: auth.signature,
     jwt: auth.jwt,
     safeAddress:
       params.isSafeWallet && safeOnchainTrackingEnabled

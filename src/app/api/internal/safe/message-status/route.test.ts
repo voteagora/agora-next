@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const enforceUnauthenticatedSafeStatusRateLimitMock = vi.fn();
+const enforceAuthenticatedSafeRateLimitMock = vi.fn();
 const getOptionalSafeJwtAddressMock = vi.fn();
 const getSafeMessageStatusForClientMock = vi.fn();
 const refreshTraceKeepAliveMock = vi.fn();
@@ -16,7 +17,14 @@ vi.mock("@/lib/mirador/serverKeepAlive", () => ({
   refreshTraceKeepAlive: refreshTraceKeepAliveMock,
 }));
 
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOffchainMessageTrackingEnabled: vi.fn(() => true),
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE:
+    "Safe offchain tracking is disabled.",
+}));
+
 vi.mock("@/lib/safeInternalApiAuth.server", () => ({
+  enforceAuthenticatedSafeRateLimit: enforceAuthenticatedSafeRateLimitMock,
   enforceUnauthenticatedSafeStatusRateLimit:
     enforceUnauthenticatedSafeStatusRateLimitMock,
   getOptionalSafeJwtAddress: getOptionalSafeJwtAddressMock,
@@ -29,6 +37,7 @@ describe("GET /api/internal/safe/message-status", () => {
     vi.clearAllMocks();
     getOptionalSafeJwtAddressMock.mockResolvedValue(undefined);
     enforceUnauthenticatedSafeStatusRateLimitMock.mockReturnValue(null);
+    enforceAuthenticatedSafeRateLimitMock.mockResolvedValue(null);
   });
 
   it("requires the Safe address parameter", async () => {
@@ -72,6 +81,11 @@ describe("GET /api/internal/safe/message-status", () => {
     const response = await GET(request as never);
 
     expect(response.status).toBe(429);
+    expect(enforceUnauthenticatedSafeStatusRateLimitMock).toHaveBeenCalledWith(
+      request,
+      "safe-message-status",
+      30
+    );
     expect(getSafeMessageStatusForClientMock).not.toHaveBeenCalled();
   });
 });

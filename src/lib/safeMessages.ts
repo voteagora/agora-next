@@ -22,6 +22,8 @@ const SAFE_DOMAIN_SEPARATOR_ABI = [
 const SAFE_MESSAGE_TYPEHASH = keccak256(
   stringToHex("SafeMessage(bytes message)")
 );
+const SAFE_DOMAIN_SEPARATOR_CACHE_MAX_ENTRIES = 500;
+const SAFE_OWNERS_AND_THRESHOLD_CACHE_MAX_ENTRIES = 500;
 
 const safeDomainSeparatorCache = new Map<string, `0x${string}`>();
 
@@ -52,6 +54,26 @@ const safeOwnersAndThresholdCache = new Map<
     threshold: number;
   }
 >();
+
+function setBoundedCacheEntry<T>(
+  cache: Map<string, T>,
+  key: string,
+  value: T,
+  maxEntries: number
+) {
+  if (cache.has(key)) {
+    cache.delete(key);
+  }
+  cache.set(key, value);
+
+  while (cache.size > maxEntries) {
+    const oldestKey = cache.keys().next().value;
+    if (!oldestKey) {
+      break;
+    }
+    cache.delete(oldestKey);
+  }
+}
 
 type SafeSettingsRpcClient = {
   request?: unknown;
@@ -101,7 +123,12 @@ async function getSafeDomainSeparator({
     functionName: "domainSeparator",
   });
 
-  safeDomainSeparatorCache.set(cacheKey, domainSeparator);
+  setBoundedCacheEntry(
+    safeDomainSeparatorCache,
+    cacheKey,
+    domainSeparator,
+    SAFE_DOMAIN_SEPARATOR_CACHE_MAX_ENTRIES
+  );
   return domainSeparator;
 }
 
@@ -110,11 +137,14 @@ export async function getSafeOwnersAndThreshold(params: {
   chainId: number;
 }) {
   const cacheKey = `${params.chainId}:${params.safeAddress.toLowerCase()}`;
+  const now = Date.now();
+  for (const [existingKey, value] of safeOwnersAndThresholdCache.entries()) {
+    if (now - value.cachedAt >= SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS) {
+      safeOwnersAndThresholdCache.delete(existingKey);
+    }
+  }
   const cached = safeOwnersAndThresholdCache.get(cacheKey);
-  if (
-    cached &&
-    Date.now() - cached.cachedAt < SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS
-  ) {
+  if (cached && now - cached.cachedAt < SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS) {
     return {
       owners: cached.owners,
       threshold: cached.threshold,
@@ -144,10 +174,15 @@ export async function getSafeOwnersAndThreshold(params: {
     owners: owners.map((owner) => owner.toLowerCase() as `0x${string}`),
     threshold: Number(threshold),
   };
-  safeOwnersAndThresholdCache.set(cacheKey, {
-    ...result,
-    cachedAt: Date.now(),
-  });
+  setBoundedCacheEntry(
+    safeOwnersAndThresholdCache,
+    cacheKey,
+    {
+      ...result,
+      cachedAt: now,
+    },
+    SAFE_OWNERS_AND_THRESHOLD_CACHE_MAX_ENTRIES
+  );
   return result;
 }
 

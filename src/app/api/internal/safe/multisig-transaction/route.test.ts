@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const enforceUnauthenticatedSafeStatusRateLimitMock = vi.fn();
+const enforceAuthenticatedSafeRateLimitMock = vi.fn();
 const getOptionalSafeJwtAddressMock = vi.fn();
 const getSafeMultisigTransactionForClientMock = vi.fn();
 const safeAddressesMatchMock = vi.fn(
@@ -12,6 +13,7 @@ vi.mock("@/lib/safeApi.server", () => ({
 }));
 
 vi.mock("@/lib/safeInternalApiAuth.server", () => ({
+  enforceAuthenticatedSafeRateLimit: enforceAuthenticatedSafeRateLimitMock,
   enforceUnauthenticatedSafeStatusRateLimit:
     enforceUnauthenticatedSafeStatusRateLimitMock,
   getOptionalSafeJwtAddress: getOptionalSafeJwtAddressMock,
@@ -23,6 +25,7 @@ describe("GET /api/internal/safe/multisig-transaction", () => {
     vi.resetModules();
     vi.clearAllMocks();
     enforceUnauthenticatedSafeStatusRateLimitMock.mockReturnValue(null);
+    enforceAuthenticatedSafeRateLimitMock.mockResolvedValue(null);
   });
 
   it("rejects authenticated Safe status lookups for a different Safe address", async () => {

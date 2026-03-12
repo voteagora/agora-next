@@ -2,12 +2,10 @@ import "server-only";
 
 import { NextResponse, type NextRequest } from "next/server";
 
+import redis from "@/lib/redis";
 import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 
-const SAFE_STATUS_RATE_LIMIT_WINDOW_MS = 60_000;
-const SAFE_STATUS_RATE_LIMIT_MAX_REQUESTS = 60;
-
-const unauthenticatedSafeStatusRequestLog = new Map<string, number[]>();
+const SAFE_RATE_LIMIT_WINDOW_SECONDS = 60;
 
 function normalizeAddress(address: string) {
   return address.toLowerCase() as `0x${string}`;
@@ -27,12 +25,24 @@ function getBearerToken(authorizationHeader: string | null) {
 }
 
 function getRequesterIp(request: NextRequest) {
+  const isVercelEnvironment =
+    process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
+
   const forwardedFor = request.headers.get("x-forwarded-for");
+  if (isVercelEnvironment && forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  const realIp = request.headers.get("x-real-ip");
+  if (realIp) {
+    return realIp.trim();
+  }
+
   if (forwardedFor) {
     return forwardedFor.split(",")[0].trim();
   }
 
-  return request.headers.get("x-real-ip") ?? "unknown";
+  return "unknown";
 }
 
 function buildAuthError(message: string, status: number) {
@@ -93,7 +103,9 @@ export async function requireSafeJwtForAddress(
   }
 
   if (authResult.response) {
-    return authResult;
+    return {
+      response: authResult.response,
+    };
   }
 
   if (!safeAddressesMatch(authResult.address!, safeAddress)) {
@@ -110,31 +122,77 @@ export async function requireSafeJwtForAddress(
   };
 }
 
-export function enforceUnauthenticatedSafeStatusRateLimit(
-  request: NextRequest,
-  routeKey: string
-) {
-  const requesterIp = getRequesterIp(request);
-  const now = Date.now();
-  const cacheKey = `${routeKey}:${requesterIp}`;
-  const recentRequests = (
-    unauthenticatedSafeStatusRequestLog.get(cacheKey) ?? []
-  ).filter((timestamp) => now - timestamp < SAFE_STATUS_RATE_LIMIT_WINDOW_MS);
+async function enforceSafeRateLimit(params: {
+  routeKey: string;
+  subjectKey: string;
+  maxRequests: number;
+  errorMessage?: string;
+}) {
+  const windowSeconds = SAFE_RATE_LIMIT_WINDOW_SECONDS;
+  const redisKey = `rate:safe:${params.routeKey}:${params.subjectKey}`;
 
-  if (recentRequests.length >= SAFE_STATUS_RATE_LIMIT_MAX_REQUESTS) {
-    unauthenticatedSafeStatusRequestLog.set(cacheKey, recentRequests);
+  try {
+    const requestCount = await redis.incr(redisKey);
+    if (requestCount === 1) {
+      await redis.expire(redisKey, windowSeconds);
+    }
+
+    let retryAfterSeconds = await redis.ttl(redisKey);
+    if (typeof retryAfterSeconds !== "number" || retryAfterSeconds < 1) {
+      retryAfterSeconds = windowSeconds;
+      await redis.expire(redisKey, windowSeconds);
+    }
+
+    if (requestCount <= params.maxRequests) {
+      return null;
+    }
+
     return NextResponse.json(
-      { message: "Too many Safe status requests. Please retry shortly." },
+      {
+        message:
+          params.errorMessage ??
+          "Too many Safe requests. Please retry shortly.",
+      },
       {
         status: 429,
         headers: {
-          "Retry-After": "60",
+          "Retry-After": String(retryAfterSeconds),
         },
       }
     );
+  } catch (error) {
+    console.error("[safe-rate-limit] redis limiter failed", {
+      routeKey: params.routeKey,
+      subjectKey: params.subjectKey,
+      error,
+    });
+    return null;
   }
+}
 
-  recentRequests.push(now);
-  unauthenticatedSafeStatusRequestLog.set(cacheKey, recentRequests);
-  return null;
+export async function enforceUnauthenticatedSafeStatusRateLimit(
+  request: NextRequest,
+  routeKey: string,
+  maxRequests: number
+) {
+  return enforceSafeRateLimit({
+    routeKey,
+    subjectKey: `ip:${getRequesterIp(request)}`,
+    maxRequests,
+    errorMessage: "Too many Safe status requests. Please retry shortly.",
+  });
+}
+
+export async function enforceAuthenticatedSafeRateLimit(
+  request: NextRequest,
+  routeKey: string,
+  address: string,
+  maxRequests: number
+) {
+  return enforceSafeRateLimit({
+    routeKey,
+    subjectKey: `safe:${normalizeAddress(address)}`,
+    maxRequests,
+    errorMessage: "Too many Safe requests for this session. Please retry shortly.",
+  });
 }

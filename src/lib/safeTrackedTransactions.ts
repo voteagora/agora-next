@@ -6,7 +6,10 @@ import {
 } from "@/lib/safeChains";
 import { getStoredSiweJwt } from "@/lib/siweSession";
 
-export type SafeTrackedTransactionKind = "publish_proposal" | (string & {});
+export const SAFE_TRACKED_TRANSACTION_KINDS = ["publish_proposal"] as const;
+
+export type SafeTrackedTransactionKind =
+  (typeof SAFE_TRACKED_TRANSACTION_KINDS)[number];
 
 export type SafeTrackedTransactionSummary = {
   kind: SafeTrackedTransactionKind;
@@ -64,22 +67,6 @@ async function postSafeTrackedRoute<T>(
     headers,
     body: JSON.stringify(body),
   });
-
-  // Direct onchain Safe publish does not require SIWE. If a stale local JWT is
-  // present, retry once without auth rather than breaking the handoff.
-  if (
-    options?.authHeaders &&
-    (response.status === 401 || response.status === 403)
-  ) {
-    response = await fetch(path, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.extraHeaders ?? {}),
-      },
-      body: JSON.stringify(body),
-    });
-  }
 
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));

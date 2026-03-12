@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const listActiveSafeTrackedTransactionsMock = vi.fn();
 const getOptionalSafeJwtAddressMock = vi.fn();
+const requireSafeJwtForAddressMock = vi.fn();
+const enforceAuthenticatedSafeRateLimitMock = vi.fn();
 const enforceUnauthenticatedSafeStatusRateLimitMock = vi.fn();
 const safeAddressesMatchMock = vi.fn((left: string, right: string) => {
   return left.toLowerCase() === right.toLowerCase();
@@ -20,8 +22,16 @@ vi.mock("@/lib/mirador/requestContext", () => ({
   getMiradorTraceContextFromHeaders: vi.fn(() => undefined),
 }));
 
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOnchainTransactionTrackingEnabled: vi.fn(() => true),
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE:
+    "Safe onchain tracking is disabled.",
+}));
+
 vi.mock("@/lib/safeInternalApiAuth.server", () => ({
+  enforceAuthenticatedSafeRateLimit: enforceAuthenticatedSafeRateLimitMock,
   getOptionalSafeJwtAddress: getOptionalSafeJwtAddressMock,
+  requireSafeJwtForAddress: requireSafeJwtForAddressMock,
   enforceUnauthenticatedSafeStatusRateLimit:
     enforceUnauthenticatedSafeStatusRateLimitMock,
   safeAddressesMatch: safeAddressesMatchMock,
@@ -39,6 +49,10 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
     getOptionalSafeJwtAddressMock.mockResolvedValue({
       address: "0x1234567890123456789012345678901234567890",
     });
+    requireSafeJwtForAddressMock.mockResolvedValue({
+      address: "0x1234567890123456789012345678901234567890",
+    });
+    enforceAuthenticatedSafeRateLimitMock.mockResolvedValue(null);
     enforceUnauthenticatedSafeStatusRateLimitMock.mockReturnValue(null);
   });
 
@@ -77,13 +91,17 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
 
     expect(response.status).toBe(503);
     await expect(response.json()).resolves.toEqual({
-      message:
-        "Unable to validate the Safe transaction right now. Please retry.",
+      message: "Failed to persist Safe tracked transaction.",
     });
   });
 
-  it("allows unauthenticated tracking and applies rate limiting instead", async () => {
-    getOptionalSafeJwtAddressMock.mockResolvedValue(undefined);
+  it("requires authentication for tracked transaction creation", async () => {
+    requireSafeJwtForAddressMock.mockResolvedValue({
+      response: new Response(
+        JSON.stringify({ message: "Authentication required." }),
+        { status: 401 }
+      ),
+    });
     upsertSafeTrackedTransactionMock.mockResolvedValue({
       kind: "publish_proposal",
       safeAddress: "0x1234567890123456789012345678901234567890",
@@ -113,12 +131,8 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
 
     const response = await POST(request as never);
 
-    expect(response.status).toBe(200);
-    expect(enforceUnauthenticatedSafeStatusRateLimitMock).toHaveBeenCalledWith(
-      request,
-      "safe-tracked-transactions-create"
-    );
-    expect(upsertSafeTrackedTransactionMock).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(401);
+    expect(upsertSafeTrackedTransactionMock).not.toHaveBeenCalled();
   });
 });
 
@@ -167,7 +181,8 @@ describe("GET /api/internal/safe/tracked-transactions", () => {
     });
     expect(enforceUnauthenticatedSafeStatusRateLimitMock).toHaveBeenCalledWith(
       request,
-      "safe-tracked-transactions-list"
+      "safe-tracked-transactions-list",
+      20
     );
     expect(listActiveSafeTrackedTransactionsMock).toHaveBeenCalledTimes(1);
   });

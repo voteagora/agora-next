@@ -9,6 +9,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import { cancelOffchainProposal } from "@/app/api/offchain-proposals/actions";
 import { PLMConfig } from "../draft/types";
 import Tenant from "@/lib/tenant/tenant";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 interface Props {
   proposal: Proposal;
@@ -20,8 +21,10 @@ export const OffchainCancel = ({ proposal }: Props) => {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [isLoading, setIsLoading] = useState(false);
+  const { getAuthenticationData } = useProposalActionAuth();
   const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
   const offchainProposalCreator = plmConfig.offchainProposalCreator;
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const canCancel =
     address &&
@@ -42,6 +45,16 @@ export const OffchainCancel = ({ proposal }: Props) => {
     const signer = new JsonRpcSigner(provider, address);
 
     try {
+      const auth = await getAuthenticationData({
+        action: "cancelOffchainProposal",
+        proposalId: proposal.id,
+        canceller: address,
+        timestamp: new Date().toISOString(),
+      });
+      if (!auth) {
+        return;
+      }
+
       const attestationUID = (
         proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"]
       ).created_attestation_hash;
@@ -50,13 +63,14 @@ export const OffchainCancel = ({ proposal }: Props) => {
         throw new Error("Attestation UID not found");
       }
 
-      const { transactionHash } = await cancelProposalAttestation({
+      await cancelProposalAttestation({
         attestationUID,
         signer: signer,
         canceller: address,
       });
 
       await cancelOffchainProposal({
+        authJwt: auth.jwt,
         proposalId: proposal.id,
         transactionHash: attestationUID,
       });

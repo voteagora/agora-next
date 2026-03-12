@@ -129,12 +129,10 @@ const CreateProposalDraftButton = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: auth.jwt ? `Bearer ${auth.jwt}` : "",
+          Authorization: `Bearer ${auth.jwt}`,
         },
         body: JSON.stringify({
           creatorAddress: address,
-          message: auth.message,
-          signature: auth.signature,
         }),
       });
       if (!res.ok) {

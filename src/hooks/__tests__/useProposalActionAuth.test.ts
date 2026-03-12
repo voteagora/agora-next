@@ -3,29 +3,31 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
-const { signMessageAsyncMock, getStoredSiweJwtMock } = vi.hoisted(() => ({
-  signMessageAsyncMock: vi.fn(),
-  getStoredSiweJwtMock: vi.fn(),
+const { ensureSiweSessionMock } = vi.hoisted(() => ({
+  ensureSiweSessionMock: vi.fn(),
 }));
 
 vi.mock("wagmi", () => ({
-  useSignMessage: () => ({
-    signMessageAsync: signMessageAsyncMock,
+  useAccount: () => ({
+    address: "0x1234567890123456789012345678901234567890",
+    chain: { id: 1 },
   }),
 }));
 
-vi.mock("@/lib/siweSession", () => ({
-  getStoredSiweJwt: getStoredSiweJwtMock,
+vi.mock("@/hooks/useEnsureSiweSession", () => ({
+  useEnsureSiweSession: () => ({
+    ensureSiweSession: ensureSiweSessionMock,
+  }),
 }));
 
 describe("useProposalActionAuth", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getStoredSiweJwtMock.mockReturnValue(null);
+    ensureSiweSessionMock.mockResolvedValue(null);
   });
 
-  it("returns the stored SIWE jwt when present", async () => {
-    getStoredSiweJwtMock.mockReturnValue("jwt-token");
+  it("returns the ensured SIWE jwt", async () => {
+    ensureSiweSessionMock.mockResolvedValue("jwt-token");
 
     const { result } = renderHook(() => useProposalActionAuth());
 
@@ -34,15 +36,10 @@ describe("useProposalActionAuth", () => {
     ).resolves.toEqual({
       jwt: "jwt-token",
     });
-
-    expect(signMessageAsyncMock).not.toHaveBeenCalled();
   });
 
-  it("treats explicit user rejection as a normal cancel path", async () => {
-    signMessageAsyncMock.mockRejectedValue({
-      code: 4001,
-      message: "User rejected the request.",
-    });
+  it("returns null while the SIWE flow is waiting on Safe auth", async () => {
+    ensureSiweSessionMock.mockResolvedValue(null);
 
     const { result } = renderHook(() => useProposalActionAuth());
 
@@ -51,9 +48,9 @@ describe("useProposalActionAuth", () => {
     ).resolves.toBeNull();
   });
 
-  it("rethrows unexpected signing failures", async () => {
+  it("rethrows unexpected authentication failures", async () => {
     const error = new Error("wallet transport disconnected");
-    signMessageAsyncMock.mockRejectedValue(error);
+    ensureSiweSessionMock.mockRejectedValue(error);
 
     const { result } = renderHook(() => useProposalActionAuth());
 
