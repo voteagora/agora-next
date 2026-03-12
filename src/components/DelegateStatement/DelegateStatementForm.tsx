@@ -9,7 +9,7 @@ import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount, useSignMessage, useWalletClient } from "wagmi";
 import { submitDelegateStatement } from "@/app/delegates/actions";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
@@ -18,6 +18,13 @@ import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeh
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { isSafeWallet } from "@/lib/utils";
+import {
+  getDelegateStatementAuthMode,
+  type DelegateStatementAuthPayload,
+} from "@/lib/delegateStatement/auth";
+import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
 
 export default function DelegateStatementForm({
   form,
@@ -25,11 +32,19 @@ export default function DelegateStatementForm({
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
-  const { ui, contracts } = Tenant.current();
-  const { address } = useAccount();
+  const { ui } = Tenant.current();
+  const { address, chain } = useAccount();
   const walletClient = useWalletClient();
   const messageSigner = useSignMessage();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const openDialog = useOpenDialog();
+  const delegateStatementAuthMode = getDelegateStatementAuthMode();
+  const { ensureSiweSession, isSigningIn: isSiweSigningIn } =
+    useEnsureSiweSession({
+      address,
+      chainId: chain?.id,
+      purpose: "delegate_statement",
+    });
 
   const { data: scwAddress } = useSmartAccountAddress({ owner: address });
   const { data: delegate } = useDelegate({ address });
@@ -55,32 +70,149 @@ export default function DelegateStatementForm({
     (state) => state.setSaveSuccess
   );
 
+  const submitDelegateProfile = useCallback(
+    async (
+      connectedAddress: `0x${string}`,
+      normalizedValues: DelegateStatementFormValues,
+      auth: DelegateStatementAuthPayload
+    ) => {
+      const response = await submitDelegateStatement({
+        address: connectedAddress,
+        delegateStatement: normalizedValues,
+        scwAddress,
+        auth,
+      }).catch((error) => {
+        console.error(error);
+        return null;
+      });
+
+      if (!response) {
+        throw new Error(
+          "There was an error submitting your delegate profile, please try again."
+        );
+      }
+
+      setSaveSuccess(true);
+      router.push(`/delegates/${connectedAddress}`);
+    },
+    [router, scwAddress, setSaveSuccess]
+  );
+
   async function onSubmit(values: DelegateStatementFormValues) {
     /* agreeCodeConduct and agreeDaoPrinciples default values are !enabled so if it's not enabled for a tenant, it will be true, skipping the check below.
     If enabled, it will be false by default and the user will need to check the box. */
-    if (!agreeCodeConduct && !agreeDaoPrinciples) {
+    if (!agreeCodeConduct || !agreeDaoPrinciples) {
       return;
     }
-    if (!walletClient) {
-      throw new Error("signer not available");
-    }
 
-    values.topIssues = values.topIssues.filter((issue) => issue.value !== "");
-
-    // User will only sign what they are seeing on the frontend
-    const serializedBody = createDelegateStatementMessage(values, {
-      daoSlug: values.daoSlug,
-      discord: values.discord,
-      email: values.email,
-      twitter: values.twitter,
-      warpcast: values.warpcast,
-      topIssues: values.topIssues,
-      topStakeholders: values.topStakeholders,
-      scwAddress,
-      notificationPreferences: values.notificationPreferences,
-    });
+    const normalizedValues = {
+      ...values,
+      topIssues: values.topIssues.filter((issue) => issue.value !== ""),
+    };
 
     try {
+      setSubmissionError(null);
+      const connectedAddress = address as `0x${string}`;
+      const connectedChainId = chain?.id;
+
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected.");
+      }
+
+      if (
+        delegateStatementAuthMode === "signed_message" &&
+        typeof connectedChainId !== "number"
+      ) {
+        throw new Error("Wallet chain unavailable.");
+      }
+
+      if (delegateStatementAuthMode === "siwe_jwt") {
+        const jwt = await ensureSiweSession({
+          onSafeAuthenticated: async (safeJwt) => {
+            setSubmissionError(null);
+            await submitDelegateProfile(connectedAddress, normalizedValues, {
+              kind: "siwe_jwt",
+              jwt: safeJwt,
+            });
+          },
+          onSafeClosed: (reason) => {
+            if (reason === "expired") {
+              setSubmissionError(
+                "The Safe sign-in flow expired. Please try again."
+              );
+              return;
+            }
+
+            setSubmissionError("Safe sign-in was cancelled or failed.");
+          },
+        });
+
+        if (!jwt) {
+          return;
+        }
+
+        await submitDelegateProfile(connectedAddress, normalizedValues, {
+          kind: "siwe_jwt",
+          jwt,
+        });
+        return;
+      }
+
+      if (!walletClient) {
+        throw new Error("signer not available");
+      }
+
+      // User will only sign what they are seeing on the frontend
+      const serializedBody = createDelegateStatementMessage(normalizedValues, {
+        daoSlug: normalizedValues.daoSlug,
+        discord: normalizedValues.discord,
+        email: normalizedValues.email,
+        twitter: normalizedValues.twitter,
+        warpcast: normalizedValues.warpcast,
+        topIssues: normalizedValues.topIssues,
+        topStakeholders: normalizedValues.topStakeholders,
+        scwAddress,
+        notificationPreferences: normalizedValues.notificationPreferences,
+      });
+
+      const safeWallet = await isSafeWallet(connectedAddress, connectedChainId!);
+
+      if (safeWallet) {
+        const submitApprovedDelegateProfile = async (signature: `0x${string}`) => {
+          await submitDelegateProfile(connectedAddress, normalizedValues, {
+            kind: "signed_message",
+            signature,
+            chainId: connectedChainId!,
+          });
+        };
+
+        openDialog({
+          type: "SAFE_OFFCHAIN_SIGNING",
+          className: "sm:w-[42rem]",
+          disableDismiss: true,
+          params: {
+            safeAddress: connectedAddress,
+            chainId: connectedChainId,
+            purpose: "delegate_statement",
+            signingKind: "raw_message",
+            message: serializedBody,
+            signMessage: messageSigner.signMessageAsync,
+            onCompleted: submitApprovedDelegateProfile,
+            onClosed: (reason) => {
+              if (reason === "expired") {
+                setSubmissionError(
+                  "The Safe signing flow expired. Please try again."
+                );
+                return;
+              }
+
+              setSubmissionError("Signature failed, please try again");
+            },
+          },
+        });
+        return;
+      }
+
       const signature = await messageSigner.signMessageAsync({
         message: serializedBody,
       });
@@ -90,32 +222,29 @@ export default function DelegateStatementForm({
         return;
       }
 
-      const response = await submitDelegateStatement({
-        address: address as `0x${string}`,
-        delegateStatement: values,
+      await submitDelegateProfile(connectedAddress, normalizedValues, {
+        kind: "signed_message",
         signature,
-        message: serializedBody,
-        scwAddress,
-      }).catch((error) => console.error(error));
-
-      if (!response) {
-        setSubmissionError(
-          "There was an error submitting your form, please try again"
-        );
-        return;
-      }
-
-      setSaveSuccess(true);
-      router.push(`/delegates/${address}`);
+        chainId: connectedChainId!,
+      });
     } catch (error) {
       console.error(error);
-      setSubmissionError("Signature failed, please try again");
+      setSubmissionError(
+        error instanceof Error
+          ? error.message
+          : delegateStatementAuthMode === "siwe_jwt"
+            ? "Failed to authenticate. Please try again."
+            : "Signature failed, please try again."
+      );
       return;
     }
   }
 
+  const requiresWalletClient = delegateStatementAuthMode === "signed_message";
   const canSubmit =
-    !!walletClient &&
+    !!address &&
+    (!requiresWalletClient || !!walletClient) &&
+    !(delegateStatementAuthMode === "siwe_jwt" && isSiweSigningIn) &&
     !form.formState.isSubmitting &&
     !!form.formState.isValid &&
     !!agreeCodeConduct &&

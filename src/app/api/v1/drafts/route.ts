@@ -4,10 +4,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import { verifyJwtAndGetAddress, verifySiwe } from "@/lib/siweAuth.server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
 
