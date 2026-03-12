@@ -193,6 +193,7 @@ export async function enforceAuthenticatedSafeRateLimit(
     routeKey,
     subjectKey: `safe:${normalizeAddress(address)}`,
     maxRequests,
-    errorMessage: "Too many Safe requests for this session. Please retry shortly.",
+    errorMessage:
+      "Too many Safe requests for this session. Please retry shortly.",
   });
 }

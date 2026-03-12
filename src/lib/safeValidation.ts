@@ -6,9 +6,7 @@ import {
 } from "@/lib/safeTrackedTransactions";
 
 function isFixedHexLength(value: string, byteLength: number) {
-  return (
-    /^0x[0-9a-fA-F]+$/.test(value) && value.length === 2 + byteLength * 2
-  );
+  return /^0x[0-9a-fA-F]+$/.test(value) && value.length === 2 + byteLength * 2;
 }
 
 export function normalizeSafeAddress(value: string): `0x${string}` | null {
@@ -19,9 +17,7 @@ export function normalizeSafeAddress(value: string): `0x${string}` | null {
   }
 }
 
-export function normalizeSafeMessageHash(
-  value: string
-): `0x${string}` | null {
+export function normalizeSafeMessageHash(value: string): `0x${string}` | null {
   if (!isFixedHexLength(value, 32)) {
     return null;
   }

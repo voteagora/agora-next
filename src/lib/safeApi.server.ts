@@ -203,11 +203,16 @@ function cacheResolvedValue<T>(
     nextAllowedAt?: number;
   }
 ) {
-  setBoundedCacheEntry(cache, key, {
-    value,
-    expiresAt: Date.now() + ttlMs,
-    nextAllowedAt,
-  }, maxEntries);
+  setBoundedCacheEntry(
+    cache,
+    key,
+    {
+      value,
+      expiresAt: Date.now() + ttlMs,
+      nextAllowedAt,
+    },
+    maxEntries
+  );
 }
 
 function setBoundedCacheEntry<T>(
@@ -273,11 +278,16 @@ async function getCachedSafeValue<T>(
     })
     .catch((error) => {
       if (cached?.value) {
-        setBoundedCacheEntry(cache, key, {
-          value: cached.value,
-          expiresAt: cached.expiresAt,
-          nextAllowedAt: cached.nextAllowedAt,
-        }, maxEntries);
+        setBoundedCacheEntry(
+          cache,
+          key,
+          {
+            value: cached.value,
+            expiresAt: cached.expiresAt,
+            nextAllowedAt: cached.nextAllowedAt,
+          },
+          maxEntries
+        );
       } else {
         cache.delete(key);
       }
@@ -285,12 +295,17 @@ async function getCachedSafeValue<T>(
       throw error;
     });
 
-  setBoundedCacheEntry(cache, key, {
-    value: cached?.value,
-    expiresAt: cached?.expiresAt ?? 0,
-    nextAllowedAt: cached?.nextAllowedAt,
-    pending,
-  }, maxEntries);
+  setBoundedCacheEntry(
+    cache,
+    key,
+    {
+      value: cached?.value,
+      expiresAt: cached?.expiresAt ?? 0,
+      nextAllowedAt: cached?.nextAllowedAt,
+      pending,
+    },
+    maxEntries
+  );
 
   return pending;
 }
@@ -696,7 +711,10 @@ export async function getSafeMessageStatusForClient(
       if (response.status === 404) {
         const recentMessages =
           normalizedSafeAddress && SAFE_DEBUG_LOGS
-            ? await getRecentSafeMessagesForClient(chainId, normalizedSafeAddress)
+            ? await getRecentSafeMessagesForClient(
+                chainId,
+                normalizedSafeAddress
+              )
             : null;
         logSafeLookup({
           event: "safe_message_status_lookup",

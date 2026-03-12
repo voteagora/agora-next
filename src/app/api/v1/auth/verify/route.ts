@@ -58,7 +58,10 @@ export async function POST(request: NextRequest) {
 
     // create JWT
     const verifiedMessage = verification.siweMessage;
-    const scope = await getRolesForUser(verifiedMessage.address, verifiedMessage);
+    const scope = await getRolesForUser(
+      verifiedMessage.address,
+      verifiedMessage
+    );
     const ttl = await getExpiry();
     const jwt = await generateJwt(verifiedMessage.address, scope, ttl, {
       address: verifiedMessage.address,

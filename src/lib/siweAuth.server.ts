@@ -3,10 +3,7 @@ import "server-only";
 import { jwtVerify } from "jose";
 import { SiweMessage } from "siwe";
 
-import {
-  AGORA_SIGN_IN_MESSAGE,
-  SIWE_LOGIN_TTL_SECONDS,
-} from "@/lib/constants";
+import { AGORA_SIGN_IN_MESSAGE, SIWE_LOGIN_TTL_SECONDS } from "@/lib/constants";
 import { consumeSiweNonce } from "@/lib/siweNonce.server";
 import verifyMessage from "@/lib/serverVerifyMessage";
 

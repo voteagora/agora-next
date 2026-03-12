@@ -33,9 +33,7 @@ export async function GET(request: NextRequest) {
   const chainIdParam = request.nextUrl.searchParams.get("chainId");
   const messageHashParam = request.nextUrl.searchParams.get("messageHash");
   const safeAddressParam = request.nextUrl.searchParams.get("safeAddress");
-  const chainId = chainIdParam
-    ? normalizePositiveInteger(chainIdParam)
-    : null;
+  const chainId = chainIdParam ? normalizePositiveInteger(chainIdParam) : null;
   const messageHash = messageHashParam
     ? normalizeSafeMessageHash(messageHashParam)
     : null;

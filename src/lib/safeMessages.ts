@@ -144,7 +144,10 @@ export async function getSafeOwnersAndThreshold(params: {
     }
   }
   const cached = safeOwnersAndThresholdCache.get(cacheKey);
-  if (cached && now - cached.cachedAt < SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS) {
+  if (
+    cached &&
+    now - cached.cachedAt < SAFE_OWNERS_AND_THRESHOLD_CACHE_TTL_MS
+  ) {
     return {
       owners: cached.owners,
       threshold: cached.threshold,

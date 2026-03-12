@@ -41,11 +41,7 @@ export async function GET(request: NextRequest) {
   const normalizedSafeAddress = safeAddress
     ? normalizeSafeAddress(safeAddress)
     : null;
-  if (
-    !normalizedSafeAddress ||
-    !kind ||
-    !isSafeTrackedTransactionKind(kind)
-  ) {
+  if (!normalizedSafeAddress || !kind || !isSafeTrackedTransactionKind(kind)) {
     return NextResponse.json(
       { message: "Missing Safe address or kind." },
       { status: 400 }

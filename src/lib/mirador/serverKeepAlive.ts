@@ -32,7 +32,11 @@ async function sendKeepAlive(traceId: string): Promise<boolean> {
 }
 
 function stopLease(traceId: string) {
-  if (activeLeases.delete(traceId) && activeLeases.size === 0 && leaseSweepTimer) {
+  if (
+    activeLeases.delete(traceId) &&
+    activeLeases.size === 0 &&
+    leaseSweepTimer
+  ) {
     clearInterval(leaseSweepTimer);
     leaseSweepTimer = null;
   }

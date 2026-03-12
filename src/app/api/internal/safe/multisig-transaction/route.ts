@@ -21,9 +21,7 @@ export async function GET(request: NextRequest) {
   const safeTxHashParam = request.nextUrl.searchParams.get("safeTxHash");
   const safeAddressParam = request.nextUrl.searchParams.get("safeAddress");
   const createdAtParam = request.nextUrl.searchParams.get("createdAt");
-  const chainId = chainIdParam
-    ? normalizePositiveInteger(chainIdParam)
-    : null;
+  const chainId = chainIdParam ? normalizePositiveInteger(chainIdParam) : null;
   const safeTxHash = safeTxHashParam
     ? normalizeSafeTxHash(safeTxHashParam)
     : null;
