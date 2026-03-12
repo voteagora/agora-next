@@ -48,6 +48,7 @@ import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { getPublicClient } from "@/lib/viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -70,6 +71,7 @@ export default function CreateProposalFormClient({
   const { data: walletClient } = useWalletClient();
   const { contracts } = Tenant.current();
   const { writeContractAsync, isPending: isWriteLoading } = useWriteContract();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -188,6 +190,16 @@ export default function CreateProposalFormClient({
       calculationOptions: proposal.calculationOptions ?? 0,
     };
 
+    const messagePayload = {
+      action: "createOffchainProposal",
+      proposer: address,
+      timestamp: new Date().toISOString(),
+    };
+    const authData = await getAuthenticationData(messagePayload);
+    if (!authData) {
+      throw new Error("Authentication failed");
+    }
+
     const network = { chainId: chain.id, name: chain.name };
     const provider = new BrowserProvider(walletClient.transport, network);
     const signer = new JsonRpcSigner(provider, address);
@@ -229,6 +241,11 @@ export default function CreateProposalFormClient({
       id: id.toString(),
       transactionHash: attestationTxHash,
       onchainProposalId: onchainProposalId?.toString() ?? null,
+      auth: {
+        jwt: authData.jwt,
+        message: authData.message,
+        signature: authData.signature as `0x${string}` | undefined,
+      },
     });
 
     return attestationTxHash as `0x${string}`;
