@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
   if (authResult?.response) {
     return authResult.response;
   }
-  if (authResult?.address && !safeAddressesMatch(authResult.address, safeAddressParam)) {
+  if (
+    authResult?.address &&
+    !safeAddressesMatch(authResult.address, safeAddressParam)
+  ) {
     return NextResponse.json(
       { message: "Safe session does not match the requested Safe." },
       { status: 403 }

@@ -97,12 +97,11 @@ export default function CreateProposalFormClient({
   const { data: walletClient } = useWalletClient();
   const { contracts } = Tenant.current();
   const { writeContractAsync, isPending: isWriteLoading } = useWriteContract();
-  const proposalCreationTraceRef = useRef<
-    ReturnType<typeof startOrResumeProposalCreationTrace>
-  >(null);
-  const discoveredSafePublishRef = useRef<
-    Awaited<ReturnType<typeof createSafeTrackedTransaction>> | null
-  >(null);
+  const proposalCreationTraceRef =
+    useRef<ReturnType<typeof startOrResumeProposalCreationTrace>>(null);
+  const discoveredSafePublishRef = useRef<Awaited<
+    ReturnType<typeof createSafeTrackedTransaction>
+  > | null>(null);
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -443,10 +442,7 @@ export default function CreateProposalFormClient({
       const isSafeConnectedWallet =
         typeof safeWalletStatusQuery.data === "boolean"
           ? safeWalletStatusQuery.data
-          : await isSafeWallet(
-              address as `0x${string}`,
-              connectedChainId
-            );
+          : await isSafeWallet(address as `0x${string}`, connectedChainId);
       if (
         isSafeConnectedWallet &&
         !isSafeProposalFlowSupported(connectedChainId)
@@ -506,7 +502,9 @@ export default function CreateProposalFormClient({
       });
 
       if (isSafeConnectedWallet) {
-        traceProposalEvent("proposal_safe_tx_hash_received", { safeTxHash: txHash });
+        traceProposalEvent("proposal_safe_tx_hash_received", {
+          safeTxHash: txHash,
+        });
         const publish =
           discoveredSafePublishRef.current ??
           (await createSafeTrackedTransaction(
@@ -548,8 +546,8 @@ export default function CreateProposalFormClient({
             ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
             : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."
           : isHybrid
-          ? "Step 1 complete. Submit offchain to finish."
-          : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",
+            ? "Step 1 complete. Submit offchain to finish."
+            : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",
         {
           duration: 10000,
         }

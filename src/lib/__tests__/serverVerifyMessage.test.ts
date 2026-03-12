@@ -27,7 +27,9 @@ describe("serverVerifyMessage", () => {
     };
     getPublicClientMock.mockReturnValue(publicClient);
 
-    const { default: verifyMessage } = await import("@/lib/serverVerifyMessage");
+    const { default: verifyMessage } = await import(
+      "@/lib/serverVerifyMessage"
+    );
 
     await expect(
       verifyMessage({
@@ -54,7 +56,9 @@ describe("serverVerifyMessage", () => {
       "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     );
 
-    const { default: verifyMessage } = await import("@/lib/serverVerifyMessage");
+    const { default: verifyMessage } = await import(
+      "@/lib/serverVerifyMessage"
+    );
 
     await expect(
       verifyMessage({

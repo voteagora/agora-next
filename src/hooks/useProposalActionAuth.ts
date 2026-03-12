@@ -31,11 +31,7 @@ function isUserRejectedSigningError(error: unknown): boolean {
     candidate.details,
   ].filter((value): value is string => typeof value === "string");
 
-  if (
-    messages.some((value) =>
-      value.toLowerCase().includes("user rejected")
-    )
-  ) {
+  if (messages.some((value) => value.toLowerCase().includes("user rejected"))) {
     return true;
   }
 

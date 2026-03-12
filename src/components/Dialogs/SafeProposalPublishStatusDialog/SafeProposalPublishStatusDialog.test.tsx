@@ -3,13 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { SafeProposalPublishStatusDialog } from "./SafeProposalPublishStatusDialog";
 
-const {
-  useSafeMultisigTransactionStatusMock,
-  useSafeOwnersAndThresholdMock,
-} = vi.hoisted(() => ({
-  useSafeMultisigTransactionStatusMock: vi.fn(),
-  useSafeOwnersAndThresholdMock: vi.fn(),
-}));
+const { useSafeMultisigTransactionStatusMock, useSafeOwnersAndThresholdMock } =
+  vi.hoisted(() => ({
+    useSafeMultisigTransactionStatusMock: vi.fn(),
+    useSafeOwnersAndThresholdMock: vi.fn(),
+  }));
 
 vi.mock("@/components/Button", () => ({
   UpdatedButton: ({ children, href, fullWidth: _fullWidth, ...props }: any) =>
@@ -28,6 +26,10 @@ vi.mock("@/hooks/useSafeMultisigTransactionStatus", () => ({
 
 vi.mock("@/hooks/useSafeOwnersAndThreshold", () => ({
   useSafeOwnersAndThreshold: useSafeOwnersAndThresholdMock,
+}));
+
+vi.mock("@/lib/utils", () => ({
+  getBlockScanUrl: vi.fn(() => "https://example.com/tx"),
 }));
 
 describe("SafeProposalPublishStatusDialog", () => {
@@ -71,9 +73,7 @@ describe("SafeProposalPublishStatusDialog", () => {
     expect(
       screen.queryByRole("link", { name: /Open Safe/i })
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Close" })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
     expect(screen.queryByText("Keep In Background")).not.toBeInTheDocument();
   });
 });

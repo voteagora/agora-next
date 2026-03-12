@@ -204,7 +204,9 @@ function getLoadingCopy(
     case "delegate_statement":
       return {
         title:
-          signingKind === "siwe" ? "Preparing Safe sign-in" : "Preparing Safe signing",
+          signingKind === "siwe"
+            ? "Preparing Safe sign-in"
+            : "Preparing Safe signing",
         description:
           signingKind === "siwe"
             ? "Agora is preparing the Safe sign-in flow before it can save your delegate profile."
@@ -1235,8 +1237,7 @@ export function SafeOffchainSigningDialog(
     secondaryAction,
     onClosed,
     signingKind = "siwe",
-  } =
-    props;
+  } = props;
   const {
     flowState,
     hasEnteredTrackedSafeFlow,

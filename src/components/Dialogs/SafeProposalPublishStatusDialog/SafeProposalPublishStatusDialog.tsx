@@ -65,12 +65,17 @@ export function SafeProposalPublishStatusDialog({
     [status?.signedOwners]
   );
   const ownerRows = useMemo(() => {
-    const owners = ownersAndThresholdQuery.data?.owners ?? status?.signedOwners ?? [];
+    const owners =
+      ownersAndThresholdQuery.data?.owners ?? status?.signedOwners ?? [];
     return owners.map((owner) => ({
       owner,
       signed: signedOwnerSet.has(owner),
     }));
-  }, [ownersAndThresholdQuery.data?.owners, signedOwnerSet, status?.signedOwners]);
+  }, [
+    ownersAndThresholdQuery.data?.owners,
+    signedOwnerSet,
+    status?.signedOwners,
+  ]);
   const threshold =
     ownersAndThresholdQuery.data?.threshold ?? status?.threshold ?? 1;
   const signedCount = status?.signedOwners.length ?? 0;
@@ -84,7 +89,8 @@ export function SafeProposalPublishStatusDialog({
   const removedCopy = getRemovedCopy();
   const isRemoved = statusQuery.data?.missingReason === "removed";
   const isStillIndexing =
-    statusQuery.data?.found === false && statusQuery.data?.missingReason !== "removed";
+    statusQuery.data?.found === false &&
+    statusQuery.data?.missingReason !== "removed";
 
   return (
     <div className="flex w-full max-w-[42rem] flex-col gap-6">
@@ -108,7 +114,7 @@ export function SafeProposalPublishStatusDialog({
                 ? "Safe transaction failed"
                 : isRemoved
                   ? removedCopy.title
-                : pendingCopy.title}
+                  : pendingCopy.title}
           </h2>
           <p className="text-secondary max-w-[30rem]">
             {isSuccessful === true
@@ -117,7 +123,7 @@ export function SafeProposalPublishStatusDialog({
                 ? "The Safe transaction finished unsuccessfully. Review the Safe transaction details before retrying."
                 : isRemoved
                   ? removedCopy.description
-                : pendingCopy.description}
+                  : pendingCopy.description}
           </p>
         </div>
       </div>
@@ -174,7 +180,11 @@ export function SafeProposalPublishStatusDialog({
             <div className="flex max-h-[16rem] flex-col gap-1 overflow-y-auto custom-scrollbar p-2">
               {ownerRows.length > 0 ? (
                 ownerRows.map(({ owner, signed }) => (
-                  <SafeOwnerStatusRow key={owner} owner={owner} signed={signed} />
+                  <SafeOwnerStatusRow
+                    key={owner}
+                    owner={owner}
+                    signed={signed}
+                  />
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center py-10 text-center">

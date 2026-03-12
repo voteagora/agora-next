@@ -45,7 +45,9 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
   it("returns a retriable 503 when the initial Safe lookup cannot be completed", async () => {
     upsertSafeTrackedTransactionMock.mockRejectedValue(
       Object.assign(
-        new Error("Unable to validate the Safe transaction right now. Please retry."),
+        new Error(
+          "Unable to validate the Safe transaction right now. Please retry."
+        ),
         {
           statusCode: 503,
         }
@@ -75,7 +77,8 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
 
     expect(response.status).toBe(503);
     await expect(response.json()).resolves.toEqual({
-      message: "Unable to validate the Safe transaction right now. Please retry.",
+      message:
+        "Unable to validate the Safe transaction right now. Please retry.",
     });
   });
 

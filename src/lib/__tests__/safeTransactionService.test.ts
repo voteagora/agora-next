@@ -105,7 +105,8 @@ describe("safeTransactionService", () => {
               "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
           },
           isSuccessful: true,
-          transactionHash: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          transactionHash:
+            "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
           nextPollMs: 5_000,
         }),
         { status: 200 }
@@ -152,7 +153,9 @@ describe("safeTransactionService", () => {
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "0x1234567890123456789012345678901234567890"
       )
-    ).rejects.toThrow("Safe proposal flows are not supported on this chain yet.");
+    ).rejects.toThrow(
+      "Safe proposal flows are not supported on this chain yet."
+    );
 
     expect(fetchSpy).not.toHaveBeenCalled();
   });

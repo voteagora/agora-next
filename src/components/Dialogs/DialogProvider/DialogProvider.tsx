@@ -21,15 +21,15 @@ type Props = {
   children: ReactNode;
 };
 
-  const Modal: FC<
-    {
-      open: boolean;
-      onClose: () => void;
-      transparent: boolean | undefined;
-      disableDismiss?: boolean;
-      className?: string;
-    } & Props
-  > = ({ open, children, onClose, transparent, disableDismiss, className }) => {
+const Modal: FC<
+  {
+    open: boolean;
+    onClose: () => void;
+    transparent: boolean | undefined;
+    disableDismiss?: boolean;
+    className?: string;
+  } & Props
+> = ({ open, children, onClose, transparent, disableDismiss, className }) => {
   if (!open) return null;
 
   return (
@@ -76,8 +76,8 @@ export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
 
   const closeCurrentDialog = () => {
-    const onClose = (currentDialog as { params?: { onClose?: () => void } })?.params
-      ?.onClose;
+    const onClose = (currentDialog as { params?: { onClose?: () => void } })
+      ?.params?.onClose;
     if (typeof onClose === "function") {
       onClose();
     }

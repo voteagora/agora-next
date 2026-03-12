@@ -268,7 +268,12 @@ export default function NotificationPreferencesClient() {
         );
       }
     })();
-  }, [ensureNotificationPreferencesSiweSession, isConnected, siweJwt, walletType]);
+  }, [
+    ensureNotificationPreferencesSiweSession,
+    isConnected,
+    siweJwt,
+    walletType,
+  ]);
 
   const recipient = data?.recipient ?? null;
 
@@ -751,8 +756,8 @@ export default function NotificationPreferencesClient() {
             {walletType === "safe"
               ? "Opening Safe sign-in to manage notifications..."
               : walletType === "loading"
-              ? "Checking wallet type..."
-              : "Requesting a signature to manage notifications..."}
+                ? "Checking wallet type..."
+                : "Requesting a signature to manage notifications..."}
           </p>
           {siweError ? (
             <p className="text-sm text-negative">{siweError}</p>

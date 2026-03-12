@@ -175,10 +175,15 @@ export default function DelegateStatementForm({
         notificationPreferences: normalizedValues.notificationPreferences,
       });
 
-      const safeWallet = await isSafeWallet(connectedAddress, connectedChainId!);
+      const safeWallet = await isSafeWallet(
+        connectedAddress,
+        connectedChainId!
+      );
 
       if (safeWallet) {
-        const submitApprovedDelegateProfile = async (signature: `0x${string}`) => {
+        const submitApprovedDelegateProfile = async (
+          signature: `0x${string}`
+        ) => {
           await submitDelegateProfile(connectedAddress, normalizedValues, {
             kind: "signed_message",
             signature,

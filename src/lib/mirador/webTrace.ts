@@ -258,7 +258,7 @@ export async function closeMiradorTrace(
   const CLOSE_STEP_TIMEOUT_MS = 1_500;
   const CLOSE_TIMEOUT = Symbol("mirador-close-timeout");
 
-  const awaitWithTimeout = async <T,>(
+  const awaitWithTimeout = async <T>(
     value: Promise<T>,
     step: "flushQueue" | "close"
   ) => {
@@ -268,7 +268,10 @@ export async function closeMiradorTrace(
       const result = await Promise.race([
         value,
         new Promise<typeof CLOSE_TIMEOUT>((resolve) => {
-          timeoutId = setTimeout(() => resolve(CLOSE_TIMEOUT), CLOSE_STEP_TIMEOUT_MS);
+          timeoutId = setTimeout(
+            () => resolve(CLOSE_TIMEOUT),
+            CLOSE_STEP_TIMEOUT_MS
+          );
         }),
       ]);
 

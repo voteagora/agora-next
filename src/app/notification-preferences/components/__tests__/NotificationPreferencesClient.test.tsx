@@ -1,5 +1,12 @@
 import React from "react";
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -35,16 +42,18 @@ vi.mock("@/lib/siweSession", () => ({
   waitForStoredSiweJwt: vi.fn(),
 }));
 
-vi.mock("@/lib/utils", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/utils")>(
-    "@/lib/utils"
-  );
+vi.mock("@/lib/utils", () => ({
+  isSafeWallet: vi.fn(),
+}));
 
-  return {
-    ...actual,
-    isSafeWallet: vi.fn(),
-  };
-});
+vi.mock("@/components/ui/button", () => ({
+  Button: ({
+    children,
+    ...props
+  }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <button {...props}>{children}</button>
+  ),
+}));
 
 vi.mock("@/lib/safeOffchainFlow", () => ({
   clearStoredSafeOffchainSigningState: vi.fn(),

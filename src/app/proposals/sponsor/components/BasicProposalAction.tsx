@@ -173,12 +173,15 @@ const BasicProposalAction = ({
               eventName: "draft_onchain_publish_failed_client",
               details: {
                 draftProposalId: draftProposal.id,
-                message: error instanceof Error ? error.message : "Unknown error",
+                message:
+                  error instanceof Error ? error.message : "Unknown error",
               },
               reason: "draft_onchain_publish_failed_client",
             });
             toast.error(
-              error instanceof Error ? error.message : "Failed to submit proposal"
+              error instanceof Error
+                ? error.message
+                : "Failed to submit proposal"
             );
           }
         }}

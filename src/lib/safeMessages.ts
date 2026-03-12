@@ -167,10 +167,7 @@ export async function getCanonicalSafeMessageHash({
   );
   const safeMessageStructHash = keccak256(
     encodeAbiParameters(
-      [
-        { type: "bytes32" },
-        { type: "bytes32" },
-      ],
+      [{ type: "bytes32" }, { type: "bytes32" }],
       [SAFE_MESSAGE_TYPEHASH, keccak256(encodedDataHash)]
     )
   );

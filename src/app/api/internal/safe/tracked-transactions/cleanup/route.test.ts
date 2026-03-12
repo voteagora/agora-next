@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const deleteExpiredSafeTrackedTransactionsMock = vi.fn();
 
 vi.mock("@/lib/safeTrackedTransactions.server", () => ({
-  deleteExpiredSafeTrackedTransactions: deleteExpiredSafeTrackedTransactionsMock,
+  deleteExpiredSafeTrackedTransactions:
+    deleteExpiredSafeTrackedTransactionsMock,
 }));
 
 describe("POST /api/internal/safe/tracked-transactions/cleanup", () => {

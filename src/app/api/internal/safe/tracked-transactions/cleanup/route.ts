@@ -11,7 +11,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { cutoff, deletedCount } = await deleteExpiredSafeTrackedTransactions();
+    const { cutoff, deletedCount } =
+      await deleteExpiredSafeTrackedTransactions();
 
     return NextResponse.json({
       deletedCount,

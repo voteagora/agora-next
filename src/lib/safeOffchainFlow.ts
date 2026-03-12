@@ -60,7 +60,11 @@ let cachedSafeOffchainSigningState: SafeOffchainSigningState | null = null;
 function normalizeStoredSafeOffchainSigningState(
   state: Partial<SafeOffchainSigningState> | null | undefined
 ): SafeOffchainSigningState | null {
-  if (!state?.safeAddress || typeof state.chainId !== "number" || !state.status) {
+  if (
+    !state?.safeAddress ||
+    typeof state.chainId !== "number" ||
+    !state.status
+  ) {
     return null;
   }
 
@@ -320,20 +324,15 @@ export function markSafeOffchainSigningMessageCreated(params: {
   const now = Date.now();
   const currentState = getStoredSafeOffchainSigningState();
   const nextState: SafeOffchainSigningState = {
-    purpose:
-      params.purpose ??
-      currentState?.purpose ??
-      "proposal_draft",
-    signingKind:
-      params.signingKind ??
-      currentState?.signingKind ??
-      "siwe",
+    purpose: params.purpose ?? currentState?.purpose ?? "proposal_draft",
+    signingKind: params.signingKind ?? currentState?.signingKind ?? "siwe",
     safeAddress: params.safeAddress,
     chainId: params.chainId,
     messageHash: params.messageHash,
     message: params.message,
     startedAt: now,
-    expiresAt: now + (params.timeoutMs ?? SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS),
+    expiresAt:
+      now + (params.timeoutMs ?? SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS),
     status: "waiting_for_signatures",
   };
 
@@ -418,8 +417,7 @@ export const markSafeProposalOffchainMessageCreated =
   markSafeOffchainSigningMessageCreated;
 export const setSafeProposalOffchainFlowStatus =
   setSafeOffchainSigningFlowStatus;
-export const isSafeProposalOffchainFlowActive =
-  isSafeOffchainSigningFlowActive;
+export const isSafeProposalOffchainFlowActive = isSafeOffchainSigningFlowActive;
 export const isSafeProposalOffchainFlowExpired =
   isSafeOffchainSigningFlowExpired;
 export const isSafeProposalOffchainFlowTerminal =

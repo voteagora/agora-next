@@ -1,5 +1,11 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import DelegateStatementForm from "../DelegateStatementForm";
@@ -77,9 +83,8 @@ vi.mock("@/hooks/useEnsureSiweSession", () => ({
 }));
 
 vi.mock("@/lib/utils", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/utils")>(
-    "@/lib/utils"
-  );
+  const actual =
+    await vi.importActual<typeof import("@/lib/utils")>("@/lib/utils");
 
   return {
     ...actual,
@@ -163,9 +168,8 @@ vi.mock("@/lib/tenant/tenant", () => ({
 }));
 
 vi.mock("react-hook-form", async () => {
-  const actual = await vi.importActual<typeof import("react-hook-form")>(
-    "react-hook-form"
-  );
+  const actual =
+    await vi.importActual<typeof import("react-hook-form")>("react-hook-form");
 
   return {
     ...actual,
@@ -208,7 +212,9 @@ describe("DelegateStatementForm", () => {
   it("submits with a SIWE JWT for EOAs by default", async () => {
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit delegate profile" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
 
     await waitFor(() =>
       expect(submitDelegateStatementMock).toHaveBeenCalledWith(
@@ -228,16 +234,20 @@ describe("DelegateStatementForm", () => {
   });
 
   it("continues submission after Safe SIWE auth succeeds", async () => {
-    ensureSiweSessionMock.mockImplementation(async (options?: {
-      onSafeAuthenticated?: (jwt: string) => Promise<void> | void;
-    }) => {
-      await options?.onSafeAuthenticated?.("safe-jwt");
-      return null;
-    });
+    ensureSiweSessionMock.mockImplementation(
+      async (options?: {
+        onSafeAuthenticated?: (jwt: string) => Promise<void> | void;
+      }) => {
+        await options?.onSafeAuthenticated?.("safe-jwt");
+        return null;
+      }
+    );
 
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit delegate profile" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
 
     await waitFor(() =>
       expect(submitDelegateStatementMock).toHaveBeenCalledWith(
@@ -261,7 +271,9 @@ describe("DelegateStatementForm", () => {
 
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit delegate profile" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
 
     await waitFor(() =>
       expect(openDialogMock).toHaveBeenCalledWith(
@@ -289,7 +301,9 @@ describe("DelegateStatementForm", () => {
 
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit delegate profile" }));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
 
     await waitFor(() => expect(signMessageAsyncMock).toHaveBeenCalledTimes(1));
     await waitFor(() =>

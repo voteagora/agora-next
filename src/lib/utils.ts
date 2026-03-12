@@ -636,8 +636,7 @@ export const isSafeWallet = async (address: Address, chainId?: number) => {
     return cached.value;
   }
 
-  const chain =
-    typeof chainId === "number" ? getChainById(chainId) : undefined;
+  const chain = typeof chainId === "number" ? getChainById(chainId) : undefined;
   if (typeof chainId === "number" && !chain) {
     return false;
   }
@@ -684,7 +683,10 @@ export const resolveSafeTx = async (
     );
   }
 
-  const response = await fetchSafeMultisigTransactionStatus(networkId, safeTxHash);
+  const response = await fetchSafeMultisigTransactionStatus(
+    networkId,
+    safeTxHash
+  );
 
   console.debug(`[${attempt}] looking up [${safeTxHash}] on [${networkId}]`, {
     found: response.found,

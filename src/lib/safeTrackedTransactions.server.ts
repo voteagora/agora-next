@@ -89,7 +89,10 @@ async function refreshRow(
 ): Promise<SafeTrackedTransactionRow | null> {
   const cacheKey = getRefreshCacheKey(row);
   const cached = safeTrackedTransactionRefreshCache.get(cacheKey);
-  if (cached && Date.now() - cached.checkedAt < SAFE_TRACKED_TRANSACTION_REFRESH_TTL_MS) {
+  if (
+    cached &&
+    Date.now() - cached.checkedAt < SAFE_TRACKED_TRANSACTION_REFRESH_TTL_MS
+  ) {
     return cached.row;
   }
 
@@ -105,13 +108,17 @@ async function refreshRow(
   if (
     lookup.found &&
     lookup.status?.safeAddress &&
-    normalizeAddress(lookup.status.safeAddress) !== normalizeAddress(row.safe_address)
+    normalizeAddress(lookup.status.safeAddress) !==
+      normalizeAddress(row.safe_address)
   ) {
-    console.warn("[safe-tracked-transaction] Safe address mismatch on refresh", {
-      storedSafeAddress: row.safe_address,
-      resolvedSafeAddress: lookup.status.safeAddress,
-      safeTxHash: row.safe_tx_hash,
-    });
+    console.warn(
+      "[safe-tracked-transaction] Safe address mismatch on refresh",
+      {
+        storedSafeAddress: row.safe_address,
+        resolvedSafeAddress: lookup.status.safeAddress,
+        safeTxHash: row.safe_tx_hash,
+      }
+    );
     safeTrackedTransactionRefreshCache.set(cacheKey, {
       checkedAt: Date.now(),
       row,
@@ -135,10 +142,12 @@ async function refreshRow(
   return null;
 }
 
-export async function upsertSafeTrackedTransaction(params: {
-  daoSlug: string;
-  traceContext?: MiradorTraceContext;
-} & CreateSafeTrackedTransactionRequest): Promise<SafeTrackedTransactionSummary> {
+export async function upsertSafeTrackedTransaction(
+  params: {
+    daoSlug: string;
+    traceContext?: MiradorTraceContext;
+  } & CreateSafeTrackedTransactionRequest
+): Promise<SafeTrackedTransactionSummary> {
   const safeAddress = normalizeAddress(params.safeAddress);
   let lookup;
   try {
@@ -254,10 +263,12 @@ export async function upsertSafeTrackedTransaction(params: {
   return toSummary(transaction);
 }
 
-export async function discoverSafeTrackedTransaction(params: {
-  daoSlug: string;
-  traceContext?: MiradorTraceContext;
-} & DiscoverSafeTrackedTransactionRequest): Promise<SafeTrackedTransactionSummary | null> {
+export async function discoverSafeTrackedTransaction(
+  params: {
+    daoSlug: string;
+    traceContext?: MiradorTraceContext;
+  } & DiscoverSafeTrackedTransactionRequest
+): Promise<SafeTrackedTransactionSummary | null> {
   let discoveredTransaction;
   try {
     discoveredTransaction = await findQueuedSafeMultisigTransactionForClient({

@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { addMiradorSafeTxHint, closeMiradorTrace } from "@/lib/mirador/webTrace";
+import {
+  addMiradorSafeTxHint,
+  closeMiradorTrace,
+} from "@/lib/mirador/webTrace";
 
 describe("webTrace", () => {
   it("adds a Safe tx hint when the trace supports it", () => {

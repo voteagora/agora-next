@@ -304,8 +304,7 @@ export function SafeProposalChoiceDialog({
           onClick={() => void handleCreateDraftOffchain()}
           isLoading={pendingAction === "offchain"}
           disabled={
-            (isSafeWallet &&
-              (!safeProposalFlowsSupported || !acknowledged)) ||
+            (isSafeWallet && (!safeProposalFlowsSupported || !acknowledged)) ||
             pendingAction !== null
           }
           type="primary"
@@ -318,7 +317,8 @@ export function SafeProposalChoiceDialog({
           onClick={() => void handleSkipToOnchain()}
           isLoading={pendingAction === "onchain"}
           disabled={
-            pendingAction !== null || (isSafeWallet && !safeProposalFlowsSupported)
+            pendingAction !== null ||
+            (isSafeWallet && !safeProposalFlowsSupported)
           }
           type="secondary"
           className="w-full text-base font-medium h-12 flex justify-center items-center gap-2"

@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Failed to load Safe debug data.";
+      error instanceof Error
+        ? error.message
+        : "Failed to load Safe debug data.";
 
     return NextResponse.json({ message }, { status: 500 });
   }

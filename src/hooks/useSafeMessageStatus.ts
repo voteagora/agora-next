@@ -19,7 +19,11 @@ export function useSafeMessageStatus({
   getHeaders?: () => Record<string, string>;
 }) {
   return useQuery({
-    enabled: enabled && Boolean(chainId) && Boolean(messageHash) && Boolean(safeAddress),
+    enabled:
+      enabled &&
+      Boolean(chainId) &&
+      Boolean(messageHash) &&
+      Boolean(safeAddress),
     queryKey: [SAFE_MESSAGE_STATUS_QK, chainId, messageHash, safeAddress],
     queryFn: async () =>
       fetchSafeMessageStatus(

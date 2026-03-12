@@ -34,7 +34,9 @@ export function SafeOnchainPendingDialog({
     chainId,
     safeAddress,
   });
-  const hasDiscoveryTarget = Boolean(expectedTo && expectedData && createdAfter);
+  const hasDiscoveryTarget = Boolean(
+    expectedTo && expectedData && createdAfter
+  );
   const discoveryHandledRef = useRef(false);
   const discoveryQuery = useQuery({
     enabled: hasDiscoveryTarget,
@@ -55,8 +57,7 @@ export function SafeOnchainPendingDialog({
         data: expectedData!,
         createdAfter: createdAfter!,
       }),
-    refetchInterval: (query) =>
-      query.state.data?.found ? false : 3_000,
+    refetchInterval: (query) => (query.state.data?.found ? false : 3_000),
     refetchOnWindowFocus: false,
     retry: false,
   });

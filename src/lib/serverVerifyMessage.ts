@@ -54,7 +54,12 @@ async function verifyEoaMessageWithClient(
 
 async function verifySafeContractMessageWithClient(
   publicClient: NonNullable<ReturnType<typeof getVerificationPublicClient>>,
-  { address, chainId, message, signature }: VerifyMessageParams & {
+  {
+    address,
+    chainId,
+    message,
+    signature,
+  }: VerifyMessageParams & {
     chainId: number;
   }
 ) {

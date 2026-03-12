@@ -69,7 +69,8 @@ export function shouldTrackMiradorSiweLogin(
 ): purpose is MiradorSiweLoginPurpose {
   return (
     purpose === "proposal_draft" ||
-    purpose === "notification_preferences" || purpose === "delegate_statement"
+    purpose === "notification_preferences" ||
+    purpose === "delegate_statement"
   );
 }
 
@@ -180,9 +181,7 @@ export function clearStoredSiweLoginTraceState() {
   clearActiveSiweLoginTrace();
 }
 
-export function getSiweLoginTraceContext():
-  | MiradorTraceContext
-  | undefined {
+export function getSiweLoginTraceContext(): MiradorTraceContext | undefined {
   const storedTrace = getStoredSiweLoginTraceState();
   if (!storedTrace) {
     return undefined;

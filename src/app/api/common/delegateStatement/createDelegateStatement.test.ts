@@ -3,15 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDelegateStatement } from "./createDelegateStatement";
 import { DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER } from "@/lib/delegateStatement/persistence";
 
-const {
-  upsertMock,
-  verifyMessageMock,
-  verifyJwtAndGetAddressMock,
-} = vi.hoisted(() => ({
-  upsertMock: vi.fn(),
-  verifyMessageMock: vi.fn(),
-  verifyJwtAndGetAddressMock: vi.fn(),
-}));
+const { upsertMock, verifyMessageMock, verifyJwtAndGetAddressMock } =
+  vi.hoisted(() => ({
+    upsertMock: vi.fn(),
+    verifyMessageMock: vi.fn(),
+    verifyJwtAndGetAddressMock: vi.fn(),
+  }));
 
 const address = "0x1234567890123456789012345678901234567890" as const;
 

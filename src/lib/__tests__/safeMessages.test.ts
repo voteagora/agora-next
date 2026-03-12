@@ -20,9 +20,9 @@ describe("ensureSafeOffchainSigningEnabled", () => {
   it("enables Safe offchain signing when the wallet supports it", async () => {
     const request = vi.fn().mockResolvedValue(undefined);
 
-    await expect(
-      ensureSafeOffchainSigningEnabled({ request })
-    ).resolves.toBe("enabled");
+    await expect(ensureSafeOffchainSigningEnabled({ request })).resolves.toBe(
+      "enabled"
+    );
 
     expect(request).toHaveBeenCalledWith({
       method: "safe_setSettings",
@@ -35,15 +35,15 @@ describe("ensureSafeOffchainSigningEnabled", () => {
       .fn()
       .mockRejectedValue(new Error("Method not found: safe_setSettings"));
 
-    await expect(
-      ensureSafeOffchainSigningEnabled({ request })
-    ).resolves.toBe("unsupported");
+    await expect(ensureSafeOffchainSigningEnabled({ request })).resolves.toBe(
+      "unsupported"
+    );
   });
 
   it("returns unavailable when the wallet client does not expose request", async () => {
-    await expect(
-      ensureSafeOffchainSigningEnabled({})
-    ).resolves.toBe("unavailable");
+    await expect(ensureSafeOffchainSigningEnabled({})).resolves.toBe(
+      "unavailable"
+    );
   });
 });
 
@@ -63,9 +63,7 @@ describe("getSafeOwnersAndThreshold", () => {
   it("refreshes owner and threshold data after the cache TTL expires", async () => {
     const readContractMock = vi
       .fn()
-      .mockResolvedValueOnce([
-        "0x1111111111111111111111111111111111111111",
-      ])
+      .mockResolvedValueOnce(["0x1111111111111111111111111111111111111111"])
       .mockResolvedValueOnce(2n)
       .mockResolvedValueOnce([
         "0x2222222222222222222222222222222222222222",

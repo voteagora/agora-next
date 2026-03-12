@@ -49,8 +49,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const safeAddress =
-      (safeAddressParam || authResult?.address) as `0x${string}` | undefined;
+    const safeAddress = (safeAddressParam || authResult?.address) as
+      | `0x${string}`
+      | undefined;
     const createdAt =
       createdAtParam && !Number.isNaN(Date.parse(createdAtParam))
         ? Date.parse(createdAtParam)

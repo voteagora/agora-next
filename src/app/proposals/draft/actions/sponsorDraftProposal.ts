@@ -26,7 +26,9 @@ export async function onSubmitAction(
     safeAddress?: `0x${string}`;
     traceContext?: MiradorTraceContext;
   }
-): Promise<FormState & { safeProposalPublish?: SafeTrackedTransactionSummary }> {
+): Promise<
+  FormState & { safeProposalPublish?: SafeTrackedTransactionSummary }
+> {
   const traceContext = data.traceContext
     ? {
         ...data.traceContext,

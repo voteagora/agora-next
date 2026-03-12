@@ -9,7 +9,9 @@ import {
 } from "./constants";
 import { MiradorFlow, MiradorTraceContext } from "./types";
 
-function getMiradorFlowFromHeader(value?: string | null): MiradorFlow | undefined {
+function getMiradorFlowFromHeader(
+  value?: string | null
+): MiradorFlow | undefined {
   if (!value) {
     return undefined;
   }

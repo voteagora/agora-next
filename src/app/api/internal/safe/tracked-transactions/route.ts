@@ -30,7 +30,10 @@ export async function GET(request: NextRequest) {
   if (authResult?.response) {
     return authResult.response;
   }
-  if (authResult?.address && !safeAddressesMatch(authResult.address, safeAddress)) {
+  if (
+    authResult?.address &&
+    !safeAddressesMatch(authResult.address, safeAddress)
+  ) {
     return NextResponse.json(
       { message: "Safe session does not match the requested Safe." },
       { status: 403 }
@@ -91,7 +94,10 @@ export async function POST(request: NextRequest) {
   if (authResult?.response) {
     return authResult.response;
   }
-  if (authResult?.address && !safeAddressesMatch(authResult.address, body.safeAddress)) {
+  if (
+    authResult?.address &&
+    !safeAddressesMatch(authResult.address, body.safeAddress)
+  ) {
     return NextResponse.json(
       { message: "Safe session does not match the requested Safe." },
       { status: 403 }

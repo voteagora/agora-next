@@ -10,9 +10,7 @@ import {
   getOptionalSafeJwtAddress,
   safeAddressesMatch,
 } from "@/lib/safeInternalApiAuth.server";
-import {
-  discoverSafeTrackedTransaction,
-} from "@/lib/safeTrackedTransactions.server";
+import { discoverSafeTrackedTransaction } from "@/lib/safeTrackedTransactions.server";
 import type { DiscoverSafeTrackedTransactionRequest } from "@/lib/safeTrackedTransactions";
 
 export async function POST(request: NextRequest) {
@@ -46,7 +44,10 @@ export async function POST(request: NextRequest) {
   if (authResult?.response) {
     return authResult.response;
   }
-  if (authResult?.address && !safeAddressesMatch(authResult.address, body.safeAddress)) {
+  if (
+    authResult?.address &&
+    !safeAddressesMatch(authResult.address, body.safeAddress)
+  ) {
     return NextResponse.json(
       { message: "Safe session does not match the requested Safe." },
       { status: 403 }

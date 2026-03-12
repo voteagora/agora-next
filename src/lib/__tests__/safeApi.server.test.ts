@@ -111,7 +111,9 @@ describe("safeApi.server", () => {
         )
       );
 
-    const { getSafeDebugSnapshotForClient } = await import("@/lib/safeApi.server");
+    const { getSafeDebugSnapshotForClient } = await import(
+      "@/lib/safeApi.server"
+    );
 
     await expect(
       getSafeDebugSnapshotForClient(
@@ -363,52 +365,51 @@ describe("safeApi.server", () => {
   });
 
   it("discovers a queued Safe multisig transaction by exact calldata match", async () => {
-    fetchMock
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            results: [
-              {
-                safe: "0x1234567890123456789012345678901234567890",
-                to: "0x9999999999999999999999999999999999999999",
-                data: "0x11111111",
-                submissionDate: "2024-03-09T16:00:00.000Z",
-                safeTxHash:
-                  "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-                isExecuted: false,
-              },
-              {
-                safe: "0x1234567890123456789012345678901234567890",
-                to: "0x9999999999999999999999999999999999999999",
-                data: "0xdeadbeef",
-                submissionDate: "2024-03-09T16:00:05.000Z",
-                isExecuted: false,
-                safeTxHash:
-                  "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-              },
-              {
-                safe: "0x1234567890123456789012345678901234567890",
-                to: "0x9999999999999999999999999999999999999999",
-                data: "0xdeadbeef",
-                submissionDate: "2024-03-09T16:00:06.000Z",
-                isExecuted: true,
-                safeTxHash:
-                  "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-              },
-              {
-                safe: "0x1234567890123456789012345678901234567890",
-                to: "0x1111111111111111111111111111111111111111",
-                data: "0xdeadbeef",
-                submissionDate: "2024-03-09T16:00:07.000Z",
-                isExecuted: false,
-                safeTxHash:
-                  "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-              },
-            ],
-          }),
-          { status: 200 }
-        )
-      );
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          results: [
+            {
+              safe: "0x1234567890123456789012345678901234567890",
+              to: "0x9999999999999999999999999999999999999999",
+              data: "0x11111111",
+              submissionDate: "2024-03-09T16:00:00.000Z",
+              safeTxHash:
+                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              isExecuted: false,
+            },
+            {
+              safe: "0x1234567890123456789012345678901234567890",
+              to: "0x9999999999999999999999999999999999999999",
+              data: "0xdeadbeef",
+              submissionDate: "2024-03-09T16:00:05.000Z",
+              isExecuted: false,
+              safeTxHash:
+                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            },
+            {
+              safe: "0x1234567890123456789012345678901234567890",
+              to: "0x9999999999999999999999999999999999999999",
+              data: "0xdeadbeef",
+              submissionDate: "2024-03-09T16:00:06.000Z",
+              isExecuted: true,
+              safeTxHash:
+                "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            },
+            {
+              safe: "0x1234567890123456789012345678901234567890",
+              to: "0x1111111111111111111111111111111111111111",
+              data: "0xdeadbeef",
+              submissionDate: "2024-03-09T16:00:07.000Z",
+              isExecuted: false,
+              safeTxHash:
+                "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            },
+          ],
+        }),
+        { status: 200 }
+      )
+    );
 
     const { findQueuedSafeMultisigTransactionForClient } = await import(
       "@/lib/safeApi.server"
@@ -425,8 +426,7 @@ describe("safeApi.server", () => {
     ).resolves.toEqual({
       safeTxHash:
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      txId:
-        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      txId: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     });
 
     expect(fetchMock).toHaveBeenNthCalledWith(

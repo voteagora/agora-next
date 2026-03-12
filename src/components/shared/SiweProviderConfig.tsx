@@ -116,7 +116,8 @@ function getActiveMiradorSiweLoginState(params?: {
   if (
     params?.walletAddress &&
     traceState.walletAddress &&
-    traceState.walletAddress.toLowerCase() !== params.walletAddress.toLowerCase()
+    traceState.walletAddress.toLowerCase() !==
+      params.walletAddress.toLowerCase()
   ) {
     return null;
   }
@@ -144,7 +145,8 @@ function getActiveProposalCreationTraceState(params?: {
   if (
     params?.walletAddress &&
     traceState.walletAddress &&
-    traceState.walletAddress.toLowerCase() !== params.walletAddress.toLowerCase()
+    traceState.walletAddress.toLowerCase() !==
+      params.walletAddress.toLowerCase()
   ) {
     return null;
   }
@@ -174,7 +176,10 @@ function shouldPreferProposalCreationSiweTrace(params: {
     walletAddress: params.walletAddress,
     chainId: params.chainId,
   });
-  if (!proposalTraceState || params.safeSiweFlowState?.purpose !== "proposal_draft") {
+  if (
+    !proposalTraceState ||
+    params.safeSiweFlowState?.purpose !== "proposal_draft"
+  ) {
     return false;
   }
 
@@ -223,8 +228,7 @@ function getMiradorSiweTrace(params: {
     kind: "surface" as const,
     trace: startOrResumeSiweLoginTrace({
       purpose: surfaceTraceState.purpose,
-      walletAddress:
-        params.walletAddress ?? surfaceTraceState.walletAddress,
+      walletAddress: params.walletAddress ?? surfaceTraceState.walletAddress,
       chainId: params.chainId ?? surfaceTraceState.chainId,
     }),
     headers: getSiweLoginTraceHeaders(),
@@ -257,9 +261,15 @@ async function closeMiradorSiweTrace(params: {
 
 function getSafeMessageHintDetails(params: {
   traceKind: "proposal" | "surface" | "none";
-  tracePurpose?: "proposal_draft" | "notification_preferences" | "delegate_statement";
+  tracePurpose?:
+    | "proposal_draft"
+    | "notification_preferences"
+    | "delegate_statement";
 }) {
-  if (params.traceKind === "proposal" || params.tracePurpose === "proposal_draft") {
+  if (
+    params.traceKind === "proposal" ||
+    params.tracePurpose === "proposal_draft"
+  ) {
     return "Create proposal SIWE";
   }
 
@@ -449,10 +459,7 @@ export const siweProviderConfig: SIWEConfig = {
           error instanceof Error
             ? error.message
             : "Unable to compute Safe message hash";
-        setSafeSiweFlowStatus(
-          "failed",
-          errorMessage
-        );
+        setSafeSiweFlowStatus("failed", errorMessage);
         await closeMiradorSiweTrace({
           traceKind: activeTrace.kind,
           eventName: "safe_message_hash_failed_closed",

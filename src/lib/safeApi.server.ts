@@ -124,7 +124,10 @@ function formatSafeApiAddress(address: `0x${string}`) {
   }
 }
 
-function parseRetryAfterMs(headers: Headers, fallbackMs = SAFE_RATE_LIMIT_BACKOFF_MS) {
+function parseRetryAfterMs(
+  headers: Headers,
+  fallbackMs = SAFE_RATE_LIMIT_BACKOFF_MS
+) {
   const retryAfter = headers.get("retry-after");
   if (!retryAfter) {
     return fallbackMs;
@@ -316,8 +319,8 @@ export async function getRecentSafeMessagesForClient(
   const results = Array.isArray(payload)
     ? payload
     : Array.isArray(payload?.results)
-    ? payload.results
-    : [];
+      ? payload.results
+      : [];
 
   return {
     status: response.status,
@@ -377,8 +380,8 @@ export async function getRecentSafeMultisigTransactionsForClient(
   const results = Array.isArray(payload)
     ? payload
     : Array.isArray(payload?.results)
-    ? payload.results
-    : [];
+      ? payload.results
+      : [];
 
   return {
     status: response.status,
@@ -447,8 +450,8 @@ async function getSafeMultisigTransactionsForDiscovery(params: {
   const results = Array.isArray(payload)
     ? payload
     : Array.isArray(payload?.results)
-    ? payload.results
-    : [];
+      ? payload.results
+      : [];
 
   return {
     status: response.status,
@@ -470,7 +473,8 @@ export async function getSafeDebugSnapshotForClient(
   const normalizedTrackedMessageHash = trackedMessageHash?.toLowerCase();
   const matchingRecentMessage =
     recentMessages.items.find(
-      (message) => message.messageHash?.toLowerCase() === normalizedTrackedMessageHash
+      (message) =>
+        message.messageHash?.toLowerCase() === normalizedTrackedMessageHash
     ) ?? null;
 
   logSafeLookup({
@@ -501,13 +505,10 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
   to: `0x${string}`;
   data: `0x${string}`;
   createdAfter: number;
-}): Promise<
-  | {
-      safeTxHash: `0x${string}`;
-      txId: string;
-    }
-  | null
-> {
+}): Promise<{
+  safeTxHash: `0x${string}`;
+  txId: string;
+} | null> {
   const createdAfterCutoff =
     params.createdAfter - SAFE_DISCOVERY_LOOKBACK_BUFFER_MS;
   const transactionList = await getSafeMultisigTransactionsForDiscovery({
@@ -525,7 +526,9 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
   const matchingTransaction = transactionList.items
     .filter((transaction) => {
       const transactionTimestamp = getNormalizedCreatedAtMs(
-        transaction.submissionDate ?? transaction.created ?? transaction.modified
+        transaction.submissionDate ??
+          transaction.created ??
+          transaction.modified
       );
 
       if (
@@ -537,7 +540,8 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
 
       if (
         transaction.safe &&
-        normalizeAddress(transaction.safe) !== normalizeAddress(params.safeAddress)
+        normalizeAddress(transaction.safe) !==
+          normalizeAddress(params.safeAddress)
       ) {
         return false;
       }
@@ -609,7 +613,8 @@ export async function getSafeMessageStatusForClient(
           safeAddress,
           outcome: "not_found",
           attempts,
-          cachedConfirmationCount: previousValue?.status?.confirmations.length ?? 0,
+          cachedConfirmationCount:
+            previousValue?.status?.confirmations.length ?? 0,
           recentMessageStatus: recentMessages?.status ?? null,
           recentMessageAttempts: recentMessages?.attempts ?? [],
           recentMessages: recentMessages?.items ?? [],
@@ -632,7 +637,8 @@ export async function getSafeMessageStatusForClient(
           outcome: "rate_limited",
           attempts,
           nextPollMs,
-          cachedConfirmationCount: previousValue?.status?.confirmations.length ?? 0,
+          cachedConfirmationCount:
+            previousValue?.status?.confirmations.length ?? 0,
         });
         return {
           value: {
@@ -654,12 +660,17 @@ export async function getSafeMessageStatusForClient(
           attempts,
           status: response.status,
         });
-        throw new Error(`Failed to load Safe message status (${response.status})`);
+        throw new Error(
+          `Failed to load Safe message status (${response.status})`
+        );
       }
 
       const payload =
         (await response.json()) as SafeMessageStatusApiResponse | null;
-      const status = normalizeSafeMessageStatusApiResponse(payload, messageHash);
+      const status = normalizeSafeMessageStatusApiResponse(
+        payload,
+        messageHash
+      );
       const hasConfirmations = status.confirmations.length > 0;
       logSafeLookup({
         event: "safe_message_status_lookup",
@@ -738,7 +749,8 @@ export async function getSafeMultisigTransactionForClient(
 
         const createdAtMs = getNormalizedCreatedAtMs(options?.createdAt);
         const hasSeenTransactionBefore =
-          previousValue?.found === true || previousValue?.missingReason === "removed";
+          previousValue?.found === true ||
+          previousValue?.missingReason === "removed";
         const isPastGracePeriod =
           typeof createdAtMs === "number" &&
           Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
@@ -748,7 +760,9 @@ export async function getSafeMultisigTransactionForClient(
             ? "removed"
             : "indexing";
         const ttlMs =
-          missingReason === "removed" ? SAFE_TERMINAL_CACHE_TTL_MS : SAFE_CACHE_TTL_MS;
+          missingReason === "removed"
+            ? SAFE_TERMINAL_CACHE_TTL_MS
+            : SAFE_CACHE_TTL_MS;
 
         logSafeLookup({
           event: "safe_multisig_transaction_lookup",

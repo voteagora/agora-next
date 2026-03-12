@@ -66,16 +66,11 @@ export async function handleDraftOnchainPublishResult(params: {
   inputData: unknown;
   txHash: `0x${string}`;
   isSafeWallet: boolean;
-  getAuthenticationData: (
-    messagePayload: Record<string, unknown>
-  ) => Promise<
-    | {
-        jwt?: string;
-        message?: string;
-        signature?: `0x${string}`;
-      }
-    | null
-  >;
+  getAuthenticationData: (messagePayload: Record<string, unknown>) => Promise<{
+    jwt?: string;
+    message?: string;
+    signature?: `0x${string}`;
+  } | null>;
   openDialog: (dialog: any) => void;
 }) {
   trackEvent({
@@ -165,7 +160,12 @@ export async function handleDraftOnchainPublishResult(params: {
 
   void (async () => {
     try {
-      const resolvedTxHash = await resolveSafeTx(params.chainId, params.txHash, 1, 6);
+      const resolvedTxHash = await resolveSafeTx(
+        params.chainId,
+        params.txHash,
+        1,
+        6
+      );
       const activeTrace = startOrResumeProposalCreationTrace({
         branch: "draft_onchain_publish",
         walletAddress: params.address,
