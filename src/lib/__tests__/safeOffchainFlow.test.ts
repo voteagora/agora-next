@@ -25,6 +25,8 @@ describe("safeOffchainFlow", () => {
     });
 
     expect(state).toEqual({
+      purpose: "proposal_draft",
+      signingKind: "siwe",
       safeAddress: "0x1234567890123456789012345678901234567890",
       chainId: 1,
       status: "pending_wallet",
@@ -57,6 +59,18 @@ describe("safeOffchainFlow", () => {
     expect(isSafeProposalOffchainFlowTerminal(state)).toBe(false);
   });
 
+  it("returns the same snapshot object while storage is unchanged", () => {
+    initializeSafeProposalOffchainFlow({
+      safeAddress: "0x1234567890123456789012345678901234567890",
+      chainId: 1,
+    });
+
+    const firstSnapshot = getStoredSafeProposalOffchainFlowState();
+    const secondSnapshot = getStoredSafeProposalOffchainFlowState();
+
+    expect(firstSnapshot).toBe(secondSnapshot);
+  });
+
   it("marks the flow as expired after the deadline passes", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-03-07T00:00:00.000Z"));
@@ -79,9 +93,48 @@ describe("safeOffchainFlow", () => {
     expect(isSafeProposalOffchainFlowTerminal(state)).toBe(false);
   });
 
+  it("stores the flow purpose for notification preferences", () => {
+    const state = initializeSafeProposalOffchainFlow({
+      safeAddress: "0x1234567890123456789012345678901234567890",
+      chainId: 1,
+      purpose: "notification_preferences",
+    });
+
+    expect(state.purpose).toBe("notification_preferences");
+    expect(getStoredSafeProposalOffchainFlowState()?.purpose).toBe(
+      "notification_preferences"
+    );
+  });
+
+  it("stores the signing kind and delegate statement purpose", () => {
+    const state = initializeSafeProposalOffchainFlow({
+      safeAddress: "0x1234567890123456789012345678901234567890",
+      chainId: 1,
+      purpose: "delegate_statement",
+      signingKind: "raw_message",
+    });
+
+    expect(state.purpose).toBe("delegate_statement");
+    expect(state.signingKind).toBe("raw_message");
+  });
+
+  it("supports delegate statement Safe SIWE flows", () => {
+    const state = initializeSafeProposalOffchainFlow({
+      safeAddress: "0x1234567890123456789012345678901234567890",
+      chainId: 1,
+      purpose: "delegate_statement",
+      signingKind: "siwe",
+    });
+
+    expect(state.purpose).toBe("delegate_statement");
+    expect(state.signingKind).toBe("siwe");
+  });
+
   it("treats expired, cancelled, and failed flows as terminal", () => {
     expect(
       isSafeProposalOffchainFlowTerminal({
+        purpose: "proposal_draft",
+        signingKind: "siwe",
         safeAddress: "0x1234567890123456789012345678901234567890",
         chainId: 1,
         status: "expired",
@@ -89,6 +142,8 @@ describe("safeOffchainFlow", () => {
     ).toBe(true);
     expect(
       isSafeProposalOffchainFlowTerminal({
+        purpose: "proposal_draft",
+        signingKind: "siwe",
         safeAddress: "0x1234567890123456789012345678901234567890",
         chainId: 1,
         status: "cancelled",
@@ -96,6 +151,8 @@ describe("safeOffchainFlow", () => {
     ).toBe(true);
     expect(
       isSafeProposalOffchainFlowTerminal({
+        purpose: "proposal_draft",
+        signingKind: "siwe",
         safeAddress: "0x1234567890123456789012345678901234567890",
         chainId: 1,
         status: "failed",

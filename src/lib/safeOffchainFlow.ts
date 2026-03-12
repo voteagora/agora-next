@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 export const SAFE_OFFCHAIN_PROPOSAL_FLOW_STORAGE_KEY =
   "agora:safe-offchain-proposal-flow";
 
@@ -8,7 +10,14 @@ const SAFE_OFFCHAIN_PROPOSAL_FLOW_EVENT =
 
 export const SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS = 3 * 60 * 1000;
 
-export type SafeProposalOffchainFlowStatus =
+export type SafeOffchainSigningPurpose =
+  | "proposal_draft"
+  | "notification_preferences"
+  | "delegate_statement";
+
+export type SafeOffchainSigningKind = "siwe" | "raw_message";
+
+export type SafeOffchainSigningStatus =
   | "idle"
   | "pending_wallet"
   | "waiting_for_signatures"
@@ -18,30 +27,64 @@ export type SafeProposalOffchainFlowStatus =
   | "cancelled"
   | "failed";
 
-export type SafeProposalOffchainFlowState = {
+export type SafeOffchainSigningState = {
+  purpose: SafeOffchainSigningPurpose;
+  signingKind: SafeOffchainSigningKind;
   safeAddress: `0x${string}`;
   chainId: number;
   messageHash?: `0x${string}`;
   message?: string;
   startedAt?: number;
   expiresAt?: number;
-  status: SafeProposalOffchainFlowStatus;
+  status: SafeOffchainSigningStatus;
   errorMessage?: string;
 };
 
-type SafeProposalOffchainFlowSubscriber = (
-  state: SafeProposalOffchainFlowState | null
+export type SafeSiweFlowPurpose = Extract<
+  SafeOffchainSigningPurpose,
+  "proposal_draft" | "notification_preferences" | "delegate_statement"
+>;
+export type SafeSiweFlowStatus = SafeOffchainSigningStatus;
+export type SafeSiweFlowState = SafeOffchainSigningState;
+
+export type SafeProposalOffchainFlowStatus = SafeOffchainSigningStatus;
+export type SafeProposalOffchainFlowState = SafeOffchainSigningState;
+
+type SafeOffchainSigningSubscriber = (
+  state: SafeOffchainSigningState | null
 ) => void;
 
-function emitSafeProposalOffchainFlowState(
-  state: SafeProposalOffchainFlowState | null
-) {
+let cachedSafeOffchainSigningRawState: string | null = null;
+let cachedSafeOffchainSigningState: SafeOffchainSigningState | null = null;
+
+function normalizeStoredSafeOffchainSigningState(
+  state: Partial<SafeOffchainSigningState> | null | undefined
+): SafeOffchainSigningState | null {
+  if (!state?.safeAddress || typeof state.chainId !== "number" || !state.status) {
+    return null;
+  }
+
+  return {
+    purpose: state.purpose ?? "proposal_draft",
+    signingKind: state.signingKind ?? "siwe",
+    safeAddress: state.safeAddress,
+    chainId: state.chainId,
+    messageHash: state.messageHash,
+    message: state.message,
+    startedAt: state.startedAt,
+    expiresAt: state.expiresAt,
+    status: state.status,
+    errorMessage: state.errorMessage,
+  };
+}
+
+function emitSafeOffchainSigningState(state: SafeOffchainSigningState | null) {
   if (typeof window === "undefined") {
     return;
   }
 
   window.dispatchEvent(
-    new CustomEvent<SafeProposalOffchainFlowState | null>(
+    new CustomEvent<SafeOffchainSigningState | null>(
       SAFE_OFFCHAIN_PROPOSAL_FLOW_EVENT,
       {
         detail: state,
@@ -50,9 +93,15 @@ function emitSafeProposalOffchainFlowState(
   );
 }
 
-export function getStoredSafeProposalOffchainFlowState():
-  | SafeProposalOffchainFlowState
-  | null {
+function updateCachedSafeOffchainSigningState(params: {
+  rawState: string | null;
+  state: SafeOffchainSigningState | null;
+}) {
+  cachedSafeOffchainSigningRawState = params.rawState;
+  cachedSafeOffchainSigningState = params.state;
+}
+
+export function getStoredSafeOffchainSigningState(): SafeOffchainSigningState | null {
   if (typeof window === "undefined") {
     return null;
   }
@@ -62,50 +111,77 @@ export function getStoredSafeProposalOffchainFlowState():
       SAFE_OFFCHAIN_PROPOSAL_FLOW_STORAGE_KEY
     );
     if (!rawValue) {
+      updateCachedSafeOffchainSigningState({
+        rawState: null,
+        state: null,
+      });
       return null;
     }
 
-    return JSON.parse(rawValue) as SafeProposalOffchainFlowState;
+    if (rawValue === cachedSafeOffchainSigningRawState) {
+      return cachedSafeOffchainSigningState;
+    }
+
+    const normalizedState = normalizeStoredSafeOffchainSigningState(
+      JSON.parse(rawValue) as Partial<SafeOffchainSigningState> | null
+    );
+
+    updateCachedSafeOffchainSigningState({
+      rawState: rawValue,
+      state: normalizedState,
+    });
+
+    return normalizedState;
   } catch {
     return null;
   }
 }
 
-export function setStoredSafeProposalOffchainFlowState(
-  state: SafeProposalOffchainFlowState
+export function setStoredSafeOffchainSigningState(
+  state: SafeOffchainSigningState
 ) {
   if (typeof window === "undefined") {
     return;
   }
 
+  const serializedState = JSON.stringify(state);
+
   try {
     window.sessionStorage.setItem(
       SAFE_OFFCHAIN_PROPOSAL_FLOW_STORAGE_KEY,
-      JSON.stringify(state)
+      serializedState
     );
   } catch {}
 
-  emitSafeProposalOffchainFlowState(state);
+  updateCachedSafeOffchainSigningState({
+    rawState: serializedState,
+    state,
+  });
+
+  emitSafeOffchainSigningState(state);
 }
 
-export function patchStoredSafeProposalOffchainFlowState(
-  patch: Partial<SafeProposalOffchainFlowState>
+export function patchStoredSafeOffchainSigningState(
+  patch: Partial<SafeOffchainSigningState>
 ) {
-  const currentState = getStoredSafeProposalOffchainFlowState();
+  const currentState = getStoredSafeOffchainSigningState();
   if (!currentState) {
     return null;
   }
 
-  const nextState = {
+  const nextState = normalizeStoredSafeOffchainSigningState({
     ...currentState,
     ...patch,
-  };
+  });
+  if (!nextState) {
+    return null;
+  }
 
-  setStoredSafeProposalOffchainFlowState(nextState);
+  setStoredSafeOffchainSigningState(nextState);
   return nextState;
 }
 
-export function clearStoredSafeProposalOffchainFlowState() {
+export function clearStoredSafeOffchainSigningState() {
   if (typeof window === "undefined") {
     return;
   }
@@ -114,11 +190,16 @@ export function clearStoredSafeProposalOffchainFlowState() {
     window.sessionStorage.removeItem(SAFE_OFFCHAIN_PROPOSAL_FLOW_STORAGE_KEY);
   } catch {}
 
-  emitSafeProposalOffchainFlowState(null);
+  updateCachedSafeOffchainSigningState({
+    rawState: null,
+    state: null,
+  });
+
+  emitSafeOffchainSigningState(null);
 }
 
-export function subscribeToSafeProposalOffchainFlowState(
-  subscriber: SafeProposalOffchainFlowSubscriber
+export function subscribeToSafeOffchainSigningState(
+  subscriber: SafeOffchainSigningSubscriber
 ) {
   if (typeof window === "undefined") {
     return () => {};
@@ -126,10 +207,10 @@ export function subscribeToSafeProposalOffchainFlowState(
 
   const handler = (
     event: Event & {
-      detail?: SafeProposalOffchainFlowState | null;
+      detail?: SafeOffchainSigningState | null;
     }
   ) => {
-    subscriber(event.detail ?? getStoredSafeProposalOffchainFlowState());
+    subscriber(event.detail ?? getStoredSafeOffchainSigningState());
   };
 
   window.addEventListener(
@@ -145,29 +226,108 @@ export function subscribeToSafeProposalOffchainFlowState(
   };
 }
 
-export function initializeSafeProposalOffchainFlow(params: {
+export function useStoredSafeOffchainSigningState(params?: {
+  safeAddress?: string;
+  purpose?: SafeOffchainSigningPurpose;
+  signingKind?: SafeOffchainSigningKind;
+}) {
+  return useSyncExternalStore(
+    subscribeToSafeOffchainSigningState,
+    () => {
+      const state = getStoredSafeOffchainSigningState();
+      if (!state) {
+        return null;
+      }
+
+      if (
+        params?.safeAddress &&
+        state.safeAddress.toLowerCase() !== params.safeAddress.toLowerCase()
+      ) {
+        return null;
+      }
+
+      if (params?.purpose && state.purpose !== params.purpose) {
+        return null;
+      }
+
+      if (params?.signingKind && state.signingKind !== params.signingKind) {
+        return null;
+      }
+
+      return state;
+    },
+    () => null
+  );
+}
+
+export function initializeSafeOffchainSigningFlow(params: {
   safeAddress: `0x${string}`;
   chainId: number;
+  purpose?: SafeOffchainSigningPurpose;
+  signingKind?: SafeOffchainSigningKind;
 }) {
-  const nextState: SafeProposalOffchainFlowState = {
+  const nextState: SafeOffchainSigningState = {
+    purpose: params.purpose ?? "proposal_draft",
+    signingKind: params.signingKind ?? "siwe",
     safeAddress: params.safeAddress,
     chainId: params.chainId,
     status: "pending_wallet",
   };
 
-  setStoredSafeProposalOffchainFlowState(nextState);
+  setStoredSafeOffchainSigningState(nextState);
   return nextState;
 }
 
-export function markSafeProposalOffchainMessageCreated(params: {
+export function primeSafeOffchainSigningMessage(params: {
   safeAddress: `0x${string}`;
   chainId: number;
   messageHash: `0x${string}`;
   message: string;
+  purpose?: SafeOffchainSigningPurpose;
+  signingKind?: SafeOffchainSigningKind;
   timeoutMs?: number;
 }) {
   const now = Date.now();
-  const nextState: SafeProposalOffchainFlowState = {
+  const currentState = getStoredSafeOffchainSigningState();
+  const nextState: SafeOffchainSigningState = {
+    purpose: params.purpose ?? currentState?.purpose ?? "proposal_draft",
+    signingKind: params.signingKind ?? currentState?.signingKind ?? "siwe",
+    safeAddress: params.safeAddress,
+    chainId: params.chainId,
+    messageHash: params.messageHash,
+    message: params.message,
+    startedAt: currentState?.startedAt ?? now,
+    expiresAt:
+      currentState?.expiresAt ??
+      now + (params.timeoutMs ?? SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS),
+    status: currentState?.status ?? "pending_wallet",
+    errorMessage: currentState?.errorMessage,
+  };
+
+  setStoredSafeOffchainSigningState(nextState);
+  return nextState;
+}
+
+export function markSafeOffchainSigningMessageCreated(params: {
+  safeAddress: `0x${string}`;
+  chainId: number;
+  messageHash: `0x${string}`;
+  message: string;
+  purpose?: SafeOffchainSigningPurpose;
+  signingKind?: SafeOffchainSigningKind;
+  timeoutMs?: number;
+}) {
+  const now = Date.now();
+  const currentState = getStoredSafeOffchainSigningState();
+  const nextState: SafeOffchainSigningState = {
+    purpose:
+      params.purpose ??
+      currentState?.purpose ??
+      "proposal_draft",
+    signingKind:
+      params.signingKind ??
+      currentState?.signingKind ??
+      "siwe",
     safeAddress: params.safeAddress,
     chainId: params.chainId,
     messageHash: params.messageHash,
@@ -177,22 +337,22 @@ export function markSafeProposalOffchainMessageCreated(params: {
     status: "waiting_for_signatures",
   };
 
-  setStoredSafeProposalOffchainFlowState(nextState);
+  setStoredSafeOffchainSigningState(nextState);
   return nextState;
 }
 
-export function setSafeProposalOffchainFlowStatus(
-  status: SafeProposalOffchainFlowStatus,
+export function setSafeOffchainSigningFlowStatus(
+  status: SafeOffchainSigningStatus,
   errorMessage?: string
 ) {
-  return patchStoredSafeProposalOffchainFlowState({
+  return patchStoredSafeOffchainSigningState({
     status,
     errorMessage,
   });
 }
 
-export function isSafeProposalOffchainFlowActive(
-  state: SafeProposalOffchainFlowState | null | undefined
+export function isSafeOffchainSigningFlowActive(
+  state: SafeOffchainSigningState | null | undefined
 ) {
   if (!state) {
     return false;
@@ -206,8 +366,8 @@ export function isSafeProposalOffchainFlowActive(
   );
 }
 
-export function isSafeProposalOffchainFlowExpired(
-  state: SafeProposalOffchainFlowState | null | undefined
+export function isSafeOffchainSigningFlowExpired(
+  state: SafeOffchainSigningState | null | undefined
 ) {
   if (!state?.expiresAt) {
     return false;
@@ -216,8 +376,8 @@ export function isSafeProposalOffchainFlowExpired(
   return Date.now() >= state.expiresAt;
 }
 
-export function isSafeProposalOffchainFlowTerminal(
-  state: SafeProposalOffchainFlowState | null | undefined
+export function isSafeOffchainSigningFlowTerminal(
+  state: SafeOffchainSigningState | null | undefined
 ) {
   if (!state) {
     return false;
@@ -229,3 +389,38 @@ export function isSafeProposalOffchainFlowTerminal(
     state.status === "failed"
   );
 }
+
+export const getStoredSafeSiweFlowState = getStoredSafeOffchainSigningState;
+export const setStoredSafeSiweFlowState = setStoredSafeOffchainSigningState;
+export const patchStoredSafeSiweFlowState = patchStoredSafeOffchainSigningState;
+export const clearStoredSafeSiweFlowState = clearStoredSafeOffchainSigningState;
+export const subscribeToSafeSiweFlowState = subscribeToSafeOffchainSigningState;
+export const initializeSafeSiweFlow = initializeSafeOffchainSigningFlow;
+export const markSafeSiweMessageCreated = markSafeOffchainSigningMessageCreated;
+export const setSafeSiweFlowStatus = setSafeOffchainSigningFlowStatus;
+export const isSafeSiweFlowActive = isSafeOffchainSigningFlowActive;
+export const isSafeSiweFlowExpired = isSafeOffchainSigningFlowExpired;
+export const isSafeSiweFlowTerminal = isSafeOffchainSigningFlowTerminal;
+
+export const getStoredSafeProposalOffchainFlowState =
+  getStoredSafeOffchainSigningState;
+export const setStoredSafeProposalOffchainFlowState =
+  setStoredSafeOffchainSigningState;
+export const patchStoredSafeProposalOffchainFlowState =
+  patchStoredSafeOffchainSigningState;
+export const clearStoredSafeProposalOffchainFlowState =
+  clearStoredSafeOffchainSigningState;
+export const subscribeToSafeProposalOffchainFlowState =
+  subscribeToSafeOffchainSigningState;
+export const initializeSafeProposalOffchainFlow =
+  initializeSafeOffchainSigningFlow;
+export const markSafeProposalOffchainMessageCreated =
+  markSafeOffchainSigningMessageCreated;
+export const setSafeProposalOffchainFlowStatus =
+  setSafeOffchainSigningFlowStatus;
+export const isSafeProposalOffchainFlowActive =
+  isSafeOffchainSigningFlowActive;
+export const isSafeProposalOffchainFlowExpired =
+  isSafeOffchainSigningFlowExpired;
+export const isSafeProposalOffchainFlowTerminal =
+  isSafeOffchainSigningFlowTerminal;
