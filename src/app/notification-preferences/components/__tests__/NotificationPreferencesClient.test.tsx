@@ -62,6 +62,17 @@ vi.mock("@/lib/safeOffchainFlow", () => ({
   isSafeOffchainSigningFlowTerminal: vi.fn(() => false),
 }));
 
+const { isSafeOffchainMessageTrackingEnabledMock } = vi.hoisted(() => ({
+  isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
+}));
+
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOffchainMessageTrackingEnabled:
+    isSafeOffchainMessageTrackingEnabledMock,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE:
+    "Safe offchain message tracking is disabled for this tenant.",
+}));
+
 vi.mock("@/hooks/usePushNotifications", () => ({
   usePushNotifications: vi.fn(),
 }));
@@ -130,6 +141,7 @@ describe("NotificationPreferencesClient", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal("fetch", fetchMock);
+    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(true);
 
     vi.mocked(useAccount).mockReturnValue({
       address,
