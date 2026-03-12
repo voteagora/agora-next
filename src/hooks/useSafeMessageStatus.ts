@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { isSafeOffchainMessageTrackingEnabled } from "@/lib/safeFeatures";
 import { fetchSafeMessageStatus } from "@/lib/safeTransactionService";
 
 export const SAFE_MESSAGE_STATUS_QK = "safeMessageStatus";
@@ -18,9 +19,12 @@ export function useSafeMessageStatus({
   enabled?: boolean;
   getHeaders?: () => Record<string, string>;
 }) {
+  const safeOffchainTrackingEnabled = isSafeOffchainMessageTrackingEnabled();
+
   return useQuery({
     enabled:
       enabled &&
+      safeOffchainTrackingEnabled &&
       Boolean(chainId) &&
       Boolean(messageHash) &&
       Boolean(safeAddress),

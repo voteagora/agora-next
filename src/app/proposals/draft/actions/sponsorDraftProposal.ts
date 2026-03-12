@@ -13,6 +13,7 @@ import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import type { MiradorTraceContext } from "@/lib/mirador/types";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { upsertSafeTrackedTransaction } from "@/lib/safeTrackedTransactions.server";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 
@@ -198,6 +199,7 @@ export async function onSubmitAction(
 
     let safeProposalPublish: SafeTrackedTransactionSummary | undefined;
     if (
+      isSafeOnchainTransactionTrackingEnabled() &&
       data.safeAddress &&
       parsed.data.onchain_transaction_hash &&
       !parsed.data.is_offchain_submission

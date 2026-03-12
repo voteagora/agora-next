@@ -1,8 +1,8 @@
 "use client";
 
 import {
-  isMiradorProposalCreationEnabled,
-  isMiradorSiweTracingEnabled,
+  isMiradorProposalCreationTracingEnabled,
+  isMiradorSiweLoginTracingEnabled,
 } from "./config";
 import {
   MIRADOR_FLOW,
@@ -25,7 +25,7 @@ import {
   startMiradorTrace,
 } from "./webTrace";
 
-export { isMiradorProposalCreationEnabled } from "./config";
+export { isMiradorProposalCreationTracingEnabled } from "./config";
 
 type ProposalCreationTraceLike = ReturnType<typeof startMiradorTrace>;
 let activeProposalCreationTrace: ProposalCreationTraceLike = null;
@@ -98,8 +98,8 @@ function applyProposalCreationTraceContext(
   });
 }
 
-export function isMiradorProposalCreationSiweEnabled(): boolean {
-  return isMiradorSiweTracingEnabled();
+export function isMiradorProposalCreationSiweTracingEnabled(): boolean {
+  return isMiradorSiweLoginTracingEnabled();
 }
 
 export function getStoredProposalCreationTraceState(): ProposalCreationTraceState | null {
@@ -178,7 +178,7 @@ export function startOrResumeProposalCreationTrace(
     chainId?: number | string;
   } = {}
 ): ProposalCreationTraceLike {
-  if (!isMiradorProposalCreationEnabled()) {
+  if (!isMiradorProposalCreationTracingEnabled()) {
     return null;
   }
 
@@ -218,7 +218,7 @@ export function startFreshProposalCreationTrace(
     chainId?: number | string;
   } = {}
 ): ProposalCreationTraceLike {
-  if (!isMiradorProposalCreationEnabled()) {
+  if (!isMiradorProposalCreationTracingEnabled()) {
     return null;
   }
 

@@ -67,6 +67,7 @@ import {
   isSafeProposalFlowSupported,
   UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
 } from "@/lib/safeChains";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
 import { createSafeTrackedTransaction } from "@/lib/safeTrackedTransactions";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
@@ -439,6 +440,8 @@ export default function CreateProposalFormClient({
       addMiradorTxInputData(getProposalCreationTrace(), encodedInputData);
       flushMiradorTrace(getProposalCreationTrace());
       const connectedChainId = chain?.id ?? contracts.governor.chain.id;
+      const safeOnchainTrackingEnabled =
+        isSafeOnchainTransactionTrackingEnabled();
       const isSafeConnectedWallet =
         typeof safeWalletStatusQuery.data === "boolean"
           ? safeWalletStatusQuery.data
@@ -505,32 +508,40 @@ export default function CreateProposalFormClient({
         traceProposalEvent("proposal_safe_tx_hash_received", {
           safeTxHash: txHash,
         });
-        const publish =
-          discoveredSafePublishRef.current ??
-          (await createSafeTrackedTransaction(
-            {
-              kind: "publish_proposal",
-              safeAddress: address as `0x${string}`,
-              chainId: connectedChainId,
-              safeTxHash: txHash,
+        if (safeOnchainTrackingEnabled) {
+          const publish =
+            discoveredSafePublishRef.current ??
+            (await createSafeTrackedTransaction(
+              {
+                kind: "publish_proposal",
+                safeAddress: address as `0x${string}`,
+                chainId: connectedChainId,
+                safeTxHash: txHash,
+              },
+              getProposalCreationTraceHeaders()
+            ));
+          discoveredSafePublishRef.current = publish;
+
+          openDialog({
+            type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+            className: "sm:w-[44rem]",
+            params: {
+              publish,
             },
-            getProposalCreationTraceHeaders()
-          ));
-        discoveredSafePublishRef.current = publish;
+          });
 
-        openDialog({
-          type: "SAFE_PROPOSAL_PUBLISH_STATUS",
-          className: "sm:w-[44rem]",
-          params: {
-            publish,
-          },
-        });
-
-        if (!isHybrid) {
+          if (!isHybrid) {
+            void finalizeProposalCreationTrace(
+              "proposal_safe_tx_handed_off",
+              { safeTxHash: txHash },
+              "proposal_safe_tx_handed_off"
+            );
+          }
+        } else if (!isHybrid) {
           void finalizeProposalCreationTrace(
-            "proposal_safe_tx_handed_off",
+            "proposal_safe_tx_tracking_disabled",
             { safeTxHash: txHash },
-            "proposal_safe_tx_handed_off"
+            "proposal_safe_tx_tracking_disabled"
           );
         }
       } else {
@@ -542,9 +553,11 @@ export default function CreateProposalFormClient({
       }
       toast.success(
         isSafeConnectedWallet
-          ? isHybrid
-            ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
-            : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."
+          ? safeOnchainTrackingEnabled
+            ? isHybrid
+              ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
+              : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."
+            : "Safe transaction created. Open Safe directly to monitor approvals and execution."
           : isHybrid
             ? "Step 1 complete. Submit offchain to finish."
             : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",

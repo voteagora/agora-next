@@ -25,7 +25,7 @@ vi.mock("@/lib/tenant/tenant", () => ({
           enabled: true,
           config: {
             proposalCreation: true,
-            proposalCreationSiwe: true,
+            siweLoginTracing: true,
           },
         }),
       },

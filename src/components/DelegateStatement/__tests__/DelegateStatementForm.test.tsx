@@ -17,6 +17,9 @@ const submitDelegateStatementMock = vi.fn();
 const signMessageAsyncMock = vi.fn();
 const setSaveSuccessMock = vi.fn();
 const ensureSiweSessionMock = vi.fn();
+const { isSafeOffchainMessageTrackingEnabledMock } = vi.hoisted(() => ({
+  isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
+}));
 const originalDelegateStatementAuthMode =
   process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
 const originalSiweEnabled = process.env.NEXT_PUBLIC_SIWE_ENABLED;
@@ -81,6 +84,13 @@ vi.mock("@/hooks/useEnsureSiweSession", () => ({
     loadSiweJwt: vi.fn(),
     walletType: "eoa",
   }),
+}));
+
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOffchainMessageTrackingEnabled:
+    isSafeOffchainMessageTrackingEnabledMock,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE:
+    "Safe offchain message tracking is disabled for this tenant.",
 }));
 
 vi.mock("@/lib/utils", async () => {
@@ -198,6 +208,7 @@ function createForm(values: DelegateStatementFormValues) {
 describe("DelegateStatementForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(true);
     process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "siwe_jwt";
     process.env.NEXT_PUBLIC_SIWE_ENABLED = "true";
     ensureSiweSessionMock.mockResolvedValue("jwt-token");
@@ -335,6 +346,27 @@ describe("DelegateStatementForm", () => {
 
     expect(submitDelegateStatementMock).not.toHaveBeenCalled();
     expect(ensureSiweSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("surfaces a clear error when Safe raw-message tracking is disabled", async () => {
+    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "signed_message";
+    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(false);
+    const { isSafeWallet } = await import("@/lib/utils");
+    vi.mocked(isSafeWallet).mockResolvedValue(true);
+
+    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
+
+    expect(
+      await screen.findByText(
+        "Safe offchain message tracking is disabled for this tenant."
+      )
+    ).toBeInTheDocument();
+    expect(openDialogMock).not.toHaveBeenCalled();
+    expect(submitDelegateStatementMock).not.toHaveBeenCalled();
   });
 
   it("keeps the direct sign-and-submit path for EOAs in rollback mode", async () => {

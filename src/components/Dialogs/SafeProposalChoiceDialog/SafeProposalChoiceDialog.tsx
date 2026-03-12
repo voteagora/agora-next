@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Wallet, AlertTriangle, ArrowRight } from "lucide-react";
+import { useSIWE } from "connectkit";
 import toast from "react-hot-toast";
 
 import { UpdatedButton } from "@/components/Button";
@@ -19,7 +20,11 @@ import {
   UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
 } from "@/lib/safeChains";
 import { clearStoredSafeOffchainSigningState } from "@/lib/safeOffchainFlow";
-import { getStoredSiweJwt } from "@/lib/siweSession";
+import {
+  isSafeOffchainMessageTrackingEnabled,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
+import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 type SafeProposalChoiceDialogProps = {
   closeDialog: () => void;
@@ -39,15 +44,22 @@ export function SafeProposalChoiceDialog({
   onAuthenticated,
 }: SafeProposalChoiceDialogProps) {
   const router = useRouter();
+  const { signIn } = useSIWE();
   const openDialog = useOpenDialog();
   const [acknowledged, setAcknowledged] = useState(false);
   const [pendingAction, setPendingAction] = useState<
     "offchain" | "onchain" | null
   >(null);
   const isMountedRef = useRef(true);
+  const safeOffchainTrackingEnabled = isSafeOffchainMessageTrackingEnabled();
   const safeProposalFlowsSupported =
     !isSafeWallet ||
     (typeof chainId === "number" && isSafeProposalFlowSupported(chainId));
+  const safeDraftOffchainSupported =
+    !isSafeWallet || safeProposalFlowsSupported;
+  const safeDraftRequirementsLabel = safeOffchainTrackingEnabled
+    ? "I understand the Safe draft signing flow requirements"
+    : "I understand Agora will not track the Safe sign-in flow and I need to finish approvals in Safe quickly";
 
   useEffect(() => {
     return () => {
@@ -181,6 +193,70 @@ export function SafeProposalChoiceDialog({
         safeAddress,
       });
 
+      clearStoredSafeOffchainSigningState();
+
+      if (!safeOffchainTrackingEnabled) {
+        let signInResult: Awaited<ReturnType<typeof signIn>>;
+        try {
+          signInResult = await signIn();
+        } catch (error) {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Safe sign-in was cancelled or failed.";
+          await closeStoredProposalCreationTrace({
+            eventName: "safe_offchain_signing_failed",
+            details: { message, signingKind: "siwe" },
+            reason: "safe_offchain_signing_failed",
+          });
+          toast(message);
+          return;
+        }
+
+        if (signInResult === false) {
+          await closeStoredProposalCreationTrace({
+            eventName: "safe_offchain_signing_cancelled",
+            details: { signingKind: "siwe", reason: "cancelled" },
+            reason: "safe_offchain_signing_cancelled",
+          });
+          toast("Safe sign-in was cancelled or failed.");
+          return;
+        }
+
+        const safeJwt = await waitForStoredSiweJwt({
+          expectedAddress: safeAddress,
+        });
+        if (!safeJwt) {
+          await closeStoredProposalCreationTrace({
+            eventName: "safe_offchain_signing_failed",
+            details: {
+              message:
+                "Safe sign-in did not complete before Agora could read the session.",
+              signingKind: "siwe",
+            },
+            reason: "safe_offchain_signing_failed",
+          });
+          toast("Safe sign-in took too long. Please try again.");
+          return;
+        }
+
+        try {
+          await onAuthenticated(safeJwt);
+          closeDialog();
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Failed to create draft";
+          await closeStoredProposalCreationTrace({
+            eventName: "safe_offchain_signing_failed",
+            details: { message, signingKind: "siwe" },
+            reason: "safe_offchain_signing_failed",
+          });
+          toast(message);
+        }
+
+        return;
+      }
+
       openDialog({
         type: "SAFE_OFFCHAIN_SIGNING",
         className: "sm:w-[42rem]",
@@ -227,7 +303,9 @@ export function SafeProposalChoiceDialog({
           <div
             className={
               safeProposalFlowsSupported
-                ? "rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 shadow-sm"
+                ? safeOffchainTrackingEnabled
+                  ? "rounded-xl border border-amber-200/60 bg-amber-50/50 p-4 shadow-sm"
+                  : "rounded-xl border border-line bg-muted/40 p-4 shadow-sm"
                 : "rounded-xl border border-negative/30 bg-negative/5 p-4 shadow-sm"
             }
           >
@@ -235,7 +313,9 @@ export function SafeProposalChoiceDialog({
               <AlertTriangle
                 className={
                   safeProposalFlowsSupported
-                    ? "h-5 w-5 flex-shrink-0 text-amber-600"
+                    ? safeOffchainTrackingEnabled
+                      ? "h-5 w-5 flex-shrink-0 text-amber-600"
+                      : "h-5 w-5 flex-shrink-0 text-secondary"
                     : "h-5 w-5 flex-shrink-0 text-negative"
                 }
               />
@@ -243,21 +323,29 @@ export function SafeProposalChoiceDialog({
                 <p
                   className={
                     safeProposalFlowsSupported
-                      ? "text-sm font-semibold text-amber-900"
+                      ? safeOffchainTrackingEnabled
+                        ? "text-sm font-semibold text-amber-900"
+                        : "text-sm font-semibold text-primary"
                       : "text-sm font-semibold text-negative"
                   }
                 >
                   {safeProposalFlowsSupported
-                    ? "Important Warning"
+                    ? safeOffchainTrackingEnabled
+                      ? "Important Warning"
+                      : "Limited Safe Draft Feedback"
                     : "Unsupported Chain"}
                 </p>
                 {safeProposalFlowsSupported ? (
-                  <p className="text-sm text-amber-800/90 leading-relaxed">
-                    Creating a draft offchain requires the required Safe signer
-                    threshold to approve within{" "}
-                    <span className="font-semibold">3 minutes</span>. Keep this
-                    page open, and do not refresh or navigate away until the
-                    flow completes.
+                  <p
+                    className={
+                      safeOffchainTrackingEnabled
+                        ? "text-sm text-amber-800/90 leading-relaxed"
+                        : "text-sm text-secondary leading-relaxed"
+                    }
+                  >
+                    {safeOffchainTrackingEnabled
+                      ? "Creating a draft offchain requires the required Safe signer threshold to approve within 3 minutes. Keep this page open, and do not refresh or navigate away until the flow completes."
+                      : `${SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE} Agora can still start the Safe sign-in request, but it will not show live signer progress. Keep this tab open and finish signature collection in Safe quickly.`}
                   </p>
                 ) : (
                   <p className="text-sm leading-relaxed text-negative/90">
@@ -267,7 +355,7 @@ export function SafeProposalChoiceDialog({
               </div>
             </div>
           </div>
-          {safeProposalFlowsSupported ? (
+          {safeDraftOffchainSupported ? (
             <label className="flex items-center gap-3 rounded-xl border border-line bg-muted/50 p-4 cursor-pointer transition-colors hover:bg-muted">
               <input
                 type="checkbox"
@@ -276,7 +364,7 @@ export function SafeProposalChoiceDialog({
                 onChange={(event) => setAcknowledged(event.target.checked)}
               />
               <span className="text-sm font-medium text-primary select-none">
-                I understand the Safe draft signing flow requirements
+                {safeDraftRequirementsLabel}
               </span>
             </label>
           ) : null}
@@ -304,7 +392,7 @@ export function SafeProposalChoiceDialog({
           onClick={() => void handleCreateDraftOffchain()}
           isLoading={pendingAction === "offchain"}
           disabled={
-            (isSafeWallet && (!safeProposalFlowsSupported || !acknowledged)) ||
+            (isSafeWallet && (!safeDraftOffchainSupported || !acknowledged)) ||
             pendingAction !== null
           }
           type="primary"

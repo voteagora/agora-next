@@ -20,6 +20,7 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { resolveSafeTx } from "@/lib/utils";
 
@@ -73,6 +74,8 @@ export async function handleDraftOnchainPublishResult(params: {
   } | null>;
   openDialog: (dialog: any) => void;
 }) {
+  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
+
   trackEvent({
     event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
     event_data: {
@@ -107,7 +110,10 @@ export async function handleDraftOnchainPublishResult(params: {
     message: auth.message,
     signature: auth.signature,
     jwt: auth.jwt,
-    safeAddress: params.isSafeWallet ? params.address : undefined,
+    safeAddress:
+      params.isSafeWallet && safeOnchainTrackingEnabled
+        ? params.address
+        : undefined,
     traceContext: getProposalCreationTraceContext(),
   });
 
@@ -124,7 +130,11 @@ export async function handleDraftOnchainPublishResult(params: {
     throw new Error(result.message);
   }
 
-  if (params.isSafeWallet && result.safeProposalPublish) {
+  if (
+    params.isSafeWallet &&
+    safeOnchainTrackingEnabled &&
+    result.safeProposalPublish
+  ) {
     params.openDialog({
       type: "SAFE_PROPOSAL_PUBLISH_STATUS",
       className: "sm:w-[44rem]",
@@ -140,6 +150,28 @@ export async function handleDraftOnchainPublishResult(params: {
         safeTxHash: params.txHash,
       },
       reason: "draft_onchain_safe_tx_handed_off",
+    });
+    return;
+  }
+
+  if (params.isSafeWallet && !safeOnchainTrackingEnabled) {
+    void closeStoredProposalCreationTrace({
+      eventName: "draft_onchain_safe_tracking_disabled",
+      details: {
+        draftProposalId: params.draftProposal.id,
+        safeTxHash: params.txHash,
+      },
+      reason: "draft_onchain_safe_tracking_disabled",
+    });
+
+    params.openDialog({
+      type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
+      params: {
+        redirectUrl: "/",
+        txHash: params.txHash,
+        isHybrid: params.draftProposal.proposal_scope === ProposalScope.HYBRID,
+        draftProposal: params.draftProposal,
+      },
     });
     return;
   }

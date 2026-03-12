@@ -6,14 +6,23 @@ import { useSafeMultisigTransactionStatus } from "@/hooks/useSafeMultisigTransac
 const { useQueryMock } = vi.hoisted(() => ({
   useQueryMock: vi.fn(),
 }));
+const { isSafeOnchainTransactionTrackingEnabledMock } = vi.hoisted(() => ({
+  isSafeOnchainTransactionTrackingEnabledMock: vi.fn(() => true),
+}));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: (options: unknown) => useQueryMock(options),
 }));
 
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOnchainTransactionTrackingEnabled:
+    isSafeOnchainTransactionTrackingEnabledMock,
+}));
+
 describe("useSafeMultisigTransactionStatus", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(true);
     useQueryMock.mockImplementation((options) => options);
   });
 
@@ -70,5 +79,23 @@ describe("useSafeMultisigTransactionStatus", () => {
     expect(queryOptions.refetchIntervalInBackground).toBe(false);
     expect(queryOptions.refetchOnWindowFocus).toBe(false);
     expect(queryOptions.retry).toBe(false);
+  });
+
+  it("disables the query when Safe onchain tracking is turned off", () => {
+    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(false);
+
+    const { result } = renderHook(() =>
+      useSafeMultisigTransactionStatus({
+        chainId: 1,
+        safeTxHash:
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      })
+    );
+
+    expect(result.current).toEqual(
+      expect.objectContaining({
+        enabled: false,
+      })
+    );
   });
 });

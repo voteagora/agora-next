@@ -360,7 +360,15 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
       config: {
         proposalCreation: true,
-        proposalCreationSiwe: true,
+        siweLoginTracing: true,
+      },
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
       },
     },
     {

@@ -17,16 +17,33 @@ import { UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE } from "@/lib/safeChains";
 import { clearStoredSafeOffchainSigningState } from "@/lib/safeOffchainFlow";
 import { getStoredSiweJwt } from "@/lib/siweSession";
 
-const { openDialogMock, pushMock, toastMock } = vi.hoisted(() => ({
+const {
+  openDialogMock,
+  pushMock,
+  signInMock,
+  toastMock,
+  waitForStoredSiweJwtMock,
+} = vi.hoisted(() => ({
   openDialogMock: vi.fn(),
   pushMock: vi.fn(),
+  signInMock: vi.fn(),
   toastMock: vi.fn(),
+  waitForStoredSiweJwtMock: vi.fn(),
+}));
+const { isSafeOffchainMessageTrackingEnabledMock } = vi.hoisted(() => ({
+  isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
 }));
 const closeDialogMock = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: pushMock,
+  }),
+}));
+
+vi.mock("connectkit", () => ({
+  useSIWE: () => ({
+    signIn: signInMock,
   }),
 }));
 
@@ -70,6 +87,14 @@ vi.mock("@/lib/safeOffchainFlow", () => ({
 
 vi.mock("@/lib/siweSession", () => ({
   getStoredSiweJwt: vi.fn(),
+  waitForStoredSiweJwt: waitForStoredSiweJwtMock,
+}));
+
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOffchainMessageTrackingEnabled:
+    isSafeOffchainMessageTrackingEnabledMock,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE:
+    "Safe offchain message tracking is disabled for this tenant.",
 }));
 
 describe("SafeProposalChoiceDialog", () => {
@@ -77,6 +102,9 @@ describe("SafeProposalChoiceDialog", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(true);
+    signInMock.mockResolvedValue(true);
+    waitForStoredSiweJwtMock.mockResolvedValue("jwt-token");
   });
 
   afterEach(() => {
@@ -183,7 +211,7 @@ describe("SafeProposalChoiceDialog", () => {
     });
 
     expect(onAuthenticated).not.toHaveBeenCalled();
-    expect(clearStoredSafeOffchainSigningState).not.toHaveBeenCalled();
+    expect(clearStoredSafeOffchainSigningState).toHaveBeenCalled();
     expect(closeDialogMock).not.toHaveBeenCalled();
   });
 
@@ -213,5 +241,45 @@ describe("SafeProposalChoiceDialog", () => {
     expect(
       screen.getByRole("button", { name: "Skip & Go Direct to Onchain" })
     ).toBeDisabled();
+  });
+
+  it("keeps Safe draft creation available without tracked signer UX when offchain tracking is turned off", async () => {
+    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(false);
+    const onAuthenticated = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(getStoredSiweJwt).mockReturnValue(null);
+
+    render(
+      <SafeProposalChoiceDialog
+        closeDialog={closeDialogMock}
+        safeAddress={safeAddress}
+        chainId={1}
+        isSafeWallet
+        onAuthenticated={onAuthenticated}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(
+      screen.getByRole("button", { name: "Create Draft Offchain" })
+    );
+
+    await waitFor(() => {
+      expect(signInMock).toHaveBeenCalledTimes(1);
+      expect(waitForStoredSiweJwtMock).toHaveBeenCalledWith({
+        expectedAddress: safeAddress,
+      });
+      expect(onAuthenticated).toHaveBeenCalledWith("jwt-token");
+    });
+
+    expect(screen.getByText("Limited Safe Draft Feedback")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Safe offchain message tracking is disabled for this tenant\./i
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByRole("checkbox")).toBeInTheDocument();
+    expect(openDialogMock).not.toHaveBeenCalled();
+    expect(closeDialogMock).toHaveBeenCalled();
+    expect(toastMock).not.toHaveBeenCalled();
   });
 });

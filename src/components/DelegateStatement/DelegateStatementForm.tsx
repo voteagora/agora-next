@@ -24,6 +24,10 @@ import {
   getDelegateStatementAuthMode,
   type DelegateStatementAuthPayload,
 } from "@/lib/delegateStatement/auth";
+import {
+  isSafeOffchainMessageTrackingEnabled,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
 import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
 
 export default function DelegateStatementForm({
@@ -181,6 +185,11 @@ export default function DelegateStatementForm({
       );
 
       if (safeWallet) {
+        if (!isSafeOffchainMessageTrackingEnabled()) {
+          setSubmissionError(SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE);
+          return;
+        }
+
         const submitApprovedDelegateProfile = async (
           signature: `0x${string}`
         ) => {

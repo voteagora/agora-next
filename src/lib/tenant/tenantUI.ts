@@ -27,8 +27,13 @@ export type UIGasRelayConfig = {
 };
 
 export type UIMiradorConfig = {
-  proposalCreation: boolean;
-  proposalCreationSiwe: boolean;
+  proposalCreation?: boolean;
+  siweLoginTracing?: boolean;
+};
+
+export type UISafeTrackingConfig = {
+  offchainMessageTracking?: boolean;
+  onchainTransactionTracking?: boolean;
 };
 
 // UI config exists to give tenant specifc config options to a UI toggle
@@ -82,7 +87,8 @@ type UIConfig =
   | UIDunaDisclosuresConfig
   | UITaxFormConfig
   | UIFinancialStatementsConfig
-  | UIMiradorConfig;
+  | UIMiradorConfig
+  | UISafeTrackingConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

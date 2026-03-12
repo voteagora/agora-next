@@ -5,6 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, Loader2, ShieldCheck } from "lucide-react";
 
 import { UpdatedButton } from "@/components/Button";
+import { SafeTrackingDisabledFallback } from "@/components/Safe/SafeTrackingDisabledFallback";
+import {
+  isSafeOnchainTransactionTrackingEnabled,
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
 import {
   discoverSafeTrackedTransaction,
   getSafeAppQueueUrl,
@@ -54,6 +59,7 @@ export function SafeOnchainPendingDialog({
     publish: SafeTrackedTransactionSummary
   ) => void;
 }) {
+  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
   const safeQueueUrl = getSafeAppQueueUrl({
     chainId,
     safeAddress,
@@ -63,7 +69,7 @@ export function SafeOnchainPendingDialog({
   );
   const discoveryHandledRef = useRef(false);
   const discoveryQuery = useQuery({
-    enabled: hasDiscoveryTarget,
+    enabled: safeOnchainTrackingEnabled && hasDiscoveryTarget,
     queryKey: [
       "discoverSafeTrackedTransaction",
       chainId,
@@ -102,6 +108,17 @@ export function SafeOnchainPendingDialog({
     discoveryHandledRef.current = true;
     onTrackedTransactionDiscovered?.(discoveryQuery.data.transaction);
   }, [discoveryQuery.data, onTrackedTransactionDiscovered]);
+
+  if (!safeOnchainTrackingEnabled) {
+    return (
+      <SafeTrackingDisabledFallback
+        heading="Open Safe and confirm transaction"
+        description={`${SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE} Open Safe to monitor approvals and execution directly.`}
+        safeQueueUrl={safeQueueUrl}
+        closeDialog={closeDialog}
+      />
+    );
+  }
 
   return (
     <div className="flex w-full max-w-[32rem] flex-col gap-6">

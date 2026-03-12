@@ -6,6 +6,10 @@ let miradorServerClient: MiradorServerClient | null = null;
 let hasWarnedMissingServerApiKey = false;
 
 export function getMiradorServerClient(): MiradorServerClient | null {
+  if (process.env.NEXT_PUBLIC_MIRADOR_ENABLED === "false") {
+    return null;
+  }
+
   const apiKey = process.env.MIRADOR_SERVER_API_KEY;
 
   if (!apiKey) {

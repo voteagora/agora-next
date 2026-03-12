@@ -2,7 +2,7 @@
 
 import type { SafeOffchainSigningPurpose } from "@/lib/safeOffchainFlow";
 
-import { isMiradorSiweTracingEnabled } from "./config";
+import { isMiradorSiweLoginTracingEnabled } from "./config";
 import {
   MIRADOR_FLOW,
   MIRADOR_SIWE_LOGIN_TRACE_STORAGE_KEY,
@@ -206,7 +206,7 @@ export function startOrResumeSiweLoginTrace(options: {
   walletAddress?: `0x${string}`;
   chainId?: number | string;
 }): SiweLoginTraceLike {
-  if (!isMiradorSiweTracingEnabled()) {
+  if (!isMiradorSiweLoginTracingEnabled()) {
     return null;
   }
 
@@ -252,7 +252,7 @@ export function startFreshSiweLoginTrace(options: {
   walletAddress?: `0x${string}`;
   chainId?: number | string;
 }): SiweLoginTraceLike {
-  if (!isMiradorSiweTracingEnabled()) {
+  if (!isMiradorSiweLoginTracingEnabled()) {
     return null;
   }
 

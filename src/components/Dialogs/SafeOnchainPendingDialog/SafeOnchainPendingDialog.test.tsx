@@ -1,14 +1,24 @@
-import { render, screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SafeOnchainPendingDialog } from "./SafeOnchainPendingDialog";
 
 const { useQueryMock } = vi.hoisted(() => ({
   useQueryMock: vi.fn(),
 }));
+const { isSafeOnchainTransactionTrackingEnabledMock } = vi.hoisted(() => ({
+  isSafeOnchainTransactionTrackingEnabledMock: vi.fn(() => true),
+}));
 
 vi.mock("@tanstack/react-query", () => ({
   useQuery: (options: unknown) => useQueryMock(options),
+}));
+
+vi.mock("@/lib/safeFeatures", () => ({
+  isSafeOnchainTransactionTrackingEnabled:
+    isSafeOnchainTransactionTrackingEnabledMock,
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE:
+    "Safe onchain transaction tracking is disabled for this tenant.",
 }));
 
 vi.mock("@/components/Button", () => ({
@@ -26,10 +36,15 @@ describe("SafeOnchainPendingDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
+    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(true);
     useQueryMock.mockReturnValue({
       data: undefined,
       isFetching: false,
     });
+  });
+
+  afterEach(() => {
+    cleanup();
   });
 
   it("renders Safe approval guidance and the queue link", () => {
@@ -137,5 +152,27 @@ describe("SafeOnchainPendingDialog", () => {
       slowQueryOptions.refetchInterval({ state: { data: { found: false } } })
     ).toBe(8_000);
     expect(slowQueryOptions.refetchIntervalInBackground).toBe(false);
+  });
+
+  it("renders a direct Safe fallback when onchain tracking is disabled", () => {
+    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(false);
+
+    render(
+      <SafeOnchainPendingDialog
+        closeDialog={vi.fn()}
+        safeAddress={"0x1234567890123456789012345678901234567890"}
+        chainId={1}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        /Safe onchain transaction tracking is disabled for this tenant\./i
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /Open Safe/i })
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   });
 });

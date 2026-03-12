@@ -17,8 +17,13 @@ import {
   SafeOwnerStatusRow,
   SafeSignerProgress,
 } from "@/components/Safe/SafeSignerStatus";
+import { SafeTrackingDisabledFallback } from "@/components/Safe/SafeTrackingDisabledFallback";
 import { useSafeMultisigTransactionStatus } from "@/hooks/useSafeMultisigTransactionStatus";
 import { useSafeOwnersAndThreshold } from "@/hooks/useSafeOwnersAndThreshold";
+import {
+  isSafeOnchainTransactionTrackingEnabled,
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
 import {
   getSafeAppQueueUrl,
   type SafeTrackedTransactionSummary,
@@ -48,15 +53,18 @@ export function SafeProposalPublishStatusDialog({
   closeDialog: () => void;
   publish: SafeTrackedTransactionSummary;
 }) {
+  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
   const statusQuery = useSafeMultisigTransactionStatus({
     chainId: publish.chainId,
     safeTxHash: publish.safeTxHash,
     safeAddress: publish.safeAddress,
     createdAt: publish.createdAt,
+    enabled: safeOnchainTrackingEnabled,
   });
   const ownersAndThresholdQuery = useSafeOwnersAndThreshold({
     safeAddress: publish.safeAddress,
     chainId: publish.chainId,
+    enabled: safeOnchainTrackingEnabled,
   });
 
   const status = statusQuery.data?.status;
@@ -91,6 +99,23 @@ export function SafeProposalPublishStatusDialog({
   const isStillIndexing =
     statusQuery.data?.found === false &&
     statusQuery.data?.missingReason !== "removed";
+
+  if (!safeOnchainTrackingEnabled) {
+    return (
+      <SafeTrackingDisabledFallback
+        heading="Safe transaction created"
+        description={`${SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE} Open Safe to monitor signatures and execution directly.`}
+        safeQueueUrl={safeQueueUrl}
+        closeDialog={closeDialog}
+      >
+        <div className="rounded-2xl border border-line bg-muted/30 p-4 text-sm text-secondary">
+          <span className="break-all">
+            Safe tx: <span className="font-mono">{publish.safeTxHash}</span>
+          </span>
+        </div>
+      </SafeTrackingDisabledFallback>
+    );
+  }
 
   return (
     <div className="flex w-full max-w-[42rem] flex-col gap-6">

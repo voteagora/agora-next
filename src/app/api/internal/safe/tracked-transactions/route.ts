@@ -6,6 +6,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import Tenant from "@/lib/tenant/tenant";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
 import {
+  isSafeOnchainTransactionTrackingEnabled,
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
+import {
   enforceUnauthenticatedSafeStatusRateLimit,
   getOptionalSafeJwtAddress,
   safeAddressesMatch,
@@ -17,6 +21,13 @@ import {
 import type { CreateSafeTrackedTransactionRequest } from "@/lib/safeTrackedTransactions";
 
 export async function GET(request: NextRequest) {
+  if (!isSafeOnchainTransactionTrackingEnabled()) {
+    return NextResponse.json(
+      { message: SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE },
+      { status: 403 }
+    );
+  }
+
   const safeAddress = request.nextUrl.searchParams.get("safeAddress");
   const kind = request.nextUrl.searchParams.get("kind");
   if (!safeAddress || !kind) {
@@ -66,6 +77,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!isSafeOnchainTransactionTrackingEnabled()) {
+    return NextResponse.json(
+      { message: SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE },
+      { status: 403 }
+    );
+  }
+
   const traceContext = getMiradorTraceContextFromHeaders(request);
 
   let body: CreateSafeTrackedTransactionRequest | null = null;

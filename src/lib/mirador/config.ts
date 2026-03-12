@@ -3,7 +3,15 @@
 import Tenant from "@/lib/tenant/tenant";
 import { UIMiradorConfig } from "@/lib/tenant/tenantUI";
 
+function isMiradorGloballyDisabled() {
+  return process.env.NEXT_PUBLIC_MIRADOR_ENABLED === "false";
+}
+
 export function getMiradorConfig(): UIMiradorConfig | null {
+  if (isMiradorGloballyDisabled()) {
+    return null;
+  }
+
   try {
     const toggle = Tenant.current().ui.toggle("mirador");
     if (!toggle?.enabled) {
@@ -16,17 +24,23 @@ export function getMiradorConfig(): UIMiradorConfig | null {
   }
 }
 
-export function isMiradorProposalCreationEnabled(): boolean {
-  return getMiradorConfig()?.proposalCreation === true;
+export function isMiradorProposalCreationTracingEnabled(): boolean {
+  const config = getMiradorConfig();
+  return config?.proposalCreation === true;
 }
 
-export function isMiradorSiweTracingEnabled(): boolean {
-  return getMiradorConfig()?.proposalCreationSiwe === true;
+export function isMiradorSiweLoginTracingEnabled(): boolean {
+  const config = getMiradorConfig();
+  return config?.siweLoginTracing === true;
+}
+
+export function isMiradorEnabled(): boolean {
+  return (
+    isMiradorProposalCreationTracingEnabled() ||
+    isMiradorSiweLoginTracingEnabled()
+  );
 }
 
 export function shouldEnableMiradorWebClient(): boolean {
-  const config = getMiradorConfig();
-  return (
-    config?.proposalCreation === true || config?.proposalCreationSiwe === true
-  );
+  return isMiradorEnabled();
 }

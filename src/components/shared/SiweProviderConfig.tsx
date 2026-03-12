@@ -13,7 +13,7 @@ import {
   closeStoredProposalCreationTrace,
   getProposalCreationTraceHeaders,
   getStoredProposalCreationTraceState,
-  isMiradorProposalCreationSiweEnabled,
+  isMiradorProposalCreationSiweTracingEnabled,
   startOrResumeProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import {
@@ -168,7 +168,7 @@ function shouldPreferProposalCreationSiweTrace(params: {
   safeSiweFlowState?: ReturnType<typeof getActiveSafeSiweFlowState>;
   requirePendingNonce?: boolean;
 }) {
-  if (!isMiradorProposalCreationSiweEnabled()) {
+  if (!isMiradorProposalCreationSiweTracingEnabled()) {
     return false;
   }
 

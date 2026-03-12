@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { fetchSafeMultisigTransactionStatus } from "@/lib/safeTransactionService";
 
 export const SAFE_MULTISIG_TRANSACTION_STATUS_QK =
@@ -19,8 +20,14 @@ export function useSafeMultisigTransactionStatus({
   createdAt?: string;
   enabled?: boolean;
 }) {
+  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
+
   return useQuery({
-    enabled: enabled && Boolean(chainId) && Boolean(safeTxHash),
+    enabled:
+      enabled &&
+      safeOnchainTrackingEnabled &&
+      Boolean(chainId) &&
+      Boolean(safeTxHash),
     queryKey: [
       SAFE_MULTISIG_TRANSACTION_STATUS_QK,
       chainId,

@@ -56,6 +56,10 @@ import {
   startFreshProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import {
+  isSafeOffchainMessageTrackingEnabled,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
+import {
   ensureSafeOffchainSigningEnabled,
   getCanonicalSafeMessageHash,
 } from "@/lib/safeMessages";
@@ -689,6 +693,11 @@ function useSafeOffchainSigningFlow({
       setStartupError(null);
       setIsCompleting(false);
       setIsStarting(true);
+
+      if (!isSafeOffchainMessageTrackingEnabled()) {
+        failCurrentAttempt(SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE);
+        return;
+      }
 
       if (!activeChainId) {
         failCurrentAttempt("Unable to determine the connected chain.");

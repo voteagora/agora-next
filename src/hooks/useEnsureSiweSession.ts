@@ -21,6 +21,7 @@ import {
   getStoredSiweJwt,
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
+import { isSafeOffchainMessageTrackingEnabled } from "@/lib/safeFeatures";
 import { isSafeWallet } from "@/lib/utils";
 
 export type WalletType = "loading" | "safe" | "eoa";
@@ -183,9 +184,14 @@ export function useEnsureSiweSession(params: {
       }
 
       if (resolvedWalletType === "safe") {
-        await prepareMiradorSiweLoginTrace();
-        openSafeSiweDialog(options);
-        return null;
+        if (isSafeOffchainMessageTrackingEnabled()) {
+          await prepareMiradorSiweLoginTrace();
+          openSafeSiweDialog(options);
+          return null;
+        }
+
+        clearStoredSafeOffchainSigningState();
+        clearStoredSiweSession();
       }
 
       if (isSigningIn) {

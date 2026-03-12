@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useActiveSafeTrackedTransactions } from "@/hooks/useActiveSafeTrackedTransactions";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import type { SafeTrackedTransactionKind } from "@/lib/safeTrackedTransactions";
 
 function getPublishLabel(kind: SafeTrackedTransactionKind) {
@@ -19,13 +20,19 @@ function getPublishLabel(kind: SafeTrackedTransactionKind) {
 export function SafeProposalPublishBanner() {
   const { address } = useAccount();
   const openDialog = useOpenDialog();
+  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
   const publishesQuery = useActiveSafeTrackedTransactions({
     kind: "publish_proposal",
     safeAddress: address,
-    enabled: Boolean(address),
+    enabled: safeOnchainTrackingEnabled && Boolean(address),
   });
 
-  if (!address || publishesQuery.isError || !publishesQuery.data?.length) {
+  if (
+    !safeOnchainTrackingEnabled ||
+    !address ||
+    publishesQuery.isError ||
+    !publishesQuery.data?.length
+  ) {
     return null;
   }
 

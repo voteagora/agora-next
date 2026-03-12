@@ -19,6 +19,7 @@ import {
   isSafeProposalFlowSupported,
   UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
 } from "@/lib/safeChains";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 import { isSafeWallet } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
@@ -85,6 +86,8 @@ const BasicProposalAction = ({
         onClick={async () => {
           try {
             const connectedChainId = chain?.id ?? contracts.governor.chain.id;
+            const safeOnchainTrackingEnabled =
+              isSafeOnchainTransactionTrackingEnabled();
             const encodedInputData = encodeFunctionData({
               abi: contracts.governor.abi,
               functionName: "propose",
@@ -114,7 +117,7 @@ const BasicProposalAction = ({
               inputData,
               draftProposalId: draftProposal.id,
             });
-            if (safeWallet) {
+            if (safeWallet && safeOnchainTrackingEnabled) {
               const createdAfter = Date.now();
               openDialog({
                 type: "SAFE_ONCHAIN_PENDING",

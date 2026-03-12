@@ -38,7 +38,7 @@ vi.mock("@/lib/mirador/proposalCreationTrace", () => ({
   closeStoredProposalCreationTrace: closeStoredProposalCreationTraceMock,
   getProposalCreationTraceHeaders: vi.fn(() => undefined),
   getStoredProposalCreationTraceState: getStoredProposalCreationTraceStateMock,
-  isMiradorProposalCreationSiweEnabled: vi.fn(() => false),
+  isMiradorProposalCreationSiweTracingEnabled: vi.fn(() => false),
   startOrResumeProposalCreationTrace: startOrResumeProposalCreationTraceMock,
 }));
 

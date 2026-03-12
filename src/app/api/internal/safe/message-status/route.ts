@@ -7,12 +7,23 @@ import { getSafeMessageStatusForClient } from "@/lib/safeApi.server";
 import { MIRADOR_TRACE_ID_HEADER } from "@/lib/mirador/constants";
 import { refreshTraceKeepAlive } from "@/lib/mirador/serverKeepAlive";
 import {
+  isSafeOffchainMessageTrackingEnabled,
+  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
+import {
   enforceUnauthenticatedSafeStatusRateLimit,
   getOptionalSafeJwtAddress,
   safeAddressesMatch,
 } from "@/lib/safeInternalApiAuth.server";
 
 export async function GET(request: NextRequest) {
+  if (!isSafeOffchainMessageTrackingEnabled()) {
+    return NextResponse.json(
+      { message: SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE },
+      { status: 403 }
+    );
+  }
+
   const chainIdParam = request.nextUrl.searchParams.get("chainId");
   const messageHashParam = request.nextUrl.searchParams.get("messageHash");
   const safeAddressParam = request.nextUrl.searchParams.get("safeAddress");
