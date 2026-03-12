@@ -12,7 +12,11 @@ export type DelegateStatementAuthPayload =
     };
 
 const DEFAULT_DELEGATE_STATEMENT_AUTH_MODE: DelegateStatementAuthMode =
-  "siwe_jwt";
+  "signed_message";
+
+function isSiweEnabled() {
+  return process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
+}
 
 export function getDelegateStatementAuthMode(): DelegateStatementAuthMode {
   const configuredMode = process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
@@ -21,7 +25,7 @@ export function getDelegateStatementAuthMode(): DelegateStatementAuthMode {
     return "signed_message";
   }
 
-  if (configuredMode === "siwe_jwt") {
+  if (configuredMode === "siwe_jwt" && isSiweEnabled()) {
     return "siwe_jwt";
   }
 

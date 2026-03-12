@@ -11,6 +11,30 @@ import {
   type SafeTrackedTransactionSummary,
 } from "@/lib/safeTrackedTransactions";
 
+const SAFE_DISCOVERY_FAST_POLL_MS = 3_000;
+const SAFE_DISCOVERY_DEFAULT_POLL_MS = 5_000;
+const SAFE_DISCOVERY_SLOW_POLL_MS = 8_000;
+const SAFE_DISCOVERY_FAST_WINDOW_MS = 15_000;
+const SAFE_DISCOVERY_DEFAULT_WINDOW_MS = 60_000;
+
+function getDiscoveryRefetchInterval(createdAfter?: number) {
+  if (!createdAfter) {
+    return SAFE_DISCOVERY_DEFAULT_POLL_MS;
+  }
+
+  const elapsedMs = Math.max(0, Date.now() - createdAfter);
+
+  if (elapsedMs < SAFE_DISCOVERY_FAST_WINDOW_MS) {
+    return SAFE_DISCOVERY_FAST_POLL_MS;
+  }
+
+  if (elapsedMs < SAFE_DISCOVERY_DEFAULT_WINDOW_MS) {
+    return SAFE_DISCOVERY_DEFAULT_POLL_MS;
+  }
+
+  return SAFE_DISCOVERY_SLOW_POLL_MS;
+}
+
 export function SafeOnchainPendingDialog({
   closeDialog,
   safeAddress,
@@ -57,7 +81,11 @@ export function SafeOnchainPendingDialog({
         data: expectedData!,
         createdAfter: createdAfter!,
       }),
-    refetchInterval: (query) => (query.state.data?.found ? false : 3_000),
+    refetchInterval: (query) =>
+      query.state.data?.found
+        ? false
+        : getDiscoveryRefetchInterval(createdAfter),
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
     retry: false,
   });

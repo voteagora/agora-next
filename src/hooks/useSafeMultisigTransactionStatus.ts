@@ -40,6 +40,7 @@ export function useSafeMultisigTransactionStatus({
             ? (query.state.data?.nextPollMs ?? DEFAULT_SAFE_MULTISIG_POLL_MS)
             : false
       : false,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
     retry: false,
   });

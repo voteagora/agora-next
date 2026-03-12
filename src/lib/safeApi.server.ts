@@ -722,8 +722,15 @@ export async function getSafeMultisigTransactionForClient(
 
       if (response.status === 404) {
         let recentListContainsTransaction: boolean | null = null;
+        const createdAtMs = getNormalizedCreatedAtMs(options?.createdAt);
+        const hasSeenTransactionBefore =
+          previousValue?.found === true ||
+          previousValue?.missingReason === "removed";
+        const isPastGracePeriod =
+          typeof createdAtMs === "number" &&
+          Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
 
-        if (options?.safeAddress) {
+        if (options?.safeAddress && (hasSeenTransactionBefore || isPastGracePeriod)) {
           try {
             recentListContainsTransaction =
               await hasSafeMultisigTransactionInRecentListForClient({
@@ -747,13 +754,6 @@ export async function getSafeMultisigTransactionForClient(
           }
         }
 
-        const createdAtMs = getNormalizedCreatedAtMs(options?.createdAt);
-        const hasSeenTransactionBefore =
-          previousValue?.found === true ||
-          previousValue?.missingReason === "removed";
-        const isPastGracePeriod =
-          typeof createdAtMs === "number" &&
-          Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
         const missingReason =
           recentListContainsTransaction === false &&
           (hasSeenTransactionBefore || isPastGracePeriod)

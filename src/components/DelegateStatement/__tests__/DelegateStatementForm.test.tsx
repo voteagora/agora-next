@@ -19,6 +19,7 @@ const setSaveSuccessMock = vi.fn();
 const ensureSiweSessionMock = vi.fn();
 const originalDelegateStatementAuthMode =
   process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
+const originalSiweEnabled = process.env.NEXT_PUBLIC_SIWE_ENABLED;
 
 const defaultValues: DelegateStatementFormValues = {
   agreeCodeConduct: true,
@@ -198,6 +199,7 @@ describe("DelegateStatementForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "siwe_jwt";
+    process.env.NEXT_PUBLIC_SIWE_ENABLED = "true";
     ensureSiweSessionMock.mockResolvedValue("jwt-token");
     signMessageAsyncMock.mockResolvedValue("0xabc123");
     submitDelegateStatementMock.mockResolvedValue({});
@@ -205,11 +207,21 @@ describe("DelegateStatementForm", () => {
 
   afterEach(() => {
     cleanup();
-    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE =
-      originalDelegateStatementAuthMode;
+    if (originalDelegateStatementAuthMode === undefined) {
+      delete process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
+    } else {
+      process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE =
+        originalDelegateStatementAuthMode;
+    }
+
+    if (originalSiweEnabled === undefined) {
+      delete process.env.NEXT_PUBLIC_SIWE_ENABLED;
+    } else {
+      process.env.NEXT_PUBLIC_SIWE_ENABLED = originalSiweEnabled;
+    }
   });
 
-  it("submits with a SIWE JWT for EOAs by default", async () => {
+  it("submits with a SIWE JWT for EOAs when SIWE auth is enabled", async () => {
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
     fireEvent.click(
@@ -230,6 +242,37 @@ describe("DelegateStatementForm", () => {
 
     expect(ensureSiweSessionMock).toHaveBeenCalledTimes(1);
     expect(signMessageAsyncMock).not.toHaveBeenCalled();
+    expect(openDialogMock).not.toHaveBeenCalled();
+  });
+
+  it("falls back to signed-message auth when SIWE is disabled", async () => {
+    delete process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
+    delete process.env.NEXT_PUBLIC_SIWE_ENABLED;
+
+    const { isSafeWallet } = await import("@/lib/utils");
+    vi.mocked(isSafeWallet).mockResolvedValue(false);
+
+    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Submit delegate profile" })
+    );
+
+    await waitFor(() => expect(signMessageAsyncMock).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(submitDelegateStatementMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          address: "0x1234567890123456789012345678901234567890",
+          auth: {
+            kind: "signed_message",
+            signature: "0xabc123",
+            chainId: 1,
+          },
+        })
+      )
+    );
+
+    expect(ensureSiweSessionMock).not.toHaveBeenCalled();
     expect(openDialogMock).not.toHaveBeenCalled();
   });
 

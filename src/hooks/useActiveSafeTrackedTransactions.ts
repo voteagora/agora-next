@@ -7,7 +7,7 @@ import {
 
 export const ACTIVE_SAFE_TRACKED_TRANSACTIONS_QK =
   "activeSafeTrackedTransactions";
-const DEFAULT_ACTIVE_SAFE_TRACKED_TRANSACTIONS_POLL_MS = 10_000;
+const DEFAULT_ACTIVE_SAFE_TRACKED_TRANSACTIONS_POLL_MS = 30_000;
 
 export function useActiveSafeTrackedTransactions({
   kind,
@@ -25,7 +25,8 @@ export function useActiveSafeTrackedTransactions({
     refetchInterval: enabled
       ? DEFAULT_ACTIVE_SAFE_TRACKED_TRANSACTIONS_POLL_MS
       : false,
-    refetchOnWindowFocus: true,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
     retry: false,
   });
 }

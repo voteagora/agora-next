@@ -271,6 +271,35 @@ describe("safeApi.server", () => {
     });
   });
 
+  it("skips the recent-list lookup during the grace period and keeps the transaction in indexing state", async () => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(new Response(null, { status: 404 }));
+
+    const { getSafeMultisigTransactionForClient } = await import(
+      "@/lib/safeApi.server"
+    );
+
+    await expect(
+      getSafeMultisigTransactionForClient(
+        1,
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        {
+          safeAddress: "0x1234567890123456789012345678901234567890",
+          createdAt: Date.now(),
+        }
+      )
+    ).resolves.toEqual({
+      found: false,
+      status: null,
+      isSuccessful: null,
+      nextPollMs: 5_000,
+      missingReason: "indexing",
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("keeps a missing multisig transaction in indexing state when the Safe tx-service list still contains the tracked safeTxHash", async () => {
     fetchMock
       .mockResolvedValueOnce(new Response(null, { status: 404 }))

@@ -15,9 +15,6 @@
     "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "init-forum-index": "tsx src/scripts/initializeForumIndex.ts",
-    "analyze-contract-wallets": "tsx src/scripts/analyzeContractWallets.ts",
-    "analyze-top-delegates": "tsx src/scripts/analyzeTopDelegates.ts",
-    "analyze-contract-delegates": "tsx src/scripts/analyzeContractDelegates.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
     "test": "vitest"
