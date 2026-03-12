@@ -89,40 +89,45 @@ outcome: {
 
 ## Status Determination
 
+OFFCHAIN_OPTIMISTIC falls through to `calculateTieredVeto` with the flat `OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20]`. It does **not** use the average method.
+
 ### Default Thresholds
 
 ```typescript
-// Simple offchain optimistic uses flat 20% threshold
-const OFFCHAIN_OPTIMISTIC_THRESHOLD = 20; // 20%
+// All three tiers set to the same 20% flat threshold
+const OFFCHAIN_OPTIMISTIC_THRESHOLD = [20, 20, 20];
 ```
 
 ### Veto Calculation
 
+Since this is a pure eas-atlas proposal (no delegates), `delegateVeto = 0`. The tiered multi-group check is applied across `[delegateVeto, appVeto, userVeto, chainVeto]`:
+
 ```typescript
-const ELIGIBLE_COUNTS = { APP: 100, USER: 1000, CHAIN: 15 };
+const ELIGIBLE_COUNTS = { apps: 100, users: 1000, chains: 15 };
+// Note: the code looks for lowercase "apps", "users", "chains" keys in outcome
 
-function calculateAverageVeto(): number {
-  const groups = ["USER", "APP", "CHAIN"];
-  let totalVetoPercent = 0;
-  let activeGroups = 0;
+const appVeto = ((outcome?.["apps"]?.["0"] ?? 0) / ELIGIBLE_COUNTS.apps) * 100;
+const userVeto =
+  ((outcome?.["users"]?.["0"] ?? 0) / ELIGIBLE_COUNTS.users) * 100;
+const chainVeto =
+  ((outcome?.["chains"]?.["0"] ?? 0) / ELIGIBLE_COUNTS.chains) * 100;
 
-  for (const group of groups) {
-    const againstVotes = outcome[group]?.["0"] || 0;
-    if (ELIGIBLE_COUNTS[group]) {
-      totalVetoPercent += (againstVotes / ELIGIBLE_COUNTS[group]) * 100;
-      activeGroups++;
-    }
-  }
+// delegateVeto = 0 (no onchain delegates for pure eas-atlas)
+const vetoPercentages = [0, appVeto, userVeto, chainVeto];
 
-  return activeGroups > 0 ? totalVetoPercent / activeGroups : 0;
-}
+const countExceeding = (threshold: number) =>
+  vetoPercentages.filter((v) => v >= threshold).length;
 
-// Status determination
-const avgVeto = calculateAverageVeto();
-const vetoTriggered = avgVeto >= OFFCHAIN_OPTIMISTIC_THRESHOLD;
+const tiers = [20, 20, 20]; // OFFCHAIN_OPTIMISTIC_THRESHOLD
+const vetoTriggered =
+  countExceeding(tiers[2]) >= 4 || // impossible: delegate is always 0
+  countExceeding(tiers[1]) >= 3 || // all 3 citizen groups >= 20%
+  countExceeding(tiers[0]) >= 2; // any 2 citizen groups >= 20%
 
 return vetoTriggered ? "DEFEATED" : "SUCCEEDED";
 ```
+
+> **Effective trigger:** Veto fires when **2 or more** citizen groups each have >= 20% against votes independently (not averaged).
 
 ---
 

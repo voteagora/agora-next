@@ -125,17 +125,17 @@ function calculateGroupVeto(group: string): number {
   return (againstVotes / ELIGIBLE_COUNTS[group]) * 100;
 }
 
-// For OFFCHAIN_OPTIMISTIC_TIERED: uses average across 3 groups
+// For OFFCHAIN_OPTIMISTIC_TIERED: average veto across 3 citizen groups
 const userVeto = calculateGroupVeto("USER");
 const appVeto = calculateGroupVeto("APP");
 const chainVeto = calculateGroupVeto("CHAIN");
 
 const avgVeto = (userVeto + appVeto + chainVeto) / 3;
 
-// Use first tier threshold (all same for offchain)
-const threshold = tiers[0] / 100; // Convert basis points to %
-
-const vetoTriggered = avgVeto >= threshold;
+// tiers[0] is used DIRECTLY — no basis-point conversion
+// Default: OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD = [65, 65, 65] (already percentages)
+// Custom tiers from proposal.tiers are also used as-is
+const vetoTriggered = avgVeto >= tiers[0];
 return vetoTriggered ? "DEFEATED" : "SUCCEEDED";
 ```
 

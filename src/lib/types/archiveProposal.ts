@@ -545,7 +545,7 @@ export type ArchiveListProposal = {
   proposal_type_info?: ProposalTypeInfo;
   kwargs?: Record<string, unknown>;
   created_blocktime?: number;
-
+  timestamp?: number;
   // snapshot-specific fields (source === "snapshot")
   author?: string;
   type?: string; // e.g. "copeland", "single-choice", "approval"

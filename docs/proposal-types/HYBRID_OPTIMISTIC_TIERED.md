@@ -173,52 +173,44 @@ const HYBRID_OPTIMISTIC_TIERED_DEFAULT = [55, 45, 35]; // percentages
 ### Per-Group Veto Calculation
 
 ```typescript
-const ELIGIBLE_COUNTS = { APP: 100, USER: 1000, CHAIN: 15 };
+// Delegate veto: onchain against votes / votable supply
+const votableSupply = BigInt(
+  proposal.votableSupply ?? proposal.total_voting_power_at_start ?? "0"
+);
+const governanceAgainstVotes = BigInt(
+  proposal.totals?.["no-param"]?.["0"] ?? "0"
+);
+const eligibleDelegates =
+  votableSupply > 0n ? votableSupply : BigInt(Number.MAX_SAFE_INTEGER);
+const delegateVeto =
+  (Number(governanceAgainstVotes) / Number(eligibleDelegates)) * 100;
 
-function calculateVetoPercentage(group: string): number {
-  if (group === "DELEGATES") {
-    const againstVotes = BigInt(totals["no-param"]["0"] || "0");
-    const eligibleDelegates = (BigInt(total_voting_power_at_start) * 3n) / 10n; // 30%
-    return (Number(againstVotes) / Number(eligibleDelegates)) * 100;
-  }
-
-  const against = outcome[group]?.["0"] || 0;
-  return (against / ELIGIBLE_COUNTS[group]) * 100;
-}
+// Citizen veto: against votes from govless_proposal.outcome / OFFCHAIN_THRESHOLDS
+// outcome = proposal.govless_proposal.outcome
+const appVeto =
+  (Number(outcome?.APP?.["0"] ?? 0) / OFFCHAIN_THRESHOLDS.APP) * 100;
+const userVeto =
+  (Number(outcome?.USER?.["0"] ?? 0) / OFFCHAIN_THRESHOLDS.USER) * 100;
+const chainVeto =
+  (Number(outcome?.CHAIN?.["0"] ?? 0) / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
 ```
 
 ### Tiered Veto Check
 
 ```typescript
-// Convert tier basis points to percentages
-const [twoGroupThreshold, threeGroupThreshold, fourGroupThreshold] = tiers.map(
-  (t) => t / 100
-);
+const vetoPercentages = [delegateVeto, appVeto, userVeto, chainVeto];
 
-// Calculate veto percentages for each group
-const groupVetoPercentages = {
-  delegates: calculateVetoPercentage("DELEGATES"),
-  users: calculateVetoPercentage("USER"),
-  apps: calculateVetoPercentage("APP"),
-  chains: calculateVetoPercentage("CHAIN"),
-};
+const countExceeding = (threshold: number) =>
+  vetoPercentages.filter((v) => v >= threshold).length;
 
-// Count groups exceeding each threshold
-function countGroupsExceeding(threshold: number): number {
-  return Object.values(groupVetoPercentages).filter((v) => v >= threshold)
-    .length;
-}
-
-// Veto is triggered if:
-// - 4+ groups exceed fourGroupThreshold (17%)
-// - 3+ groups exceed threeGroupThreshold (14%)
-// - 2+ groups exceed twoGroupThreshold (11%)
+// tiers[] values are used directly — no basis-point conversion
 const vetoTriggered =
-  countGroupsExceeding(fourGroupThreshold) >= 4 ||
-  countGroupsExceeding(threeGroupThreshold) >= 3 ||
-  countGroupsExceeding(twoGroupThreshold) >= 2;
+  countExceeding(tiers[2]) >= 4 || // All 4 groups >= tiers[2]
+  countExceeding(tiers[1]) >= 3 || // Any 3 groups >= tiers[1]
+  countExceeding(tiers[0]) >= 2; // Any 2 groups >= tiers[0]
 
-return vetoTriggered ? "DEFEATED" : "SUCCEEDED";
+return { vetoTriggered };
+// Caller: vetoTriggered ? "DEFEATED" : "SUCCEEDED"
 ```
 
 ---
@@ -238,14 +230,10 @@ return vetoTriggered ? "DEFEATED" : "SUCCEEDED";
 
 ### Status Tests
 
-1. **SUCCEEDED - No Vetoes**: All groups have 0 veto votes
-2. **SUCCEEDED - Below All Thresholds**: No coalition meets threshold
-3. **DEFEATED - 2 Groups Exceed**: 2+ groups exceed 11%
-4. **DEFEATED - 3 Groups Exceed**: 3+ groups exceed 14%
-5. **DEFEATED - 4 Groups Exceed**: 4 groups exceed 17%
-
-### Edge Cases
-
-1. **Missing Tiers**: Use default [55, 45, 35] percentages
-2. **Empty Groups**: Some groups may have no veto votes
-3. **Single Group High Veto**: One group at 100% doesn't trigger alone
+1. **SUCCEEDED - No Vetoes**: All veto percentages below `tiers[0]`
+2. **DEFEATED - 2-Group Veto**: Exactly 2 groups >= `tiers[0]` (but < tiers[1]/tiers[2] conditions)
+3. **DEFEATED - 3-Group Veto**: Exactly 3 groups >= `tiers[1]`
+4. **DEFEATED - 4-Group Veto**: All 4 groups >= `tiers[2]`
+5. **SUCCEEDED - Single High Veto**: Only 1 group exceeds tiers[0]; no multi-group condition met
+6. **Custom Tiers**: `govless_proposal.tiers` used directly; no basis-point conversion
+7. **Terminal States**: Same as STANDARD (QUEUED, EXECUTED, CANCELLED)

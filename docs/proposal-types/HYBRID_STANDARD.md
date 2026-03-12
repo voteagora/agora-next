@@ -138,73 +138,94 @@ govless_proposal.outcome: {
 
 ## Status Determination
 
-### Voter Groups & Weights
+### Voter Groups
 
-| Group     | Description            | Eligible Count        | Weight  |
-| --------- | ---------------------- | --------------------- | ------- |
-| DELEGATES | Token House (onchain)  | 30% of votable supply | 50%     |
-| USER      | Citizen House - Users  | 1000                  | ~16.67% |
-| APP       | Citizen House - Apps   | 100                   | ~16.67% |
-| CHAIN     | Citizen House - Chains | 15                    | ~16.67% |
+| Group     | Eligible Count                              | Source            |
+| --------- | ------------------------------------------- | ----------------- |
+| Delegates | `total_voting_power_at_start / 10^decimals` | dao_node totals   |
+| APP       | `OFFCHAIN_THRESHOLDS.APP` = 100             | eas-atlas outcome |
+| USER      | `OFFCHAIN_THRESHOLDS.USER` = 1000           | eas-atlas outcome |
+| CHAIN     | `OFFCHAIN_THRESHOLDS.CHAIN` = 15            | eas-atlas outcome |
+
+> Unlike HYBRID_APPROVAL, HYBRID_STANDARD uses the full votable supply (`total_voting_power_at_start`) as the delegate eligible count — not the quorum-derived value.
 
 ### Calculation Logic
 
 ```typescript
-const HYBRID_VOTE_WEIGHTS = {
-  delegates: 0.5,
-  apps: 1 / 6,
-  users: 1 / 6,
-  chains: 1 / 6,
-};
+// 1. Resolve thresholds from the dao_node onchain proposal
+const thresholds = resolveArchiveThresholds(proposal);
+// thresholds.quorum: BigInt absolute value (from proposal.quorum)
+// thresholds.approvalThreshold: BigInt basis points (e.g. 5100 = 51%)
 
-const ELIGIBLE_COUNTS = {
-  APP: 100,
-  USER: 1000,
-  CHAIN: 15,
-};
+// 2. Derive eligible delegates from total votable supply
+const eligibleDelegates = proposal.total_voting_power_at_start
+  ? convertToNumber(String(proposal.total_voting_power_at_start), decimals)
+  : 1;
 
-// Per-group tally calculation
-function calculateGroupTally(
-  forVotes: number,
-  againstVotes: number,
-  abstainVotes: number,
-  eligibleCount: number,
-  calculationOptions: 0 | 1
-) {
-  const quorumVotes =
-    calculationOptions === 1 ? forVotes : forVotes + abstainVotes;
-  const totalVoted = forVotes + againstVotes;
+// 3. Extract onchain votes (dao_node totals["no-param"])
+const voteTotals = proposal.totals?.["no-param"] || {};
+const delegateFor = convertToNumber(String(voteTotals["1"] ?? 0), decimals);
+const delegateAgainst = convertToNumber(String(voteTotals["0"] ?? 0), decimals);
+const delegateAbstain = convertToNumber(String(voteTotals["2"] ?? 0), decimals);
 
-  return {
-    quorum: quorumVotes / eligibleCount, // 0-1 participation ratio
-    approval: totalVoted > 0 ? forVotes / totalVoted : 0, // 0-1 approval ratio
-  };
+// 4. Extract offchain votes from govless_proposal.outcome
+const outcome = proposal.govless_proposal?.outcome ?? {};
+const citizenVotes = (key: string) => ({
+  user: Number(outcome.USER?.[key]?.["1"] ?? 0),
+  app: Number(outcome.APP?.[key]?.["1"] ?? 0),
+  chain: Number(outcome.CHAIN?.[key]?.["1"] ?? 0),
+});
+
+// 5. Compute weighted percentages (HYBRID_VOTE_WEIGHTS: delegates=0.5, each citizen=1/6)
+function calcWeightedPct(delegateVotes, eligibleDelegates, citizen) {
+  const delegatePct =
+    eligibleDelegates > 0 ? (delegateVotes / eligibleDelegates) * 100 : 0;
+  const userPct = (citizen.user / OFFCHAIN_THRESHOLDS.USER) * 100;
+  const appPct = (citizen.app / OFFCHAIN_THRESHOLDS.APP) * 100;
+  const chainPct = (citizen.chain / OFFCHAIN_THRESHOLDS.CHAIN) * 100;
+  return (
+    delegatePct * 0.5 +
+    userPct * (1 / 6) +
+    appPct * (1 / 6) +
+    chainPct * (1 / 6)
+  );
 }
 
-// Final weighted calculation
-const finalQuorum =
-  delegatesTally.quorum * 0.5 +
-  appsTally.quorum * (1 / 6) +
-  usersTally.quorum * (1 / 6) +
-  chainsTally.quorum * (1 / 6);
+const forVotes = calcWeightedPct(
+  delegateFor,
+  eligibleDelegates,
+  citizenVotes("1")
+);
+const againstVotes = calcWeightedPct(
+  delegateAgainst,
+  eligibleDelegates,
+  citizenVotes("0")
+);
+const abstainVotes = calcWeightedPct(
+  delegateAbstain,
+  eligibleDelegates,
+  citizenVotes("2")
+);
 
-const finalApproval =
-  delegatesTally.approval * 0.5 +
-  appsTally.approval * (1 / 6) +
-  usersTally.approval * (1 / 6) +
-  chainsTally.approval * (1 / 6);
+// 6. Approval check (% of for vs for+against)
+const thresholdVotes = forVotes + againstVotes;
+const voteThresholdPercent =
+  thresholdVotes > 0 ? (forVotes / thresholdVotes) * 100 : 0;
+const hasMetThreshold =
+  voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+  Number(thresholds.approvalThreshold) === 0;
 
-// Thresholds
-const QUORUM_THRESHOLD = 0.3; // 30%
-const approvalThreshold = proposal_type_info.approval_threshold / 10000; // Convert basis points
+// 7. Quorum check (tenant-specific calculateQuorumNumber — applies to weighted %s)
+const quorumVotes = calculateQuorumNumber(forVotes, againstVotes, abstainVotes);
 
-// Status
-const quorumMet = finalQuorum >= QUORUM_THRESHOLD;
-const approvalMet = finalApproval >= approvalThreshold;
-
-if (quorumMet && approvalMet) return "SUCCEEDED";
+// 8. Status: SUCCEEDED if EITHER threshold OR quorum is met (OR, not AND)
+if (hasMetThreshold || quorumVotes >= Number(thresholds.quorum)) {
+  return "SUCCEEDED";
+}
 return "DEFEATED";
 ```
+
+> **Important:** The status uses an OR condition — a proposal passes if approval threshold OR quorum check is met.
 
 ---
 
@@ -224,13 +245,14 @@ return "DEFEATED";
 
 ### Status Tests
 
-1. **DEFEATED - Low Weighted Quorum**: `finalQuorum < 0.30`
-2. **DEFEATED - Low Weighted Approval**: `finalApproval < approval_threshold`
-3. **SUCCEEDED**: Both quorum and approval met
+1. **SUCCEEDED - Threshold Met**: `voteThresholdPercent >= approvalThreshold` (even if quorum not met)
+2. **SUCCEEDED - Quorum Met**: `quorumVotes >= Number(thresholds.quorum)` (even if threshold not met)
+3. **DEFEATED - Both Low**: Neither approval threshold nor quorum check is satisfied
 4. **Terminal States**: Same as STANDARD (QUEUED, EXECUTED, CANCELLED)
 
-### Edge Cases
+### Calculation Tests
 
-1. **Missing Groups**: Some citizen groups may have empty outcomes
-2. **Zero Votes in Group**: Should handle division by zero in approval calc
-3. **Asymmetric Timing**: Offchain voting may have different timing than onchain
+1. **Delegates Only**: No offchain votes; weighted pct is driven purely by `delegatePct * 0.5`
+2. **Citizens Only**: `eligibleDelegates = 1` fallback when `rawQuorum = 0`
+3. **Mixed**: Both delegate and citizen votes contribute to weighted percentage
+4. **Edge Case - Zero eligibleDelegates**: Falls back to `1` to avoid division by zero
