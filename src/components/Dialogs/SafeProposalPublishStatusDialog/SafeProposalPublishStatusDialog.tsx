@@ -211,9 +211,9 @@ export function SafeProposalPublishStatusDialog({
             href={getBlockScanUrl(executionTxHash)}
             target="_blank"
             rel="noreferrer"
-            className="w-full h-12 flex-1 items-center justify-center gap-2"
+            className="flex h-12 w-full flex-1 items-center justify-center rounded-lg text-center"
           >
-            <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span className="flex w-full items-center justify-center gap-2 whitespace-nowrap text-center">
               View Execution Tx <ExternalLink className="h-4 w-4" />
             </span>
           </UpdatedButton>
@@ -224,9 +224,9 @@ export function SafeProposalPublishStatusDialog({
             href={safeQueueUrl}
             target="_blank"
             rel="noreferrer"
-            className="w-full h-12 flex-1 items-center justify-center gap-2"
+            className="flex h-12 w-full flex-1 items-center justify-center rounded-lg text-center"
           >
-            <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span className="flex w-full items-center justify-center gap-2 whitespace-nowrap text-center">
               Open Safe <ExternalLink className="h-4 w-4" />
             </span>
           </UpdatedButton>
@@ -235,7 +235,7 @@ export function SafeProposalPublishStatusDialog({
         <UpdatedButton
           fullWidth
           type={executionTxHash || isRemoved ? "secondary" : "primary"}
-          className="w-full h-12 flex-1 items-center justify-center"
+          className="flex h-12 w-full flex-1 items-center justify-center rounded-lg text-center"
           onClick={closeDialog}
         >
           {executionTxHash || isRemoved ? "Close" : "Keep In Background"}

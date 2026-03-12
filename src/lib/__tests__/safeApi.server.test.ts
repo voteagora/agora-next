@@ -234,7 +234,7 @@ describe("safeApi.server", () => {
     });
   });
 
-  it("classifies a missing multisig transaction as removed when it is gone from the Safe queue after the grace period", async () => {
+  it("classifies a missing multisig transaction as removed when it is absent from the Safe tx-service list after the grace period", async () => {
     fetchMock
       .mockResolvedValueOnce(new Response(null, { status: 404 }))
       .mockResolvedValueOnce(new Response(null, { status: 404 }))
@@ -269,7 +269,7 @@ describe("safeApi.server", () => {
     });
   });
 
-  it("keeps a missing multisig transaction in indexing state when the queue still contains the tracked safeTxHash", async () => {
+  it("keeps a missing multisig transaction in indexing state when the Safe tx-service list still contains the tracked safeTxHash", async () => {
     fetchMock
       .mockResolvedValueOnce(new Response(null, { status: 404 }))
       .mockResolvedValueOnce(new Response(null, { status: 404 }))
@@ -278,27 +278,16 @@ describe("safeApi.server", () => {
           JSON.stringify({
             results: [
               {
-                type: "TRANSACTION",
-                transaction: {
-                  id: "queued_tx_1",
-                  timestamp: 1710000005000,
-                },
+                safeTxHash:
+                  "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                transactionHash: null,
+                nonce: 7,
+                created: "2026-03-10T00:04:00Z",
+                modified: "2026-03-10T00:05:00Z",
+                isExecuted: false,
+                isSuccessful: null,
               },
             ],
-          }),
-          { status: 200 }
-        )
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            safeAddress: "0x1234567890123456789012345678901234567890",
-            txId: "queued_tx_1",
-            detailedExecutionInfo: {
-              type: "MULTISIG",
-              safeTxHash:
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            },
           }),
           { status: 200 }
         )
@@ -326,6 +315,53 @@ describe("safeApi.server", () => {
     });
   });
 
+  it("does not let a blind cached lookup mask a richer removed-transaction lookup", async () => {
+    fetchMock
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(new Response(null, { status: 404 }))
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            results: [],
+          }),
+          { status: 200 }
+        )
+      );
+
+    const { getSafeMultisigTransactionForClient } = await import(
+      "@/lib/safeApi.server"
+    );
+    const safeTxHash =
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
+    await expect(
+      getSafeMultisigTransactionForClient(1, safeTxHash)
+    ).resolves.toEqual({
+      found: false,
+      status: null,
+      isSuccessful: null,
+      nextPollMs: 5_000,
+      missingReason: "indexing",
+    });
+
+    await expect(
+      getSafeMultisigTransactionForClient(1, safeTxHash, {
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        createdAt: Date.now() - 60_000,
+      })
+    ).resolves.toEqual({
+      found: false,
+      status: null,
+      isSuccessful: null,
+      nextPollMs: 30_000,
+      missingReason: "removed",
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(5);
+  });
+
   it("discovers a queued Safe multisig transaction by exact calldata match", async () => {
     fetchMock
       .mockResolvedValueOnce(
@@ -333,72 +369,42 @@ describe("safeApi.server", () => {
           JSON.stringify({
             results: [
               {
-                type: "TRANSACTION",
-                transaction: {
-                  id: "multisig_old_candidate",
-                  timestamp: 1710000000000,
-                  txStatus: "AWAITING_CONFIRMATIONS",
-                  txInfo: {
-                    to: {
-                      value: "0x9999999999999999999999999999999999999999",
-                    },
-                  },
-                },
+                safe: "0x1234567890123456789012345678901234567890",
+                to: "0x9999999999999999999999999999999999999999",
+                data: "0x11111111",
+                submissionDate: "2024-03-09T16:00:00.000Z",
+                safeTxHash:
+                  "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+                isExecuted: false,
               },
               {
-                type: "TRANSACTION",
-                transaction: {
-                  id: "multisig_matching_candidate",
-                  timestamp: 1710000005000,
-                  txStatus: "AWAITING_CONFIRMATIONS",
-                  txInfo: {
-                    to: {
-                      value: "0x9999999999999999999999999999999999999999",
-                    },
-                  },
-                },
+                safe: "0x1234567890123456789012345678901234567890",
+                to: "0x9999999999999999999999999999999999999999",
+                data: "0xdeadbeef",
+                submissionDate: "2024-03-09T16:00:05.000Z",
+                isExecuted: false,
+                safeTxHash:
+                  "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              },
+              {
+                safe: "0x1234567890123456789012345678901234567890",
+                to: "0x9999999999999999999999999999999999999999",
+                data: "0xdeadbeef",
+                submissionDate: "2024-03-09T16:00:06.000Z",
+                isExecuted: true,
+                safeTxHash:
+                  "0xcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+              },
+              {
+                safe: "0x1234567890123456789012345678901234567890",
+                to: "0x1111111111111111111111111111111111111111",
+                data: "0xdeadbeef",
+                submissionDate: "2024-03-09T16:00:07.000Z",
+                isExecuted: false,
+                safeTxHash:
+                  "0xdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
               },
             ],
-          }),
-          { status: 200 }
-        )
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            safeAddress: "0x1234567890123456789012345678901234567890",
-            txId: "multisig_matching_candidate",
-            txData: {
-              hexData: "0xdeadbeef",
-              to: {
-                value: "0x9999999999999999999999999999999999999999",
-              },
-            },
-            detailedExecutionInfo: {
-              type: "MULTISIG",
-              safeTxHash:
-                "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            },
-          }),
-          { status: 200 }
-        )
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            safeAddress: "0x1234567890123456789012345678901234567890",
-            txId: "multisig_old_candidate",
-            txData: {
-              hexData: "0x11111111",
-              to: {
-                value: "0x9999999999999999999999999999999999999999",
-              },
-            },
-            detailedExecutionInfo: {
-              type: "MULTISIG",
-              safeTxHash:
-                "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            },
           }),
           { status: 200 }
         )
@@ -419,12 +425,13 @@ describe("safeApi.server", () => {
     ).resolves.toEqual({
       safeTxHash:
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      txId: "multisig_matching_candidate",
+      txId:
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     });
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      "https://safe-client.safe.global/v1/chains/1/safes/0x1234567890123456789012345678901234567890/transactions/queued?trusted=true",
+      "https://safe-transaction-mainnet.safe.global/api/v1/safes/0x1234567890123456789012345678901234567890/multisig-transactions/?limit=20&ordering=-modified",
       expect.objectContaining({
         cache: "no-store",
       })

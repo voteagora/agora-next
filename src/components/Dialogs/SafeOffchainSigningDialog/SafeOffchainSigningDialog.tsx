@@ -82,9 +82,7 @@ export type SafeOffchainSigningDialogProps = {
 };
 
 type UseSafeOffchainSigningFlowParams = SafeOffchainSigningDialogProps;
-const SAFE_DEBUG_LOGS =
-  process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true" ||
-  process.env.NODE_ENV !== "production";
+const SAFE_DEBUG_LOGS = process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true";
 
 function logSafeClientDebug(event: Record<string, unknown>) {
   if (!SAFE_DEBUG_LOGS) {

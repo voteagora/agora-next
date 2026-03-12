@@ -36,11 +36,11 @@ describe("SafeOnchainPendingDialog", () => {
     );
 
     expect(
-      screen.getByText("Open Safe and approve transaction")
+      screen.getByText("Open Safe and confirm transaction")
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Waiting for Safe wallet approval in the Safe app."
+        "Waiting for the first Safe confirmation in the Safe app."
       )
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Open Safe/i })).toHaveAttribute(

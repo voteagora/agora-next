@@ -44,9 +44,7 @@ const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
 
 const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
-const SAFE_DEBUG_LOGS =
-  process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true" ||
-  process.env.NODE_ENV !== "production";
+const SAFE_DEBUG_LOGS = process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true";
 let activeSafeSiweNonceCache: {
   safeAddress: `0x${string}`;
   chainId: number;

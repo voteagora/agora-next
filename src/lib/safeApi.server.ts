@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getAddress } from "viem";
+
 import {
   normalizeSafeMessageStatusApiResponse,
   normalizeSafeMultisigTransactionApiResponse,
@@ -15,13 +17,9 @@ const SAFE_ACTIVE_CONFIRMATION_POLL_MS = 3_000;
 const SAFE_RATE_LIMIT_BACKOFF_MS = 15_000;
 const SAFE_CACHE_TTL_MS = 2_000;
 const SAFE_TERMINAL_CACHE_TTL_MS = 30_000;
-const SAFE_CLIENT_API_BASE_URL = "https://safe-client.safe.global/v1";
 const SAFE_DISCOVERY_LOOKBACK_BUFFER_MS = 60_000;
 const SAFE_MISSING_MULTISIG_GRACE_MS = 30_000;
-const SAFE_QUEUE_SCAN_MAX_PAGES = 5;
-const SAFE_QUEUE_SCAN_MAX_TRANSACTIONS = 100;
-const SAFE_DEBUG_LOGS =
-  process.env.SAFE_DEBUG_LOGS === "true" || process.env.NODE_ENV !== "production";
+const SAFE_DEBUG_LOGS = process.env.SAFE_DEBUG_LOGS === "true";
 
 type SafeCacheEntry<T> = {
   value?: T;
@@ -66,36 +64,15 @@ export type SafeDebugSnapshotResult = {
   recentMultisigTransactions: SafeDebugListResult<SafeRecentMultisigTransactionLookup>;
 };
 
-type SafeQueuedTransactionListApiResponse = {
-  next?: string | null;
-  results?: Array<{
-    type?: string;
-    transaction?: {
-      id?: string;
-      timestamp?: number;
-      txStatus?: string;
-      txInfo?: {
-        to?: {
-          value?: string;
-        };
-      };
-    };
-  }>;
-};
-
-type SafeClientTransactionDetailsApiResponse = {
-  safeAddress?: string;
-  txId?: string;
-  txData?: {
-    hexData?: string;
-    to?: {
-      value?: string;
-    };
-  };
-  detailedExecutionInfo?: {
-    type?: string;
-    safeTxHash?: string;
-  };
+type SafeMultisigTransactionListItemApiResponse = {
+  safe?: string;
+  to?: string;
+  data?: string;
+  submissionDate?: string;
+  created?: string;
+  modified?: string;
+  safeTxHash?: string;
+  isExecuted?: boolean | null;
 };
 
 const safeMessageStatusCache = new Map<
@@ -120,34 +97,6 @@ function getSafeApiHeaders() {
   return headers;
 }
 
-async function fetchSafeClientApi<T>(path: string): Promise<T> {
-  const response = await fetch(
-    path.startsWith("http://") || path.startsWith("https://")
-      ? path
-      : `${SAFE_CLIENT_API_BASE_URL}${path}`,
-    {
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Failed to load Safe client API (${response.status})`);
-  }
-
-  return (await response.json()) as T;
-}
-
-function normalizeTimestamp(timestamp?: number) {
-  if (!timestamp || !Number.isFinite(timestamp)) {
-    return null;
-  }
-
-  return timestamp < 1_000_000_000_000 ? timestamp * 1_000 : timestamp;
-}
-
 function getNormalizedCreatedAtMs(createdAt?: number | string) {
   if (typeof createdAt === "number" && Number.isFinite(createdAt)) {
     return createdAt;
@@ -167,88 +116,12 @@ function normalizeAddress(address?: string) {
   return address?.toLowerCase();
 }
 
-function getQueuedTransactionIds(queue: SafeQueuedTransactionListApiResponse) {
-  return (queue.results ?? [])
-    .filter((item) => item.type === "TRANSACTION")
-    .map((item) => item.transaction)
-    .filter(
-      (transaction): transaction is NonNullable<typeof transaction> =>
-        Boolean(transaction?.id)
-    );
-}
-
-async function findQueuedSafeMultisigTransactionByHashForClient(params: {
-  chainId: number;
-  safeAddress: `0x${string}`;
-  safeTxHash: `0x${string}`;
-}): Promise<
-  | {
-      safeTxHash: `0x${string}`;
-      txId: string;
-    }
-  | null
-> {
-  let pageUrl =
-    `/chains/${params.chainId}/safes/${params.safeAddress}` +
-    "/transactions/queued?trusted=true";
-  let scannedTransactions = 0;
-
-  for (let page = 0; page < SAFE_QUEUE_SCAN_MAX_PAGES && pageUrl; page += 1) {
-    const queue =
-      await fetchSafeClientApi<SafeQueuedTransactionListApiResponse>(pageUrl);
-    const transactions = getQueuedTransactionIds(queue);
-    scannedTransactions += transactions.length;
-
-    const details = await Promise.all(
-      transactions.map(async (transaction) => {
-        try {
-          const result =
-            await fetchSafeClientApi<SafeClientTransactionDetailsApiResponse>(
-              `/chains/${params.chainId}/transactions/${encodeURIComponent(
-                transaction.id!
-              )}`
-            );
-          return {
-            txId: transaction.id!,
-            result,
-          };
-        } catch {
-          return null;
-        }
-      })
-    );
-
-    for (const detail of details) {
-      if (!detail) {
-        continue;
-      }
-
-      const executionInfo = detail.result.detailedExecutionInfo;
-      if (normalizeAddress(detail.result.safeAddress) !== normalizeAddress(params.safeAddress)) {
-        continue;
-      }
-
-      if (
-        executionInfo?.type !== "MULTISIG" ||
-        executionInfo.safeTxHash?.toLowerCase() !== params.safeTxHash.toLowerCase()
-      ) {
-        continue;
-      }
-
-      return {
-        safeTxHash: executionInfo.safeTxHash as `0x${string}`,
-        txId: detail.result.txId ?? detail.txId,
-      };
-    }
-
-    if (scannedTransactions >= SAFE_QUEUE_SCAN_MAX_TRANSACTIONS) {
-      break;
-    }
-
-    pageUrl = queue.next ?? "";
+function formatSafeApiAddress(address: `0x${string}`) {
+  try {
+    return getAddress(address);
+  } catch {
+    return address;
   }
-
-  return null;
 }
 
 function parseRetryAfterMs(headers: Headers, fallbackMs = SAFE_RATE_LIMIT_BACKOFF_MS) {
@@ -412,9 +285,10 @@ export async function getRecentSafeMessagesForClient(
   chainId: number,
   safeAddress: `0x${string}`
 ): Promise<SafeDebugListResult<SafeRecentMessageLookup>> {
+  const normalizedSafeAddress = formatSafeApiAddress(safeAddress);
   const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
     chainId,
-    `/safes/${safeAddress}/messages/?limit=5&ordering=-modified`
+    `/safes/${normalizedSafeAddress}/messages/?limit=5&ordering=-modified`
   );
 
   if (!response.ok) {
@@ -458,11 +332,16 @@ export async function getRecentSafeMessagesForClient(
 
 export async function getRecentSafeMultisigTransactionsForClient(
   chainId: number,
-  safeAddress: `0x${string}`
+  safeAddress: `0x${string}`,
+  options?: {
+    limit?: number;
+  }
 ): Promise<SafeDebugListResult<SafeRecentMultisigTransactionLookup>> {
+  const normalizedSafeAddress = formatSafeApiAddress(safeAddress);
+  const limit = options?.limit ?? 5;
   const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
     chainId,
-    `/safes/${safeAddress}/multisig-transactions/?limit=5&ordering=-modified`
+    `/safes/${normalizedSafeAddress}/multisig-transactions/?limit=${limit}&ordering=-modified`
   );
 
   if (!response.ok) {
@@ -504,7 +383,7 @@ export async function getRecentSafeMultisigTransactionsForClient(
   return {
     status: response.status,
     attempts,
-    items: results.slice(0, 5).map((transaction) => ({
+    items: results.slice(0, limit).map((transaction) => ({
       safeTxHash: transaction.safeTxHash,
       transactionHash: transaction.transactionHash,
       nonce: transaction.nonce,
@@ -513,6 +392,68 @@ export async function getRecentSafeMultisigTransactionsForClient(
       isExecuted: transaction.isExecuted,
       isSuccessful: transaction.isSuccessful,
     })),
+  };
+}
+
+async function hasSafeMultisigTransactionInRecentListForClient(params: {
+  chainId: number;
+  safeAddress: `0x${string}`;
+  safeTxHash: `0x${string}`;
+}): Promise<boolean | null> {
+  const recentTransactions = await getRecentSafeMultisigTransactionsForClient(
+    params.chainId,
+    params.safeAddress,
+    {
+      limit: 100,
+    }
+  );
+
+  if (recentTransactions.status !== 200) {
+    return null;
+  }
+
+  return recentTransactions.items.some(
+    (transaction) =>
+      transaction.safeTxHash?.toLowerCase() === params.safeTxHash.toLowerCase()
+  );
+}
+
+async function getSafeMultisigTransactionsForDiscovery(params: {
+  chainId: number;
+  safeAddress: `0x${string}`;
+  limit?: number;
+}): Promise<SafeDebugListResult<SafeMultisigTransactionListItemApiResponse>> {
+  const normalizedSafeAddress = formatSafeApiAddress(params.safeAddress);
+  const limit = params.limit ?? 20;
+  const { response, attempts } = await fetchSafeTxServiceWithLegacyFallback(
+    params.chainId,
+    `/safes/${normalizedSafeAddress}/multisig-transactions/?limit=${limit}&ordering=-modified`
+  );
+
+  if (!response.ok) {
+    return {
+      status: response.status,
+      attempts,
+      items: [],
+    };
+  }
+
+  const payload = (await response.json()) as
+    | {
+        results?: SafeMultisigTransactionListItemApiResponse[];
+      }
+    | SafeMultisigTransactionListItemApiResponse[];
+
+  const results = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.results)
+    ? payload.results
+    : [];
+
+  return {
+    status: response.status,
+    attempts,
+    items: results.slice(0, limit),
   };
 }
 
@@ -567,86 +508,77 @@ export async function findQueuedSafeMultisigTransactionForClient(params: {
     }
   | null
 > {
-  const queue = await fetchSafeClientApi<SafeQueuedTransactionListApiResponse>(
-    `/chains/${params.chainId}/safes/${params.safeAddress}/transactions/queued?trusted=true`
-  );
   const createdAfterCutoff =
     params.createdAfter - SAFE_DISCOVERY_LOOKBACK_BUFFER_MS;
+  const transactionList = await getSafeMultisigTransactionsForDiscovery({
+    chainId: params.chainId,
+    safeAddress: params.safeAddress,
+    limit: 20,
+  });
 
-  const candidateIds = (queue.results ?? [])
-    .filter((item) => item.type === "TRANSACTION")
-    .map((item) => item.transaction)
-    .filter(
-      (transaction): transaction is NonNullable<typeof transaction> =>
-        Boolean(transaction?.id)
-    )
+  if (transactionList.status !== 200) {
+    throw new Error(
+      `Failed to load Safe tx-service multisig list (${transactionList.status})`
+    );
+  }
+
+  const matchingTransaction = transactionList.items
     .filter((transaction) => {
-      const timestamp = normalizeTimestamp(transaction.timestamp);
-      if (timestamp === null || timestamp < createdAfterCutoff) {
+      const transactionTimestamp = getNormalizedCreatedAtMs(
+        transaction.submissionDate ?? transaction.created ?? transaction.modified
+      );
+
+      if (
+        typeof transactionTimestamp !== "number" ||
+        transactionTimestamp < createdAfterCutoff
+      ) {
         return false;
       }
 
-      const txTo = normalizeAddress(transaction.txInfo?.to?.value);
-      return txTo === normalizeAddress(params.to);
-    })
-    .sort((left, right) => (right.timestamp ?? 0) - (left.timestamp ?? 0))
-    .slice(0, 5)
-    .map((transaction) => transaction.id!);
+      if (
+        transaction.safe &&
+        normalizeAddress(transaction.safe) !== normalizeAddress(params.safeAddress)
+      ) {
+        return false;
+      }
 
-  if (candidateIds.length === 0) {
+      if (normalizeAddress(transaction.to) !== normalizeAddress(params.to)) {
+        return false;
+      }
+
+      if (transaction.data?.toLowerCase() !== params.data.toLowerCase()) {
+        return false;
+      }
+
+      return transaction.safeTxHash?.startsWith("0x") === true;
+    })
+    .sort((left, right) => {
+      const leftExecuted = left.isExecuted ? 1 : 0;
+      const rightExecuted = right.isExecuted ? 1 : 0;
+      if (leftExecuted !== rightExecuted) {
+        return leftExecuted - rightExecuted;
+      }
+
+      const leftTimestamp =
+        getNormalizedCreatedAtMs(
+          left.submissionDate ?? left.created ?? left.modified
+        ) ?? 0;
+      const rightTimestamp =
+        getNormalizedCreatedAtMs(
+          right.submissionDate ?? right.created ?? right.modified
+        ) ?? 0;
+
+      return rightTimestamp - leftTimestamp;
+    })[0];
+
+  if (!matchingTransaction?.safeTxHash) {
     return null;
   }
 
-  const details = await Promise.all(
-    candidateIds.map(async (txId) => {
-      try {
-        const result =
-          await fetchSafeClientApi<SafeClientTransactionDetailsApiResponse>(
-            `/chains/${params.chainId}/transactions/${encodeURIComponent(txId)}`
-          );
-        return {
-          txId,
-          result,
-        };
-      } catch {
-        return null;
-      }
-    })
-  );
-
-  for (const detail of details) {
-    if (!detail) {
-      continue;
-    }
-
-    const txData = detail.result.txData;
-    const executionInfo = detail.result.detailedExecutionInfo;
-    if (normalizeAddress(detail.result.safeAddress) !== normalizeAddress(params.safeAddress)) {
-      continue;
-    }
-
-    if (normalizeAddress(txData?.to?.value) !== normalizeAddress(params.to)) {
-      continue;
-    }
-
-    if (txData?.hexData?.toLowerCase() !== params.data.toLowerCase()) {
-      continue;
-    }
-
-    if (
-      executionInfo?.type !== "MULTISIG" ||
-      !executionInfo.safeTxHash?.startsWith("0x")
-    ) {
-      continue;
-    }
-
-    return {
-      safeTxHash: executionInfo.safeTxHash as `0x${string}`,
-      txId: detail.result.txId ?? detail.txId,
-    };
-  }
-
-  return null;
+  return {
+    safeTxHash: matchingTransaction.safeTxHash as `0x${string}`,
+    txId: matchingTransaction.safeTxHash,
+  };
 }
 
 export async function getSafeMessageStatusForClient(
@@ -761,7 +693,12 @@ export async function getSafeMultisigTransactionForClient(
     createdAt?: number | string;
   }
 ): Promise<SafeMultisigTransactionLookupResult> {
-  const cacheKey = `${chainId}:${safeTxHash}`;
+  const cacheKey = [
+    chainId,
+    safeTxHash.toLowerCase(),
+    normalizeAddress(options?.safeAddress) ?? "no-safe",
+    String(getNormalizedCreatedAtMs(options?.createdAt) ?? "no-created-at"),
+  ].join(":");
 
   return getCachedSafeValue(
     safeMultisigTransactionCache,
@@ -773,27 +710,28 @@ export async function getSafeMultisigTransactionForClient(
       );
 
       if (response.status === 404) {
-        let queueContainsTransaction: boolean | null = null;
+        let recentListContainsTransaction: boolean | null = null;
 
         if (options?.safeAddress) {
           try {
-            queueContainsTransaction = Boolean(
-              await findQueuedSafeMultisigTransactionByHashForClient({
+            recentListContainsTransaction =
+              await hasSafeMultisigTransactionInRecentListForClient({
                 chainId,
                 safeAddress: options.safeAddress,
                 safeTxHash,
-              })
-            );
+              });
           } catch (error) {
             logSafeLookup({
               event: "safe_multisig_transaction_lookup",
               chainId,
               safeTxHash,
               safeAddress: options.safeAddress,
-              outcome: "queue_lookup_error",
+              outcome: "recent_list_lookup_error",
               attempts,
               error:
-                error instanceof Error ? error.message : "Unknown queue lookup error",
+                error instanceof Error
+                  ? error.message
+                  : "Unknown recent transaction lookup error",
             });
           }
         }
@@ -805,7 +743,7 @@ export async function getSafeMultisigTransactionForClient(
           typeof createdAtMs === "number" &&
           Date.now() - createdAtMs >= SAFE_MISSING_MULTISIG_GRACE_MS;
         const missingReason =
-          queueContainsTransaction === false &&
+          recentListContainsTransaction === false &&
           (hasSeenTransactionBefore || isPastGracePeriod)
             ? "removed"
             : "indexing";
@@ -819,7 +757,7 @@ export async function getSafeMultisigTransactionForClient(
           outcome: "not_found",
           attempts,
           safeAddress: options?.safeAddress,
-          queueContainsTransaction,
+          recentListContainsTransaction,
           missingReason,
           hasSeenTransactionBefore,
           createdAtMs,

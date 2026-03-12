@@ -82,12 +82,12 @@ export function SafeOnchainPendingDialog({
         </div>
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
-            Open Safe and approve transaction
+            Open Safe and confirm transaction
           </h2>
           <p className="text-secondary max-w-[26rem]">
-            Agora is waiting for the Safe transaction to be created. Review and
-            confirm it in Safe, then this dialog will switch to the live signer
-            status automatically.
+            Agora is waiting for the first Safe owner to confirm this
+            transaction. Once Safe submits it to the queue, this dialog will
+            switch to the live signer status automatically.
           </p>
         </div>
       </div>
@@ -97,8 +97,8 @@ export function SafeOnchainPendingDialog({
           <Loader2 className="h-5 w-5 animate-spin text-primary" />
           <p className="text-sm text-secondary">
             {hasDiscoveryTarget && discoveryQuery.isFetching
-              ? "Waiting for Safe approval and queued transaction detection in the Safe app."
-              : "Waiting for Safe wallet approval in the Safe app."}
+              ? "Waiting for the first Safe confirmation and queued transaction detection in the Safe app."
+              : "Waiting for the first Safe confirmation in the Safe app."}
           </p>
         </div>
       </div>
@@ -111,9 +111,9 @@ export function SafeOnchainPendingDialog({
             href={safeQueueUrl}
             target="_blank"
             rel="noreferrer"
-            className="h-12 flex-1 items-center justify-center gap-2"
+            className="flex h-12 flex-1 items-center justify-center rounded-lg text-center"
           >
-            <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span className="flex w-full items-center justify-center gap-2 whitespace-nowrap text-center">
               Open Safe <ExternalLink className="h-4 w-4" />
             </span>
           </UpdatedButton>
@@ -122,7 +122,7 @@ export function SafeOnchainPendingDialog({
         <UpdatedButton
           fullWidth
           type={safeQueueUrl ? "secondary" : "primary"}
-          className="h-12 flex-1 items-center justify-center"
+          className="flex h-12 flex-1 items-center justify-center rounded-lg text-center"
           onClick={closeDialog}
         >
           Keep In Background
