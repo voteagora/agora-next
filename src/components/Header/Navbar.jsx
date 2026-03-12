@@ -78,13 +78,11 @@ export default function Navbar() {
       {/* Sliding overlay */}
       {activeNavItem && (
         <div
-          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
+          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px] bg-headerBackground"
           style={{
             left: `${activeIndicator.left}px`,
             width: `${activeIndicator.width}px`,
             opacity: activeIndicator.width ? 1 : 0,
-            backgroundColor:
-              ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
           }}
         />
       )}
