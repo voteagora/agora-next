@@ -5,6 +5,68 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
+import {
+  verifySiwe,
+  verifyJwtAndGetAddress,
+} from "@/app/proposals/draft/actions/siweAuth";
+import { PLMConfig } from "@/app/proposals/draft/types";
+
+interface AuthParams {
+  jwt?: string;
+  message?: string;
+  signature?: `0x${string}`;
+}
+
+async function authenticateAndAuthorize(
+  auth: AuthParams,
+  expectedAddress?: string
+): Promise<{ ok: true; address: string } | { ok: false; error: string }> {
+  let authenticatedAddress: string | null = null;
+
+  if (auth.jwt) {
+    authenticatedAddress = await verifyJwtAndGetAddress(auth.jwt);
+    if (!authenticatedAddress) {
+      return { ok: false, error: "Invalid token" };
+    }
+  } else if (auth.message && auth.signature) {
+    if (!expectedAddress) {
+      return { ok: false, error: "Missing address for signature verification" };
+    }
+    const isValid = await verifySiwe({
+      address: expectedAddress as `0x${string}`,
+      message: auth.message,
+      signature: auth.signature,
+    });
+    if (!isValid) {
+      return { ok: false, error: "Invalid signature" };
+    }
+    authenticatedAddress = expectedAddress;
+  } else {
+    return { ok: false, error: "Missing authentication" };
+  }
+
+  if (
+    expectedAddress &&
+    authenticatedAddress.toLowerCase() !== expectedAddress.toLowerCase()
+  ) {
+    return { ok: false, error: "Address mismatch" };
+  }
+
+  const tenant = Tenant.current();
+  const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const offchainCreators =
+    (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
+
+  const isAuthorized = offchainCreators.some(
+    (creator) => creator.toLowerCase() === authenticatedAddress!.toLowerCase()
+  );
+
+  if (!isAuthorized) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  return { ok: true, address: authenticatedAddress };
+}
 
 interface OffchainProposalData {
   proposer: string;
@@ -26,6 +88,7 @@ interface CreateOffchainProposalParams {
   id: string;
   transactionHash?: string;
   onchainProposalId: string | null;
+  auth: AuthParams;
 }
 
 export async function createOffchainProposal({
@@ -33,7 +96,16 @@ export async function createOffchainProposal({
   onchainProposalId,
   id,
   transactionHash,
+  auth,
 }: CreateOffchainProposalParams) {
+  const authResult = await authenticateAndAuthorize(
+    auth,
+    proposalData.proposer
+  );
+  if (!authResult.ok) {
+    throw new Error(authResult.error);
+  }
+
   try {
     const { slug, contracts } = Tenant.current();
     const governor = contracts.governor.address as `0x${string}`;
@@ -99,12 +171,19 @@ export async function createOffchainProposal({
 interface CancelOffchainProposalParams {
   proposalId: string;
   transactionHash: string;
+  auth: AuthParams;
 }
 
 export async function cancelOffchainProposal({
   proposalId,
   transactionHash,
+  auth,
 }: CancelOffchainProposalParams) {
+  const authResult = await authenticateAndAuthorize(auth);
+  if (!authResult.ok) {
+    throw new Error(authResult.error);
+  }
+
   try {
     const { slug } = Tenant.current();
 
