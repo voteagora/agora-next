@@ -24,7 +24,6 @@ export const OffchainCancel = ({ proposal }: Props) => {
   const { getAuthenticationData } = useProposalActionAuth();
   const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
   const offchainProposalCreator = plmConfig.offchainProposalCreator;
-  const { getAuthenticationData } = useProposalActionAuth();
 
   const canCancel =
     address &&
