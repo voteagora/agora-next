@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { encodeFunctionData } from "viem";
 import { useSimulateContract, useWriteContract, useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { BasicProposal, ProposalScope } from "../../../proposals/draft/types";
+import { BasicProposal } from "../../../proposals/draft/types";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
-import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
-
-import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { parseError } from "../../draft/utils/stages";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import {
+  handleDraftOnchainPublishResult,
+  prepareDraftOnchainPublishTrace,
+} from "./publishDraftProposalOnchain";
+import { closeStoredProposalCreationTrace } from "@/lib/mirador/proposalCreationTrace";
+import {
+  isSafeProposalFlowSupported,
+  UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+} from "@/lib/safeChains";
+import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
+import { isSafeWallet } from "@/lib/utils";
+import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
+import toast from "react-hot-toast";
 
 const BasicProposalAction = ({
   draftProposal,
@@ -23,9 +33,16 @@ const BasicProposalAction = ({
   const { contracts } = Tenant.current();
   const { inputData } = getInputData(draftProposal);
   const [proposalCreated, setProposalCreated] = useState(false);
-  const proposal_scope = draftProposal.proposal_scope;
-  const { address } = useAccount();
+  const discoveredSafePublishRef = useRef<SafeTrackedTransactionSummary | null>(
+    null
+  );
+  const { address, chain } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
+  const safeWalletStatusQuery = useSafeWalletStatus({
+    address: address as `0x${string}` | undefined,
+    chainId: chain?.id ?? contracts.governor.chain.id,
+    enabled: Boolean(address),
+  });
 
   /**
    * Notes on proposal methods per governor:
@@ -67,55 +84,102 @@ const BasicProposalAction = ({
         type={onPrepareError && !proposalCreated ? "disabled" : "primary"}
         onClick={async () => {
           try {
+            const connectedChainId = chain?.id ?? contracts.governor.chain.id;
+            const encodedInputData = encodeFunctionData({
+              abi: contracts.governor.abi,
+              functionName: "propose",
+              args: inputData as never,
+            });
+            discoveredSafePublishRef.current = null;
+            const safeWallet =
+              typeof safeWalletStatusQuery.data === "boolean"
+                ? safeWalletStatusQuery.data
+                : await isSafeWallet(
+                    address as `0x${string}`,
+                    connectedChainId
+                  );
+            if (
+              safeWallet &&
+              !isSafeProposalFlowSupported(contracts.governor.chain.id)
+            ) {
+              toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
+              return;
+            }
+
+            await prepareDraftOnchainPublishTrace({
+              address: address as `0x${string}`,
+              chainId: contracts.governor.chain.id,
+              functionName: "propose",
+              governorAbi: contracts.governor.abi,
+              inputData,
+              draftProposalId: draftProposal.id,
+            });
+            if (safeWallet) {
+              const createdAfter = Date.now();
+              openDialog({
+                type: "SAFE_ONCHAIN_PENDING",
+                className: "sm:w-[34rem]",
+                params: {
+                  safeAddress: address as `0x${string}`,
+                  chainId: contracts.governor.chain.id,
+                  expectedTo: contracts.governor.address as `0x${string}`,
+                  expectedData: encodedInputData,
+                  createdAfter,
+                  onTrackedTransactionDiscovered: (publish) => {
+                    discoveredSafePublishRef.current = publish;
+                    openDialog({
+                      type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+                      className: "sm:w-[44rem]",
+                      params: {
+                        publish,
+                      },
+                    });
+                  },
+                },
+              });
+            }
             const data = await writeAsync(config!.request);
             if (!data) {
               // for dev
               console.log(error);
+              if (!discoveredSafePublishRef.current) {
+                openDialog(null);
+              }
+              await closeStoredProposalCreationTrace({
+                eventName: "draft_onchain_publish_failed_missing_tx_hash",
+                details: { draftProposalId: draftProposal.id },
+                reason: "draft_onchain_publish_failed_missing_tx_hash",
+              });
               return;
             }
 
             setProposalCreated(true);
-
-            trackEvent({
-              event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
-              event_data: {
-                transaction_hash: data,
-                uses_plm: true,
-                proposal_data: inputData,
-              },
-            });
-
-            const messagePayload = {
-              action: "sponsorDraft",
-              draftProposalId: draftProposal.id,
-              creatorAddress: address,
-              timestamp: new Date().toISOString(),
-            };
-
-            const auth = await getAuthenticationData(messagePayload);
-            if (!auth) return;
-
-            await sponsorDraftProposal({
-              draftProposalId: draftProposal.id,
-              onchain_transaction_hash: data,
-              is_offchain_submission: false,
-              proposal_scope: draftProposal.proposal_scope,
-              creatorAddress: address as `0x${string}`,
-              message: auth.message,
-              signature: auth.signature,
-              jwt: auth.jwt,
-            });
-            openDialog({
-              type: "SPONSOR_ONCHAIN_DRAFT_PROPOSAL",
-              params: {
-                redirectUrl: "/",
-                txHash: data,
-                isHybrid: proposal_scope === ProposalScope.HYBRID,
-                draftProposal,
-              },
+            await handleDraftOnchainPublishResult({
+              address: address as `0x${string}`,
+              chainId: contracts.governor.chain.id,
+              draftProposal,
+              inputData,
+              txHash: data,
+              isSafeWallet: safeWallet,
+              getAuthenticationData,
+              openDialog,
             });
           } catch (error) {
+            if (!discoveredSafePublishRef.current) {
+              openDialog(null);
+            }
             console.log(error);
+            await closeStoredProposalCreationTrace({
+              eventName: "draft_onchain_publish_failed_client",
+              details: {
+                draftProposalId: draftProposal.id,
+                message: error instanceof Error ? error.message : "Unknown error",
+              },
+              reason: "draft_onchain_publish_failed_client",
+            });
+            toast.error(
+              error instanceof Error ? error.message : "Failed to submit proposal"
+            );
           }
         }}
       >

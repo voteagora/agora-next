@@ -9,6 +9,12 @@ import { WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import {
+  persistProposalCreationTraceState,
+  startFreshProposalCreationTrace,
+  startOrResumeProposalCreationTrace,
+} from "@/lib/mirador/proposalCreationTrace";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
 
 const openDialogMock = vi.fn();
@@ -44,6 +50,27 @@ vi.mock("connectkit", () => ({
   useSIWE: () => ({
     signIn: vi.fn(),
   }),
+}));
+
+vi.mock("@/lib/mirador/proposalCreationTrace", () => ({
+  clearStoredProposalCreationTraceState: vi.fn(),
+  closeStoredProposalCreationTrace: vi.fn(),
+  getProposalCreationTraceHeaders: vi.fn(() => ({})),
+  getStoredProposalCreationTraceState: vi.fn(() => null),
+  persistProposalCreationTraceState: vi.fn(),
+  startFreshProposalCreationTrace: vi.fn(),
+  startOrResumeProposalCreationTrace: vi.fn(),
+}));
+
+vi.mock("@/lib/mirador/webTrace", () => ({
+  addMiradorEvent: vi.fn(),
+  flushMiradorTrace: vi.fn(),
+}));
+
+vi.mock("@/lib/siweSession", () => ({
+  clearStoredSiweSession: vi.fn(),
+  getStoredSiweJwt: vi.fn(() => null),
+  waitForStoredSiweJwt: vi.fn(),
 }));
 
 const createMockQueryResult = (data: any): UseQueryResult<any, Error> => ({
@@ -134,6 +161,7 @@ describe("CreateProposalDraftButton", () => {
     mockConfig.protocolLevelCreateProposalButtonCheck = true;
     mockSafeProposalChoiceEnabled = true;
     vi.mocked(isSafeWallet).mockResolvedValue(false);
+    vi.mocked(getStoredSiweJwt).mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -213,5 +241,42 @@ describe("CreateProposalDraftButton", () => {
         })
       )
     );
+  });
+
+  it("starts a proposal trace for safe wallets even when a SIWE JWT already exists", async () => {
+    vi.mocked(useManager).mockReturnValue(createMockQueryResult(mockAddress));
+    vi.mocked(useGetVotes).mockReturnValue(createMockQueryResult(0n));
+    vi.mocked(useProposalThreshold).mockReturnValue(
+      createMockQueryResult(100n)
+    );
+    vi.mocked(isSafeWallet).mockResolvedValue(true);
+    vi.mocked(getStoredSiweJwt).mockReturnValue("jwt-token");
+    vi.mocked(startFreshProposalCreationTrace).mockReturnValue({
+      getTraceId: vi.fn(() => "trace-id"),
+    } as never);
+
+    renderWithProviders(<CreateProposalDraftButton address={mockAddress} />);
+
+    fireEvent.click(screen.getByText("Create proposal"));
+
+    await waitFor(() =>
+      expect(openDialogMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "SAFE_PROPOSAL_CHOICE",
+          params: expect.objectContaining({
+            safeAddress: mockAddress,
+            isSafeWallet: true,
+            onAuthenticated: expect.any(Function),
+          }),
+        })
+      )
+    );
+
+    expect(startFreshProposalCreationTrace).toHaveBeenCalledWith({
+      walletAddress: mockAddress,
+      chainId: undefined,
+    });
+    expect(startOrResumeProposalCreationTrace).not.toHaveBeenCalled();
+    expect(persistProposalCreationTraceState).toHaveBeenCalled();
   });
 });

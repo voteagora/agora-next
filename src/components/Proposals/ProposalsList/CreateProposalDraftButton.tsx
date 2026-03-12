@@ -17,7 +17,11 @@ import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
+  closeStoredProposalCreationTrace,
+  getStoredProposalCreationTraceState,
+  getProposalCreationTraceHeaders,
   persistProposalCreationTraceState,
+  startFreshProposalCreationTrace,
   startOrResumeProposalCreationTrace,
 } from "@/lib/mirador/proposalCreationTrace";
 import { addMiradorEvent, flushMiradorTrace } from "@/lib/mirador/webTrace";
@@ -150,39 +154,107 @@ const CreateProposalDraftButton = ({
     }
   };
 
+  const createSafeDraftProposal = async (jwt: string) => {
+    const shouldTrace =
+      getStoredProposalCreationTraceState()?.branch === "safe_offchain_draft";
+    const trace = shouldTrace
+      ? startOrResumeProposalCreationTrace({
+          branch: "safe_offchain_draft",
+          walletAddress: address,
+          chainId: chain?.id,
+        })
+      : null;
+    addMiradorEvent(trace, "proposal_draft_create_requested");
+    flushMiradorTrace(trace);
+
+    const response = await fetch("/api/v1/drafts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwt}`,
+        ...(shouldTrace ? getProposalCreationTraceHeaders() : {}),
+      },
+      body: JSON.stringify({
+        creatorAddress: address,
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      const message =
+        typeof body?.message === "string"
+          ? body.message
+          : "Failed to create draft";
+      if (shouldTrace) {
+        await closeStoredProposalCreationTrace({
+          eventName: "proposal_draft_create_failed_client",
+          details: { message, status: response.status },
+          reason: "proposal_draft_create_failed",
+        });
+      }
+      throw new Error(message);
+    }
+
+    const proposal = await response.json();
+    if (shouldTrace) {
+      await closeStoredProposalCreationTrace({
+        eventName: "proposal_draft_created_client",
+        details: { draftId: proposal.uuid },
+        reason: "proposal_draft_created",
+      });
+    }
+    router.push(`/proposals/draft/${proposal.uuid}`);
+  };
+
   const openProposalChoiceDialog = async (isSafe: boolean) => {
     if (isSafe) {
       const previousSafeFlowState = getStoredSafeProposalOffchainFlowState();
+      const existingJwt = getStoredSiweJwt({ expectedAddress: address });
       if (
         previousSafeFlowState?.safeAddress?.toLowerCase() ===
           address.toLowerCase() &&
         (isSafeProposalOffchainFlowTerminal(previousSafeFlowState) ||
           isSafeProposalOffchainFlowExpired(previousSafeFlowState))
       ) {
-        clearStoredSiweSession();
+        if (!existingJwt) {
+          clearStoredSiweSession();
+        }
       }
 
       clearStoredSafeProposalOffchainFlowState();
+      const storedTrace = getStoredProposalCreationTraceState();
+      const storedSafeAddress =
+        storedTrace?.safeAddress ?? storedTrace?.walletAddress;
+      const shouldResumeTrace =
+        storedSafeAddress?.toLowerCase() === address.toLowerCase() &&
+        (typeof chain?.id !== "number" || storedTrace?.chainId === chain.id);
 
-      const trace = startOrResumeProposalCreationTrace({
-        walletAddress: address,
-        chainId: chain?.id,
-      });
+      const trace = shouldResumeTrace
+        ? startOrResumeProposalCreationTrace({
+            walletAddress: address,
+            chainId: chain?.id,
+          })
+        : startFreshProposalCreationTrace({
+            walletAddress: address,
+            chainId: chain?.id,
+          });
 
-      addMiradorEvent(trace, "proposal_creation_clicked", {
-        entrypoint: "create_proposal_button",
-      });
-      addMiradorEvent(trace, "safe_wallet_detected", {
-        safeAddress: address,
-      });
-      addMiradorEvent(trace, "safe_proposal_choice_modal_opened");
-      flushMiradorTrace(trace);
+      if (trace) {
+        addMiradorEvent(trace, "proposal_creation_clicked", {
+          entrypoint: "create_proposal_button",
+        });
+        addMiradorEvent(trace, "safe_wallet_detected", {
+          safeAddress: address,
+        });
+        addMiradorEvent(trace, "safe_proposal_choice_modal_opened");
+        flushMiradorTrace(trace);
 
-      await persistProposalCreationTraceState(trace, {
-        walletAddress: address,
-        chainId: chain?.id,
-        safeAddress: address,
-      });
+        await persistProposalCreationTraceState(trace, {
+          walletAddress: address,
+          chainId: chain?.id,
+          safeAddress: address,
+        });
+      }
     }
 
     openDialog({
@@ -194,6 +266,7 @@ const CreateProposalDraftButton = ({
         chainId: chain?.id,
         isSafeWallet: isSafe,
         onCreateDraftProposal: isSafe ? undefined : createDraftProposal,
+        onAuthenticated: isSafe ? createSafeDraftProposal : undefined,
       },
     });
   };
@@ -211,7 +284,7 @@ const CreateProposalDraftButton = ({
         if (isPending) return;
 
         setIsPending(true);
-        const isSafe = await isSafeWallet(address);
+        const isSafe = await isSafeWallet(address, chain?.id);
 
         if (safeProposalChoiceEnabled) {
           setIsPending(false);

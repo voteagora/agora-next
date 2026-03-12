@@ -51,6 +51,7 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { encodeFunctionData } from "viem";
 import {
   closeStoredProposalCreationTrace,
+  getProposalCreationTraceHeaders,
   getProposalCreationTraceContext,
   getStoredProposalCreationTraceState,
   startOrResumeProposalCreationTrace,
@@ -62,7 +63,13 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
-import { resolveSafeTx } from "@/lib/utils";
+import {
+  isSafeProposalFlowSupported,
+  UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+} from "@/lib/safeChains";
+import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
+import { createSafeTrackedTransaction } from "@/lib/safeTrackedTransactions";
+import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -82,11 +89,19 @@ export default function CreateProposalFormClient({
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address, chain } = useAccount();
+  const safeWalletStatusQuery = useSafeWalletStatus({
+    address: address as `0x${string}` | undefined,
+    chainId: chain?.id,
+    enabled: Boolean(address) && Boolean(chain?.id),
+  });
   const { data: walletClient } = useWalletClient();
   const { contracts } = Tenant.current();
   const { writeContractAsync, isPending: isWriteLoading } = useWriteContract();
   const proposalCreationTraceRef = useRef<
     ReturnType<typeof startOrResumeProposalCreationTrace>
+  >(null);
+  const discoveredSafePublishRef = useRef<
+    Awaited<ReturnType<typeof createSafeTrackedTransaction>> | null
   >(null);
 
   const { data: votingDelay } = useReadContract({
@@ -421,8 +436,60 @@ export default function CreateProposalFormClient({
         functionName,
         args: inputData as never,
       });
+      discoveredSafePublishRef.current = null;
       addMiradorTxInputData(getProposalCreationTrace(), encodedInputData);
       flushMiradorTrace(getProposalCreationTrace());
+      const connectedChainId = chain?.id ?? contracts.governor.chain.id;
+      const isSafeConnectedWallet =
+        typeof safeWalletStatusQuery.data === "boolean"
+          ? safeWalletStatusQuery.data
+          : await isSafeWallet(
+              address as `0x${string}`,
+              connectedChainId
+            );
+      if (
+        isSafeConnectedWallet &&
+        !isSafeProposalFlowSupported(connectedChainId)
+      ) {
+        traceProposalEvent("proposal_onchain_submit_failed", {
+          message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+          chainId: connectedChainId,
+        });
+        await finalizeProposalCreationTrace(
+          "proposal_onchain_submit_failed_closed",
+          {
+            message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+            chainId: connectedChainId,
+          },
+          "proposal_onchain_submit_failed"
+        );
+        toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
+        return;
+      }
+      if (isSafeConnectedWallet) {
+        const createdAfter = Date.now();
+        openDialog({
+          type: "SAFE_ONCHAIN_PENDING",
+          className: "sm:w-[34rem]",
+          params: {
+            safeAddress: address as `0x${string}`,
+            chainId: connectedChainId,
+            expectedTo: contracts.governor.address as `0x${string}`,
+            expectedData: encodedInputData,
+            createdAfter,
+            onTrackedTransactionDiscovered: (publish) => {
+              discoveredSafePublishRef.current = publish;
+              openDialog({
+                type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+                className: "sm:w-[44rem]",
+                params: {
+                  publish,
+                },
+              });
+            },
+          },
+        });
+      }
       const txHash = await writeContractAsync({
         address: contracts.governor.address as `0x${string}`,
         abi: contracts.governor.abi,
@@ -437,21 +504,61 @@ export default function CreateProposalFormClient({
           proposal_data: inputData,
         },
       });
-      scheduleTransactionTraceResolution(txHash, {
-        submittedEventName: "proposal_onchain_tx_hash_received",
-        resolveEventName: "proposal_onchain_tx_resolved",
-        closeWhenDone: !isHybrid,
-      });
+
+      if (isSafeConnectedWallet) {
+        traceProposalEvent("proposal_safe_tx_hash_received", { safeTxHash: txHash });
+        const publish =
+          discoveredSafePublishRef.current ??
+          (await createSafeTrackedTransaction(
+            {
+              kind: "publish_proposal",
+              safeAddress: address as `0x${string}`,
+              chainId: connectedChainId,
+              safeTxHash: txHash,
+            },
+            getProposalCreationTraceHeaders()
+          ));
+        discoveredSafePublishRef.current = publish;
+
+        openDialog({
+          type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+          className: "sm:w-[44rem]",
+          params: {
+            publish,
+          },
+        });
+
+        if (!isHybrid) {
+          void finalizeProposalCreationTrace(
+            "proposal_safe_tx_handed_off",
+            { safeTxHash: txHash },
+            "proposal_safe_tx_handed_off"
+          );
+        }
+      } else {
+        scheduleTransactionTraceResolution(txHash, {
+          submittedEventName: "proposal_onchain_tx_hash_received",
+          resolveEventName: "proposal_onchain_tx_resolved",
+          closeWhenDone: !isHybrid,
+        });
+      }
       toast.success(
-        isHybrid
+        isSafeConnectedWallet
+          ? isHybrid
+            ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
+            : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."
+          : isHybrid
           ? "Step 1 complete. Submit offchain to finish."
           : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",
         {
           duration: 10000,
         }
       );
-      if (!isHybrid) router.push("/");
+      if (!isHybrid && !isSafeConnectedWallet) router.push("/");
     } catch (err: unknown) {
+      if (!discoveredSafePublishRef.current) {
+        openDialog(null);
+      }
       traceProposalEvent("proposal_onchain_submit_failed", {
         message: err instanceof Error ? err.message : "Transaction failed",
       });
