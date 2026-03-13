@@ -64,6 +64,43 @@ export const InfoHero = () => {
               </a>
             </div>
           </div>
+        ) : ui.toggle("shape-hero-content")?.enabled ? (
+          <div className="text-base text-secondary mt-4">
+            <div className="whitespace-pre-line">{page!.description}</div>
+            <div className="mt-4">
+              <a
+                href="#duna-administration"
+                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-white text-black rounded-[40px] hover:bg-gray-50 transition-colors cursor-pointer text-sm sm:text-base border border-line"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="8"
+                    cy="8"
+                    r="7"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M8 4V6M8 8V12"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="whitespace-normal text-red-500 font-bold">
+                  View Structura Member{" "}
+                  <span className="underline">Disclosures</span>
+                </span>
+              </a>
+            </div>
+          </div>
         ) : ui.toggle("syndicate-hero-content")?.enabled ? (
           <div className="text-base text-secondary mt-4">
             <div className="whitespace-pre-line">{page!.description}</div>
