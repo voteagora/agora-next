@@ -46,6 +46,27 @@ function getRemovedCopy() {
   };
 }
 
+function SafeTransactionMetadataCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-3xl bg-neutral ring-1 ring-line shadow-xl overflow-hidden">
+      <div className="bg-muted/30 px-6 py-4 border-b border-line">
+        <p className="text-sm font-bold text-primary tracking-tight">{label}</p>
+      </div>
+      <div className="px-6 py-5">
+        <span className="block break-all font-mono text-[12px] text-secondary/80 tracking-tight">
+          {value}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function SafeProposalPublishStatusDialog({
   closeDialog,
   publish,
@@ -108,11 +129,10 @@ export function SafeProposalPublishStatusDialog({
         safeQueueUrl={safeQueueUrl}
         closeDialog={closeDialog}
       >
-        <div className="rounded-2xl border border-line bg-muted/30 p-4 text-sm text-secondary">
-          <span className="break-all">
-            Safe tx: <span className="font-mono">{publish.safeTxHash}</span>
-          </span>
-        </div>
+        <SafeTransactionMetadataCard
+          label="Safe Tx"
+          value={publish.safeTxHash}
+        />
       </SafeTrackingDisabledFallback>
     );
   }
@@ -226,17 +246,10 @@ export function SafeProposalPublishStatusDialog({
         </>
       ) : null}
 
-      <div className="rounded-2xl border border-line bg-muted/30 p-4 text-sm text-secondary">
-        {executionTxHash ? (
-          <span className="break-all">
-            Execution tx: <span className="font-mono">{executionTxHash}</span>
-          </span>
-        ) : (
-          <span className="break-all">
-            Safe tx: <span className="font-mono">{publish.safeTxHash}</span>
-          </span>
-        )}
-      </div>
+      <SafeTransactionMetadataCard
+        label={executionTxHash ? "Execution Tx" : "Safe Tx"}
+        value={executionTxHash ?? publish.safeTxHash}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         {executionTxHash ? (
