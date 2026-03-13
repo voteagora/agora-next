@@ -416,13 +416,14 @@ export const demo3TenantUIConfig = new TenantUI({
 
       enabled: true,
     },
-
     {
       name: "use-archive-for-proposal-details",
-
       enabled: true,
     },
-
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
     {
       name: "use-daonode-for-proposals",
 

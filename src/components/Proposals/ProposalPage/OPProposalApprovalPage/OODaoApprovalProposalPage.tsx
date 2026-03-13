@@ -1,9 +1,9 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import ArchiveApprovalVotesPanel from "./ApprovalVotesPanel/ArchiveApprovalVotesPanel";
-import ArchiveProposalTypeApproval from "../OPProposalPage/ArchiveProposalTypeApproval";
+import OODaoApprovalVotesPanel from "./ApprovalVotesPanel/OODaoApprovalVotesPanel";
+import OODaoProposalTypeApproval from "../OPProposalPage/OODaoProposalTypeApproval";
 
-export default function ArchiveApprovalProposalPage({
+export default function OODaoApprovalProposalPage({
   proposal,
 }: {
   proposal: Proposal;
@@ -15,10 +15,10 @@ export default function ArchiveApprovalProposalPage({
           <ProposalDescription proposal={proposal} />
         </div>
         <div className="w-full md:max-w-[24rem]">
-          <ArchiveProposalTypeApproval proposal={proposal} />
+          <OODaoProposalTypeApproval proposal={proposal} />
           <div className="flex flex-col gap-4 sticky top-20 flex-shrink bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between w-full max-h-none h-auto">
             <div className="flex flex-col gap-4 w-full">
-              <ArchiveApprovalVotesPanel proposal={proposal} />
+              <OODaoApprovalVotesPanel proposal={proposal} />
             </div>
           </div>
         </div>

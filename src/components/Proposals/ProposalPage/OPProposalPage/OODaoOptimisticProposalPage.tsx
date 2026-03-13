@@ -1,12 +1,12 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import OptimisticProposalVotesCard from "./ProposalVotesCard/OptimisticProposalVotesCard";
-import { ParsedProposalData } from "@/lib/proposalUtils";
+import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
-import ArchiveProposalTypeApproval from "../OPProposalPage/ArchiveProposalTypeApproval";
+import OODaoProposalTypeApproval from "../OPProposalPage/OODaoProposalTypeApproval";
 
-export default function ArchiveOptimisticProposalPage({
+export default function OODaoOptimisticProposalPage({
   proposal,
 }: {
   proposal: Proposal;
@@ -15,19 +15,17 @@ export default function ArchiveOptimisticProposalPage({
   const tokenDecimals = token.decimals ?? 18;
 
   // Calculate against relative amount from proposal results
-  const proposalResults = proposal.proposalResults as {
-    for: bigint;
-    against: bigint;
-    abstain: bigint;
-  } | null;
+  const proposalResults = proposal.proposalResults as
+    | ParsedProposalResults["STANDARD"]["kind"]
+    | null;
 
-  const againstVotes = proposalResults?.against ?? 0n;
-  const forVotes = proposalResults?.for ?? 0n;
-  const totalVotes = Number(againstVotes) + Number(forVotes);
+  const againstVotes = BigInt(proposalResults?.against ?? 0);
+  const votableSupply = BigInt(proposal.votableSupply ?? 0);
 
+  // Use BigInt math to avoid precision loss with large wei values
   const againstRelativeAmount =
-    totalVotes > 0
-      ? (Number(againstVotes) / Number(proposal.votableSupply)) * 100
+    votableSupply > 0n
+      ? Number((againstVotes * 10000n) / votableSupply) / 100
       : 0;
 
   const againstLengthString = formatNumber(
@@ -36,6 +34,11 @@ export default function ArchiveOptimisticProposalPage({
     0,
     true
   );
+
+  // Get disapproval threshold from proposalData (already computed during normalization)
+  const proposalData =
+    proposal.proposalData as ParsedProposalData["OPTIMISTIC"]["kind"];
+  const disapprovalThreshold = proposalData?.disapprovalThreshold ?? 0;
 
   // Derive status from proposal status or calculate based on votes
   let status = "approved";
@@ -50,14 +53,12 @@ export default function ArchiveOptimisticProposalPage({
           <ProposalDescription proposal={proposal} />
         </div>
         <div className="w-full md:max-w-[24rem]">
-          <ArchiveProposalTypeApproval proposal={proposal} />
+          <OODaoProposalTypeApproval proposal={proposal} />
           <OptimisticProposalVotesCard
             proposal={proposal}
             againstRelativeAmount={againstRelativeAmount.toFixed(2)}
             againstLengthString={againstLengthString}
-            disapprovalThreshold={
-              Number(proposal.proposalTypeData?.quorum) / 100
-            }
+            disapprovalThreshold={disapprovalThreshold}
             status={status}
           />
         </div>

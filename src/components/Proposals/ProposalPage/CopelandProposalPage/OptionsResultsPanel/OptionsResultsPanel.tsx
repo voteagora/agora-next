@@ -103,11 +103,34 @@ export default function OptionsResultsPanel({
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Filter out extended options to avoid duplicate rows
+  // Filter out extended options to avoid duplicate rows, then sort funded before unfunded
   const filteredResults = React.useMemo(() => {
     if (!proposalResults) return [];
-    return proposalResults.filter((result) => !isExtendedOption(result.option));
-  }, [proposalResults]);
+    const filtered = proposalResults.filter(
+      (result) => !isExtendedOption(result.option)
+    );
+    return filtered.sort((a, b) => {
+      const aExtended = proposalResults.find(
+        (r) =>
+          isExtendedOption(r.option) &&
+          getBaseOptionName(r.option, options) === a.option
+      );
+      const bExtended = proposalResults.find(
+        (r) =>
+          isExtendedOption(r.option) &&
+          getBaseOptionName(r.option, options) === b.option
+      );
+      const aFunded =
+        a.fundingType !== "None" ||
+        (aExtended && aExtended.fundingType !== "None");
+      const bFunded =
+        b.fundingType !== "None" ||
+        (bExtended && bExtended.fundingType !== "None");
+      if (aFunded && !bFunded) return -1;
+      if (!aFunded && bFunded) return 1;
+      return 0;
+    });
+  }, [proposalResults, options]);
 
   return (
     <div

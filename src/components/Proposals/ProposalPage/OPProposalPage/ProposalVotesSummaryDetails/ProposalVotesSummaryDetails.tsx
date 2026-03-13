@@ -9,7 +9,6 @@ import {
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
-import Link from "next/link";
 import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -77,7 +76,6 @@ export default function ProposalVotesSummaryDetails({
   const { token, namespace } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
-
   const formatTime = (date: Date | null) => {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
@@ -249,7 +247,8 @@ export default function ProposalVotesSummaryDetails({
             </div>
           </div>
         ) : !hasPendingRanges ? (
-          proposal.approvalThreshold && (
+          proposal.approvalThreshold &&
+          apprThresholdPercent !== 0 && (
             <div className="flex justify-between">
               <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
                 Threshold
