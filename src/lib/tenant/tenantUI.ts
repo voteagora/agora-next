@@ -440,7 +440,11 @@ export class TenantUI {
       return this._linksCache[name];
     }
 
-    const result = this._links?.find((t) => t.name === name);
+    let result = this._links?.find((t) => t.name === name);
+    // Canonical "twitter" resolves to any link with title "Twitter" (e.g. shape-twitter, townstwitter)
+    if (result === undefined && name === "twitter") {
+      result = this._links?.find((t) => t.title === "Twitter");
+    }
     this._linksCache[name] = result;
     return result;
   }
