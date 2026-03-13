@@ -175,4 +175,33 @@ describe("SafeOnchainPendingDialog", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Close" })).toBeInTheDocument();
   });
+
+  it("keeps discovery polling enabled without a Safe session", () => {
+    useQueryMock.mockReturnValueOnce({
+      data: undefined,
+      isFetching: true,
+    });
+
+    render(
+      <SafeOnchainPendingDialog
+        closeDialog={vi.fn()}
+        safeAddress={"0x1234567890123456789012345678901234567890"}
+        chainId={1}
+        expectedTo={"0x9999999999999999999999999999999999999999"}
+        expectedData={"0xdeadbeef"}
+        createdAfter={95_000}
+      />
+    );
+
+    const queryOptions = useQueryMock.mock.calls[0][0] as {
+      enabled: boolean;
+    };
+
+    expect(queryOptions.enabled).toBe(true);
+    expect(
+      screen.getByText(
+        "Waiting for the first Safe confirmation and queued transaction detection in the Safe app."
+      )
+    ).toBeInTheDocument();
+  });
 });

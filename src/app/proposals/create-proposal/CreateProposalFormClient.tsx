@@ -58,6 +58,7 @@ import {
 } from "@/lib/mirador/proposalCreationTrace";
 import {
   addMiradorEvent,
+  addMiradorSafeTxHint,
   addMiradorTxHint,
   addMiradorTxInputData,
   flushMiradorTrace,
@@ -69,9 +70,9 @@ import {
 } from "@/lib/safeChains";
 import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
-import { createSafeTrackedTransaction } from "@/lib/safeTrackedTransactions";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { resolveSafePublishSummary } from "./helpers";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -478,21 +479,6 @@ export default function CreateProposalFormClient({
         toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
         return;
       }
-      if (isSafeConnectedWallet && safeOnchainTrackingEnabled) {
-        const auth = await getAuthenticationData({
-          action: "trackSafeProposalPublish",
-          creatorAddress: address,
-          timestamp: new Date().toISOString(),
-        });
-        if (!auth) {
-          await finalizeProposalCreationTrace(
-            "proposal_onchain_auth_cancelled_closed",
-            { chainId: connectedChainId },
-            "proposal_onchain_auth_cancelled"
-          );
-          return;
-        }
-      }
       if (isSafeConnectedWallet) {
         const createdAfter = Date.now();
         openDialog({
@@ -536,19 +522,32 @@ export default function CreateProposalFormClient({
         traceProposalEvent("proposal_safe_tx_hash_received", {
           safeTxHash: txHash,
         });
+        const miradorChain = getMiradorChainNameFromChainId(connectedChainId);
+        if (miradorChain) {
+          addMiradorSafeTxHint(
+            getProposalCreationTrace(),
+            txHash,
+            miradorChain
+          );
+          flushMiradorTrace(getProposalCreationTrace());
+        }
         if (safeOnchainTrackingEnabled) {
-          const publish =
-            discoveredSafePublishRef.current ??
-            (await createSafeTrackedTransaction(
-              {
-                kind: "publish_proposal",
-                safeAddress: address as `0x${string}`,
-                chainId: connectedChainId,
-                safeTxHash: txHash,
-              },
-              getProposalCreationTraceHeaders()
-            ));
+          const { persisted, publish } = await resolveSafePublishSummary({
+            discoveredPublish: discoveredSafePublishRef.current,
+            safeAddress: address as `0x${string}`,
+            chainId: connectedChainId,
+            safeTxHash: txHash,
+            extraHeaders: getProposalCreationTraceHeaders(),
+          });
           discoveredSafePublishRef.current = publish;
+          traceProposalEvent(
+            persisted
+              ? "proposal_safe_tracking_persisted"
+              : "proposal_safe_tracking_local_only",
+            {
+              safeTxHash: txHash,
+            }
+          );
 
           openDialog({
             type: "SAFE_PROPOSAL_PUBLISH_STATUS",

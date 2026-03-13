@@ -173,13 +173,15 @@ async function enforceSafeRateLimit(params: {
 export async function enforceUnauthenticatedSafeStatusRateLimit(
   request: NextRequest,
   routeKey: string,
-  maxRequests: number
+  maxRequests: number,
+  errorMessage?: string
 ) {
   return enforceSafeRateLimit({
     routeKey,
     subjectKey: `ip:${getRequesterIp(request)}`,
     maxRequests,
-    errorMessage: "Too many Safe status requests. Please retry shortly.",
+    errorMessage:
+      errorMessage ?? "Too many Safe status requests. Please retry shortly.",
   });
 }
 

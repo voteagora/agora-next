@@ -68,6 +68,20 @@ async function postSafeTrackedRoute<T>(
     body: JSON.stringify(body),
   });
 
+  if (
+    options?.authHeaders &&
+    (response.status === 401 || response.status === 403)
+  ) {
+    response = await fetch(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(options?.extraHeaders ?? {}),
+      },
+      body: JSON.stringify(body),
+    });
+  }
+
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
     throw new Error(

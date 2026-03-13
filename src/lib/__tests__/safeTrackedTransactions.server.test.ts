@@ -97,6 +97,60 @@ describe("safeTrackedTransactions.server", () => {
     );
   });
 
+  it("can record the tracked Safe transaction without appending a duplicate Safe tx hint", async () => {
+    getSafeMultisigTransactionForClientMock.mockResolvedValue({
+      found: true,
+      status: {
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        safeTxHash:
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        confirmations: [],
+        signedOwners: [],
+        threshold: 2,
+        isExecuted: false,
+        isSuccessful: null,
+      },
+      isSuccessful: null,
+      transactionHash: undefined,
+      nextPollMs: 5000,
+    });
+    queryRawMock.mockResolvedValueOnce([
+      {
+        dao_slug: "ENS",
+        kind: "publish_proposal",
+        safe_address: "0x1234567890123456789012345678901234567890",
+        chain_id: 1,
+        safe_tx_hash:
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        created_at: new Date("2026-03-11T00:00:00Z"),
+      },
+    ]);
+
+    const { upsertSafeTrackedTransaction } = await import(
+      "@/lib/safeTrackedTransactions.server"
+    );
+
+    await upsertSafeTrackedTransaction({
+      daoSlug: "ENS",
+      kind: "publish_proposal",
+      safeAddress: "0x1234567890123456789012345678901234567890",
+      chainId: 1,
+      safeTxHash:
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      traceContext: {
+        traceId: "trace-123",
+        flow: "proposal_creation",
+      },
+      includeTraceSafeTxHint: false,
+    });
+
+    const traceEvent = appendServerTraceEventMock.mock.calls[0]?.[0];
+    expect(traceEvent).toMatchObject({
+      eventName: "safe_tracked_transaction_recorded",
+    });
+    expect(traceEvent).not.toHaveProperty("safeTxHints");
+  });
+
   it("fails closed when the initial Safe lookup throws", async () => {
     getSafeMultisigTransactionForClientMock.mockRejectedValue(
       new Error("Safe API unavailable")

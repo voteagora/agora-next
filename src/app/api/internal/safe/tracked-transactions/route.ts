@@ -13,7 +13,6 @@ import {
   enforceAuthenticatedSafeRateLimit,
   enforceUnauthenticatedSafeStatusRateLimit,
   getOptionalSafeJwtAddress,
-  requireSafeJwtForAddress,
   safeAddressesMatch,
 } from "@/lib/safeInternalApiAuth.server";
 import {
@@ -139,19 +138,32 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const authResult = await requireSafeJwtForAddress(
-    request,
-    normalizedSafeAddress
-  );
-  if ("response" in authResult) {
+  const authResult = await getOptionalSafeJwtAddress(request);
+  if (authResult?.response) {
     return authResult.response;
   }
-  const rateLimitResponse = await enforceAuthenticatedSafeRateLimit(
-    request,
-    "safe-tracked-transactions-create",
-    authResult.address,
-    30
-  );
+  if (
+    authResult?.address &&
+    !safeAddressesMatch(authResult.address, normalizedSafeAddress)
+  ) {
+    return NextResponse.json(
+      { message: "Safe session does not match the requested Safe." },
+      { status: 403 }
+    );
+  }
+  const rateLimitResponse = authResult?.address
+    ? await enforceAuthenticatedSafeRateLimit(
+        request,
+        "safe-tracked-transactions-create",
+        authResult.address,
+        30
+      )
+    : await enforceUnauthenticatedSafeStatusRateLimit(
+        request,
+        "safe-tracked-transactions-create",
+        10,
+        "Too many Safe publish tracking requests. Please retry shortly."
+      );
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
@@ -164,6 +176,7 @@ export async function POST(request: NextRequest) {
       chainId,
       daoSlug: Tenant.current().slug,
       traceContext,
+      includeTraceSafeTxHint: false,
     });
     return NextResponse.json({ transaction });
   } catch (error) {

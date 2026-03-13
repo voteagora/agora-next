@@ -146,6 +146,7 @@ export async function upsertSafeTrackedTransaction(
   params: {
     daoSlug: string;
     traceContext?: MiradorTraceContext;
+    includeTraceSafeTxHint?: boolean;
   } & CreateSafeTrackedTransactionRequest
 ): Promise<SafeTrackedTransactionSummary> {
   const safeAddress = normalizeAddress(params.safeAddress);
@@ -189,12 +190,16 @@ export async function upsertSafeTrackedTransaction(
         kind: params.kind,
         safeTxHash: params.safeTxHash,
       },
-      safeTxHints: [
-        {
-          safeTxHash: params.safeTxHash,
-          chain: miradorChain,
-        },
-      ],
+      ...(params.includeTraceSafeTxHint !== false
+        ? {
+            safeTxHints: [
+              {
+                safeTxHash: params.safeTxHash,
+                chain: miradorChain,
+              },
+            ],
+          }
+        : {}),
     });
   }
 

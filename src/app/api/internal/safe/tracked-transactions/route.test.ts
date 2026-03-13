@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const listActiveSafeTrackedTransactionsMock = vi.fn();
 const getOptionalSafeJwtAddressMock = vi.fn();
-const requireSafeJwtForAddressMock = vi.fn();
 const enforceAuthenticatedSafeRateLimitMock = vi.fn();
 const enforceUnauthenticatedSafeStatusRateLimitMock = vi.fn();
 const safeAddressesMatchMock = vi.fn((left: string, right: string) => {
@@ -31,7 +30,6 @@ vi.mock("@/lib/safeFeatures", () => ({
 vi.mock("@/lib/safeInternalApiAuth.server", () => ({
   enforceAuthenticatedSafeRateLimit: enforceAuthenticatedSafeRateLimitMock,
   getOptionalSafeJwtAddress: getOptionalSafeJwtAddressMock,
-  requireSafeJwtForAddress: requireSafeJwtForAddressMock,
   enforceUnauthenticatedSafeStatusRateLimit:
     enforceUnauthenticatedSafeStatusRateLimitMock,
   safeAddressesMatch: safeAddressesMatchMock,
@@ -47,9 +45,6 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
     vi.resetModules();
     vi.clearAllMocks();
     getOptionalSafeJwtAddressMock.mockResolvedValue({
-      address: "0x1234567890123456789012345678901234567890",
-    });
-    requireSafeJwtForAddressMock.mockResolvedValue({
       address: "0x1234567890123456789012345678901234567890",
     });
     enforceAuthenticatedSafeRateLimitMock.mockResolvedValue(null);
@@ -95,13 +90,8 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
     });
   });
 
-  it("requires authentication for tracked transaction creation", async () => {
-    requireSafeJwtForAddressMock.mockResolvedValue({
-      response: new Response(
-        JSON.stringify({ message: "Authentication required." }),
-        { status: 401 }
-      ),
-    });
+  it("allows unauthenticated tracked transaction creation and applies IP rate limiting", async () => {
+    getOptionalSafeJwtAddressMock.mockResolvedValue(undefined);
     upsertSafeTrackedTransactionMock.mockResolvedValue({
       kind: "publish_proposal",
       safeAddress: "0x1234567890123456789012345678901234567890",
@@ -131,8 +121,24 @@ describe("POST /api/internal/safe/tracked-transactions", () => {
 
     const response = await POST(request as never);
 
-    expect(response.status).toBe(401);
-    expect(upsertSafeTrackedTransactionMock).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      transaction: {
+        kind: "publish_proposal",
+        safeAddress: "0x1234567890123456789012345678901234567890",
+        chainId: 1,
+        safeTxHash:
+          "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        createdAt: "2026-03-12T12:00:00.000Z",
+      },
+    });
+    expect(enforceUnauthenticatedSafeStatusRateLimitMock).toHaveBeenCalledWith(
+      request,
+      "safe-tracked-transactions-create",
+      10,
+      "Too many Safe publish tracking requests. Please retry shortly."
+    );
+    expect(upsertSafeTrackedTransactionMock).toHaveBeenCalledTimes(1);
   });
 });
 
