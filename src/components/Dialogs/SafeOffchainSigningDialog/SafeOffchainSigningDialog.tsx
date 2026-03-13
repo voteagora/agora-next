@@ -6,7 +6,6 @@ import {
   Loader2,
   Wallet,
   AlertTriangle,
-  CheckCircle2,
   Clock,
   ShieldCheck,
   ArrowRight,
@@ -22,7 +21,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAccount, useWalletClient } from "wagmi";
 
 import { UpdatedButton } from "@/components/Button";
-import { Button } from "@/components/ui/button";
 import ENSName from "@/components/shared/ENSName";
 import {
   SafeOwnerStatusRow,
@@ -46,7 +44,10 @@ import {
   setSafeOffchainSigningFlowStatus,
   useStoredSafeOffchainSigningState,
 } from "@/lib/safeOffchainFlow";
-import { encodeSafeMessageConfirmations } from "@/lib/safeTransactionService";
+import {
+  encodeSafeMessageConfirmations,
+  type SafeMessageConfirmation,
+} from "@/lib/safeTransactionService";
 import { clearStoredSiweSession, getStoredSiweJwt } from "@/lib/siweSession";
 import { LOCAL_STORAGE_SIWE_STAGE_KEY } from "@/lib/constants";
 import {
@@ -63,6 +64,12 @@ import {
   ensureSafeOffchainSigningEnabled,
   getCanonicalSafeMessageHash,
 } from "@/lib/safeMessages";
+import {
+  getSafeVerifyingCopy,
+  mergeSafeMessageConfirmations,
+  safeMessageConfirmationsEqual,
+  shouldIgnoreLateSafeSiweResult,
+} from "./helpers";
 
 type SafeOffchainFlowClosedReason = "cancelled" | "failed" | "expired";
 
@@ -230,8 +237,15 @@ function getProgressCopy(params: {
   signingKind: SafeOffchainSigningKind;
   status?: SafeOffchainSigningState["status"];
   isCompleting: boolean;
+  hasRequiredSignatures: boolean;
 }) {
-  const { purpose, signingKind, status, isCompleting } = params;
+  const {
+    purpose,
+    signingKind,
+    status,
+    isCompleting,
+    hasRequiredSignatures,
+  } = params;
 
   if (isCompleting) {
     if (purpose === "proposal_draft") {
@@ -286,21 +300,11 @@ function getProgressCopy(params: {
   }
 
   if (status === "verifying") {
-    if (purpose === "delegate_statement") {
-      return {
-        title: "Verifying Safe signature",
-        description:
-          signingKind === "siwe"
-            ? "All required Safe signatures were collected. Agora is verifying the Safe sign-in message."
-            : "All required Safe signatures were collected. Agora is validating the approved delegate profile message.",
-      };
-    }
-
-    return {
-      title: "Verifying Safe signature",
-      description:
-        "All required Safe signatures were collected. Agora is verifying the Safe sign-in message.",
-    };
+    return getSafeVerifyingCopy({
+      purpose,
+      signingKind,
+      hasRequiredSignatures,
+    });
   }
 
   if (purpose === "delegate_statement") {
@@ -417,6 +421,7 @@ function useSafeOffchainSigningFlow({
   const [now, setNow] = useState(() => Date.now());
   const [isStarting, setIsStarting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [isProviderSignInPending, setIsProviderSignInPending] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
 
   const activeChainId = flowState?.chainId ?? providedChainId ?? chain?.id;
@@ -424,19 +429,32 @@ function useSafeOffchainSigningFlow({
   const manualVerifyStartedRef = useRef(false);
   const successStartedRef = useRef(false);
   const proposalTraceFinalizedRef = useRef(false);
-  const lastSignedCountRef = useRef<number | null>(null);
-  const thresholdLoadedRef = useRef(false);
+  const completedSuccessfullyRef = useRef(false);
+  const stableMessageHashRef = useRef<`0x${string}` | null>(null);
   const pathnameRef = useRef(pathname);
   const autoStartRef = useRef(false);
+  const [stableConfirmations, setStableConfirmations] = useState<
+    SafeMessageConfirmation[]
+  >([]);
 
   const resetLocalRefs = useCallback(() => {
     timeoutHandledRef.current = false;
     manualVerifyStartedRef.current = false;
     successStartedRef.current = false;
     proposalTraceFinalizedRef.current = false;
-    lastSignedCountRef.current = null;
-    thresholdLoadedRef.current = false;
   }, []);
+
+  const hasStoredSiweJwt = useCallback(() => {
+    if (signingKind !== "siwe") {
+      return false;
+    }
+
+    return Boolean(
+      getStoredSiweJwt({
+        expectedAddress: safeAddress,
+      })
+    );
+  }, [safeAddress, signingKind]);
 
   const clearSafeFlow = useCallback(
     (options?: { clearSiweSession?: boolean }) => {
@@ -448,9 +466,12 @@ function useSafeOffchainSigningFlow({
         clearStoredSiweSession();
       }
 
+      stableMessageHashRef.current = null;
+      setStableConfirmations([]);
       setStartupError(null);
       setIsStarting(false);
       setIsCompleting(false);
+      setIsProviderSignInPending(false);
       resetLocalRefs();
     },
     [resetLocalRefs, signingKind]
@@ -478,6 +499,15 @@ function useSafeOffchainSigningFlow({
 
   const failCurrentAttempt = useCallback(
     (messageText: string) => {
+      if (
+        shouldIgnoreLateSafeSiweResult({
+          completedSuccessfully: completedSuccessfullyRef.current,
+          hasStoredJwt: hasStoredSiweJwt(),
+        })
+      ) {
+        return;
+      }
+
       const currentState = getStoredSafeOffchainSigningState();
       const expiredByClock =
         currentState &&
@@ -524,7 +554,13 @@ function useSafeOffchainSigningFlow({
         });
       }
     },
-    [finalizeProposalDraftTrace, purpose, safeAddress, signingKind]
+    [
+      finalizeProposalDraftTrace,
+      hasStoredSiweJwt,
+      purpose,
+      safeAddress,
+      signingKind,
+    ]
   );
 
   const prepareFreshSafeSiweAttempt = useCallback(async () => {
@@ -575,6 +611,7 @@ function useSafeOffchainSigningFlow({
       }
 
       successStartedRef.current = true;
+      completedSuccessfullyRef.current = true;
       setIsCompleting(true);
       if (purpose === "proposal_draft") {
         setSafeOffchainSigningFlowStatus("draft_creating");
@@ -587,6 +624,7 @@ function useSafeOffchainSigningFlow({
         clearSafeFlow();
         closeDialog();
       } catch (error) {
+        completedSuccessfullyRef.current = false;
         successStartedRef.current = false;
         failCurrentAttempt(
           getErrorMessage(
@@ -608,6 +646,7 @@ function useSafeOffchainSigningFlow({
       }
 
       successStartedRef.current = true;
+      completedSuccessfullyRef.current = true;
       setIsCompleting(true);
       setSafeOffchainSigningFlowStatus("verifying");
 
@@ -616,6 +655,7 @@ function useSafeOffchainSigningFlow({
         clearSafeFlow();
         closeDialog();
       } catch (error) {
+        completedSuccessfullyRef.current = false;
         successStartedRef.current = false;
         failCurrentAttempt(
           getErrorMessage(
@@ -689,9 +729,13 @@ function useSafeOffchainSigningFlow({
 
   const startFlow = useCallback(
     async (options?: { restarted?: boolean }) => {
+      completedSuccessfullyRef.current = false;
+      stableMessageHashRef.current = null;
+      setStableConfirmations([]);
       resetLocalRefs();
       setStartupError(null);
       setIsCompleting(false);
+      setIsProviderSignInPending(false);
       setIsStarting(true);
 
       if (!isSafeOffchainMessageTrackingEnabled()) {
@@ -743,9 +787,19 @@ function useSafeOffchainSigningFlow({
         });
 
         let signInResult: Awaited<ReturnType<typeof signIn>>;
+        setIsProviderSignInPending(true);
         try {
           signInResult = await signIn();
         } catch (error) {
+          if (
+            shouldIgnoreLateSafeSiweResult({
+              completedSuccessfully: completedSuccessfullyRef.current,
+              hasStoredJwt: hasStoredSiweJwt(),
+            })
+          ) {
+            return;
+          }
+
           const latestState = getStoredSafeOffchainSigningState();
           const isSafeFlowInProgress =
             latestState &&
@@ -764,10 +818,20 @@ function useSafeOffchainSigningFlow({
           );
           return;
         } finally {
+          setIsProviderSignInPending(false);
           setIsStarting(false);
         }
 
         if (signInResult === false) {
+          if (
+            shouldIgnoreLateSafeSiweResult({
+              completedSuccessfully: completedSuccessfullyRef.current,
+              hasStoredJwt: hasStoredSiweJwt(),
+            })
+          ) {
+            return;
+          }
+
           const latestState = getStoredSafeOffchainSigningState();
           const isSafeFlowInProgress =
             latestState &&
@@ -877,6 +941,7 @@ function useSafeOffchainSigningFlow({
       purpose,
       resetLocalRefs,
       safeAddress,
+      hasStoredSiweJwt,
       signIn,
       signMessage,
       signingKind,
@@ -1091,67 +1156,102 @@ function useSafeOffchainSigningFlow({
         : undefined,
   });
 
+  useEffect(() => {
+    const messageHash = flowState?.messageHash ?? null;
+    const nextConfirmations = safeMessageStatusQuery.data?.status?.confirmations;
+
+    if (!messageHash) {
+      stableMessageHashRef.current = null;
+      setStableConfirmations((currentConfirmations) =>
+        currentConfirmations.length === 0 ? currentConfirmations : []
+      );
+      return;
+    }
+
+    if (stableMessageHashRef.current !== messageHash) {
+      stableMessageHashRef.current = messageHash;
+      setStableConfirmations(nextConfirmations ?? []);
+      return;
+    }
+
+    if (!nextConfirmations) {
+      return;
+    }
+
+    setStableConfirmations((currentConfirmations) => {
+      const mergedConfirmations = mergeSafeMessageConfirmations(
+        currentConfirmations,
+        nextConfirmations
+      );
+
+      return safeMessageConfirmationsEqual(
+        currentConfirmations,
+        mergedConfirmations
+      )
+        ? currentConfirmations
+        : mergedConfirmations;
+    });
+  }, [flowState?.messageHash, safeMessageStatusQuery.data?.status?.confirmations]);
+
   const signedOwnersSet = useMemo(
-    () => new Set(safeMessageStatusQuery.data?.status?.signedOwners ?? []),
-    [safeMessageStatusQuery.data?.status?.signedOwners]
+    () =>
+      new Set(
+        stableConfirmations.map(
+          (confirmation) => confirmation.owner
+        ) as `0x${string}`[]
+      ),
+    [stableConfirmations]
   );
 
   const signedCount = signedOwnersSet.size;
-
-  useEffect(() => {
-    if (!flowState?.messageHash || !ownersAndThresholdQuery.data) {
-      return;
-    }
-
-    if (thresholdLoadedRef.current) {
-      return;
-    }
-
-    thresholdLoadedRef.current = true;
-  }, [flowState?.messageHash, ownersAndThresholdQuery.data]);
-
-  useEffect(() => {
-    if (!flowState?.messageHash) {
-      return;
-    }
-
-    if (lastSignedCountRef.current === signedCount) {
-      return;
-    }
-
-    lastSignedCountRef.current = signedCount;
-  }, [flowState?.messageHash, signedCount]);
+  const threshold = ownersAndThresholdQuery.data?.threshold;
+  const hasRequiredSignatures =
+    typeof threshold === "number" && threshold > 0 && signedCount >= threshold;
+  const encodedSignatures = useMemo(
+    () => encodeSafeMessageConfirmations(stableConfirmations),
+    [stableConfirmations]
+  );
 
   useEffect(() => {
     if (
       !flowState?.message ||
       !flowState.messageHash ||
-      !ownersAndThresholdQuery.data?.threshold ||
+      !threshold ||
       flowState.status === "draft_creating" ||
       isSafeOffchainSigningFlowTerminal(flowState) ||
       isSafeOffchainSigningFlowExpired(flowState) ||
-      signedCount < ownersAndThresholdQuery.data.threshold ||
+      !hasRequiredSignatures ||
       manualVerifyStartedRef.current ||
       successStartedRef.current
     ) {
       return;
     }
 
-    const encodedSignatures = encodeSafeMessageConfirmations(
-      safeMessageStatusQuery.data?.status?.confirmations ?? []
-    );
     if (encodedSignatures === "0x") {
       return;
+    }
+
+    if (signingKind === "siwe") {
+      if (hasStoredSiweJwt()) {
+        const jwt = getStoredSiweJwt({
+          expectedAddress: safeAddress,
+        });
+        if (jwt) {
+          void completeAuthenticatedFlow(jwt);
+        }
+        return;
+      }
+
+      const stage = readStoredSiweStage();
+      if (isProviderSignInPending || stage === "awaiting_response") {
+        return;
+      }
     }
 
     manualVerifyStartedRef.current = true;
     setSafeOffchainSigningFlowStatus("verifying");
 
     if (signingKind === "siwe") {
-      if (getStoredSiweJwt({ expectedAddress: safeAddress })) {
-        return;
-      }
-
       void siweProviderConfig
         .verifyMessage({
           message: flowState.message,
@@ -1160,13 +1260,23 @@ function useSafeOffchainSigningFlow({
         .then((verified) => {
           if (!verified) {
             manualVerifyStartedRef.current = false;
+            if (hasStoredSiweJwt()) {
+              const jwt = getStoredSiweJwt({
+                expectedAddress: safeAddress,
+              });
+              if (jwt) {
+                void completeAuthenticatedFlow(jwt);
+              }
+              return;
+            }
+            if (isProviderSignInPending) {
+              return;
+            }
             failCurrentAttempt("Failed to verify Safe signature.");
             return;
           }
 
-          const jwt = getStoredSiweJwt({
-            expectedAddress: safeAddress,
-          });
+          const jwt = getStoredSiweJwt({ expectedAddress: safeAddress });
           if (jwt) {
             void completeAuthenticatedFlow(jwt);
           }
@@ -1192,15 +1302,17 @@ function useSafeOffchainSigningFlow({
   }, [
     completeAuthenticatedFlow,
     completeRawMessageFlow,
+    encodedSignatures,
     failCurrentAttempt,
     flowState?.message,
     flowState?.messageHash,
     flowState?.status,
-    ownersAndThresholdQuery.data?.threshold,
+    hasRequiredSignatures,
+    hasStoredSiweJwt,
+    isProviderSignInPending,
     safeAddress,
-    safeMessageStatusQuery.data?.status?.confirmations,
-    signedCount,
     signingKind,
+    threshold,
   ]);
 
   const ownerRows = useMemo(() => {
@@ -1216,6 +1328,7 @@ function useSafeOffchainSigningFlow({
     activeChainId,
     flowState,
     hasEnteredTrackedSafeFlow,
+    hasRequiredSignatures,
     isCompleting,
     isStarting,
     ownerRows,
@@ -1245,6 +1358,7 @@ export function SafeOffchainSigningDialog(
   const {
     flowState,
     hasEnteredTrackedSafeFlow,
+    hasRequiredSignatures,
     isCompleting,
     isStarting,
     ownerRows,
@@ -1263,6 +1377,7 @@ export function SafeOffchainSigningDialog(
     signingKind,
     status: flowState?.status,
     isCompleting,
+    hasRequiredSignatures,
   });
   const infoCopy = getInfoCopy(purpose, signingKind);
   const isExpired = flowState?.status === "expired";

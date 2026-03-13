@@ -314,8 +314,6 @@ export async function closeMiradorTrace(
     if (closeResult === CLOSE_TIMEOUT) {
       return;
     }
-
-    console.info("[mirador-close] client close sent", { traceId, reason });
   } catch (error) {
     console.error("[mirador-close] client close failed", {
       traceId,

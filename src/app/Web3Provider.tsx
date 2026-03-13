@@ -48,8 +48,8 @@ const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
 // Create config only on client side to avoid SSR issues with indexedDB
 export const config =
   typeof window !== "undefined"
-    ? createConfig(
-        getDefaultConfig({
+    ? createConfig({
+        ...getDefaultConfig({
           walletConnectProjectId: projectId,
           chains: [normalizedTokenChain, mainnet],
           transports: {
@@ -60,9 +60,11 @@ export const config =
           appDescription: metadata.description,
           appUrl: metadata.url,
           enableFamily: false,
-        })
-      )
+        }),
+        ssr: true,
+      })
     : createConfig({
+        ssr: true,
         chains: [normalizedTokenChain, mainnet],
         transports: {
           [mainnet.id]: getTransportForChain(mainnet.id)!,

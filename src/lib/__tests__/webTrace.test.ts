@@ -26,6 +26,9 @@ describe("webTrace", () => {
   });
 
   it("disables keepalive and waits for the pending flush queue before closing", async () => {
+    const consoleInfoSpy = vi
+      .spyOn(console, "info")
+      .mockImplementation(() => undefined);
     let resolveFlush: (() => void) | undefined;
     const flushQueue = new Promise<void>((resolve) => {
       resolveFlush = resolve;
@@ -50,5 +53,7 @@ describe("webTrace", () => {
     await closePromise;
 
     expect(close).toHaveBeenCalledWith("done");
+    expect(consoleInfoSpy).not.toHaveBeenCalled();
+    consoleInfoSpy.mockRestore();
   });
 });
