@@ -286,5 +286,9 @@ export const shapeTenantUIConfig = new TenantUI({
       },
     },
     { name: "ui/use-dark-theme-styling", enabled: false },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });
