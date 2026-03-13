@@ -239,13 +239,8 @@ function getProgressCopy(params: {
   isCompleting: boolean;
   hasRequiredSignatures: boolean;
 }) {
-  const {
-    purpose,
-    signingKind,
-    status,
-    isCompleting,
-    hasRequiredSignatures,
-  } = params;
+  const { purpose, signingKind, status, isCompleting, hasRequiredSignatures } =
+    params;
 
   if (isCompleting) {
     if (purpose === "proposal_draft") {
@@ -1158,7 +1153,8 @@ function useSafeOffchainSigningFlow({
 
   useEffect(() => {
     const messageHash = flowState?.messageHash ?? null;
-    const nextConfirmations = safeMessageStatusQuery.data?.status?.confirmations;
+    const nextConfirmations =
+      safeMessageStatusQuery.data?.status?.confirmations;
 
     if (!messageHash) {
       stableMessageHashRef.current = null;
@@ -1191,7 +1187,10 @@ function useSafeOffchainSigningFlow({
         ? currentConfirmations
         : mergedConfirmations;
     });
-  }, [flowState?.messageHash, safeMessageStatusQuery.data?.status?.confirmations]);
+  }, [
+    flowState?.messageHash,
+    safeMessageStatusQuery.data?.status?.confirmations,
+  ]);
 
   const signedOwnersSet = useMemo(
     () =>

@@ -131,7 +131,9 @@ describe("SafeProposalChoiceDialog", () => {
         name: "I understand the Safe draft signing flow requirements",
       })
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Choose Proposal Flow" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Choose Proposal Flow" })
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Go Direct Onchain" })
     ).toBeInTheDocument();
