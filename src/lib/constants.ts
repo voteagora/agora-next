@@ -262,7 +262,7 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   b3: ["dao-node"],
   demo: ["dao-node"],
   syndicate: ["eas-oodao"],
-  towns: ["dao-node"],
+  towns: ["eas-oodao"],
   demo2: ["dao-node"],
   demo4: ["dao-node"],
   demo3: ["dao-node"],

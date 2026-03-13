@@ -26,7 +26,6 @@ export function BaseRowLayout({
 }: BaseRowLayoutProps) {
   const { ui } = Tenant.current();
   const isOODao = data.source === "eas-oodao";
-
   const statusProposal = {
     status: data.statusLabel,
     id: data.id,

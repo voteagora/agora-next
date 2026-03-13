@@ -148,8 +148,8 @@ export async function fetchProposalsFromArchive(
         );
       })
       .sort((a, b) => {
-        const aTime = Number(a.created_block_number ?? a.created_time ?? 0);
-        const bTime = Number(b.created_block_number ?? b.created_time ?? 0);
+        const aTime = Number(a.block_number ?? a.timestamp ?? 0);
+        const bTime = Number(b.block_number ?? b.timestamp ?? 0);
         return bTime - aTime;
       });
     // Apply filter if needed

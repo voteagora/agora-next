@@ -25,7 +25,6 @@ export function StandardProposalRow({
   const decimals = tokenDecimals ?? token.decimals ?? 18;
   const isHybrid =
     proposalType === "HYBRID_STANDARD" || isHybridProposal(proposal);
-
   // Compute display data and metrics
   const { displayData, metrics, proposalTypeName } = useMemo(() => {
     const effectiveType = isHybrid ? "HYBRID_STANDARD" : proposalType;

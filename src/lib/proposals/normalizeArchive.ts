@@ -316,12 +316,24 @@ function normalizeStandardProposal(
     // Pure STANDARD: Only delegate/onchain votes
     const voteTotals =
       source === "eas-oodao"
-        ? ((proposal.outcome as EasOodaoVoteOutcome)?.["no-param"] ?? {})
+        ? ((proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"] ?? {})
         : ((proposal.totals as DaoNodeVoteTotals)?.["no-param"] ?? {});
 
-    const forVotes = safeBigInt(voteTotals["1"]);
-    const againstVotes = safeBigInt(voteTotals["0"]);
-    const abstainVotes = safeBigInt(voteTotals["2"]);
+    const forVotes = safeBigInt(
+      typeof voteTotals["1"] === "string"
+        ? voteTotals["1"]
+        : voteTotals["1"]?.["1"]
+    );
+    const againstVotes = safeBigInt(
+      typeof voteTotals["0"] === "string"
+        ? voteTotals["0"]
+        : voteTotals["0"]?.["1"]
+    );
+    const abstainVotes = safeBigInt(
+      typeof voteTotals["2"] === "string"
+        ? voteTotals["2"]
+        : voteTotals["2"]?.["1"]
+    );
 
     const proposalResults = {
       for: forVotes,

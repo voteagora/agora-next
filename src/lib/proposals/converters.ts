@@ -117,6 +117,10 @@ export const deriveTimeStatus = (
     proposalQueueTime = toDate(proposal.queue_event.timestamp);
   }
 
+  if (isDaoNodeSource(proposal) && proposal.cancel_event) {
+    proposalCancelledTime = toDate(proposal.cancel_event.timestamp);
+  }
+
   return {
     proposalStatus: normalizedStatus,
     proposalStartTime,

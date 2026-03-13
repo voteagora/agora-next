@@ -29,7 +29,7 @@ export default function ArchiveProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { token, namespace } = Tenant.current();
+  const { token } = Tenant.current();
   const searchParams = useSearchParams();
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;

@@ -76,7 +76,6 @@ export default function ProposalVotesSummaryDetails({
   const { token, namespace } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
-
   const formatTime = (date: Date | null) => {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };

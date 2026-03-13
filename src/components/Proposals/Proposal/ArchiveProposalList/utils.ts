@@ -61,10 +61,9 @@ export function extractDisplayData(
         : (proposal.proposer_ens?.detail ?? undefined)
       : undefined;
   }
-
+  const timeStatus = deriveTimeStatus(proposal, normalizedStatus);
   // Check for pending proposal type approval (eas-oodao specific)
   const hasPendingRanges = proposal.proposal_type_approval === "PENDING";
-
   return {
     id: proposal.id,
     href: `/proposals/${proposal.id}`,
@@ -76,7 +75,7 @@ export function extractDisplayData(
     proposalTypeTag: proposalTag,
     source: proposal.data_eng_properties?.source,
     hasPendingRanges,
-    timeStatus: deriveTimeStatus(proposal, normalizedStatus),
+    timeStatus,
   };
 }
 

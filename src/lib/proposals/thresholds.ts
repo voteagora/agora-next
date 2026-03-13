@@ -67,7 +67,10 @@ export const resolveArchiveThresholds = (
   proposal: ArchiveListProposal
 ): ResolvedThresholds => {
   if (isEasOodaoSource(proposal)) {
-    if (proposal.default_proposal_type_ranges) {
+    if (
+      proposal.default_proposal_type_ranges &&
+      Object.keys(proposal.default_proposal_type_ranges || {}).length > 0
+    ) {
       //standard awaiting approval easOodao proposals
       // Values are in basis points (e.g. 10 = 0.1%, 5000 = 50%)
       // Use same pattern as non-pending branch: integer math to compute absolute quorum
