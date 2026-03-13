@@ -9,6 +9,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import { cancelOffchainProposal } from "@/app/api/offchain-proposals/actions";
 import { PLMConfig } from "../draft/types";
 import Tenant from "@/lib/tenant/tenant";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 interface Props {
   proposal: Proposal;
@@ -22,6 +23,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
   const offchainProposalCreator = plmConfig.offchainProposalCreator;
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const canCancel =
     address &&
@@ -42,6 +44,17 @@ export const OffchainCancel = ({ proposal }: Props) => {
     const signer = new JsonRpcSigner(provider, address);
 
     try {
+      const messagePayload = {
+        action: "cancelOffchainProposal",
+        proposalId: proposal.id,
+        canceller: address,
+        timestamp: new Date().toISOString(),
+      };
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
+      }
+
       const attestationUID = (
         proposal.proposalData as ParsedProposalData["OFFCHAIN_STANDARD"]["kind"]
       ).created_attestation_hash;
@@ -59,6 +72,11 @@ export const OffchainCancel = ({ proposal }: Props) => {
       await cancelOffchainProposal({
         proposalId: proposal.id,
         transactionHash: attestationUID,
+        auth: {
+          jwt: authData.jwt,
+          message: authData.message,
+          signature: authData.signature as `0x${string}` | undefined,
+        },
       });
 
       toast.success("Offchain proposal cancelled successfully.");

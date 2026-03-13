@@ -165,6 +165,16 @@ const OffchainProposalAction = ({
         });
       }
 
+      const messagePayload = {
+        action: "createOffchainProposal",
+        proposer: address,
+        draftProposalId: draftProposal.id,
+        timestamp: new Date().toISOString(),
+      };
+
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) throw new Error("Authentication failed");
+
       const { id, transactionHash } = await createProposalAttestation({
         contract: governorContract.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
@@ -183,7 +193,7 @@ const OffchainProposalAction = ({
         calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
       });
 
-      const result = await createOffchainProposal({
+      await createOffchainProposal({
         proposalData: {
           proposer: rawProposalDataForBackend.proposer,
           description: rawProposalDataForBackend.description,
@@ -202,6 +212,11 @@ const OffchainProposalAction = ({
         id: id.toString(),
         transactionHash,
         onchainProposalId: onchainProposalId?.toString() ?? null,
+        auth: {
+          jwt: auth.jwt,
+          message: auth.message,
+          signature: auth.signature as `0x${string}` | undefined,
+        },
       });
 
       toast.success("Proposal submitted successfully");
@@ -212,15 +227,6 @@ const OffchainProposalAction = ({
           txHash: transactionHash as `0x${string}`,
         },
       });
-      const messagePayload = {
-        action: "sponsorDraft",
-        draftProposalId: draftProposal.id,
-        creatorAddress: address,
-        timestamp: new Date().toISOString(),
-      };
-
-      const auth = await getAuthenticationData(messagePayload);
-      if (!auth) throw new Error("Authentication failed");
 
       await sponsorDraftProposal({
         draftProposalId: draftProposal.id,
