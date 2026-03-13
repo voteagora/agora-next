@@ -51,12 +51,16 @@ export function SafeProposalChoiceDialog({
     "offchain" | "onchain" | null
   >(null);
   const isMountedRef = useRef(true);
+  const hasExistingSiweSession = Boolean(
+    getStoredSiweJwt({ expectedAddress: safeAddress })
+  );
+  const needsSafeSigningWarning = isSafeWallet && !hasExistingSiweSession;
   const safeOffchainTrackingEnabled = isSafeOffchainMessageTrackingEnabled();
   const safeProposalFlowsSupported =
     !isSafeWallet ||
     (typeof chainId === "number" && isSafeProposalFlowSupported(chainId));
   const safeDraftOffchainSupported =
-    !isSafeWallet || safeProposalFlowsSupported;
+    !needsSafeSigningWarning || safeProposalFlowsSupported;
   const safeDraftRequirementsLabel = safeOffchainTrackingEnabled
     ? "I understand the Safe draft signing flow requirements"
     : "I understand Agora will not track the Safe sign-in flow and I need to finish approvals in Safe quickly";
@@ -288,17 +292,19 @@ export function SafeProposalChoiceDialog({
         </div>
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-semibold tracking-tight text-primary">
-            {isSafeWallet ? "Safe Wallet Detected" : "Choose Proposal Flow"}
+            {needsSafeSigningWarning
+              ? "Safe Wallet Detected"
+              : "Choose Proposal Flow"}
           </h2>
           <p className="text-secondary max-w-[24rem]">
-            {isSafeWallet
+            {needsSafeSigningWarning
               ? "Creating a draft offchain requires a Safe signature flow before Agora can create the draft."
               : "Choose whether to go straight to onchain proposal creation or start with the offchain draft flow."}
           </p>
         </div>
       </div>
 
-      {isSafeWallet ? (
+      {needsSafeSigningWarning ? (
         <>
           <div
             className={
@@ -392,7 +398,8 @@ export function SafeProposalChoiceDialog({
           onClick={() => void handleCreateDraftOffchain()}
           isLoading={pendingAction === "offchain"}
           disabled={
-            (isSafeWallet && (!safeDraftOffchainSupported || !acknowledged)) ||
+            (needsSafeSigningWarning &&
+              (!safeDraftOffchainSupported || !acknowledged)) ||
             pendingAction !== null
           }
           type="primary"
@@ -406,12 +413,14 @@ export function SafeProposalChoiceDialog({
           isLoading={pendingAction === "onchain"}
           disabled={
             pendingAction !== null ||
-            (isSafeWallet && !safeProposalFlowsSupported)
+            (needsSafeSigningWarning && !safeProposalFlowsSupported)
           }
           type="secondary"
           className="w-full text-base font-medium h-12 flex justify-center items-center gap-2"
         >
-          {isSafeWallet ? "Skip & Go Direct to Onchain" : "Go Direct Onchain"}
+          {needsSafeSigningWarning
+            ? "Skip & Go Direct to Onchain"
+            : "Go Direct Onchain"}
           <ArrowRight className="h-4 w-4" />
         </UpdatedButton>
 

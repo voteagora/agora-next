@@ -105,6 +105,7 @@ describe("SafeProposalChoiceDialog", () => {
     isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(true);
     signInMock.mockResolvedValue(true);
     waitForStoredSiweJwtMock.mockResolvedValue("jwt-token");
+    vi.mocked(getStoredSiweJwt).mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -125,7 +126,15 @@ describe("SafeProposalChoiceDialog", () => {
       />
     );
 
-    fireEvent.click(screen.getByRole("checkbox"));
+    expect(
+      screen.queryByRole("checkbox", {
+        name: "I understand the Safe draft signing flow requirements",
+      })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Choose Proposal Flow" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Go Direct Onchain" })
+    ).toBeInTheDocument();
     fireEvent.click(
       screen.getByRole("button", { name: "Create Draft Offchain" })
     );
