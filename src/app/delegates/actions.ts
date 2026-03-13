@@ -21,6 +21,7 @@ import {
   fetchDirectDelegatee as apiFetchDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import type { DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
@@ -103,22 +104,19 @@ export async function fetchDirectDelegatee(addressOrENSName: string) {
 export async function submitDelegateStatement({
   address,
   delegateStatement,
-  signature,
-  message,
   scwAddress,
+  auth,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
-  signature: `0x${string}`;
-  message: string;
   scwAddress?: string;
+  auth: DelegateStatementAuthPayload;
 }) {
   const response = await createDelegateStatement({
     address,
     delegateStatement,
-    signature,
-    message,
     scwAddress,
+    auth,
   });
 
   revalidateDelegateAddressPage(address.toLowerCase());

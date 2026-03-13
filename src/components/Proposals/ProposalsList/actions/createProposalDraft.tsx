@@ -1,13 +1,13 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { verifySiwe } from "@/app/proposals/draft/actions/siweAuth";
+import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
 async function createProposalDraft(
   address: `0x${string}`,
-  params: { message: string; signature: `0x${string}` }
+  params: { jwt: string }
 ) {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
@@ -18,13 +18,13 @@ async function createProposalDraft(
     );
   }
 
-  const valid = await verifySiwe({
-    address,
-    message: params.message,
-    signature: params.signature,
-  });
-  if (!valid) {
-    throw new Error("Invalid signature");
+  const verifiedAddress = await verifyJwtAndGetAddress(params.jwt);
+  if (!verifiedAddress) {
+    throw new Error("Invalid token");
+  }
+
+  if (verifiedAddress.toLowerCase() !== address.toLowerCase()) {
+    throw new Error("Token address mismatch");
   }
 
   const config = plmToggle.config as PLMConfig;

@@ -21,9 +21,9 @@ export const OffchainCancel = ({ proposal }: Props) => {
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const [isLoading, setIsLoading] = useState(false);
+  const { getAuthenticationData } = useProposalActionAuth();
   const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
   const offchainProposalCreator = plmConfig.offchainProposalCreator;
-  const { getAuthenticationData } = useProposalActionAuth();
 
   const canCancel =
     address &&
@@ -44,15 +44,14 @@ export const OffchainCancel = ({ proposal }: Props) => {
     const signer = new JsonRpcSigner(provider, address);
 
     try {
-      const messagePayload = {
+      const auth = await getAuthenticationData({
         action: "cancelOffchainProposal",
         proposalId: proposal.id,
         canceller: address,
         timestamp: new Date().toISOString(),
-      };
-      const authData = await getAuthenticationData(messagePayload);
-      if (!authData) {
-        throw new Error("Authentication failed");
+      });
+      if (!auth) {
+        return;
       }
 
       const attestationUID = (
@@ -63,20 +62,16 @@ export const OffchainCancel = ({ proposal }: Props) => {
         throw new Error("Attestation UID not found");
       }
 
-      const { transactionHash } = await cancelProposalAttestation({
+      await cancelProposalAttestation({
         attestationUID,
         signer: signer,
         canceller: address,
       });
 
       await cancelOffchainProposal({
+        authJwt: auth.jwt,
         proposalId: proposal.id,
         transactionHash: attestationUID,
-        auth: {
-          jwt: authData.jwt,
-          message: authData.message,
-          signature: authData.signature as `0x${string}` | undefined,
-        },
       });
 
       toast.success("Offchain proposal cancelled successfully.");

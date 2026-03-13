@@ -497,6 +497,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -539,6 +540,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -578,6 +580,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement

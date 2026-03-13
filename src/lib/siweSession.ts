@@ -98,7 +98,6 @@ export function getStoredSiweSession(options?: {
   if (options?.expectedAddress) {
     const expected = normalizeAddress(options.expectedAddress);
     if (expected !== normalized) {
-      clearStoredSiweSession();
       return null;
     }
   }

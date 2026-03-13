@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
@@ -48,7 +48,31 @@ import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { getPublicClient } from "@/lib/viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { encodeFunctionData } from "viem";
+import {
+  closeStoredProposalCreationTrace,
+  getProposalCreationTraceHeaders,
+  getProposalCreationTraceContext,
+  getStoredProposalCreationTraceState,
+  startOrResumeProposalCreationTrace,
+} from "@/lib/mirador/proposalCreationTrace";
+import {
+  addMiradorEvent,
+  addMiradorSafeTxHint,
+  addMiradorTxHint,
+  addMiradorTxInputData,
+  flushMiradorTrace,
+} from "@/lib/mirador/webTrace";
+import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import {
+  isSafeProposalFlowSupported,
+  UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+} from "@/lib/safeChains";
+import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
+import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
+import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { resolveSafePublishSummary } from "./helpers";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -68,10 +92,20 @@ export default function CreateProposalFormClient({
   const router = useRouter();
   const openDialog = useOpenDialog();
   const { address, chain } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
+  const safeWalletStatusQuery = useSafeWalletStatus({
+    address: address as `0x${string}` | undefined,
+    chainId: chain?.id,
+    enabled: Boolean(address) && Boolean(chain?.id),
+  });
   const { data: walletClient } = useWalletClient();
   const { contracts } = Tenant.current();
   const { writeContractAsync, isPending: isWriteLoading } = useWriteContract();
-  const { getAuthenticationData } = useProposalActionAuth();
+  const proposalCreationTraceRef =
+    useRef<ReturnType<typeof startOrResumeProposalCreationTrace>>(null);
+  const discoveredSafePublishRef = useRef<Awaited<
+    ReturnType<typeof createSafeTrackedTransaction>
+  > | null>(null);
 
   const { data: votingDelay } = useReadContract({
     address: contracts.governor.address as `0x${string}`,
@@ -134,6 +168,130 @@ export default function CreateProposalFormClient({
     isOffchainScope &&
     plmConfig?.offchainProposalCreator?.includes(address ?? "");
 
+  const getProposalCreationTrace = () => {
+    const storedTrace = getStoredProposalCreationTraceState();
+    if (storedTrace?.branch !== "safe_direct_onchain") {
+      return null;
+    }
+
+    const trace =
+      proposalCreationTraceRef.current ??
+      startOrResumeProposalCreationTrace({
+        branch: "safe_direct_onchain",
+        walletAddress: (address ?? storedTrace.safeAddress) as
+          | `0x${string}`
+          | undefined,
+        chainId: chain?.id ?? storedTrace.chainId,
+      });
+
+    proposalCreationTraceRef.current = trace;
+    return trace;
+  };
+
+  const traceProposalEvent = (
+    eventName: string,
+    details?: Record<string, unknown> | string
+  ) => {
+    const trace = getProposalCreationTrace();
+    addMiradorEvent(trace, eventName, details);
+    flushMiradorTrace(trace);
+  };
+
+  const finalizeProposalCreationTrace = async (
+    eventName: string,
+    details?: Record<string, unknown> | string,
+    reason?: string
+  ) => {
+    const storedTrace = getStoredProposalCreationTraceState();
+    if (storedTrace?.branch !== "safe_direct_onchain") {
+      return;
+    }
+
+    await closeStoredProposalCreationTrace({
+      eventName,
+      details,
+      reason,
+    });
+    proposalCreationTraceRef.current = null;
+  };
+
+  const scheduleTransactionTraceResolution = (
+    txHash: `0x${string}`,
+    options: {
+      submittedEventName: string;
+      resolveEventName: string;
+      closeWhenDone: boolean;
+    }
+  ) => {
+    const trace = getProposalCreationTrace();
+    const storedTrace = getStoredProposalCreationTraceState();
+    const activeChainId = chain?.id ?? storedTrace?.chainId;
+    const miradorChain = getMiradorChainNameFromChainId(activeChainId);
+
+    addMiradorEvent(trace, options.submittedEventName, { txHash });
+    flushMiradorTrace(trace);
+
+    if (!miradorChain || typeof activeChainId !== "number") {
+      void finalizeProposalCreationTrace(
+        "proposal_tx_trace_closed_without_chain",
+        { txHash },
+        "proposal_tx_trace_closed_without_chain"
+      );
+      return;
+    }
+
+    void (async () => {
+      try {
+        const resolvedTxHash = await resolveSafeTx(activeChainId, txHash, 1, 6);
+        const nextTrace = getProposalCreationTrace();
+
+        if (resolvedTxHash) {
+          addMiradorTxHint(nextTrace, resolvedTxHash, miradorChain);
+          addMiradorEvent(nextTrace, options.resolveEventName, {
+            txHash: resolvedTxHash,
+          });
+        } else {
+          addMiradorEvent(nextTrace, "proposal_tx_resolution_unavailable", {
+            txHash,
+          });
+        }
+        flushMiradorTrace(nextTrace);
+
+        if (options.closeWhenDone) {
+          await finalizeProposalCreationTrace(
+            "proposal_creation_complete",
+            { txHash: resolvedTxHash ?? txHash },
+            "proposal_creation_complete"
+          );
+        }
+      } catch (error) {
+        traceProposalEvent("proposal_tx_resolution_failed", {
+          txHash,
+          message: error instanceof Error ? error.message : "Unknown error",
+        });
+
+        if (options.closeWhenDone) {
+          await finalizeProposalCreationTrace(
+            "proposal_creation_complete_with_unresolved_tx",
+            { txHash },
+            "proposal_creation_complete_with_unresolved_tx"
+          );
+        }
+      }
+    })();
+  };
+
+  useEffect(() => {
+    const storedTrace = getStoredProposalCreationTraceState();
+    if (storedTrace?.branch !== "safe_direct_onchain") {
+      return;
+    }
+
+    const trace = getProposalCreationTrace();
+    addMiradorEvent(trace, "safe_direct_proposal_form_opened");
+    flushMiradorTrace(trace);
+  }, [address, chain?.id]);
+
   const submitOffchain = async (
     proposal: ReturnType<typeof formDataToProposal>,
     onchainProposalId: bigint | null
@@ -192,11 +350,11 @@ export default function CreateProposalFormClient({
 
     const messagePayload = {
       action: "createOffchainProposal",
-      proposer: address,
+      creatorAddress: address,
       timestamp: new Date().toISOString(),
     };
-    const authData = await getAuthenticationData(messagePayload);
-    if (!authData) {
+    const auth = await getAuthenticationData(messagePayload);
+    if (!auth) {
       throw new Error("Authentication failed");
     }
 
@@ -223,7 +381,13 @@ export default function CreateProposalFormClient({
         calculationOptions: rawProposalDataForBackend.calculationOptions,
       });
 
+    traceProposalEvent("proposal_offchain_attestation_submitted", {
+      txHash: attestationTxHash,
+      onchainProposalId: onchainProposalId?.toString() ?? null,
+    });
+
     await createOffchainProposal({
+      authJwt: auth.jwt,
       proposalData: {
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
@@ -241,11 +405,13 @@ export default function CreateProposalFormClient({
       id: id.toString(),
       transactionHash: attestationTxHash,
       onchainProposalId: onchainProposalId?.toString() ?? null,
-      auth: {
-        jwt: authData.jwt,
-        message: authData.message,
-        signature: authData.signature as `0x${string}` | undefined,
-      },
+      traceContext: getProposalCreationTraceContext(),
+    });
+
+    scheduleTransactionTraceResolution(attestationTxHash as `0x${string}`, {
+      submittedEventName: "proposal_offchain_attestation_hash_received",
+      resolveEventName: "proposal_offchain_attestation_resolved",
+      closeWhenDone: true,
     });
 
     return attestationTxHash as `0x${string}`;
@@ -275,6 +441,68 @@ export default function CreateProposalFormClient({
       }
       const functionName =
         data.type === ProposalType.BASIC ? "propose" : "proposeWithModule";
+      traceProposalEvent("proposal_onchain_submit_requested", {
+        functionName,
+        proposalScope: data.proposal_scope,
+      });
+      const encodedInputData = encodeFunctionData({
+        abi: contracts.governor.abi,
+        functionName,
+        args: inputData as never,
+      });
+      discoveredSafePublishRef.current = null;
+      addMiradorTxInputData(getProposalCreationTrace(), encodedInputData);
+      flushMiradorTrace(getProposalCreationTrace());
+      const connectedChainId = chain?.id ?? contracts.governor.chain.id;
+      const safeOnchainTrackingEnabled =
+        isSafeOnchainTransactionTrackingEnabled();
+      const isSafeConnectedWallet =
+        typeof safeWalletStatusQuery.data === "boolean"
+          ? safeWalletStatusQuery.data
+          : await isSafeWallet(address as `0x${string}`, connectedChainId);
+      if (
+        isSafeConnectedWallet &&
+        !isSafeProposalFlowSupported(connectedChainId)
+      ) {
+        traceProposalEvent("proposal_onchain_submit_failed", {
+          message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+          chainId: connectedChainId,
+        });
+        await finalizeProposalCreationTrace(
+          "proposal_onchain_submit_failed_closed",
+          {
+            message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
+            chainId: connectedChainId,
+          },
+          "proposal_onchain_submit_failed"
+        );
+        toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
+        return;
+      }
+      if (isSafeConnectedWallet) {
+        const createdAfter = Date.now();
+        openDialog({
+          type: "SAFE_ONCHAIN_PENDING",
+          className: "sm:w-[34rem]",
+          params: {
+            safeAddress: address as `0x${string}`,
+            chainId: connectedChainId,
+            expectedTo: contracts.governor.address as `0x${string}`,
+            expectedData: encodedInputData,
+            createdAfter,
+            onTrackedTransactionDiscovered: (publish) => {
+              discoveredSafePublishRef.current = publish;
+              openDialog({
+                type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+                className: "sm:w-[44rem]",
+                params: {
+                  publish,
+                },
+              });
+            },
+          },
+        });
+      }
       const txHash = await writeContractAsync({
         address: contracts.governor.address as `0x${string}`,
         abi: contracts.governor.abi,
@@ -289,16 +517,96 @@ export default function CreateProposalFormClient({
           proposal_data: inputData,
         },
       });
+
+      if (isSafeConnectedWallet) {
+        traceProposalEvent("proposal_safe_tx_hash_received", {
+          safeTxHash: txHash,
+        });
+        const miradorChain = getMiradorChainNameFromChainId(connectedChainId);
+        if (miradorChain) {
+          addMiradorSafeTxHint(
+            getProposalCreationTrace(),
+            txHash,
+            miradorChain
+          );
+          flushMiradorTrace(getProposalCreationTrace());
+        }
+        if (safeOnchainTrackingEnabled) {
+          const { persisted, publish } = await resolveSafePublishSummary({
+            discoveredPublish: discoveredSafePublishRef.current,
+            safeAddress: address as `0x${string}`,
+            chainId: connectedChainId,
+            safeTxHash: txHash,
+            extraHeaders: getProposalCreationTraceHeaders(),
+          });
+          discoveredSafePublishRef.current = publish;
+          traceProposalEvent(
+            persisted
+              ? "proposal_safe_tracking_persisted"
+              : "proposal_safe_tracking_local_only",
+            {
+              safeTxHash: txHash,
+            }
+          );
+
+          openDialog({
+            type: "SAFE_PROPOSAL_PUBLISH_STATUS",
+            className: "sm:w-[44rem]",
+            params: {
+              publish,
+            },
+          });
+
+          if (!isHybrid) {
+            void finalizeProposalCreationTrace(
+              "proposal_safe_tx_handed_off",
+              { safeTxHash: txHash },
+              "proposal_safe_tx_handed_off"
+            );
+          }
+        } else if (!isHybrid) {
+          void finalizeProposalCreationTrace(
+            "proposal_safe_tx_tracking_disabled",
+            { safeTxHash: txHash },
+            "proposal_safe_tx_tracking_disabled"
+          );
+        }
+      } else {
+        scheduleTransactionTraceResolution(txHash, {
+          submittedEventName: "proposal_onchain_tx_hash_received",
+          resolveEventName: "proposal_onchain_tx_resolved",
+          closeWhenDone: !isHybrid,
+        });
+      }
       toast.success(
-        isHybrid
-          ? "Step 1 complete. Submit offchain to finish."
-          : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",
+        isSafeConnectedWallet
+          ? safeOnchainTrackingEnabled
+            ? isHybrid
+              ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
+              : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."
+            : "Safe transaction created. Open Safe directly to monitor approvals and execution."
+          : isHybrid
+            ? "Step 1 complete. Submit offchain to finish."
+            : "Proposal created. It might take a few minutes for the proposal to be indexed and appear.",
         {
           duration: 10000,
         }
       );
-      if (!isHybrid) router.push("/");
+      if (!isHybrid && !isSafeConnectedWallet) router.push("/");
     } catch (err: unknown) {
+      if (!discoveredSafePublishRef.current) {
+        openDialog(null);
+      }
+      traceProposalEvent("proposal_onchain_submit_failed", {
+        message: err instanceof Error ? err.message : "Transaction failed",
+      });
+      await finalizeProposalCreationTrace(
+        "proposal_onchain_submit_failed_closed",
+        {
+          message: err instanceof Error ? err.message : "Transaction failed",
+        },
+        "proposal_onchain_submit_failed"
+      );
       toast.error(err instanceof Error ? err.message : "Transaction failed");
     } finally {
       setIsOnchainPending(false);
@@ -319,6 +627,9 @@ export default function CreateProposalFormClient({
     }
     setIsOffchainPending(true);
     try {
+      traceProposalEvent("proposal_offchain_submit_requested", {
+        proposalScope: data.proposal_scope,
+      });
       const proposal = formDataToProposal(data);
       const { inputData } = getInputData(proposal);
       if (!inputData) {
@@ -366,6 +677,16 @@ export default function CreateProposalFormClient({
       });
       router.push("/");
     } catch (err: unknown) {
+      traceProposalEvent("proposal_offchain_submit_failed", {
+        message: err instanceof Error ? err.message : "Transaction failed",
+      });
+      await finalizeProposalCreationTrace(
+        "proposal_offchain_submit_failed_closed",
+        {
+          message: err instanceof Error ? err.message : "Transaction failed",
+        },
+        "proposal_offchain_submit_failed"
+      );
       toast.error(err instanceof Error ? err.message : "Transaction failed");
     } finally {
       setIsOffchainPending(false);

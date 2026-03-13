@@ -26,9 +26,10 @@ const Modal: FC<
     open: boolean;
     onClose: () => void;
     transparent: boolean | undefined;
+    disableDismiss?: boolean;
     className?: string;
   } & Props
-> = ({ open, children, onClose, transparent, className }) => {
+> = ({ open, children, onClose, transparent, disableDismiss, className }) => {
   if (!open) return null;
 
   return (
@@ -43,7 +44,7 @@ const Modal: FC<
               ? "fixed top-0 right-0 bottom-0 left-0 flex flex-col items-center justify-center bg-black/50 z-[1000] p-0"
               : "fixed top-0 right-0 bottom-0 left-0 flex flex-col items-center justify-center bg-black/50 z-[1000] p-4"
           }
-          onClick={onClose}
+          onClick={() => !disableDismiss && onClose()}
         >
           <motion.div
             initial={{ scale: 0.98, y: 20 }}
@@ -57,10 +58,12 @@ const Modal: FC<
               className
             )}
           >
-            <XMarkIcon
-              className="h-5 w-5 text-secondary cursor-pointer absolute right-2 top-2"
-              onClick={onClose}
-            />
+            {!disableDismiss ? (
+              <XMarkIcon
+                className="h-5 w-5 text-secondary cursor-pointer absolute right-2 top-2"
+                onClick={onClose}
+              />
+            ) : null}
             {children}
           </motion.div>
         </motion.div>
@@ -71,6 +74,15 @@ const Modal: FC<
 
 export const DialogProvider: FC<Props> = ({ children }) => {
   const [currentDialog, setCurrentDialog] = useState<DialogType | null>(null);
+
+  const closeCurrentDialog = () => {
+    const onClose = (currentDialog as { params?: { onClose?: () => void } })
+      ?.params?.onClose;
+    if (typeof onClose === "function") {
+      onClose();
+    }
+    setCurrentDialog(null);
+  };
 
   useEffect(() => {
     if (currentDialog) {
@@ -94,9 +106,12 @@ export const DialogProvider: FC<Props> = ({ children }) => {
       <Modal
         open={!!currentDialog}
         onClose={() =>
-          currentDialog?.type !== "SWITCH_NETWORK" && setCurrentDialog(null)
+          currentDialog?.type !== "SWITCH_NETWORK" && closeCurrentDialog()
         }
         transparent={(currentDialog as { transparent?: boolean })?.transparent}
+        disableDismiss={
+          (currentDialog as { disableDismiss?: boolean })?.disableDismiss
+        }
         className={cn(
           "max-h-[95vh] overflow-y-auto",
           (currentDialog as { className?: string })?.className
