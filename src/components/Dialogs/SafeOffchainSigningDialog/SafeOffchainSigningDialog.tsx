@@ -747,24 +747,20 @@ function useSafeOffchainSigningFlow({
           signInResult = await signIn();
         } catch (error) {
           const latestState = getStoredSafeOffchainSigningState();
-          if (
+          const isSafeFlowInProgress =
             latestState &&
             latestState.purpose === purpose &&
             latestState.signingKind === signingKind &&
             latestState.safeAddress.toLowerCase() ===
               safeAddress.toLowerCase() &&
-            isSafeOffchainSigningFlowActive(latestState) &&
-            latestState.status === "pending_wallet" &&
-            !latestState.messageHash
-          ) {
-            failCurrentAttempt(
-              getErrorMessage(error, "Sign-in cancelled or failed.")
-            );
+            latestState.messageHash;
+
+          if (isSafeFlowInProgress) {
             return;
           }
 
           failCurrentAttempt(
-            getErrorMessage(error, "Failed to sign in with Safe")
+            getErrorMessage(error, "Sign-in cancelled or failed.")
           );
           return;
         } finally {
@@ -773,16 +769,15 @@ function useSafeOffchainSigningFlow({
 
         if (signInResult === false) {
           const latestState = getStoredSafeOffchainSigningState();
-          if (
+          const isSafeFlowInProgress =
             latestState &&
             latestState.purpose === purpose &&
             latestState.signingKind === signingKind &&
             latestState.safeAddress.toLowerCase() ===
               safeAddress.toLowerCase() &&
-            isSafeOffchainSigningFlowActive(latestState) &&
-            latestState.status === "pending_wallet" &&
-            !latestState.messageHash
-          ) {
+            latestState.messageHash;
+
+          if (!isSafeFlowInProgress) {
             failCurrentAttempt("Sign-in cancelled or failed.");
           }
         }

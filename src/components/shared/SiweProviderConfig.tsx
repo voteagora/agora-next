@@ -44,7 +44,6 @@ const API_AUTH_PREFIX = "/api/v1/auth";
 
 const LOCAL_STORAGE_JWT_KEY = LOCAL_STORAGE_SIWE_JWT_KEY;
 
-const SIWE_ENABLED = process.env.NEXT_PUBLIC_SIWE_ENABLED === "true";
 const SAFE_DEBUG_LOGS = process.env.NEXT_PUBLIC_SAFE_DEBUG_LOGS === "true";
 let activeSafeSiweNonceCache: {
   safeAddress: `0x${string}`;
@@ -528,15 +527,21 @@ export const siweProviderConfig: SIWEConfig = {
         status: res.status,
       });
       flushMiradorTrace(trace);
-      if (safeSiweFlowState) {
+      const isSafeFlowAwaitingManualVerify =
+        safeSiweFlowState &&
+        isSafeSiweFlowActive(safeSiweFlowState) &&
+        safeSiweFlowState.messageHash;
+      if (safeSiweFlowState && !isSafeFlowAwaitingManualVerify) {
         setSafeSiweFlowStatus("failed", `Verification failed (${res.status})`);
       }
-      await closeMiradorSiweTrace({
-        traceKind: activeTrace.kind,
-        eventName: "siwe_verify_failed_client_closed",
-        details: { status: res.status },
-        reason: "siwe_verify_failed",
-      });
+      if (!isSafeFlowAwaitingManualVerify) {
+        await closeMiradorSiweTrace({
+          traceKind: activeTrace.kind,
+          eventName: "siwe_verify_failed_client_closed",
+          details: { status: res.status },
+          reason: "siwe_verify_failed",
+        });
+      }
       return false;
     }
     try {
@@ -692,5 +697,5 @@ export const siweProviderConfig: SIWEConfig = {
     clearStoredSiweSession();
     return Promise.resolve(true);
   },
-  enabled: SIWE_ENABLED,
+  enabled: false,
 };

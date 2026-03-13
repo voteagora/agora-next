@@ -131,6 +131,21 @@ export async function verifySiweLogin({
       };
     }
 
+    const isValidSignature = await verifyMessage({
+      address: siweMessage.address as `0x${string}`,
+      message,
+      signature,
+      chainId: siweMessage.chainId,
+      allowSafeContractSignature: true,
+    });
+
+    if (!isValidSignature) {
+      return {
+        ok: false as const,
+        reason: "Invalid SIWE signature.",
+      };
+    }
+
     const nonceResult = await consumeSiweNonce(siweMessage.nonce);
     if (!nonceResult.ok) {
       return {
@@ -146,21 +161,6 @@ export async function verifySiweLogin({
       return {
         ok: false as const,
         reason: "SIWE nonce host mismatch.",
-      };
-    }
-
-    const isValidSignature = await verifyMessage({
-      address: siweMessage.address as `0x${string}`,
-      message,
-      signature,
-      chainId: siweMessage.chainId,
-      allowSafeContractSignature: true,
-    });
-
-    if (!isValidSignature) {
-      return {
-        ok: false as const,
-        reason: "Invalid SIWE signature.",
       };
     }
 

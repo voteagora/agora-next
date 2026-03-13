@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useProfileData } from "@/hooks/useProfileData";
+import { SiweStatusBadge } from "./SiweStatusBadge";
 
 import ENSAvatar from "../shared/ENSAvatar";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
@@ -174,6 +175,7 @@ export const ProfileDropDownContent = ({
             }`}
           >
             <ENSAvatar ensName={ensName} size={60} />
+            <SiweStatusBadge className="w-5 h-5" />
           </div>
           <div className="flex flex-col flex-1">
             {ensName ? (
