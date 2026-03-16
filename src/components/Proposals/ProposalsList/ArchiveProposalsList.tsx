@@ -14,7 +14,6 @@ import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
-import { UpdatedButton } from "@/components/Button";
 
 export default function ArchiveProposalsList({
   proposals,
@@ -83,17 +82,7 @@ export default function ArchiveProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {address && (
-            <UpdatedButton
-              variant="rounded"
-              type="primary"
-              onClick={async () => {
-                window.location.href = `/create`;
-              }}
-            >
-              Create proposal
-            </UpdatedButton>
-          )}
+          {address && <CreateProposalDraftButton address={address} />}
         </div>
       </div>
 
