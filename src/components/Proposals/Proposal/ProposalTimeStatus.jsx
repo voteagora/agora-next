@@ -38,7 +38,7 @@ export default function ProposalTimeStatus({
       return <HStack gap={1}>Starts {pendingProposalStartTime}</HStack>;
 
     case "ACTIVE":
-      return <HStack gap={1}>Ends {activeProposalEndTime}</HStack>;
+      return <HStack gap={1}>Ends {endTime}</HStack>;
 
     case "CANCELLED":
       return <HStack gap={1}>Cancelled {_proposalCancelledTime}</HStack>;
