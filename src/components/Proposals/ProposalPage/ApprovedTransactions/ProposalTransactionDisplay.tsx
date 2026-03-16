@@ -25,6 +25,7 @@ import React, { useState } from "react";
 import { formatUnits } from "viem";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { toast } from "react-hot-toast";
+import { areAllActionsSupported, getAdapter } from "@/lib/knownSelectors";
 import {
   checkExistingProposal,
   checkNewProposal,
@@ -35,6 +36,29 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
+
+const PrettyButtonDisabled = () => {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className="px-2 py-1 text-xs font-semibold text-secondary opacity-50 cursor-not-allowed"
+            type="button"
+            disabled
+          >
+            Pretty
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="text-xs">
+            Pretty view is not yet available for this proposal.
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 function getActionsLabel(status: string | null | undefined): string {
   switch (status) {
@@ -101,7 +125,10 @@ const ProposalTransactionDisplay = ({
   proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
-  const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
+  const allActionsSupported = areAllActionsSupported(calldatas);
+  const [viewMode, setViewMode] = useState<"decoded" | "raw" | "pretty">(() =>
+    allActionsSupported ? "pretty" : "decoded"
+  );
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
   const [showBenignExplanation, setShowBenignExplanation] = useState(false);
@@ -266,11 +293,11 @@ const ProposalTransactionDisplay = ({
                 </div>
                 <div className="flex">
                   <button
-                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-                    onClick={() => setViewMode("summary")}
+                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "decoded" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                    onClick={() => setViewMode("decoded")}
                     type="button"
                   >
-                    Summary
+                    Decoded
                   </button>
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
@@ -279,6 +306,17 @@ const ProposalTransactionDisplay = ({
                   >
                     Raw
                   </button>
+                  {allActionsSupported ? (
+                    <button
+                      className={`px-2 py-1 text-xs font-semibold ${viewMode === "pretty" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                      onClick={() => setViewMode("pretty")}
+                      type="button"
+                    >
+                      Pretty
+                    </button>
+                  ) : (
+                    <PrettyButtonDisabled />
+                  )}
                 </div>
               </div>
               {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
@@ -299,7 +337,7 @@ const ProposalTransactionDisplay = ({
             </div>
 
             <div className="p-4 pt-2">
-              {viewMode === "summary" ? (
+              {viewMode === "decoded" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -323,10 +361,12 @@ const ProposalTransactionDisplay = ({
                           : undefined
                       }
                       index={idx}
+                      viewMode={viewMode}
                     />
                   ))}
                 </div>
-              ) : (
+              )}
+              {viewMode === "raw" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -338,6 +378,35 @@ const ProposalTransactionDisplay = ({
                       calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
                       value={idx < values.length ? values[idx] : "0"}
                       index={idx}
+                    />
+                  ))}
+                </div>
+              )}
+              {viewMode === "pretty" && (
+                <div>
+                  {(collapsed
+                    ? [targets[0]]
+                    : targets.slice(0, normalizedLength)
+                  ).map((target, idx) => (
+                    <TransactionItem
+                      key={idx}
+                      target={target}
+                      calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                      value={idx < values.length ? values[idx] : "0"}
+                      description={
+                        descriptions && idx < descriptions.length
+                          ? descriptions[idx]
+                          : undefined
+                      }
+                      collapsed={collapsed}
+                      network={network}
+                      signature={
+                        signatures && idx < signatures.length
+                          ? signatures[idx]
+                          : undefined
+                      }
+                      index={idx}
+                      viewMode={viewMode}
                     />
                   ))}
                 </div>
@@ -375,6 +444,7 @@ const TransactionItem = ({
   network,
   index,
   signature,
+  viewMode = "decoded",
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -384,6 +454,7 @@ const TransactionItem = ({
   network: string;
   index: number;
   signature?: string;
+  viewMode?: "decoded" | "raw" | "pretty";
 }) => {
   const {
     data: decodedData,
@@ -394,13 +465,23 @@ const TransactionItem = ({
   });
 
   const isTransfer = decodedData?.function === "transfer";
+  const isPrettyMode = viewMode === "pretty";
+  const adapter = isPrettyMode ? getAdapter(calldata) : null;
+  const prettyMethodName = adapter?.prettyName ?? "Unknown";
 
   return (
     <div className={`${index > 0 ? "pt-4" : ""}`}>
       <div className="flex justify-between items-center mb-2">
-        <div className="text-base font-semibold text-primary">
-          Action {index + 1}
-        </div>
+        {isPrettyMode ? (
+          <div className="text-base font-semibold text-primary">
+            <span className="text-tertiary font-normal">{index + 1}.</span>{" "}
+            {prettyMethodName}
+          </div>
+        ) : (
+          <div className="text-base font-semibold text-primary">
+            Action {index + 1}
+          </div>
+        )}
         <a
           className="text-xs text-tertiary hover:text-primary transition-colors flex items-center"
           href={getBlockScanAddress(target)}
@@ -415,31 +496,94 @@ const TransactionItem = ({
       <div
         className={cn(
           "flex flex-col gap-y-10 rounded-lg p-4",
-          !isTransfer && "bg-wash border-line border"
+          (isPrettyMode || !isTransfer) && "bg-wash border-line border"
         )}
       >
-        <ActionSummary
-          decodedData={decodedData}
-          target={target}
-          value={value}
-          isLoading={isLoading}
-          calldata={calldata}
-          error={error ? (error as Error).message : null}
-        />
-
-        {!collapsed && decodedData?.function !== "transfer" && (
-          <ActionDetails
+        {isPrettyMode ? (
+          <PrettyView
             decodedData={decodedData}
             target={target}
             calldata={calldata}
-            value={value}
             isLoading={isLoading}
-            error={error ? (error as Error).message : null}
           />
+        ) : (
+          <>
+            <DecodedActionView
+              decodedData={decodedData}
+              target={target}
+              value={value}
+              isLoading={isLoading}
+              calldata={calldata}
+              error={error ? (error as Error).message : null}
+            />
+
+            {!collapsed && decodedData?.function !== "transfer" && (
+              <ActionDetails
+                decodedData={decodedData}
+                target={target}
+                calldata={calldata}
+                value={value}
+                isLoading={isLoading}
+                error={error ? (error as Error).message : null}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
   );
+};
+
+const PrettyView = ({
+  decodedData,
+  target,
+  calldata,
+  isLoading,
+}: {
+  decodedData: unknown;
+  target: string;
+  calldata: `0x${string}`;
+  isLoading: boolean;
+}) => {
+  if (isLoading) {
+    return (
+      <div className="text-sm text-secondary">Decoding transaction...</div>
+    );
+  }
+
+  const adapter = getAdapter(calldata);
+  if (!adapter) {
+    return (
+      <div className="text-sm text-secondary">
+        Unable to render pretty view for this action.
+      </div>
+    );
+  }
+
+  if (!decodedData) {
+    return (
+      <div className="text-sm text-secondary">
+        Unable to decode transaction data.
+      </div>
+    );
+  }
+
+  try {
+    return (
+      <>
+        {adapter.prettyRender(
+          decodedData as Parameters<typeof adapter.prettyRender>[0],
+          target
+        )}
+      </>
+    );
+  } catch {
+    return (
+      <div className="text-sm text-secondary">
+        Error rendering pretty view for this action.
+      </div>
+    );
+  }
 };
 
 const RawTransactionItem = ({
@@ -498,7 +642,7 @@ const safelyFormatEther = (val: string) => {
   return `${BigInt(val).toString()}`;
 };
 
-const ActionSummary = ({
+const DecodedActionView = ({
   decodedData,
   target,
   value,
