@@ -413,7 +413,7 @@ export function deriveProposalType(
 
   // Determine final type based on hybrid/offchain status
   if (hybrid) {
-    if (baseClass === "OPTIMISTIC" && isTiered) {
+    if (baseClass === "OPTIMISTIC") {
       return "HYBRID_OPTIMISTIC_TIERED";
     }
     return `HYBRID_${baseClass}` as ProposalType;

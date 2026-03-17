@@ -205,10 +205,10 @@ export function extractOptimisticMetrics(
   } else {
     // Pure OPTIMISTIC: Only delegate votes matter
     const voteTotals = hasDaoNodeTotals(proposal)
-      ? (proposal.totals as DaoNodeVoteTotals)["no-param"]
-      : (proposal.outcome as EasOodaoVoteOutcome)["token-holders"];
+      ? (proposal.totals as DaoNodeVoteTotals)?.["no-param"]
+      : (proposal.outcome as EasOodaoVoteOutcome)?.["token-holders"];
 
-    const againstVal = voteTotals["0"];
+    const againstVal = voteTotals?.["0"] ?? 0;
     const againstVotesRaw =
       typeof againstVal === "string" ? againstVal : String(againstVal ?? "0");
     const againstCount = convertToNumber(againstVotesRaw, tokenDecimals);

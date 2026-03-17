@@ -37,6 +37,10 @@ import {
   extractOptimisticTieredMetrics,
 } from "./extractors";
 import { ProposalType } from "../types";
+import {
+  HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
+  OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
+} from "../constants";
 
 // =============================================================================
 // Types
@@ -642,7 +646,10 @@ function normalizeOptimisticTieredProposal(
       source?: string;
     } = {
       options: [],
-      tiers: metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100),
+      tiers:
+        metrics.tiers.length > 0
+          ? metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100)
+          : HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
       source,
     };
 
@@ -680,7 +687,10 @@ function normalizeOptimisticTieredProposal(
       source?: string;
     } = {
       options: [],
-      tiers: metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100),
+      tiers:
+        metrics.tiers.length > 0
+          ? metrics.tiers.sort((a, b) => b - a).map((tier) => tier / 100)
+          : OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
       source,
     };
 
