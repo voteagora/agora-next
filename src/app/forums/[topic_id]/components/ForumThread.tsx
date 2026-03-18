@@ -46,11 +46,8 @@ export default function ForumThread({
     namespace === TENANT_NAMESPACES.SYNDICATE
       ? "bg-white"
       : "bg-buttonBackground";
-  const textStyle =
-    namespace === TENANT_NAMESPACES.SYNDICATE ||
-    namespace === TENANT_NAMESPACES.TOWNS
-      ? "text-primary"
-      : "text-neutral";
+  // text-primary adapts per tenant: dark for light themes (Shape, Syndicate), white for dark themes (Towns)
+  const textStyle = "text-primary";
 
   const onReply = async (commentId: number) => {
     if (!(await requireLogin())) {
