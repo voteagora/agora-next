@@ -310,5 +310,9 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "forums",
       enabled: false,
     },
+    {
+      name: "notifications",
+      enabled: true,
+    },
   ],
 });

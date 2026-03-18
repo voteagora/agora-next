@@ -74,8 +74,6 @@ export const townsTenantUIConfig = new TenantUI({
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
-    customButtonBackground: "#130C2F",
-    customHeroTitleWidth: "max-w-none",
   },
 
   theme: "dark",

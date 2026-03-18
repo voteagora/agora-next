@@ -182,6 +182,7 @@ export default function ProposalDescription({
             proposalData={proposal.proposalData}
             proposalType={proposal.proposalType}
             executedTransactionHash={proposal.executedTransactionHash}
+            proposal={proposal}
           />
         )}
         <RelatedProposalLinks proposalId={proposal.id} />

@@ -197,7 +197,6 @@ type TenantUIParams = {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customButtonBackground?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
@@ -265,7 +264,6 @@ export class TenantUI {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customButtonBackground?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
@@ -413,7 +411,6 @@ export class TenantUI {
         customCardSize?: string;
         customIconColor?: string;
         noReportsFound?: string;
-        customButtonBackground?: string;
         tagBackground?: string;
         infoBannerBackground?: string;
       }

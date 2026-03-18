@@ -599,7 +599,7 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   }
 );
 
-const isContractWallet = async (address: Address) => {
+export const isContractWallet = async (address: Address) => {
   const publicClient = getPublicClient();
   const bytecode = await publicClient.getCode({ address });
 
