@@ -58,7 +58,7 @@ export const InfoHero = () => {
         </p>
         <div className="mt-1">
           <a
-            href="#duna-administration"
+            href="#duna-disclosures"
             className="inline-flex items-center gap-2 px-[10px] py-[6px] bg-[rgba(255,0,0,0.1)] border border-[rgba(255,0,0,0.3)] rounded-[40px] hover:bg-[rgba(255,0,0,0.15)] transition-colors cursor-pointer"
           >
             <svg

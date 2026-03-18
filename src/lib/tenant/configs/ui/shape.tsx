@@ -180,8 +180,7 @@ export const shapeTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Structura governance goes live on September 15, 2026",
-      description:
-        "Shape voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
+      description: "Shape voters are the stewards for the DAO.",
       hero: shapeHero,
       meta: {
         title: "Shape Protocol Governance",
