@@ -152,8 +152,7 @@ export const shapeTenantUIConfig = new TenantUI({
     {
       route: "grants",
       title: "Structura Grants Program",
-      description:
-        "Apply for grants to support the Structura ecosystem",
+      description: "Apply for grants to support the Structura ecosystem",
       meta: {
         title: "Structura Grants Program",
         description: "Apply for grants to support the Structura ecosystem",
