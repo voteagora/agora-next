@@ -93,20 +93,13 @@ export default function FormationDocumentsList({
     );
   }
 
-  // Sort by createdAt descending
-  const sortedDocuments = [...documents].sort((a, b) => {
-    const dateA = new Date(a.createdAt);
-    const dateB = new Date(b.createdAt);
-    return dateB.getTime() - dateA.getTime();
-  });
-
   return (
     <div className="flex flex-col">
-      {sortedDocuments.map((document, index) => {
+      {documents.map((document, index) => {
         const displayName = document.name.replace(/\.[^/.]+$/, "");
         const displayDate = formatDocumentDate(document.createdAt);
         const displaySize = formatFileSize(document.fileSize);
-        const isLast = index === sortedDocuments.length - 1;
+        const isLast = index === documents.length - 1;
 
         return (
           <div

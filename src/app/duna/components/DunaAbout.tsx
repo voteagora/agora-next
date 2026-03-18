@@ -51,7 +51,27 @@ const DunaAbout = async () => {
   const infoPage = ui.page("info");
   const communityLinks = infoPage?.links ?? [];
 
-  const otherDocuments = documents.filter((doc) => !doc.isFinancialStatement);
+  const documentOrder = [
+    "Association Agreement",
+    "Purpose",
+    "Existing Authorization of Authority",
+    "Grant Programs Overview",
+    "Redacted EIN",
+  ];
+
+  const getDocumentOrderIndex = (docName: string) => {
+    const index = documentOrder.findIndex((suffix) => docName.includes(suffix));
+    return index === -1 ? documentOrder.length : index;
+  };
+
+  const otherDocuments = documents
+    .filter((doc) => !doc.isFinancialStatement)
+    .sort((a, b) => {
+      const indexA = getDocumentOrderIndex(a.name);
+      const indexB = getDocumentOrderIndex(b.name);
+      return indexA - indexB;
+    });
+
   const aboutContent =
     dunaDescriptionToggle?.enabled && dunaDescriptionContent
       ? dunaDescriptionContent
@@ -59,7 +79,6 @@ const DunaAbout = async () => {
   const hasAboutContent = !!aboutContent;
   const aboutTitle =
     ui.customization?.customAboutSubtitle || administrationTitle;
-
   return (
     <div id="duna-administration" className="mt-8 flex flex-col gap-6">
       {/* About + Community Resources */}
