@@ -1,7 +1,7 @@
 import { TenantContracts } from "@/lib/types";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { BaseContract, AlchemyProvider, JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { shape, shapeSepolia } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ERC20__factory } from "@/lib/contracts/generated";
@@ -29,8 +29,12 @@ export const shapeTenantConfig = ({
   const provider = usingForkedNode
     ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
     : isProd
-      ? new AlchemyProvider("shape-mainnet", alchemyId)
-      : new AlchemyProvider("shape-sepolia", alchemyId);
+      ? new JsonRpcProvider(
+          `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+        )
+      : new JsonRpcProvider(
+          `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
+        );
   const chain = isProd ? shape : shapeSepolia;
 
   return {

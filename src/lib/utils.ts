@@ -571,6 +571,18 @@ export const getTransportForChain = (chainId: number) => {
         FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
+    // shape mainnet
+    case 360:
+      return http(
+        FORK_NODE_URL || `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
+
+    // shape sepolia
+    case 11011:
+      return http(
+        FORK_NODE_URL || `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
+
     // for each new dao with a new chainId add them here
     default:
       return null;
