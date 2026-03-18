@@ -56,6 +56,7 @@ export const shapeTenantUIConfig = new TenantUI({
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
+    grantsListBackground: "bg-wash",
   },
 
   theme: "light",
@@ -149,6 +150,18 @@ export const shapeTenantUIConfig = new TenantUI({
       },
     },
     {
+      route: "grants",
+      title: "Structura Grants Program",
+      description:
+        "Apply for grants to support the Structura ecosystem",
+      meta: {
+        title: "Structura Grants Program",
+        description: "Apply for grants to support the Structura ecosystem",
+        imageTitle: "Structura Grants Program",
+        imageDescription: "Apply for grants to support the Structura ecosystem",
+      },
+    },
+    {
       route: "info/about",
       title: "Structura Roadmap",
       hero: shapeInfoHero,
@@ -217,6 +230,9 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "use-daonode-for-votable-supply", enabled: false },
     { name: "use-daonode-for-proposal-types", enabled: false },
     { name: "forums", enabled: true },
+    { name: "grants", enabled: true },
+    { name: "grants/intake-form", enabled: true },
+    { name: "notifications", enabled: true },
     {
       name: "duna",
       enabled: true,

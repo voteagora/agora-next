@@ -200,6 +200,7 @@ type TenantUIParams = {
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -267,6 +268,7 @@ export class TenantUI {
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -413,6 +415,8 @@ export class TenantUI {
         noReportsFound?: string;
         tagBackground?: string;
         infoBannerBackground?: string;
+        heroCardGradient?: { from: string; to: string };
+        grantsListBackground?: string;
       }
     | undefined {
     return this._customization;
