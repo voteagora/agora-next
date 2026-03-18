@@ -165,8 +165,6 @@ export default function DunaContentRenderer({
   className,
   enableEmbeds = true,
 }: DunaContentRendererProps) {
-  if (!content) return null;
-
   const { ui } = Tenant.current();
   const [mounted, setMounted] = useState(false);
 
@@ -191,12 +189,18 @@ export default function DunaContentRenderer({
     return parseContentWithEmbeds(decodedContent);
   }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
 
+  // Only use white text for dark themes (e.g. Towns). Light themes (Shape, Syndicate)
+  // need dark text for visibility on light backgrounds.
+  const useDarkThemeProse = ui.theme === "dark";
+
+  if (!content) return null;
+
   return (
     <div
       data-testid="duna-content"
       className={cn(
         "text-sm prose prose-sm max-w-none",
-        ui.customization?.cardBackground
+        useDarkThemeProse
           ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white prose-img:rounded-lg"
           : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-img:rounded-lg",
         "prose-a:font-medium prose-img:max-w-full prose-img:h-auto prose-img:my-2",
@@ -204,7 +208,7 @@ export default function DunaContentRenderer({
       )}
       style={{
         // Force some basic styling to ensure content is visible
-        color: ui.customization?.cardBackground ? "white" : "inherit",
+        color: useDarkThemeProse ? "white" : "inherit",
         fontSize: "inherit",
         lineHeight: "inherit",
       }}
