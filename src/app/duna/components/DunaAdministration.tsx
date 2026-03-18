@@ -13,9 +13,9 @@ import {
   UIFinancialStatementsConfig,
 } from "@/lib/tenant/tenantUI";
 import { ExternalLink } from "@/icons/ExternalLink";
-import FormationDocumentsList from "./FormationDocumentsList";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import DunaMetricsCards from "./DunaMetricsCards";
+import DocumentsSection from "./DocumentsSection";
 
 const DunaAdministration = async () => {
   let documents: any[] = [];
@@ -169,9 +169,10 @@ const DunaAdministration = async () => {
                 {financialStatementsConfig?.title?.toUpperCase() ??
                   "FINANCIAL STATEMENTS"}
               </p>
-              <FinancialStatementsClient
-                statements={financialStatements}
-                title=""
+              <DocumentsSection
+                initialDocuments={financialStatements}
+                hideHeader={true}
+                hideComms={true}
               />
             </div>
           )}
@@ -183,7 +184,11 @@ const DunaAdministration = async () => {
           <p className="text-base font-semibold text-primary uppercase tracking-wide">
             FORMATION DOCUMENTS
           </p>
-          <FormationDocumentsList initialDocuments={otherDocuments} />
+          <DocumentsSection
+            initialDocuments={otherDocuments}
+            hideHeader={true}
+            hideComms={true}
+          />
         </div>
       )}
       <GovernanceInfoSections />

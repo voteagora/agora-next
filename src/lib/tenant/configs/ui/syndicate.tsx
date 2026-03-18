@@ -397,10 +397,6 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "syndicate-hero-content",
-      enabled: true,
-    },
-    {
       name: "duna/use-community-dialogue-label",
       enabled: true,
     },

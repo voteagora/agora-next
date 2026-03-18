@@ -125,7 +125,7 @@ export const shapeTenantUIConfig = new TenantUI({
         {
           name: "Document Archive",
           title: "Document Archive",
-          url: "#",
+          url: "/document-archive",
           image: shapeInfoCard3,
         },
       ],
@@ -156,20 +156,6 @@ export const shapeTenantUIConfig = new TenantUI({
         "Structura is the Decentralized Unincorporated Nonprofit Association comprised of SHAPE governance token holders: a legal structure purpose-built for decentralized communities that need to operate in the real world without sacrificing decentralization.\n\nDAOs coordinate beautifully onchain. But the moment they need to do something outside the chain (sign a contract, engage a service provider, open a bank account), the structure breaks down. Structura fixes that. Governance decisions made by SHAPE holders translate into real-world actions.\n\nAs a taxpaying U.S. entity organized under Wyoming law, Structura is positioned at the front of a shifting policy environment - proudly built in America, open to the world. The SHAPE token puts members in ultimate control of how the treasury is deployed in support of the Shape Network and its nonprofit purpose: a culture-first network that scales open meritocracy to fuel fine art and bold experiments, and bring fun back onchain.\n\nThis Dashboard\n\nThe focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
       sectionTitle: "Structura Roadmap",
       tabs: [
-        {
-          icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#87819F" />,
-          title: "September 15, 2026",
-          description:
-            "Token governance is live, with token delegation, a Temp-Check and majority voting on proposals.",
-        },
-        {
-          icon: (
-            <NotificationIcon className="w-[24px] h-[24px]" stroke="#87819F" />
-          ),
-          title: "DUNA Administration",
-          description:
-            "Structura Updates\n[Formation Documents go here until the first Financial Update]",
-        },
         {
           icon: (
             <CheckCircleBrokenIcon
@@ -305,5 +291,169 @@ export const shapeTenantUIConfig = new TenantUI({
       },
     },
     { name: "ui/use-dark-theme-styling", enabled: false },
+    {
+      name: "info/governance-sections",
+      enabled: true,
+      config: {
+        title: "Voting in the Structura",
+        sections: [
+          {
+            id: "voting-process",
+            title: "Voting process",
+            content: (
+              <ul className="list-disc list-outside space-y-2 ml-6">
+                <li>
+                  In order for a <strong>Governance Proposal</strong> to be
+                  enacted, it must:
+                  <ul className="list-[circle] list-outside space-y-2 ml-6 mt-2 text-sm leading-relaxed">
+                    <li>
+                      first be submitted as a <strong>Temp-Check</strong>, which
+                      is a five-day period during which <strong>Members</strong>{" "}
+                      can utilize their SYND token to indicate support for a
+                      proposal. In order for a proposal to transition from a{" "}
+                      <strong>Temp-Check</strong> to a vote of the membership,
+                      the <strong>Temp-Check</strong> must attain the support of
+                      5% of the SYND tokens minted (excludes future emissions),
+                      except as limited by Article 13 of the Association
+                      Agreement.
+                    </li>
+                    <li>
+                      upon a successful <strong>Temp-Check</strong>, the{" "}
+                      <strong>Governance Proposal</strong> period is open for
+                      seven days, during which time
+                      <strong> Members</strong> can utilize their SYND token to
+                      affirm, deny, or participate without voting on the
+                      proposal. A proposal:
+                      <ul className="list-[square] list-outside space-y-1 ml-6 mt-2 text-sm leading-relaxed">
+                        <li>
+                          <strong>passes</strong> if the majority of votes
+                          affirm the proposal and 10% of the minted SYND tokens
+                          (excludes future emissions) participate in the vote;
+                          and
+                        </li>
+                        <li>
+                          <strong>fails</strong> if the majority of votes deny
+                          the proposal or 10% of the SYND tokens minted
+                          (excludes future emissions) did not participate in the
+                          vote.
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  A passed <strong>Governance Proposal</strong> can be reverted
+                  for further consideration and modification pursuant to Article
+                  14 of the Association Agreement if it is determined by the{" "}
+                  <strong>Rules Committee</strong> within 3-days of passage to
+                  be violative of legal requirements, technically unfeasible, or
+                  malicious. If the 3-day period expires without reversion or
+                  the <strong>Rules Committee</strong> affirms the{" "}
+                  <strong>Governance Proposal</strong>, it is enacted.
+                </li>
+                <li>
+                  Upon enactment of a <strong>Governance Proposal</strong>, any
+                  recipients of funds must complete a tax reporting intake
+                  through tooling provided by the
+                  <strong> Rules Committee Administrator</strong> within 15
+                  days, or the payment will expire, and the recipient shall not
+                  be eligible to receive the funds absent future{" "}
+                  <strong>Governance Proposal</strong>.
+                </li>
+              </ul>
+            ),
+          },
+          {
+            id: "voting-power",
+            title: "How voting power works",
+            content: (
+              <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-3">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    SHAPE on Ethereum Mainnet
+                  </h3>
+                  <div className="flex flex-col space-y-3">
+                    <p>
+                      The SHAPE token uses OpenZeppelin&apos;s ERC20Votes. Your
+                      tokens do not count as votes until you choose where your
+                      voting power should live:
+                    </p>
+                    <ul className="list-disc list-inside space-y-2 ml-4 text-sm">
+                      <li>
+                        <strong>Self-delegate</strong> to vote directly with
+                        your own wallet.
+                      </li>
+                      <li>
+                        <strong>Delegate to someone you trust</strong> so they
+                        can vote on your behalf.
+                      </li>
+                    </ul>
+                    <p>
+                      Either way, you keep full ownership of your tokens.
+                      Delegation does not let anyone move your tokens or claim
+                      them; it only points your voting power. You can change or
+                      revoke delegation at any time by making a new delegation.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-3 border-t border-line pt-6">
+                  <h3 className="text-[16px] font-semibold text-primary">
+                    Delegating to yourself and others
+                  </h3>
+                  <div className="flex flex-col space-y-3">
+                    <div>
+                      <h4 className="font-semibold mb-2">Self-Delegation:</h4>
+                      <p className="mb-2">
+                        Self-delegating activates your voting power so you can
+                        vote directly in onchain proposals.
+                      </p>
+                      <p className="mb-2">
+                        <strong>Onchain action:</strong> Call{" "}
+                        <code className="bg-wash px-2 py-1 rounded text-sm">
+                          delegate(0xYOUR-WALLET-HERE)
+                        </code>
+                        .
+                      </p>
+                      <p className="mb-2">
+                        After this one-time step (per address, per chain), your
+                        votes will track your token balance automatically. No
+                        need to repeat unless you later delegate to someone
+                        else.
+                      </p>
+                      <p>Vote directly from your wallet</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">
+                        Delegate to Other Members:
+                      </h4>
+                      <p className="mb-2">
+                        You can point your voting power to a trusted delegate.
+                        This helps active representatives vote on your behalf
+                        while you retain token ownership and can re-delegate at
+                        any time.
+                      </p>
+                      <p className="mb-2">
+                        You are still a member of the WY DUNA.
+                      </p>
+                      <p>
+                        Under Wyoming&apos;s Decentralized Unincorporated
+                        Nonprofit Association Act, a member is someone who may
+                        participate in selecting administrators or shaping
+                        policies. A membership interest is the voting right
+                        defined by those principles, and the Act explicitly
+                        contemplates that voting can be administered by smart
+                        contracts. Delegating your votes does not transfer your
+                        tokens or your membership; it only authorizes another
+                        address to cast votes using your voting power.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+          },
+        ],
+      },
+    },
   ],
 });

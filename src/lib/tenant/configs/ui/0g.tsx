@@ -228,7 +228,6 @@ export const ogTenantUIConfig = new TenantUI({
     { name: "footer/hide-votable-supply", enabled: true },
     { name: "footer/hide-changelog", enabled: true },
     { name: "changelog/simplified-view", enabled: true },
-    { name: "0g-hero-content", enabled: true },
     { name: "duna/use-community-dialogue-label", enabled: true },
     { name: "0g-duna-administration", enabled: true },
     {

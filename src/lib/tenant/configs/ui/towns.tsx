@@ -362,10 +362,6 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "towns-hero-content",
-      enabled: true,
-    },
-    {
       name: "towns-duna-administration",
       enabled: true,
     },

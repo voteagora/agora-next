@@ -43,9 +43,6 @@ const DunaAbout = async () => {
   const dunaToggle = ui.toggle("duna");
   const administrationTitle =
     (dunaToggle?.config as { title?: string })?.title ?? "DUNA Administration";
-  const financialStatementsToggle = ui.toggle("duna/financial-statements");
-  const isFinancialStatementsEnabled =
-    financialStatementsToggle?.enabled ?? false;
   const dunaDescriptionToggle = ui.toggle("duna-description");
   const dunaDescriptionContent = (
     dunaDescriptionToggle?.config as UIDunaDescriptionConfig
@@ -54,10 +51,7 @@ const DunaAbout = async () => {
   const infoPage = ui.page("info");
   const communityLinks = infoPage?.links ?? [];
 
-  const otherDocuments = isFinancialStatementsEnabled
-    ? documents.filter((doc) => !(doc.isFinancialStatement ?? false))
-    : documents;
-
+  const otherDocuments = documents.filter((doc) => !doc.isFinancialStatement);
   const aboutContent =
     dunaDescriptionToggle?.enabled && dunaDescriptionContent
       ? dunaDescriptionContent

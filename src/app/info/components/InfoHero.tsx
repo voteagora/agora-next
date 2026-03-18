@@ -12,8 +12,6 @@ export const InfoHero = () => {
   const page = ui!.page("info");
 
   const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
-  const isTownsDuna = ui.toggle("towns-hero-content")?.enabled === true;
-  const isSyndicateDuna = ui.toggle("syndicate-hero-content")?.enabled === true;
 
   const rotationClasses = [
     "sm:-rotate-2",
@@ -38,9 +36,9 @@ export const InfoHero = () => {
   if (hasDunaAdministration) {
     let disclosureLabel = "View DUNI Member";
     let disclosureLinkText = "Disclosure";
-    if (isTownsDuna) {
+    if (namespace === TENANT_NAMESPACES.TOWNS) {
       disclosureLabel = "View Towns Lodge DUNA Member";
-    } else if (isSyndicateDuna) {
+    } else if (namespace === TENANT_NAMESPACES.SYNDICATE) {
       disclosureLabel = "View Syndicate DUNA Member";
       disclosureLinkText = "Disclosures";
     } else if (namespace === TENANT_NAMESPACES.SHAPE) {
@@ -105,131 +103,18 @@ export const InfoHero = () => {
         >
           {page!.title}
         </h1>
-        {ui.toggle("towns-hero-content")?.enabled ? (
-          <div className="text-base text-secondary mt-4">
-            {renderDesc(page!.description, "whitespace-pre-line")}
-            <div className="mt-4">
-              <a
-                href="#duna-administration"
-                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#3A3454] text-white rounded-[40px] hover:bg-[#3A3454]/90 transition-colors cursor-pointer text-sm sm:text-base"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="8"
-                    cy="8"
-                    r="7"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M8 4V6M8 8V12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span className="whitespace-normal">
-                  View Towns Lodge DUNA Member{" "}
-                  <span className="underline">Disclosure</span>
-                </span>
-              </a>
+        <div className="text-base text-secondary mt-4">
+          {renderDesc(page!.description)}
+          {namespace === TENANT_NAMESPACES.SCROLL && (
+            <div className="flex flex-row gap-2 mt-4">
+              <Link href={"https://claim.scroll.io/faq"}>
+                <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
+                  FAQ
+                </Button>
+              </Link>
             </div>
-          </div>
-        ) : ui.toggle("syndicate-hero-content")?.enabled ? (
-          <div className="text-base text-secondary mt-4">
-            {renderDesc(page!.description, "whitespace-pre-line")}
-            <div className="mt-4">
-              <a
-                href="#duna-administration"
-                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-white text-black rounded-[40px] hover:bg-gray-50 transition-colors cursor-pointer text-sm sm:text-base"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0 text-red-500"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="8"
-                    cy="8"
-                    r="7"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M8 4V6M8 8V12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span className="whitespace-normal text-red-500 font-bold">
-                  View Syndicate DUNA Member{" "}
-                  <span className="underline">Disclosures</span>
-                </span>
-              </a>
-            </div>
-          </div>
-        ) : ui.toggle("0g-hero-content")?.enabled ? (
-          <div className="text-base text-secondary mt-4">
-            {renderDesc(page!.description, "whitespace-pre-line")}
-            <div className="mt-4">
-              <a
-                href="#duna-administration"
-                className="inline-flex items-center gap-2 px-3 py-2 sm:px-4 bg-[#F6EAFF] text-black rounded-[40px] hover:bg-[#F6EAFF]/90 transition-colors cursor-pointer text-sm sm:text-base"
-              >
-                <svg
-                  width="14"
-                  height="14"
-                  className="sm:w-4 sm:h-4 flex-shrink-0"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle
-                    cx="8"
-                    cy="8"
-                    r="7"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M8 4V6M8 8V12"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <span className="whitespace-normal">
-                  View 0G DUNA Member{" "}
-                  <span className="underline">Disclosure</span>
-                </span>
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div className="text-base text-secondary mt-4">
-            {renderDesc(page!.description)}
-            {namespace === TENANT_NAMESPACES.SCROLL && (
-              <div className="flex flex-row gap-2 mt-4">
-                <Link href={"https://claim.scroll.io/faq"}>
-                  <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
-                    FAQ
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:flex sm:flex-row md:w-fit md:flex-auto md:mx-auto self-start justify-between sm:justify-end w-full gap-4 sm:mt-4 lg:mt-0">
