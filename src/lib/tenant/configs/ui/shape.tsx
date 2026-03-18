@@ -107,13 +107,13 @@ export const shapeTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Structura",
       description:
-        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\n\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
+        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\n\nThis Dashboard is the focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
       hero: shapeHero,
       links: [
         {
-          name: "Docs",
-          title: "Docs",
-          url: "#",
+          name: "Shape Network",
+          title: "Shape Network",
+          url: "https://shape.network/",
           image: shapeInfoCard1,
         },
         {
@@ -140,7 +140,7 @@ export const shapeTenantUIConfig = new TenantUI({
       route: "delegates",
       title: "Shape Protocol Delegates",
       description:
-        "Shape Protocol is currently setting up its governance infrastructure. Delegate functionality will be available soon.",
+        "Shape voters are the stewards for the DUNA. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
         title: "Shape Protocol Delegates",
         description: "Delegate your voting power in Shape Protocol",
@@ -180,7 +180,8 @@ export const shapeTenantUIConfig = new TenantUI({
     {
       route: "coming-soon",
       title: "Structura governance goes live on September 15, 2026",
-      description: "Shape voters are the stewards for the DAO.",
+      description:
+        "The Structura DUNA is currently setting up its governance infrastructure. Check back later.",
       hero: shapeHero,
       meta: {
         title: "Shape Protocol Governance",
@@ -243,11 +244,11 @@ export const shapeTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+            <div className="mb-6 text-base font-semibold text-[#ff0101] uppercase tracking-wide underline">
               STRUCTURA – DUNA DISCLOSURES
             </div>
 
-            <div className="font-medium">
+            <div className="text-base leading-relaxed">
               <p className="mt-2">
                 By owning the token and actively participating in Structura
                 (including, claiming SHAPE tokens through airdrop or
@@ -340,11 +341,11 @@ export const shapeTenantUIConfig = new TenantUI({
                 <li>
                   A passed <strong>Governance Proposal</strong> can be reverted
                   for further consideration and modification pursuant to Article
-                  14 of the Association Agreement if it is determined by the{" "}
-                  <strong>Rules Committee</strong> within 3-days of passage to
-                  be violative of legal requirements, technically unfeasible, or
-                  malicious. If the 3-day period expires without reversion or
-                  the <strong>Rules Committee</strong> affirms the{" "}
+                  14 if it is determined by the <strong>Rules Committee</strong>{" "}
+                  within 3-days of passage to be violative of legal
+                  requirements, technically unfeasible, or malicious. If the
+                  3-day period expires without reversion or the{" "}
+                  <strong>Rules Committee</strong> affirms the{" "}
                   <strong>Governance Proposal</strong>, it is enacted.
                 </li>
                 <li>
@@ -365,9 +366,9 @@ export const shapeTenantUIConfig = new TenantUI({
             content: (
               <div className="flex flex-col space-y-6">
                 <div className="flex flex-col space-y-3">
-                  <h3 className="text-[16px] font-semibold text-primary">
-                    SHAPE on Ethereum Mainnet
-                  </h3>
+                  <h4 className="font-semibold mb-2">
+                    SHAPE on Ethereum Mainnet:
+                  </h4>
                   <div className="flex flex-col space-y-3">
                     <p>
                       The SHAPE token uses OpenZeppelin&apos;s ERC20Votes. Your
@@ -386,14 +387,15 @@ export const shapeTenantUIConfig = new TenantUI({
                     </ul>
                     <p>
                       Either way, you keep full ownership of your tokens.
-                      Delegation does not let anyone move your tokens or claim
-                      them; it only points your voting power. You can change or
-                      revoke delegation at any time by making a new delegation.
+                      Delegation <strong>does not</strong> let anyone move your
+                      tokens or claim them; it only points your voting power.
+                      You can change or revoke delegation at any time by making
+                      a new delegation.
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-col space-y-3 border-t border-line pt-6">
-                  <h3 className="text-[16px] font-semibold text-primary">
+                  <h3 className="text-lg font-bold text-primary">
                     Delegating to yourself and others
                   </h3>
                   <div className="flex flex-col space-y-3">
@@ -403,20 +405,22 @@ export const shapeTenantUIConfig = new TenantUI({
                         Self-delegating activates your voting power so you can
                         vote directly in onchain proposals.
                       </p>
-                      <p className="mb-2">
-                        <strong>Onchain action:</strong> Call{" "}
-                        <code className="bg-wash px-2 py-1 rounded text-sm">
-                          delegate(0xYOUR-WALLET-HERE)
-                        </code>
-                        .
-                      </p>
-                      <p className="mb-2">
-                        After this one-time step (per address, per chain), your
-                        votes will track your token balance automatically. No
-                        need to repeat unless you later delegate to someone
-                        else.
-                      </p>
-                      <p>Vote directly from your wallet</p>
+                      <ul className="list-disc list-inside space-y-2 ml-4 mb-2">
+                        <li>
+                          <strong>Onchain action:</strong> Call{" "}
+                          <code className="bg-wash px-2 py-1 rounded text-sm">
+                            delegate(0xYOUR-WALLET-HERE)
+                          </code>
+                          .
+                        </li>
+                        <li>
+                          After this one-time step (per address, per chain),
+                          your votes will track your token balance
+                          automatically. No need to repeat unless you later
+                          delegate to someone else.
+                        </li>
+                      </ul>
+                      <p>Vote directly from your wallet.</p>
                     </div>
                     <div>
                       <h4 className="font-semibold mb-2">
@@ -425,22 +429,24 @@ export const shapeTenantUIConfig = new TenantUI({
                       <p className="mb-2">
                         You can point your voting power to a trusted delegate.
                         This helps active representatives vote on your behalf
-                        while you retain token ownership and can re-delegate at
-                        any time.
+                        while <strong>you retain token ownership</strong> and
+                        can re-delegate at any time.
                       </p>
                       <p className="mb-2">
-                        You are still a member of the WY DUNA.
+                        <strong>You are still a member of the WY DUNA.</strong>
                       </p>
                       <p>
                         Under Wyoming&apos;s Decentralized Unincorporated
-                        Nonprofit Association Act, a member is someone who may
-                        participate in selecting administrators or shaping
-                        policies. A membership interest is the voting right
+                        Nonprofit Association Act, a <strong>member</strong> is
+                        someone who may participate in selecting administrators
+                        or shaping policies. A{" "}
+                        <strong>membership interest</strong> is the voting right
                         defined by those principles, and the Act explicitly
                         contemplates that voting can be administered by smart
-                        contracts. Delegating your votes does not transfer your
-                        tokens or your membership; it only authorizes another
-                        address to cast votes using your voting power.
+                        contracts. Delegating your votes{" "}
+                        <strong>does not transfer your tokens</strong> or your
+                        membership; it only authorizes another address to cast
+                        votes using your voting power.
                       </p>
                     </div>
                   </div>

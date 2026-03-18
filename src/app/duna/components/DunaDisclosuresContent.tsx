@@ -15,8 +15,8 @@ export default function DunaDisclosuresContent() {
 
   return (
     <div className="mt-6" id="duna-disclosures">
-      <div className="border border-line rounded-2xl p-6 bg-wash shadow-sm text-primary">
-        <div className="text-base leading-relaxed">
+      <div className="border border-line rounded-2xl p-6 bg-wash shadow-sm">
+        <div className="text-secondary text-base leading-relaxed">
           {disclosuresConfig.content}
         </div>
         {disclosuresConfig.disclaimer && (
