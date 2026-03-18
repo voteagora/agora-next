@@ -80,7 +80,7 @@ const DunaAbout = async () => {
   const aboutTitle =
     ui.customization?.customAboutSubtitle || administrationTitle;
   return (
-    <div id="duna-administration" className="mt-8 flex flex-col gap-6">
+    <div className="mt-8 flex flex-col gap-6">
       {/* About + Community Resources */}
       {(hasAboutContent || communityLinks.length > 0) && (
         <div className="flex flex-col lg:flex-row gap-6">
