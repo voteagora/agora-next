@@ -52,7 +52,7 @@ export const shapeTenantUIConfig = new TenantUI({
     customHeroImageSize: "w-auto h-auto",
     customIconBackground: "bg-transparent",
     customInfoLayout: "flex-col sm:flex-row gap-2",
-    customAboutSubtitle: "About Shape",
+    customAboutSubtitle: "About Structura",
     customTitleSize: "text-5xl leading-[48px] sm:text-[56px] sm:leading-[56px]",
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
@@ -105,9 +105,9 @@ export const shapeTenantUIConfig = new TenantUI({
     },
     {
       route: "info",
-      title: "Welcome to\nStructura",
+      title: "Welcome to Structura",
       description:
-        "Your home for information about Structura governance and community. Member dashboard for documents, onchain proposals, voting and governance.",
+        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nView Structura DUNA Member Disclosures",
       hero: shapeHero,
       links: [
         {
@@ -150,23 +150,25 @@ export const shapeTenantUIConfig = new TenantUI({
     },
     {
       route: "info/about",
-      title: "Shape Roadmap",
+      title: "Structura Roadmap",
       hero: shapeInfoHero,
       description:
-        "This dashboard is a focal point for Structura governance information and roadmap.",
-      sectionTitle: "Shape Roadmap",
+        "Structura is the Decentralized Unincorporated Nonprofit Association comprised of SHAPE governance token holders: a legal structure purpose-built for decentralized communities that need to operate in the real world without sacrificing decentralization.\n\nDAOs coordinate beautifully onchain. But the moment they need to do something outside the chain (sign a contract, engage a service provider, open a bank account), the structure breaks down. Structura fixes that. Governance decisions made by SHAPE holders translate into real-world actions.\n\nAs a taxpaying U.S. entity organized under Wyoming law, Structura is positioned at the front of a shifting policy environment - proudly built in America, open to the world. The SHAPE token puts members in ultimate control of how the treasury is deployed in support of the Shape Network and its nonprofit purpose: a culture-first network that scales open meritocracy to fuel fine art and bold experiments, and bring fun back onchain.\n\nThis Dashboard\n\nThe focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
+      sectionTitle: "Structura Roadmap",
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#87819F" />,
-          title: "Milestone 1",
-          description: "Community setup and token claims.",
+          title: "September 15, 2026",
+          description:
+            "Token governance is live, with token delegation, a Temp-Check and majority voting on proposals.",
         },
         {
           icon: (
             <NotificationIcon className="w-[24px] h-[24px]" stroke="#87819F" />
           ),
-          title: "Milestone 2",
-          description: "Docs and tax updates posted with messaging enabled.",
+          title: "DUNA Administration",
+          description:
+            "Structura Updates\n[Formation Documents go here until the first Financial Update]",
         },
         {
           icon: (
@@ -175,8 +177,9 @@ export const shapeTenantUIConfig = new TenantUI({
               stroke="#87819F"
             />
           ),
-          title: "Milestone 3",
-          description: "Token governance goes live.",
+          title: "Voting in Structura",
+          description:
+            "Voting Process\n\nIn order for a Governance Proposal to be enacted, it must:\n\nfirst be submitted as a Temp-Check, which is a five-day period during which Members can utilize their SHAPE token to indicate support for a proposal. In order for a proposal to transition from a Temp-Check to a vote of the membership, the Temp-Check must attain the support of 5% of the SHAPE tokens in circulation, except as limited by Article 13.\n\nupon a successful Temp-Check, the Governance Proposal period is open for seven days, during which time Members can utilize their SHAPE token to affirm, deny, or participate without voting on the proposal. A proposal:\n\nPasses if the majority of votes affirm the proposal and 10% of the SHAPE tokens in circulation participate in the vote; and\nFails if the majority of votes deny the proposal or 10% of the SHAPE tokens in circulation did not participate in the vote.\n\nA passed Governance Proposal can be reverted for further consideration and modification pursuant to Article 14 if it is determined by the Rules Committee within 3-days of passage to be violative of legal requirements, technically unfeasible, or malicious. If the 3-day period expires without reversion or the Rules Committee affirms the Governance Proposal, it is enacted.\n\nUpon enactment of a Governance Proposal, any recipients of funds must complete a tax reporting intake through tooling provided by the Rules Committee Administrator within 15 days, or the payment will expire, and the recipient shall not be eligible to receive the funds absent future Governance Proposal.\n\nHow voting power works\n\nSHAPE on Ethereum Mainnet\n\nThe SHAPE token uses OpenZeppelin's ERC20Votes. Your tokens do not count as votes until you choose where your voting power should live:\n\nSelf-delegate to vote directly with your own wallet.\nDelegate to someone you trust so they can vote on your behalf.\n\nEither way, you keep full ownership of your tokens. Delegation does not let anyone move your tokens or claim them; it only points your voting power. You can change or revoke delegation at any time by making a new delegation.\n\nDelegating to yourself and others\n\nSelf-Delegation:\nSelf-delegating activates your voting power so you can vote directly in onchain proposals.\nOnchain action: Call delegate (0xYOUR-WALLET-HERE).\nAfter this one-time step (per address, per chain), your votes will track your token balance automatically. No need to repeat unless you later delegate to someone else.\nVote directly from your wallet\n\nDelegate to Other Members:\nYou can point your voting power to a trusted delegate. This helps active representatives vote on your behalf while you retain token ownership and can re-delegate at any time.\nYou are still a member of the WY DUNA.\n\nUnder Wyoming's Decentralized Unincorporated Nonprofit Association Act, a member is someone who may participate in selecting administrators or shaping policies. A membership interest is the voting right defined by those principles, and the Act explicitly contemplates that voting can be administered by smart contracts. Delegating your votes does not transfer your tokens or your membership; it only authorizes another address to cast votes using your voting power.",
         },
       ],
       meta: {
@@ -190,7 +193,7 @@ export const shapeTenantUIConfig = new TenantUI({
     },
     {
       route: "coming-soon",
-      title: "Structura governance is\ncoming soon",
+      title: "Structura governance goes live on September 15, 2026",
       description:
         "Shape voters are the stewards for the DAO. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       hero: shapeHero,
@@ -256,14 +259,15 @@ export const shapeTenantUIConfig = new TenantUI({
         content: (
           <>
             <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
-              STRUCTURA DISCLOSURES
+              STRUCTURA – DUNA DISCLOSURES
             </div>
 
             <div className="font-medium">
               <p className="mt-2">
-                By owning the token and participating in the governance of
-                Structura on this forum, you acknowledge and agree that you are
-                electing to become a member of a Wyoming Decentralized
+                By owning the token and actively participating in Structura
+                (including, claiming SHAPE tokens through airdrop or
+                participation in governance), you acknowledge and agree that you
+                are electing to become a member of a Wyoming Decentralized
                 Unincorporated Nonprofit Association (&quot;Association&quot;).
                 Your participation is subject to the terms and conditions set
                 forth in the Association Agreement. You further acknowledge and
@@ -294,8 +298,8 @@ export const shapeTenantUIConfig = new TenantUI({
         ),
         disclaimer: (
           <p className="text-secondary text-sm opacity-75">
-            * Structura Docs will archive upon the release of the year-end
-            financial statements and tax update.
+            * DUNA Administration Docs will archive upon the release of the
+            first financial statements and tax update.
           </p>
         ),
       },

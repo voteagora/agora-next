@@ -43,6 +43,9 @@ export const InfoHero = () => {
     } else if (isSyndicateDuna) {
       disclosureLabel = "View Syndicate DUNA Member";
       disclosureLinkText = "Disclosures";
+    } else if (namespace === TENANT_NAMESPACES.SHAPE) {
+      disclosureLabel = "View Structura DUNA Member";
+      disclosureLinkText = "Disclosures";
     }
 
     return (
