@@ -68,7 +68,7 @@ export const shapeTenantUIConfig = new TenantUI({
     {
       name: "twitter",
       title: "Twitter",
-      url: "https://x.com/Shape",
+      url: "https://x.com/structura",
     },
     {
       name: "shape-website",
@@ -107,7 +107,7 @@ export const shapeTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Structura",
       description:
-        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nView Structura DUNA Member Disclosures. \n\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
+        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\nGovernance is yours. This is where you use it.",
       hero: shapeHero,
       links: [
         {
@@ -309,33 +309,30 @@ export const shapeTenantUIConfig = new TenantUI({
                     <li>
                       first be submitted as a <strong>Temp-Check</strong>, which
                       is a five-day period during which <strong>Members</strong>{" "}
-                      can utilize their SYND token to indicate support for a
+                      can utilize their SHAPE token to indicate support for a
                       proposal. In order for a proposal to transition from a{" "}
                       <strong>Temp-Check</strong> to a vote of the membership,
                       the <strong>Temp-Check</strong> must attain the support of
-                      5% of the SYND tokens minted (excludes future emissions),
-                      except as limited by Article 13 of the Association
-                      Agreement.
+                      5% of the SHAPE tokens in circulation, except as limited
+                      by Article 13.
                     </li>
                     <li>
                       upon a successful <strong>Temp-Check</strong>, the{" "}
                       <strong>Governance Proposal</strong> period is open for
                       seven days, during which time
-                      <strong> Members</strong> can utilize their SYND token to
+                      <strong> Members</strong> can utilize their SHAPE token to
                       affirm, deny, or participate without voting on the
                       proposal. A proposal:
                       <ul className="list-[square] list-outside space-y-1 ml-6 mt-2 text-sm leading-relaxed">
                         <li>
-                          <strong>passes</strong> if the majority of votes
-                          affirm the proposal and 10% of the minted SYND tokens
-                          (excludes future emissions) participate in the vote;
-                          and
+                          <strong>Passes</strong> if the majority of votes
+                          affirm the proposal and 10% of the SHAPE tokens in
+                          circulation participate in the vote; and
                         </li>
                         <li>
-                          <strong>fails</strong> if the majority of votes deny
-                          the proposal or 10% of the SYND tokens minted
-                          (excludes future emissions) did not participate in the
-                          vote.
+                          <strong>Fails</strong> if the majority of votes deny
+                          the proposal or 10% of the SHAPE tokens in circulation
+                          did not participate in the vote.
                         </li>
                       </ul>
                     </li>
