@@ -107,7 +107,7 @@ export const shapeTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Structura",
       description:
-        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nView Structura DUNA Member Disclosures",
+        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nView Structura DUNA Member Disclosures. \n\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
       hero: shapeHero,
       links: [
         {
@@ -153,7 +153,7 @@ export const shapeTenantUIConfig = new TenantUI({
       title: "Structura Roadmap",
       hero: shapeInfoHero,
       description:
-        "Structura is the Decentralized Unincorporated Nonprofit Association comprised of SHAPE governance token holders: a legal structure purpose-built for decentralized communities that need to operate in the real world without sacrificing decentralization.\n\nDAOs coordinate beautifully onchain. But the moment they need to do something outside the chain (sign a contract, engage a service provider, open a bank account), the structure breaks down. Structura fixes that. Governance decisions made by SHAPE holders translate into real-world actions.\n\nAs a taxpaying U.S. entity organized under Wyoming law, Structura is positioned at the front of a shifting policy environment - proudly built in America, open to the world. The SHAPE token puts members in ultimate control of how the treasury is deployed in support of the Shape Network and its nonprofit purpose: a culture-first network that scales open meritocracy to fuel fine art and bold experiments, and bring fun back onchain.\n\nThis Dashboard\n\nThe focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
+        "Structura is the Decentralized Unincorporated Nonprofit Association comprised of SHAPE governance token holders: a legal structure purpose-built for decentralized communities that need to operate in the real world without sacrificing decentralization.\n\nDAOs coordinate beautifully onchain. But the moment they need to do something outside the chain (sign a contract, engage a service provider, open a bank account), the structure breaks down. Structura fixes that. Governance decisions made by SHAPE holders translate into real-world actions.\n\nAs a taxpaying U.S. entity organized under Wyoming law, Structura is positioned at the front of a shifting policy environment - proudly built in America, open to the world. The SHAPE token puts members in ultimate control of how the treasury is deployed in support of the Shape Network and its nonprofit purpose: a culture-first network that scales open meritocracy to fuel fine art and bold experiments, and bring fun back onchain.",
       sectionTitle: "Structura Roadmap",
       tabs: [
         {

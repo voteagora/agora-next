@@ -198,7 +198,6 @@ type TenantUIParams = {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
@@ -267,7 +266,6 @@ export class TenantUI {
     customIconColor?: string;
     noReportsFound?: string;
     customButtonBackground?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };

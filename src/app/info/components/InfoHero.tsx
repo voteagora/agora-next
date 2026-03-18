@@ -53,8 +53,8 @@ export const InfoHero = () => {
         >
           {page!.title}
         </h1>
-        <p className="text-base font-medium text-secondary">
-          {page!.description}
+        <p className="text-base font-medium text-secondary whitespace-pre-line leading-snug">
+          {String(page!.description)}
         </p>
         <div className="mt-1">
           <a
