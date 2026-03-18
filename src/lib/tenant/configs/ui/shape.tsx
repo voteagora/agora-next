@@ -65,6 +65,8 @@ export const shapeTenantUIConfig = new TenantUI({
     title: "Shape Protocol",
   },
 
+  grantsFollowXHandle: "structura",
+
   links: [
     {
       name: "twitter",

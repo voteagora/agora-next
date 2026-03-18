@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useAccount, useConnect } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -109,6 +110,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { connect, connectors } = useConnect();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const grantsFollowXHandle = Tenant.current().ui.grantsFollowXHandle;
 
   // Build dynamic zod schema from form_schema
   const dynamicSchema = useMemo(() => {
@@ -475,15 +477,17 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
               • You will receive an email confirmation with your submission
               details
             </li>
-            <li>
-              • Make sure you follow us on{" "}
-              <a
-                href="https://x.com/syndicateio"
-                className="text-primary hover:underline"
-              >
-                @syndicateio
-              </a>
-            </li>
+            {grantsFollowXHandle && (
+              <li>
+                • Make sure you follow us on{" "}
+                <a
+                  href={`https://x.com/${grantsFollowXHandle}`}
+                  className="text-primary hover:underline"
+                >
+                  @{grantsFollowXHandle}
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       </div>

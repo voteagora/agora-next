@@ -150,6 +150,7 @@ type UIOrganization = {
 type TenantUIParams = {
   assets: UIAssets;
   delegates?: UIDelegates;
+  grantsFollowXHandle?: string;
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
@@ -219,6 +220,7 @@ type TenantUIParams = {
 export class TenantUI {
   private _assets: UIAssets;
   private _delegates?: UIDelegates;
+  private _grantsFollowXHandle?: string;
   private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
@@ -293,6 +295,7 @@ export class TenantUI {
     customization,
     delegates,
     documentColors,
+    grantsFollowXHandle,
     dunaDisclaimers,
     favicon,
     googleAnalytics,
@@ -314,6 +317,7 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._grantsFollowXHandle = grantsFollowXHandle;
     this._documentColors = documentColors;
     this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
@@ -340,6 +344,10 @@ export class TenantUI {
 
   public get delegates(): UIDelegates | undefined {
     return this._delegates;
+  }
+
+  public get grantsFollowXHandle(): string | undefined {
+    return this._grantsFollowXHandle;
   }
 
   public get governanceIssues(): UIGovernanceIssue[] | undefined {

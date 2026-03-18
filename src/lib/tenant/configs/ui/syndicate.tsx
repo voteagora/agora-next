@@ -45,6 +45,8 @@ export const syndicateTenantUIConfig = new TenantUI({
     title: "Syndicate Network",
   },
 
+  grantsFollowXHandle: "syndicateio",
+
   dunaDisclaimers:
     "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
