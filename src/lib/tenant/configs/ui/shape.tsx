@@ -66,6 +66,8 @@ export const shapeTenantUIConfig = new TenantUI({
   },
 
   grantsFollowXHandle: "structura",
+  grantsEmailOrgName: "Structura",
+  grantsEmailSenderName: "Shape",
 
   links: [
     {

@@ -151,6 +151,8 @@ type TenantUIParams = {
   assets: UIAssets;
   delegates?: UIDelegates;
   grantsFollowXHandle?: string;
+  grantsEmailOrgName?: string;
+  grantsEmailSenderName?: string;
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
@@ -221,6 +223,8 @@ export class TenantUI {
   private _assets: UIAssets;
   private _delegates?: UIDelegates;
   private _grantsFollowXHandle?: string;
+  private _grantsEmailOrgName?: string;
+  private _grantsEmailSenderName?: string;
   private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
@@ -296,6 +300,8 @@ export class TenantUI {
     delegates,
     documentColors,
     grantsFollowXHandle,
+    grantsEmailOrgName,
+    grantsEmailSenderName,
     dunaDisclaimers,
     favicon,
     googleAnalytics,
@@ -318,6 +324,8 @@ export class TenantUI {
     this._customization = customization;
     this._delegates = delegates;
     this._grantsFollowXHandle = grantsFollowXHandle;
+    this._grantsEmailOrgName = grantsEmailOrgName;
+    this._grantsEmailSenderName = grantsEmailSenderName;
     this._documentColors = documentColors;
     this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
@@ -348,6 +356,14 @@ export class TenantUI {
 
   public get grantsFollowXHandle(): string | undefined {
     return this._grantsFollowXHandle;
+  }
+
+  public get grantsEmailOrgName(): string | undefined {
+    return this._grantsEmailOrgName;
+  }
+
+  public get grantsEmailSenderName(): string | undefined {
+    return this._grantsEmailSenderName;
   }
 
   public get governanceIssues(): UIGovernanceIssue[] | undefined {

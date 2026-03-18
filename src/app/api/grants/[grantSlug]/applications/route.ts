@@ -447,6 +447,7 @@ export async function POST(
           }
         }
 
+        const { ui } = Tenant.current();
         await sendGrantConfirmationEmail({
           to: email,
           data: {
@@ -459,6 +460,11 @@ export async function POST(
             telegram_handle: telegramHandle,
             support_url:
               process.env.SUPPORT_URL || "https://support.agora.vote",
+          },
+          tenantConfig: {
+            orgName: ui.grantsEmailOrgName,
+            senderName: ui.grantsEmailSenderName,
+            followXHandle: ui.grantsFollowXHandle,
           },
         });
       } catch (emailError) {
