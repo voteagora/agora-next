@@ -90,22 +90,24 @@ export const shapeTenantUIConfig = new TenantUI({
         "Structura is experimenting with minimal, onchain governance. This page is the canonical home for Structura governance information.",
       hero: shapeHero,
       meta: {
-        title: "Shape Protocol Agora",
-        description: "Home of Shape Protocol governance",
-        imageTitle: "Shape Protocol Agora",
-        imageDescription: "Home of Shape Protocol governance",
+        title: "Structura - Agora",
+        description:
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Structura - Agora",
+        imageDescription:
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
       route: "proposals",
-      title: "Shape Protocol Proposals",
+      title: "Structura Proposals",
       description:
-        "Shape Protocol is currently setting up its governance infrastructure. Proposal functionality will be available soon.",
+        "Structura is currently setting up its governance infrastructure. Proposal functionality will be available soon.",
       meta: {
-        title: "Shape Protocol Proposals",
-        description: "View and vote on Shape Protocol proposals",
-        imageTitle: "Shape Protocol Proposals",
-        imageDescription: "View and vote on Shape Protocol proposals",
+        title: "Structura Proposals",
+        description: "View and vote on Structura proposals",
+        imageTitle: "Structura Proposals",
+        imageDescription: "View and vote on Structura proposals",
       },
     },
     {
@@ -135,22 +137,24 @@ export const shapeTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "Shape Protocol Agora",
-        description: "Home of Shape Protocol governance",
-        imageTitle: "Shape Protocol Agora",
-        imageDescription: "Home of Shape Protocol governance",
+        title: "Structura - Agora",
+        description:
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Structura - Agora",
+        imageDescription:
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
       route: "delegates",
-      title: "Shape Protocol Delegates",
+      title: "Structura Delegates",
       description:
         "Shape voters are the stewards for the DUNA. You can see them all below, delegate your votes to them, or contact them about your ideas.",
       meta: {
-        title: "Shape Protocol Delegates",
-        description: "Delegate your voting power in Shape Protocol",
-        imageTitle: "Shape Protocol Delegates",
-        imageDescription: "Delegate your voting power in Shape Protocol",
+        title: "Structura Delegates",
+        description: "Delegate your voting power in Structura",
+        imageTitle: "Structura Delegates",
+        imageDescription: "Delegate your voting power in Structura",
       },
     },
     {
@@ -185,12 +189,12 @@ export const shapeTenantUIConfig = new TenantUI({
         },
       ],
       meta: {
-        title: "About Shape Protocol",
+        title: "Structura - Agora",
         description:
-          "Learn about Shape Protocol and decentralized community governance",
-        imageTitle: "About Shape Protocol",
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
+        imageTitle: "Structura - Agora",
         imageDescription:
-          "Learn about Shape Protocol and decentralized community governance",
+          "Structura, a Wyoming DUNA. Member dashboard for DUNA documents, proposals, voting, and governance.",
       },
     },
     {
@@ -200,10 +204,10 @@ export const shapeTenantUIConfig = new TenantUI({
         "The Structura DUNA is currently setting up its governance infrastructure. Check back later.",
       hero: shapeHero,
       meta: {
-        title: "Shape Protocol Governance",
-        description: "Shape Protocol governance coming soon",
-        imageTitle: "Shape Protocol Governance",
-        imageDescription: "Shape Protocol governance coming soon",
+        title: "Structura Governance",
+        description: "Structura governance coming soon",
+        imageTitle: "Structura Governance",
+        imageDescription: "Structura governance coming soon",
       },
     },
     {
@@ -212,10 +216,10 @@ export const shapeTenantUIConfig = new TenantUI({
       description: "",
       hero: shapeHero,
       meta: {
-        title: "Shape Protocol Financials",
-        description: "Shape Protocol financials coming soon",
-        imageTitle: "Shape Protocol Financials",
-        imageDescription: "Shape Protocol financials coming soon",
+        title: "Structura Financials",
+        description: "Structura financials coming soon",
+        imageTitle: "Structura Financials",
+        imageDescription: "Structura financials coming soon",
       },
     },
   ],
