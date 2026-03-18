@@ -107,7 +107,7 @@ export const shapeTenantUIConfig = new TenantUI({
       route: "info",
       title: "Welcome to Structura",
       description:
-        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\nGovernance is yours. This is where you use it.",
+        "Structura, a Wyoming DUNA. This is the Member Dashboard for DUNA documents, onchain proposals, voting and governance.\n\nThis Dashboard is The focal point for Structura governance. Track treasury activity, monitor governance proposals, and stay current on the financial position of the DUNA, including the tax consequences of treasury activity that come with operating as a U.S. entity.\n\nGovernance is yours. This is where you use it.",
       hero: shapeHero,
       links: [
         {
