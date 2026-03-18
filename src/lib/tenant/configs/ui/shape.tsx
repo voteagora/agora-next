@@ -120,7 +120,7 @@ export const shapeTenantUIConfig = new TenantUI({
         {
           name: "Governance Forums",
           title: "Governance",
-          url: "/forums",
+          url: "/coming-soon",
           image: shapeInfoCard2,
         },
         {
