@@ -1,4 +1,6 @@
-export async function POST(request: Request) {
+import { NextRequest } from "next/server";
+
+export async function POST(request: NextRequest) {
   const body = await request.json();
   const user = process.env.TENDERLY_USER;
   const project = process.env.TENDERLY_PROJECT;

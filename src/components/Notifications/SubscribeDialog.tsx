@@ -6,6 +6,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAccount } from "wagmi";
 import { Button } from "../ui/button";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
 import EnvelopePaper from "./DialogImage/EnvelopePaper";
 import EnvelopeTop from "./DialogImage/EnvelopeTop";
@@ -60,6 +61,7 @@ const SubscribeDialog = ({
   const [isHovering, setIsHovering] = useState(false);
   const [email, setEmail] = useState<string | undefined>(undefined);
   const { data: delegate, refetch } = useDelegate({ address: address });
+  const { getAuthenticationData } = useProposalActionAuth();
   const existingEmail = null;
   const hasEmail = false;
 
@@ -109,14 +111,27 @@ const SubscribeDialog = ({
                   </Link>
                 </span>
               );
-              await updateNotificationPreferencesForAddress(
+              const messagePayload = {
+                action: "updateNotificationPreferences",
                 address,
-                existingEmail || email || "",
-                {
-                  wants_proposal_created_email: "prompted",
-                  wants_proposal_ending_soon_email: "prompted",
-                }
-              );
+                timestamp: new Date().toISOString(),
+              };
+              const authData = await getAuthenticationData(messagePayload);
+              if (authData) {
+                await updateNotificationPreferencesForAddress(
+                  address,
+                  existingEmail || email || "",
+                  {
+                    wants_proposal_created_email: "prompted",
+                    wants_proposal_ending_soon_email: "prompted",
+                  },
+                  {
+                    message: authData.message,
+                    signature: authData.signature as `0x${string}` | undefined,
+                    jwt: authData.jwt,
+                  }
+                );
+              }
               // refresh delegate data
               await refetch();
             } catch (error) {
@@ -141,12 +156,27 @@ const SubscribeDialog = ({
                 toast.error("Please enter an email address.");
                 return;
               }
+              const messagePayload = {
+                action: "updateNotificationPreferences",
+                address,
+                timestamp: new Date().toISOString(),
+              };
+              const authData = await getAuthenticationData(messagePayload);
+              if (!authData) {
+                toast.error("Authentication failed");
+                return;
+              }
               await updateNotificationPreferencesForAddress(
                 address,
                 (existingEmail || email) as string,
                 {
                   wants_proposal_created_email: true,
                   wants_proposal_ending_soon_email: true,
+                },
+                {
+                  message: authData.message,
+                  signature: authData.signature as `0x${string}` | undefined,
+                  jwt: authData.jwt,
                 }
               );
               // refresh delegate data

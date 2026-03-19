@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
@@ -11,6 +11,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DraftProposal } from "../../types";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 /**
  * TODO:
@@ -24,7 +25,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const shareParam = searchParams?.get("share");
   const openDialog = useOpenDialog();
   const { address } = useAccount();
-  const messageSigner = useSignMessage();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [isCreatePRPending, setIsCreatePRPending] = useState(false);
   const [isSkipPending, setIsSkipPending] = useState(false);
 
@@ -45,19 +46,17 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const message = JSON.stringify(messagePayload);
-      const signature = await messageSigner
-        .signMessageAsync({ message })
-        .catch(() => undefined);
-      if (!signature) {
-        throw new Error("Signature failed");
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
       }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
-        message,
-        signature,
+        message: authData.message,
+        signature: authData.signature as `0x${string}` | undefined,
+        jwt: authData.jwt,
       });
 
       setIsSkipPending(false);
@@ -83,19 +82,17 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const message = JSON.stringify(messagePayload);
-      const signature = await messageSigner
-        .signMessageAsync({ message })
-        .catch(() => undefined);
-      if (!signature) {
-        throw new Error("Signature failed");
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
       }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
-        message,
-        signature,
+        message: authData.message,
+        signature: authData.signature as `0x${string}` | undefined,
+        jwt: authData.jwt,
       });
 
       setIsCreatePRPending(false);

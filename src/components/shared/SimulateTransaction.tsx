@@ -6,7 +6,6 @@ import { icons } from "../../icons/icons";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
-import { opAdminAddress } from "@/lib/contracts/contracts";
 import Tenant from "@/lib/tenant/tenant";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";

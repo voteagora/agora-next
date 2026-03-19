@@ -3,6 +3,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
+import { checkAuth, type AuthParams } from "@/lib/auth/authHelpers";
 
 interface AttachmentData {
   fileName: string;
@@ -15,9 +16,14 @@ export async function uploadAttachment(
   attachmentData: AttachmentData,
   address: string,
   targetType: "category" | "post",
-  targetId: number
+  targetId: number,
+  auth: AuthParams
 ) {
   try {
+    // Verify authentication
+    const authError = await checkAuth(auth, address as `0x${string}`);
+    if (authError) return authError;
+
     const { slug } = Tenant.current();
 
     const buffer = Buffer.from(attachmentData.base64Data, "base64");
@@ -99,9 +105,14 @@ export async function uploadAttachment(
 // Upload to IPFS only (for temporary uploads during composition)
 export async function uploadToIPFSOnly(
   attachmentData: AttachmentData,
-  address: string
+  address: string,
+  auth: AuthParams
 ) {
   try {
+    // Verify authentication
+    const authError = await checkAuth(auth, address as `0x${string}`);
+    if (authError) return authError;
+
     const buffer = Buffer.from(attachmentData.base64Data, "base64");
 
     const fileBlob = new Blob([buffer], { type: attachmentData.contentType });

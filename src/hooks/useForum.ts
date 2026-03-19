@@ -38,6 +38,7 @@ import {
   ForumCategory,
 } from "@/lib/forumUtils";
 import toast from "react-hot-toast";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
@@ -72,11 +73,12 @@ interface CreatePostData {
 }
 
 export const useForum = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { address } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { signTypedDataAsync } = useSignTypedData();
+  const { getAuthenticationData } = useProposalActionAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const permissions = useForumPermissionsContext();
 
   const createForumSubscriptionSignedRequest = useCallback(
@@ -269,6 +271,16 @@ export const useForum = () => {
 
         if (data.attachment) {
           try {
+            const messagePayload = {
+              action: "uploadAttachment",
+              address: currentAddress,
+              timestamp: new Date().toISOString(),
+            };
+            const authData = await getAuthenticationData(messagePayload);
+            if (!authData) {
+              throw new Error("Authentication failed for attachment upload");
+            }
+
             const attachmentData = await convertFileToAttachmentData(
               data.attachment
             );
@@ -277,7 +289,12 @@ export const useForum = () => {
               attachmentData,
               currentAddress,
               "post",
-              result.data?.post.id!
+              result.data?.post.id!,
+              {
+                message: authData.message,
+                signature: authData.signature as `0x${string}` | undefined,
+                jwt: authData.jwt,
+              }
             );
 
             if (
@@ -377,6 +394,16 @@ export const useForum = () => {
 
         if (data.attachment) {
           try {
+            const messagePayload = {
+              action: "uploadAttachment",
+              address: currentAddress,
+              timestamp: new Date().toISOString(),
+            };
+            const authData = await getAuthenticationData(messagePayload);
+            if (!authData) {
+              throw new Error("Authentication failed for attachment upload");
+            }
+
             const attachmentData = await convertFileToAttachmentData(
               data.attachment
             );
@@ -385,7 +412,12 @@ export const useForum = () => {
               attachmentData,
               currentAddress,
               "post",
-              result.data?.id!
+              result.data?.id!,
+              {
+                message: authData.message,
+                signature: authData.signature as `0x${string}` | undefined,
+                jwt: authData.jwt,
+              }
             );
 
             if (attachmentResult && attachmentResult.success) {

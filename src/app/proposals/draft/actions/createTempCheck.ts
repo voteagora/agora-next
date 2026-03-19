@@ -4,7 +4,9 @@ import { z } from "zod";
 import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import { verifyOwnerAndSiweForDraft } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "../types";
 import {
   getStageByIndex,
   getStageIndexForTenant,
@@ -14,17 +16,48 @@ export async function onSubmitAction(
   data: z.output<typeof tempCheckSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    message: string;
-    signature: `0x${string}`;
-  }
+  } & AuthParams
 ): Promise<FormState> {
-  const ownerCheck = await verifyOwnerAndSiweForDraft(data.draftProposalId, {
-    address: data.creatorAddress as `0x${string}`,
-    message: data.message,
-    signature: data.signature,
+  const authResult = await verifyAuth(
+    {
+      jwt: data.jwt,
+      message: data.message,
+      signature: data.signature,
+      address: data.creatorAddress as `0x${string}`,
+    },
+    data.creatorAddress as `0x${string}`
+  );
+  if (!authResult.success) {
+    return { ok: false, message: authResult.error };
+  }
+
+  // Check draft ownership
+  const draft = await prismaWeb2Client.proposalDraft.findUnique({
+    where: { id: data.draftProposalId },
+    select: { id: true, author_address: true },
   });
-  if (!ownerCheck.ok) {
-    return { ok: false, message: ownerCheck.reason };
+
+  if (!draft) {
+    return { ok: false, message: "Draft not found" };
+  }
+
+  // Check if user is authorized (author or offchain proposal creator)
+  const addressLower = authResult.address.toLowerCase();
+  const authorLower = draft.author_address.toLowerCase();
+  let isAuthorized = addressLower === authorLower;
+
+  if (!isAuthorized) {
+    const tenant = Tenant.current();
+    const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+    const offchainCreators =
+      (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
+    isAuthorized = offchainCreators.some(
+      (creator) => creator.toLowerCase() === addressLower
+    );
+  }
+
+  if (!isAuthorized) {
+    return { ok: false, message: "Unauthorized" };
   }
 
   const parsed = tempCheckSchema.safeParse(data);

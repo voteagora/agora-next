@@ -26,6 +26,7 @@ import { useTopicViewTracking } from "@/hooks/useTopicViewTracking";
 import Tenant from "@/lib/tenant/tenant";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { useStableCallback } from "@/hooks/useStableCallback";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 interface ReportModalProps {
   report: ForumTopic | null;
@@ -60,6 +61,7 @@ const ReportModal = ({
     dunaCategoryId || undefined
   );
   const requireLogin = useRequireLogin();
+  const { getAuthenticationData } = useProposalActionAuth();
   const stableCreatePost = useStableCallback(createPost);
   const stableDeleteTopic = useStableCallback(deleteTopic);
   const stableArchiveTopic = useStableCallback(archiveTopic);
@@ -75,11 +77,26 @@ const ReportModal = ({
         throw new Error("Wallet not connected");
       }
 
+      const messagePayload = {
+        action: "uploadAttachment",
+        address: loggedInAddress,
+        timestamp: new Date().toISOString(),
+      };
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
+      }
+
       // Upload to IPFS only (no database record yet)
       const attachmentData = await convertFileToAttachmentData(file);
       const uploadResult = await uploadToIPFSOnly(
         attachmentData,
-        loggedInAddress
+        loggedInAddress,
+        {
+          message: authData.message,
+          signature: authData.signature as `0x${string}` | undefined,
+          jwt: authData.jwt,
+        }
       );
 
       if (!uploadResult.success || !uploadResult.ipfsUrl) {

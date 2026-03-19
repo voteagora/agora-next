@@ -24,6 +24,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 export interface FormData {
   title: string;
@@ -53,6 +54,7 @@ export default function ForumNewClient({
   const { categories } = useForumCategories();
   const permissions = useForumPermissionsContext();
   const { address } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVPModal, setShowVPModal] = useState(false);
 
@@ -86,8 +88,22 @@ export default function ForumNewClient({
       throw new Error("Wallet not connected");
     }
 
+    const messagePayload = {
+      action: "uploadAttachment",
+      address,
+      timestamp: new Date().toISOString(),
+    };
+    const authData = await getAuthenticationData(messagePayload);
+    if (!authData) {
+      throw new Error("Authentication failed");
+    }
+
     const attachmentData = await convertFileToAttachmentData(file);
-    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
+      message: authData.message,
+      signature: authData.signature as `0x${string}` | undefined,
+      jwt: authData.jwt,
+    });
 
     if (!uploadResult.success || !uploadResult.ipfsUrl) {
       throw new Error(uploadResult.error || "Upload failed");
@@ -117,18 +133,32 @@ export default function ForumNewClient({
 
       if (created?.id) {
         if (relatedProposal) {
-          await createProposalLinks({
-            sourceId: relatedProposal.id,
-            sourceType: relatedProposal.type,
-            links: [
-              {
-                targetId: created.id.toString(),
-                targetType: "forum_topic",
+          const messagePayload = {
+            action: "createProposalLinks",
+            address,
+            timestamp: new Date().toISOString(),
+          };
+          const authData = await getAuthenticationData(messagePayload);
+          if (authData) {
+            await createProposalLinks({
+              sourceId: relatedProposal.id,
+              sourceType: relatedProposal.type,
+              links: [
+                {
+                  targetId: created.id.toString(),
+                  targetType: "forum_topic",
+                },
+              ],
+              auth: {
+                address: address,
+                message: authData.message,
+                signature: authData.signature as `0x${string}` | undefined,
+                jwt: authData.jwt,
               },
-            ],
-          }).catch((error) => {
-            console.error("Failed to create proposal link:", error);
-          });
+            }).catch((error) => {
+              console.error("Failed to create proposal link:", error);
+            });
+          }
         }
 
         toast.success("Forum topic created successfully! Redirecting...");

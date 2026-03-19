@@ -2,40 +2,47 @@
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import {
-  verifyOwnerAndSiweForDraft,
-  verifyOwnerAndJwtForDraft,
-} from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import Tenant from "@/lib/tenant/tenant";
+import { PLMConfig } from "../types";
 
 export async function onSubmitAction(
   draftProposalId: number,
-  params: {
-    address: `0x${string}`;
-    message?: string;
-    signature?: `0x${string}`;
-    jwt?: string;
-  }
+  params: { address: `0x${string}` } & AuthParams
 ): Promise<FormState> {
   try {
-    if (params.jwt) {
-      const jwtCheck = await verifyOwnerAndJwtForDraft(
-        draftProposalId,
-        params.jwt
+    const authResult = await verifyAuth(params, params.address);
+    if (!authResult.success) {
+      return { ok: false, message: authResult.error };
+    }
+
+    // Check draft ownership
+    const draft = await prismaWeb2Client.proposalDraft.findUnique({
+      where: { id: draftProposalId },
+      select: { id: true, author_address: true },
+    });
+
+    if (!draft) {
+      return { ok: false, message: "Draft not found" };
+    }
+
+    // Check if user is authorized (author or offchain proposal creator)
+    const addressLower = authResult.address.toLowerCase();
+    const authorLower = draft.author_address.toLowerCase();
+    let isAuthorized = addressLower === authorLower;
+
+    if (!isAuthorized) {
+      const tenant = Tenant.current();
+      const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+      const offchainCreators =
+        (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
+      isAuthorized = offchainCreators.some(
+        (creator) => creator.toLowerCase() === addressLower
       );
-      if (!jwtCheck.ok) {
-        return { ok: false, message: jwtCheck.reason };
-      }
-    } else if (params.message && params.signature) {
-      const ownerCheck = await verifyOwnerAndSiweForDraft(draftProposalId, {
-        address: params.address,
-        message: params.message,
-        signature: params.signature,
-      });
-      if (!ownerCheck.ok) {
-        return { ok: false, message: ownerCheck.reason };
-      }
-    } else {
-      return { ok: false, message: "Missing authentication" };
+    }
+
+    if (!isAuthorized) {
+      return { ok: false, message: "Unauthorized" };
     }
     // TODO: maybe we don't delete, we just flag isDeleted
     await prismaWeb2Client.proposalDraft.delete({

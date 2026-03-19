@@ -5,67 +5,37 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { PLMConfig } from "@/app/proposals/draft/types";
-
-interface AuthParams {
-  jwt?: string;
-  message?: string;
-  signature?: `0x${string}`;
-}
 
 async function authenticateAndAuthorize(
   auth: AuthParams,
   expectedAddress?: string
 ): Promise<{ ok: true; address: string } | { ok: false; error: string }> {
-  let authenticatedAddress: string | null = null;
-
-  if (auth.jwt) {
-    authenticatedAddress = await verifyJwtAndGetAddress(auth.jwt);
-    if (!authenticatedAddress) {
-      return { ok: false, error: "Invalid token" };
-    }
-  } else if (auth.message && auth.signature) {
-    if (!expectedAddress) {
-      return { ok: false, error: "Missing address for signature verification" };
-    }
-    const isValid = await verifySiwe({
-      address: expectedAddress as `0x${string}`,
-      message: auth.message,
-      signature: auth.signature,
-    });
-    if (!isValid) {
-      return { ok: false, error: "Invalid signature" };
-    }
-    authenticatedAddress = expectedAddress;
-  } else {
-    return { ok: false, error: "Missing authentication" };
+  // Verify authentication
+  const authResult = await verifyAuth(
+    auth,
+    expectedAddress as `0x${string}` | undefined
+  );
+  if (!authResult.success) {
+    return { ok: false, error: authResult.error };
   }
 
-  if (
-    expectedAddress &&
-    authenticatedAddress.toLowerCase() !== expectedAddress.toLowerCase()
-  ) {
-    return { ok: false, error: "Address mismatch" };
-  }
-
+  // Check authorization (must be in offchainProposalCreator list)
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const offchainCreators =
     (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
 
   const isAuthorized = offchainCreators.some(
-    (creator) => creator.toLowerCase() === authenticatedAddress!.toLowerCase()
+    (creator) => creator.toLowerCase() === authResult.address.toLowerCase()
   );
 
   if (!isAuthorized) {
     return { ok: false, error: "Unauthorized" };
   }
 
-  return { ok: true, address: authenticatedAddress };
+  return { ok: true, address: authResult.address };
 }
 
 interface OffchainProposalData {

@@ -25,6 +25,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { requireAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
@@ -192,8 +193,12 @@ export async function updateNotificationPreferencesForAddress(
   options: {
     wants_proposal_created_email: "prompt" | "prompted" | true | false;
     wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
-  }
+  },
+  auth: AuthParams
 ) {
+  // Verify authentication (throws on failure)
+  await requireAuth(auth, address);
+
   return fetchUpdateNotificationPreferencesForAddress(address, email, options);
 }
 
