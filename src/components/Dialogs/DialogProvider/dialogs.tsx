@@ -41,8 +41,6 @@ import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActio
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
 import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
-import { ForumPost, ForumTopic } from "@/lib/forumUtils";
-import ReportModal from "@/app/duna/components/ReportModal";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -69,8 +67,7 @@ export type DialogType =
   | CreateScopeDialogType
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
-  | ConfirmDialogType
-  | ReportModalDialogType;
+  | ConfirmDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -325,19 +322,6 @@ export type ConfirmDialogType = {
   };
 };
 
-export type ReportModalDialogType = {
-  type: "REPORT_MODAL";
-  className?: string;
-  params: {
-    report: ForumTopic | null;
-    onDelete?: () => void;
-    onArchive?: () => void;
-    onCommentAdded?: (newComment: ForumPost) => void;
-    onCommentDeleted?: (commentId: number) => void;
-    onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
-  };
-};
-
 export const dialogs: DialogDefinitions<DialogType> = {
   DELEGATE: (
     { delegate, fetchDirectDelegatee, isDelegationEncouragement },
@@ -588,29 +572,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
         title={title}
         message={message}
         onConfirm={onConfirm}
-        closeDialog={closeDialog}
-      />
-    );
-  },
-  REPORT_MODAL: (
-    {
-      report,
-      onDelete,
-      onArchive,
-      onCommentAdded,
-      onCommentDeleted,
-      onCommentUpdated,
-    },
-    closeDialog
-  ) => {
-    return (
-      <ReportModal
-        report={report}
-        onDelete={onDelete}
-        onArchive={onArchive}
-        onCommentAdded={onCommentAdded}
-        onCommentDeleted={onCommentDeleted}
-        onCommentUpdated={onCommentUpdated}
         closeDialog={closeDialog}
       />
     );

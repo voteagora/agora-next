@@ -24,11 +24,11 @@ export type AuthResult =
 
 /**
  * Verify JWT or SIWE authentication and return the authenticated address.
- * 
+ *
  * @param auth - Authentication parameters (JWT or SIWE signature)
  * @param expectedAddress - Optional address to verify against (required for SIWE)
  * @returns AuthResult with success status and address or error message
- * 
+ *
  * @example
  * ```ts
  * const authResult = await verifyAuth(auth, address);
@@ -48,47 +48,53 @@ export async function verifyAuth(
     if (!jwtAddress) {
       return { success: false, error: "Invalid token" };
     }
-    
+
     // Verify address match if expected address provided
-    if (expectedAddress && jwtAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
+    if (
+      expectedAddress &&
+      jwtAddress.toLowerCase() !== expectedAddress.toLowerCase()
+    ) {
       return { success: false, error: "Token address mismatch" };
     }
-    
+
     return { success: true, address: jwtAddress };
   }
-  
+
   // SIWE authentication
   if (auth.message && auth.signature) {
     if (!expectedAddress && !auth.address) {
-      return { success: false, error: "Address required for signature verification" };
+      return {
+        success: false,
+        error: "Address required for signature verification",
+      };
     }
-    
+
     const addressToVerify = expectedAddress || auth.address!;
     const isValid = await verifySiwe({
       address: addressToVerify,
       message: auth.message,
       signature: auth.signature,
     });
-    
+
     if (!isValid) {
       return { success: false, error: "Invalid signature" };
     }
-    
+
     return { success: true, address: addressToVerify };
   }
-  
+
   return { success: false, error: "Missing authentication credentials" };
 }
 
 /**
  * Verify authentication and throw an error if invalid.
  * Useful for server actions that want to throw instead of returning error objects.
- * 
+ *
  * @param auth - Authentication parameters
  * @param expectedAddress - Optional address to verify against
  * @returns The authenticated address
  * @throws Error if authentication fails
- * 
+ *
  * @example
  * ```ts
  * const address = await requireAuth(auth, expectedAddress);
@@ -109,11 +115,11 @@ export async function requireAuth(
 /**
  * Verify authentication for server actions that return { success, error } format.
  * Returns early with error object if auth fails, otherwise returns null to continue.
- * 
+ *
  * @param auth - Authentication parameters
  * @param expectedAddress - Optional address to verify against
  * @returns Error object if auth failed, null if successful
- * 
+ *
  * @example
  * ```ts
  * const authError = await checkAuth(auth, address);

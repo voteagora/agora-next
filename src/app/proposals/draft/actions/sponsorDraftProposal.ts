@@ -57,8 +57,8 @@ export async function onSubmitAction(
       ProposalScope.OFFCHAIN_ONLY;
     const allowOffchainCreator = Boolean(
       offchainToggle?.enabled &&
-      (isOffchainScope || data.is_offchain_submission) &&
-      plmConfig?.offchainProposalCreator?.includes(signer)
+        (isOffchainScope || data.is_offchain_submission) &&
+        plmConfig?.offchainProposalCreator?.includes(signer)
     );
     if (allowOffchainCreator) {
       isAuthorized = true;
