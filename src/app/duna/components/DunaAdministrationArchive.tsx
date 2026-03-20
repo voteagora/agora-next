@@ -25,7 +25,6 @@ const DunaAdministrationArchive = async () => {
       categoryId: dunaCategoryId,
       archived: true,
     });
-
     if (documentsResult.success) {
       documents = documentsResult.data;
     }
@@ -37,7 +36,6 @@ const DunaAdministrationArchive = async () => {
     (doc) => doc.isFinancialStatement
   );
   const otherDocuments = documents.filter((doc) => !doc.isFinancialStatement);
-
   return (
     <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
@@ -58,7 +56,6 @@ const DunaAdministrationArchive = async () => {
               <DocumentsSection
                 initialDocuments={otherDocuments}
                 hideHeader={true}
-                hideComms={true}
               />
             </CardContent>
           </Card>

@@ -3,6 +3,13 @@
 import React, { useState } from "react";
 import { ArrowCircle } from "@/icons/ArrowCircle";
 import { DownloadCloud } from "@/icons/DownloadCloud";
+import { ArchiveBoxIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { useAccount } from "wagmi";
+import { useForum } from "@/hooks/useForum";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumDocument {
   id: number;
@@ -52,6 +59,24 @@ export default function FormationDocumentsList({
     initialDocuments || []
   );
 
+  const { address } = useAccount();
+  const { deleteAttachment, archiveAttachment } = useForum();
+  const openDialog = useOpenDialog();
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
+
+  const { hasPermission: canArchiveFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "archive"
+  );
+  const { hasPermission: canDeleteFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "delete"
+  );
+
   const handleDocumentClick = (document: ForumDocument) => {
     if (onDocumentOpen) {
       onDocumentOpen(document);
@@ -85,6 +110,76 @@ export default function FormationDocumentsList({
     }
   };
 
+  const handleDeleteAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Attachment",
+        message: "Are you sure you want to delete this attachment?",
+        onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableDeleteAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
+  };
+
+  const handleArchiveAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Attachment",
+        message: "Are you sure you want to archive this attachment?",
+        onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const isAuthor =
+            documents
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setDocuments((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
+  };
+
   if (documents.length === 0) {
     return (
       <div className="text-center py-8">
@@ -100,6 +195,10 @@ export default function FormationDocumentsList({
         const displayDate = formatDocumentDate(document.createdAt);
         const displaySize = formatFileSize(document.fileSize);
         const isLast = index === documents.length - 1;
+        const isAuthor =
+          address?.toLowerCase() === document.uploadedBy?.toLowerCase();
+        const canArchive = canArchiveFilings || isAuthor;
+        const canDelete = canDeleteFilings;
 
         return (
           <div
@@ -134,6 +233,26 @@ export default function FormationDocumentsList({
                   aria-label="Download document"
                 >
                   <DownloadCloud className="w-6 h-6" />
+                </button>
+              )}
+              {canArchive && !document.archived && (
+                <button
+                  onClick={(e) => handleArchiveAttachment(document.id, e)}
+                  className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-primary"
+                  title="Archive"
+                  aria-label="Archive document"
+                >
+                  <ArchiveBoxIcon className="w-5 h-5" />
+                </button>
+              )}
+              {canDelete && (
+                <button
+                  onClick={(e) => handleDeleteAttachment(document.id, e)}
+                  className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-red-600"
+                  title="Delete"
+                  aria-label="Delete document"
+                >
+                  <TrashIcon className="w-5 h-5" />
                 </button>
               )}
             </div>

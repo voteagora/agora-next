@@ -1,8 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ArrowCircle } from "@/icons/ArrowCircle";
 import { DownloadCloud } from "@/icons/DownloadCloud";
+import { ArchiveBoxIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { useAccount } from "wagmi";
+import { useForum } from "@/hooks/useForum";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import useRequireLogin from "@/hooks/useRequireLogin";
+import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface FinancialStatement {
   id: number;
@@ -42,9 +49,100 @@ export default function FinancialStatementsSection({
   onStatementClick,
   title,
 }: FinancialStatementsSectionProps) {
-  if (statements.length === 0) return null;
-  console.log(statements);
-  const sortedStatements = [...statements].sort((a, b) => {
+  const [localStatements, setLocalStatements] = useState<FinancialStatement[]>(
+    statements || []
+  );
+
+  const { address } = useAccount();
+  const { deleteAttachment, archiveAttachment } = useForum();
+  const openDialog = useOpenDialog();
+  const requireLogin = useRequireLogin();
+  const stableDeleteAttachment = useStableCallback(deleteAttachment);
+  const stableArchiveAttachment = useStableCallback(archiveAttachment);
+
+  const { hasPermission: canArchiveFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "archive"
+  );
+  const { hasPermission: canDeleteFilings } = useHasPermission(
+    "duna_filings",
+    "filings",
+    "delete"
+  );
+
+  const handleDeleteAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Delete Attachment",
+        message: "Are you sure you want to delete this attachment?",
+        onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const isAuthor =
+            localStatements
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableDeleteAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setLocalStatements((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
+  };
+
+  const handleArchiveAttachment = async (
+    attachmentId: number,
+    e: React.MouseEvent
+  ) => {
+    e.stopPropagation();
+    openDialog({
+      type: "CONFIRM",
+      params: {
+        title: "Archive Attachment",
+        message: "Are you sure you want to archive this attachment?",
+        onConfirm: async () => {
+          const loggedInAddress = await requireLogin();
+          if (!loggedInAddress) {
+            return;
+          }
+
+          const isAuthor =
+            localStatements
+              .find((doc) => doc.id === attachmentId)
+              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
+          const success = await stableArchiveAttachment(
+            attachmentId,
+            "category",
+            isAuthor
+          );
+          if (success) {
+            setLocalStatements((prev) =>
+              prev.filter((doc) => doc.id !== attachmentId)
+            );
+          }
+        },
+      },
+    });
+  };
+
+  if (localStatements.length === 0) return null;
+  const sortedStatements = [...localStatements].sort((a, b) => {
     const dateA = new Date(a.revealTime ?? a.createdAt);
     const dateB = new Date(b.revealTime ?? b.createdAt);
     return dateB.getTime() - dateA.getTime();
@@ -63,6 +161,10 @@ export default function FinancialStatementsSection({
             statement.revealTime ?? statement.createdAt
           );
           const displayName = statement.name.replace(/\.[^/.]+$/, "");
+          const isAuthor =
+            address?.toLowerCase() === statement.uploadedBy?.toLowerCase();
+          const canArchive = canArchiveFilings || isAuthor;
+          const canDelete = canDeleteFilings;
 
           return (
             <div
@@ -110,6 +212,26 @@ export default function FinancialStatementsSection({
                     aria-label="Download statement"
                   >
                     <DownloadCloud className="w-5 h-5" />
+                  </button>
+                )}
+                {canArchive && !statement.archived && (
+                  <button
+                    onClick={(e) => handleArchiveAttachment(statement.id, e)}
+                    className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-primary"
+                    title="Archive"
+                    aria-label="Archive statement"
+                  >
+                    <ArchiveBoxIcon className="w-5 h-5" />
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={(e) => handleDeleteAttachment(statement.id, e)}
+                    className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-red-600"
+                    title="Delete"
+                    aria-label="Delete statement"
+                  >
+                    <TrashIcon className="w-5 h-5" />
                   </button>
                 )}
               </div>

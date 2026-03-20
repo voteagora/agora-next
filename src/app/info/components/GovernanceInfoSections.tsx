@@ -6,14 +6,11 @@ import { UIGovernanceInfoConfig } from "@/lib/tenant/tenantUI";
 export default function GovernanceInfoSections() {
   const { ui } = Tenant.current();
   const config = ui.toggle("info/governance-sections");
-  console.log("test");
   if (!config?.enabled || !config?.config) {
     return null;
   }
 
   const governanceConfig = config.config as UIGovernanceInfoConfig;
-  const useNeutral =
-    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
   if (!governanceConfig.sections || governanceConfig.sections.length === 0) {
     return null;
