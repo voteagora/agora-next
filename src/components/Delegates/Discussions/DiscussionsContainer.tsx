@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfiniteScroll from "react-infinite-scroller";
 import { MessageCircle, Clock, User } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { stripHtmlToText } from "@/app/forums/stripHtml";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
@@ -254,9 +253,6 @@ const DiscussionsContainer = ({
                               <span>{formatRelative(post.createdAt)}</span>
                             </div>
                           </div>
-                        </div>
-                        <div className="mt-1 text-sm text-secondary line-clamp-2">
-                          {stripHtmlToText(post.content)}
                         </div>
                         <div className="mt-1 flex items-center gap-2 text-xs text-secondary">
                           <span>Category: {post.topic?.category?.name}</span>
