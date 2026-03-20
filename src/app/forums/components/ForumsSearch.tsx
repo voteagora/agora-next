@@ -229,7 +229,10 @@ const ForumsSearch: React.FC<ForumsSearchProps> = ({ className }) => {
   }
 
   return (
-    <div ref={containerRef} className={cn("relative w-[400px]", className)}>
+    <div
+      ref={containerRef}
+      className={cn("relative w-full min-w-0 sm:max-w-[400px]", className)}
+    >
       <InstantSearch indexName={indexName} searchClient={searchClient}>
         <SearchInput
           placeholder="Search discussions"
