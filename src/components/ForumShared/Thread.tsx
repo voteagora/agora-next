@@ -98,8 +98,6 @@ const CommentItem = ({
     "forums",
     "posts",
     "archive",
-    undefined,
-    undefined,
     { autoAuthenticate: true }
   );
 

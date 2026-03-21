@@ -53,24 +53,18 @@ const DocumentsSection = ({
     "duna_filings",
     "filings",
     "create",
-    undefined,
-    undefined,
     { autoAuthenticate: true }
   );
   const { hasPermission: canArchiveFilings } = useHasPermission(
     "duna_filings",
     "filings",
     "archive",
-    undefined,
-    undefined,
     { autoAuthenticate: true }
   );
   const { hasPermission: canDeleteFilings } = useHasPermission(
     "duna_filings",
     "filings",
     "delete",
-    undefined,
-    undefined,
     { autoAuthenticate: true }
   );
 

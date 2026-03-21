@@ -26,7 +26,9 @@ interface UserPermissionsResponse {
   permissions: Permission[];
 }
 
-interface PermissionQueryOptions {
+interface PermissionHookOptions {
+  address?: string;
+  daoSlug?: DaoSlug;
   autoAuthenticate?: boolean;
 }
 
@@ -34,16 +36,12 @@ interface PermissionQueryOptions {
  * Fetch user's permissions for a specific DAO
  * Includes both DAO-specific and system-wide roles (Super Admin)
  */
-export function useUserPermissions(
-  address?: string,
-  daoSlug?: DaoSlug,
-  options: PermissionQueryOptions = {}
-) {
+export function useUserPermissions(options: PermissionHookOptions = {}) {
   const { address: connectedAddress } = useAccount();
   const { slug: currentDaoSlug } = Tenant.current();
 
-  const userAddress = address || connectedAddress;
-  const targetDaoSlug = daoSlug || (currentDaoSlug as DaoSlug);
+  const userAddress = options.address || connectedAddress;
+  const targetDaoSlug = options.daoSlug || (currentDaoSlug as DaoSlug);
   const normalizedUserAddress = userAddress?.toLowerCase();
   const normalizedConnectedAddress = connectedAddress?.toLowerCase();
   const isSelfLookup =
@@ -101,8 +99,8 @@ export function useUserPermissions(
       return response.json();
     },
     enabled: !!normalizedUserAddress && !!targetDaoSlug && authInitialized,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 1,
   });
 
@@ -117,17 +115,14 @@ export function useUserPermissions(
 
 /**
  * Check if user has a specific permission
- * Returns a boolean and loading state
  */
 export function useHasPermission(
   module: string,
   resource: string,
   action: string,
-  address?: string,
-  daoSlug?: DaoSlug,
-  options?: PermissionQueryOptions
+  options?: PermissionHookOptions
 ) {
-  const { data, isLoading } = useUserPermissions(address, daoSlug, options);
+  const { data, isLoading } = useUserPermissions(options);
 
   const hasPermission =
     data?.permissions.some(
@@ -147,11 +142,9 @@ export function useHasPermission(
  */
 export function useHasAnyPermission(
   permissions: Array<{ module: string; resource: string; action: string }>,
-  address?: string,
-  daoSlug?: DaoSlug,
-  options?: PermissionQueryOptions
+  options?: PermissionHookOptions
 ) {
-  const { data, isLoading } = useUserPermissions(address, daoSlug, options);
+  const { data, isLoading } = useUserPermissions(options);
 
   const hasAnyPermission =
     permissions.some((required) =>
@@ -175,11 +168,9 @@ export function useHasAnyPermission(
  */
 export function useHasAllPermissions(
   permissions: Array<{ module: string; resource: string; action: string }>,
-  address?: string,
-  daoSlug?: DaoSlug,
-  options?: PermissionQueryOptions
+  options?: PermissionHookOptions
 ) {
-  const { data, isLoading } = useUserPermissions(address, daoSlug, options);
+  const { data, isLoading } = useUserPermissions(options);
 
   const hasAllPermissions =
     permissions.every((required) =>
@@ -201,12 +192,9 @@ export function useHasAllPermissions(
 /**
  * Check if user is a super admin (system-wide role)
  */
-export function useIsSuperAdmin(
-  address?: string,
-  options: PermissionQueryOptions = {}
-) {
+export function useIsSuperAdmin(options: PermissionHookOptions = {}) {
   const { address: connectedAddress } = useAccount();
-  const userAddress = address || connectedAddress;
+  const userAddress = options.address || connectedAddress;
   const normalizedUserAddress = userAddress?.toLowerCase();
   const normalizedConnectedAddress = connectedAddress?.toLowerCase();
   const isSelfLookup =
@@ -252,10 +240,10 @@ export function useIsSuperAdmin(
       return data.isSuperAdmin;
     },
     enabled: !!normalizedUserAddress && authInitialized,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 1,
-    placeholderData: false, // Default to false
+    placeholderData: false,
   });
 
   return {
@@ -269,14 +257,9 @@ export function useIsSuperAdmin(
 
 /**
  * Get all permissions grouped by module
- * Useful for displaying permission matrices or admin panels
  */
-export function usePermissionsByModule(
-  address?: string,
-  daoSlug?: DaoSlug,
-  options?: PermissionQueryOptions
-) {
-  const { data, isLoading } = useUserPermissions(address, daoSlug, options);
+export function usePermissionsByModule(options?: PermissionHookOptions) {
+  const { data, isLoading } = useUserPermissions(options);
 
   const permissionsByModule =
     data?.permissions.reduce(
