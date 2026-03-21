@@ -14,7 +14,7 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import { createProposalLinks } from "@/lib/actions/proposalLinks";
+import { createDiscussionProposalLink } from "@/lib/actions/proposalLinks";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -134,23 +134,18 @@ export default function ForumNewClient({
       if (created?.id) {
         if (relatedProposal) {
           const messagePayload = {
-            action: "createProposalLinks",
+            action: "createDiscussionProposalLink",
             address,
             timestamp: new Date().toISOString(),
           };
           const authData = await getAuthenticationData(messagePayload);
           if (authData) {
-            await createProposalLinks({
-              sourceId: relatedProposal.id,
-              sourceType: relatedProposal.type,
-              links: [
-                {
-                  targetId: created.id.toString(),
-                  targetType: "forum_topic",
-                },
-              ],
+            await createDiscussionProposalLink({
+              proposalId: relatedProposal.id,
+              proposalType: relatedProposal.type,
+              forumTopicId: created.id.toString(),
               auth: {
-                address: address,
+                address: authData.address,
                 message: authData.message,
                 signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,

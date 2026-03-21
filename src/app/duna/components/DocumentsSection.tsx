@@ -52,17 +52,26 @@ const DocumentsSection = ({
   const { hasPermission: canCreateFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "create"
+    "create",
+    undefined,
+    undefined,
+    { autoAuthenticate: true }
   );
   const { hasPermission: canArchiveFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "archive"
+    "archive",
+    undefined,
+    undefined,
+    { autoAuthenticate: true }
   );
   const { hasPermission: canDeleteFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "delete"
+    "delete",
+    undefined,
+    undefined,
+    { autoAuthenticate: true }
   );
 
   const { ui } = Tenant.current();
@@ -99,14 +108,9 @@ const DocumentsSection = ({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
           const success = await stableDeleteAttachment(
             attachmentId,
-            "category",
-            isAuthor
+            "category"
           );
           if (success) {
             setDocuments((prev) =>
@@ -134,14 +138,9 @@ const DocumentsSection = ({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
           const success = await stableArchiveAttachment(
             attachmentId,
-            "category",
-            isAuthor
+            "category"
           );
           if (success) {
             setDocuments((prev) =>

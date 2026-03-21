@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { ethers } from "ethers";
+import { useAccount } from "wagmi";
 import { icons } from "../../icons/icons";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import Tenant from "@/lib/tenant/tenant";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 type Status = "Unconfirmed" | "Valid" | "Invalid";
 
@@ -20,8 +22,12 @@ export default function SimulateTransaction({
   calldata: string;
 }) {
   const tenant = Tenant.current();
+  const { address } = useAccount();
   const [status, setStatus] = useState<Status>("Unconfirmed");
   const [isLoading, setIsLoading] = useState(false);
+  const { ensureSession } = useSiweJwt({
+    expectedAddress: address?.toLowerCase(),
+  });
 
   // Calldata example:
   // 0xa9059cbb00000000000000000000000037f1d6f468d31145960523687df6af7d7ff61e330000000000000000000000000000000000000000000000000000000000000064
@@ -33,10 +39,17 @@ export default function SimulateTransaction({
       setIsLoading(true);
 
       try {
+        const jwt = await ensureSession();
+        if (!jwt) {
+          setStatus("Invalid");
+          return;
+        }
+
         const response = await fetch("/api/simulate", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
           },
           body: JSON.stringify({
             target,
@@ -56,9 +69,9 @@ export default function SimulateTransaction({
         }
       } catch (e) {
         setStatus("Invalid");
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     } else {
       setStatus("Invalid");
     }

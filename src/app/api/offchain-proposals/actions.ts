@@ -149,7 +149,7 @@ export async function cancelOffchainProposal({
   transactionHash,
   auth,
 }: CancelOffchainProposalParams) {
-  const authResult = await authenticateAndAuthorize(auth);
+  const authResult = await authenticateAndAuthorize(auth, auth.address);
   if (!authResult.ok) {
     throw new Error(authResult.error);
   }

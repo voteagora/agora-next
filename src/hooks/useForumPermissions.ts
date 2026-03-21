@@ -43,7 +43,8 @@ export function useForumPermissions(): ForumPermissions {
   const { slug, contracts, namespace } = Tenant.current();
   const client = getPublicClient();
 
-  // Specific RBAC permission checks for each action
+  // This hook is mounted from the global layout, so it must not trigger SIWE
+  // automatically. Specific pages can opt in when they need RBAC-backed UI.
   const { hasPermission: hasTopicPermission, isLoading: topicPermLoading } =
     useHasPermission("forums", "topics", "create");
   const { hasPermission: hasPostPermission, isLoading: postPermLoading } =

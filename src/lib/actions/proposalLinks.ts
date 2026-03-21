@@ -1,93 +1,84 @@
 "use server";
 
+import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { checkAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { createProposalLinksInternal } from "./proposalLinksInternal";
 
-interface CreateProposalLinksParams {
-  sourceId: string;
-  sourceType: string;
-  links: Array<{
-    targetId: string;
-    targetType: string;
-  }>;
+interface CreateDiscussionProposalLinkParams {
+  proposalId: string;
+  proposalType: string;
+  forumTopicId: string;
   auth: AuthParams;
 }
 
-interface CreateProposalLinksInternalParams {
-  sourceId: string;
-  sourceType: string;
-  links: Array<{
-    targetId: string;
-    targetType: string;
-  }>;
-}
-
-// Internal function for server-side/CRON callers (no auth required)
-// Only call this from already-authenticated server contexts (e.g., CRON routes)
-export async function createProposalLinksInternal({
-  sourceId,
-  sourceType,
-  links,
-}: CreateProposalLinksInternalParams) {
-  if (!sourceId || !sourceType || !Array.isArray(links)) {
-    return { success: false, error: "Invalid request body" };
+function normalizeDiscussionProposalType(proposalType: string) {
+  if (proposalType === "gov-proposal") {
+    return "gov";
   }
 
-  const validatedLinks = links.filter((link) => {
-    if (!link.targetId || !link.targetType) return false;
-    return sourceId !== link.targetId;
-  });
-
-  if (validatedLinks.length === 0) {
-    return { success: true, created: 0 };
+  if (proposalType === "gov" || proposalType === "tempcheck") {
+    return proposalType;
   }
 
-  const results = await Promise.allSettled(
-    validatedLinks.map((link) =>
-      prismaWeb2Client.proposalLinks.upsert({
-        where: {
-          sourceId_targetId: {
-            sourceId: sourceId,
-            targetId: link.targetId,
-          },
-        },
-        create: {
-          sourceId: sourceId,
-          sourceType: sourceType,
-          targetId: link.targetId,
-          targetType: link.targetType,
-        },
-        update: {},
-      })
-    )
-  );
-
-  const created = results.filter((r) => r.status === "fulfilled").length;
-
-  return {
-    success: true,
-    created,
-    total: validatedLinks.length,
-  };
+  return null;
 }
 
-// Public function for client callers (requires auth)
-export async function createProposalLinks({
-  sourceId,
-  sourceType,
-  links,
+// Public action for forum-topic authors linking their topic back to a proposal.
+export async function createDiscussionProposalLink({
+  proposalId,
+  proposalType,
+  forumTopicId,
   auth,
-}: CreateProposalLinksParams) {
+}: CreateDiscussionProposalLinkParams) {
   try {
-    // Verify authentication
-    const authError = await checkAuth(auth, auth.address);
-    if (authError) return authError;
+    const normalizedProposalType =
+      normalizeDiscussionProposalType(proposalType);
+    if (!proposalId || !normalizedProposalType || !forumTopicId) {
+      return { success: false, error: "Invalid request body" };
+    }
 
-    // Delegate to internal function after auth passes
-    return await createProposalLinksInternal({ sourceId, sourceType, links });
+    const authResult = await verifyAuth(auth, auth.address);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+
+    const topicId = Number(forumTopicId);
+    if (!Number.isInteger(topicId) || topicId <= 0) {
+      return { success: false, error: "Invalid forum topic id" };
+    }
+
+    const { slug } = Tenant.current();
+    const forumTopic = await prismaWeb2Client.forumTopic.findFirst({
+      where: {
+        id: topicId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
+
+    if (!forumTopic) {
+      return { success: false, error: "Forum topic not found" };
+    }
+
+    if (forumTopic.address.toLowerCase() !== authResult.address.toLowerCase()) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    return await createProposalLinksInternal({
+      sourceId: proposalId,
+      sourceType: normalizedProposalType,
+      links: [{ targetId: forumTopicId, targetType: "forum_topic" }],
+    });
   } catch (error) {
-    console.error("Error creating proposal links:", error);
-    return { success: false, error: "Failed to create proposal links" };
+    console.error("Error creating discussion proposal link:", error);
+    return {
+      success: false,
+      error: "Failed to create discussion proposal link",
+    };
   }
 }
 

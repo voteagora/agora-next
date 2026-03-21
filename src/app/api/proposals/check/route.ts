@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckProposalAttestation } from "@/lib/eas-server";
-import { createProposalLinksInternal } from "@/lib/actions/proposalLinks";
+import { createProposalLinksInternal } from "@/lib/actions/proposalLinksInternal";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { fetchVotingPowerFromContract } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";

@@ -63,7 +63,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         throw new Error("Attestation UID not found");
       }
 
-      const { transactionHash } = await cancelProposalAttestation({
+      await cancelProposalAttestation({
         attestationUID,
         signer: signer,
         canceller: address,
@@ -73,6 +73,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         proposalId: proposal.id,
         transactionHash: attestationUID,
         auth: {
+          address: authData.address,
           jwt: authData.jwt,
           message: authData.message,
           signature: authData.signature as `0x${string}` | undefined,

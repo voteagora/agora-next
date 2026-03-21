@@ -97,7 +97,10 @@ const CommentItem = ({
   const { hasPermission: canSoftDeleteOrRestore } = useHasPermission(
     "forums",
     "posts",
-    "archive"
+    "archive",
+    undefined,
+    undefined,
+    { autoAuthenticate: true }
   );
 
   // Get replies for this comment

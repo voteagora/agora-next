@@ -6,12 +6,13 @@
 import { permissionService } from "@/server/services/permission.service";
 import { db } from "@/server/db";
 import type { DaoSlug } from "@prisma/client";
-import verifyMessage from "./serverVerifyMessage";
+import { verifyAuth } from "./auth/authHelpers";
 
 export interface PermissionCheckParams {
   address: string;
-  message: string;
-  signature: string;
+  message?: string;
+  signature?: string;
+  jwt?: string;
   daoSlug: DaoSlug;
   module: string;
   resource: string;
@@ -19,29 +20,34 @@ export interface PermissionCheckParams {
 }
 
 /**
- * Verify signature and check if user has required permission
- * Throws error if signature invalid or permission denied
+ * Verify auth (JWT or signature) and check if user has required permission
+ * Throws error if auth invalid or permission denied
  */
 export async function requirePermission(
   params: PermissionCheckParams
 ): Promise<{ address: string; daoSlug: DaoSlug }> {
-  const { address, message, signature, daoSlug, module, resource, action } =
-    params;
-
-  // Verify signature
-  const isValid = await verifyMessage({
-    address: address as `0x${string}`,
+  const {
+    address,
     message,
-    signature: signature as `0x${string}`,
-  });
+    signature,
+    jwt,
+    daoSlug,
+    module,
+    resource,
+    action,
+  } = params;
 
-  if (!isValid) {
-    throw new Error("Invalid signature");
+  const authResult = await verifyAuth(
+    { message, signature: signature as `0x${string}` | undefined, jwt },
+    address as `0x${string}`
+  );
+
+  if (!authResult.success) {
+    throw new Error(authResult.error);
   }
 
-  // Check permission
   const hasPermission = await permissionService.checkPermission(
-    { address: address.toLowerCase(), daoSlug },
+    { address: authResult.address.toLowerCase(), daoSlug },
     { module, resource, action }
   );
 
@@ -51,7 +57,7 @@ export async function requirePermission(
     );
   }
 
-  return { address: address.toLowerCase(), daoSlug };
+  return { address: authResult.address.toLowerCase(), daoSlug };
 }
 
 /**

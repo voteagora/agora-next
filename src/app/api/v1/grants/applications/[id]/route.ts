@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { z } from "zod";
+import Tenant from "@/lib/tenant/tenant";
+import type { DaoSlug } from "@prisma/client";
+import { permissionService } from "@/server/services/permission.service";
+import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
 
 export const revalidate = 0;
 
@@ -14,26 +18,36 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Simple auth check - in production, use proper admin auth
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+    const auth = await requireWalletJwtAuth(req);
+    if (!auth.ok) {
+      return auth.response;
+    }
+
+    const { slug } = Tenant.current();
+    const daoSlug = slug as DaoSlug;
+    const hasUpdatePermission = await permissionService.checkPermission(
+      { address: auth.address, daoSlug },
+      { module: "grants", resource: "applications", action: "update" }
+    );
+
+    if (!hasUpdatePermission) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { id } = params;
     const body = await req.json();
     const validatedData = updateStatusSchema.parse(body);
 
-    // Update application status (parameterized)
+    // Update application status within the current tenant only.
     const result = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
-        UPDATE alltenant.grant_applications 
+        UPDATE alltenant.grant_applications AS ga
         SET status = ${validatedData.status}, updated_at = NOW()
-        WHERE id = ${id}
-        RETURNING id
+        FROM alltenant.grants AS g
+        WHERE ga.id = ${id}
+          AND ga.grant_id = g.id
+          AND g.dao_slug::text = ${slug}
+        RETURNING ga.id
       `
     );
 

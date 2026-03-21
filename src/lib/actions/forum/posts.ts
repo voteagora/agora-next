@@ -10,12 +10,13 @@ import {
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 import { indexForumPost, removeForumPostFromIndex } from "./search";
 import verifyMessage from "@/lib/serverVerifyMessage";
+import { verifyAuth } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
 import { requirePermission, checkPermission } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
-import { createAttachmentsFromContent } from "../attachment";
+import { createAttachmentsFromContent } from "../attachmentInternal";
 import {
   canCreatePost,
   canPerformAction,
@@ -53,8 +54,9 @@ function buildPreview(content: string): string {
 const topicVoteSchema = z.object({
   topicId: z.number().min(1, "Topic ID is required"),
   address: z.string().min(1, "Address is required"),
-  signature: z.string().min(1, "Signature is required"),
-  message: z.string().min(1, "Signed message is required"),
+  signature: z.string().optional(),
+  message: z.string().optional(),
+  jwt: z.string().optional(),
 });
 
 async function getRootPostId(topicId: number): Promise<number | null> {
@@ -70,21 +72,23 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   try {
     const validated = topicVoteSchema.parse(data);
 
-    // Parallelize independent operations
-    const [isValid, topic] = await Promise.all([
-      verifyMessage({
-        address: validated.address as `0x${string}`,
-        message: validated.message,
-        signature: validated.signature as `0x${string}`,
-      }),
+    const [authResult, topic] = await Promise.all([
+      verifyAuth(
+        {
+          message: validated.message,
+          signature: validated.signature as `0x${string}` | undefined,
+          jwt: validated.jwt,
+        },
+        validated.address as `0x${string}`
+      ),
       prismaWeb2Client.forumTopic.findFirst({
         where: { id: validated.topicId, dao_slug: slug },
         select: { id: true, categoryId: true, address: true, title: true },
       }),
     ]);
 
-    if (!isValid)
-      return { success: false, error: "Invalid signature" } as const;
+    if (!authResult.success)
+      return { success: false, error: authResult.error } as const;
 
     if (!topic) return { success: false, error: "Topic not found" } as const;
 
@@ -189,13 +193,16 @@ export async function removeUpvoteForumTopic(
   try {
     const validated = topicVoteSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
-    if (!isValid)
-      return { success: false, error: "Invalid signature" } as const;
+    const authResult = await verifyAuth(
+      {
+        message: validated.message,
+        signature: validated.signature as `0x${string}` | undefined,
+        jwt: validated.jwt,
+      },
+      validated.address as `0x${string}`
+    );
+    if (!authResult.success)
+      return { success: false, error: authResult.error } as const;
 
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
@@ -321,13 +328,15 @@ export async function createForumPost(
   try {
     const validatedData = createPostSchema.parse(data);
 
-    // Parallelize independent operations
-    const [isValid, topic] = await Promise.all([
-      verifyMessage({
-        address: validatedData.address as `0x${string}`,
-        message: validatedData.message,
-        signature: validatedData.signature as `0x${string}`,
-      }),
+    const [authResult, topic] = await Promise.all([
+      verifyAuth(
+        {
+          message: validatedData.message,
+          signature: validatedData.signature as `0x${string}` | undefined,
+          jwt: validatedData.jwt,
+        },
+        validatedData.address as `0x${string}`
+      ),
       prismaWeb2Client.forumTopic.findUnique({
         where: { id: topicId },
         include: {
@@ -336,8 +345,8 @@ export async function createForumPost(
       }),
     ]);
 
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
     if (!topic) {
@@ -556,14 +565,17 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
   try {
     const validatedData = deletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
 
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
     const post = await prismaWeb2Client.forumPost.findUnique({
@@ -574,7 +586,7 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
       return { success: false, error: "Post not found" };
     }
 
-    if (post.address !== validatedData.address) {
+    if (post.address !== authResult.address) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -603,11 +615,11 @@ export async function softDeleteForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "posts",
@@ -643,20 +655,35 @@ export async function restoreForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "posts",
       action: "archive",
     });
 
-    await prismaWeb2Client.forumPost.update({
+    const post = await prismaWeb2Client.forumPost.findFirst({
       where: {
         id: validatedData.postId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
+
+    if (!post) {
+      return { success: false, error: "Post not found" };
+    }
+
+    await prismaWeb2Client.forumPost.update({
+      where: {
+        id: post.id,
         dao_slug: slug,
       },
       data: {
@@ -665,7 +692,7 @@ export async function restoreForumPost(
       },
     });
 
-    if (!validatedData.isAuthor) {
+    if (post.address.toLowerCase() !== validatedData.address.toLowerCase()) {
       await logForumAuditAction(
         slug,
         validatedData.address,

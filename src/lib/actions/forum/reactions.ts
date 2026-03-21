@@ -4,6 +4,7 @@ import { z } from "zod";
 import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
 import verifyMessage from "@/lib/serverVerifyMessage";
+import { verifyAuth } from "@/lib/auth/authHelpers";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
 import { checkPermission } from "@/lib/rbac";
@@ -23,11 +24,11 @@ import {
 const addReactionSchema = z.object({
   targetType: z.literal("post"),
   targetId: z.number().min(1),
-  // Store actual Unicode emoji grapheme; we'll normalize to NFC
   emoji: z.string().min(1).max(16),
   address: z.string().min(1),
-  signature: z.string().min(1),
-  message: z.string().min(1),
+  signature: z.string().optional(),
+  message: z.string().optional(),
+  jwt: z.string().optional(),
 });
 
 function normalizeEmoji(input: string): string {
@@ -62,12 +63,15 @@ export async function addForumReaction(
     const validated = addReactionSchema.parse(data);
     const { slug } = Tenant.current();
 
-    const [isValid, post] = await Promise.all([
-      verifyMessage({
-        address: validated.address as `0x${string}`,
-        message: validated.message,
-        signature: validated.signature as `0x${string}`,
-      }),
+    const [authResult, post] = await Promise.all([
+      verifyAuth(
+        {
+          message: validated.message,
+          signature: validated.signature as `0x${string}` | undefined,
+          jwt: validated.jwt,
+        },
+        validated.address as `0x${string}`
+      ),
       prismaWeb2Client.forumPost.findUnique({
         where: { id: validated.targetId },
         include: {
@@ -78,7 +82,7 @@ export async function addForumReaction(
       }),
     ]);
 
-    if (!isValid) return { success: false, error: "Invalid signature" };
+    if (!authResult.success) return { success: false, error: authResult.error };
 
     if (!post) {
       return { success: false, error: "Post not found" };
@@ -187,8 +191,9 @@ const removeReactionSchema = z.object({
   targetId: z.number().min(1),
   emoji: z.string().min(1).max(16),
   address: z.string().min(1),
-  signature: z.string().min(1),
-  message: z.string().min(1),
+  signature: z.string().optional(),
+  message: z.string().optional(),
+  jwt: z.string().optional(),
 });
 
 export async function removeForumReaction(
@@ -198,12 +203,15 @@ export async function removeForumReaction(
     const validated = removeReactionSchema.parse(data);
     const { slug } = Tenant.current();
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
-    if (!isValid) return { success: false, error: "Invalid signature" };
+    const authResult = await verifyAuth(
+      {
+        message: validated.message,
+        signature: validated.signature as `0x${string}` | undefined,
+        jwt: validated.jwt,
+      },
+      validated.address as `0x${string}`
+    );
+    if (!authResult.success) return { success: false, error: authResult.error };
 
     const emoji = normalizeEmoji(validated.emoji);
 
