@@ -100,8 +100,6 @@ export default function ForumNewClient({
 
     const attachmentData = await convertFileToAttachmentData(file);
     const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
-      message: authData.message,
-      signature: authData.signature as `0x${string}` | undefined,
       jwt: authData.jwt,
     });
 
@@ -145,9 +143,6 @@ export default function ForumNewClient({
               proposalType: relatedProposal.type,
               forumTopicId: created.id.toString(),
               auth: {
-                address: authData.address,
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               },
             }).catch((error) => {
@@ -300,11 +295,15 @@ export default function ForumNewClient({
                     ) : (
                       <span className="text-red-600 flex items-center gap-1">
                         <XMarkIcon className="h-4 w-4" />
-                        Insufficient voting power
+                        {!address
+                          ? "Wallet not connected"
+                          : "Insufficient voting power"}
                       </span>
                     )}
                     <div className="text-xs mt-1">
-                      {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                      {!address
+                        ? "Connect your wallet to check permissions"
+                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                     </div>
                   </div>
                   <div className="flex gap-2">

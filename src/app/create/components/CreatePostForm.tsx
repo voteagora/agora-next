@@ -16,6 +16,7 @@ import { ApprovalOptionsInput } from "./ApprovalOptionsInput";
 import MarkdownTextareaInput from "@/app/proposals/draft/components/form/MarkdownTextareaInput";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount } from "wagmi";
 
 interface CreatePostFormProps {
   form: UseFormReturn<CreatePostFormData>;
@@ -72,6 +73,7 @@ export function CreatePostForm({
   const relatedTempChecks = watch("relatedTempChecks") || [];
   const title = watch("title");
   const description = watch("description");
+  const { address } = useAccount();
   const tenant = Tenant.current();
   const { ui } = tenant;
   const isDarkTenant = ui.theme === "dark";
@@ -168,11 +170,13 @@ export function CreatePostForm({
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
-                      Insufficient voting power
+                      {!address ? "Wallet not connected" : "Insufficient voting power"}
                     </span>
                   )}
                   <div className="text-xs mt-1">
-                    {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                    {!address
+                      ? "Connect your wallet to check permissions"
+                      : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                   </div>
                 </div>
               )}
