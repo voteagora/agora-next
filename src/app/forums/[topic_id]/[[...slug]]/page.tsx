@@ -379,7 +379,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
           breadcrumbs={[{ label: "Discussions", href: "/forums" }]}
           isDuna={false}
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <UnpublishedTopicGate
             redirectPath={buildForumTopicPath(topicId, transformed.title)}
           />
@@ -401,7 +401,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
           commentsCount: comments.length,
         }}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Main Content */}
           <div
