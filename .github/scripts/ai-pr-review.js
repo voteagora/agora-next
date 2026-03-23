@@ -41,6 +41,7 @@ Vulnerability Criteria:
 Rules:
 - Be highly professional, concise, and concrete. Avoid conversational language.
 - Flag ONLY confirmed missing authorization checks. Ignore false positives or unrelated code.
+- To determine the correct line number, look at the hunk header (e.g., \`@@ -12,3 +14,6 @@\`). The new line numbers start at the second start number (14) and increment for each line that is NOT a deletion (lines starting with '-').
 - Return strictly valid JSON containing no markdown wrappers, conforming to this schema:
 {
   "summary": "Executive summary of identified Server Action vulnerabilities, or confirmation of secure implementation.",
