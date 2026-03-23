@@ -90,8 +90,6 @@ export const DeleteDraftProposalDialog = ({
 
               const result = await deleteAction(proposalId, {
                 address: address as `0x${string}`,
-                message: auth.message,
-                signature: auth.signature,
                 jwt: auth.jwt,
               });
 

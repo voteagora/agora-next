@@ -95,8 +95,6 @@ const CreateProposalDraftButton = ({
             },
             body: JSON.stringify({
               creatorAddress: address,
-              message: auth.message,
-              signature: auth.signature,
             }),
           });
           if (!res.ok) {

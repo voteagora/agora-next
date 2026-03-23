@@ -243,8 +243,6 @@ export default function CreateProposalFormClient({
       onchainProposalId: onchainProposalId?.toString() ?? null,
       auth: {
         jwt: authData.jwt,
-        message: authData.message,
-        signature: authData.signature as `0x${string}` | undefined,
       },
     });
 

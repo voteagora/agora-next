@@ -259,8 +259,6 @@ export const useForum = () => {
           content: data.content,
           categoryId: data.categoryId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -299,8 +297,6 @@ export const useForum = () => {
               "post",
               result.data?.post.id!,
               {
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               }
             );
@@ -334,10 +330,7 @@ export const useForum = () => {
                   createdTopicId,
                   currentAddress as `0x${string}`,
                   {
-                    address: authData.address,
                     jwt: authData.jwt,
-                    message: authData.message,
-                    signature: authData.signature as `0x${string}` | undefined,
                   }
                 );
 
@@ -407,8 +400,6 @@ export const useForum = () => {
           content: data.content,
           parentId: data.parentId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -442,8 +433,6 @@ export const useForum = () => {
               "post",
               result.data?.id!,
               {
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               }
             );
@@ -551,8 +540,6 @@ export const useForum = () => {
           currentAddress,
           categoryId,
           {
-            message: authData.message,
-            signature: authData.signature as `0x${string}` | undefined,
             jwt: authData.jwt,
           }
         );
@@ -604,8 +591,6 @@ export const useForum = () => {
 
         const authFields = {
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         };
 
@@ -658,8 +643,6 @@ export const useForum = () => {
 
         const authFields = {
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         };
 
@@ -721,8 +704,6 @@ export const useForum = () => {
           attachmentId,
           targetType,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -769,8 +750,6 @@ export const useForum = () => {
         const result = await archiveForumTopic({
           topicId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -825,8 +804,6 @@ export const useForum = () => {
           attachmentId,
           targetType,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -909,8 +886,6 @@ export const useForum = () => {
         const result = await restoreForumTopic({
           topicId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -955,8 +930,6 @@ export const useForum = () => {
         const result = await restoreForumPost({
           postId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
 
@@ -1001,8 +974,6 @@ export const useForum = () => {
           targetId,
           emoji,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
         if (!res.success)
@@ -1038,8 +1009,6 @@ export const useForum = () => {
           targetId,
           emoji,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
         if (!res.success)
@@ -1069,8 +1038,6 @@ export const useForum = () => {
         const res = await upvoteForumTopic({
           topicId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
         if (!res.success) throw new Error(res.error || "Failed to upvote");
@@ -1098,8 +1065,6 @@ export const useForum = () => {
         const res = await removeUpvoteForumTopic({
           topicId,
           address: currentAddress,
-          signature: authData.signature as `0x${string}` | undefined,
-          message: authData.message,
           jwt: authData.jwt,
         });
         if (!res.success)

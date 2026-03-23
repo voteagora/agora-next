@@ -214,8 +214,6 @@ const OffchainProposalAction = ({
         onchainProposalId: onchainProposalId?.toString() ?? null,
         auth: {
           jwt: auth.jwt,
-          message: auth.message,
-          signature: auth.signature as `0x${string}` | undefined,
         },
       });
 
@@ -234,8 +232,6 @@ const OffchainProposalAction = ({
         is_offchain_submission: true,
         proposal_scope: draftProposal.proposal_scope,
         creatorAddress: address as `0x${string}`,
-        message: auth.message,
-        signature: auth.signature,
         jwt: auth.jwt,
       });
     } catch (e: any) {

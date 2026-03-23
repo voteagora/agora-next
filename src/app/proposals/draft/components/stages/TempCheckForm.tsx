@@ -67,8 +67,6 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
-        message: authData.message,
-        signature: authData.signature as `0x${string}` | undefined,
         jwt: authData.jwt,
       });
       if (!res.ok) {

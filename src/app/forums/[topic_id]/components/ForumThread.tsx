@@ -135,8 +135,6 @@ export default function ForumThread({
         attachmentData,
         loggedInAddress,
         {
-          message: authData.message,
-          signature: authData.signature as `0x${string}` | undefined,
           jwt: authData.jwt,
         }
       );

@@ -3,6 +3,11 @@ import { useCallback } from "react";
 
 import { useSiweJwt } from "@/hooks/useSiweJwt";
 
+type ProposalActionAuthData = {
+  jwt: string;
+  address: `0x${string}`;
+};
+
 export const useProposalActionAuth = () => {
   const { address } = useAccount();
   const { ensureSession } = useSiweJwt({
@@ -10,7 +15,9 @@ export const useProposalActionAuth = () => {
   });
 
   const getAuthenticationData = useCallback(
-    async (_messagePayload: Record<string, any>) => {
+    async (
+      _messagePayload: Record<string, unknown>
+    ): Promise<ProposalActionAuthData | null> => {
       if (!address) {
         return null;
       }
@@ -22,7 +29,10 @@ export const useProposalActionAuth = () => {
         return null;
       }
 
-      return { jwt, address: normalizedAddress };
+      return {
+        jwt,
+        address: normalizedAddress,
+      };
     },
     [address, ensureSession]
   );

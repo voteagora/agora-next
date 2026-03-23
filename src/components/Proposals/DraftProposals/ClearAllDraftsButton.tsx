@@ -93,8 +93,6 @@ export const DeleteAllDraftProposalsDialog = ({
 
               const result = await deleteAllAction({
                 address: address as `0x${string}`,
-                message: auth.message,
-                signature: auth.signature,
                 jwt: auth.jwt,
               });
 

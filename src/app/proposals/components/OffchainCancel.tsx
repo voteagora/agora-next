@@ -73,10 +73,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         proposalId: proposal.id,
         transactionHash: attestationUID,
         auth: {
-          address: authData.address,
           jwt: authData.jwt,
-          message: authData.message,
-          signature: authData.signature as `0x${string}` | undefined,
         },
       });
 
