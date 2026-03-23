@@ -1161,6 +1161,7 @@ export const getForumData = async ({
 
     const processedTopics = topics.map((topic) => ({
       ...topic,
+      createdAt: topic.createdAt.toISOString(),
       upvotes: (topic as any).posts[0]?._count?.votes || 0,
       firstPost: (topic as any).posts[0],
       postsCount: (topic as any)._count.posts,

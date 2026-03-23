@@ -116,20 +116,23 @@ export async function requireSuperAdmin(params: {
 }): Promise<{ address: string }> {
   const { address, message, signature } = params;
 
-  // Verify signature
-  const isValid = await verifyMessage({
-    address: address as `0x${string}`,
-    message,
-    signature: signature as `0x${string}`,
-  });
+  const authResult = await verifyAuth(
+    {
+      message,
+      signature: signature as `0x${string}`,
+    },
+    address as `0x${string}`
+  );
 
-  if (!isValid) {
-    throw new Error("Invalid signature");
+  if (!authResult.success) {
+    throw new Error(authResult.error);
   }
+
+  const normalizedAddress = authResult.address.toLowerCase();
 
   const superAdminRole = await db.forumUserRole.findFirst({
     where: {
-      address: address.toLowerCase(),
+      address: normalizedAddress,
       daoSlug: null, // System-wide role
       isActive: true,
       revokedAt: null,
@@ -143,7 +146,7 @@ export async function requireSuperAdmin(params: {
     throw new Error("Super admin access required");
   }
 
-  return { address: address.toLowerCase() };
+  return { address: normalizedAddress };
 }
 
 /**

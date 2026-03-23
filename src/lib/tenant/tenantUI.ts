@@ -95,12 +95,14 @@ export type UILink = {
   name: string;
   title: string;
   url: string;
-  image?: string | StaticImageData;
+  image?: UIImageSource;
 };
+
+export type UIImageSource = string | StaticImageData;
 
 type UIPage = {
   description: string | React.ReactNode;
-  hero?: StaticImageData | string;
+  hero?: UIImageSource;
   href?: string;
   links?: UILink[];
   route: string;
@@ -155,7 +157,7 @@ type TenantUIParams = {
   governanceStakeholders?: UIGovernanceStakeholder[];
   hideAgoraBranding?: boolean;
   links?: UILink[];
-  logo: string;
+  logo: UIImageSource;
   logoSize?: string;
   organization?: UIOrganization;
   pages?: UIPage[];
@@ -224,7 +226,7 @@ export class TenantUI {
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hideAgoraBranding?: boolean;
   private _links?: UILink[];
-  private _logo: string;
+  private _logo: UIImageSource;
   private _logoSize?: string;
   private _organization?: UIOrganization;
   private _pages?: UIPage[];
@@ -362,7 +364,7 @@ export class TenantUI {
     return this._title;
   }
 
-  public get logo(): string {
+  public get logo(): UIImageSource {
     return this._logo;
   }
 
