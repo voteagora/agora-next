@@ -14,8 +14,8 @@ import {
   addMiradorAttributes,
   addMiradorEvent,
   closeMiradorTrace,
-  flushAndWaitForMiradorTraceId,
   flushMiradorTrace,
+  getMiradorTraceId,
   startMiradorTrace,
 } from "./webTrace";
 
@@ -294,8 +294,7 @@ export async function persistSiweLoginTraceState(
     return null;
   }
 
-  const traceId =
-    trace.getTraceId() ?? (await flushAndWaitForMiradorTraceId(trace));
+  const traceId = getMiradorTraceId(trace);
   if (!traceId) {
     return null;
   }

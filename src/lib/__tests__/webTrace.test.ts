@@ -1,59 +1,107 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  addMiradorSafeMsgHint,
   addMiradorSafeTxHint,
+  addMiradorTxInputData,
   closeMiradorTrace,
+  getMiradorTraceId,
 } from "@/lib/mirador/webTrace";
 
 describe("webTrace", () => {
-  it("adds a Safe tx hint when the trace supports it", () => {
+  it("returns the trace id synchronously from the v2 SDK", () => {
     const trace = {
-      addSafeTxHint: vi.fn(),
+      getTraceId: vi.fn(() => "trace-id"),
     };
 
-    addMiradorSafeTxHint(
-      trace as any,
-      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "ethereum",
-      "draft_publish"
-    );
-
-    expect(trace.addSafeTxHint).toHaveBeenCalledWith(
-      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "ethereum",
-      "draft_publish"
-    );
+    expect(getMiradorTraceId(trace as any)).toBe("trace-id");
   });
 
-  it("disables keepalive and waits for the pending flush queue before closing", async () => {
-    const consoleInfoSpy = vi
-      .spyOn(console, "info")
-      .mockImplementation(() => undefined);
-    let resolveFlush: (() => void) | undefined;
-    const flushQueue = new Promise<void>((resolve) => {
-      resolveFlush = resolve;
-    });
-    const stopKeepAlive = vi.fn();
-    const close = vi.fn(async () => {});
+  it("returns null when trace is missing", () => {
+    expect(getMiradorTraceId(null)).toBeNull();
+    expect(getMiradorTraceId(undefined)).toBeNull();
+  });
+
+  it("delegates trace closing to the SDK close API", async () => {
     const trace = {
-      getTraceId: vi.fn(() => "trace-123"),
-      autoKeepAlive: true,
-      flushQueue,
-      stopKeepAlive,
-      close,
+      getTraceId: vi.fn(() => "trace-id"),
+      close: vi.fn(async () => undefined),
     };
 
-    const closePromise = closeMiradorTrace(trace as any, "done");
+    await closeMiradorTrace(trace as any, "done");
 
-    expect(trace.autoKeepAlive).toBe(false);
-    expect(stopKeepAlive).toHaveBeenCalledTimes(1);
-    expect(close).not.toHaveBeenCalled();
+    expect(trace.close).toHaveBeenCalledWith("done");
+  });
 
-    resolveFlush?.();
-    await closePromise;
+  it("handles close errors gracefully", async () => {
+    const trace = {
+      getTraceId: vi.fn(() => "trace-id"),
+      close: vi.fn(async () => {
+        throw new Error("close failed");
+      }),
+    };
+    const consoleSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
 
-    expect(close).toHaveBeenCalledWith("done");
-    expect(consoleInfoSpy).not.toHaveBeenCalled();
-    consoleInfoSpy.mockRestore();
+    await closeMiradorTrace(trace as any, "done");
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[mirador-close] client close failed",
+      expect.objectContaining({ traceId: "trace-id", reason: "done" })
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it("skips empty tx input data placeholders", () => {
+    const trace = {
+      web3: {
+        evm: {
+          addInputData: vi.fn(),
+        },
+      },
+    };
+
+    addMiradorTxInputData(trace as any, "0x");
+    addMiradorTxInputData(trace as any, "0xa9059cbb");
+
+    expect(trace.web3.evm.addInputData).toHaveBeenCalledTimes(1);
+    expect(trace.web3.evm.addInputData).toHaveBeenCalledWith("0xa9059cbb");
+  });
+
+  it("forwards safe hints to the SDK web3 plugin", () => {
+    const trace = {
+      web3: {
+        evm: {},
+        safe: {
+          addMsgHint: vi.fn(),
+          addTxHint: vi.fn(),
+        },
+      },
+    };
+
+    addMiradorSafeMsgHint(
+      trace as any,
+      "0xsafe-message",
+      "ethereum",
+      "Safe SIWE message"
+    );
+    addMiradorSafeTxHint(
+      trace as any,
+      "0xsafe-tx",
+      "ethereum",
+      "Safe multisig proposal"
+    );
+
+    expect(trace.web3.safe.addMsgHint).toHaveBeenCalledWith(
+      "0xsafe-message",
+      "ethereum",
+      "Safe SIWE message"
+    );
+    expect(trace.web3.safe.addTxHint).toHaveBeenCalledWith(
+      "0xsafe-tx",
+      "ethereum",
+      "Safe multisig proposal"
+    );
   });
 });
