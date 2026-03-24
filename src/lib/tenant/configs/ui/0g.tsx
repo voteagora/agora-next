@@ -202,6 +202,18 @@ export const ogTenantUIConfig = new TenantUI({
         imageDescription: "0G governance coming soon",
       },
     },
+    {
+      route: "financials-coming-soon",
+      title: "0G financials are\ncoming soon",
+      description: "",
+      hero: ogHero,
+      meta: {
+        title: "0G Financials",
+        description: "0G financials coming soon",
+        imageTitle: "0G Financials",
+        imageDescription: "0G financials coming soon",
+      },
+    },
   ],
 
   toggles: [
@@ -230,6 +242,7 @@ export const ogTenantUIConfig = new TenantUI({
     { name: "changelog/simplified-view", enabled: true },
     { name: "duna/use-community-dialogue-label", enabled: true },
     { name: "0g-duna-administration", enabled: true },
+    { name: "financials-coming-soon", enabled: true },
     {
       name: "duna-disclosures",
       enabled: true,
