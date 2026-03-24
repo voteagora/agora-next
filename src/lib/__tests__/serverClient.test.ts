@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { clientCtorMock, web3PluginMock } = vi.hoisted(() => ({
-  clientCtorMock: vi.fn().mockImplementation((apiKey: string, options?: unknown) => ({
-    apiKey,
-    options,
-  })),
+  clientCtorMock: vi
+    .fn()
+    .mockImplementation((apiKey: string, options?: unknown) => ({
+      apiKey,
+      options,
+    })),
   web3PluginMock: vi.fn(() => ({ name: "web3" })),
 }));
 
@@ -33,7 +35,9 @@ describe("serverClient", () => {
     process.env.NEXT_PUBLIC_MIRADOR_ENABLED = "false";
     process.env.MIRADOR_SERVER_API_KEY = "server-key";
 
-    const { getMiradorServerClient } = await import("@/lib/mirador/serverClient");
+    const { getMiradorServerClient } = await import(
+      "@/lib/mirador/serverClient"
+    );
 
     expect(getMiradorServerClient()).toBeNull();
     expect(clientCtorMock).not.toHaveBeenCalled();
@@ -43,7 +47,9 @@ describe("serverClient", () => {
     delete process.env.NEXT_PUBLIC_MIRADOR_ENABLED;
     process.env.MIRADOR_SERVER_API_KEY = "server-key";
 
-    const { getMiradorServerClient } = await import("@/lib/mirador/serverClient");
+    const { getMiradorServerClient } = await import(
+      "@/lib/mirador/serverClient"
+    );
 
     expect(getMiradorServerClient()).toEqual(
       expect.objectContaining({ apiKey: "server-key" })

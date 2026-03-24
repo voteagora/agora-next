@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { clientCtorMock, web3PluginMock } = vi.hoisted(() => ({
-  clientCtorMock: vi.fn().mockImplementation((apiKey: string, options?: unknown) => ({
-    apiKey,
-    options,
-  })),
+  clientCtorMock: vi
+    .fn()
+    .mockImplementation((apiKey: string, options?: unknown) => ({
+      apiKey,
+      options,
+    })),
   web3PluginMock: vi.fn(() => ({ name: "web3" })),
 }));
 

@@ -220,11 +220,7 @@ export async function appendServerTraceEvent({
     }
 
     for (const hint of normalizeSafeTxHints(safeTxHints)) {
-      web3Trace.web3.safe.addTxHint(
-        hint.safeTxHash,
-        hint.chain,
-        hint.details
-      );
+      web3Trace.web3.safe.addTxHint(hint.safeTxHash, hint.chain, hint.details);
     }
 
     trace.flush();
