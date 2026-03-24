@@ -35,8 +35,8 @@ vi.mock("@/lib/mirador/webTrace", () => ({
   addMiradorAttributes: vi.fn(),
   addMiradorEvent: vi.fn(),
   closeMiradorTrace: vi.fn(),
-  flushAndWaitForMiradorTraceId: vi.fn(async () => "trace-123"),
   flushMiradorTrace: vi.fn(),
+  getMiradorTraceId: vi.fn((trace) => trace?.getTraceId?.() ?? null),
   startMiradorTrace: vi.fn(),
 }));
 

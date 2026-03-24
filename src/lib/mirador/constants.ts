@@ -7,9 +7,6 @@ export const MIRADOR_FLOW = {
   delegateStatement: "delegate_statement",
 } as const;
 
-export const MIRADOR_DEFAULT_TRACE_ID_WAIT_TIMEOUT_MS = 3000;
-export const MIRADOR_DEFAULT_TRACE_ID_WAIT_INTERVAL_MS = 50;
-
 export const PROPOSAL_CREATION_TRACE_NAME = "proposal_creation";
 export const PROPOSAL_CREATION_TRACE_STORAGE_KEY =
   "agora:proposal-creation-trace";

@@ -15,9 +15,7 @@ export function MiradorProvider({
   children,
 }: MiradorProviderProps) {
   useEffect(() => {
-    if (enabled) {
-      configureMiradorWebClient(apiKey);
-    }
+    configureMiradorWebClient({ apiKey, enabled });
   }, [apiKey, enabled]);
 
   return <>{children}</>;

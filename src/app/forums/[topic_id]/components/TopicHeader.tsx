@@ -103,7 +103,7 @@ export default function TopicHeader({
             {formatRelative(topic.createdAt)}
           </div>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <TopicWatch topicId={topic.id} topicTitle={topic.title} />
           <TopicUpvote topicId={topic.id} />
         </div>
