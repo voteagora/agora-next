@@ -1,5 +1,10 @@
 import "server-only";
 
+import type {
+  Trace as MiradorServerTrace,
+  Web3Methods,
+} from "@miradorlabs/nodejs-sdk";
+
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import { getMiradorServerClient } from "./serverClient";
 import {
@@ -7,6 +12,8 @@ import {
   MiradorChainName,
   MiradorTraceContext,
 } from "./types";
+
+type MiradorServerTraceWithWeb3 = MiradorServerTrace & Web3Methods;
 
 type MiradorTxHashHint = {
   txHash: string;
@@ -38,10 +45,26 @@ type AppendServerTraceEventArgs = {
   txInputData?: string | string[];
 };
 
-const MIRADOR_SERVER_UPDATE_MAX_RETRIES = 3;
-const MIRADOR_SERVER_UPDATE_RETRY_BASE_MS = 200;
 const MIRADOR_SERVER_DEFAULT_TRACE_NAME = "AgoraServerTrace";
 let hasWarnedMissingTraceId = false;
+
+type EventSeverity = "info" | "warn" | "error";
+
+function inferEventSeverity(eventName: string): EventSeverity {
+  if (eventName.endsWith("_failed") || eventName.endsWith("_error")) {
+    return "error";
+  }
+
+  if (
+    eventName.endsWith("_skipped") ||
+    eventName.includes("_mismatch") ||
+    eventName.endsWith("_replaced")
+  ) {
+    return "warn";
+  }
+
+  return "info";
+}
 
 function buildContextAttributes(
   traceContext?: MiradorTraceContext | null
@@ -59,12 +82,6 @@ function buildContextAttributes(
     "proposal.branch": traceContext.branch,
     "session.id": traceContext.sessionId,
   };
-}
-
-function buildAttributePayload(
-  attributes?: MiradorAttributeMap
-): Record<string, string> {
-  return normalizeMiradorAttributePayload(attributes);
 }
 
 function toEventDetails(
@@ -160,7 +177,7 @@ export async function appendServerTraceEvent({
     return;
   }
 
-  const attributePayload = buildAttributePayload({
+  const attributePayload = normalizeMiradorAttributePayload({
     ...buildContextAttributes(traceContext),
     ...attributes,
   });
@@ -170,8 +187,6 @@ export async function appendServerTraceEvent({
       name: traceContext?.flow ?? MIRADOR_SERVER_DEFAULT_TRACE_NAME,
       traceId,
       captureStackTrace: false,
-      maxRetries: MIRADOR_SERVER_UPDATE_MAX_RETRIES,
-      retryBackoff: MIRADOR_SERVER_UPDATE_RETRY_BASE_MS,
       autoKeepAlive: false,
     });
 
@@ -183,18 +198,21 @@ export async function appendServerTraceEvent({
       trace.addTags(tags);
     }
 
-    trace.addEvent(eventName, toEventDetails(details));
+    const severity = inferEventSeverity(eventName);
+    trace[severity](eventName, toEventDetails(details));
+
+    const web3Trace = trace as MiradorServerTraceWithWeb3;
 
     for (const inputData of normalizeTxInputData(txInputData)) {
-      trace.addTxInputData(inputData);
+      web3Trace.web3.evm.addInputData(inputData);
     }
 
     for (const hint of normalizeTxHashHints(txHashHints)) {
-      trace.addTxHint(hint.txHash, hint.chain, hint.details);
+      web3Trace.web3.evm.addTxHint(hint.txHash, hint.chain, hint.details);
     }
 
     for (const hint of normalizeSafeMessageHints(safeMessageHints)) {
-      trace.addSafeMsgHint(
+      web3Trace.web3.safe.addMsgHint(
         hint.safeMessageHash,
         hint.chain,
         hint.details ?? undefined
@@ -202,7 +220,11 @@ export async function appendServerTraceEvent({
     }
 
     for (const hint of normalizeSafeTxHints(safeTxHints)) {
-      trace.addSafeTxHint(hint.safeTxHash, hint.chain, hint.details);
+      web3Trace.web3.safe.addTxHint(
+        hint.safeTxHash,
+        hint.chain,
+        hint.details
+      );
     }
 
     trace.flush();

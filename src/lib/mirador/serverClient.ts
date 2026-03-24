@@ -1,6 +1,9 @@
 import "server-only";
 
-import { Client as MiradorServerClient } from "@miradorlabs/nodejs-sdk";
+import {
+  Client as MiradorServerClient,
+  Web3Plugin,
+} from "@miradorlabs/nodejs-sdk";
 
 let miradorServerClient: MiradorServerClient | null = null;
 let hasWarnedMissingServerApiKey = false;
@@ -24,7 +27,17 @@ export function getMiradorServerClient(): MiradorServerClient | null {
 
   if (!miradorServerClient) {
     try {
-      miradorServerClient = new MiradorServerClient(apiKey);
+      miradorServerClient = new MiradorServerClient(apiKey, {
+        plugins: [Web3Plugin()],
+        callbacks: {
+          onFlushError: (error) => {
+            console.error("[mirador] server flush error", error);
+          },
+          onDropped: (count, reason) => {
+            console.warn("[mirador] server trace dropped", { count, reason });
+          },
+        },
+      });
     } catch (error) {
       console.error("Failed to initialize Mirador server client", error);
       miradorServerClient = null;

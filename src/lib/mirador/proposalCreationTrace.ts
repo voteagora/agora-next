@@ -20,8 +20,8 @@ import {
   addMiradorAttributes,
   addMiradorEvent,
   closeMiradorTrace,
-  flushAndWaitForMiradorTraceId,
   flushMiradorTrace,
+  getMiradorTraceId,
   startMiradorTrace,
 } from "./webTrace";
 
@@ -260,8 +260,7 @@ export async function persistProposalCreationTraceState(
     return null;
   }
 
-  const traceId =
-    trace.getTraceId() ?? (await flushAndWaitForMiradorTraceId(trace));
+  const traceId = getMiradorTraceId(trace);
   if (!traceId) {
     return null;
   }
