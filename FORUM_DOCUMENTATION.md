@@ -834,3 +834,4 @@ graph LR
 - `PINATA_SECRET_KEY`: IPFS file storage secret key
 - `CRON_SECRET`: Cron job authentication secret
 - `NEXT_PUBLIC_PINATA_GATEWAY`: IPFS gateway URL for file access
+
