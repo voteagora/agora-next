@@ -4,8 +4,6 @@ import {
   COWRIE_VERIFICATION_COMPLETED_KEY,
   EXECUTION_TRANSACTIONS_KEY,
   extractPayeeFromMetadata,
-  FORM_COMPLETED_KEY,
-  normalizeBoolean,
 } from "@/lib/taxFormUtils";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -107,10 +105,6 @@ export async function fetchProposalTaxFormMetadata(
   }
 
   metadata[COWRIE_VERIFICATION_COMPLETED_KEY] = verificationCompleted;
-  if (verificationCompleted) {
-    metadata[FORM_COMPLETED_KEY] =
-      normalizeBoolean(metadata[FORM_COMPLETED_KEY]) || verificationCompleted;
-  }
 
   return metadata;
 }

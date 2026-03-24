@@ -154,6 +154,7 @@ export function TaxFormBanner({ proposal }: Props) {
   const {
     hasPayeeKey,
     payeeAddress,
+    hasPayeeAddress,
     currentUserIsPayee,
     isFormCompleted,
     payeeFormUrl,
@@ -162,8 +163,7 @@ export function TaxFormBanner({ proposal }: Props) {
     const metadata = proposal.taxFormMetadata ?? {};
     const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
 
-    // Tax form status logic: manual override > API result > default
-    // This matches the logic in agora-admin
+    // Tax form status logic: manual override > DB value > API fallback > default.
     let isFormCompleted = false;
 
     // Check for manual override first (takes precedence)
@@ -173,7 +173,15 @@ export function TaxFormBanner({ proposal }: Props) {
     } else if (manualStatus === "pending" || manualStatus === "not_done") {
       isFormCompleted = false;
     } else {
-      // Fall back to API results (Cowrie or form_completed)
+      // Use DB completion value first.
+      const hasFormCompleted = Object.prototype.hasOwnProperty.call(
+        metadata,
+        FORM_COMPLETED_KEY
+      );
+      if (hasFormCompleted) {
+        isFormCompleted = normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
+      } else {
+        // Fall back to Cowrie API verification when DB value is absent.
       const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
         metadata,
         COWRIE_VERIFICATION_COMPLETED_KEY
@@ -183,7 +191,8 @@ export function TaxFormBanner({ proposal }: Props) {
       );
       isFormCompleted = hasCowrieStatus
         ? isCowrieComplete
-        : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
+        : false;
+      }
     }
 
     const executionTransactions = (metadata[EXECUTION_TRANSACTIONS_KEY] ??
@@ -192,6 +201,7 @@ export function TaxFormBanner({ proposal }: Props) {
     return {
       hasPayeeKey,
       payeeAddress,
+      hasPayeeAddress: Boolean(payeeAddress),
       currentUserIsPayee:
         hasPayeeKey && addressesMatch(payeeAddress, address ?? null),
       isFormCompleted,
@@ -235,7 +245,7 @@ export function TaxFormBanner({ proposal }: Props) {
     isWaitingForPayment &&
     isOnchainProposal &&
     !isTempCheck &&
-    hasPayeeKey;
+    hasPayeeAddress;
 
   const {
     deadline,
