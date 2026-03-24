@@ -245,6 +245,14 @@ export async function generateMetadata({
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("forums")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
   const [
     topicBundle,
     adminsResult,

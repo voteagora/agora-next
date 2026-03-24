@@ -15,6 +15,7 @@ import { demoTenantConfig } from "./configs/contracts/demo";
 import { lineaTenantConfig } from "./configs/contracts/linea";
 import { townsTenantConfig } from "./configs/contracts/towns";
 import { syndicateTenantConfig } from "./configs/contracts/syndicate";
+import { ogTenantConfig } from "@/lib/tenant/configs/contracts/0g";
 import { demo2TenantConfig } from "./configs/contracts/demo2";
 import { demo4TenantConfig } from "./configs/contracts/demo4";
 import { demo3TenantConfig } from "./configs/contracts/demo3";
@@ -56,6 +57,8 @@ export default class TenantContractFactory {
         return townsTenantConfig({ isProd, alchemyId });
       case TENANT_NAMESPACES.SYNDICATE:
         return syndicateTenantConfig({ isProd, alchemyId });
+      case TENANT_NAMESPACES.OG:
+        return ogTenantConfig({ isProd, alchemyId });
 
       case TENANT_NAMESPACES.DEMO2:
         return demo2TenantConfig({ isProd, alchemyId });
