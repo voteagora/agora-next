@@ -114,6 +114,18 @@ export const contestTenantUIConfig = new TenantUI({
         imageDescription: "Vote for the Winner",
       },
     },
+    {
+      route: "delegates",
+      title: "Novo Origo Prize Delegates",
+      description: "Delegate your voting power for the Novo Origo Prize",
+      meta: {
+        title: "Novo Origo Prize - Delegates",
+        description:
+          "Delegate your voting power for the governance design competition",
+        imageTitle: "Novo Origo Prize Delegates",
+        imageDescription: "Delegate your voting power",
+      },
+    },
   ],
 
   toggles: [
