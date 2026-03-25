@@ -1,9 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { AttachableType } from "@prisma/client";
 import Tenant from "@/lib/tenant/tenant";
-import verifyMessage from "@/lib/serverVerifyMessage";
 import { verifyAuth } from "@/lib/auth/authHelpers";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
@@ -72,8 +70,11 @@ export async function addForumReaction(
         },
         validated.address as `0x${string}`
       ),
-      prismaWeb2Client.forumPost.findUnique({
-        where: { id: validated.targetId },
+      prismaWeb2Client.forumPost.findFirst({
+        where: {
+          id: validated.targetId,
+          dao_slug: slug,
+        },
         include: {
           topic: {
             select: { categoryId: true, title: true },
@@ -88,9 +89,11 @@ export async function addForumReaction(
       return { success: false, error: "Post not found" };
     }
 
+    const normalizedAddress = authResult.address.toLowerCase();
+
     // Check if user has posts.create permission (bypasses VP requirements for reactions)
     const hasPostPermission = await checkPermission(
-      validated.address,
+      normalizedAddress,
       slug as DaoSlug,
       "forums",
       "posts",
@@ -106,7 +109,7 @@ export async function addForumReaction(
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
-          validated.address,
+          normalizedAddress,
           {
             namespace: tenant.namespace,
             contracts: tenant.contracts,
@@ -136,7 +139,7 @@ export async function addForumReaction(
       where: {
         dao_slug_address_postId_emoji: {
           dao_slug: slug,
-          address: validated.address.toLowerCase(),
+          address: normalizedAddress,
           postId: validated.targetId,
           emoji,
         },
@@ -144,30 +147,29 @@ export async function addForumReaction(
       update: {},
       create: {
         dao_slug: slug,
-        address: validated.address.toLowerCase(),
+        address: normalizedAddress,
         postId: validated.targetId,
         emoji,
       },
     });
 
-    const normalizedReactor = validated.address.toLowerCase();
-    if (post.address && post.address.toLowerCase() !== normalizedReactor) {
+    if (post.address && post.address.toLowerCase() !== normalizedAddress) {
       // Format address for display (ENS or truncated) and build profile URL
       const reactorDisplayName =
-        await formatAddressForNotification(normalizedReactor);
+        await formatAddressForNotification(normalizedAddress);
 
       emitDirectEvent(
         "forum_reaction_received",
         post.address,
-        `${post.id}:${normalizedReactor}:${emoji}`,
+        `${post.id}:${normalizedAddress}:${emoji}`,
         {
           dao_name: slug,
           topic_title: post.topic?.title ?? "Forum discussion",
           post_url: buildForumPostUrl(post.topicId, post.topic?.title, post.id),
           reaction_emoji: emoji,
-          reactor_address: normalizedReactor,
+          reactor_address: normalizedAddress,
           reactor_display_name: reactorDisplayName,
-          reactor_profile_url: buildProfileUrl(normalizedReactor),
+          reactor_profile_url: buildProfileUrl(normalizedAddress),
         }
       );
     }

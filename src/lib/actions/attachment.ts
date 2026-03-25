@@ -4,6 +4,13 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import {
+  ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+  ALLOWED_INLINE_IMAGE_CONTENT_TYPES,
+  decodeBase64Upload,
+  validateUploadBuffer,
+  validateUploadRateLimit,
+} from "@/lib/uploadValidation";
 
 interface AttachmentData {
   fileName: string;
@@ -65,16 +72,27 @@ export async function uploadAttachment(
       return { success: false, error: canAttach.error };
     }
 
+    const rateLimitError = validateUploadRateLimit({
+      address: authenticatedAddress,
+      scope: "attachment",
+    });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
+
     const { slug } = Tenant.current();
 
-    const buffer = Buffer.from(attachmentData.base64Data, "base64");
-
-    const fileBlob = new Blob([buffer], { type: attachmentData.contentType });
-    const file = new File([fileBlob], attachmentData.fileName, {
-      type: attachmentData.contentType,
+    const buffer = decodeBase64Upload(attachmentData.base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType: attachmentData.contentType,
+      allowedContentTypes: ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
     });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
 
-    const uploadResult = await uploadFileToPinata(file, {
+    const uploadResult = await uploadFileToPinata(buffer, {
       name: attachmentData.fileName,
       keyvalues: {
         type: "forum-attachment",
@@ -139,14 +157,25 @@ export async function uploadToIPFSOnly(
 
     const authenticatedAddress = authResult.address.toLowerCase();
 
-    const buffer = Buffer.from(attachmentData.base64Data, "base64");
-
-    const fileBlob = new Blob([buffer], { type: attachmentData.contentType });
-    const file = new File([fileBlob], attachmentData.fileName, {
-      type: attachmentData.contentType,
+    const rateLimitError = validateUploadRateLimit({
+      address: authenticatedAddress,
+      scope: "inline-image",
     });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
 
-    const uploadResult = await uploadFileToPinata(file, {
+    const buffer = decodeBase64Upload(attachmentData.base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType: attachmentData.contentType,
+      allowedContentTypes: ALLOWED_INLINE_IMAGE_CONTENT_TYPES,
+    });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
+
+    const uploadResult = await uploadFileToPinata(buffer, {
       name: attachmentData.fileName,
       keyvalues: {
         type: "forum-attachment",

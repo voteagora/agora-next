@@ -1158,7 +1158,9 @@ export const useForum = () => {
   );
 
   const fetchSubscriptions = useCallback(async () => {
-    if (!address) return { topicSubscriptions: [], categorySubscriptions: [] };
+    if (!address) {
+      return { topicSubscriptions: [], categorySubscriptions: [] };
+    }
     try {
       const res = await getForumSubscriptions(address);
       if (!res.success) throw new Error("Failed to fetch subscriptions");

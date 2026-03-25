@@ -11,6 +11,7 @@ import { ProposalScope } from "../types";
 import type { FormState } from "@/app/types";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
+import { getDraftAuthorizationContext } from "./draftAuthorization";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
@@ -31,19 +32,22 @@ export async function onSubmitAction(
     return { ok: false, message: authResult.error };
   }
 
-  // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)
-  const draft = await prismaWeb2Client.proposalDraft.findUnique({
-    where: { id: data.draftProposalId },
-    select: {
-      id: true,
-      author_address: true,
-      proposal_scope: true,
-    },
+  const draftAccess = await getDraftAuthorizationContext({
+    draftProposalId: data.draftProposalId,
+    address: authResult.address,
+    includeProposalScope: true,
   });
-  if (!draft) return { ok: false, message: "Draft not found" };
+  if (!draftAccess.ok) {
+    return { ok: false, message: draftAccess.message };
+  }
 
-  const signer = data.creatorAddress.toLowerCase();
-  let isAuthorized = signer === draft.author_address.toLowerCase();
+  const {
+    draft,
+    normalizedAddress: signer,
+    isAuthor,
+    isOffchainCreator,
+  } = draftAccess.context;
+  let isAuthorized = isAuthor;
 
   try {
     const tenant = Tenant.current();
@@ -57,8 +61,11 @@ export async function onSubmitAction(
       ProposalScope.OFFCHAIN_ONLY;
     const allowOffchainCreator = Boolean(
       offchainToggle?.enabled &&
+        isOffchainCreator &&
         (isOffchainScope || data.is_offchain_submission) &&
-        plmConfig?.offchainProposalCreator?.includes(signer)
+        plmConfig?.offchainProposalCreator?.some(
+          (creator) => creator.toLowerCase() === signer
+        )
     );
     if (allowOffchainCreator) {
       isAuthorized = true;

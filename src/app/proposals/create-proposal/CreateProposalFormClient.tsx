@@ -204,7 +204,7 @@ export default function CreateProposalFormClient({
     const provider = new BrowserProvider(walletClient.transport, network);
     const signer = new JsonRpcSigner(provider, address);
 
-    const { id, transactionHash: attestationTxHash } =
+    const { id, attestationUid } =
       await createProposalAttestation({
         contract: contracts.governor.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
@@ -223,7 +223,7 @@ export default function CreateProposalFormClient({
         calculationOptions: rawProposalDataForBackend.calculationOptions,
       });
 
-    await createOffchainProposal({
+      await createOffchainProposal({
       proposalData: {
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
@@ -239,14 +239,14 @@ export default function CreateProposalFormClient({
         calculationOptions: rawProposalDataForBackend.calculationOptions,
       },
       id: id.toString(),
-      transactionHash: attestationTxHash,
+      attestationUid,
       onchainProposalId: onchainProposalId?.toString() ?? null,
       auth: {
         jwt: authData.jwt,
       },
     });
 
-    return attestationTxHash as `0x${string}`;
+    return attestationUid as `0x${string}`;
   };
 
   const onSubmitOnchain = async (
@@ -353,13 +353,13 @@ export default function CreateProposalFormClient({
           moduleAddress,
         });
       }
-      const txHash = await submitOffchain(proposal, onchainProposalId);
+      const attestationUid = await submitOffchain(proposal, onchainProposalId);
       toast.success("Proposal submitted successfully");
       openDialog({
         type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL",
         params: {
           redirectUrl: "/",
-          txHash,
+          attestationUid,
         },
       });
       router.push("/");

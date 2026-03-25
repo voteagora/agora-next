@@ -3,8 +3,6 @@
 import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
-import Tenant from "@/lib/tenant/tenant";
-import { PLMConfig } from "../types";
 import { ProposalType } from "../types";
 import type { FormState } from "@/app/types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
@@ -14,6 +12,7 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { requireDraftEditAccess } from "./draftAuthorization";
 
 const formDataByType = (
   data: z.output<typeof DraftProposalSchema>,
@@ -152,33 +151,12 @@ export async function onSubmitAction(
     return { ok: false, message: authResult.error };
   }
 
-  // Check draft ownership
-  const draft = await prismaWeb2Client.proposalDraft.findUnique({
-    where: { id: data.draftProposalId },
-    select: { id: true, author_address: true },
+  const draftAccess = await requireDraftEditAccess({
+    draftProposalId: data.draftProposalId,
+    address: authResult.address,
   });
-
-  if (!draft) {
-    return { ok: false, message: "Draft not found" };
-  }
-
-  // Check if user is authorized (author or offchain proposal creator)
-  const addressLower = authResult.address.toLowerCase();
-  const authorLower = draft.author_address.toLowerCase();
-  let isAuthorized = addressLower === authorLower;
-
-  if (!isAuthorized) {
-    const tenant = Tenant.current();
-    const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-    const offchainCreators =
-      (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
-    isAuthorized = offchainCreators.some(
-      (creator) => creator.toLowerCase() === addressLower
-    );
-  }
-
-  if (!isAuthorized) {
-    return { ok: false, message: "Unauthorized" };
+  if (!draftAccess.ok) {
+    return { ok: false, message: draftAccess.message };
   }
 
   const parsed = DraftProposalSchema.safeParse(data);

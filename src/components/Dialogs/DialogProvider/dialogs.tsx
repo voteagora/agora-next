@@ -273,7 +273,7 @@ export type SponsorOnchainDraftProposalDialog = {
 
 export type SponsorOffchainDraftProposalDialog = {
   type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; txHash: `0x${string}` };
+  params: { redirectUrl: string; attestationUid: `0x${string}` };
 };
 
 export type OpenGithubPRDialog = {
@@ -521,10 +521,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
       draftProposal={draftProposal}
     />
   ),
-  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: (
+    { redirectUrl, attestationUid },
+    closeDialog
+  ) => (
     <SponsorOffchainProposalDialog
       redirectUrl={redirectUrl}
-      txHash={txHash}
+      attestationUid={attestationUid}
       closeDialog={closeDialog}
     />
   ),

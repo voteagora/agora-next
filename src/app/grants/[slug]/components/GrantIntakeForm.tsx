@@ -8,6 +8,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import DynamicFormField from "./DynamicFormField";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 interface FormField {
   id: string;
@@ -109,6 +110,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { connect, connectors } = useConnect();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { getAuthenticationData } = useProposalActionAuth();
 
   // Build dynamic zod schema from form_schema
   const dynamicSchema = useMemo(() => {
@@ -310,16 +312,25 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
     setIsSubmitting(true);
 
     try {
+      const authData = await getAuthenticationData({
+        action: "submitGrantApplication",
+        grantSlug: grant.slug,
+        applicantAddress: address,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (!authData) {
+        throw new Error("Authentication failed");
+      }
+
       // Submit to API
       const response = await fetch(`/api/grants/${grant.slug}/applications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.jwt}`,
         },
-        body: JSON.stringify({
-          ...data,
-          applicantAddress: address,
-        }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {

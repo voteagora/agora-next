@@ -40,19 +40,16 @@ export const deletePostSchema = z.object({
 
 export const softDeleteTopicSchema = z.object({
   topicId: z.number().min(1, "Topic ID is required"),
-  isAuthor: z.boolean().optional(),
   ...authFields,
 });
 
 export const softDeletePostSchema = z.object({
   postId: z.number().min(1, "Post ID is required"),
-  isAuthor: z.boolean().optional(),
   ...authFields,
 });
 
 export const archiveTopicSchema = z.object({
   topicId: z.number().min(1, "Topic ID is required"),
-  isAuthor: z.boolean().optional(),
   ...authFields,
 });
 

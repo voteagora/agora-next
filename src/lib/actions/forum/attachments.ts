@@ -4,12 +4,17 @@ import type { DaoSlug } from "@prisma/client";
 import { z } from "zod";
 import { handlePrismaError, archiveAttachmentSchema } from "./shared";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
-import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
 import { checkAnyPermission, checkPermission } from "@/lib/rbac";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import {
+  ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+  decodeBase64Upload,
+  validateUploadBuffer,
+  validateUploadRateLimit,
+} from "@/lib/uploadValidation";
 
 const { slug } = Tenant.current();
 
@@ -21,24 +26,6 @@ const deleteAttachmentSchema = z.object({
   message: z.string().optional(),
   jwt: z.string().optional(),
 });
-
-async function verifySignedForumRequest(
-  address: string,
-  message: string,
-  signature: string
-) {
-  const isValid = await verifyMessage({
-    address: address as `0x${string}`,
-    message,
-    signature: signature as `0x${string}`,
-  });
-
-  if (!isValid) {
-    return null;
-  }
-
-  return address.toLowerCase();
-}
 
 export async function getForumAttachments() {
   try {
@@ -175,10 +162,23 @@ export async function uploadDocumentFromBase64(
       return { success: false, error: "Unauthorized" };
     }
 
-    const base64Content = base64Data.includes(",")
-      ? base64Data.split(",")[1]
-      : base64Data;
-    const buffer = Buffer.from(base64Content, "base64");
+    const rateLimitError = validateUploadRateLimit({
+      address: normalizedAddress,
+      scope: "document",
+    });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
+
+    const buffer = decodeBase64Upload(base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType,
+      allowedContentTypes: ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+    });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
 
     const result = await uploadFileToPinata(buffer, {
       name: fileName,

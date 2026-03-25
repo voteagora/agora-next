@@ -71,7 +71,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
 
       await cancelOffchainProposal({
         proposalId: proposal.id,
-        transactionHash: attestationUID,
+        attestationUid: attestationUID,
         auth: {
           jwt: authData.jwt,
         },

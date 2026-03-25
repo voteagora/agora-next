@@ -55,10 +55,6 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
       return existing;
     }
 
-    if (isSigningIn) {
-      return null;
-    }
-
     const existingRequest = siweSessionRequests.get(expectedAddress);
     if (existingRequest) {
       setIsSigningIn(true);

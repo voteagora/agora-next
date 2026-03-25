@@ -12,7 +12,7 @@ export async function onSubmitAction(
     if (!authResult.success) {
       return { ok: false, message: authResult.error };
     }
-    const verifiedAddress = authResult.address;
+    const verifiedAddress = authResult.address.toLowerCase();
 
     const result = await prismaWeb2Client.proposalDraft.deleteMany({
       where: {
