@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
+import { useSIWE } from "connectkit";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Markdown from "@/components/shared/Markdown/Markdown";
-import { getStoredSiweJwt } from "@/lib/siweSession";
+import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total
@@ -70,6 +71,7 @@ interface AttachmentFile {
 export default function NewSubmissionClient() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
+  const { signIn } = useSIWE();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<{
@@ -154,12 +156,24 @@ export default function NewSubmissionClient() {
     setSubmitError(null);
 
     try {
-      const token = getStoredSiweJwt({ expectedAddress: address });
+      let token = getStoredSiweJwt({ expectedAddress: address });
       if (!token) {
-        setSubmitError(
-          "Not authenticated (missing SIWE session). Please sign in again."
-        );
-        return;
+        try {
+          await signIn();
+          token = await waitForStoredSiweJwt({
+            expectedAddress: address,
+            timeoutMs: 10_000,
+            intervalMs: 200,
+          });
+        } catch {
+          setSubmitError("Sign-in cancelled or failed. Please try again.");
+          return;
+        }
+
+        if (!token) {
+          setSubmitError("Session expired. Please sign in to continue.");
+          return;
+        }
       }
 
       const attachmentData = await Promise.all(
