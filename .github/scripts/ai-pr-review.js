@@ -19,7 +19,12 @@ module.exports = async ({ github, context, core }) => {
 
   for (const file of files) {
     if (file.status === "removed") continue;
-    if (!file.filename.endsWith(".ts") && !file.filename.endsWith(".tsx") && !file.filename.endsWith(".js")) continue;
+    if (
+      !file.filename.endsWith(".ts") &&
+      !file.filename.endsWith(".tsx") &&
+      !file.filename.endsWith(".js")
+    )
+      continue;
 
     try {
       const { data: fileData } = await github.rest.repos.getContent({
@@ -31,14 +36,16 @@ module.exports = async ({ github, context, core }) => {
 
       const content = Buffer.from(fileData.content, "base64").toString("utf8");
 
-      const isApiRoute = file.filename.includes("app/api/") && file.filename.includes("route.");
-      const hasUseServer = content.includes('"use server"') || content.includes("'use server'");
+      const isApiRoute =
+        file.filename.includes("app/api/") && file.filename.includes("route.");
+      const hasUseServer =
+        content.includes('"use server"') || content.includes("'use server'");
 
       if (isApiRoute || hasUseServer) {
         targetFiles.push({
           filename: file.filename,
           patch: file.patch,
-          content: content
+          content: content,
         });
       }
     } catch (e) {
@@ -50,9 +57,12 @@ module.exports = async ({ github, context, core }) => {
     return;
   }
 
-  const promptTargetFiles = targetFiles.map(f => 
-    `File: ${f.filename}\n\n--- FULL CONTENT ---\n${f.content}\n\n--- PR DIFF PATCH ---\n${f.patch || "No patch available"}\n`
-  ).join("\n====================\n\n");
+  const promptTargetFiles = targetFiles
+    .map(
+      (f) =>
+        `File: ${f.filename}\n\n--- FULL CONTENT ---\n${f.content}\n\n--- PR DIFF PATCH ---\n${f.patch || "No patch available"}\n`
+    )
+    .join("\n====================\n\n");
 
   const systemPrompt = `Analyze the provided PR files as a strict Next.js Security Auditor.
 

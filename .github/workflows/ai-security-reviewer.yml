@@ -22,7 +22,7 @@ jobs:
         run: |
           git fetch origin ${{ github.base_ref }}
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
-          
+
           has_server="false"
           for file in $CHANGED_FILES; do
             if [ -f "$file" ]; then
@@ -35,7 +35,7 @@ jobs:
               fi
             fi
           done
-          
+
           echo "has_server=$has_server" >> $GITHUB_OUTPUT
 
       - name: Execute Security Audit
