@@ -1,6 +1,7 @@
 "use server";
 
 import { Octokit } from "@octokit/rest";
+import { createAppAuth } from "@octokit/auth-app";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { SubmissionAttachment } from "./getSubmissions";
 
@@ -85,12 +86,37 @@ ${attachmentsSection}
 `;
 }
 
+function getSubmissionAuthorSlug(submission: ContestSubmissionData): string {
+  return submission.isAnonymous
+    ? "anonymous"
+    : slugify(submission.authorDisplayName || submission.authorWallet);
+}
+
 function getOctokit(): Octokit {
-  const token = process.env.PR_BOT_TOKEN;
-  if (!token) {
-    throw new Error("PR_BOT_TOKEN is not configured");
+  const appId = process.env.GITHUB_APP_ID;
+  const installationId = process.env.GITHUB_APP_INSTALLATION_ID;
+  const privateKeyRaw = process.env.GITHUB_APP_PRIVATE_KEY;
+
+  if (appId && installationId && privateKeyRaw) {
+    const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
+    return new Octokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId,
+        installationId,
+        privateKey,
+      },
+    });
   }
-  return new Octokit({ auth: token });
+
+  const token = process.env.PR_BOT_TOKEN;
+  if (token) {
+    return new Octokit({ auth: token });
+  }
+
+  throw new Error(
+    "GitHub auth is not configured. Set GITHUB_APP_ID + GITHUB_APP_INSTALLATION_ID + GITHUB_APP_PRIVATE_KEY (recommended) or PR_BOT_TOKEN."
+  );
 }
 
 export async function createGithubPR(
@@ -99,10 +125,10 @@ export async function createGithubPR(
   try {
     const octokit = getOctokit();
 
-    const shortId = submission.id.substring(0, 8);
+    const authorSlug = getSubmissionAuthorSlug(submission);
     const titleSlug = slugify(submission.title);
-    const branchName = `submission/${shortId}-${titleSlug}`;
-    const filePath = `submissions/${shortId}-${titleSlug}/README.md`;
+    const branchName = `submission/${authorSlug}/${titleSlug}`;
+    const filePath = `submissions/${authorSlug}/${titleSlug}/README.md`;
 
     const baseBranchRef = await octokit.git.getRef({
       owner: REPO_OWNER,
@@ -188,9 +214,9 @@ export async function updateGithubPR(
     });
 
     const branchName = pr.data.head.ref;
-    const shortId = submission.id.substring(0, 8);
+    const authorSlug = getSubmissionAuthorSlug(submission);
     const titleSlug = slugify(submission.title);
-    const filePath = `submissions/${shortId}-${titleSlug}/README.md`;
+    const filePath = `submissions/${authorSlug}/${titleSlug}/README.md`;
 
     let existingSha: string | undefined;
     try {

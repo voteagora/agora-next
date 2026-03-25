@@ -34,6 +34,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@meilisearch/instant-meilisearch": "^0.27.0",
     "@next/third-parties": "^14.2.5",
+    "@octokit/auth-app": "^8.2.0",
     "@octokit/rest": "^20.1.1",
     "@opentelemetry/api": "1.7.0",
     "@opentelemetry/api-logs": "^0.46.0",
