@@ -8,6 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
 
 import {
   Tooltip,
@@ -31,12 +35,17 @@ export const AgoraGovExecute = ({
   useOptimismStyling = false,
 }: Props) => {
   const { contracts, ui } = Tenant.current();
+  const governorInstance = proposal.contract
+    ? (getGovernorByAddress(proposal.contract, contracts) ??
+      getDefaultGovernor(contracts))
+    : getDefaultGovernor(contracts);
+  const timelock = governorInstance.timelock ?? contracts.timelock;
 
   const { data: delayInSeconds } = useReadContract({
-    address: contracts.timelock!.address as `0x${string}`,
-    abi: contracts.timelock!.abi,
+    address: timelock!.address as `0x${string}`,
+    abi: timelock!.abi,
     functionName: "getMinDelay",
-    chainId: contracts.timelock!.chain.id,
+    chainId: timelock!.chain.id,
   });
 
   let canExecute = false;
@@ -104,8 +113,9 @@ export const AgoraGovExecute = ({
                 <Button
                   onClick={() =>
                     write({
-                      address: contracts.governor.address as `0x${string}`,
-                      abi: contracts.governor.abi,
+                      address: governorInstance.governor
+                        .address as `0x${string}`,
+                      abi: governorInstance.governor.abi,
                       functionName: getProposalFunctionName(
                         proposal.proposalType!,
                         "execute"

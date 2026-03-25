@@ -11,20 +11,24 @@ import linkIcon from "@/assets/icons/link.svg";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
 import { getBlockScanAddress } from "@/lib/utils";
+import { getGovernorInstances } from "@/lib/tenant/governorUtils";
 
 const ContractList = () => {
   const { contracts } = Tenant.current();
+  const governors = getGovernorInstances(contracts);
 
-  const list = [
-    {
-      title: "Governor",
-      address: contracts.governor.address,
-    },
-    {
-      title: "Token",
-      address: contracts.token.address,
-    },
-  ];
+  const list: { title: string; address: string }[] = [];
+  governors.forEach((gov) => {
+    const label = governors.length > 1 ? ` (${gov.label})` : "";
+    list.push({
+      title: `Governor${label}`,
+      address: gov.governor.address,
+    });
+    list.push({
+      title: `Token${label}`,
+      address: gov.token.address,
+    });
+  });
 
   return (
     <Table>

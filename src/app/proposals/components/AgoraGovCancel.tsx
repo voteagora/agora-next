@@ -11,6 +11,10 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { useGovernorAdmin } from "@/hooks/useGovernorAdmin";
 import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
+import {
   getProposalCallArgs,
   getProposalFunctionName,
 } from "@/app/proposals/utils/moduleProposalUtils";
@@ -25,6 +29,10 @@ export const AgoraGovCancel = ({
   useOptimismStyling = false,
 }: Props) => {
   const { contracts } = Tenant.current();
+  const governorInstance = proposal.contract
+    ? (getGovernorByAddress(proposal.contract, contracts) ??
+      getDefaultGovernor(contracts))
+    : getDefaultGovernor(contracts);
   const { address } = useAccount();
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: true });
@@ -69,8 +77,8 @@ export const AgoraGovCancel = ({
           }
           onClick={() =>
             write({
-              address: contracts.governor.address as `0x${string}`,
-              abi: contracts.governor.abi,
+              address: governorInstance.governor.address as `0x${string}`,
+              abi: governorInstance.governor.abi,
               functionName: getProposalFunctionName(
                 proposal.proposalType!,
                 "cancel"

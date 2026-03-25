@@ -183,11 +183,11 @@ export function findSnapshotProposalsQueryFromDb({
   contract,
 }: {
   namespace: TenantNamespace;
-  contract: string;
+  contract: string | string[];
 }) {
   const condition = {
     where: {
-      contract,
+      contract: Array.isArray(contract) ? { in: contract } : contract,
       proposal_type: "SNAPSHOT",
     },
   };
@@ -236,9 +236,10 @@ export function findProposalsQueryFromDB({
   skip: number;
   take: number;
   filter: string;
-  contract: string;
+  contract: string | string[];
   type?: string;
 }) {
+  console.log(contract, "contractsasd");
   const allOffchainProposalTypes = [
     "OFFCHAIN_STANDARD",
     "OFFCHAIN_APPROVAL",
@@ -252,7 +253,7 @@ export function findProposalsQueryFromDB({
       ordinal: "desc" as const,
     },
     where: {
-      contract,
+      contract: Array.isArray(contract) ? { in: contract } : contract,
       cancelled_block: filter === "relevant" ? null : undefined,
       ...(type
         ? {
@@ -264,8 +265,7 @@ export function findProposalsQueryFromDB({
         : {}),
     },
     select: {
-      // Required by ProposalPayload type
-      // contract: true,
+      contract: true,
       proposal_id: true,
       proposer: true,
       description: true,
@@ -348,10 +348,13 @@ export function findProposal({
 }: {
   namespace: TenantNamespace;
   proposalId: string;
-  contract: string;
+  contract: string | string[];
 }) {
   const condition = {
-    where: { proposal_id: proposalId, contract },
+    where: {
+      proposal_id: proposalId,
+      contract: Array.isArray(contract) ? { in: contract } : contract,
+    },
   };
 
   switch (namespace) {
@@ -395,7 +398,7 @@ export function findProposalsByIds({
 }: {
   namespace: TenantNamespace;
   proposalIds: string[];
-  contract: string;
+  contract: string | string[];
 }) {
   if (proposalIds.length === 0) {
     return Promise.resolve([]);
@@ -404,7 +407,7 @@ export function findProposalsByIds({
   const condition = {
     where: {
       proposal_id: { in: proposalIds },
-      contract,
+      contract: Array.isArray(contract) ? { in: contract } : contract,
     },
   };
 

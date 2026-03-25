@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
+import {
   getProposalCallArgs,
   getProposalFunctionName,
 } from "@/app/proposals/utils/moduleProposalUtils";
@@ -17,6 +21,10 @@ interface Props {
 
 export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
   const { contracts } = Tenant.current();
+  const governorInstance = proposal.contract
+    ? (getGovernorByAddress(proposal.contract, contracts) ??
+      getDefaultGovernor(contracts))
+    : getDefaultGovernor(contracts);
 
   const { data, writeContract: write } = useWriteContract();
 
@@ -56,8 +64,8 @@ export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
           loading={isLoading}
           onClick={() =>
             write({
-              address: contracts.governor.address as `0x${string}`,
-              abi: contracts.governor.abi,
+              address: governorInstance.governor.address as `0x${string}`,
+              abi: governorInstance.governor.abi,
               functionName: getProposalFunctionName(
                 proposal.proposalType!,
                 "queue"

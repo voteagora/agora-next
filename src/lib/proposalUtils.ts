@@ -385,6 +385,7 @@ export async function parseProposal(
 
   return {
     id: proposal.proposal_id,
+    contract: (proposal as any).contract,
     proposer: proposal.proposer,
     snapshotBlockNumber: Number(proposal.created_block),
     createdTime,

@@ -1,8 +1,10 @@
 import {
+  type GovernorInstance,
   type TenantContracts,
   type TenantNamespace,
   type TenantToken,
 } from "../types";
+import { getGovernorInstances } from "@/lib/tenant/governorUtils";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import TenantContractFactory from "@/lib/tenant/tenantContractFactory";
 import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
@@ -71,6 +73,10 @@ export default class Tenant {
 
   public get brandName(): string {
     return this._brandName;
+  }
+
+  public get governorInstances(): GovernorInstance[] {
+    return getGovernorInstances(this._contracts);
   }
 
   public static current(): Tenant {

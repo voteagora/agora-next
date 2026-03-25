@@ -5,7 +5,7 @@ import {
   UniswapTimelock__factory,
 } from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "@/lib/types";
+import { GovernorInstance, TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
@@ -61,15 +61,91 @@ export const uniswapTenantContractConfig = ({
 
   const chain = isProd ? mainnet : sepolia;
 
+  const token = createTokenContract({
+    abi: UniswapToken__factory.abi,
+    address: TOKEN as `0x${string}`,
+    chain,
+    contract: UniswapToken__factory.connect(TOKEN, provider),
+    provider,
+    type: "erc20",
+  });
+
+  const governor = new TenantContract<IGovernorContract>({
+    abi: UniswapGovernor__factory.abi,
+    address: GOVERNOR,
+    chain,
+    contract: UniswapGovernor__factory.connect(GOVERNOR, provider),
+    provider,
+  });
+
+  const timelock = new TenantContract<ITimelockContract>({
+    abi: UniswapTimelock__factory.abi,
+    address: TIMELOCK,
+    chain,
+    contract: UniswapTimelock__factory.connect(TIMELOCK, provider),
+    provider,
+  });
+
+  // ENS contracts as a second governor instance for multi-governor testing
+  const SECONDARY_TOKEN = isProd
+    ? "0xc796953c443f542728eedf33aab32753d3f7a91a"
+    : "0xca83e6932cf4F03cDd6238be0fFcF2fe97854f67";
+  const SECONDARY_GOVERNOR = isProd
+    ? "0x58b9952016d19bf2c6cb62f398dcde6a22278aaa"
+    : "0xb65c031ac61128ae791d42ae43780f012e2f7f89";
+  const SECONDARY_TIMELOCK = isProd
+    ? "0xb90021440D94e32448387d8b06851f5C4F7b0a49"
+    : "0x1E9BE5E89AE5ccBf047477Ac01D3d4b0eBFB328e";
+
+  const secondaryToken = createTokenContract({
+    abi: UniswapToken__factory.abi, // Use UniswapToken ABI for consistency
+    address: SECONDARY_TOKEN as `0x${string}`,
+    chain,
+    contract: UniswapToken__factory.connect(SECONDARY_TOKEN, provider),
+    provider,
+    type: "erc20",
+  });
+
+  const secondaryGovernor = new TenantContract<IGovernorContract>({
+    abi: UniswapGovernor__factory.abi,
+    address: SECONDARY_GOVERNOR,
+    chain,
+    contract: UniswapGovernor__factory.connect(SECONDARY_GOVERNOR, provider),
+    provider,
+  });
+
+  const secondaryTimelock = new TenantContract<ITimelockContract>({
+    abi: UniswapTimelock__factory.abi,
+    address: SECONDARY_TIMELOCK,
+    chain,
+    contract: UniswapTimelock__factory.connect(SECONDARY_TIMELOCK, provider),
+    provider,
+  });
+
+  const governors: GovernorInstance[] = [
+    {
+      id: "uniswap-main",
+      label: "Uniswap",
+      governor,
+      timelock,
+      token,
+      governorType: GOVERNOR_TYPE.BRAVO,
+      timelockType: TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL,
+      treasury: TREASURY,
+    },
+    {
+      id: "uniswap-secondary",
+      label: "coincil",
+      governor: secondaryGovernor,
+      timelock: secondaryTimelock,
+      token: secondaryToken,
+      governorType: GOVERNOR_TYPE.BRAVO,
+      timelockType: TIMELOCK_TYPE.TIMELOCK_NO_ACCESS_CONTROL,
+    },
+  ];
+
   return {
-    token: createTokenContract({
-      abi: UniswapToken__factory.abi,
-      address: TOKEN as `0x${string}`,
-      chain,
-      contract: UniswapToken__factory.connect(TOKEN, provider),
-      provider,
-      type: "erc20",
-    }),
+    token,
 
     staker: new TenantContract<IStaker>({
       abi: UniswapStaker__factory.abi,
@@ -79,21 +155,9 @@ export const uniswapTenantContractConfig = ({
       provider,
     }),
 
-    governor: new TenantContract<IGovernorContract>({
-      abi: UniswapGovernor__factory.abi,
-      address: GOVERNOR,
-      chain,
-      contract: UniswapGovernor__factory.connect(GOVERNOR, provider),
-      provider,
-    }),
-
-    timelock: new TenantContract<ITimelockContract>({
-      abi: UniswapTimelock__factory.abi,
-      address: TIMELOCK,
-      chain,
-      contract: UniswapTimelock__factory.connect(TIMELOCK, provider),
-      provider,
-    }),
+    governor,
+    timelock,
+    governors,
 
     treasury: TREASURY,
 

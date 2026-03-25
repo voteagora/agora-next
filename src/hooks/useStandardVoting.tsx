@@ -1,5 +1,5 @@
 import { MissingVote } from "@/lib/voteUtils";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
@@ -7,6 +7,10 @@ import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
+import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
 
 const useStandardVoting = ({
   proposalId,
@@ -14,15 +18,25 @@ const useStandardVoting = ({
   reason = "",
   params,
   missingVote,
+  governorContract,
 }: {
   proposalId: string;
   support: number;
   reason?: string;
   params?: `0x${string}`;
   missingVote: MissingVote;
+  governorContract?: string;
 }) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
+  const governorInstance = useMemo(
+    () =>
+      governorContract
+        ? (getGovernorByAddress(governorContract, contracts) ??
+          getDefaultGovernor(contracts))
+        : getDefaultGovernor(contracts),
+    [governorContract, contracts]
+  );
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
@@ -45,13 +59,13 @@ const useStandardVoting = ({
       setStandardVoteLoading(true);
       try {
         const directTx = await standardVote({
-          address: contracts.governor.address as `0x${string}`,
-          abi: contracts.governor.abi,
+          address: governorInstance.governor.address as `0x${string}`,
+          abi: governorInstance.governor.abi,
           functionName: !!reason ? "castVoteWithReason" : "castVote",
           args: !!reason
             ? [BigInt(proposalId), support, reason]
             : [BigInt(proposalId), support],
-          chainId: contracts.governor.chain.id,
+          chainId: governorInstance.governor.chain.id,
         });
 
         const { status, transactionHash } =

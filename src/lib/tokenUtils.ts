@@ -4,7 +4,7 @@ import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { TenantContracts } from "./types";
+import { TenantContracts, TenantTokenContract } from "./types";
 
 // TODO: This file seems messy -- consider refactoring
 
@@ -130,7 +130,7 @@ export function createTokenContract({
   contract: any;
   provider: any;
   type: "erc20" | "erc721";
-}): TenantContracts["token"] {
+}): TenantTokenContract {
   const tenantContract = (
     type === "erc20"
       ? new TenantContract<ITokenContract>({
@@ -147,16 +147,16 @@ export function createTokenContract({
           contract,
           provider,
         })
-  ) as TenantContracts["token"];
+  ) as TenantTokenContract;
 
   Object.assign(tenantContract, {
     isERC20: function (
-      this: TenantContracts["token"]
+      this: TenantTokenContract
     ): this is TenantContract<ITokenContract> {
       return type === "erc20";
     },
     isERC721: function (
-      this: TenantContracts["token"]
+      this: TenantTokenContract
     ): this is TenantContract<IMembershipContract> {
       return type === "erc721";
     },

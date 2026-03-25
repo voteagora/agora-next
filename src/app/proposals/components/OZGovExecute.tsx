@@ -10,6 +10,10 @@ import { Button } from "@/components/ui/button";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
 
 import {
   Tooltip,
@@ -24,28 +28,33 @@ interface Props {
 
 export const OZGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
+  const governorInstance = proposal.contract
+    ? (getGovernorByAddress(proposal.contract, contracts) ??
+      getDefaultGovernor(contracts))
+    : getDefaultGovernor(contracts);
+  const timelock = governorInstance.timelock ?? contracts.timelock;
   const { address } = useAccount();
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState(new Date());
 
   // Check whether user has the EXECUTOR_ROLE
   const { data: hasExecuteRole, isFetched: fetchedRole } = useReadContract({
-    address: contracts.timelock!.address as `0x${string}`,
-    abi: contracts.timelock!.abi,
+    address: timelock!.address as `0x${string}`,
+    abi: timelock!.abi,
     functionName: "hasRole",
     args: [
       "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63", // EXECUTOR_ROLE
       address as `0x${string}`,
     ],
-    chainId: contracts.timelock!.chain.id,
+    chainId: timelock!.chain.id,
   });
 
   // Check whether time has passed
   const { data: delayInSeconds, isFetched: fetchedDelay } = useReadContract({
-    address: contracts.timelock!.address as `0x${string}`,
-    abi: contracts.timelock!.abi,
+    address: timelock!.address as `0x${string}`,
+    abi: timelock!.abi,
     functionName: "getMinDelay",
-    chainId: contracts.timelock!.chain.id,
+    chainId: timelock!.chain.id,
   });
 
   const { data, writeContract: write } = useWriteContract();
@@ -105,8 +114,9 @@ export const OZGovExecute = ({ proposal }: Props) => {
                 <Button
                   onClick={() =>
                     write({
-                      address: contracts.governor!.address as `0x${string}`,
-                      abi: contracts.governor!.abi,
+                      address: governorInstance.governor
+                        .address as `0x${string}`,
+                      abi: governorInstance.governor.abi,
                       functionName: "execute",
                       args: proposalToCallArgs(proposal),
                     })

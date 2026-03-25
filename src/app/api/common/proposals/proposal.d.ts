@@ -71,6 +71,7 @@ export type ProposalPayloadFromDAONode = {
 
 export type ProposalPayloadFromDB = {
   proposal_id: string;
+  contract?: string;
 
   proposer: string;
   description: string | null;
@@ -123,6 +124,7 @@ export type ProposalTypeData = {
 export type Proposal = {
   archiveMetadata?: any;
   id: string;
+  contract?: string;
   proposer: string;
   snapshotBlockNumber: number;
   createdTime: Date | null;

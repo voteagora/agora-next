@@ -34,6 +34,7 @@ import {
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
 import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
+import { getDefaultGovernor } from "@/lib/tenant/governorUtils";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 import { formDataToProposal } from "@/app/proposals/draft/utils/formDataToProposal";
@@ -70,21 +71,22 @@ export default function CreateProposalFormClient({
   const { address, chain } = useAccount();
   const { data: walletClient } = useWalletClient();
   const { contracts } = Tenant.current();
+  const defaultGovernor = getDefaultGovernor(contracts);
   const { writeContractAsync, isPending: isWriteLoading } = useWriteContract();
   const { getAuthenticationData } = useProposalActionAuth();
 
   const { data: votingDelay } = useReadContract({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
+    address: defaultGovernor.governor.address as `0x${string}`,
+    abi: defaultGovernor.governor.abi,
     functionName: "votingDelay",
-    chainId: contracts.governor.chain.id,
+    chainId: defaultGovernor.governor.chain.id,
   });
 
   const { data: votingPeriod } = useReadContract({
-    address: contracts.governor.address as `0x${string}`,
-    abi: contracts.governor.abi,
+    address: defaultGovernor.governor.address as `0x${string}`,
+    abi: defaultGovernor.governor.abi,
     functionName: "votingPeriod",
-    chainId: contracts.governor.chain.id,
+    chainId: defaultGovernor.governor.chain.id,
   });
 
   const methods = useForm<z.output<typeof DraftProposalSchema>>({
@@ -206,7 +208,7 @@ export default function CreateProposalFormClient({
 
     const { id, transactionHash: attestationTxHash } =
       await createProposalAttestation({
-        contract: contracts.governor.address as `0x${string}`,
+        contract: defaultGovernor.governor.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
         choices: rawProposalDataForBackend.choices,
@@ -276,8 +278,8 @@ export default function CreateProposalFormClient({
       const functionName =
         data.type === ProposalType.BASIC ? "propose" : "proposeWithModule";
       const txHash = await writeContractAsync({
-        address: contracts.governor.address as `0x${string}`,
-        abi: contracts.governor.abi,
+        address: defaultGovernor.governor.address as `0x${string}`,
+        abi: defaultGovernor.governor.abi,
         functionName,
         args: inputData as never,
       });

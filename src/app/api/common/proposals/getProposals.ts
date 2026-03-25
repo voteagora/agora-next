@@ -15,6 +15,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import Tenant from "@/lib/tenant/tenant";
+import { getAllGovernorAddresses } from "@/lib/tenant/governorUtils";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { Proposal, ProposalPayload } from "./proposal";
 import { doInSpan } from "@/app/lib/logging";
@@ -84,7 +85,7 @@ async function fetchProposalsFromDaoNode(
       skip,
       take,
       filter,
-      contract: contracts.governor.address,
+      contract: getAllGovernorAddresses(contracts),
     })) as ProposalPayload[];
   }
 }
@@ -118,15 +119,12 @@ async function fetchOnchainProposalsByIds(
     const onchainProposals = await findProposalsByIds({
       namespace,
       proposalIds,
-      contract: contracts.governor.address,
+      contract: getAllGovernorAddresses(contracts),
     });
 
-    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
+    (onchainProposals as ProposalPayload[]).forEach((proposal) => {
       if (proposal) {
-        onchainProposalsMap.set(
-          proposal.proposal_id,
-          proposal as ProposalPayload
-        );
+        onchainProposalsMap.set(proposal.proposal_id, proposal);
       }
     });
   } catch (error) {
@@ -216,7 +214,7 @@ async function fetchInitialProposals(
           take,
           filter,
           type,
-          contract: contracts.governor.address,
+          contract: getAllGovernorAddresses(contracts),
         })) as ProposalPayload[];
       },
       pagination
@@ -288,7 +286,7 @@ function getSnapshotProposalsFromDB() {
 
   return findSnapshotProposalsQueryFromDb({
     namespace,
-    contract: contracts.governor.address,
+    contract: getAllGovernorAddresses(contracts),
   });
 }
 
@@ -326,7 +324,6 @@ export async function getProposals({
           getLatestBlockPromise(ui, contracts),
           fetchVotableSupply(),
         ]);
-
         const referencedOnchainIds = extractOnchainIdsFromOffchainProposals(
           proposals.data
         );
@@ -358,7 +355,6 @@ export async function getProposals({
           filter,
           type
         );
-
         return {
           meta: proposals.meta,
           data: parsedProposals,
@@ -389,7 +385,7 @@ async function getProposal(proposalId: string) {
       findProposal({
         namespace,
         proposalId,
-        contract: contracts.governor.address,
+        contract: getAllGovernorAddresses(contracts),
       })
     );
 
@@ -432,7 +428,7 @@ async function getProposal(proposalId: string) {
           findProposal({
             namespace,
             proposalId: onchainId,
-            contract: contracts.governor.address,
+            contract: getAllGovernorAddresses(contracts),
           })
       );
 

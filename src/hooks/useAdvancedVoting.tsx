@@ -1,5 +1,5 @@
 import { MissingVote } from "@/lib/voteUtils";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
@@ -8,6 +8,10 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
+import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -17,6 +21,7 @@ const useAdvancedVoting = ({
   reason = "",
   params,
   missingVote,
+  governorContract,
 }: {
   proposalId: string;
   support: number;
@@ -25,9 +30,18 @@ const useAdvancedVoting = ({
   reason?: string;
   params?: `0x${string}`;
   missingVote: MissingVote;
+  governorContract?: string;
 }) => {
   const { contracts } = Tenant.current();
   const { address } = useAccount();
+  const governorInstance = useMemo(
+    () =>
+      governorContract
+        ? (getGovernorByAddress(governorContract, contracts) ??
+          getDefaultGovernor(contracts))
+        : getDefaultGovernor(contracts),
+    [governorContract, contracts]
+  );
   const {
     writeContractAsync: advancedVote,
     isError: _advancedVoteError,
@@ -63,8 +77,8 @@ const useAdvancedVoting = ({
       setStandardVoteLoading(true);
       try {
         const directTx = await standardVote({
-          address: contracts.governor.address as `0x${string}`,
-          abi: contracts.governor.abi,
+          address: governorInstance.governor.address as `0x${string}`,
+          abi: governorInstance.governor.abi,
           functionName: reason
             ? params
               ? "castVoteWithReasonAndParams"
@@ -79,7 +93,7 @@ const useAdvancedVoting = ({
             : params
               ? [BigInt(proposalId), support, reason, params]
               : ([BigInt(proposalId), support] as any),
-          chainId: contracts.governor.chain.id,
+          chainId: governorInstance.governor.chain.id,
         });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
@@ -116,9 +130,10 @@ const useAdvancedVoting = ({
       }
       setAdvancedVoteLoading(true);
       try {
+        const alligator = governorInstance.alligator ?? contracts.alligator;
         const advancedTx = await advancedVote({
-          address: contracts.alligator!.address as `0x${string}`,
-          abi: contracts.alligator!.abi,
+          address: alligator!.address as `0x${string}`,
+          abi: alligator!.abi,
           functionName: "limitedCastVoteWithReasonAndParamsBatched",
           args: [
             advancedVP,
@@ -128,7 +143,7 @@ const useAdvancedVoting = ({
             reason,
             params ?? "0x",
           ],
-          chainId: contracts.alligator?.chain.id,
+          chainId: alligator?.chain.id,
         });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({

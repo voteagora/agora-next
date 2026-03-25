@@ -8,6 +8,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+  getGovernorByAddress,
+  getDefaultGovernor,
+} from "@/lib/tenant/governorUtils";
 
 import {
   Tooltip,
@@ -22,15 +26,20 @@ interface Props {
 
 export const BravoGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
+  const governorInstance = proposal.contract
+    ? (getGovernorByAddress(proposal.contract, contracts) ??
+      getDefaultGovernor(contracts))
+    : getDefaultGovernor(contracts);
+  const timelock = governorInstance.timelock ?? contracts.timelock;
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState<Date | undefined>();
 
   const { data: delayInSeconds, isFetched: executionDelayFetched } =
     useReadContract({
-      address: contracts.timelock!.address as `0x${string}`,
-      abi: contracts.timelock!.abi,
+      address: timelock!.address as `0x${string}`,
+      abi: timelock!.abi,
       functionName: "delay",
-      chainId: contracts.timelock!.chain.id,
+      chainId: timelock!.chain.id,
     });
 
   const { data, writeContract } = useWriteContract();
@@ -89,8 +98,9 @@ export const BravoGovExecute = ({ proposal }: Props) => {
                 <Button
                   onClick={() =>
                     writeContract({
-                      address: contracts.governor.address as `0x${string}`,
-                      abi: contracts.governor.abi,
+                      address: governorInstance.governor
+                        .address as `0x${string}`,
+                      abi: governorInstance.governor.abi,
                       functionName: "execute",
                       args: [proposal.id],
                     })

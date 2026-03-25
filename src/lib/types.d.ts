@@ -41,13 +41,30 @@ export type VoterStats = {
 export type TenantNamespace =
   (typeof TENANT_NAMESPACES)[keyof typeof TENANT_NAMESPACES];
 
+export type TenantTokenContract = TenantContract<
+  ITokenContract | IMembershipContract
+> & {
+  isERC20: () => this is TenantContract<ITokenContract>;
+  isERC721: () => this is TenantContract<IMembershipContract>;
+};
+
+export type GovernorInstance = {
+  id: string;
+  label: string;
+  governor: TenantContract<IGovernorContract>;
+  timelock?: TenantContract<BaseContract>;
+  token: TenantTokenContract;
+  governorType?: GOVERNOR_TYPE;
+  timelockType?: TIMELOCK_TYPE;
+  proposalTypesConfigurator?: TenantContract<BaseContract>;
+  alligator?: TenantContract<IAlligatorContract>;
+  treasury?: string[];
+};
+
 export type TenantContracts = {
   governor: TenantContract<IGovernorContract>;
   proposalTypesConfigurator?: TenantContract<BaseContract>;
-  token: TenantContract<ITokenContract | IMembershipContract> & {
-    isERC20: () => this is TenantContract<ITokenContract>;
-    isERC721: () => this is TenantContract<IMembershipContract>;
-  };
+  token: TenantTokenContract;
 
   votableSupplyOracle?: TenantContract<IVotableSupplyOracleContract>;
   staker?: TenantContract<IStaker>;
@@ -64,6 +81,7 @@ export type TenantContracts = {
   supportScopes?: boolean;
   easRecipient?: string;
   proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;
+  governors?: GovernorInstance[];
 };
 
 export type TenantToken = {
