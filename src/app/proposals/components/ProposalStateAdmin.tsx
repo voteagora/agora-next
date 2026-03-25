@@ -45,14 +45,14 @@ export const ProposalStateAdmin = ({ proposal }: Props) => {
     (namespace === TENANT_NAMESPACES.CYBER ||
       namespace === TENANT_NAMESPACES.XAI ||
       namespace === TENANT_NAMESPACES.DEMO ||
-      namespace === TENANT_NAMESPACES.CONTEST ||
       namespace === TENANT_NAMESPACES.SCROLL ||
       namespace === TENANT_NAMESPACES.OPTIMISM ||
       namespace === TENANT_NAMESPACES.DERIVE ||
       namespace === TENANT_NAMESPACES.UNISWAP ||
       namespace === TENANT_NAMESPACES.LINEA ||
       namespace === TENANT_NAMESPACES.B3 ||
-      namespace === TENANT_NAMESPACES.PGUILD);
+      namespace === TENANT_NAMESPACES.PGUILD ||
+      namespace === TENANT_NAMESPACES.CONTEST);
 
   const { data: adminAddress } = useGovernorAdmin({ enabled: isCancellable });
 
@@ -175,11 +175,11 @@ const successActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
-    case TENANT_NAMESPACES.CONTEST:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
     case TENANT_NAMESPACES.PGUILD:
+    case TENANT_NAMESPACES.CONTEST:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -252,11 +252,11 @@ const queuedStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
-    case TENANT_NAMESPACES.CONTEST:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
     case TENANT_NAMESPACES.PGUILD:
+    case TENANT_NAMESPACES.CONTEST:
       return (
         <div className="flex flex-row gap-2">
           {proposal.proposalType?.startsWith("OFFCHAIN") ? (
@@ -316,11 +316,11 @@ const activeStateActions = ({ proposal, namespace }: ActionProps) => {
     case TENANT_NAMESPACES.CYBER:
     case TENANT_NAMESPACES.XAI:
     case TENANT_NAMESPACES.DEMO:
-    case TENANT_NAMESPACES.CONTEST:
     case TENANT_NAMESPACES.DERIVE:
     case TENANT_NAMESPACES.LINEA:
     case TENANT_NAMESPACES.B3:
     case TENANT_NAMESPACES.PGUILD:
+    case TENANT_NAMESPACES.CONTEST:
       return proposal.proposalType?.startsWith("OFFCHAIN") ? (
         <OffchainCancel proposal={proposal} />
       ) : (
