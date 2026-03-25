@@ -1,275 +1,367 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 export default function ContestInfoContent() {
   return (
     <div className="flex flex-col gap-12 max-w-4xl mx-auto py-12 px-4">
-      {/* Hero Section */}
       <section className="text-center space-y-6">
-        <Badge variant="outline" className="text-sm px-4 py-1">
-          $15,000 Prize
-        </Badge>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-primary">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-primary">
           The Agora Novo Origo Prize
         </h1>
-        <p className="text-xl text-secondary max-w-2xl mx-auto">
-          Design the governance system for a new L1 blockchain. The best
-          submission wins $15,000.
+        <p className="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
+          A new L1, no legacy governance, and a $15K prize for the strongest
+          design. Submit work, challenge others in discussion, then vote when
+          voting opens.
         </p>
       </section>
 
-      {/* Imagine Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">
-          Imagine a New L1 Chain
-        </h2>
-        <p className="text-secondary leading-relaxed">
-          We've partnered with an ambitious L1 project that's building from
-          scratch. Governance is a blank canvas—no legacy systems, no technical
-          debt, no sacred cows. This is your chance to design something new.
-        </p>
+        <h2 className="text-2xl font-bold text-primary">Why this chain</h2>
+        <Card className="border-line bg-wash border-l-4 border-l-primary">
+          <CardContent className="pt-6 space-y-4">
+            <p className="text-secondary leading-relaxed">
+              We are working with a pre-launch L1 that wants governance designed
+              deliberately — not inherited from another ecosystem. Many details
+              stay under wraps for now; what matters here is that you get to
+              propose how decisions should be made before habits and politics
+              harden.
+            </p>
+            <p className="text-secondary leading-relaxed">
+              Nothing is live yet: no entrenched committees, no baggage from
+              past votes, no need to optimize around yesterday&apos;s mistakes.
+              You start from the chain&apos;s real constraints and answer one
+              question: what governance keeps working year after year?
+            </p>
+          </CardContent>
+        </Card>
       </section>
 
-      {/* Chain Properties */}
       <section className="space-y-6">
         <h2 className="text-2xl font-bold text-primary">
-          The Chain's Properties
+          Constraints your design should respect
         </h2>
         <p className="text-secondary mb-4">
-          The chain has the following properties that your governance design
-          must accommodate:
+          The protocol roughly has the following shape — your write-up should
+          engage with all of it:
         </p>
         <div className="grid gap-4 md:grid-cols-2">
-          <Card className="border-line">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">1. Sybil Resistance</CardTitle>
+              <CardTitle className="text-lg">Accounts &amp; sybils</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                The chain has a built-in sybil resistance mechanism. Your
-                governance design can leverage this.
+                Identity and sybil resistance are wired into how accounts work.
+                Treat it as strong but imperfect: design for real-world abuse,
+                not a perfect game.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-line">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">2. Emission Curve</CardTitle>
+              <CardTitle className="text-lg">Issuance</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                New tokens are emitted on a predictable schedule. Governance may
-                control allocation.
+                Token issuance follows a curve that tapers steeply early, then
+                settles to a steady long-term rate.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-line">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">3. Treasury</CardTitle>
+              <CardTitle className="text-lg">Treasury &amp; burns</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                A protocol treasury exists. Governance decides how funds are
-                allocated.
+                Protocol revenue feeds a treasury; the north-star use is
+                supporting buy-and-burn of the native asset (your governance
+                should say how that stays credible).
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-line">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">4. Bootstrap Funding</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-secondary">
-                Initial funding is allocated for ecosystem development.
-                Distribution mechanism is open.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-line">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">
-                5. Protocol Upgrades via Governance
+                Launch &amp; constitution
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                Protocol upgrades happen through governance. Design the process.
+                There is room for early funding and tooling, but the ambition is
+                a clean launch: codified rules and a constitution-like layer
+                that outlasts any single team.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-line">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">6. Quasi-UBI</CardTitle>
+              <CardTitle className="text-lg">Upgrades</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                The chain supports a form of universal basic income. Governance
-                may influence parameters.
+                Core protocol changes are expected to route through governance,
+                not ad hoc multisigs.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="border-line md:col-span-2">
+          <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">7. Validator Agents</CardTitle>
+              <CardTitle className="text-lg">Broad participation</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                Validators can act as autonomous agents. Consider how this
-                affects governance participation.
+                The economics include a UBI-like tilt: ordinary use of the
+                protocol should benefit participants, not only large holders.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-line md:col-span-2 border-l-4 border-l-primary">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Validators</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-secondary">
+                Validators are economic actors with incentives aligned to
+                keeping the network running; governance should mesh with that
+                reality.
               </p>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* The Ask */}
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">The Ask</h2>
-        <p className="text-secondary leading-relaxed">
-          Submit a written plan and mixed-media design for the governance
-          system. Your submission should include:
-        </p>
-        <ul className="list-disc list-inside text-secondary space-y-2 ml-4">
-          <li>A comprehensive written proposal (markdown)</li>
-          <li>Diagrams, flowcharts, or visual aids</li>
-          <li>
-            Optional: code snippets, smart contract sketches, or pseudocode
-          </li>
-        </ul>
-      </section>
+      <section className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-line bg-tertiary/10 md:col-span-1">
+            <CardHeader>
+              <CardTitle className="text-lg">What to deliver</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                <p className="text-sm text-secondary leading-relaxed">
+                  Written plan with diagrams, flows, specs, or contract
+                  sketches.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                <p className="text-sm text-secondary leading-relaxed">
+                  Clear tradeoffs: failure cases, who loses, and what you will
+                  monitor post-launch.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                <p className="text-sm text-secondary leading-relaxed">
+                  Public critique on other submissions to strengthen the field.
+                </p>
+              </div>
+              <p className="pt-1 text-sm text-primary font-medium leading-relaxed">
+                $15K to the winning entry.
+              </p>
+            </CardContent>
+          </Card>
 
-      {/* Submission Guidance */}
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">
-          Submission & Judging Guidance
-        </h2>
-        <div className="space-y-3 text-secondary">
-          <p>
-            <strong className="text-primary">
-              Must solve protocol changes:
-            </strong>{" "}
-            How does the chain upgrade? Who decides? What safeguards exist?
-          </p>
-          <p>
-            <strong className="text-primary">Avoid known failure modes:</strong>{" "}
-            Learn from existing DAOs. Don't repeat their mistakes.
-          </p>
-          <p>
-            <strong className="text-primary">
-              Attempt code-is-law with nuance:
-            </strong>{" "}
-            Pure on-chain governance has limits. How do you handle edge cases?
-          </p>
-          <p>
-            <strong className="text-primary">Must be sustainable:</strong>{" "}
-            Governance should work for years, not just launch day.
-          </p>
+          <Card className="border-line bg-tertiary/10 md:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-lg">
+                What judges will look for
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                  <span className="text-xs font-bold text-tertiary">01</span>
+                  <p className="text-sm text-secondary leading-relaxed">
+                    <span className="font-semibold text-primary">
+                      Upgrades:
+                    </span>{" "}
+                    a credible path for protocol change that does not fall apart
+                    under stress.
+                  </p>
+                </div>
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                  <span className="text-xs font-bold text-tertiary">02</span>
+                  <p className="text-sm text-secondary leading-relaxed">
+                    <span className="font-semibold text-primary">
+                      Learning from history:
+                    </span>{" "}
+                    explicit guardrails against plutocracy, expert capture, and
+                    other well-known DAO failure modes.
+                  </p>
+                </div>
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                  <span className="text-xs font-bold text-tertiary">03</span>
+                  <p className="text-sm text-secondary leading-relaxed">
+                    <span className="font-semibold text-primary">
+                      On-chain vs social:
+                    </span>{" "}
+                    where rules live on-chain, where humans must interpret, and
+                    how you avoid locking out non-technical stakeholders.
+                  </p>
+                </div>
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                  <span className="text-xs font-bold text-tertiary">04</span>
+                  <p className="text-sm text-secondary leading-relaxed">
+                    <span className="font-semibold text-primary">
+                      Longevity:
+                    </span>{" "}
+                    incentives and process that still make sense years out, not
+                    only at genesis.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* Timeline */}
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">When</h2>
-        <Card className="border-line bg-wash">
-          <CardContent className="pt-6">
-            <ul className="space-y-3 text-secondary">
-              <li className="flex items-start gap-3">
-                <span className="text-positive font-bold">Open:</span>
-                <span>
-                  Contest stays open until we receive 5+ qualified submissions
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="text-negative font-bold">Close:</span>
-                <span>
-                  Closes at 25 submissions OR after 4 days of inactivity (no new
-                  submissions) followed by a 3-day countdown
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="font-bold text-primary">Voting:</span>
-                <span>
-                  Voting begins when the contest closes and lasts 7 days
-                </span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Rules */}
       <section className="space-y-4">
         <h2 className="text-2xl font-bold text-primary">Rules</h2>
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-primary mb-2">
-              Voting Power
-            </h3>
-            <ul className="list-disc list-inside text-secondary space-y-1 ml-4">
-              <li>
-                <strong>3 votes</strong> for identified submitters (name +
-                contact info)
-              </li>
-              <li>
-                <strong>1 vote</strong> for anonymous submitters
-              </li>
-              <li>
-                <strong>0 votes</strong> for Agora staff (can participate but
-                cannot vote)
-              </li>
-            </ul>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-semibold text-primary mb-2">
-              Eligibility
-            </h3>
-            <ul className="list-disc list-inside text-secondary space-y-1 ml-4">
-              <li>One submission per wallet address</li>
-              <li>KYC required for prize winner (for compliance)</li>
-              <li>Only qualified submitters can vote</li>
-            </ul>
-          </div>
+        <div className="space-y-2">
+          <p className="text-xs text-tertiary uppercase tracking-wide">
+            Governance
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Winner</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  Selected by a vote among people whose submissions are accepted
+                  into the qualified set.
+                </p>
+              </CardContent>
+            </Card>
 
-          <div>
-            <h3 className="text-lg font-semibold text-primary mb-2">
-              Moderation
-            </h3>
-            <p className="text-secondary">
-              Submissions may be disqualified for spam, plagiarism, or content
-              that violates community standards. Appeals can be made via GitHub
-              issues.
-            </p>
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Voting weight</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-sm text-secondary">
+                    Qualified, identified
+                  </p>
+                  <p className="text-sm font-semibold text-primary">3</p>
+                </div>
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-sm text-secondary">Qualified, anonymous</p>
+                  <p className="text-sm font-semibold text-primary">1</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <p className="text-xs text-tertiary uppercase tracking-wide">
+            Eligibility
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">
+                  Qualifying submissions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  We qualify work that matches the contest brief in spirit, is
+                  substantive, and does not cause clear harm. Borderline cases
+                  are judgment calls by Agora.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Eligibility</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  Individuals only — no teams or orgs as named entrants.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-line bg-tertiary/10 md:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Agora team</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  Agora people may comment or participate in the open, but they
+                  do not receive voting power in this contest.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        <div className="space-y-2 pt-2">
+          <p className="text-xs text-tertiary uppercase tracking-wide">
+            Enforcement & payout
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Prize &amp; KYC</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  The prize is paid in USD after a private KYC step with Agora
+                  for the winning individual.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-line bg-tertiary/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Moderation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-secondary leading-relaxed">
+                  We may remove or disqualify spam, fraud, or bad-faith entries.
+                  Notable rejections are documented in the submissions repo;
+                  contested cases can be reopened through the repo&apos;s usual
+                  review process (including supermajority support from past
+                  submitters where applicable — see repo README for the exact
+                  bar).
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Why This Matters */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">Why This Matters</h2>
-        <Card className="border-line bg-wash">
+        <h2 className="text-2xl font-bold text-primary">Why bother</h2>
+        <Card className="border-line bg-wash border-l-4 border-l-primary">
           <CardContent className="pt-6">
             <p className="text-secondary leading-relaxed">
-              If you've ever complained about governance—low turnout, whale
-              dominance, proposal spam, voter fatigue, capture by
-              insiders—here's your shot. Design something better. Prove it can
-              work. Win $15,000 and potentially see your design implemented on a
-              real chain.
+              Most of us have a list of things we wish on-chain governance did
+              differently. This is a rare moment to sketch that from scratch on
+              a chain that has not yet ossified — and to stress-test those ideas
+              against a community that will push back hard.
             </p>
           </CardContent>
         </Card>
       </section>
 
-      {/* How To Participate */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">How to Participate</h2>
+        <h2 className="text-2xl font-bold text-primary">How to participate</h2>
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="border-line">
             <CardHeader>
@@ -277,24 +369,26 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Connect your wallet and submit your governance design proposal.
+                Create an entry here. Add contact info and GitHub if you want
+                reviewers to reach you.
               </p>
               <a
                 href="/submissions/new"
                 className="text-sm font-medium text-brandPrimary hover:underline"
               >
-                Go to Submission Form →
+                New submission →
               </a>
             </CardContent>
           </Card>
 
           <Card className="border-line">
             <CardHeader>
-              <CardTitle className="text-lg">Critique</CardTitle>
+              <CardTitle className="text-lg">Discuss</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Review submissions and provide feedback via GitHub issues.
+                Use the forums for conversation; submissions are also mirrored
+                to GitHub for line-by-line review and follow-up PRs.
               </p>
               <a
                 href="https://github.com/voteagora/novo-origo-contest-submissions"
@@ -302,7 +396,7 @@ export default function ContestInfoContent() {
                 rel="noopener noreferrer"
                 className="text-sm font-medium text-brandPrimary hover:underline"
               >
-                View GitHub Repo →
+                GitHub mirror →
               </a>
             </CardContent>
           </Card>
@@ -313,23 +407,31 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Once qualified, use your voting power to choose the winner.
+                Timing and mechanics are announced on{" "}
+                <a
+                  href="https://twitter.com/AgoraGovernance"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brandPrimary hover:underline"
+                >
+                  @AgoraGovernance
+                </a>
+                . Ballots run on-chain in this app.
               </p>
               <a
                 href="/proposals"
                 className="text-sm font-medium text-brandPrimary hover:underline"
               >
-                View Voting (when open) →
+                Proposals / voting →
               </a>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* Footer Note */}
       <section className="text-center pt-8 border-t border-line">
         <p className="text-sm text-tertiary">
-          Questions? Open an issue on{" "}
+          Questions? File an issue on{" "}
           <a
             href="https://github.com/voteagora/novo-origo-contest-submissions/issues"
             target="_blank"
@@ -338,7 +440,7 @@ export default function ContestInfoContent() {
           >
             GitHub
           </a>{" "}
-          or reach out on{" "}
+          or find us on{" "}
           <a
             href="https://discord.gg/agora"
             target="_blank"

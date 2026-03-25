@@ -2,41 +2,34 @@
 
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PublicSubmission } from "@/app/api/common/contest/getSubmissions";
-import { formatDistanceToNow } from "date-fns";
 
 interface SubmissionsListClientProps {
   initialSubmissions: PublicSubmission[];
 }
 
-function getStatusBadgeVariant(
-  status: string
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "qualified":
-      return "default";
-    case "pending_review":
-      return "secondary";
-    case "disqualified":
-      return "destructive";
-    default:
-      return "outline";
-  }
+function normalizeSubmissionTitle(title: string): string {
+  return title.replace(/^title:\s*/i, "").trim();
 }
 
-function getStatusLabel(status: string): string {
-  switch (status) {
-    case "qualified":
-      return "Qualified";
-    case "pending_review":
-      return "Pending Review";
-    case "disqualified":
-      return "Disqualified";
-    default:
-      return status;
-  }
+function buildSubmissionPreview(contentMarkdown: string): string {
+  const withoutTitleLine = contentMarkdown
+    .replace(/^\s*#*\s*title:\s.*$/im, "")
+    .trim();
+
+  const plainText = withoutTitleLine
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[[^\]]*]\([^)]+\)/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/[*_~>-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (plainText.length <= 200) return plainText;
+  return `${plainText.slice(0, 200)}...`;
 }
 
 export default function SubmissionsListClient({
@@ -92,31 +85,20 @@ export default function SubmissionsListClient({
             <Link key={submission.id} href={`/submissions/${submission.id}`}>
               <Card className="border-line hover:shadow-newHover transition-shadow cursor-pointer h-full">
                 <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg line-clamp-2">
-                      {submission.title}
-                    </CardTitle>
-                    <Badge variant={getStatusBadgeVariant(submission.status)}>
-                      {getStatusLabel(submission.status)}
-                    </Badge>
-                  </div>
+                  <CardTitle className="text-lg line-clamp-2">
+                    {normalizeSubmissionTitle(submission.title)}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-secondary line-clamp-3 mb-4">
-                    {submission.contentMarkdown.substring(0, 200)}
-                    {submission.contentMarkdown.length > 200 ? "..." : ""}
+                    {buildSubmissionPreview(submission.contentMarkdown)}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-tertiary">
+                  <div className="text-xs text-tertiary">
                     <span>
                       {submission.isAnonymous
                         ? "Anonymous"
                         : submission.authorDisplayName ||
                           `${submission.authorWallet?.substring(0, 6)}...${submission.authorWallet?.substring(38)}`}
-                    </span>
-                    <span>
-                      {formatDistanceToNow(new Date(submission.submittedAt), {
-                        addSuffix: true,
-                      })}
                     </span>
                   </div>
                   {submission.votingPower > 0 && (
@@ -135,13 +117,6 @@ export default function SubmissionsListClient({
           ))}
         </div>
       )}
-
-      <div className="mt-8 text-center">
-        <p className="text-sm text-tertiary">
-          Total: {initialSubmissions.length} submission
-          {initialSubmissions.length !== 1 ? "s" : ""}
-        </p>
-      </div>
     </div>
   );
 }

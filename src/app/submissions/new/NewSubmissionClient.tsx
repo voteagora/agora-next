@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50MB total
@@ -153,6 +154,14 @@ export default function NewSubmissionClient() {
     setSubmitError(null);
 
     try {
+      const token = getStoredSiweJwt({ expectedAddress: address });
+      if (!token) {
+        setSubmitError(
+          "Not authenticated (missing SIWE session). Please sign in again."
+        );
+        return;
+      }
+
       const attachmentData = await Promise.all(
         attachments.map(async (att) => {
           const buffer = await att.file.arrayBuffer();
@@ -170,6 +179,7 @@ export default function NewSubmissionClient() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ...data,
@@ -226,7 +236,9 @@ export default function NewSubmissionClient() {
               You need to connect your wallet to submit a governance design
               proposal.
             </p>
-            <ConnectKitButton />
+            <div className="flex justify-center">
+              <ConnectKitButton />
+            </div>
           </CardContent>
         </Card>
       </div>

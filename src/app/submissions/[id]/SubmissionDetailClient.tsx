@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAccount } from "wagmi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { SubmissionWithComments } from "@/app/api/common/contest/getSubmissions";
 import { formatDistanceToNow, format } from "date-fns";
@@ -13,43 +10,13 @@ interface SubmissionDetailClientProps {
   submission: SubmissionWithComments;
 }
 
-function getStatusBadgeVariant(
-  status: string
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case "qualified":
-      return "default";
-    case "pending_review":
-      return "secondary";
-    case "disqualified":
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
-
-function getStatusLabel(status: string): string {
-  switch (status) {
-    case "qualified":
-      return "Qualified";
-    case "pending_review":
-      return "Pending Review";
-    case "disqualified":
-      return "Disqualified";
-    default:
-      return status;
-  }
+function normalizeSubmissionTitle(title: string): string {
+  return title.replace(/^title:\s*/i, "").trim();
 }
 
 export default function SubmissionDetailClient({
   submission,
 }: SubmissionDetailClientProps) {
-  const { address } = useAccount();
-  const isAuthor =
-    address &&
-    submission.authorWallet &&
-    address.toLowerCase() === submission.authorWallet.toLowerCase();
-
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <Link
@@ -72,47 +39,31 @@ export default function SubmissionDetailClient({
         Back to Submissions
       </Link>
 
-      <div className="flex items-start justify-between gap-4 mb-6 mt-4">
-        <div>
-          <h1 className="text-2xl font-extrabold text-primary mb-2">
-            {submission.title}
-          </h1>
-          <div className="flex items-center gap-3 text-sm text-secondary">
-            <span>
-              {submission.isAnonymous
-                ? "Anonymous"
-                : submission.authorDisplayName ||
-                  `${submission.authorWallet?.substring(0, 6)}...${submission.authorWallet?.substring(38)}`}
-            </span>
-            <span>•</span>
-            <span>
-              {format(new Date(submission.submittedAt), "MMM d, yyyy")}
-            </span>
-            {submission.authorGithub && !submission.isAnonymous && (
-              <>
-                <span>•</span>
-                <a
-                  href={`https://github.com/${submission.authorGithub}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brandPrimary hover:underline"
-                >
-                  @{submission.authorGithub}
-                </a>
-              </>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant={getStatusBadgeVariant(submission.status)}>
-            {getStatusLabel(submission.status)}
-          </Badge>
-          {isAuthor && (
-            <Link href={`/submissions/${submission.id}/edit`}>
-              <Button variant="outline" size="sm">
-                Edit
-              </Button>
-            </Link>
+      <div className="mb-6 mt-4">
+        <h1 className="text-2xl font-extrabold text-primary mb-2">
+          {normalizeSubmissionTitle(submission.title)}
+        </h1>
+        <div className="flex items-center gap-3 text-sm text-secondary">
+          <span>
+            {submission.isAnonymous
+              ? "Anonymous"
+              : submission.authorDisplayName ||
+                `${submission.authorWallet?.substring(0, 6)}...${submission.authorWallet?.substring(38)}`}
+          </span>
+          <span>•</span>
+          <span>{format(new Date(submission.submittedAt), "MMM d, yyyy")}</span>
+          {submission.authorGithub && !submission.isAnonymous && (
+            <>
+              <span>•</span>
+              <a
+                href={`https://github.com/${submission.authorGithub}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brandPrimary hover:underline"
+              >
+                @{submission.authorGithub}
+              </a>
+            </>
           )}
         </div>
       </div>
@@ -252,14 +203,6 @@ export default function SubmissionDetailClient({
                   {format(new Date(submission.submittedAt), "PPpp")}
                 </p>
               </div>
-              {submission.updatedAt !== submission.submittedAt && (
-                <div>
-                  <p className="text-xs text-tertiary mb-1">Last Updated</p>
-                  <p className="text-sm text-secondary">
-                    {format(new Date(submission.updatedAt), "PPpp")}
-                  </p>
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -290,16 +233,6 @@ export default function SubmissionDetailClient({
                 </a>
                 <p className="text-xs text-tertiary mt-2">
                   Leave comments and feedback on the GitHub PR
-                </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {!submission.githubPrUrl && (
-            <Card className="border-line bg-wash">
-              <CardContent className="py-4">
-                <p className="text-sm text-tertiary text-center">
-                  GitHub PR pending...
                 </p>
               </CardContent>
             </Card>

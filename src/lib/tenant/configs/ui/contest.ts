@@ -3,17 +3,18 @@ import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import demoLogo from "@/assets/tenant/demo_logo.svg";
+import agoraLogo from "@/assets/tenant/agora.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
 
 export const contestTenantUIConfig = new TenantUI({
   title: "Agora Novo Origo Prize",
-  logo: demoLogo,
+  logo: agoraLogo,
+  logoSize: "16",
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.CONTEST)],
 
   assets: {
-    success: demoLogo,
-    pending: demoLogo,
+    success: agoraLogo,
+    pending: agoraLogo,
     delegate: demoDelegate,
   },
 
@@ -36,7 +37,7 @@ export const contestTenantUIConfig = new TenantUI({
     line: "223 223 223",
     positive: "66 122 43",
     negative: "182 13 13",
-    brandPrimary: "99 102 241",
+    brandPrimary: "23 23 23",
     brandSecondary: "242 242 242",
   },
 
@@ -105,8 +106,9 @@ export const contestTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "Voting",
-      description: "Vote on the winning submission using NOVO tokens",
+      title: "You Submit. You Critique. You Judge.",
+      description:
+        "The best governance design wins $15K — and the community decides who that is.",
       meta: {
         title: "Novo Origo Prize - Voting",
         description: "Vote on the winning governance design",
