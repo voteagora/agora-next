@@ -8,10 +8,12 @@ import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
+import { getDbSchemaForNamespace } from "@/lib/prismaUtils";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
     const { namespace, contracts, ui } = Tenant.current();
+    const dbSchema = getDbSchemaForNamespace(namespace);
 
     const isTimeStampBasedTenant = ui.toggle(
       "use-timestamp-for-proposals"
@@ -38,7 +40,7 @@ async function getNeedsMyVoteProposals(address: string) {
         SELECT p.*
         FROM (
           SELECT *
-          FROM ${namespace + ".proposals_v2"}
+          FROM ${dbSchema + ".proposals_v2"}
           WHERE ${
             isTimeStampBasedTenant
               ? `CAST(start_timestamp AS INTEGER) < $1
@@ -51,7 +53,7 @@ async function getNeedsMyVoteProposals(address: string) {
             ${prodDataOnly}
         ) AS p
         LEFT JOIN ${
-          namespace + ".votes"
+          dbSchema + ".votes"
         } v ON p.proposal_id = v.proposal_id AND v.voter = $2
         WHERE v.proposal_id IS NULL
         ORDER BY p.ordinal DESC;

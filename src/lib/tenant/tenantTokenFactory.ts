@@ -163,6 +163,13 @@ export default class TenantTokenFactory {
             ? ZERO_ADDRESS
             : "0xf1f9686d8144c7c5f16feffc8fdf93ec64058dec",
         };
+      case TENANT_NAMESPACES.CONTEST:
+        return {
+          name: "Novo Origo Prize",
+          symbol: "CONTEST",
+          decimals: 18,
+          address: "0xd5741323b3ddfe5556C3477961B5160600C29c53",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

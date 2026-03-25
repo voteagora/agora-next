@@ -34,6 +34,7 @@ const TENANT_DISPLAY_NAMES: Record<string, string> = {
   [TENANT_NAMESPACES.DEMO2]: "Demo 2",
   [TENANT_NAMESPACES.DEMO3]: "Demo 3",
   [TENANT_NAMESPACES.DEMO4]: "Demo 4",
+  [TENANT_NAMESPACES.CONTEST]: "Contest",
 };
 
 export function TenantSwitcher() {

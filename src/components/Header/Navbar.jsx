@@ -190,6 +190,19 @@ export default function Navbar() {
           Info
         </HeaderLink>
       )}
+
+      {ui.toggle("submissions") && ui.toggle("submissions").enabled && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current.submissions = el;
+          }}
+          href="/submissions"
+          isActive={activeNavItem === "submissions"}
+          onClick={() => handleNavClick("submissions")}
+        >
+          Submissions
+        </HeaderLink>
+      )}
     </div>
   );
 }
