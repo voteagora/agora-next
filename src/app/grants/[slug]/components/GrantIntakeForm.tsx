@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useAccount, useConnect } from "wagmi";
+import { useAccount } from "wagmi";
+import { useModal } from "connectkit";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -107,7 +108,7 @@ function renderTextWithLinks(text: string) {
 
 export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { isConnected, address } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { setOpen } = useModal();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { getAuthenticationData } = useProposalActionAuth();
@@ -320,7 +321,11 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
       });
 
       if (!authData) {
-        throw new Error("Authentication failed");
+        toast.error(
+          "Authentication required. Please sign the message to continue."
+        );
+        setIsSubmitting(false);
+        return;
       }
 
       // Submit to API
@@ -355,11 +360,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   };
 
   const handleConnectWallet = () => {
-    if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
-    } else {
-      toast.error("No wallet connectors available");
-    }
+    setOpen(true);
   };
 
   // Sort dynamic fields by order if available

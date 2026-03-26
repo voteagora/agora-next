@@ -71,14 +71,20 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
     setError(null);
 
     const sessionRequest = (async (): Promise<string | null> => {
+      let session;
       try {
-        await signIn();
+        session = await signIn();
       } catch (signInError) {
         setError(
           signInError instanceof Error
             ? signInError.message
             : "Sign-in cancelled."
         );
+        return null;
+      }
+
+      if (!session) {
+        setError("Sign-in cancelled.");
         return null;
       }
 

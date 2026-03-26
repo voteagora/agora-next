@@ -89,5 +89,5 @@ export const siweProviderConfig: SIWEConfig = {
     clearStoredSiweSession();
     return Promise.resolve(true);
   },
-  enabled: SIWE_ENABLED,
+  enabled: false,
 };
