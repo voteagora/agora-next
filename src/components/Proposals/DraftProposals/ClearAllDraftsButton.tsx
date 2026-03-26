@@ -97,10 +97,9 @@ export const DeleteAllDraftProposalsDialog = ({
               });
 
               if (result.ok) {
+                const count = result.deletedCount ?? 0;
                 toast.success(
-                  `Successfully deleted ${result.deletedCount || draftCount} draft${
-                    (result.deletedCount || draftCount) === 1 ? "" : "s"
-                  }`
+                  `Successfully deleted ${count} draft${count === 1 ? "" : "s"}`
                 );
                 closeDialog();
                 if (onSuccess) {

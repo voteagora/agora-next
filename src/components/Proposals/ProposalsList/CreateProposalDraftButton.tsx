@@ -83,6 +83,9 @@ const CreateProposalDraftButton = ({
             timestamp: new Date().toISOString(),
           });
           if (!auth) {
+            toast.error(
+              "Authentication required. Please sign the message to continue."
+            );
             setIsPending(false);
             return;
           }

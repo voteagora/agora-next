@@ -3,6 +3,7 @@
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import Tenant from "@/lib/tenant/tenant";
 
 export async function onSubmitAction(
   params: { address: `0x${string}` } & AuthParams
@@ -14,9 +15,15 @@ export async function onSubmitAction(
     }
     const verifiedAddress = authResult.address.toLowerCase();
 
+    const { slug } = Tenant.current();
+
     const result = await prismaWeb2Client.proposalDraft.deleteMany({
       where: {
-        author_address: verifiedAddress,
+        author_address: {
+          equals: verifiedAddress,
+          mode: "insensitive",
+        },
+        dao_slug: slug,
       },
     });
 

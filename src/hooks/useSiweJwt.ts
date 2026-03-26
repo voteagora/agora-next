@@ -71,10 +71,12 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
     setError(null);
 
     const sessionRequest = (async (): Promise<string | null> => {
-      let session;
       try {
-        session = await signIn();
+        await signIn();
       } catch (signInError) {
+        const stored = getStoredSiweJwt({ expectedAddress });
+        if (stored) return stored;
+
         setError(
           signInError instanceof Error
             ? signInError.message
@@ -83,14 +85,11 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
         return null;
       }
 
-      if (!session) {
-        setError("Sign-in cancelled.");
-        return null;
-      }
-
-      const token = await waitForStoredSiweJwt({ expectedAddress });
+      const token =
+        getStoredSiweJwt({ expectedAddress }) ??
+        (await waitForStoredSiweJwt({ expectedAddress, timeoutMs: 1_000 }));
       if (!token) {
-        setError("Unable to load SIWE session. Please try again.");
+        setError("Sign-in failed. Please try again.");
         return null;
       }
 
