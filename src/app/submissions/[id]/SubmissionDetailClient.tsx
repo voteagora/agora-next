@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Markdown from "@/components/shared/Markdown/Markdown";
-import { SubmissionWithComments } from "@/app/api/common/contest/getSubmissions";
-import { formatDistanceToNow, format } from "date-fns";
+import { PublicSubmission } from "@/app/api/common/contest/getSubmissions";
+import { format } from "date-fns";
 
 interface SubmissionDetailClientProps {
-  submission: SubmissionWithComments;
+  submission: PublicSubmission;
 }
 
 function normalizeSubmissionTitle(title: string): string {
@@ -143,41 +143,6 @@ export default function SubmissionDetailClient({
                         />
                       </svg>
                     </a>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {submission.comments.length > 0 && (
-            <Card className="border-line">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  Comments ({submission.comments.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {submission.comments.map((comment) => (
-                    <div
-                      key={comment.id}
-                      className="p-4 rounded-md border border-line"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-primary">
-                          {comment.authorDisplayName ||
-                            `${comment.authorWallet.substring(0, 6)}...${comment.authorWallet.substring(38)}`}
-                        </span>
-                        <span className="text-xs text-tertiary">
-                          {formatDistanceToNow(new Date(comment.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-sm text-secondary whitespace-pre-wrap">
-                        {comment.content}
-                      </p>
-                    </div>
                   ))}
                 </div>
               </CardContent>

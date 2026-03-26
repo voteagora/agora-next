@@ -6538,38 +6538,23 @@ model ForumRoleChangeAudit {
 }
 
 model ContestSubmission {
-  id                     String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                     String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title                  String
-  authorWallet           String                     @unique @map("author_wallet")
-  authorEmail            String                     @map("author_email")
-  authorDisplayName      String?                    @map("author_display_name")
-  authorGithub           String?                    @map("author_github")
-  isAnonymous            Boolean                    @default(false) @map("is_anonymous")
-  contentMarkdown        String                     @map("content_markdown")
-  attachments            Json                       @default("[]")
-  githubPrUrl            String?                    @map("github_pr_url")
-  githubPrNumber         Int?                       @map("github_pr_number")
-  votingPower            Int                        @default(3) @map("voting_power")
-  status                 String                     @default("pending_review")
-  disqualificationReason String?                    @map("disqualification_reason")
-  submittedAt            DateTime                   @default(now()) @map("submitted_at") @db.Timestamptz(6)
-  updatedAt              DateTime                   @default(now()) @map("updated_at") @db.Timestamptz(6)
-  comments               ContestSubmissionComment[]
+  authorWallet           String   @unique @map("author_wallet")
+  authorEmail            String   @map("author_email")
+  authorDisplayName      String?  @map("author_display_name")
+  authorGithub           String?  @map("author_github")
+  isAnonymous            Boolean  @default(false) @map("is_anonymous")
+  contentMarkdown        String   @map("content_markdown")
+  attachments            Json     @default("[]")
+  githubPrUrl            String?  @map("github_pr_url")
+  githubPrNumber         Int?     @map("github_pr_number")
+  votingPower            Int      @default(3) @map("voting_power")
+  status                 String   @default("pending_review")
+  disqualificationReason String?  @map("disqualification_reason")
+  submittedAt            DateTime @default(now()) @map("submitted_at") @db.Timestamptz(6)
+  updatedAt              DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   @@map("submissions")
-  @@schema("contest")
-}
-
-model ContestSubmissionComment {
-  id                String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  submissionId      String            @map("submission_id") @db.Uuid
-  authorWallet      String            @map("author_wallet")
-  authorDisplayName String?           @map("author_display_name")
-  content           String
-  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-  submission        ContestSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-
-  @@index([submissionId])
-  @@map("submission_comments")
   @@schema("contest")
 }

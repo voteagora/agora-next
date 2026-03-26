@@ -20,15 +20,6 @@ interface ContestSubmission {
   updatedAt: Date;
 }
 
-interface ContestSubmissionComment {
-  id: string;
-  submissionId: string;
-  authorWallet: string;
-  authorDisplayName: string | null;
-  content: string;
-  createdAt: Date;
-}
-
 export interface SubmissionAttachment {
   type: string;
   ipfs_cid: string;
@@ -54,16 +45,6 @@ export interface PublicSubmission {
   status: string;
   submittedAt: Date;
   updatedAt: Date;
-}
-
-export interface SubmissionWithComments extends PublicSubmission {
-  comments: Array<{
-    id: string;
-    authorWallet: string;
-    authorDisplayName: string | null;
-    content: string;
-    createdAt: Date;
-  }>;
 }
 
 function sanitizeSubmissionForPublic(
@@ -119,34 +100,18 @@ export async function getSubmissions(options?: {
 
 export async function getSubmissionById(
   id: string
-): Promise<SubmissionWithComments | null> {
+): Promise<PublicSubmission | null> {
   const submission = await (
     prismaWeb2Client as any
   ).contestSubmission.findUnique({
     where: { id },
-    include: {
-      comments: {
-        orderBy: { createdAt: "asc" },
-      },
-    },
   });
 
   if (!submission) {
     return null;
   }
 
-  const publicSubmission = sanitizeSubmissionForPublic(submission);
-
-  return {
-    ...publicSubmission,
-    comments: submission.comments.map((comment: ContestSubmissionComment) => ({
-      id: comment.id,
-      authorWallet: comment.authorWallet,
-      authorDisplayName: comment.authorDisplayName,
-      content: comment.content,
-      createdAt: comment.createdAt,
-    })),
-  };
+  return sanitizeSubmissionForPublic(submission);
 }
 
 export async function getSubmissionByWallet(
