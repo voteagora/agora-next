@@ -17,6 +17,7 @@ interface ContestSubmission {
   status: string;
   disqualificationReason: string | null;
   ipAddress: string | null;
+  moderationFlagged: boolean;
   submittedAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +44,7 @@ const contestSubmissionPublicSelect = {
   votingPower: true,
   status: true,
   disqualificationReason: true,
+  moderationFlagged: true,
   submittedAt: true,
   updatedAt: true,
 } as const;
@@ -70,6 +72,7 @@ export interface PublicSubmission {
   githubPrNumber: number | null;
   votingPower: number;
   status: string;
+  moderationFlagged: boolean;
   submittedAt: Date;
   updatedAt: Date;
 }
@@ -91,6 +94,7 @@ function sanitizeSubmissionForPublic(
     githubPrNumber: submission.githubPrNumber,
     votingPower: submission.votingPower,
     status: submission.status,
+    moderationFlagged: submission.moderationFlagged,
     submittedAt: submission.submittedAt,
     updatedAt: submission.updatedAt,
   };

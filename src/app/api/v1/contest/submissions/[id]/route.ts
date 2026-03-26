@@ -147,3 +147,67 @@ export async function PATCH(
     }
   });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { deleteSubmission } = await import(
+    "@/app/api/common/contest/submissionActions"
+  );
+
+  const authResponse = await authenticateApiUser(request);
+
+  if (!authResponse.authenticated) {
+    return new Response(authResponse.failReason, { status: 401 });
+  }
+
+  const walletAddress = authResponse.userId;
+  if (!walletAddress || !walletAddress.startsWith("0x")) {
+    return new Response(
+      "Wallet authentication required. Please sign in with your wallet.",
+      { status: 401 }
+    );
+  }
+
+  const isAdmin =
+    authResponse.scope?.includes("admin") ||
+    authResponse.scope?.includes("super_admin") ||
+    authResponse.scope?.includes("duna_admin");
+
+  const { id } = await params;
+
+  return await traceWithUserId(authResponse.userId as string, async () => {
+    try {
+      const deleted = await deleteSubmission(id, walletAddress, !!isAdmin);
+      return NextResponse.json({
+        id: deleted.id,
+        message: "Submission deleted successfully",
+      });
+    } catch (e: any) {
+      if (e.message?.includes("not found")) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      if (e.message?.includes("not authorized")) {
+        return new Response(JSON.stringify({ error: e.message }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
+      console.error("Error deleting submission:", e);
+      return new Response(
+        JSON.stringify({ error: "Failed to delete submission" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  });
+}

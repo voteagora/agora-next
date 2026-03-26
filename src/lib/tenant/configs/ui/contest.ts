@@ -221,6 +221,10 @@ The submission with the most votes wins the prize.
     {
       name: "forums",
       enabled: true,
+      config: {
+        hideNewTopicCta: true,
+        hideOfficialAdminBadge: true,
+      },
     },
     {
       name: "grants",

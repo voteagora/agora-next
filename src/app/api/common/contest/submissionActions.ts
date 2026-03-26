@@ -5,6 +5,7 @@ import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import { SubmissionAttachment } from "./getSubmissions";
 import Tenant from "@/lib/tenant/tenant";
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
+import { deleteForumTopic } from "@/lib/actions/forum/topics";
 
 interface AttachmentInput {
   file: string; // base64
@@ -122,7 +123,7 @@ export async function createForumTopicFromSubmission(submission: {
     process.env.NEXT_PUBLIC_AGORA_BASE_URL || "https://contest.agora.xyz";
   const submissionUrl = `${contestBaseUrl}/submissions/${submission.id}`;
 
-  const forumBody = `${submission.contentMarkdown}\n\n---\n\n[View submission on contest page](${submissionUrl})`;
+  const forumBody = `${submission.contentMarkdown}\n\n---\n\nYou can view the full submission and its attachments [on the contest page](${submissionUrl}).`;
 
   let isNsfw = false;
   try {
@@ -134,13 +135,20 @@ export async function createForumTopicFromSubmission(submission: {
     console.error("Submission forum moderation failed:", error);
   }
 
+  if (isNsfw) {
+    return {
+      skipped: true,
+      reason: "flagged_by_moderation" as const,
+    };
+  }
+
   const topic = await prismaWeb2Client.forumTopic.create({
     data: {
       title: submission.title,
       address: normalizedAddress,
       dao_slug: tenant.slug,
       categoryId: null,
-      isNsfw,
+      isNsfw: false,
     },
   });
 
@@ -150,11 +158,37 @@ export async function createForumTopicFromSubmission(submission: {
       address: normalizedAddress,
       topicId: topic.id,
       dao_slug: tenant.slug,
-      isNsfw,
+      isNsfw: false,
     },
   });
 
-  return { topicId: topic.id, postId: post.id };
+  return { skipped: false, topicId: topic.id, postId: post.id };
+}
+
+export async function setSubmissionModerationFlag(
+  submissionId: string,
+  moderationFlagged: boolean
+) {
+  return (prismaWeb2Client as any).contestSubmission.update({
+    where: { id: submissionId },
+    data: {
+      moderationFlagged,
+      updatedAt: new Date(),
+    },
+  });
+}
+
+export async function linkSubmissionToForumTopic(
+  submissionId: string,
+  forumTopicId: number
+) {
+  return (prismaWeb2Client as any).contestSubmission.update({
+    where: { id: submissionId },
+    data: {
+      forumTopicId,
+      updatedAt: new Date(),
+    },
+  });
 }
 
 export async function updateSubmission(
@@ -235,4 +269,45 @@ export async function updateSubmissionStatus(
   });
 
   return submission;
+}
+
+export async function deleteSubmission(
+  submissionId: string,
+  requesterWallet: string,
+  isAdmin: boolean
+) {
+  const normalizedWallet = requesterWallet.toLowerCase();
+  const existingSubmission = await (
+    prismaWeb2Client as any
+  ).contestSubmission.findUnique({
+    where: { id: submissionId },
+    select: {
+      id: true,
+      authorWallet: true,
+      forumTopicId: true,
+    },
+  });
+
+  if (!existingSubmission) {
+    throw new Error("Submission not found");
+  }
+
+  const isOwner =
+    existingSubmission.authorWallet.toLowerCase() === normalizedWallet;
+  if (!isOwner && !isAdmin) {
+    throw new Error("You are not authorized to delete this submission");
+  }
+
+  if (existingSubmission.forumTopicId) {
+    await deleteForumTopic({
+      topicId: existingSubmission.forumTopicId,
+      _internal: true,
+    });
+  }
+
+  await (prismaWeb2Client as any).contestSubmission.delete({
+    where: { id: submissionId },
+  });
+
+  return { id: submissionId };
 }

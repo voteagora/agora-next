@@ -87,9 +87,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { createSubmission, createForumTopicFromSubmission } = await import(
-    "@/app/api/common/contest/submissionActions"
-  );
+  const {
+    createSubmission,
+    createForumTopicFromSubmission,
+    setSubmissionModerationFlag,
+    linkSubmissionToForumTopic,
+  } = await import("@/app/api/common/contest/submissionActions");
   const { checkWalletHasSubmission } = await import(
     "@/app/api/common/contest/getSubmissions"
   );
@@ -147,14 +150,25 @@ export async function POST(request: NextRequest) {
         })),
       });
 
-      createForumTopicFromSubmission({
-        id: submission.id,
-        title: submission.title,
-        contentMarkdown: submission.contentMarkdown,
-        authorWallet: submission.authorWallet,
-      }).catch((err) => {
-        console.error("Background forum topic creation failed:", err);
-      });
+      try {
+        const forumResult = await createForumTopicFromSubmission({
+          id: submission.id,
+          title: submission.title,
+          contentMarkdown: submission.contentMarkdown,
+          authorWallet: submission.authorWallet,
+        });
+
+        if (forumResult.skipped) {
+          await setSubmissionModerationFlag(submission.id, true);
+        } else {
+          await linkSubmissionToForumTopic(submission.id, forumResult.topicId);
+        }
+      } catch (forumError) {
+        console.error(
+          "Forum creation/linking failed after submission create:",
+          forumError
+        );
+      }
 
       return NextResponse.json(
         {

@@ -38,6 +38,9 @@ export default function NewTopicButton({
   >(null);
   const requireLogin = useRequireLogin();
   const router = useRouter();
+  const forumConfig = (ui.toggle("forums")?.config || {}) as {
+    hideNewTopicCta?: boolean;
+  };
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
@@ -101,6 +104,10 @@ export default function NewTopicButton({
     namespace === TENANT_NAMESPACES.TOWNS
       ? "text-primary"
       : "text-neutral";
+
+  if (forumConfig.hideNewTopicCta) {
+    return null;
+  }
 
   if (isEASV2Enabled && topicContext) {
     return (

@@ -7,7 +7,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import CategoryList from "./CategoryList";
 
-const { namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -57,6 +57,9 @@ export default function ForumsSidebar({
     namespace === TENANT_NAMESPACES.SYNDICATE
       ? "text-primary"
       : "text-secondary";
+  const forumConfig = (ui.toggle("forums")?.config || {}) as {
+    hideOfficialAdminBadge?: boolean;
+  };
 
   return (
     <div className="w-full lg:w-72 xl:w-64 bg-cardBackground rounded-lg border border-cardBorder max-h-max lg:ml-auto">
@@ -117,17 +120,18 @@ export default function ForumsSidebar({
             </div>
           )}
         </div>
-        {/* Official DUNA Admin Badge */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
-            <div className="flex items-center gap-2 text-sm">
-              <ForumAdminBadge type="ADMIN" />
-              <span className="text-primary font-medium">
-                Official DUNA Admin
-              </span>
+        {!forumConfig.hideOfficialAdminBadge && (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <ForumAdminBadge type="ADMIN" />
+                <span className="text-primary font-medium">
+                  Official DUNA Admin
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <div>
         <div className="border-t border-border">

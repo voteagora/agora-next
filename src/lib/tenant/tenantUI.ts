@@ -68,6 +68,11 @@ export type UIFinancialStatementsConfig = {
   title: string;
 };
 
+export type UIForumsConfig = {
+  hideNewTopicCta?: boolean;
+  hideOfficialAdminBadge?: boolean;
+};
+
 type UIConfig =
   | PLMConfig
   | UIDunaDescriptionConfig
@@ -76,7 +81,8 @@ type UIConfig =
   | UIInfoBannerConfig
   | UIDunaDisclosuresConfig
   | UITaxFormConfig
-  | UIFinancialStatementsConfig;
+  | UIFinancialStatementsConfig
+  | UIForumsConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account

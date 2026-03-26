@@ -68,6 +68,17 @@ export default function SubmissionDetailClient({
         </div>
       </div>
 
+      {submission.moderationFlagged && (
+        <Card className="border-line bg-wash mb-6">
+          <CardContent className="pt-4">
+            <p className="text-sm text-secondary">
+              This submission was flagged by automated moderation and is pending
+              staff review.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid gap-6 md:grid-cols-[1fr_280px]">
         <div className="space-y-6">
           <Card className="border-line">
