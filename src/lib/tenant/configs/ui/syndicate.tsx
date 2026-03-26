@@ -525,7 +525,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in SNC",
+        title: "Voting in the Syndicate Collective",
         sections: [
           {
             id: "voting-process",
@@ -713,7 +713,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "duna/financial-statements",
       enabled: true,
       config: {
-        title: "SNC Updates",
+        title: "Syndicate Collective Updates",
       },
     },
     {
