@@ -3,6 +3,8 @@
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
 import { SubmissionAttachment } from "./getSubmissions";
+import Tenant from "@/lib/tenant/tenant";
+import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 
 interface AttachmentInput {
   file: string; // base64
@@ -15,6 +17,7 @@ interface CreateSubmissionInput {
   title: string;
   contentMarkdown: string;
   authorEmail: string;
+  ipAddress?: string;
   authorDisplayName?: string;
   authorGithub?: string;
   isAnonymous: boolean;
@@ -93,6 +96,7 @@ export async function createSubmission(
       title: input.title,
       authorWallet: normalizedWallet,
       authorEmail: input.authorEmail,
+      ipAddress: input.ipAddress || null,
       authorDisplayName: trimmedDisplay || null,
       authorGithub: trimmedGithub || null,
       isAnonymous: input.isAnonymous,
@@ -104,6 +108,53 @@ export async function createSubmission(
   });
 
   return submission;
+}
+
+export async function createForumTopicFromSubmission(submission: {
+  id: string;
+  title: string;
+  contentMarkdown: string;
+  authorWallet: string;
+}) {
+  const tenant = Tenant.current();
+  const normalizedAddress = submission.authorWallet.toLowerCase();
+  const contestBaseUrl =
+    process.env.NEXT_PUBLIC_AGORA_BASE_URL || "https://contest.agora.xyz";
+  const submissionUrl = `${contestBaseUrl}/submissions/${submission.id}`;
+
+  const forumBody = `${submission.contentMarkdown}\n\n---\n\n[View submission on contest page](${submissionUrl})`;
+
+  let isNsfw = false;
+  try {
+    const moderation = await moderateTextContent(
+      `${submission.title}\n\n${forumBody}`
+    );
+    isNsfw = isContentNSFW(moderation);
+  } catch (error) {
+    console.error("Submission forum moderation failed:", error);
+  }
+
+  const topic = await prismaWeb2Client.forumTopic.create({
+    data: {
+      title: submission.title,
+      address: normalizedAddress,
+      dao_slug: tenant.slug,
+      categoryId: null,
+      isNsfw,
+    },
+  });
+
+  const post = await prismaWeb2Client.forumPost.create({
+    data: {
+      content: forumBody,
+      address: normalizedAddress,
+      topicId: topic.id,
+      dao_slug: tenant.slug,
+      isNsfw,
+    },
+  });
+
+  return { topicId: topic.id, postId: post.id };
 }
 
 export async function updateSubmission(

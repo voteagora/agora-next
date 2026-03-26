@@ -87,11 +87,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
-  const { createSubmission } = await import(
+  const { createSubmission, createForumTopicFromSubmission } = await import(
     "@/app/api/common/contest/submissionActions"
-  );
-  const { createGithubPR } = await import(
-    "@/app/api/common/contest/githubService"
   );
   const { checkWalletHasSubmission } = await import(
     "@/app/api/common/contest/getSubmissions"
@@ -115,6 +112,10 @@ export async function POST(request: NextRequest) {
     try {
       const body = await request.json();
       const validated = createSubmissionSchema.parse(body);
+      const ipAddress =
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+        request.headers.get("x-real-ip") ||
+        "unknown";
 
       const hasExisting = await checkWalletHasSubmission(walletAddress);
       if (hasExisting) {
@@ -134,6 +135,7 @@ export async function POST(request: NextRequest) {
         title: validated.title,
         contentMarkdown: validated.content_markdown,
         authorEmail: validated.author_email,
+        ipAddress,
         authorDisplayName: validated.author_display_name || undefined,
         authorGithub: validated.author_github || undefined,
         isAnonymous: validated.is_anonymous,
@@ -145,8 +147,13 @@ export async function POST(request: NextRequest) {
         })),
       });
 
-      createGithubPR(submission).catch((err) => {
-        console.error("Background GitHub PR creation failed:", err);
+      createForumTopicFromSubmission({
+        id: submission.id,
+        title: submission.title,
+        contentMarkdown: submission.contentMarkdown,
+        authorWallet: submission.authorWallet,
+      }).catch((err) => {
+        console.error("Background forum topic creation failed:", err);
       });
 
       return NextResponse.json(

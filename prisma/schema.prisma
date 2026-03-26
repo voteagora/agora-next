@@ -6552,6 +6552,7 @@ model ContestSubmission {
   votingPower            Int      @default(3) @map("voting_power")
   status                 String   @default("pending_review")
   disqualificationReason String?  @map("disqualification_reason")
+  ipAddress              String?  @map("ip_address")
   submittedAt            DateTime @default(now()) @map("submitted_at") @db.Timestamptz(6)
   updatedAt              DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
 

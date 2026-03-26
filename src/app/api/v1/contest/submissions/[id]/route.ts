@@ -64,9 +64,6 @@ export async function PATCH(
   const { updateGithubPR } = await import(
     "@/app/api/common/contest/githubService"
   );
-  const { fetchSubmissionByWallet } = await import(
-    "@/app/api/common/contest/getSubmissions"
-  );
 
   const authResponse = await authenticateApiUser(request);
 

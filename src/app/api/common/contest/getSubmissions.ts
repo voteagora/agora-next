@@ -16,9 +16,36 @@ interface ContestSubmission {
   votingPower: number;
   status: string;
   disqualificationReason: string | null;
+  ipAddress: string | null;
   submittedAt: Date;
   updatedAt: Date;
 }
+
+/** DB columns excluded from public list/detail APIs (same pattern as authorEmail). */
+type PrivateContestSubmissionKeys = "authorEmail" | "ipAddress";
+
+type ContestSubmissionPublicFields = Omit<
+  ContestSubmission,
+  PrivateContestSubmissionKeys
+>;
+
+const contestSubmissionPublicSelect = {
+  id: true,
+  title: true,
+  authorWallet: true,
+  authorDisplayName: true,
+  authorGithub: true,
+  isAnonymous: true,
+  contentMarkdown: true,
+  attachments: true,
+  githubPrUrl: true,
+  githubPrNumber: true,
+  votingPower: true,
+  status: true,
+  disqualificationReason: true,
+  submittedAt: true,
+  updatedAt: true,
+} as const;
 
 export interface SubmissionAttachment {
   type: string;
@@ -48,7 +75,7 @@ export interface PublicSubmission {
 }
 
 function sanitizeSubmissionForPublic(
-  submission: ContestSubmission
+  submission: ContestSubmissionPublicFields
 ): PublicSubmission {
   const isAnonymous = submission.isAnonymous;
   return {
@@ -90,6 +117,7 @@ export async function getSubmissions(options?: {
     prismaWeb2Client as any
   ).contestSubmission.findMany({
     where: whereClause,
+    select: contestSubmissionPublicSelect,
     orderBy: {
       [sort === "submitted_at" ? "submittedAt" : "updatedAt"]: order,
     },
@@ -105,6 +133,7 @@ export async function getSubmissionById(
     prismaWeb2Client as any
   ).contestSubmission.findUnique({
     where: { id },
+    select: contestSubmissionPublicSelect,
   });
 
   if (!submission) {
@@ -116,9 +145,10 @@ export async function getSubmissionById(
 
 export async function getSubmissionByWallet(
   wallet: string
-): Promise<ContestSubmission | null> {
+): Promise<ContestSubmissionPublicFields | null> {
   return (prismaWeb2Client as any).contestSubmission.findUnique({
     where: { authorWallet: wallet.toLowerCase() },
+    select: contestSubmissionPublicSelect,
   });
 }
 
