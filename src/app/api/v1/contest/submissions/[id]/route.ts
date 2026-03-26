@@ -61,9 +61,6 @@ export async function PATCH(
   const { updateSubmission } = await import(
     "@/app/api/common/contest/submissionActions"
   );
-  const { updateGithubPR } = await import(
-    "@/app/api/common/contest/githubService"
-  );
 
   const authResponse = await authenticateApiUser(request);
 
@@ -95,10 +92,6 @@ export async function PATCH(
           mime_type: att.mime_type,
           label: att.label,
         })),
-      });
-
-      updateGithubPR(updatedSubmission).catch((err) => {
-        console.error("Background GitHub PR update failed:", err);
       });
 
       return NextResponse.json({

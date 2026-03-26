@@ -12,8 +12,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
+  const { fetchSubmissionById } = await import(
+    "@/app/api/common/contest/getSubmissions"
+  );
   const { updateSubmissionStatus } = await import(
     "@/app/api/common/contest/submissionActions"
+  );
+  const { createGithubPR } = await import(
+    "@/app/api/common/contest/githubService"
   );
 
   const authResponse = await authenticateApiUser(request);
@@ -56,16 +62,53 @@ export async function PATCH(
         );
       }
 
+      const existingSubmission = await fetchSubmissionById(id);
+      if (!existingSubmission) {
+        return new Response(JSON.stringify({ error: "Submission not found" }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+
       const updatedSubmission = await updateSubmissionStatus(
         id,
         validated.status,
         validated.disqualification_reason
       );
 
+      const shouldCreateGithubPr =
+        validated.status === "qualified" &&
+        existingSubmission.status !== "qualified" &&
+        !updatedSubmission.githubPrUrl;
+
+      let githubPrUrl = updatedSubmission.githubPrUrl;
+      let githubPrNumber = updatedSubmission.githubPrNumber;
+
+      if (shouldCreateGithubPr) {
+        const prResult = await createGithubPR(updatedSubmission);
+        if (!prResult) {
+          return new Response(
+            JSON.stringify({
+              error:
+                "Submission status was updated, but GitHub PR creation failed",
+              code: "GITHUB_PR_CREATE_FAILED",
+            }),
+            {
+              status: 500,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+        githubPrUrl = prResult.prUrl;
+        githubPrNumber = prResult.prNumber;
+      }
+
       return NextResponse.json({
         id: updatedSubmission.id,
         status: updatedSubmission.status,
         disqualificationReason: updatedSubmission.disqualificationReason,
+        githubPrUrl,
+        githubPrNumber,
         message: `Submission ${validated.status}`,
       });
     } catch (e: any) {

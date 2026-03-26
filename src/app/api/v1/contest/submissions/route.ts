@@ -92,7 +92,11 @@ export async function POST(request: NextRequest) {
     createForumTopicFromSubmission,
     setSubmissionModerationFlag,
     linkSubmissionToForumTopic,
+    updateSubmissionStatus,
   } = await import("@/app/api/common/contest/submissionActions");
+  const { createGithubPR } = await import(
+    "@/app/api/common/contest/githubService"
+  );
   const { checkWalletHasSubmission } = await import(
     "@/app/api/common/contest/getSubmissions"
   );
@@ -150,6 +154,10 @@ export async function POST(request: NextRequest) {
         })),
       });
 
+      let currentStatus = submission.status;
+      let githubPrUrl: string | null = null;
+      let githubPrNumber: number | null = null;
+
       try {
         const forumResult = await createForumTopicFromSubmission({
           id: submission.id,
@@ -162,6 +170,22 @@ export async function POST(request: NextRequest) {
           await setSubmissionModerationFlag(submission.id, true);
         } else {
           await linkSubmissionToForumTopic(submission.id, forumResult.topicId);
+          const qualifiedSubmission = await updateSubmissionStatus(
+            submission.id,
+            "qualified"
+          );
+          currentStatus = qualifiedSubmission.status;
+
+          const prResult = await createGithubPR(qualifiedSubmission);
+          if (prResult) {
+            githubPrUrl = prResult.prUrl;
+            githubPrNumber = prResult.prNumber;
+          } else {
+            console.error(
+              "GitHub PR creation failed after forum topic and qualification:",
+              submission.id
+            );
+          }
         }
       } catch (forumError) {
         console.error(
@@ -174,7 +198,9 @@ export async function POST(request: NextRequest) {
         {
           id: submission.id,
           title: submission.title,
-          status: submission.status,
+          status: currentStatus,
+          githubPrUrl,
+          githubPrNumber,
           submittedAt: submission.submittedAt,
           message: "Submission created successfully",
         },
