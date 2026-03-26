@@ -101,16 +101,6 @@ export default function SubmissionsListClient({
                           `${submission.authorWallet?.substring(0, 6)}...${submission.authorWallet?.substring(38)}`}
                     </span>
                   </div>
-                  {submission.votingPower > 0 && (
-                    <div className="mt-3 pt-3 border-t border-line">
-                      <span className="text-xs text-tertiary">
-                        Voting Power:{" "}
-                        <span className="font-medium text-secondary">
-                          {submission.votingPower}
-                        </span>
-                      </span>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             </Link>

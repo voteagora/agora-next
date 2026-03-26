@@ -85,15 +85,16 @@ export async function createSubmission(
     }
   }
 
-  const votingPower = input.isAnonymous ? 1 : 3;
-
+  const trimmedDisplay = input.authorDisplayName?.trim();
+  const votingPower = !input.isAnonymous && !!trimmedDisplay ? 1 : 0;
+  const trimmedGithub = input.authorGithub?.trim();
   const submission = await (prismaWeb2Client as any).contestSubmission.create({
     data: {
       title: input.title,
       authorWallet: normalizedWallet,
       authorEmail: input.authorEmail,
-      authorDisplayName: input.isAnonymous ? null : input.authorDisplayName,
-      authorGithub: input.isAnonymous ? null : input.authorGithub,
+      authorDisplayName: trimmedDisplay || null,
+      authorGithub: trimmedGithub || null,
       isAnonymous: input.isAnonymous,
       contentMarkdown: input.contentMarkdown,
       attachments: uploadedAttachments,

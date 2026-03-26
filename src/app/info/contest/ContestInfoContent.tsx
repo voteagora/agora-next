@@ -10,28 +10,26 @@ export default function ContestInfoContent() {
           The Agora Novo Origo Prize
         </h1>
         <p className="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
-          A new L1, no legacy governance, and a $15K prize for the strongest
-          design. Submit work, challenge others in discussion, then vote when
-          voting opens.
+          What if a truly decentralized network launched today, with no
+          committees or inherited playbook? Propose a governance model that can
+          hold up over time. The winning design earns $15K USD.
         </p>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">Why this chain</h2>
+        <h2 className="text-2xl font-bold text-primary">Why this prompt</h2>
         <Card className="border-line bg-wash border-l-4 border-l-primary">
           <CardContent className="pt-6 space-y-4">
             <p className="text-secondary leading-relaxed">
-              We are working with a pre-launch L1 that wants governance designed
-              deliberately — not inherited from another ecosystem. Many details
-              stay under wraps for now; what matters here is that you get to
-              propose how decisions should be made before habits and politics
-              harden.
+              Most governance conversations begin with inherited institutions,
+              power centers, and political baggage. This contest intentionally
+              starts earlier: design governance as if the network begins now and
+              legitimacy has to be earned, not assumed.
             </p>
             <p className="text-secondary leading-relaxed">
-              Nothing is live yet: no entrenched committees, no baggage from
-              past votes, no need to optimize around yesterday&apos;s mistakes.
-              You start from the chain&apos;s real constraints and answer one
-              question: what governance keeps working year after year?
+              The goal is not to mirror a specific chain. The goal is to define
+              durable rules for upgrades, participation, accountability, and
+              conflict resolution that can survive real stress over time.
             </p>
           </CardContent>
         </Card>
@@ -42,8 +40,8 @@ export default function ContestInfoContent() {
           Constraints your design should respect
         </h2>
         <p className="text-secondary mb-4">
-          The protocol roughly has the following shape — your write-up should
-          engage with all of it:
+          Use the following baseline assumptions. Your submission should engage
+          with each area:
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="border-line border-l-4 border-l-primary">
@@ -140,7 +138,7 @@ export default function ContestInfoContent() {
 
       <section className="space-y-6">
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className="border-line bg-tertiary/10 md:col-span-1">
+          <Card className="border-line bg-tertiary/5 md:col-span-1">
             <CardHeader>
               <CardTitle className="text-lg">What to deliver</CardTitle>
             </CardHeader>
@@ -171,7 +169,7 @@ export default function ContestInfoContent() {
             </CardContent>
           </Card>
 
-          <Card className="border-line bg-tertiary/10 md:col-span-2">
+          <Card className="border-line bg-tertiary/5 md:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg">
                 What judges will look for
@@ -179,7 +177,7 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/5 p-4">
                   <span className="text-xs font-bold text-tertiary">01</span>
                   <p className="text-sm text-secondary leading-relaxed">
                     <span className="font-semibold text-primary">
@@ -189,7 +187,7 @@ export default function ContestInfoContent() {
                     under stress.
                   </p>
                 </div>
-                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/5 p-4">
                   <span className="text-xs font-bold text-tertiary">02</span>
                   <p className="text-sm text-secondary leading-relaxed">
                     <span className="font-semibold text-primary">
@@ -199,7 +197,7 @@ export default function ContestInfoContent() {
                     other well-known DAO failure modes.
                   </p>
                 </div>
-                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/5 p-4">
                   <span className="text-xs font-bold text-tertiary">03</span>
                   <p className="text-sm text-secondary leading-relaxed">
                     <span className="font-semibold text-primary">
@@ -209,7 +207,7 @@ export default function ContestInfoContent() {
                     how you avoid locking out non-technical stakeholders.
                   </p>
                 </div>
-                <div className="flex gap-3 rounded-md border border-line bg-tertiary/10 p-4">
+                <div className="flex gap-3 rounded-md border border-line bg-tertiary/5 p-4">
                   <span className="text-xs font-bold text-tertiary">04</span>
                   <p className="text-sm text-secondary leading-relaxed">
                     <span className="font-semibold text-primary">
@@ -233,7 +231,7 @@ export default function ContestInfoContent() {
             Governance
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Winner</CardTitle>
               </CardHeader>
@@ -245,7 +243,7 @@ export default function ContestInfoContent() {
               </CardContent>
             </Card>
 
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Voting weight</CardTitle>
               </CardHeader>
@@ -254,11 +252,11 @@ export default function ContestInfoContent() {
                   <p className="text-sm text-secondary">
                     Qualified, identified
                   </p>
-                  <p className="text-sm font-semibold text-primary">3</p>
+                  <p className="text-sm font-semibold text-primary">1</p>
                 </div>
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-sm text-secondary">Qualified, anonymous</p>
-                  <p className="text-sm font-semibold text-primary">1</p>
+                  <p className="text-sm font-semibold text-primary">0</p>
                 </div>
               </CardContent>
             </Card>
@@ -270,7 +268,7 @@ export default function ContestInfoContent() {
             Eligibility
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">
                   Qualifying submissions
@@ -285,7 +283,7 @@ export default function ContestInfoContent() {
               </CardContent>
             </Card>
 
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Eligibility</CardTitle>
               </CardHeader>
@@ -296,7 +294,7 @@ export default function ContestInfoContent() {
               </CardContent>
             </Card>
 
-            <Card className="border-line bg-tertiary/10 md:col-span-2">
+            <Card className="border-line bg-tertiary/5 md:col-span-2">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Agora team</CardTitle>
               </CardHeader>
@@ -315,7 +313,7 @@ export default function ContestInfoContent() {
             Enforcement & payout
           </p>
           <div className="grid gap-4 md:grid-cols-2">
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Prize &amp; KYC</CardTitle>
               </CardHeader>
@@ -327,7 +325,7 @@ export default function ContestInfoContent() {
               </CardContent>
             </Card>
 
-            <Card className="border-line bg-tertiary/10">
+            <Card className="border-line bg-tertiary/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Moderation</CardTitle>
               </CardHeader>

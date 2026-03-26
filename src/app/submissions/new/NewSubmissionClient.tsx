@@ -53,9 +53,10 @@ const formSchema = z
   .refine(
     (data) =>
       data.is_anonymous ||
-      (data.author_display_name && data.author_display_name.length > 0),
+      (data.author_display_name && data.author_display_name.trim().length > 0),
     {
-      message: "Display name is required for non-anonymous submissions",
+      message:
+        "Display name is required when you are not submitting anonymously",
       path: ["author_display_name"],
     }
   );
@@ -526,32 +527,43 @@ export default function NewSubmissionClient() {
                     <div className="space-y-1 leading-none">
                       <FormLabel>Submit Anonymously</FormLabel>
                       <FormDescription>
-                        Anonymous submissions have reduced voting power (1
-                        instead of 3)
+                        See how voting power works below.
                       </FormDescription>
                     </div>
                   </FormItem>
                 )}
               />
 
-              {!isAnonymous && (
-                <FormField
-                  control={form.control}
-                  name="author_display_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel isRequired>Display Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Your name" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        This will be shown publicly with your submission
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              <FormField
+                control={form.control}
+                name="author_display_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel isRequired={!isAnonymous}>
+                      Display Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Your name"
+                        {...field}
+                        value={field.value ?? ""}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {isAnonymous ? (
+                        <>
+                          Optional. Your submission still appears as anonymous
+                          publicly; a name may be used by staff only for contest
+                          coordination.
+                        </>
+                      ) : (
+                        <>This will be shown publicly with your submission.</>
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -563,7 +575,14 @@ export default function NewSubmissionClient() {
                       <Input placeholder="username (without @)" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Optional. Will be linked on your submission.
+                      {isAnonymous ? (
+                        <>
+                          Optional. Not shown publicly on anonymous submissions;
+                          may be used by staff only.
+                        </>
+                      ) : (
+                        <>Optional. Will be linked on your submission.</>
+                      )}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -591,6 +610,39 @@ export default function NewSubmissionClient() {
                   </FormItem>
                 )}
               />
+            </CardContent>
+          </Card>
+
+          <Card className="border-line">
+            <CardHeader>
+              <CardTitle className="text-lg">How voting power works</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-secondary">
+                Voting power depends on how you choose to submit. Here is how it
+                breaks down:
+              </p>
+              <ul className="list-disc pl-5 space-y-2 text-sm text-secondary">
+                <li>
+                  <span className="text-primary font-medium">
+                    Anonymous submission, no display name.
+                  </span>{" "}
+                  If you check anonymous and leave display name blank, your
+                  entry receives no VP.
+                </li>
+                <li>
+                  <span className="text-primary font-medium">
+                    Email, display name, public or private submission.
+                  </span>{" "}
+                  If you provide your email and a display name and you are not
+                  submitting anonymously, your entry receives 1 VP, whether the
+                  submission is public or private.
+                </li>
+              </ul>
+              <p className="text-xs text-tertiary">
+                Agora may update contest rules when necessary. If anything here
+                differs from the official rules, the official rules apply.
+              </p>
             </CardContent>
           </Card>
 

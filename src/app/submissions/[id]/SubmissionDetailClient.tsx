@@ -192,12 +192,6 @@ export default function SubmissionDetailClient({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-xs text-tertiary mb-1">Voting Power</p>
-                <p className="text-lg font-bold text-primary">
-                  {submission.votingPower}
-                </p>
-              </div>
-              <div>
                 <p className="text-xs text-tertiary mb-1">Submitted</p>
                 <p className="text-sm text-secondary">
                   {format(new Date(submission.submittedAt), "PPpp")}
