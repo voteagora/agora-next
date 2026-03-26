@@ -41,7 +41,7 @@ export default function PostAttachments({
       { module: "forums", resource: "posts", action: "delete" },
       { module: "forums", resource: "posts", action: "archive" },
     ],
-    { autoAuthenticate: true }
+    { autoAuthenticate: false }
   );
 
   if (!items.length) return null;

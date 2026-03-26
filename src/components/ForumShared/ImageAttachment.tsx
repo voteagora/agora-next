@@ -43,7 +43,7 @@ export default function ImageAttachment({
       { module: "forums", resource: "posts", action: "delete" },
       { module: "forums", resource: "posts", action: "archive" },
     ],
-    { autoAuthenticate: true }
+    { autoAuthenticate: false }
   );
 
   const canDelete = (uploadedBy: string) => {

@@ -252,7 +252,12 @@ export const useForum = () => {
           address: currentAddress,
           timestamp: new Date().toISOString(),
         });
-        if (!authData) throw new Error("Authentication failed");
+        if (!authData) {
+          toast.error(
+            "Authentication required. Please sign the message to continue."
+          );
+          return null;
+        }
 
         const result = await createForumTopic({
           title: data.title,
@@ -368,7 +373,8 @@ export const useForum = () => {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create topic";
         setError(errorMessage);
-        throw err;
+        toast.error(errorMessage);
+        return null;
       } finally {
         setLoading(false);
         toast.dismiss(toastId);
@@ -394,7 +400,12 @@ export const useForum = () => {
           address: currentAddress,
           timestamp: new Date().toISOString(),
         });
-        if (!authData) throw new Error("Authentication failed");
+        if (!authData) {
+          toast.error(
+            "Authentication required. Please sign the message to continue."
+          );
+          return null;
+        }
 
         const result = await createForumPost(topicId, {
           content: data.content,
@@ -470,7 +481,8 @@ export const useForum = () => {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create post";
         setError(errorMessage);
-        throw err;
+        toast.error(errorMessage);
+        return null;
       } finally {
         setLoading(false);
         toast.dismiss(toastId);

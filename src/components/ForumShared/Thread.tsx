@@ -98,7 +98,7 @@ const CommentItem = ({
     "forums",
     "posts",
     "archive",
-    { autoAuthenticate: true }
+    { autoAuthenticate: false }
   );
 
   // Get replies for this comment
