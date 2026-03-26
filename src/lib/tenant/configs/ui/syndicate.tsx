@@ -17,7 +17,7 @@ import DelegatingSectionContent from "@/app/info/components/DelegatingSectionCon
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
-  dunaTitle: "Syndicate Collective",
+  dunaTitle: "SNC",
   documentColors: ["#CBD49B", "#7C873A", "#4A5413", "#2B3300"],
   tokens: [
     {
@@ -525,7 +525,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Syndicate Collective",
+        title: "Voting in SNC",
         sections: [
           {
             id: "voting-process",
@@ -713,7 +713,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "duna/financial-statements",
       enabled: true,
       config: {
-        title: "Syndicate Collective Updates",
+        title: "SNC Updates",
       },
     },
     {
