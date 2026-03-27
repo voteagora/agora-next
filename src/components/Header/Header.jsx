@@ -10,6 +10,7 @@ import { ConnectButton } from "./ConnectButton";
 import MobileNavMenu from "./MobileNavMenu";
 import { HamburgerIcon } from "@/icons/HamburgerIcon";
 import Tenant from "@/lib/tenant/tenant";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,7 +34,8 @@ export default function Header() {
           <div className="w-full justify-center hidden sm:flex">
             <Navbar />
           </div>
-          <div className="min-w-[24px] sm:w-full flex justify-end content-end">
+          <div className="min-w-[24px] sm:w-full flex justify-end content-end items-center gap-2">
+            <ThemeToggle />
             <ConnectButton />
           </div>
         </HStack>
