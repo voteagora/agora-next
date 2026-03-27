@@ -423,11 +423,11 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     },
     {
       name: "grants",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "grants/intake-form",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "easv2-govlessvoting",
