@@ -792,29 +792,23 @@ export default function NewSubmissionClient() {
               <CardTitle className="text-lg">How voting power works</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-secondary">
-                Voting power depends on how you choose to submit. Here is how it
-                breaks down:
-              </p>
               <ul className="list-disc pl-5 space-y-2 text-sm text-secondary">
                 <li>
                   <span className="text-primary font-medium">
-                    Anonymous submission, no display name.
+                    Submitting anonymously:
                   </span>{" "}
-                  If you check anonymous and leave display name blank, your
-                  entry receives no VP.
+                  include your name to receive 1 VP. Anonymous submissions
+                  without a name receive 0 VP.
                 </li>
                 <li>
                   <span className="text-primary font-medium">
-                    Email, display name, public or private submission.
+                    Submitting identified:
                   </span>{" "}
-                  If you provide your email and a display name and you are not
-                  submitting anonymously, your entry receives 1 VP, whether the
-                  submission is public or private.
+                  receive 1 VP.
                 </li>
               </ul>
               <p className="text-xs text-tertiary">
-                Agora may update contest rules when necessary. If anything here
+                Agora may update contest rules if necessary. If anything here
                 differs from the official rules, the official rules apply.
               </p>
             </CardContent>
