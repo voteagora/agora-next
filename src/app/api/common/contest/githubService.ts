@@ -3,7 +3,6 @@
 import { Octokit } from "@octokit/rest";
 import { createAppAuth } from "@octokit/auth-app";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { SubmissionAttachment } from "./getSubmissions";
 
 interface ContestSubmissionData {
   id: string;
@@ -37,59 +36,22 @@ function slugify(text: string): string {
     .substring(0, 50);
 }
 
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-}
-
 function formatSubmissionReadme(submission: ContestSubmissionData): string {
-  const authorDisplay = submission.isAnonymous
-    ? "Anonymous"
-    : submission.authorDisplayName || submission.authorWallet;
-  const submittedDate = submission.submittedAt.toISOString().split("T")[0];
-  const attachments = (submission.attachments as SubmissionAttachment[]) || [];
-
-  let attachmentsSection = "";
-  if (attachments.length > 0) {
-    attachmentsSection = `
----
-
-## Supporting Materials
-
-${attachments
-  .map(
-    (att) =>
-      `- [${att.label}](${att.gateway_url}) (${att.type}, ${formatBytes(att.size_bytes)})`
-  )
-  .join("\n")}
-`;
-  }
-
   return `# ${submission.title}
 
-**Author:** ${authorDisplay}
-**Submitted:** ${submittedDate}
-**Status:** ${submission.status}
+**Author Wallet:** ${submission.authorWallet.toLowerCase()}
 
----
-
-## Full Proposal
-
-${submission.contentMarkdown}
-${attachmentsSection}
----
-
-*Submitted via the [Agora Novo Origo Prize](${CONTEST_URL}/info).*
+[View submission on Agora](${CONTEST_URL}/submissions/${submission.id})
 `;
 }
 
-function getSubmissionAuthorSlug(submission: ContestSubmissionData): string {
-  return submission.isAnonymous
-    ? "anonymous"
-    : slugify(submission.authorDisplayName || submission.authorWallet);
+function getBranchAndFilePath(submission: ContestSubmissionData) {
+  const authorWallet = submission.authorWallet.toLowerCase();
+  const titleSlug = slugify(submission.title);
+  return {
+    branchName: `submission/${authorWallet}/${titleSlug}`,
+    filePath: `submissions/${authorWallet}/${titleSlug}/README.md`,
+  };
 }
 
 function getOctokit(): Octokit {
@@ -125,10 +87,7 @@ export async function createGithubPR(
   try {
     const octokit = getOctokit();
 
-    const authorSlug = getSubmissionAuthorSlug(submission);
-    const titleSlug = slugify(submission.title);
-    const branchName = `submission/${authorSlug}/${titleSlug}`;
-    const filePath = `submissions/${authorSlug}/${titleSlug}/README.md`;
+    const { branchName, filePath } = getBranchAndFilePath(submission);
 
     const baseBranchRef = await octokit.git.getRef({
       owner: REPO_OWNER,
@@ -160,7 +119,7 @@ export async function createGithubPR(
     const prBody = `## Novo Origo Prize Submission
 
 **Title:** ${submission.title}
-**Author:** ${submission.isAnonymous ? "Anonymous" : submission.authorDisplayName || submission.authorWallet}
+**Author Wallet:** ${submission.authorWallet.toLowerCase()}
 
 [View on Contest Platform](${CONTEST_URL}/submissions/${submission.id})
 
@@ -214,9 +173,7 @@ export async function updateGithubPR(
     });
 
     const branchName = pr.data.head.ref;
-    const authorSlug = getSubmissionAuthorSlug(submission);
-    const titleSlug = slugify(submission.title);
-    const filePath = `submissions/${authorSlug}/${titleSlug}/README.md`;
+    const { filePath } = getBranchAndFilePath(submission);
 
     let existingSha: string | undefined;
     try {

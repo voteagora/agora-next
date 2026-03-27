@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { PublicSubmission } from "@/app/api/common/contest/getSubmissions";
 import { format } from "date-fns";
+import { buildForumTopicPath } from "@/lib/forumUtils";
 
 interface SubmissionDetailClientProps {
   submission: PublicSubmission;
@@ -17,6 +18,10 @@ function normalizeSubmissionTitle(title: string): string {
 export default function SubmissionDetailClient({
   submission,
 }: SubmissionDetailClientProps) {
+  const forumTopicPath = submission.forumTopicId
+    ? buildForumTopicPath(submission.forumTopicId, submission.title)
+    : null;
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <Link
@@ -202,7 +207,41 @@ export default function SubmissionDetailClient({
                   View Pull Request #{submission.githubPrNumber}
                 </a>
                 <p className="text-xs text-tertiary mt-2">
-                  Leave comments and feedback on the GitHub PR
+                  A merged PR means the submission is qualified. A closed PR
+                  without merge means it is not qualified and has been removed
+                  from the contest.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {forumTopicPath && (
+            <Card className="border-line">
+              <CardHeader>
+                <CardTitle className="text-lg">Forum</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Link
+                  href={forumTopicPath}
+                  className="inline-flex items-center gap-2 text-sm text-brandPrimary hover:underline"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-4 4v-4z"
+                    />
+                  </svg>
+                  View forum topic
+                </Link>
+                <p className="text-xs text-tertiary mt-2">
+                  Add feedback and comments on the forum post.
                 </p>
               </CardContent>
             </Card>

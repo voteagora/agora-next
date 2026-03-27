@@ -13,6 +13,7 @@ interface ContestSubmission {
   attachments: unknown;
   githubPrUrl: string | null;
   githubPrNumber: number | null;
+  forumTopicId: number | null;
   votingPower: number;
   status: string;
   disqualificationReason: string | null;
@@ -41,6 +42,7 @@ const contestSubmissionPublicSelect = {
   attachments: true,
   githubPrUrl: true,
   githubPrNumber: true,
+  forumTopicId: true,
   votingPower: true,
   status: true,
   disqualificationReason: true,
@@ -70,6 +72,7 @@ export interface PublicSubmission {
   attachments: SubmissionAttachment[];
   githubPrUrl: string | null;
   githubPrNumber: number | null;
+  forumTopicId: number | null;
   votingPower: number;
   status: string;
   moderationFlagged: boolean;
@@ -92,6 +95,7 @@ function sanitizeSubmissionForPublic(
     attachments: (submission.attachments as SubmissionAttachment[]) || [],
     githubPrUrl: submission.githubPrUrl,
     githubPrNumber: submission.githubPrNumber,
+    forumTopicId: submission.forumTopicId,
     votingPower: submission.votingPower,
     status: submission.status,
     moderationFlagged: submission.moderationFlagged,
