@@ -74,6 +74,7 @@ vi.mock("@/lib/mirador/webTrace", () => ({
 }));
 
 vi.mock("@/lib/siweSession", () => ({
+  SIWE_SESSION_CHANGE_EVENT: "agora:siwe-session-change",
   clearStoredSiweSession: vi.fn(),
   getStoredSiweJwt: vi.fn(() => null),
   waitForStoredSiweJwt: vi.fn(),

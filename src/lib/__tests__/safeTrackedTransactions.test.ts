@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const getStoredSiweJwtMock = vi.fn();
 
 vi.mock("@/lib/siweSession", () => ({
+  SIWE_SESSION_CHANGE_EVENT: "agora:siwe-session-change",
   getStoredSiweJwt: getStoredSiweJwtMock,
 }));
 

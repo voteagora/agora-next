@@ -37,6 +37,7 @@ vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
 }));
 
 vi.mock("@/lib/siweSession", () => ({
+  SIWE_SESSION_CHANGE_EVENT: "agora:siwe-session-change",
   clearStoredSiweSession: vi.fn(),
   getStoredSiweJwt: vi.fn(),
   waitForStoredSiweJwt: vi.fn(),

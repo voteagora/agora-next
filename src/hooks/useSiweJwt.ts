@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
-import { SIWE_SESSION_CHANGE_EVENT, getStoredSiweJwt } from "@/lib/siweSession";
+import * as siweSession from "@/lib/siweSession";
 import type { SafeOffchainSigningPurpose } from "@/lib/safeOffchainFlow";
 
 interface UseSiweJwtOptions {
@@ -15,6 +15,7 @@ interface UseSiweJwtOptions {
 
 const siweSessionRequests = new Map<string, Promise<string | null>>();
 const SAFE_SIGN_IN_TIMEOUT_MS = 3 * 60 * 1000;
+const DEFAULT_SIWE_SESSION_CHANGE_EVENT = "agora:siwe-session-change";
 
 export function useSiweJwt(options: UseSiweJwtOptions = {}) {
   const { address, chain, isConnected } = useAccount();
@@ -39,7 +40,7 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
   const loadJwt = useCallback((): string | null => {
     if (!expectedAddress) return null;
     const sessionJwt = typeof loadSiweJwt === "function" ? loadSiweJwt() : null;
-    return sessionJwt ?? getStoredSiweJwt({ expectedAddress });
+    return sessionJwt ?? siweSession.getStoredSiweJwt({ expectedAddress });
   }, [expectedAddress, loadSiweJwt]);
 
   const clearSession = useCallback(async () => {
@@ -137,7 +138,7 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
             return;
           }
 
-          if (walletType === "safe") {
+          if (walletType === "safe" || walletType === "loading") {
             timeoutId = setTimeout(() => {
               settle(null, "The Safe sign-in flow expired. Please try again.");
             }, SAFE_SIGN_IN_TIMEOUT_MS);
@@ -189,18 +190,31 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const sessionChangeEvent =
+      "SIWE_SESSION_CHANGE_EVENT" in siweSession
+        ? siweSession.SIWE_SESSION_CHANGE_EVENT
+        : DEFAULT_SIWE_SESSION_CHANGE_EVENT;
+
     const syncJwt = () => {
       setJwt(loadJwt());
     };
 
     window.addEventListener("storage", syncJwt);
-    window.addEventListener(SIWE_SESSION_CHANGE_EVENT, syncJwt);
+    window.addEventListener(sessionChangeEvent, syncJwt);
 
     return () => {
       window.removeEventListener("storage", syncJwt);
-      window.removeEventListener(SIWE_SESSION_CHANGE_EVENT, syncJwt);
+      window.removeEventListener(sessionChangeEvent, syncJwt);
     };
   }, [loadJwt]);
+
+  useEffect(() => {
+    return () => {
+      if (sessionKey) {
+        siweSessionRequests.delete(sessionKey);
+      }
+    };
+  }, [sessionKey]);
 
   useEffect(() => {
     if (!options.autoAuthenticate) return;

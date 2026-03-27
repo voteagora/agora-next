@@ -70,6 +70,7 @@ vi.mock("@/lib/safeOffchainFlow", () => ({
 }));
 
 vi.mock("@/lib/siweSession", () => ({
+  SIWE_SESSION_CHANGE_EVENT: "agora:siwe-session-change",
   clearStoredSiweSession: vi.fn(),
   getStoredSiweSession: vi.fn(() => null),
 }));
