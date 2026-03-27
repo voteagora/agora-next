@@ -1,31 +1,40 @@
-import { useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
 import { useCallback } from "react";
 
-import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
+
+type ProposalActionAuthData = {
+  jwt: string;
+  address: `0x${string}`;
+};
 
 export const useProposalActionAuth = () => {
-  const { signMessageAsync } = useSignMessage();
+  const { address } = useAccount();
+  const { ensureSession } = useSiweJwt({
+    expectedAddress: address?.toLowerCase(),
+  });
 
   const getAuthenticationData = useCallback(
-    async (messagePayload: Record<string, any>) => {
-      const jwt = getStoredSiweJwt();
-
-      if (jwt) {
-        return { jwt };
-      }
-
-      const message = JSON.stringify(messagePayload);
-      const signature = await signMessageAsync({ message }).catch(
-        () => undefined
-      );
-
-      if (!signature) {
+    async (
+      _messagePayload: Record<string, unknown>
+    ): Promise<ProposalActionAuthData | null> => {
+      if (!address) {
         return null;
       }
 
-      return { message, signature };
+      const normalizedAddress = address.toLowerCase() as `0x${string}`;
+      const jwt = await ensureSession();
+
+      if (!jwt) {
+        return null;
+      }
+
+      return {
+        jwt,
+        address: normalizedAddress,
+      };
     },
-    [signMessageAsync]
+    [address, ensureSession]
   );
 
   return { getAuthenticationData };

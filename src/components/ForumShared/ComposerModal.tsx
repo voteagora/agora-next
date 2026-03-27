@@ -141,8 +141,6 @@ export default function ComposerModal({
     // Upload to IPFS only (no database record yet)
     const attachmentData = await convertFileToAttachmentData(file);
     const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
-      message: authData.message,
-      signature: authData.signature as `0x${string}` | undefined,
       jwt: authData.jwt,
     });
 

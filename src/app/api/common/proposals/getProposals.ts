@@ -121,14 +121,12 @@ async function fetchOnchainProposalsByIds(
       contract: contracts.governor.address,
     });
 
-    onchainProposals.forEach((proposal: ProposalPayload | undefined) => {
-      if (proposal) {
-        onchainProposalsMap.set(
-          proposal.proposal_id,
-          proposal as ProposalPayload
-        );
-      }
-    });
+    for (const proposal of onchainProposals) {
+      onchainProposalsMap.set(
+        proposal.proposal_id,
+        proposal as ProposalPayload
+      );
+    }
   } catch (error) {
     console.error(`Failed to fetch onchain proposals:`, error);
   }

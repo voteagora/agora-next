@@ -3,13 +3,44 @@
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
-import { checkAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import {
+  ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+  ALLOWED_INLINE_IMAGE_CONTENT_TYPES,
+  decodeBase64Upload,
+  validateUploadBuffer,
+  validateUploadRateLimit,
+} from "@/lib/uploadValidation";
 
 interface AttachmentData {
   fileName: string;
   contentType: string;
   fileSize: number;
   base64Data: string;
+}
+
+async function assertCanAttachToPost(postId: number, address: string) {
+  const { slug } = Tenant.current();
+  const post = await prismaWeb2Client.forumPost.findFirst({
+    where: {
+      id: postId,
+      dao_slug: slug,
+    },
+    select: {
+      id: true,
+      address: true,
+    },
+  });
+
+  if (!post) {
+    return { ok: false as const, error: "Post not found" };
+  }
+
+  if (post.address.toLowerCase() !== address.toLowerCase()) {
+    return { ok: false as const, error: "Unauthorized" };
+  }
+
+  return { ok: true as const };
 }
 
 export async function uploadAttachment(
@@ -20,20 +51,48 @@ export async function uploadAttachment(
   auth: AuthParams
 ) {
   try {
-    // Verify authentication
-    const authError = await checkAuth(auth, address as `0x${string}`);
-    if (authError) return authError;
+    const authResult = await verifyAuth(auth, address as `0x${string}`);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+
+    if (targetType !== "post") {
+      return {
+        success: false,
+        error: "Category attachment uploads are not supported by this action",
+      };
+    }
+
+    const authenticatedAddress = authResult.address.toLowerCase();
+    const canAttach = await assertCanAttachToPost(
+      targetId,
+      authenticatedAddress
+    );
+    if (!canAttach.ok) {
+      return { success: false, error: canAttach.error };
+    }
+
+    const rateLimitError = validateUploadRateLimit({
+      address: authenticatedAddress,
+      scope: "attachment",
+    });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
 
     const { slug } = Tenant.current();
 
-    const buffer = Buffer.from(attachmentData.base64Data, "base64");
-
-    const fileBlob = new Blob([buffer], { type: attachmentData.contentType });
-    const file = new File([fileBlob], attachmentData.fileName, {
-      type: attachmentData.contentType,
+    const buffer = decodeBase64Upload(attachmentData.base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType: attachmentData.contentType,
+      allowedContentTypes: ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
     });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
 
-    const uploadResult = await uploadFileToPinata(file, {
+    const uploadResult = await uploadFileToPinata(buffer, {
       name: attachmentData.fileName,
       keyvalues: {
         type: "forum-attachment",
@@ -49,35 +108,17 @@ export async function uploadAttachment(
       throw new Error("Pinata upload failed");
     }
 
-    let newAttachment;
-
-    if (targetType === "post") {
-      newAttachment = await prismaWeb2Client.forumPostAttachment.create({
-        data: {
-          dao_slug: slug,
-          ipfsCid: uploadResult.IpfsHash,
-          fileName: attachmentData.fileName,
-          contentType: attachmentData.contentType,
-          fileSize: BigInt(attachmentData.fileSize),
-          address: address,
-          postId: targetId,
-        },
-      });
-    } else if (targetType === "category") {
-      newAttachment = await prismaWeb2Client.forumCategoryAttachment.create({
-        data: {
-          dao_slug: slug,
-          ipfsCid: uploadResult.IpfsHash,
-          fileName: attachmentData.fileName,
-          contentType: attachmentData.contentType,
-          fileSize: BigInt(attachmentData.fileSize),
-          address: address,
-          categoryId: targetId,
-        },
-      });
-    } else {
-      throw new Error(`Invalid target type: ${targetType}`);
-    }
+    const newAttachment = await prismaWeb2Client.forumPostAttachment.create({
+      data: {
+        dao_slug: slug,
+        ipfsCid: uploadResult.IpfsHash,
+        fileName: attachmentData.fileName,
+        contentType: attachmentData.contentType,
+        fileSize: BigInt(attachmentData.fileSize),
+        address: authenticatedAddress,
+        postId: targetId,
+      },
+    });
 
     const ipfsUrl = getIPFSUrl(uploadResult.IpfsHash);
 
@@ -109,25 +150,39 @@ export async function uploadToIPFSOnly(
   auth: AuthParams
 ) {
   try {
-    // Verify authentication
-    const authError = await checkAuth(auth, address as `0x${string}`);
-    if (authError) return authError;
+    const authResult = await verifyAuth(auth, address as `0x${string}`);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
 
-    const buffer = Buffer.from(attachmentData.base64Data, "base64");
+    const authenticatedAddress = authResult.address.toLowerCase();
 
-    const fileBlob = new Blob([buffer], { type: attachmentData.contentType });
-    const file = new File([fileBlob], attachmentData.fileName, {
-      type: attachmentData.contentType,
+    const rateLimitError = validateUploadRateLimit({
+      address: authenticatedAddress,
+      scope: "inline-image",
     });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
 
-    const uploadResult = await uploadFileToPinata(file, {
+    const buffer = decodeBase64Upload(attachmentData.base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType: attachmentData.contentType,
+      allowedContentTypes: ALLOWED_INLINE_IMAGE_CONTENT_TYPES,
+    });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
+
+    const uploadResult = await uploadFileToPinata(buffer, {
       name: attachmentData.fileName,
       keyvalues: {
         type: "forum-attachment",
         originalName: attachmentData.fileName,
         contentType: attachmentData.contentType,
         uploadedAt: Date.now(),
-        uploadedBy: address,
+        uploadedBy: authenticatedAddress,
       },
     });
 
@@ -148,102 +203,5 @@ export async function uploadToIPFSOnly(
       success: false,
       error: error instanceof Error ? error.message : "Upload failed",
     };
-  }
-}
-
-// Create attachment record after post is created
-export async function createAttachmentFromIPFS(
-  ipfsCid: string,
-  fileName: string,
-  contentType: string,
-  fileSize: number,
-  address: string,
-  targetType: "post" | "category",
-  targetId: number
-) {
-  try {
-    const { slug } = Tenant.current();
-
-    if (targetType === "post") {
-      return await prismaWeb2Client.forumPostAttachment.create({
-        data: {
-          dao_slug: slug,
-          ipfsCid,
-          fileName,
-          contentType,
-          fileSize: BigInt(fileSize),
-          address,
-          postId: targetId,
-        },
-      });
-    } else if (targetType === "category") {
-      return await prismaWeb2Client.forumCategoryAttachment.create({
-        data: {
-          dao_slug: slug,
-          ipfsCid,
-          fileName,
-          contentType,
-          fileSize: BigInt(fileSize),
-          address,
-          categoryId: targetId,
-        },
-      });
-    } else {
-      throw new Error(`Invalid target type: ${targetType}`);
-    }
-  } catch (error) {
-    console.error("Attachment creation failed:", error);
-    throw error;
-  }
-}
-
-// Extract IPFS URLs from HTML content and create attachment records
-export async function createAttachmentsFromContent(
-  content: string,
-  address: string,
-  targetType: "post" | "category",
-  targetId: number
-) {
-  try {
-    // Extract IPFS URLs from img tags
-    const ipfsUrlRegex =
-      /https:\/\/gateway\.pinata\.cloud\/ipfs\/([a-zA-Z0-9]+)/g;
-    const matches = Array.from(content.matchAll(ipfsUrlRegex));
-
-    if (matches.length === 0) {
-      return []; // No images to process
-    }
-
-    const attachments = [];
-
-    for (const match of matches) {
-      const ipfsCid = match[1];
-      const ipfsUrl = match[0];
-
-      // Extract filename from URL or use a default
-      const fileName = `image_${ipfsCid.substring(0, 8)}.jpg`; // Default filename
-
-      try {
-        const attachment = await createAttachmentFromIPFS(
-          ipfsCid,
-          fileName,
-          "image/jpeg", // Default content type
-          0, // Unknown file size
-          address,
-          targetType,
-          targetId
-        );
-
-        attachments.push(attachment);
-      } catch (error) {
-        console.error(`Failed to create attachment for ${ipfsCid}:`, error);
-        // Continue with other attachments even if one fails
-      }
-    }
-
-    return attachments;
-  } catch (error) {
-    console.error("Failed to create attachments from content:", error);
-    throw error;
   }
 }

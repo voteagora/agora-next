@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { useModal, useSIWE } from "connectkit";
+import { useModal } from "connectkit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,6 @@ import type {
   Recipient,
 } from "@/lib/notification-center/types";
 import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
-import {
-  clearStoredSiweSession,
-  getStoredSiweJwt,
-  waitForStoredSiweJwt,
-} from "@/lib/siweSession";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ContactInformationSection, {
   renderStatusIcon,
@@ -27,6 +22,7 @@ import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 const CHANNEL_ORDER: ChannelType[] = [
   "email",
@@ -49,7 +45,6 @@ type ChannelStatusInfo = {
 export default function NotificationPreferencesClient() {
   const { address, isConnected } = useAccount();
   const { setOpen } = useModal();
-  const { signIn, signOut } = useSIWE();
   const queryClient = useQueryClient();
   const openDialog = useOpenDialog();
   const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(
@@ -59,12 +54,8 @@ export default function NotificationPreferencesClient() {
   const [verificationSentAt, setVerificationSentAt] = useState<number | null>(
     null
   );
-  const [siweJwt, setSiweJwt] = useState<string | null | undefined>(undefined);
-  const [siweError, setSiweError] = useState<string | null>(null);
-  const [isSigningIn, setIsSigningIn] = useState(false);
   const pushState = usePushNotifications();
   const { isSubscribed: isPushSubscribed } = pushState;
-  const hasAutoSignAttemptedRef = useRef(false);
 
   // Check if user has grants admin permission
   const { hasPermission: isGrantsAdmin } = useHasPermission(
@@ -74,6 +65,14 @@ export default function NotificationPreferencesClient() {
   );
 
   const recipientId = address?.toLowerCase() ?? "";
+  const {
+    jwt: siweJwt,
+    error: siweError,
+    clearSession: clearSiweSession,
+  } = useSiweJwt({
+    expectedAddress: recipientId,
+    autoAuthenticate: true,
+  });
   const queryKey = ["notification-settings", recipientId];
 
   const buildBaseSettings = useCallback((): NotificationSettings => {
@@ -98,57 +97,6 @@ export default function NotificationPreferencesClient() {
       eventTypes: [],
     };
   }, [recipientId]);
-
-  const loadSiweJwt = useCallback((): string | null => {
-    if (!recipientId) return null;
-    return getStoredSiweJwt({ expectedAddress: recipientId });
-  }, [recipientId]);
-
-  const clearSiweSession = useCallback(async () => {
-    try {
-      await signOut();
-    } catch {
-      clearStoredSiweSession();
-    }
-    setSiweJwt(null);
-  }, [signOut]);
-
-  const ensureSiweSession = useCallback(async () => {
-    if (!recipientId) throw new Error("Wallet not connected");
-
-    const existing = loadSiweJwt();
-    if (existing) {
-      setSiweJwt(existing);
-      return existing;
-    }
-
-    if (isSigningIn) return null;
-
-    setIsSigningIn(true);
-    setSiweError(null);
-
-    try {
-      await signIn();
-    } catch (error) {
-      setSiweError(
-        error instanceof Error ? error.message : "Sign-in cancelled."
-      );
-      return null;
-    } finally {
-      setIsSigningIn(false);
-    }
-
-    let jwt: string | null = null;
-    jwt = await waitForStoredSiweJwt({ expectedAddress: recipientId });
-
-    if (!jwt) {
-      setSiweError("Unable to load SIWE session. Please try again.");
-      return null;
-    }
-
-    setSiweJwt(jwt);
-    return jwt;
-  }, [isSigningIn, loadSiweJwt, recipientId, signIn]);
 
   const authedFetchJson = useCallback(
     async (
@@ -225,13 +173,7 @@ export default function NotificationPreferencesClient() {
     setTelegramLink(null);
     setTelegramError(null);
     setVerificationSentAt(null);
-    setSiweError(null);
-    setSiweJwt(undefined);
-    hasAutoSignAttemptedRef.current = false;
-
-    const jwt = loadSiweJwt();
-    setSiweJwt(jwt);
-  }, [loadSiweJwt, recipientId]);
+  }, [recipientId]);
 
   useEffect(() => {
     if (!telegramLink) return;
@@ -250,31 +192,6 @@ export default function NotificationPreferencesClient() {
 
     return () => clearTimeout(timeout);
   }, [telegramLink]);
-
-  useEffect(() => {
-    if (siweJwt) {
-      setSiweError(null);
-    }
-  }, [siweJwt]);
-
-  useEffect(() => {
-    if (!isConnected) return;
-    if (siweJwt !== null) return;
-    if (hasAutoSignAttemptedRef.current) return;
-
-    hasAutoSignAttemptedRef.current = true;
-    void (async () => {
-      try {
-        await ensureSiweSession();
-      } catch (error) {
-        setSiweError(
-          error instanceof Error
-            ? error.message
-            : "Failed to request signature. Please retry from your wallet."
-        );
-      }
-    })();
-  }, [ensureSiweSession, isConnected, siweJwt]);
 
   const recipient = data?.recipient ?? null;
 
@@ -837,7 +754,7 @@ export default function NotificationPreferencesClient() {
                   try {
                     await refetch();
                   } catch (retryError) {
-                    setSiweError(
+                    toast.error(
                       retryError instanceof Error
                         ? retryError.message
                         : "Unable to refresh settings."

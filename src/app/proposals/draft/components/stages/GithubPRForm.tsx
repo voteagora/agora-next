@@ -54,8 +54,6 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
-        message: authData.message,
-        signature: authData.signature as `0x${string}` | undefined,
         jwt: authData.jwt,
       });
 
@@ -90,8 +88,6 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
-        message: authData.message,
-        signature: authData.signature as `0x${string}` | undefined,
         jwt: authData.jwt,
       });
 

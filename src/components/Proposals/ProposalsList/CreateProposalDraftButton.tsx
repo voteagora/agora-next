@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import classNames from "classnames";
-import { useSIWE } from "connectkit";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
@@ -12,7 +11,6 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 import { isContractWallet as isContractWalletUtil } from "@/lib/utils";
 
 const CreateProposalDraftButton = ({
@@ -26,7 +24,6 @@ const CreateProposalDraftButton = ({
   const { getAuthenticationData } = useProposalActionAuth();
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-  const { signIn } = useSIWE();
   const { ui } = Tenant.current();
   const protocolLevelCreateProposalButtonCheck = (
     ui.toggle("proposal-lifecycle")?.config as PLMConfig
@@ -80,39 +77,15 @@ const CreateProposalDraftButton = ({
           return;
         }
         try {
-          // Require SIWE JWT session before proceeding (middleware enforces it)
-          let jwt = getStoredSiweJwt({ expectedAddress: address });
-          if (!jwt) {
-            // Try to initiate SIWE sign-in and then proceed
-            try {
-              await signIn();
-              // Retry fetching the session for up to 10 seconds to handle potential race conditions
-              // specifically observed with Brave Wallet
-              jwt = await waitForStoredSiweJwt({
-                expectedAddress: address,
-                timeoutMs: 10_000,
-                intervalMs: 200,
-              });
-            } catch (e) {
-              toast("Sign-in cancelled or failed. Please try again.");
-              setIsPending(false);
-              return;
-            }
-            if (!jwt) {
-              toast("Session expired. Please sign in to continue.");
-              setIsPending(false);
-              return;
-            }
-          }
-
-          const messagePayload = {
+          const auth = await getAuthenticationData({
             action: "createDraft",
             creatorAddress: address,
             timestamp: new Date().toISOString(),
-          };
-
-          const auth = await getAuthenticationData(messagePayload);
+          });
           if (!auth) {
+            toast.error(
+              "Authentication required. Please sign the message to continue."
+            );
             setIsPending(false);
             return;
           }
@@ -125,8 +98,6 @@ const CreateProposalDraftButton = ({
             },
             body: JSON.stringify({
               creatorAddress: address,
-              message: auth.message,
-              signature: auth.signature,
             }),
           });
           if (!res.ok) {

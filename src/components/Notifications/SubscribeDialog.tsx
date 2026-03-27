@@ -126,8 +126,6 @@ const SubscribeDialog = ({
                     wants_proposal_ending_soon_email: "prompted",
                   },
                   {
-                    message: authData.message,
-                    signature: authData.signature as `0x${string}` | undefined,
                     jwt: authData.jwt,
                   }
                 );
@@ -174,8 +172,6 @@ const SubscribeDialog = ({
                   wants_proposal_ending_soon_email: true,
                 },
                 {
-                  message: authData.message,
-                  signature: authData.signature as `0x${string}` | undefined,
                   jwt: authData.jwt,
                 }
               );

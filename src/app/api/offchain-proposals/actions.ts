@@ -56,7 +56,7 @@ interface OffchainProposalData {
 interface CreateOffchainProposalParams {
   proposalData: OffchainProposalData;
   id: string;
-  transactionHash?: string;
+  attestationUid?: string;
   onchainProposalId: string | null;
   auth: AuthParams;
 }
@@ -65,7 +65,7 @@ export async function createOffchainProposal({
   proposalData,
   onchainProposalId,
   id,
-  transactionHash,
+  attestationUid,
   auth,
 }: CreateOffchainProposalParams) {
   const authResult = await authenticateAndAuthorize(
@@ -111,7 +111,7 @@ export async function createOffchainProposal({
         tiers: tiers,
         start_block: start_block.toString(),
         end_block: end_block.toString(),
-        created_attestation_hash: transactionHash ?? null,
+        created_attestation_hash: attestationUid ?? null,
         created_block: latestBlock,
         max_options: maxApprovals,
         criteria: criteria,
@@ -130,7 +130,7 @@ export async function createOffchainProposal({
     return {
       success: true,
       proposalId: dbProposal.id,
-      transactionHash,
+      attestationUid,
     };
   } catch (error: any) {
     console.error("Error creating off-chain proposal:", error);
@@ -140,16 +140,16 @@ export async function createOffchainProposal({
 
 interface CancelOffchainProposalParams {
   proposalId: string;
-  transactionHash: string;
+  attestationUid: string;
   auth: AuthParams;
 }
 
 export async function cancelOffchainProposal({
   proposalId,
-  transactionHash,
+  attestationUid,
   auth,
 }: CancelOffchainProposalParams) {
-  const authResult = await authenticateAndAuthorize(auth);
+  const authResult = await authenticateAndAuthorize(auth, auth.address);
   if (!authResult.ok) {
     throw new Error(authResult.error);
   }
@@ -170,14 +170,14 @@ export async function cancelOffchainProposal({
       },
       data: {
         cancelled_block: latestBlock,
-        cancelled_attestation_hash: transactionHash ?? null,
+        cancelled_attestation_hash: attestationUid ?? null,
       },
     });
 
     return {
       success: true,
       proposalId: updatedProposal.id,
-      transactionHash,
+      attestationUid,
     };
   } catch (error: any) {
     console.error("Error cancelling off-chain proposal:", error);

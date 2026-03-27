@@ -16,6 +16,28 @@ import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
 
+function normalizeProposalKwargs(
+  kwargs: unknown
+): Record<string, unknown> | undefined {
+  if (!kwargs) {
+    return {};
+  }
+
+  if (typeof kwargs === "string") {
+    try {
+      return JSON.parse(kwargs.replace(/'/g, '"'));
+    } catch {
+      return {};
+    }
+  }
+
+  if (typeof kwargs === "object") {
+    return kwargs as Record<string, unknown>;
+  }
+
+  return {};
+}
+
 export default function ArchiveProposalsList({
   proposals,
   governanceCalendar,
@@ -38,7 +60,7 @@ export default function ArchiveProposalsList({
     if (filter === proposalsFilterOptions.everything.filter) {
       return proposals.map((proposal) => ({
         ...proposal,
-        kwargs: proposal.kwargs ? JSON.parse(proposal.kwargs) : {},
+        kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
     }
 
@@ -57,10 +79,7 @@ export default function ArchiveProposalsList({
       )
       .map((proposal) => ({
         ...proposal,
-        kwargs:
-          typeof proposal.kwargs === "string"
-            ? JSON.parse(proposal.kwargs.replace(/'/g, '"'))
-            : proposal.kwargs,
+        kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
   }, [filter, proposals]);
 

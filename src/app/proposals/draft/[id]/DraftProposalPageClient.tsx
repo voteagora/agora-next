@@ -129,6 +129,15 @@ export default function DraftProposalPageClient({
     refetchOnWindowFocus: false,
     refetchOnMount: "always",
     staleTime: 0,
+    retry: (failureCount, error) => {
+      const msg = (error as Error).message || "";
+      if (
+        /^(401|403|404)\b/.test(msg) ||
+        /Forbidden|Not authenticated/.test(msg)
+      )
+        return false;
+      return failureCount < 2;
+    },
   });
 
   useEffect(() => {

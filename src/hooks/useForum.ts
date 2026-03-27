@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
-import { useAccount, useSignMessage, useSignTypedData } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import {
   getForumTopics,
   getForumTopic,
   createForumTopic,
   createForumPost,
   deleteForumTopic,
+  deleteForumTopicWithAuth,
   deleteForumPost,
   deleteForumAttachment,
   getForumAttachments,
@@ -74,7 +75,7 @@ interface CreatePostData {
 
 export const useForum = () => {
   const { address } = useAccount();
-  const { signMessageAsync } = useSignMessage();
+
   const { signTypedDataAsync } = useSignTypedData();
   const { getAuthenticationData } = useProposalActionAuth();
   const [loading, setLoading] = useState(false);
@@ -246,17 +247,24 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Create forum topic: ${data.title}\nContent: ${data.content}\nTimestamp: ${Date.now()}`;
-
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "createTopic",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) {
+          toast.error(
+            "Authentication required. Please sign the message to continue."
+          );
+          return null;
+        }
 
         const result = await createForumTopic({
           title: data.title,
           content: data.content,
           categoryId: data.categoryId,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -270,13 +278,16 @@ export const useForum = () => {
         let attachments: any[] = [];
 
         if (data.attachment) {
+          let authData: Awaited<
+            ReturnType<typeof getAuthenticationData>
+          > | null = null;
           try {
             const messagePayload = {
               action: "uploadAttachment",
               address: currentAddress,
               timestamp: new Date().toISOString(),
             };
-            const authData = await getAuthenticationData(messagePayload);
+            authData = await getAuthenticationData(messagePayload);
             if (!authData) {
               throw new Error("Authentication failed for attachment upload");
             }
@@ -291,8 +302,6 @@ export const useForum = () => {
               "post",
               result.data?.post.id!,
               {
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               }
             );
@@ -320,10 +329,23 @@ export const useForum = () => {
             ];
           } catch (attachmentError) {
             try {
-              await deleteForumTopic({
-                topicId: result.data?.topic.id!,
-                _internal: true,
-              });
+              const createdTopicId = result.data?.topic.id;
+              if (createdTopicId && authData) {
+                const cleanupResult = await deleteForumTopicWithAuth(
+                  createdTopicId,
+                  currentAddress as `0x${string}`,
+                  {
+                    jwt: authData.jwt,
+                  }
+                );
+
+                if (!cleanupResult.success) {
+                  console.error(
+                    "Failed to clean up topic after attachment error:",
+                    cleanupResult.error
+                  );
+                }
+              }
             } catch (cleanupError) {
               console.error(
                 "Failed to clean up topic after attachment error:",
@@ -351,13 +373,14 @@ export const useForum = () => {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create topic";
         setError(errorMessage);
-        throw err;
+        toast.error(errorMessage);
+        return null;
       } finally {
         setLoading(false);
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const createPost = useCallback(
@@ -372,16 +395,23 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Create forum post: ${data.content}\nTopic ID: ${topicId}\nTimestamp: ${Date.now()}`;
-
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "createPost",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) {
+          toast.error(
+            "Authentication required. Please sign the message to continue."
+          );
+          return null;
+        }
 
         const result = await createForumPost(topicId, {
           content: data.content,
           parentId: data.parentId,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -414,8 +444,6 @@ export const useForum = () => {
               "post",
               result.data?.id!,
               {
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               }
             );
@@ -453,13 +481,14 @@ export const useForum = () => {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create post";
         setError(errorMessage);
-        throw err;
+        toast.error(errorMessage);
+        return null;
       } finally {
         setLoading(false);
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const fetchDocuments = useCallback(async (): Promise<ForumDocument[]> => {
@@ -506,17 +535,25 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Upload forum document: ${attachmentData.fileName}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const messagePayload = {
+          action: "uploadDocument",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        };
+        const authData = await getAuthenticationData(messagePayload);
+        if (!authData) {
+          throw new Error("Authentication failed");
+        }
 
         const result = await uploadDocumentFromBase64(
           attachmentData.base64Data,
           attachmentData.fileName,
           attachmentData.contentType,
           currentAddress,
-          signature,
-          message,
-          categoryId
+          categoryId,
+          {
+            jwt: authData.jwt,
+          }
         );
 
         if (!result.success) {
@@ -545,7 +582,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const deleteTopic = useCallback(
@@ -557,24 +594,23 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Delete forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "deleteTopic",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
+
+        const authFields = {
+          address: currentAddress,
+          jwt: authData.jwt,
+        };
 
         let result;
         if (isAdmin) {
-          result = await deleteForumTopic({
-            topicId,
-            address: currentAddress,
-            signature,
-            message,
-          });
+          result = await deleteForumTopic({ topicId, ...authFields });
         } else {
-          result = await softDeleteForumTopic({
-            topicId,
-            address: currentAddress,
-            signature,
-            message,
-          });
+          result = await softDeleteForumTopic({ topicId, ...authFields });
         }
 
         if (!result.success) {
@@ -598,7 +634,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const deletePost = useCallback(
@@ -610,24 +646,23 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Delete forum post: ${postId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "deletePost",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
+
+        const authFields = {
+          address: currentAddress,
+          jwt: authData.jwt,
+        };
 
         let result;
         if (isAdmin) {
-          result = await deleteForumPost({
-            postId,
-            address: currentAddress,
-            signature,
-            message,
-          });
+          result = await deleteForumPost({ postId, ...authFields });
         } else {
-          result = await softDeleteForumPost({
-            postId,
-            address: currentAddress,
-            signature,
-            message,
-          });
+          result = await softDeleteForumPost({ postId, ...authFields });
         }
 
         if (!result.success) {
@@ -651,14 +686,13 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const deleteAttachment = useCallback(
     async (
       attachmentId: number,
-      targetType: "post" | "category",
-      isAuthor: boolean = true
+      targetType: "post" | "category"
     ): Promise<boolean> => {
       const currentAddress = address!.toLowerCase();
 
@@ -667,16 +701,22 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Delete forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const messagePayload = {
+          action: "deleteAttachment",
+          attachmentId,
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        };
+        const authData = await getAuthenticationData(messagePayload);
+        if (!authData) {
+          throw new Error("Authentication failed");
+        }
 
         const result = await deleteForumAttachment({
           attachmentId,
           targetType,
           address: currentAddress,
-          isAuthor,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -700,7 +740,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const archiveTopic = useCallback(
@@ -712,15 +752,17 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Archive forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "archiveTopic",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
 
         const result = await archiveForumTopic({
           topicId,
           address: currentAddress,
-          signature,
-          message,
-          isAuthor,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -744,14 +786,13 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const archiveAttachment = useCallback(
     async (
       attachmentId: number,
-      targetType: "post" | "category",
-      isAuthor: boolean = true
+      targetType: "post" | "category"
     ): Promise<boolean> => {
       const currentAddress = address!.toLowerCase();
 
@@ -760,16 +801,22 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Archive forum attachment: ${attachmentId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const messagePayload = {
+          action: "archiveAttachment",
+          attachmentId,
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        };
+        const authData = await getAuthenticationData(messagePayload);
+        if (!authData) {
+          throw new Error("Authentication failed");
+        }
 
         const result = await archiveForumAttachment({
           attachmentId,
           targetType,
           address: currentAddress,
-          isAuthor,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -793,7 +840,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const fetchCategories = useCallback(async (): Promise<ForumCategory[]> => {
@@ -841,15 +888,17 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Restore forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "restoreTopic",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
 
         const result = await restoreForumTopic({
           topicId,
           address: currentAddress,
-          signature,
-          message,
-          isAuthor,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -871,7 +920,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const restorePost = useCallback(
@@ -883,15 +932,17 @@ export const useForum = () => {
       setError(null);
 
       try {
-        const message = `Restore forum post: ${postId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "restorePost",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
 
         const result = await restoreForumPost({
           postId,
           address: currentAddress,
-          signature,
-          message,
-          isAuthor,
+          jwt: authData.jwt,
         });
 
         if (!result.success) {
@@ -913,7 +964,7 @@ export const useForum = () => {
         toast.dismiss(toastId);
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const addReaction = useCallback(
@@ -924,16 +975,18 @@ export const useForum = () => {
     ): Promise<boolean> => {
       const currentAddress = address!.toLowerCase();
       try {
-        const message = `Add forum reaction: ${emoji} to ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "addReaction",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
         const res = await addForumReaction({
-          // Only post reactions supported by schema
           targetType: "post",
           targetId,
           emoji,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
         if (!res.success)
           throw new Error(res.error || "Failed to add reaction");
@@ -946,7 +999,7 @@ export const useForum = () => {
         return false;
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const removeReaction = useCallback(
@@ -957,15 +1010,18 @@ export const useForum = () => {
     ): Promise<boolean> => {
       const currentAddress = address!.toLowerCase();
       try {
-        const message = `Remove forum reaction: ${emoji} from ${targetType}:${targetId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "removeReaction",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
         const res = await removeForumReaction({
           targetType: "post",
           targetId,
           emoji,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
         if (!res.success)
           throw new Error(res.error || "Failed to remove reaction");
@@ -978,20 +1034,23 @@ export const useForum = () => {
         return false;
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const upvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
       const currentAddress = address!.toLowerCase();
       try {
-        const message = `Upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "upvoteTopic",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
         const res = await upvoteForumTopic({
           topicId,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
         if (!res.success) throw new Error(res.error || "Failed to upvote");
         return res.data?.upvotes ?? null;
@@ -1002,20 +1061,23 @@ export const useForum = () => {
         return null;
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const removeUpvoteTopic = useCallback(
     async (topicId: number): Promise<number | null> => {
       const currentAddress = address!.toLowerCase();
       try {
-        const message = `Remove upvote forum topic: ${topicId}\nTimestamp: ${Date.now()}`;
-        const signature = await signMessageAsync({ message });
+        const authData = await getAuthenticationData({
+          action: "removeUpvote",
+          address: currentAddress,
+          timestamp: new Date().toISOString(),
+        });
+        if (!authData) throw new Error("Authentication failed");
         const res = await removeUpvoteForumTopic({
           topicId,
           address: currentAddress,
-          signature,
-          message,
+          jwt: authData.jwt,
         });
         if (!res.success)
           throw new Error(res.error || "Failed to remove upvote");
@@ -1028,7 +1090,7 @@ export const useForum = () => {
         return null;
       }
     },
-    [address, signMessageAsync]
+    [address, getAuthenticationData]
   );
 
   const fetchTopicUpvotes = useCallback(async (topicId: number) => {
@@ -1108,19 +1170,17 @@ export const useForum = () => {
   );
 
   const fetchSubscriptions = useCallback(async () => {
-    if (!address) return { topicSubscriptions: [], categorySubscriptions: [] };
+    if (!address) {
+      return { topicSubscriptions: [], categorySubscriptions: [] };
+    }
     try {
-      const signed = await createForumSubscriptionSignedRequest(
-        "read_subscriptions",
-        {}
-      );
-      const res = await getForumSubscriptions(signed);
+      const res = await getForumSubscriptions(address);
       if (!res.success) throw new Error("Failed to fetch subscriptions");
       return res.data;
     } catch {
       return { topicSubscriptions: [], categorySubscriptions: [] };
     }
-  }, [address, createForumSubscriptionSignedRequest]);
+  }, [address]);
 
   return {
     loading,

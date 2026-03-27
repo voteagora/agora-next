@@ -14,7 +14,7 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import { createProposalLinks } from "@/lib/actions/proposalLinks";
+import { createDiscussionProposalLink } from "@/lib/actions/proposalLinks";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -100,8 +100,6 @@ export default function ForumNewClient({
 
     const attachmentData = await convertFileToAttachmentData(file);
     const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
-      message: authData.message,
-      signature: authData.signature as `0x${string}` | undefined,
       jwt: authData.jwt,
     });
 
@@ -134,25 +132,17 @@ export default function ForumNewClient({
       if (created?.id) {
         if (relatedProposal) {
           const messagePayload = {
-            action: "createProposalLinks",
+            action: "createDiscussionProposalLink",
             address,
             timestamp: new Date().toISOString(),
           };
           const authData = await getAuthenticationData(messagePayload);
           if (authData) {
-            await createProposalLinks({
-              sourceId: relatedProposal.id,
-              sourceType: relatedProposal.type,
-              links: [
-                {
-                  targetId: created.id.toString(),
-                  targetType: "forum_topic",
-                },
-              ],
+            await createDiscussionProposalLink({
+              proposalId: relatedProposal.id,
+              proposalType: relatedProposal.type,
+              forumTopicId: created.id.toString(),
               auth: {
-                address: address,
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               },
             }).catch((error) => {
@@ -305,11 +295,15 @@ export default function ForumNewClient({
                     ) : (
                       <span className="text-red-600 flex items-center gap-1">
                         <XMarkIcon className="h-4 w-4" />
-                        Insufficient voting power
+                        {!address
+                          ? "Wallet not connected"
+                          : "Insufficient voting power"}
                       </span>
                     )}
                     <div className="text-xs mt-1">
-                      {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                      {!address
+                        ? "Connect your wallet to check permissions"
+                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                     </div>
                   </div>
                   <div className="flex gap-2">

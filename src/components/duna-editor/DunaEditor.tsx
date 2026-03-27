@@ -361,8 +361,6 @@ export default function DunaEditor({
               attachmentData,
               address,
               {
-                message: authData.message,
-                signature: authData.signature as `0x${string}` | undefined,
                 jwt: authData.jwt,
               }
             );
