@@ -251,7 +251,7 @@ export type ApprovalProposal = BaseProposal & {
 
 type ApprovalProposalOption = {
   title: string;
-  transactions: ProposalDraftTransaction[];
+  contestant: string;
 };
 
 export type OptimisticProposal = BaseProposal & {
@@ -338,8 +338,8 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
           topChoices: proposal.top_choices?.toString(),
           options: proposal.approval_options?.map((option) => {
             return {
-              title: option.title,
-              transactions: option.transactions.map((t) => parseTransaction(t)),
+              description: option.title,
+              contestant: option.contestant,
             };
           }),
         },

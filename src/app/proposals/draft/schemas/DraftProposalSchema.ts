@@ -49,8 +49,8 @@ const transaction = z.object({
 });
 
 const approval_option = z.object({
-  title: z.string().min(1, { message: "Title cannot be empty" }),
-  transactions: z.array(transaction),
+  description: z.string().min(1, { message: "Description cannot be empty" }),
+  contestant: ethereumAddressSchema,
 });
 
 const socialOption = z.object({
@@ -76,7 +76,6 @@ const socialProposal = z
 const approvalProposal = z
   .object({
     criteria: z.nativeEnum(ApprovalProposalType),
-    budget: z.string().optional(),
     maxOptions: z.string().optional(),
     threshold: z.string().optional(),
     topChoices: z

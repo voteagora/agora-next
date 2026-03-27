@@ -79,7 +79,7 @@ const formDataByType = (
         threshold: data.approvalProposal.threshold
           ? parseInt(data.approvalProposal.threshold)
           : null,
-        budget: parseInt(data.approvalProposal.budget ?? "0"),
+        budget: 0,
         max_options: data.approvalProposal.maxOptions
           ? parseInt(data.approvalProposal.maxOptions)
           : null,
@@ -91,38 +91,9 @@ const formDataByType = (
           // TODO: do we need to make sure deletes cascade and remove transactions?
           deleteMany: {},
           create: data.approvalProposal.options.map(
-            (option: {
-              title: string;
-              transactions: {
-                target: string;
-                value: string;
-                calldata: string;
-                signature?: string;
-                description: string;
-              }[];
-            }) => ({
-              title: sanitizeContent(option.title),
-              transactions: {
-                create: option.transactions.map(
-                  (
-                    transaction: {
-                      target: string;
-                      value: string;
-                      calldata: string;
-                      signature?: string;
-                      description: string;
-                    },
-                    idx: number
-                  ) => ({
-                    order: idx,
-                    target: transaction.target as string,
-                    value: transaction.value,
-                    calldata: transaction.calldata,
-                    description: sanitizeContent(transaction.description),
-                    proposal: { connect: { id } },
-                  })
-                ),
-              },
+            (option: { description: string; contestant: string }) => ({
+              title: sanitizeContent(option.description),
+              contestant: option.contestant,
             })
           ),
         },

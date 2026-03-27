@@ -508,7 +508,7 @@ async function getProposalTypes() {
           ? configuratorContract.address
           : undefined;
       types = await findProposalType({
-        namespace,
+        namespace: "optimism",
         contract: contractToUse,
       });
     }

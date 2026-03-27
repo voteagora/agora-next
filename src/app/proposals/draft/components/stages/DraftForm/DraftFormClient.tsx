@@ -84,7 +84,7 @@ const DraftFormClient = ({
       proposalTypes,
       votingModuleType
     );
-
+    console.log("newValidProposalTypes", newValidProposalTypes);
     setValidProposalTypes(newValidProposalTypes);
   }, [votingModuleType, proposalTypes]);
 

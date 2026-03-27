@@ -1,4 +1,8 @@
-import { ERC20__factory } from "@/lib/contracts/generated";
+import {
+  ERC20__factory,
+  OptimismGovernor__factory,
+  ProposalTypesConfigurator__factory,
+} from "@/lib/contracts/generated";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
@@ -21,7 +25,9 @@ export const contestTenantConfig = ({
 
   const DUMMY_GOVERNOR = "0x0000000000000000000000000000000000000002";
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
-  const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
+  const TYPES = isProd
+    ? "0xCE52b7cc490523B3e81C3076D5ae5Cca9a3e2D6F"
+    : "0xb88131610ff4D7D46050c9d1DEE413f8b6b8A5bd";
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
@@ -60,10 +66,10 @@ export const contestTenantConfig = ({
     }),
 
     proposalTypesConfigurator: new TenantContract<BaseContract>({
-      abi: [],
-      address: DUMMY_TYPES,
+      abi: ProposalTypesConfigurator__factory.abi,
+      address: TYPES,
       chain,
-      contract: {} as BaseContract,
+      contract: OptimismGovernor__factory.connect(TYPES, provider),
       provider,
     }),
 

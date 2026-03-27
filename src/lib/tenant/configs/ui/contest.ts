@@ -200,6 +200,11 @@ export const contestTenantUIConfig = new TenantUI({
             prodAddress: null,
             testnetAddress: null,
           },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0x8060b18290f48fc0bf2149eeb2f3c280bde7674f",
+            testnetAddress: "0x4E2e3509F4C77Df377FeE48e3969BB7000B9FAF1",
+          },
         ],
         copy: {
           helperText: `

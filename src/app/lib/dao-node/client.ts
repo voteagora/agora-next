@@ -139,7 +139,7 @@ export const getDaoNodeURLForNamespace = (namespace: string) => {
 
 export const getProposalTypesFromDaoNode = unstable_cache(
   async () => {
-    const url = getDaoNodeURLForNamespace(namespace);
+    const url = getDaoNodeURLForNamespace("optimism");
     const useDaoNodeForProposalTypes = ui.toggle(
       "use-daonode-for-proposal-types"
     )?.enabled;

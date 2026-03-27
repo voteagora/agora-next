@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { DraftProposal, ProposalType } from "../types";
-import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
+import { encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
 import {
   TIMELOCK_TYPE,
@@ -145,7 +145,7 @@ export function getInputData(proposal: DraftProposal): {
       return { inputData };
 
     // inputs for approval type
-    // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
+    // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description,address contestant)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
     case ProposalType.APPROVAL: {
       let options = [] as {
         budgetTokensSpent: bigint;
@@ -153,55 +153,29 @@ export function getInputData(proposal: DraftProposal): {
         values: bigint[];
         calldatas: `0x${string}`[];
         description: string;
+        contestant: `0x${string}`;
       }[];
 
       proposal.approval_options.forEach((option) => {
-        const formattedOption = {
+        options.push({
           budgetTokensSpent: BigInt(0),
           targets: [] as `0x${string}`[],
           values: [] as bigint[],
           calldatas: [] as `0x${string}`[],
           description: option.title,
-        };
-
-        option.transactions.forEach((t) => {
-          if (isTransfer(t.calldata)) {
-            const {
-              args: [_recipient, amount],
-            } = decodeFunctionData({
-              abi: transferABI,
-              data: t.calldata as `0x${string}`,
-            });
-
-            formattedOption.budgetTokensSpent += amount;
-            formattedOption.targets.push(t.target as `0x${string}`);
-            formattedOption.values.push(BigInt(proposal.top_choices));
-            formattedOption.calldatas.push(t.calldata as `0x${string}`);
-          } else {
-            formattedOption.targets.push(
-              ethers.getAddress(t.target) as `0x${string}`
-            );
-            formattedOption.values.push(parseEther(t.value.toString() || "0"));
-            formattedOption.calldatas.push(t.calldata as `0x${string}`);
-          }
+          contestant: ethers.getAddress(option.contestant) as `0x${string}`,
         });
-        options.push(formattedOption);
       });
-
-      // typescript saying budget is 'never'?
-      const budget = proposal.budget as number;
 
       const settings = {
         maxApprovals: proposal.max_options,
         criteria: proposal.criteria === "Threshold" ? 0 : 1,
-        budgetToken: (proposal.budget > 0
-          ? contracts.governor.address
-          : ethers.ZeroAddress) as `0x${string}`,
+        budgetToken: ethers.ZeroAddress as `0x${string}`,
         criteriaValue:
           proposal.criteria === "Threshold"
             ? parseEther(proposal.threshold.toString())
             : BigInt(proposal.top_choices),
-        budgetAmount: parseEther(budget.toString()),
+        budgetAmount: BigInt(0),
       };
 
       const calldata = encodeAbiParameters(
@@ -215,6 +189,7 @@ export function getInputData(proposal: DraftProposal): {
               { name: "values", type: "uint256[]" },
               { name: "calldatas", type: "bytes[]" },
               { name: "description", type: "string" },
+              { name: "contestant", type: "address" },
             ],
           },
           {
