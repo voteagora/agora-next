@@ -1,12 +1,4 @@
-import { NextRequest } from "next/server";
-import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
-
-export async function POST(request: NextRequest) {
-  const authResponse = await authenticateApiUser(request);
-  if (!authResponse.authenticated) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
+export async function POST(request: Request) {
   const body = await request.json();
   const user = process.env.TENDERLY_USER;
   const project = process.env.TENDERLY_PROJECT;
