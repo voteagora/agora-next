@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+
 export default function ContestInfoContent() {
   return (
     <div className="flex flex-col gap-12 max-w-4xl mx-auto py-12 px-4">
@@ -10,26 +11,33 @@ export default function ContestInfoContent() {
           The Agora Novo Origo Prize
         </h1>
         <p className="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
-          What if a truly decentralized network launched today, with no
-          committees or inherited playbook? Propose a governance model that can
-          hold up over time. The winning design earns $15K USD.
+          What if a truly decentralized blockchain launched today, without pre-existing
+          core contributors, committees, token holders, or investors? Propose a governance model 
+          that can hold up over time.
+          </p>
+        <p className="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
+          The winning design earns $15K USD.
         </p>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">Why this prompt</h2>
+        <h2 className="text-2xl font-bold text-primary">Why?</h2>
         <Card className="border-line bg-wash border-l-4 border-l-primary">
           <CardContent className="pt-6 space-y-4">
             <p className="text-secondary leading-relaxed">
-              Most governance conversations begin with inherited institutions,
-              power centers, and political baggage. This contest intentionally
-              starts earlier: design governance as if the network begins now and
-              legitimacy has to be earned, not assumed.
+              Most governance conversations begin with inherited institutions, 
+              power centers, political baggage and even cap tables. This contest 
+              intentionally starts earlier: design governance as if the protocol begins 
+              now and legitimacy has to be earned, not assumed.
             </p>
             <p className="text-secondary leading-relaxed">
-              The goal is not to mirror a specific chain. The goal is to define
-              durable rules for upgrades, participation, accountability, and
-              conflict resolution that can survive real stress over time.
+              The goal is to define a durable and competitve governance system for change across 
+              unknowable unknowns, evolving narratives, and necessary upgrades.  This is about 
+              either removing the humans or ensuring rational behaviour if they are necessary.  
+              This is about aligning incentives, iteration off of what has been done before.  
+              
+              Does a system exist to manage conflict resolution and survive real stress over time?  
+              What new primitives would be necessary to function?  Where are the limits and risks, if any?
             </p>
           </CardContent>
         </Card>
@@ -40,17 +48,16 @@ export default function ContestInfoContent() {
           Constraints your design should respect
         </h2>
         <p className="text-secondary mb-4">
-          Use the following baseline assumptions. Your submission should engage
-          with each area:
+          Use the following properties about the protocol at launch. Assume they work.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Accounts &amp; sybils</CardTitle>
+              <CardTitle className="text-lg">Approximate Sybil Resistance</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                Identity and sybil resistance are wired into how accounts work.
+                Sybil resistance is wired into how accounts work.
                 Treat it as strong but imperfect: design for real-world abuse,
                 not a perfect game.
               </p>
@@ -63,21 +70,21 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                Token issuance follows a curve that tapers steeply early, then
-                settles to a steady long-term rate.
+                The native asset issuance follows a curve that tapers slowly over time, then
+                settles to long-term rate of issuance.  There is no premine.  No "early" investors.
+                Should convernance control this rate? You decide.
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Treasury &amp; burns</CardTitle>
+              <CardTitle className="text-lg">Managed Burn</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                Protocol revenue feeds a treasury; the north-star use is
-                supporting buy-and-burn of the native asset (your governance
-                should say how that stays credible).
+                Protocol revenue feeds a simple treasury mechanism; the north-star 
+                use is supporting buy-and-burn of the native asset.
               </p>
             </CardContent>
           </Card>
@@ -85,14 +92,13 @@ export default function ContestInfoContent() {
           <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">
-                Launch &amp; constitution
+                Launch &amp; Funding
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
-                There is room for early funding and tooling, but the ambition is
-                a clean launch: codified rules and a constitution-like layer
-                that outlasts any single team.
+                The chain has a benevolent founder donating altruistically to bootstrap the chain's launch.  
+                However, after launch funding is extinguished, the chain must sustain itself.
               </p>
             </CardContent>
           </Card>
@@ -104,19 +110,19 @@ export default function ContestInfoContent() {
             <CardContent>
               <p className="text-sm text-secondary">
                 Core protocol changes are expected to route through governance,
-                not ad hoc multisigs.
+                not blessed or ceremony-created multisigs. 
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-line border-l-4 border-l-primary">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Broad participation</CardTitle>
+              <CardTitle className="text-lg">Broad Participation</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary">
                 The economics include a UBI-like tilt: ordinary use of the
-                protocol should benefit participants, not only large holders.
+                protocol should will participants.
               </p>
             </CardContent>
           </Card>
@@ -140,14 +146,13 @@ export default function ContestInfoContent() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card className="border-line bg-tertiary/5 md:col-span-1">
             <CardHeader>
-              <CardTitle className="text-lg">What to deliver</CardTitle>
+              <CardTitle className="text-lg">What to Deliver</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex gap-2">
                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                 <p className="text-sm text-secondary leading-relaxed">
-                  Written plan with diagrams, flows, specs, or contract
-                  sketches.
+                  Written declaration of governance design in the minimum.  Submissions may optionally be augmented with mixed-media.  Internet native techniques are encouraged.
                 </p>
               </div>
               <div className="flex gap-2">
@@ -172,7 +177,7 @@ export default function ContestInfoContent() {
           <Card className="border-line bg-tertiary/5 md:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg">
-                What judges will look for
+                How to Judge
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -213,7 +218,7 @@ export default function ContestInfoContent() {
                     <span className="font-semibold text-primary">
                       Longevity:
                     </span>{" "}
-                    incentives and process that still make sense years out, not
+                    incentives and process that still make sense decades out, not
                     only at genesis.
                   </p>
                 </div>
@@ -276,9 +281,9 @@ export default function ContestInfoContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-secondary leading-relaxed">
-                  We qualify work that matches the contest brief in spirit, is
-                  substantive, and does not cause clear harm. Borderline cases
-                  are judgment calls by Agora.
+                  We qualify submissions that matche the contest brief in spirit,
+                  is substantive, and does not cause clear harm to the community 
+                  or contest. 
                 </p>
               </CardContent>
             </Card>
@@ -289,19 +294,19 @@ export default function ContestInfoContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-secondary leading-relaxed">
-                  Individuals only — no teams or orgs as named entrants.
+                  Individuals only — no teams or orgs as named entrants.  One entry per person.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="border-line bg-tertiary/5 md:col-span-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Agora team</CardTitle>
+                <CardTitle className="text-lg">Agora Team</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-secondary leading-relaxed">
-                  Agora people may comment or participate in the open, but they
-                  do not receive voting power in this contest.
+                  Agora staff may participate as individuals, however must self-identify. 
+                  However do not receive voting power for submissions.
                 </p>
               </CardContent>
             </Card>
@@ -310,7 +315,7 @@ export default function ContestInfoContent() {
 
         <div className="space-y-2 pt-2">
           <p className="text-xs text-tertiary uppercase tracking-wide">
-            Enforcement & payout
+            Enforcement & Payout
           </p>
           <div className="grid gap-4 md:grid-cols-2">
             <Card className="border-line bg-tertiary/5">
@@ -319,8 +324,8 @@ export default function ContestInfoContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-secondary leading-relaxed">
-                  The prize is paid in USD after a private KYC step with Agora
-                  for the winning individual.
+                  The prize is paid in USDT or USDC on Ethereum or Optimism after a 
+                  private KYC step with Agora for the winning individual.
                 </p>
               </CardContent>
             </Card>
@@ -331,12 +336,13 @@ export default function ContestInfoContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-secondary leading-relaxed">
-                  We may remove or disqualify spam, fraud, or bad-faith entries.
+                  Submissions may be removed and disqualified for spam, fraud, 
+                  or bad-faith.
                   Notable rejections are documented in the submissions repo;
                   contested cases can be reopened through the repo&apos;s usual
                   review process (including supermajority support from past
-                  submitters where applicable — see repo README for the exact
-                  bar).
+                  submitters where applicable — see repo README for the exact 
+                  details).
                 </p>
               </CardContent>
             </Card>
@@ -345,14 +351,13 @@ export default function ContestInfoContent() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-primary">Why bother</h2>
+        <h2 className="text-2xl font-bold text-primary">Why Bother?</h2>
         <Card className="border-line bg-wash border-l-4 border-l-primary">
           <CardContent className="pt-6">
             <p className="text-secondary leading-relaxed">
               Most of us have a list of things we wish on-chain governance did
-              differently. This is a rare moment to sketch that from scratch on
-              a chain that has not yet ossified — and to stress-test those ideas
-              against a community that will push back hard.
+              differently. This is a rare moment to flex and sketch that before ossification. 
+              And, to stress-test those ideas against a community that will push back hard.
             </p>
           </CardContent>
         </Card>
@@ -367,8 +372,8 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Create an entry here. Add contact info and GitHub if you want
-                reviewers to reach you.
+                Create an entry on the submission page. Then, either check the 
+                proposal page every few days or follow @AgoraGovernance for updates. 
               </p>
               <a
                 href="/submissions/new"
@@ -385,8 +390,10 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Use the forums for conversation; submissions are also mirrored
-                to GitHub for line-by-line review and follow-up PRs.
+                Use the forums to question and critique.  Feedback is a gift. 
+                
+                All submissions are also mirrored to a GitHub repo.  Once merge,
+                submissions are added to the qualified set.
               </p>
               <a
                 href="https://github.com/voteagora/novo-origo-contest-submissions"
@@ -405,7 +412,7 @@ export default function ContestInfoContent() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-secondary mb-4">
-                Timing and mechanics are announced on{" "}
+                Timing details were shared in the blog post here: TODO .  Check {" "}
                 <a
                   href="https://twitter.com/AgoraGovernance"
                   target="_blank"
@@ -414,7 +421,7 @@ export default function ContestInfoContent() {
                 >
                   @AgoraGovernance
                 </a>
-                . Ballots run on-chain in this app.
+                for updates. Ballots run on-chain in this app.
               </p>
               <a
                 href="/proposals"
