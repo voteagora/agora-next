@@ -3,7 +3,7 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 
 import demoHero from "@/assets/tenant/demo_hero.png";
-import demoHeroV2 from "@/assets/tenant/demo_logo.svg";
+import StandWithCryptoLogo from "@/assets/tenant/standwithcrypto_logo.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
 import demoDocs from "@/assets/tenant/demo_docs.png";
 import demoVision from "@/assets/tenant/demo_vision.png";
@@ -17,10 +17,10 @@ import DelegatingSectionContent from "@/app/info/components/DelegatingSectionCon
 
 export const standwithcryptoTenantUIConfig = new TenantUI({
   title: "Stand With Crypto Governance",
-  logo: demoHeroV2,
+  logo: StandWithCryptoLogo,
   assets: {
-    success: demoHeroV2,
-    pending: demoHeroV2,
+    success: StandWithCryptoLogo,
+    pending: StandWithCryptoLogo,
     delegate: demoDelegate,
   },
   organization: {
@@ -363,7 +363,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     },
     {
       name: "syndicate-hero-content",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "duna/use-community-dialogue-label",

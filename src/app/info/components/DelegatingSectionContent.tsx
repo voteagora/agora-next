@@ -1,9 +1,12 @@
 "use client";
 
+import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
 
 export default function DelegatingSectionContent() {
   const { address } = useAccount();
+  const { ui } = Tenant.current();
+  const isDuna = ui.toggle("duna")?.enabled === true;
 
   return (
     <div className="flex flex-col space-y-6">
@@ -52,20 +55,24 @@ export default function DelegatingSectionContent() {
             <strong>you retain token ownership</strong> and can re-delegate at
             any time.
           </p>
-          <p>
-            <strong>You are still a member of the WY DUNA.</strong>
-          </p>
-          <p>
-            Under Wyoming&apos;s Decentralized Unincorporated Nonprofit
-            Association Act, a <strong>member</strong> is someone who may
-            participate in selecting administrators or shaping policies. A{" "}
-            <strong>membership interest</strong> is the voting right defined by
-            those principles, and the Act explicitly contemplates that voting
-            can be administered by smart contracts. Delegating your votes{" "}
-            <strong>does not transfer your tokens</strong> or your membership;
-            it only authorizes another address to cast votes using your voting
-            power.
-          </p>
+          {isDuna ? (
+            <>
+              <p>
+                <strong>You are still a member of the WY DUNA.</strong>
+              </p>
+              <p>
+                Under Wyoming&apos;s Decentralized Unincorporated Nonprofit
+                Association Act, a <strong>member</strong> is someone who may
+                participate in selecting administrators or shaping policies. A{" "}
+                <strong>membership interest</strong> is the voting right defined
+                by those principles, and the Act explicitly contemplates that
+                voting can be administered by smart contracts. Delegating your
+                votes <strong>does not transfer your tokens</strong> or your
+                membership; it only authorizes another address to cast votes
+                using your voting power.
+              </p>
+            </>
+          ) : null}
         </div>
       </div>
     </div>
