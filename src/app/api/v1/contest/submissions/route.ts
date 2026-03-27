@@ -37,7 +37,28 @@ const createSubmissionSchema = z.object({
     )
     .optional()
     .default([]),
+  turnstile_token: z.string().min(1),
 });
+
+async function verifyTurnstileToken(
+  token: string,
+  ipAddress: string
+): Promise<boolean> {
+  const secret = process.env.CLOUDFARE_TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // skip verification if secret not configured
+
+  const formData = new FormData();
+  formData.append("secret", secret);
+  formData.append("response", token);
+  formData.append("remoteip", ipAddress);
+
+  const response = await fetch(
+    "https://challenges.cloudflare.com/turnstile/v1/siteverify",
+    { method: "POST", body: formData }
+  );
+  const data = await response.json();
+  return data.success === true;
+}
 
 async function isSubmissionEmailVerified(walletAddress: string, email: string) {
   const recipient = await notificationCenterClient.getRecipient(
@@ -130,14 +151,38 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const body = await request.json();
+  const ipAddress =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  try {
+    const validated = createSubmissionSchema.parse(body);
+
+    const turnstileValid = await verifyTurnstileToken(
+      validated.turnstile_token,
+      ipAddress
+    );
+    if (!turnstileValid) {
+      return new Response(
+        JSON.stringify({ error: "Security check failed. Please try again." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+  } catch {
+    return new Response(
+      JSON.stringify({ error: "Security check failed. Please try again." }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const body = await request.json();
       const validated = createSubmissionSchema.parse(body);
-      const ipAddress =
-        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        request.headers.get("x-real-ip") ||
-        "unknown";
       const canCheckEmailVerification = Boolean(
         process.env.NOTIFICATION_CENTER_URL &&
           process.env.NOTIFICATION_CENTER_API_KEY

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 import { ConnectKitButton } from "connectkit";
@@ -86,6 +87,8 @@ export default function NewSubmissionClient() {
   const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
   const [isSendingVerification, setIsSendingVerification] = useState(false);
   const [isCheckingVerification, setIsCheckingVerification] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -180,6 +183,11 @@ export default function NewSubmissionClient() {
         return;
       }
 
+      if (!turnstileToken) {
+        setSubmitError("Please complete the security check before submitting.");
+        return;
+      }
+
       let token = getStoredSiweJwt({ expectedAddress: address });
       if (!token) {
         try {
@@ -222,6 +230,7 @@ export default function NewSubmissionClient() {
         body: JSON.stringify({
           ...data,
           attachments: attachmentData,
+          turnstile_token: turnstileToken,
         }),
       });
 
@@ -242,10 +251,14 @@ export default function NewSubmissionClient() {
         return;
       }
 
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
       setSubmitSuccess({ id: result.id });
     } catch (error) {
       console.error("Submission error:", error);
       setSubmitError("An unexpected error occurred. Please try again.");
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
     } finally {
       setIsSubmitting(false);
     }
@@ -822,6 +835,14 @@ export default function NewSubmissionClient() {
             </Card>
           )}
 
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={process.env.NEXT_PUBLIC_CLOUDFARE_TURNSTILE_SITE_KEY!}
+            onSuccess={(token) => setTurnstileToken(token)}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+          />
+
           <div className="flex items-center justify-between">
             <p className="text-sm text-tertiary">
               Connected:{" "}
@@ -832,7 +853,11 @@ export default function NewSubmissionClient() {
             <Button
               type="submit"
               loading={isSubmitting}
-              disabled={isSubmitting || emailVerificationStatus !== "verified"}
+              disabled={
+                isSubmitting ||
+                emailVerificationStatus !== "verified" ||
+                !turnstileToken
+              }
             >
               {isSubmitting ? "Submitting..." : "Submit Proposal"}
             </Button>
