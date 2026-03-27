@@ -18,6 +18,7 @@ import { syndicateTenantUIConfig } from "@/lib/tenant/configs/ui/syndicate";
 import { demo2TenantUIConfig } from "@/lib/tenant/configs/ui/demo2";
 import { demo4TenantUIConfig } from "@/lib/tenant/configs/ui/demo4";
 import { demo3TenantUIConfig } from "@/lib/tenant/configs/ui/demo3";
+import { standwithcryptoTenantUIConfig } from "@/lib/tenant/configs/ui/standwithcrypto";
 
 export default class TenantUIFactory {
   public static create(namespace: TenantNamespace): any {
@@ -73,6 +74,8 @@ export default class TenantUIFactory {
         return demo4TenantUIConfig;
       case TENANT_NAMESPACES.DEMO3:
         return demo3TenantUIConfig;
+            case TENANT_NAMESPACES.STANDWITHCRYPTO:
+        return standwithcryptoTenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

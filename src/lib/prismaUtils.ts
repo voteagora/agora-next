@@ -50,6 +50,8 @@ export function findDelagatee({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateDelegatees.findFirst(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3Delegatees.findFirst(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -110,6 +112,8 @@ export function findAdvancedDelegatee({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedDelegatees.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3AdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -167,6 +171,8 @@ export function findVotableSupply({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotableSupply.findFirst({});
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoVotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3VotableSupply.findFirst({});
     case TENANT_NAMESPACES.DEMO4:
@@ -330,6 +336,8 @@ export function findProposalsQueryFromDB({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoProposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3Proposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -440,6 +448,8 @@ export function findProposalsByIds({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposals.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoProposals.findMany(condition);
     case TENANT_NAMESPACES.DEMO2:
       return prismaWeb3Client.demo2Proposals.findMany(condition);
 
@@ -611,6 +621,8 @@ export function findProposalType({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateProposalTypes.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3ProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -667,6 +679,8 @@ export function findVotes({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateVotes.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoVotes.findMany(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3Votes.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -776,6 +790,8 @@ export function findAdvancedVotingPower({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateAdvancedVotingPower.findFirst(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3AdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.DEMO4:
@@ -891,6 +907,8 @@ export function findStakedDeposits({
     case TENANT_NAMESPACES.SYNDICATE:
       return prismaWeb3Client.syndicateStakedDeposits.findMany(condition);
 
+    case TENANT_NAMESPACES.STANDWITHCRYPTO:
+      return prismaWeb3Client.standwithcryptoStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO3:
       return prismaWeb3Client.demo3StakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.DEMO4:

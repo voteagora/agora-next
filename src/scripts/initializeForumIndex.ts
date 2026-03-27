@@ -11,7 +11,7 @@ async function main() {
 
   try {
     const forumSearchService = new ForumSearchService();
-    await forumSearchService.initializeIndex("DEMO2", false);
+    await forumSearchService.initializeIndex("STANDWITHCRYPTO", true);
     console.log("✅ Forum index initialized successfully!");
     process.exit(0);
   } catch (error) {

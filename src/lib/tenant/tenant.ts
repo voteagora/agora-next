@@ -17,6 +17,7 @@ export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   pguild: "Protocol Guild",
   boost: "Boost",
   demo: "Canopy",
+  standwithcrypto: "Stand with Crypto",
 };
 
 export default class Tenant {

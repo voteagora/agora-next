@@ -163,6 +163,15 @@ export default class TenantTokenFactory {
             ? ZERO_ADDRESS
             : "0xf1f9686d8144c7c5f16feffc8fdf93ec64058dec",
         };
+            case TENANT_NAMESPACES.STANDWITHCRYPTO:
+        return {
+          name: "SWC",
+          symbol: "SWC",
+          decimals: 18,
+          address: isProd
+            ? "0x9c63bb4f3315675ef5d888dec5560ea929151185"
+            : "None",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
