@@ -5,7 +5,7 @@ import { FileIcon } from "lucide-react";
 import { TrashIcon, ArchiveBoxIcon } from "@heroicons/react/20/solid";
 import { ForumAttachment } from "@/lib/forumUtils";
 import { useForum } from "@/hooks/useForum";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useHasAnyPermission } from "@/hooks/useRbacPermissions";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -36,11 +36,12 @@ export default function PostAttachments({
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
-  // RBAC permission for posts (attachments are tied to posts)
-  const { hasPermission: hasPostPermission } = useHasPermission(
-    "forums",
-    "posts",
-    "delete"
+  const { hasPermission: canManageByPermission } = useHasAnyPermission(
+    [
+      { module: "forums", resource: "posts", action: "delete" },
+      { module: "forums", resource: "posts", action: "archive" },
+    ],
+    { autoAuthenticate: false }
   );
 
   if (!items.length) return null;
@@ -63,13 +64,7 @@ export default function PostAttachments({
             return;
           }
 
-          const isAuthor =
-            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await stableDeleteAttachment(
-            attachmentId,
-            "post",
-            isAuthor
-          );
+          const ok = await stableDeleteAttachment(attachmentId, "post");
           if (ok) setItems((prev) => prev.filter((a) => a.id !== attachmentId));
         },
       },
@@ -88,13 +83,7 @@ export default function PostAttachments({
             return;
           }
 
-          const isAuthor =
-            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await stableArchiveAttachment(
-            attachmentId,
-            "post",
-            isAuthor
-          );
+          const ok = await stableArchiveAttachment(attachmentId, "post");
           if (ok) setItems((prev) => prev.filter((a) => a.id !== attachmentId));
         },
       },
@@ -104,7 +93,7 @@ export default function PostAttachments({
   const canManage = (uploadedBy: string) => {
     const isAuthor =
       address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
-    return hasPostPermission || isAuthor;
+    return canManageByPermission || isAuthor;
   };
 
   return (

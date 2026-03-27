@@ -38,7 +38,6 @@ import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
-import { getStoredSiweJwt } from "@/lib/siweSession";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui } = Tenant.current();
@@ -109,13 +108,6 @@ const DraftFormClient = ({
     try {
       if (!address) {
         toast("Account not connected.");
-        return;
-      }
-      // Guard: require SIWE JWT before prompting signature for this action
-      const jwt = getStoredSiweJwt({ expectedAddress: address });
-      if (!jwt) {
-        toast("Session expired. Please sign in to continue.");
-        window.location.reload();
         return;
       }
       const messagePayload = {

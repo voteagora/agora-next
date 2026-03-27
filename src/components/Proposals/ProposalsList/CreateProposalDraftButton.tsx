@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import classNames from "classnames";
-import { useSIWE } from "connectkit";
 import { useAccount } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import Tenant from "@/lib/tenant/tenant";
@@ -13,7 +12,7 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
+import { getStoredSiweJwt } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
@@ -44,7 +43,6 @@ const CreateProposalDraftButton = ({
   const { getAuthenticationData } = useProposalActionAuth();
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-  const { signIn } = useSIWE();
   const { chain } = useAccount();
   const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
@@ -94,26 +92,6 @@ const CreateProposalDraftButton = ({
     setIsPending(true);
 
     try {
-      let jwt = getStoredSiweJwt({ expectedAddress: address });
-      if (!jwt) {
-        try {
-          await signIn();
-          jwt = await waitForStoredSiweJwt({
-            expectedAddress: address,
-            timeoutMs: 10_000,
-            intervalMs: 200,
-          });
-        } catch (error) {
-          toast("Sign-in cancelled or failed. Please try again.");
-          return;
-        }
-
-        if (!jwt) {
-          toast("Session expired. Please sign in to continue.");
-          return;
-        }
-      }
-
       const messagePayload = {
         action: "createDraft",
         creatorAddress: address,

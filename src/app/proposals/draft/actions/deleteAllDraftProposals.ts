@@ -2,27 +2,28 @@
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import { verifyJwtAndGetAddress } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import Tenant from "@/lib/tenant/tenant";
 
-export async function onSubmitAction(params: {
-  address: `0x${string}`;
-  jwt: string;
-}): Promise<FormState & { deletedCount?: number }> {
+export async function onSubmitAction(
+  params: { address: `0x${string}` } & AuthParams
+): Promise<FormState & { deletedCount?: number }> {
   try {
-    if (!params.jwt) {
-      return { ok: false, message: "Missing authentication" };
+    const authResult = await verifyAuth(params, params.address);
+    if (!authResult.success) {
+      return { ok: false, message: authResult.error };
     }
-    const verifiedAddress = await verifyJwtAndGetAddress(params.jwt);
-    if (!verifiedAddress) {
-      return { ok: false, message: "Invalid token" };
-    }
-    if (verifiedAddress.toLowerCase() !== params.address.toLowerCase()) {
-      return { ok: false, message: "Address mismatch" };
-    }
+    const verifiedAddress = authResult.address.toLowerCase();
+
+    const { slug } = Tenant.current();
 
     const result = await prismaWeb2Client.proposalDraft.deleteMany({
       where: {
-        author_address: verifiedAddress,
+        author_address: {
+          equals: verifiedAddress,
+          mode: "insensitive",
+        },
+        dao_slug: slug,
       },
     });
 
@@ -32,6 +33,7 @@ export async function onSubmitAction(params: {
       deletedCount: result.count,
     };
   } catch (error) {
+    console.log(error);
     return {
       ok: false,
       message: "Error deleting draft proposals",

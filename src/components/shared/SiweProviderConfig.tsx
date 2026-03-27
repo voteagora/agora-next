@@ -9,6 +9,7 @@ import {
 import {
   clearStoredSiweSession,
   getStoredSiweSession,
+  notifyStoredSiweSessionChanged,
 } from "@/lib/siweSession";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
 import {
@@ -652,6 +653,7 @@ export const siweProviderConfig: SIWEConfig = {
       }
 
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+      notifyStoredSiweSessionChanged();
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
       } catch {}

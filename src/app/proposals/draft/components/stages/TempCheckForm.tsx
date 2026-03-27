@@ -15,8 +15,8 @@ import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { DraftProposal } from "../../types";
-import toast from "react-hot-toast";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import toast from "react-hot-toast";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
   const router = useRouter();
@@ -58,8 +58,8 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const auth = await getAuthenticationData(messagePayload);
-      if (!auth) {
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
         toast.error("Authentication failed");
         return;
       }
@@ -67,7 +67,7 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         ...data,
         draftProposalId: draftProposal.id,
         creatorAddress: address,
-        jwt: auth.jwt,
+        jwt: authData.jwt,
       });
       if (!res.ok) {
         toast.error(res.message);

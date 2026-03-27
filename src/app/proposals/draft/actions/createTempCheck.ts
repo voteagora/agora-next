@@ -4,25 +4,38 @@ import { z } from "zod";
 import { schema as tempCheckSchema } from "../schemas/tempCheckSchema";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import { verifyOwnerAndJwtForDraft } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { requireDraftEditAccess } from "./draftAuthorization";
 
 export async function onSubmitAction(
   data: z.output<typeof tempCheckSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    jwt: string;
-  }
+  } & AuthParams
 ): Promise<FormState> {
-  const ownerCheck = await verifyOwnerAndJwtForDraft(
-    data.draftProposalId,
-    data.jwt
+  const authResult = await verifyAuth(
+    {
+      jwt: data.jwt,
+      message: data.message,
+      signature: data.signature,
+      address: data.creatorAddress as `0x${string}`,
+    },
+    data.creatorAddress as `0x${string}`
   );
-  if (!ownerCheck.ok) {
-    return { ok: false, message: ownerCheck.reason };
+  if (!authResult.success) {
+    return { ok: false, message: authResult.error };
+  }
+
+  const draftAccess = await requireDraftEditAccess({
+    draftProposalId: data.draftProposalId,
+    address: authResult.address,
+  });
+  if (!draftAccess.ok) {
+    return { ok: false, message: draftAccess.message };
   }
 
   const parsed = tempCheckSchema.safeParse(data);

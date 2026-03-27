@@ -27,6 +27,7 @@ import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import toast from "react-hot-toast";
 import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 export interface ThreadProps {
   comments: ForumPost[];
@@ -96,7 +97,8 @@ const CommentItem = ({
   const { hasPermission: canSoftDeleteOrRestore } = useHasPermission(
     "forums",
     "posts",
-    "archive"
+    "archive",
+    { autoAuthenticate: false }
   );
 
   // Get replies for this comment
@@ -575,6 +577,7 @@ export default function Thread({
   }, [normalizedDirectory]);
 
   const { address } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
 
   const handleImageUpload = React.useCallback(
     async (file: File): Promise<string> => {
@@ -582,9 +585,21 @@ export default function Thread({
         throw new Error("Wallet not connected");
       }
 
+      const messagePayload = {
+        action: "uploadAttachment",
+        address,
+        timestamp: new Date().toISOString(),
+      };
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
+      }
+
       // Upload to IPFS only (no database record yet)
       const attachmentData = await convertFileToAttachmentData(file);
-      const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+      const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
+        jwt: authData.jwt,
+      });
 
       if (!uploadResult.success || !uploadResult.ipfsUrl) {
         throw new Error(uploadResult.error || "Upload failed");
@@ -592,7 +607,7 @@ export default function Thread({
 
       return uploadResult.ipfsUrl;
     },
-    [address]
+    [address, getAuthenticationData]
   );
 
   return (

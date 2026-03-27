@@ -8,8 +8,6 @@ import { onSubmitAction as deleteAllAction } from "@/app/proposals/draft/actions
 import toast from "react-hot-toast";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { TrashIcon } from "@heroicons/react/20/solid";
-import { useSIWE } from "connectkit";
-import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 const ClearAllDraftsButton = ({
   draftCount,
@@ -55,7 +53,6 @@ export const DeleteAllDraftProposalsDialog = ({
   const [isPending, setIsPending] = useState(false);
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
-  const { signIn } = useSIWE();
 
   return (
     <div>
@@ -84,33 +81,11 @@ export const DeleteAllDraftProposalsDialog = ({
             if (isPending) return;
             setIsPending(true);
             try {
-              let jwt = getStoredSiweJwt({ expectedAddress: address });
-              if (!jwt) {
-                try {
-                  await signIn();
-                  jwt = await waitForStoredSiweJwt({
-                    expectedAddress: address,
-                    timeoutMs: 10_000,
-                    intervalMs: 200,
-                  });
-                } catch (e) {
-                  toast("Sign-in cancelled or failed. Please try again.");
-                  setIsPending(false);
-                  return;
-                }
-                if (!jwt) {
-                  toast("Session expired. Please sign in to continue.");
-                  setIsPending(false);
-                  return;
-                }
-              }
-
-              const messagePayload = {
+              const auth = await getAuthenticationData({
                 action: "deleteAllDrafts",
                 creatorAddress: address,
                 timestamp: new Date().toISOString(),
-              };
-              const auth = await getAuthenticationData(messagePayload);
+              });
               if (!auth || !address) {
                 setIsPending(false);
                 return;
@@ -122,10 +97,9 @@ export const DeleteAllDraftProposalsDialog = ({
               });
 
               if (result.ok) {
+                const count = result.deletedCount ?? 0;
                 toast.success(
-                  `Successfully deleted ${result.deletedCount || draftCount} draft${
-                    (result.deletedCount || draftCount) === 1 ? "" : "s"
-                  }`
+                  `Successfully deleted ${count} draft${count === 1 ? "" : "s"}`
                 );
                 closeDialog();
                 if (onSuccess) {

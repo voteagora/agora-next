@@ -46,15 +46,15 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const auth = await getAuthenticationData(messagePayload);
-      if (!auth) {
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
         throw new Error("Authentication failed");
       }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: "",
-        jwt: auth.jwt,
+        jwt: authData.jwt,
       });
 
       setIsSkipPending(false);
@@ -80,15 +80,15 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         creatorAddress: address,
         timestamp: new Date().toISOString(),
       };
-      const auth = await getAuthenticationData(messagePayload);
-      if (!auth) {
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
         throw new Error("Authentication failed");
       }
       await createGithubChecklistItem({
         draftProposalId: draftProposal.id,
         creatorAddress: address,
         link: link,
-        jwt: auth.jwt,
+        jwt: authData.jwt,
       });
 
       setIsCreatePRPending(false);

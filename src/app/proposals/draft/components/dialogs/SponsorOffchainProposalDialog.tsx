@@ -9,11 +9,11 @@ import { getBlockScanUrl } from "@/lib/utils";
 
 const SponsorOffchainProposalDialog = ({
   redirectUrl,
-  txHash,
+  attestationUid,
   closeDialog,
 }: {
   redirectUrl: string;
-  txHash: `0x${string}`;
+  attestationUid: `0x${string}`;
   closeDialog: () => void;
 }) => {
   const tenant = Tenant.current();
@@ -50,9 +50,9 @@ const SponsorOffchainProposalDialog = ({
               </UpdatedButton>
             </div>
             <div className="flex flex-row justify-between items-center mt-4">
-              <span className="text-secondary">View transaction on EAS</span>
+              <span className="text-secondary">View attestation on EAS</span>
               <div className="flex flex-row items-center space-x-2">
-                <Link href={`${getBlockScanUrl(txHash, true)}`}>
+                <Link href={`${getBlockScanUrl(attestationUid, true)}`}>
                   <Image
                     src={icons.link}
                     height="16"

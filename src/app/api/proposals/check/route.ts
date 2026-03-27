@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckProposalAttestation } from "@/lib/eas-server";
-import { createProposalLinks } from "@/lib/actions/proposalLinks";
+import { createProposalLinksInternal } from "@/lib/actions/proposalLinksInternal";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { fetchVotingPowerFromContract } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
@@ -199,13 +199,13 @@ export async function POST(request: NextRequest) {
     if (relatedLinks.length > 0) {
       const linkPromises = relatedLinks.map((linkId) => {
         if (linkId.startsWith("0x")) {
-          return createProposalLinks({
+          return createProposalLinksInternal({
             sourceId: linkId,
             sourceType: "tempcheck",
             links: [{ targetId: proposalId, targetType }],
           });
         }
-        return createProposalLinks({
+        return createProposalLinksInternal({
           sourceId: linkId,
           sourceType: "forum_topic",
           links: [{ targetId: proposalId, targetType }],

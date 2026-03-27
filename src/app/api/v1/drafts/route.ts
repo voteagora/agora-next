@@ -4,9 +4,10 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
+import { verifyAuth } from "@/lib/auth/authHelpers";
+import { PLMConfig } from "@/app/proposals/draft/types";
 
 type CreateDraftBody = {
   creatorAddress?: `0x${string}` | string;
@@ -33,15 +34,6 @@ export async function POST(request: NextRequest) {
       eventName: "proposal_draft_create_requested",
     });
 
-    const authz =
-      request.headers.get("authorization") ||
-      request.headers.get("Authorization");
-    const token = authz?.startsWith("Bearer ") ? authz.slice(7) : undefined;
-    let jwtAddress: `0x${string}` | null = null;
-    if (token) {
-      jwtAddress = await verifyJwtAndGetAddress(token);
-    }
-
     if (!creatorAddress) {
       await appendServerTraceEvent({
         traceContext,
@@ -54,37 +46,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!jwtAddress) {
+    const authz =
+      request.headers.get("authorization") ||
+      request.headers.get("Authorization");
+    const token = authz?.startsWith("Bearer ") ? authz.slice(7) : undefined;
+    const authResult = await verifyAuth(
+      { jwt: token },
+      creatorAddress as `0x${string}`
+    );
+
+    if (!authResult.success) {
+      const reason =
+        authResult.error === "Missing authentication credentials"
+          ? "missing_auth"
+          : authResult.error === "Token address mismatch"
+            ? "token_address_mismatch"
+            : authResult.error === "Invalid token"
+              ? "invalid_token"
+              : "auth_failed";
+
       await appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
-        details: { reason: "missing_auth" },
+        details: { reason },
       });
-      return NextResponse.json(
-        { message: "A valid SIWE session is required." },
-        { status: 400 }
-      );
+
+      return NextResponse.json({ message: authResult.error }, { status: 401 });
     }
 
-    if (jwtAddress.toLowerCase() !== creatorAddress.toLowerCase()) {
-      await appendServerTraceEvent({
-        traceContext,
-        eventName: "proposal_draft_create_failed",
-        details: { reason: "token_address_mismatch" },
-      });
-      return NextResponse.json(
-        { message: "Token address mismatch" },
-        { status: 401 }
-      );
-    }
-
-    // Resolve tenant config and initial stage
     const tenant = Tenant.current();
     const plmToggle = tenant.ui.toggle("proposal-lifecycle");
-    if (
-      !plmToggle?.config ||
-      !Array.isArray((plmToggle.config as any)?.stages)
-    ) {
+    const plmConfig = plmToggle?.config as PLMConfig | undefined;
+    if (!plmConfig?.stages?.length) {
       await appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
@@ -95,7 +88,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    const firstStage = (plmToggle.config as any).stages[0];
+    const firstStage = plmConfig.stages[0];
     if (!firstStage?.stage) {
       await appendServerTraceEvent({
         traceContext,
@@ -108,7 +101,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create draft
     const proposal = await prismaWeb2Client.proposalDraft.create({
       data: {
         contract:
@@ -118,7 +110,7 @@ export async function POST(request: NextRequest) {
         title: "",
         abstract: "",
         audit_url: "",
-        author_address: creatorAddress,
+        author_address: authResult.address,
         sponsor_address: "",
         stage: firstStage.stage,
         dao_slug: tenant.slug,

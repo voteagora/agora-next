@@ -2,25 +2,25 @@
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import { verifyOwnerAndJwtForDraft } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { requireDraftEditAccess } from "./draftAuthorization";
 
 export async function onSubmitAction(
   draftProposalId: number,
-  params: {
-    address: `0x${string}`;
-    jwt: string;
-  }
+  params: { address: `0x${string}` } & AuthParams
 ): Promise<FormState> {
   try {
-    if (!params.jwt) {
-      return { ok: false, message: "Missing authentication" };
+    const authResult = await verifyAuth(params, params.address);
+    if (!authResult.success) {
+      return { ok: false, message: authResult.error };
     }
-    const jwtCheck = await verifyOwnerAndJwtForDraft(
+
+    const draftAccess = await requireDraftEditAccess({
       draftProposalId,
-      params.jwt
-    );
-    if (!jwtCheck.ok) {
-      return { ok: false, message: jwtCheck.reason };
+      address: authResult.address,
+    });
+    if (!draftAccess.ok) {
+      return { ok: false, message: draftAccess.message };
     }
     // TODO: maybe we don't delete, we just flag isDeleted
     await prismaWeb2Client.proposalDraft.delete({
@@ -34,6 +34,7 @@ export async function onSubmitAction(
       message: "Success!",
     };
   } catch (error) {
+    console.log(error);
     return {
       ok: false,
       message: "Error deleting draft proposal",

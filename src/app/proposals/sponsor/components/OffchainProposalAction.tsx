@@ -176,7 +176,7 @@ const OffchainProposalAction = ({
         return;
       }
 
-      const { id, transactionHash } = await createProposalAttestation({
+      const { id, attestationUid } = await createProposalAttestation({
         contract: governorContract.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
@@ -195,7 +195,7 @@ const OffchainProposalAction = ({
       });
 
       await createOffchainProposal({
-        authJwt: auth.jwt,
+        auth: { jwt: auth.jwt },
         proposalData: {
           proposer: rawProposalDataForBackend.proposer,
           description: rawProposalDataForBackend.description,
@@ -212,7 +212,7 @@ const OffchainProposalAction = ({
           calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
         },
         id: id.toString(),
-        transactionHash,
+        attestationUid,
         onchainProposalId: onchainProposalId?.toString() ?? null,
       });
 
@@ -221,13 +221,12 @@ const OffchainProposalAction = ({
         type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL",
         params: {
           redirectUrl: "/",
-          txHash: transactionHash as `0x${string}`,
+          attestationUid: attestationUid as `0x${string}`,
         },
       });
 
       await sponsorDraftProposal({
         draftProposalId: draftProposal.id,
-        onchain_transaction_hash: transactionHash,
         is_offchain_submission: true,
         proposal_scope: draftProposal.proposal_scope,
         creatorAddress: address as `0x${string}`,

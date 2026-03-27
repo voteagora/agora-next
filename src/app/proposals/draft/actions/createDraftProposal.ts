@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import { verifyOwnerAndJwtForDraft } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { ProposalType } from "../types";
 import type { FormState } from "@/app/types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
@@ -12,6 +12,7 @@ import {
   getStageByIndex,
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
+import { requireDraftEditAccess } from "./draftAuthorization";
 
 const formDataByType = (
   data: z.output<typeof DraftProposalSchema>,
@@ -135,19 +136,27 @@ export async function onSubmitAction(
   data: z.output<typeof DraftProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    jwt: string;
-  }
+  } & AuthParams
 ): Promise<FormState> {
-  if (!data.jwt) {
-    return { ok: false, message: "Missing authentication" };
+  const authResult = await verifyAuth(
+    {
+      jwt: data.jwt,
+      message: data.message,
+      signature: data.signature,
+      address: data.creatorAddress as `0x${string}`,
+    },
+    data.creatorAddress as `0x${string}`
+  );
+  if (!authResult.success) {
+    return { ok: false, message: authResult.error };
   }
 
-  const jwtCheck = await verifyOwnerAndJwtForDraft(
-    data.draftProposalId,
-    data.jwt
-  );
-  if (!jwtCheck.ok) {
-    return { ok: false, message: jwtCheck.reason };
+  const draftAccess = await requireDraftEditAccess({
+    draftProposalId: data.draftProposalId,
+    address: authResult.address,
+  });
+  if (!draftAccess.ok) {
+    return { ok: false, message: draftAccess.message };
   }
 
   const parsed = DraftProposalSchema.safeParse(data);
