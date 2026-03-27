@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAccount } from "wagmi";
@@ -80,6 +80,12 @@ export default function NewSubmissionClient() {
   } | null>(null);
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [emailVerificationStatus, setEmailVerificationStatus] = useState<
+    "unverified" | "pending" | "verified"
+  >("unverified");
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+  const [isCheckingVerification, setIsCheckingVerification] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -94,6 +100,18 @@ export default function NewSubmissionClient() {
   });
 
   const isAnonymous = form.watch("is_anonymous");
+  const authorEmail = form.watch("author_email");
+
+  useEffect(() => {
+    if (!authorEmail || !verifiedEmail) {
+      setEmailVerificationStatus("unverified");
+      return;
+    }
+
+    if (authorEmail.trim().toLowerCase() !== verifiedEmail.toLowerCase()) {
+      setEmailVerificationStatus("unverified");
+    }
+  }, [authorEmail, verifiedEmail]);
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,6 +175,11 @@ export default function NewSubmissionClient() {
     setSubmitError(null);
 
     try {
+      if (emailVerificationStatus !== "verified") {
+        setSubmitError("Please verify your email before submitting.");
+        return;
+      }
+
       let token = getStoredSiweJwt({ expectedAddress: address });
       if (!token) {
         try {
@@ -209,6 +232,10 @@ export default function NewSubmissionClient() {
           setSubmitError(
             "You have already submitted an entry. Each wallet can only submit once."
           );
+        } else if (result.code === "EMAIL_NOT_VERIFIED") {
+          setSubmitError(
+            "Please verify your email with the magic link before submitting."
+          );
         } else {
           setSubmitError(result.error || "Failed to create submission");
         }
@@ -223,6 +250,120 @@ export default function NewSubmissionClient() {
       setIsSubmitting(false);
     }
   };
+
+  const getAuthToken = useCallback(async () => {
+    if (!address) return null;
+
+    let token = getStoredSiweJwt({ expectedAddress: address });
+    if (token) return token;
+
+    await signIn();
+    token = await waitForStoredSiweJwt({
+      expectedAddress: address,
+      timeoutMs: 10_000,
+      intervalMs: 200,
+    });
+    return token;
+  }, [address, signIn]);
+
+  const handleSendVerification = useCallback(async () => {
+    const email = form.getValues("author_email")?.trim();
+    if (!email) {
+      setSubmitError("Please enter your email before sending verification.");
+      return;
+    }
+
+    const emailValidation = z.string().email().safeParse(email);
+    if (!emailValidation.success) {
+      setSubmitError("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSendingVerification(true);
+    setSubmitError(null);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        setSubmitError("Session expired. Please sign in to continue.");
+        return;
+      }
+
+      const response = await fetch("/api/v1/contest/submissions/email/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        setSubmitError(result.error || "Failed to send verification email.");
+        return;
+      }
+
+      setEmailVerificationStatus("pending");
+      setVerifiedEmail(null);
+    } catch (error) {
+      console.error("Failed to send verification email:", error);
+      setSubmitError("Failed to send verification email.");
+    } finally {
+      setIsSendingVerification(false);
+    }
+  }, [form, getAuthToken]);
+
+  const handleCheckVerification = useCallback(async () => {
+    const email = form.getValues("author_email")?.trim();
+    if (!email) {
+      setSubmitError("Please enter your email before checking verification.");
+      return;
+    }
+
+    setIsCheckingVerification(true);
+    setSubmitError(null);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        setSubmitError("Session expired. Please sign in to continue.");
+        return;
+      }
+
+      const response = await fetch(
+        `/api/v1/contest/submissions/email/verify?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) {
+        setSubmitError(result.error || "Failed to check email verification.");
+        return;
+      }
+
+      if (result.verified) {
+        setEmailVerificationStatus("verified");
+        setVerifiedEmail(email);
+      } else {
+        setEmailVerificationStatus("pending");
+        setVerifiedEmail(null);
+        setSubmitError(
+          "Email is not verified yet. Please click the magic link in your inbox."
+        );
+      }
+    } catch (error) {
+      console.error("Failed to check email verification:", error);
+      setSubmitError("Failed to check email verification status.");
+    } finally {
+      setIsCheckingVerification(false);
+    }
+  }, [form, getAuthToken]);
 
   if (!isConnected) {
     return (
@@ -606,6 +747,39 @@ export default function NewSubmissionClient() {
                       Private — only shared with Agora staff for contest
                       coordination
                     </FormDescription>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSendVerification}
+                        loading={isSendingVerification}
+                        disabled={
+                          isSendingVerification || isCheckingVerification
+                        }
+                      >
+                        {emailVerificationStatus === "pending"
+                          ? "Resend Magic Link"
+                          : "Send Magic Link"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCheckVerification}
+                        loading={isCheckingVerification}
+                        disabled={
+                          isSendingVerification || isCheckingVerification
+                        }
+                      >
+                        I Have Verified
+                      </Button>
+                    </div>
+                    <p className="text-xs text-secondary">
+                      {emailVerificationStatus === "verified"
+                        ? "Email verified. You can submit now."
+                        : "Verify this email via magic link before submitting."}
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -664,7 +838,7 @@ export default function NewSubmissionClient() {
             <Button
               type="submit"
               loading={isSubmitting}
-              disabled={isSubmitting}
+              disabled={isSubmitting || emailVerificationStatus !== "verified"}
             >
               {isSubmitting ? "Submitting..." : "Submit Proposal"}
             </Button>

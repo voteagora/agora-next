@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z, ZodError } from "zod";
 import { traceWithUserId } from "../../apiUtils";
 import { createOptionalStringValidator } from "@/app/api/common/utils/validators";
+import { notificationCenterClient } from "@/lib/notification-center/client";
 
 const statusValidator = z
   .union([
@@ -37,6 +38,20 @@ const createSubmissionSchema = z.object({
     .optional()
     .default([]),
 });
+
+async function isSubmissionEmailVerified(walletAddress: string, email: string) {
+  const recipient = await notificationCenterClient.getRecipient(
+    walletAddress.toLowerCase()
+  );
+  const emailChannel = recipient?.channels?.email;
+
+  return Boolean(
+    emailChannel &&
+      emailChannel.type === "email" &&
+      emailChannel.address.toLowerCase() === email.toLowerCase() &&
+      emailChannel.verified
+  );
+}
 
 export async function GET(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -123,6 +138,30 @@ export async function POST(request: NextRequest) {
         request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         request.headers.get("x-real-ip") ||
         "unknown";
+      const canCheckEmailVerification = Boolean(
+        process.env.NOTIFICATION_CENTER_URL &&
+          process.env.NOTIFICATION_CENTER_API_KEY
+      );
+
+      if (canCheckEmailVerification) {
+        const emailVerified = await isSubmissionEmailVerified(
+          walletAddress,
+          validated.author_email
+        );
+        if (!emailVerified) {
+          return new Response(
+            JSON.stringify({
+              error:
+                "Please verify your email with the magic link before submitting.",
+              code: "EMAIL_NOT_VERIFIED",
+            }),
+            {
+              status: 400,
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
 
       const hasExisting = await checkWalletHasSubmission(walletAddress);
       if (hasExisting) {
