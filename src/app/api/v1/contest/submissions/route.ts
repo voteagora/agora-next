@@ -53,7 +53,7 @@ async function verifyTurnstileToken(
   formData.append("remoteip", ipAddress);
 
   const response = await fetch(
-    "https://challenges.cloudflare.com/turnstile/v1/siteverify",
+    "https://challenges.cloudflare.com/turnstile/v0/siteverify",
     { method: "POST", body: formData }
   );
   const data = await response.json();
