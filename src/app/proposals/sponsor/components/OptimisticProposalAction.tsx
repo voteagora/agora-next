@@ -16,9 +16,7 @@ import {
   prepareDraftOnchainPublishTrace,
 } from "./publishDraftProposalOnchain";
 import { closeStoredProposalCreationTrace } from "@/lib/mirador/proposalCreationTrace";
-import {
-  shouldTrackSafeOnchainTransactions,
-} from "@/lib/safeFeatures";
+import { shouldTrackSafeOnchainTransactions } from "@/lib/safeFeatures";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 import { isSafeWallet } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";

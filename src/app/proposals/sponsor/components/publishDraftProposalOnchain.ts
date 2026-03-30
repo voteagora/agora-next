@@ -121,10 +121,7 @@ export async function handleDraftOnchainPublishResult(params: {
     throw new Error(result.message);
   }
 
-  if (
-    params.shouldTrackSafeOnchain &&
-    result.safeProposalPublish
-  ) {
+  if (params.shouldTrackSafeOnchain && result.safeProposalPublish) {
     params.openDialog({
       type: "SAFE_PROPOSAL_PUBLISH_STATUS",
       className: "sm:w-[44rem]",

@@ -64,9 +64,7 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
-import {
-  shouldTrackSafeOnchainTransactions,
-} from "@/lib/safeFeatures";
+import { shouldTrackSafeOnchainTransactions } from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
