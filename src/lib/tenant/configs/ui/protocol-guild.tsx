@@ -322,5 +322,17 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         siweLoginTracing: true,
       },
     },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
   ],
 });
