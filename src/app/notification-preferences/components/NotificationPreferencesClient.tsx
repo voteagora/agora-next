@@ -69,6 +69,7 @@ export default function NotificationPreferencesClient() {
     jwt: siweJwt,
     error: siweError,
     clearSession: clearSiweSession,
+    ensureSession: ensureSiweSession,
   } = useSiweJwt({
     expectedAddress: recipientId,
     autoAuthenticate: true,
@@ -674,7 +675,28 @@ export default function NotificationPreferencesClient() {
             Requesting a signature to manage notifications...
           </p>
           {siweError ? (
-            <p className="text-sm text-negative">{siweError}</p>
+            <>
+              <p className="text-sm text-negative">{siweError}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="elevatedOutline"
+                  onClick={async () => {
+                    try {
+                      await ensureSiweSession();
+                    } catch (retryError) {
+                      toast.error(
+                        retryError instanceof Error
+                          ? retryError.message
+                          : "Unable to restart sign-in."
+                      );
+                    }
+                  }}
+                >
+                  Retry sign-in
+                </Button>
+              </div>
+            </>
           ) : null}
         </div>
       </main>

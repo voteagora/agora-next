@@ -10,7 +10,6 @@ import {
 } from "./shared";
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 import { removeForumTopicFromIndex, indexForumTopic } from "./search";
-import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl } from "@/lib/pinata";

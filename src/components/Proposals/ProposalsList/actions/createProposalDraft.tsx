@@ -1,17 +1,11 @@
 "use server";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
-async function createProposalDraft(
-  address: `0x${string}`,
-  params: { message?: string; signature?: `0x${string}`; jwt?: string }
-) {
+async function createProposalDraft(address: `0x${string}`, params: AuthParams) {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
 
@@ -21,25 +15,9 @@ async function createProposalDraft(
     );
   }
 
-  if (params.jwt) {
-    const jwtAddress = await verifyJwtAndGetAddress(params.jwt);
-    if (!jwtAddress) {
-      throw new Error("Invalid token");
-    }
-    if (jwtAddress.toLowerCase() !== address.toLowerCase()) {
-      throw new Error("Token address mismatch");
-    }
-  } else if (params.message && params.signature) {
-    const valid = await verifySiwe({
-      address,
-      message: params.message,
-      signature: params.signature,
-    });
-    if (!valid) {
-      throw new Error("Invalid signature");
-    }
-  } else {
-    throw new Error("Missing authentication");
+  const authResult = await verifyAuth(params, address);
+  if (!authResult.success) {
+    throw new Error(authResult.error);
   }
 
   const config = plmToggle.config as PLMConfig;
@@ -54,7 +32,7 @@ async function createProposalDraft(
       title: "",
       abstract: "",
       audit_url: "",
-      author_address: address,
+      author_address: authResult.address,
       sponsor_address: "",
       stage: firstStage.stage,
       dao_slug: tenant.slug,

@@ -2,71 +2,47 @@ import "server-only";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
-import { sanitizeContent } from "@/lib/sanitizationUtils";
-import { createHash } from "crypto";
-import { createDelegateStatementMessage } from "@/lib/delegateStatement/messageFormat";
+import {
+  DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER,
+  buildStoredDelegateStatementPayload,
+  getDelegateStatementPayloadHash,
+} from "@/lib/delegateStatement/persistence";
+import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
+import type { DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 
 export async function createDelegateStatement({
   address,
   delegateStatement,
-  signature,
-  message,
   scwAddress,
+  auth,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
-  signature: `0x${string}`;
-  message: string;
   scwAddress?: string;
+  auth: DelegateStatementAuthPayload;
 }) {
   const { twitter, warpcast, discord, email, notificationPreferences } =
     delegateStatement;
   const { slug } = Tenant.current();
+  const normalizedAddress = address.toLowerCase();
 
-  // Regenerate expected message from form data and compare
-  const expectedMessage = createDelegateStatementMessage(delegateStatement, {
-    daoSlug: slug,
-    discord,
-    email,
-    twitter,
-    warpcast,
-    topIssues: delegateStatement.topIssues,
-    topStakeholders: delegateStatement.topStakeholders,
-    scwAddress,
-    notificationPreferences,
-  });
+  const verifiedAddress = await verifyJwtAndGetAddress(auth.jwt);
 
-  // Verify signature against the message
-  const valid = await verifyMessage({
-    address,
-    message: expectedMessage,
-    signature,
-  });
-
-  if (!valid) {
-    throw new Error("Invalid signature");
+  if (!verifiedAddress || verifiedAddress.toLowerCase() !== normalizedAddress) {
+    throw new Error("Invalid token");
   }
 
-  // Sanitize the statement before storing and remove email from payload
-  const { email: _, ...delegateStatementWithoutEmail } = delegateStatement;
-  const sanitizedStatement = {
-    ...delegateStatementWithoutEmail,
-    delegateStatement: sanitizeContent(delegateStatement.delegateStatement),
-  };
-
-  const stopGapMessageHash = createHash("sha256")
-    .update(sanitizedStatement.delegateStatement)
-    .digest("hex");
+  const storedPayload = buildStoredDelegateStatementPayload(delegateStatement);
+  const messageHash = getDelegateStatementPayloadHash(storedPayload);
 
   const data: any = {
-    address: address.toLowerCase(),
+    address: normalizedAddress,
     dao_slug: slug,
-    message_hash: stopGapMessageHash,
-    signature,
-    payload: sanitizedStatement as Prisma.InputJsonValue,
+    message_hash: messageHash,
+    signature: DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER,
+    payload: storedPayload as Prisma.InputJsonValue,
     twitter,
     warpcast,
     discord,
@@ -85,9 +61,9 @@ export async function createDelegateStatement({
   return prismaWeb2Client.delegateStatements.upsert({
     where: {
       address_dao_slug_message_hash: {
-        address: address.toLowerCase(),
+        address: normalizedAddress,
         dao_slug: slug,
-        message_hash: stopGapMessageHash,
+        message_hash: messageHash,
       },
     },
     update: data,

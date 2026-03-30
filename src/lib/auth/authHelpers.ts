@@ -1,9 +1,7 @@
 "use server";
 
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import verifyMessage from "@/lib/serverVerifyMessage";
+import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 
 /**
  * Standard auth parameters for server actions
@@ -60,7 +58,7 @@ export async function verifyAuth(
     return { success: true, address: jwtAddress };
   }
 
-  // SIWE authentication
+  // Signed message authentication
   if (auth.message && auth.signature) {
     if (!expectedAddress && !auth.address) {
       return {
@@ -70,7 +68,7 @@ export async function verifyAuth(
     }
 
     const addressToVerify = expectedAddress || auth.address!;
-    const isValid = await verifySiwe({
+    const isValid = await verifyMessage({
       address: addressToVerify,
       message: auth.message,
       signature: auth.signature,

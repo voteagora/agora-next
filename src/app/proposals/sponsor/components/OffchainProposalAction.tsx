@@ -20,12 +20,12 @@ import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
 import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { contracts, ui } = Tenant.current();
 const plmToggle = ui.toggle("proposal-lifecycle");
 const config = plmToggle?.config as PLMConfig;
 const governorContract = contracts.governor;
-import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const OffchainProposalAction = ({
   draftProposal,
@@ -167,13 +167,14 @@ const OffchainProposalAction = ({
 
       const messagePayload = {
         action: "createOffchainProposal",
-        proposer: address,
+        creatorAddress: address,
         draftProposalId: draftProposal.id,
         timestamp: new Date().toISOString(),
       };
-
       const auth = await getAuthenticationData(messagePayload);
-      if (!auth) throw new Error("Authentication failed");
+      if (!auth) {
+        return;
+      }
 
       const { id, attestationUid } = await createProposalAttestation({
         contract: governorContract.address as `0x${string}`,
@@ -194,6 +195,7 @@ const OffchainProposalAction = ({
       });
 
       await createOffchainProposal({
+        auth: { jwt: auth.jwt },
         proposalData: {
           proposer: rawProposalDataForBackend.proposer,
           description: rawProposalDataForBackend.description,
@@ -212,9 +214,6 @@ const OffchainProposalAction = ({
         id: id.toString(),
         attestationUid,
         onchainProposalId: onchainProposalId?.toString() ?? null,
-        auth: {
-          jwt: auth.jwt,
-        },
       });
 
       toast.success("Proposal submitted successfully");
@@ -228,7 +227,6 @@ const OffchainProposalAction = ({
 
       await sponsorDraftProposal({
         draftProposalId: draftProposal.id,
-        onchain_transaction_hash: attestationUid,
         is_offchain_submission: true,
         proposal_scope: draftProposal.proposal_scope,
         creatorAddress: address as `0x${string}`,

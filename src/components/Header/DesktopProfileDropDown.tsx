@@ -6,6 +6,7 @@ import { useAccount } from "wagmi";
 import ENSAvatar from "../shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
+import { SiweStatusBadge } from "./SiweStatusBadge";
 
 type Props = {
   ensName: string | undefined;
@@ -19,8 +20,9 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
       <>
         <Popover.Button className="flex outline-none">
           <div className="text-primary flex items-center gap-3">
-            <div className="w-[30px] h-[30px] lg:w-6 lg:h-6 shadow-newDefault rounded-full flex">
+            <div className="relative w-[30px] h-[30px] lg:w-6 lg:h-6 shadow-newDefault rounded-full flex">
               <ENSAvatar ensName={ensName} />
+              <SiweStatusBadge />
             </div>
             <div className="hidden lg:inline">
               {address && <ENSName address={address} />}
