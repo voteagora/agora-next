@@ -65,10 +65,8 @@ import {
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
 import {
-  isSafeProposalFlowSupported,
-  UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
-} from "@/lib/safeChains";
-import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
+  shouldTrackSafeOnchainTransactions,
+} from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
@@ -461,32 +459,14 @@ export default function CreateProposalFormClient({
       addMiradorTxInputData(getProposalCreationTrace(), encodedInputData);
       flushMiradorTrace(getProposalCreationTrace());
       const connectedChainId = chain?.id ?? contracts.governor.chain.id;
-      const safeOnchainTrackingEnabled =
-        isSafeOnchainTransactionTrackingEnabled();
       const isSafeConnectedWallet =
         typeof safeWalletStatusQuery.data === "boolean"
           ? safeWalletStatusQuery.data
           : await isSafeWallet(address as `0x${string}`, connectedChainId);
-      if (
+      const shouldTrackSafeOnchain =
         isSafeConnectedWallet &&
-        !isSafeProposalFlowSupported(connectedChainId)
-      ) {
-        traceProposalEvent("proposal_onchain_submit_failed", {
-          message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
-          chainId: connectedChainId,
-        });
-        await finalizeProposalCreationTrace(
-          "proposal_onchain_submit_failed_closed",
-          {
-            message: UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
-            chainId: connectedChainId,
-          },
-          "proposal_onchain_submit_failed"
-        );
-        toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
-        return;
-      }
-      if (isSafeConnectedWallet) {
+        shouldTrackSafeOnchainTransactions(connectedChainId);
+      if (shouldTrackSafeOnchain) {
         const createdAfter = Date.now();
         openDialog({
           type: "SAFE_ONCHAIN_PENDING",
@@ -538,7 +518,7 @@ export default function CreateProposalFormClient({
           );
           flushMiradorTrace(getProposalCreationTrace());
         }
-        if (safeOnchainTrackingEnabled) {
+        if (shouldTrackSafeOnchain) {
           const { persisted, publish } = await resolveSafePublishSummary({
             discoveredPublish: discoveredSafePublishRef.current,
             safeAddress: address as `0x${string}`,
@@ -573,9 +553,9 @@ export default function CreateProposalFormClient({
           }
         } else if (!isHybrid) {
           void finalizeProposalCreationTrace(
-            "proposal_safe_tx_tracking_disabled",
-            { safeTxHash: txHash },
-            "proposal_safe_tx_tracking_disabled"
+            "proposal_safe_tx_tracking_unavailable",
+            { safeTxHash: txHash, chainId: connectedChainId },
+            "proposal_safe_tx_tracking_unavailable"
           );
         }
       } else {
@@ -587,7 +567,7 @@ export default function CreateProposalFormClient({
       }
       toast.success(
         isSafeConnectedWallet
-          ? safeOnchainTrackingEnabled
+          ? shouldTrackSafeOnchain
             ? isHybrid
               ? "Safe transaction created. You can continue with the offchain step while Safe owners approve the onchain publish."
               : "Safe transaction created. The proposal will publish onchain after enough Safe owners approve and execute it."

@@ -20,7 +20,6 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
-import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { resolveSafeTx } from "@/lib/utils";
 
@@ -67,13 +66,12 @@ export async function handleDraftOnchainPublishResult(params: {
   inputData: unknown;
   txHash: `0x${string}`;
   isSafeWallet: boolean;
+  shouldTrackSafeOnchain: boolean;
   getAuthenticationData: (messagePayload: Record<string, unknown>) => Promise<{
     jwt: string;
   } | null>;
   openDialog: (dialog: any) => void;
 }) {
-  const safeOnchainTrackingEnabled = isSafeOnchainTransactionTrackingEnabled();
-
   trackEvent({
     event_name: ANALYTICS_EVENT_NAMES.CREATE_PROPOSAL,
     event_data: {
@@ -106,10 +104,7 @@ export async function handleDraftOnchainPublishResult(params: {
     proposal_scope: params.draftProposal.proposal_scope,
     creatorAddress: params.address,
     jwt: auth.jwt,
-    safeAddress:
-      params.isSafeWallet && safeOnchainTrackingEnabled
-        ? params.address
-        : undefined,
+    safeAddress: params.shouldTrackSafeOnchain ? params.address : undefined,
     traceContext: getProposalCreationTraceContext(),
   });
 
@@ -127,8 +122,7 @@ export async function handleDraftOnchainPublishResult(params: {
   }
 
   if (
-    params.isSafeWallet &&
-    safeOnchainTrackingEnabled &&
+    params.shouldTrackSafeOnchain &&
     result.safeProposalPublish
   ) {
     params.openDialog({
@@ -150,14 +144,15 @@ export async function handleDraftOnchainPublishResult(params: {
     return;
   }
 
-  if (params.isSafeWallet && !safeOnchainTrackingEnabled) {
+  if (params.isSafeWallet && !params.shouldTrackSafeOnchain) {
     void closeStoredProposalCreationTrace({
-      eventName: "draft_onchain_safe_tracking_disabled",
+      eventName: "draft_onchain_safe_tracking_unavailable",
       details: {
         draftProposalId: params.draftProposal.id,
         safeTxHash: params.txHash,
+        chainId: params.chainId,
       },
-      reason: "draft_onchain_safe_tracking_disabled",
+      reason: "draft_onchain_safe_tracking_unavailable",
     });
 
     params.openDialog({

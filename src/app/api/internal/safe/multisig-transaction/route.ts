@@ -5,6 +5,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSafeMultisigTransactionForClient } from "@/lib/safeApi.server";
 import {
+  isSafeOnchainTransactionTrackingEnabled,
+  SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE,
+} from "@/lib/safeFeatures";
+import {
   enforceAuthenticatedSafeRateLimit,
   enforceUnauthenticatedSafeStatusRateLimit,
   getOptionalSafeJwtAddress,
@@ -17,6 +21,13 @@ import {
 } from "@/lib/safeValidation";
 
 export async function GET(request: NextRequest) {
+  if (!isSafeOnchainTransactionTrackingEnabled()) {
+    return NextResponse.json(
+      { message: SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE },
+      { status: 403 }
+    );
+  }
+
   const chainIdParam = request.nextUrl.searchParams.get("chainId");
   const safeTxHashParam = request.nextUrl.searchParams.get("safeTxHash");
   const safeAddressParam = request.nextUrl.searchParams.get("safeAddress");

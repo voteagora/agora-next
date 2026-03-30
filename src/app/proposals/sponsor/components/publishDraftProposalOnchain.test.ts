@@ -8,13 +8,11 @@ const {
   closeStoredProposalCreationTraceMock,
   getProposalCreationTraceContextMock,
   trackEventMock,
-  isSafeOnchainTransactionTrackingEnabledMock,
 } = vi.hoisted(() => ({
   sponsorDraftProposalMock: vi.fn(),
   closeStoredProposalCreationTraceMock: vi.fn(),
   getProposalCreationTraceContextMock: vi.fn(() => undefined),
   trackEventMock: vi.fn(),
-  isSafeOnchainTransactionTrackingEnabledMock: vi.fn(() => true),
 }));
 
 vi.mock("../../draft/actions/sponsorDraftProposal", () => ({
@@ -48,15 +46,9 @@ vi.mock("@/lib/utils", () => ({
   resolveSafeTx: vi.fn(),
 }));
 
-vi.mock("@/lib/safeFeatures", () => ({
-  isSafeOnchainTransactionTrackingEnabled:
-    isSafeOnchainTransactionTrackingEnabledMock,
-}));
-
 describe("handleDraftOnchainPublishResult", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(true);
   });
 
   it("opens the Safe publish dialog without waiting for trace closure", async () => {
@@ -89,6 +81,7 @@ describe("handleDraftOnchainPublishResult", () => {
         txHash:
           "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         isSafeWallet: true,
+        shouldTrackSafeOnchain: true,
         getAuthenticationData: vi.fn().mockResolvedValue({
           jwt: "jwt-token",
         }),
@@ -114,8 +107,7 @@ describe("handleDraftOnchainPublishResult", () => {
     );
   });
 
-  it("falls back to the generic publish dialog when Safe onchain tracking is disabled", async () => {
-    isSafeOnchainTransactionTrackingEnabledMock.mockReturnValue(false);
+  it("falls back to the generic publish dialog when Safe onchain tracking is unavailable", async () => {
     sponsorDraftProposalMock.mockResolvedValue({
       ok: true,
       safeProposalPublish: undefined,
@@ -134,6 +126,7 @@ describe("handleDraftOnchainPublishResult", () => {
       txHash:
         "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       isSafeWallet: true,
+      shouldTrackSafeOnchain: false,
       getAuthenticationData: vi.fn().mockResolvedValue({
         jwt: "jwt-token",
       }),
@@ -152,7 +145,7 @@ describe("handleDraftOnchainPublishResult", () => {
     );
     expect(closeStoredProposalCreationTraceMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        eventName: "draft_onchain_safe_tracking_disabled",
+        eventName: "draft_onchain_safe_tracking_unavailable",
       })
     );
   });

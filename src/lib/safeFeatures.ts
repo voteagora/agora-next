@@ -1,4 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
+import { isSafeProposalFlowSupported } from "@/lib/safeChains";
 import { UISafeTrackingConfig } from "@/lib/tenant/tenantUI";
 
 export const SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE =
@@ -83,4 +84,12 @@ export function isSafeOnchainTransactionTrackingEnabled(): boolean {
   }
 
   return getSafeTrackingConfig()?.onchainTransactionTracking !== false;
+}
+
+export function shouldTrackSafeOnchainTransactions(chainId?: number): boolean {
+  return (
+    typeof chainId === "number" &&
+    isSafeOnchainTransactionTrackingEnabled() &&
+    isSafeProposalFlowSupported(chainId)
+  );
 }

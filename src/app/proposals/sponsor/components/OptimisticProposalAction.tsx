@@ -17,10 +17,8 @@ import {
 } from "./publishDraftProposalOnchain";
 import { closeStoredProposalCreationTrace } from "@/lib/mirador/proposalCreationTrace";
 import {
-  isSafeProposalFlowSupported,
-  UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE,
-} from "@/lib/safeChains";
-import { isSafeOnchainTransactionTrackingEnabled } from "@/lib/safeFeatures";
+  shouldTrackSafeOnchainTransactions,
+} from "@/lib/safeFeatures";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 import { isSafeWallet } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
@@ -72,8 +70,6 @@ const OptimisticProposalAction = ({
         onClick={async () => {
           try {
             const connectedChainId = chain?.id ?? contracts.governor.chain.id;
-            const safeOnchainTrackingEnabled =
-              isSafeOnchainTransactionTrackingEnabled();
             const encodedInputData = encodeFunctionData({
               abi: contracts.governor.abi,
               functionName: "proposeWithModule",
@@ -87,13 +83,9 @@ const OptimisticProposalAction = ({
                     address as `0x${string}`,
                     connectedChainId
                   );
-            if (
+            const shouldTrackSafeOnchain =
               safeWallet &&
-              !isSafeProposalFlowSupported(contracts.governor.chain.id)
-            ) {
-              toast.error(UNSUPPORTED_SAFE_PROPOSAL_FLOW_MESSAGE);
-              return;
-            }
+              shouldTrackSafeOnchainTransactions(contracts.governor.chain.id);
 
             await prepareDraftOnchainPublishTrace({
               address: address as `0x${string}`,
@@ -103,7 +95,7 @@ const OptimisticProposalAction = ({
               inputData,
               draftProposalId: draftProposal.id,
             });
-            if (safeWallet && safeOnchainTrackingEnabled) {
+            if (shouldTrackSafeOnchain) {
               const auth = await getAuthenticationData({
                 action: "trackSafeProposalPublish",
                 creatorAddress: address,
@@ -163,6 +155,7 @@ const OptimisticProposalAction = ({
               inputData,
               txHash: data,
               isSafeWallet: safeWallet,
+              shouldTrackSafeOnchain,
               getAuthenticationData,
               openDialog,
             });
