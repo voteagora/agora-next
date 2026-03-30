@@ -314,5 +314,13 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "notifications",
       enabled: true,
     },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+      },
+    },
   ],
 });
