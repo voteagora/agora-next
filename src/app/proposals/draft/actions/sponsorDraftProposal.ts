@@ -9,52 +9,45 @@ import {
 } from "@/app/proposals/draft/utils/stages";
 import { ProposalScope } from "../types";
 import type { FormState } from "@/app/types";
-import { verifySiwe, verifyJwtAndGetAddress } from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
+import { getDraftAuthorizationContext } from "./draftAuthorization";
 
 export async function onSubmitAction(
   data: z.output<typeof SponsorProposalSchema> & {
     draftProposalId: number;
     creatorAddress: string;
-    message?: string;
-    signature?: `0x${string}`;
-    jwt?: string;
-  }
+  } & AuthParams
 ): Promise<FormState> {
-  if (data.jwt) {
-    const jwtAddress = await verifyJwtAndGetAddress(data.jwt);
-    if (!jwtAddress) {
-      return { ok: false, message: "Invalid token" };
-    }
-    if (jwtAddress.toLowerCase() !== data.creatorAddress.toLowerCase()) {
-      return { ok: false, message: "Token address mismatch" };
-    }
-  } else if (data.message && data.signature) {
-    const isValidSig = await verifySiwe({
-      address: data.creatorAddress as `0x${string}`,
+  const authResult = await verifyAuth(
+    {
+      jwt: data.jwt,
       message: data.message,
       signature: data.signature,
-    });
-    if (!isValidSig) {
-      return { ok: false, message: "Invalid signature" };
-    }
-  } else {
-    return { ok: false, message: "Missing authentication" };
+      address: data.creatorAddress as `0x${string}`,
+    },
+    data.creatorAddress as `0x${string}`
+  );
+  if (!authResult.success) {
+    return { ok: false, message: authResult.error };
   }
 
-  // Authorization: allow author OR governor manager OR configured offchainProposalCreator (when applicable)
-  const draft = await prismaWeb2Client.proposalDraft.findUnique({
-    where: { id: data.draftProposalId },
-    select: {
-      id: true,
-      author_address: true,
-      proposal_scope: true,
-    },
+  const draftAccess = await getDraftAuthorizationContext({
+    draftProposalId: data.draftProposalId,
+    address: authResult.address,
+    includeProposalScope: true,
   });
-  if (!draft) return { ok: false, message: "Draft not found" };
+  if (!draftAccess.ok) {
+    return { ok: false, message: draftAccess.message };
+  }
 
-  const signer = data.creatorAddress.toLowerCase();
-  let isAuthorized = signer === draft.author_address.toLowerCase();
+  const {
+    draft,
+    normalizedAddress: signer,
+    isAuthor,
+    isOffchainCreator,
+  } = draftAccess.context;
+  let isAuthorized = isAuthor;
 
   try {
     const tenant = Tenant.current();
@@ -68,8 +61,11 @@ export async function onSubmitAction(
       ProposalScope.OFFCHAIN_ONLY;
     const allowOffchainCreator = Boolean(
       offchainToggle?.enabled &&
+        isOffchainCreator &&
         (isOffchainScope || data.is_offchain_submission) &&
-        plmConfig?.offchainProposalCreator?.includes(signer)
+        plmConfig?.offchainProposalCreator?.some(
+          (creator) => creator.toLowerCase() === signer
+        )
     );
     if (allowOffchainCreator) {
       isAuthorized = true;

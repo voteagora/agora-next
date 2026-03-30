@@ -7,6 +7,7 @@ import {
 import {
   clearStoredSiweSession,
   getStoredSiweSession,
+  notifyStoredSiweSessionChanged,
 } from "@/lib/siweSession";
 
 const API_AUTH_PREFIX = "/api/v1/auth";
@@ -66,6 +67,7 @@ export const siweProviderConfig: SIWEConfig = {
         return false;
       }
       localStorage.setItem(LOCAL_STORAGE_JWT_KEY, JSON.stringify(token));
+      notifyStoredSiweSessionChanged();
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "signed");
       } catch {}
@@ -87,5 +89,5 @@ export const siweProviderConfig: SIWEConfig = {
     clearStoredSiweSession();
     return Promise.resolve(true);
   },
-  enabled: SIWE_ENABLED,
+  enabled: false,
 };

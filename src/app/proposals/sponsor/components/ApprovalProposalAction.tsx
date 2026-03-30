@@ -85,8 +85,6 @@ const ApprovalProposalAction = ({
               is_offchain_submission: false,
               proposal_scope: draftProposal.proposal_scope,
               creatorAddress: address as `0x${string}`,
-              message: auth.message,
-              signature: auth.signature,
               jwt: auth.jwt,
             });
 

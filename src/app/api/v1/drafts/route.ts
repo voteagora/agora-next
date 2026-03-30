@@ -4,10 +4,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import { verifyAuth } from "@/lib/auth/authHelpers";
 
 type CreateDraftBody = {
   creatorAddress?: `0x${string}` | string;
@@ -27,10 +24,6 @@ export async function POST(request: NextRequest) {
       request.headers.get("authorization") ||
       request.headers.get("Authorization");
     const token = authz?.startsWith("Bearer ") ? authz.slice(7) : undefined;
-    let jwtAddress: `0x${string}` | null = null;
-    if (token) {
-      jwtAddress = await verifyJwtAndGetAddress(token);
-    }
 
     if (!creatorAddress) {
       return NextResponse.json(
@@ -39,36 +32,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!jwtAddress && (!message || !signature)) {
-      return NextResponse.json(
-        {
-          message: "Missing required fields: message, signature (or valid JWT)",
-        },
-        { status: 400 }
-      );
-    }
-
-    // Verify SIWE signature (EOA, with 1271 fallback handled by verifySiwe stack)
-    if (jwtAddress) {
-      if (jwtAddress.toLowerCase() !== creatorAddress.toLowerCase()) {
-        return NextResponse.json(
-          { message: "Token address mismatch" },
-          { status: 401 }
-        );
-      }
-    } else {
-      const isValid = await verifySiwe({
+    // Verify authentication
+    const authResult = await verifyAuth(
+      {
+        jwt: token,
+        message,
+        signature,
         address: creatorAddress,
-        message: message!,
-        signature: signature!,
-      });
+      },
+      creatorAddress
+    );
 
-      if (!isValid) {
-        return NextResponse.json(
-          { message: "Invalid signature" },
-          { status: 401 }
-        );
-      }
+    if (!authResult.success) {
+      return NextResponse.json({ message: authResult.error }, { status: 401 });
     }
 
     // Resolve tenant config and initial stage

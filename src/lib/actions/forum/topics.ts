@@ -16,8 +16,9 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction } from "./admin";
 import { requirePermission, checkPermission } from "@/lib/rbac";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import type { DaoSlug } from "@prisma/client";
-import { createAttachmentsFromContent } from "../attachment";
+import { createAttachmentsFromContent } from "../attachmentInternal";
 import { canCreateTopic, formatVPError } from "@/lib/forumSettings";
 import {
   fetchVotingPowerFromContract,
@@ -32,6 +33,45 @@ import {
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
+
+async function deleteOwnedForumTopic(topicId: number, address: string) {
+  const normalizedAddress = address.toLowerCase();
+  const topic = await prismaWeb2Client.forumTopic.findFirst({
+    where: {
+      id: topicId,
+      dao_slug: slug,
+    },
+  });
+
+  if (!topic) {
+    return { success: false as const, error: "Topic not found" };
+  }
+
+  if (topic.address.toLowerCase() !== normalizedAddress) {
+    return { success: false as const, error: "Unauthorized" };
+  }
+
+  await prismaWeb2Client.$transaction(async (tx) => {
+    await tx.forumPost.deleteMany({
+      where: {
+        topicId: topic.id,
+        dao_slug: slug,
+      },
+    });
+
+    await tx.forumTopic.delete({ where: { id: topic.id } });
+  });
+
+  await logForumAuditAction(
+    slug,
+    normalizedAddress,
+    "DELETE_TOPIC",
+    "topic",
+    topicId
+  );
+
+  return { success: true as const };
+}
 
 interface GetForumTopicsOptions {
   categoryId?: number;
@@ -371,13 +411,15 @@ export async function createForumTopic(
   try {
     const validatedData = createTopicSchema.parse(data);
 
-    // Parallelize signature verification and permission check
-    const [isValid, hasTopicPermission] = await Promise.all([
-      verifyMessage({
-        address: validatedData.address as `0x${string}`,
-        message: validatedData.message,
-        signature: validatedData.signature as `0x${string}`,
-      }),
+    const [authResult, hasTopicPermission] = await Promise.all([
+      verifyAuth(
+        {
+          message: validatedData.message,
+          signature: validatedData.signature as `0x${string}` | undefined,
+          jwt: validatedData.jwt,
+        },
+        validatedData.address as `0x${string}`
+      ),
       checkPermission(
         validatedData.address,
         slug as DaoSlug,
@@ -387,11 +429,11 @@ export async function createForumTopic(
       ),
     ]);
 
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
-    const normalizedAddress = validatedData.address.toLowerCase();
+    const normalizedAddress = authResult.address.toLowerCase();
 
     // Only check voting power if user doesn't have RBAC permission
     if (!hasTopicPermission) {
@@ -549,82 +591,49 @@ export async function createForumTopic(
   }
 }
 
-async function _deleteForumTopicInternal(topicId: number) {
-  try {
-    await prismaWeb2Client.forumPost.deleteMany({
-      where: {
-        topicId: topicId,
-        dao_slug: slug,
-      },
-    });
-
-    await prismaWeb2Client.forumTopic.delete({
-      where: {
-        id: topicId,
-      },
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting forum topic (internal):", error);
-    return {
-      success: false,
-      error: "Failed to delete topic",
-      details: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
 export async function deleteForumTopic(
-  data:
-    | z.infer<typeof deleteTopicSchema>
-    | { topicId: number; _internal?: boolean }
+  data: z.infer<typeof deleteTopicSchema>
 ) {
-  // Allow internal cleanup operations to bypass signature verification
-  if ("_internal" in data && data._internal) {
-    return _deleteForumTopicInternal(data.topicId);
-  }
-
   try {
     const validatedData = deleteTopicSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
-    }
-
-    const topic = await prismaWeb2Client.forumTopic.findUnique({
-      where: { id: validatedData.topicId },
-    });
-
-    if (!topic) {
-      return { success: false, error: "Topic not found" };
-    }
-
-    if (topic.address !== validatedData.address) {
-      return { success: false, error: "Unauthorized" };
-    }
-
-    await prismaWeb2Client.forumTopic.delete({
-      where: { id: validatedData.topicId },
-    });
-
-    await logForumAuditAction(
-      slug,
-      validatedData.address,
-      "DELETE_TOPIC",
-      "topic",
-      validatedData.topicId
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
     );
 
-    return { success: true };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+
+    return await deleteOwnedForumTopic(
+      validatedData.topicId,
+      authResult.address
+    );
   } catch (error) {
     console.error("Error deleting forum topic:", error);
+    return handlePrismaError(error);
+  }
+}
+
+export async function deleteForumTopicWithAuth(
+  topicId: number,
+  address: `0x${string}`,
+  auth: AuthParams
+) {
+  try {
+    const authResult = await verifyAuth(auth, address);
+    if (!authResult.success) {
+      return { success: false as const, error: authResult.error };
+    }
+
+    return await deleteOwnedForumTopic(topicId, authResult.address);
+  } catch (error) {
+    console.error("Error deleting forum topic with auth:", error);
     return handlePrismaError(error);
   }
 }
@@ -635,11 +644,11 @@ export async function softDeleteForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "topics",
@@ -675,20 +684,35 @@ export async function restoreForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "topics",
       action: "archive",
     });
 
-    await prismaWeb2Client.forumTopic.update({
+    const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: {
         id: validatedData.topicId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
+
+    if (!topic) {
+      return { success: false, error: "Topic not found" };
+    }
+
+    await prismaWeb2Client.forumTopic.update({
+      where: {
+        id: topic.id,
         dao_slug: slug,
       },
       data: {
@@ -697,7 +721,7 @@ export async function restoreForumTopic(
       },
     });
 
-    if (!validatedData.isAuthor) {
+    if (topic.address.toLowerCase() !== validatedData.address.toLowerCase()) {
       await logForumAuditAction(
         slug,
         validatedData.address,
@@ -747,20 +771,35 @@ export async function archiveForumTopic(
   try {
     const validatedData = archiveTopicSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "topics",
       action: "archive",
     });
 
-    await prismaWeb2Client.forumTopic.update({
+    const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: {
         id: validatedData.topicId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
+
+    if (!topic) {
+      return { success: false, error: "Topic not found" };
+    }
+
+    await prismaWeb2Client.forumTopic.update({
+      where: {
+        id: topic.id,
         dao_slug: slug,
       },
       data: {
@@ -768,7 +807,7 @@ export async function archiveForumTopic(
       },
     });
 
-    if (!validatedData.isAuthor) {
+    if (topic.address.toLowerCase() !== validatedData.address.toLowerCase()) {
       await logForumAuditAction(
         slug,
         validatedData.address,
@@ -1122,6 +1161,7 @@ export const getForumData = async ({
 
     const processedTopics = topics.map((topic) => ({
       ...topic,
+      createdAt: topic.createdAt.toISOString(),
       upvotes: (topic as any).posts[0]?._count?.votes || 0,
       firstPost: (topic as any).posts[0],
       postsCount: (topic as any)._count.posts,

@@ -14,7 +14,7 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import { createProposalLinks } from "@/lib/actions/proposalLinks";
+import { createDiscussionProposalLink } from "@/lib/actions/proposalLinks";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -24,6 +24,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 export interface FormData {
   title: string;
@@ -53,6 +54,7 @@ export default function ForumNewClient({
   const { categories } = useForumCategories();
   const permissions = useForumPermissionsContext();
   const { address } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVPModal, setShowVPModal] = useState(false);
 
@@ -86,8 +88,20 @@ export default function ForumNewClient({
       throw new Error("Wallet not connected");
     }
 
+    const messagePayload = {
+      action: "uploadAttachment",
+      address,
+      timestamp: new Date().toISOString(),
+    };
+    const authData = await getAuthenticationData(messagePayload);
+    if (!authData) {
+      throw new Error("Authentication failed");
+    }
+
     const attachmentData = await convertFileToAttachmentData(file);
-    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
+      jwt: authData.jwt,
+    });
 
     if (!uploadResult.success || !uploadResult.ipfsUrl) {
       throw new Error(uploadResult.error || "Upload failed");
@@ -117,18 +131,24 @@ export default function ForumNewClient({
 
       if (created?.id) {
         if (relatedProposal) {
-          await createProposalLinks({
-            sourceId: relatedProposal.id,
-            sourceType: relatedProposal.type,
-            links: [
-              {
-                targetId: created.id.toString(),
-                targetType: "forum_topic",
+          const messagePayload = {
+            action: "createDiscussionProposalLink",
+            address,
+            timestamp: new Date().toISOString(),
+          };
+          const authData = await getAuthenticationData(messagePayload);
+          if (authData) {
+            await createDiscussionProposalLink({
+              proposalId: relatedProposal.id,
+              proposalType: relatedProposal.type,
+              forumTopicId: created.id.toString(),
+              auth: {
+                jwt: authData.jwt,
               },
-            ],
-          }).catch((error) => {
-            console.error("Failed to create proposal link:", error);
-          });
+            }).catch((error) => {
+              console.error("Failed to create proposal link:", error);
+            });
+          }
         }
 
         toast.success("Forum topic created successfully! Redirecting...");
@@ -275,11 +295,15 @@ export default function ForumNewClient({
                     ) : (
                       <span className="text-red-600 flex items-center gap-1">
                         <XMarkIcon className="h-4 w-4" />
-                        Insufficient voting power
+                        {!address
+                          ? "Wallet not connected"
+                          : "Insufficient voting power"}
                       </span>
                     )}
                     <div className="text-xs mt-1">
-                      {`${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                      {!address
+                        ? "Connect your wallet to check permissions"
+                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
                     </div>
                   </div>
                   <div className="flex gap-2">

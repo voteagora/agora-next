@@ -9,13 +9,13 @@ import {
 } from "./shared";
 import { moderateTextContent, isContentNSFW } from "@/lib/moderation";
 import { indexForumPost, removeForumPostFromIndex } from "./search";
-import verifyMessage from "@/lib/serverVerifyMessage";
+import { verifyAuth } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
 import { requirePermission, checkPermission } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
-import { createAttachmentsFromContent } from "../attachment";
+import { createAttachmentsFromContent } from "../attachmentInternal";
 import {
   canCreatePost,
   canPerformAction,
@@ -53,8 +53,9 @@ function buildPreview(content: string): string {
 const topicVoteSchema = z.object({
   topicId: z.number().min(1, "Topic ID is required"),
   address: z.string().min(1, "Address is required"),
-  signature: z.string().min(1, "Signature is required"),
-  message: z.string().min(1, "Signed message is required"),
+  signature: z.string().optional(),
+  message: z.string().optional(),
+  jwt: z.string().optional(),
 });
 
 async function getRootPostId(topicId: number): Promise<number | null> {
@@ -70,21 +71,23 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
   try {
     const validated = topicVoteSchema.parse(data);
 
-    // Parallelize independent operations
-    const [isValid, topic] = await Promise.all([
-      verifyMessage({
-        address: validated.address as `0x${string}`,
-        message: validated.message,
-        signature: validated.signature as `0x${string}`,
-      }),
+    const [authResult, topic] = await Promise.all([
+      verifyAuth(
+        {
+          message: validated.message,
+          signature: validated.signature as `0x${string}` | undefined,
+          jwt: validated.jwt,
+        },
+        validated.address as `0x${string}`
+      ),
       prismaWeb2Client.forumTopic.findFirst({
         where: { id: validated.topicId, dao_slug: slug },
         select: { id: true, categoryId: true, address: true, title: true },
       }),
     ]);
 
-    if (!isValid)
-      return { success: false, error: "Invalid signature" } as const;
+    if (!authResult.success)
+      return { success: false, error: authResult.error } as const;
 
     if (!topic) return { success: false, error: "Topic not found" } as const;
 
@@ -189,13 +192,16 @@ export async function removeUpvoteForumTopic(
   try {
     const validated = topicVoteSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validated.address as `0x${string}`,
-      message: validated.message,
-      signature: validated.signature as `0x${string}`,
-    });
-    if (!isValid)
-      return { success: false, error: "Invalid signature" } as const;
+    const authResult = await verifyAuth(
+      {
+        message: validated.message,
+        signature: validated.signature as `0x${string}` | undefined,
+        jwt: validated.jwt,
+      },
+      validated.address as `0x${string}`
+    );
+    if (!authResult.success)
+      return { success: false, error: authResult.error } as const;
 
     const rootPostId = await getRootPostId(validated.topicId);
     if (!rootPostId)
@@ -321,34 +327,56 @@ export async function createForumPost(
   try {
     const validatedData = createPostSchema.parse(data);
 
-    // Parallelize independent operations
-    const [isValid, topic] = await Promise.all([
-      verifyMessage({
-        address: validatedData.address as `0x${string}`,
-        message: validatedData.message,
-        signature: validatedData.signature as `0x${string}`,
-      }),
-      prismaWeb2Client.forumTopic.findUnique({
-        where: { id: topicId },
+    const [authResult, topic, parentPost] = await Promise.all([
+      verifyAuth(
+        {
+          message: validatedData.message,
+          signature: validatedData.signature as `0x${string}` | undefined,
+          jwt: validatedData.jwt,
+        },
+        validatedData.address as `0x${string}`
+      ),
+      prismaWeb2Client.forumTopic.findFirst({
+        where: {
+          id: topicId,
+          dao_slug: slug,
+        },
         include: {
           category: true,
         },
       }),
+      validatedData.parentId
+        ? prismaWeb2Client.forumPost.findFirst({
+            where: {
+              id: validatedData.parentId,
+              dao_slug: slug,
+              topicId,
+            },
+            select: {
+              id: true,
+              address: true,
+            },
+          })
+        : Promise.resolve(null),
     ]);
 
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
     if (!topic) {
       return { success: false, error: "Topic not found" };
     }
 
-    const normalizedAddress = validatedData.address.toLowerCase();
+    if (validatedData.parentId && !parentPost) {
+      return { success: false, error: "Parent post not found" };
+    }
+
+    const normalizedAddress = authResult.address.toLowerCase();
 
     // Check if user has posts.create permission (bypasses VP requirements)
     const hasPostPermission = await checkPermission(
-      validatedData.address,
+      normalizedAddress,
       slug as DaoSlug,
       "forums",
       "posts",
@@ -364,7 +392,7 @@ export async function createForumPost(
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
           client,
-          validatedData.address,
+          normalizedAddress,
           {
             namespace: tenant.namespace,
             contracts: tenant.contracts,
@@ -399,9 +427,9 @@ export async function createForumPost(
     const newPost = await prismaWeb2Client.forumPost.create({
       data: {
         content: validatedData.content,
-        address: validatedData.address,
+        address: normalizedAddress,
         topicId: topicId,
-        parentPostId: validatedData.parentId || null,
+        parentPostId: validatedData.parentId ?? null,
         dao_slug: slug,
         isNsfw,
       },
@@ -411,7 +439,7 @@ export async function createForumPost(
     try {
       await createAttachmentsFromContent(
         validatedData.content,
-        validatedData.address,
+        normalizedAddress,
         "post",
         newPost.id
       );
@@ -429,7 +457,7 @@ export async function createForumPost(
         postId: newPost.id,
         daoSlug: slug,
         content: validatedData.content,
-        author: validatedData.address,
+        author: normalizedAddress,
         topicId: topicId,
         topicTitle: topic.title,
         parentPostId: validatedData.parentId || undefined,
@@ -451,34 +479,27 @@ export async function createForumPost(
 
       const candidates: Parameters<typeof emitCompoundEvent>[2] = [];
 
-      if (validatedData.parentId) {
-        const parentPost = await prismaWeb2Client.forumPost.findUnique({
-          where: { id: validatedData.parentId },
-          select: { address: true },
+      if (
+        parentPost?.address &&
+        parentPost.address.toLowerCase() !== normalizedAddress
+      ) {
+        // Link directly to the reply post
+        const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
+        candidates.push({
+          kind: "direct",
+          eventType: "forum_reply_to_your_comment",
+          entityId: String(newPost.id),
+          recipientIds: [parentPost.address],
+          data: {
+            dao_name: slug,
+            topic_title: topic.title,
+            topic_url: postUrl,
+            reply_preview: preview,
+            replier_address: normalizedAddress,
+            replier_display_name: authorDisplayName,
+            replier_profile_url: authorProfileUrl,
+          },
         });
-
-        if (
-          parentPost?.address &&
-          parentPost.address.toLowerCase() !== normalizedAddress
-        ) {
-          // Link directly to the reply post
-          const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
-          candidates.push({
-            kind: "direct",
-            eventType: "forum_reply_to_your_comment",
-            entityId: String(newPost.id),
-            recipientIds: [parentPost.address],
-            data: {
-              dao_name: slug,
-              topic_title: topic.title,
-              topic_url: postUrl,
-              reply_preview: preview,
-              replier_address: normalizedAddress,
-              replier_display_name: authorDisplayName,
-              replier_profile_url: authorProfileUrl,
-            },
-          });
-        }
       }
 
       // Prefer "watched" over "engaged" when audiences overlap.
@@ -528,7 +549,7 @@ export async function createForumPost(
       where: {
         dao_slug: slug,
         topicId: topicId,
-        address: validatedData.address,
+        address: normalizedAddress,
       },
     });
 
@@ -556,25 +577,33 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
   try {
     const validatedData = deletePostSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
 
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
-    const post = await prismaWeb2Client.forumPost.findUnique({
-      where: { id: validatedData.postId },
+    const normalizedAddress = authResult.address.toLowerCase();
+
+    const post = await prismaWeb2Client.forumPost.findFirst({
+      where: {
+        id: validatedData.postId,
+        dao_slug: slug,
+      },
     });
 
     if (!post) {
       return { success: false, error: "Post not found" };
     }
 
-    if (post.address !== validatedData.address) {
+    if (post.address.toLowerCase() !== normalizedAddress) {
       return { success: false, error: "Unauthorized" };
     }
 
@@ -584,7 +613,7 @@ export async function deleteForumPost(data: z.infer<typeof deletePostSchema>) {
 
     await logForumAuditAction(
       slug,
-      validatedData.address,
+      normalizedAddress,
       "DELETE_POST",
       "post",
       validatedData.postId
@@ -603,11 +632,11 @@ export async function softDeleteForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "posts",
@@ -643,20 +672,35 @@ export async function restoreForumPost(
   try {
     const validatedData = softDeletePostSchema.parse(data);
 
-    // Verify signature and check permission
     await requirePermission({
       address: validatedData.address,
       message: validatedData.message,
       signature: validatedData.signature,
+      jwt: validatedData.jwt,
       daoSlug: slug as any,
       module: "forums",
       resource: "posts",
       action: "archive",
     });
 
-    await prismaWeb2Client.forumPost.update({
+    const post = await prismaWeb2Client.forumPost.findFirst({
       where: {
         id: validatedData.postId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
+
+    if (!post) {
+      return { success: false, error: "Post not found" };
+    }
+
+    await prismaWeb2Client.forumPost.update({
+      where: {
+        id: post.id,
         dao_slug: slug,
       },
       data: {
@@ -665,7 +709,7 @@ export async function restoreForumPost(
       },
     });
 
-    if (!validatedData.isAuthor) {
+    if (post.address.toLowerCase() !== validatedData.address.toLowerCase()) {
       await logForumAuditAction(
         slug,
         validatedData.address,

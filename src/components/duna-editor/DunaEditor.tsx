@@ -30,6 +30,7 @@ import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -191,16 +192,17 @@ export default function DunaEditor({
   variant = "post",
   onImageUpload,
 }: DunaEditorProps) {
+  const { address, isConnected } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
-  const { address, isConnected } = useAccount();
+  const [isMounted, setIsMounted] = useState(false);
 
   // Debug link dialog state
   useEffect(() => {
     console.log("Link dialog state:", { linkDialogOpen, linkDialogUrl });
   }, [linkDialogOpen, linkDialogUrl]);
-  const [isMounted, setIsMounted] = useState(false);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -344,10 +346,23 @@ export default function DunaEditor({
             imageUrl = await onImageUpload(file);
           } else {
             // Use IPFS upload only (no database record)
+            const messagePayload = {
+              action: "uploadAttachment",
+              address,
+              timestamp: new Date().toISOString(),
+            };
+            const authData = await getAuthenticationData(messagePayload);
+            if (!authData) {
+              throw new Error("Authentication failed");
+            }
+
             const attachmentData = await convertFileToAttachmentData(file);
             const uploadResult = await uploadToIPFSOnly(
               attachmentData,
-              address
+              address,
+              {
+                jwt: authData.jwt,
+              }
             );
 
             if (!uploadResult.success || !uploadResult.ipfsUrl) {

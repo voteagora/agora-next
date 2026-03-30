@@ -2,40 +2,25 @@
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import type { FormState } from "@/app/types";
-import {
-  verifyOwnerAndSiweForDraft,
-  verifyOwnerAndJwtForDraft,
-} from "./siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { requireDraftEditAccess } from "./draftAuthorization";
 
 export async function onSubmitAction(
   draftProposalId: number,
-  params: {
-    address: `0x${string}`;
-    message?: string;
-    signature?: `0x${string}`;
-    jwt?: string;
-  }
+  params: { address: `0x${string}` } & AuthParams
 ): Promise<FormState> {
   try {
-    if (params.jwt) {
-      const jwtCheck = await verifyOwnerAndJwtForDraft(
-        draftProposalId,
-        params.jwt
-      );
-      if (!jwtCheck.ok) {
-        return { ok: false, message: jwtCheck.reason };
-      }
-    } else if (params.message && params.signature) {
-      const ownerCheck = await verifyOwnerAndSiweForDraft(draftProposalId, {
-        address: params.address,
-        message: params.message,
-        signature: params.signature,
-      });
-      if (!ownerCheck.ok) {
-        return { ok: false, message: ownerCheck.reason };
-      }
-    } else {
-      return { ok: false, message: "Missing authentication" };
+    const authResult = await verifyAuth(params, params.address);
+    if (!authResult.success) {
+      return { ok: false, message: authResult.error };
+    }
+
+    const draftAccess = await requireDraftEditAccess({
+      draftProposalId,
+      address: authResult.address,
+    });
+    if (!draftAccess.ok) {
+      return { ok: false, message: draftAccess.message };
     }
     // TODO: maybe we don't delete, we just flag isDeleted
     await prismaWeb2Client.proposalDraft.delete({

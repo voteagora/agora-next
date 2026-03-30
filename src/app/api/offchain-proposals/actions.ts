@@ -5,67 +5,37 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
-import {
-  verifySiwe,
-  verifyJwtAndGetAddress,
-} from "@/app/proposals/draft/actions/siweAuth";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { PLMConfig } from "@/app/proposals/draft/types";
-
-interface AuthParams {
-  jwt?: string;
-  message?: string;
-  signature?: `0x${string}`;
-}
 
 async function authenticateAndAuthorize(
   auth: AuthParams,
   expectedAddress?: string
 ): Promise<{ ok: true; address: string } | { ok: false; error: string }> {
-  let authenticatedAddress: string | null = null;
-
-  if (auth.jwt) {
-    authenticatedAddress = await verifyJwtAndGetAddress(auth.jwt);
-    if (!authenticatedAddress) {
-      return { ok: false, error: "Invalid token" };
-    }
-  } else if (auth.message && auth.signature) {
-    if (!expectedAddress) {
-      return { ok: false, error: "Missing address for signature verification" };
-    }
-    const isValid = await verifySiwe({
-      address: expectedAddress as `0x${string}`,
-      message: auth.message,
-      signature: auth.signature,
-    });
-    if (!isValid) {
-      return { ok: false, error: "Invalid signature" };
-    }
-    authenticatedAddress = expectedAddress;
-  } else {
-    return { ok: false, error: "Missing authentication" };
+  // Verify authentication
+  const authResult = await verifyAuth(
+    auth,
+    expectedAddress as `0x${string}` | undefined
+  );
+  if (!authResult.success) {
+    return { ok: false, error: authResult.error };
   }
 
-  if (
-    expectedAddress &&
-    authenticatedAddress.toLowerCase() !== expectedAddress.toLowerCase()
-  ) {
-    return { ok: false, error: "Address mismatch" };
-  }
-
+  // Check authorization (must be in offchainProposalCreator list)
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
   const offchainCreators =
     (plmToggle?.config as PLMConfig)?.offchainProposalCreator || [];
 
   const isAuthorized = offchainCreators.some(
-    (creator) => creator.toLowerCase() === authenticatedAddress!.toLowerCase()
+    (creator) => creator.toLowerCase() === authResult.address.toLowerCase()
   );
 
   if (!isAuthorized) {
     return { ok: false, error: "Unauthorized" };
   }
 
-  return { ok: true, address: authenticatedAddress };
+  return { ok: true, address: authResult.address };
 }
 
 interface OffchainProposalData {
@@ -86,7 +56,7 @@ interface OffchainProposalData {
 interface CreateOffchainProposalParams {
   proposalData: OffchainProposalData;
   id: string;
-  transactionHash?: string;
+  attestationUid?: string;
   onchainProposalId: string | null;
   auth: AuthParams;
 }
@@ -95,7 +65,7 @@ export async function createOffchainProposal({
   proposalData,
   onchainProposalId,
   id,
-  transactionHash,
+  attestationUid,
   auth,
 }: CreateOffchainProposalParams) {
   const authResult = await authenticateAndAuthorize(
@@ -141,7 +111,7 @@ export async function createOffchainProposal({
         tiers: tiers,
         start_block: start_block.toString(),
         end_block: end_block.toString(),
-        created_attestation_hash: transactionHash ?? null,
+        created_attestation_hash: attestationUid ?? null,
         created_block: latestBlock,
         max_options: maxApprovals,
         criteria: criteria,
@@ -160,7 +130,7 @@ export async function createOffchainProposal({
     return {
       success: true,
       proposalId: dbProposal.id,
-      transactionHash,
+      attestationUid,
     };
   } catch (error: any) {
     console.error("Error creating off-chain proposal:", error);
@@ -170,16 +140,16 @@ export async function createOffchainProposal({
 
 interface CancelOffchainProposalParams {
   proposalId: string;
-  transactionHash: string;
+  attestationUid: string;
   auth: AuthParams;
 }
 
 export async function cancelOffchainProposal({
   proposalId,
-  transactionHash,
+  attestationUid,
   auth,
 }: CancelOffchainProposalParams) {
-  const authResult = await authenticateAndAuthorize(auth);
+  const authResult = await authenticateAndAuthorize(auth, auth.address);
   if (!authResult.ok) {
     throw new Error(authResult.error);
   }
@@ -200,14 +170,14 @@ export async function cancelOffchainProposal({
       },
       data: {
         cancelled_block: latestBlock,
-        cancelled_attestation_hash: transactionHash ?? null,
+        cancelled_attestation_hash: attestationUid ?? null,
       },
     });
 
     return {
       success: true,
       proposalId: updatedProposal.id,
-      transactionHash,
+      attestationUid,
     };
   } catch (error: any) {
     console.error("Error cancelling off-chain proposal:", error);
