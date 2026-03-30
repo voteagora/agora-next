@@ -45,9 +45,9 @@ export default function ForumsHeader({
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;
 
   return (
-    <div className="mt-6 max-w-7xl mx-auto px-6 sm:px-0">
-      <div className="flex items-center justify-between mb-6">
-        <div>
+    <div className="mt-6 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between mb-6">
+        <div className="min-w-0 flex-1">
           {shouldRenderBreadcrumb ? (
             <Breadcrumb className="mb-2">
               <BreadcrumbList>
@@ -77,9 +77,11 @@ export default function ForumsHeader({
 
           {description ? <h3 className="text-primary">{description}</h3> : null}
         </div>
-        <div className="flex gap-2">
-          <ForumsSearch />
-          <NewTopicButton isDuna={isDuna} topicContext={topicContext} />
+        <div className="flex flex-col gap-3 w-full shrink-0 sm:flex-row sm:items-center sm:justify-end lg:w-auto">
+          <ForumsSearch className="w-full min-w-0 sm:max-w-[400px] lg:w-[400px]" />
+          <div className="shrink-0 sm:flex sm:items-center">
+            <NewTopicButton isDuna={isDuna} topicContext={topicContext} />
+          </div>
         </div>
       </div>
     </div>

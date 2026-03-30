@@ -252,7 +252,7 @@ function TopicCard({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             {/* Watch button */}
             {showWatchButton && (
               <TooltipProvider>
