@@ -36,8 +36,7 @@ export async function storeSiweNonce(nonce: string, host: string) {
   };
   const key = getActiveNonceKey(nonce);
 
-  await redis.set(key, payload);
-  await redis.expire(key, SIWE_NONCE_TTL_SECONDS);
+  await redis.set(key, payload, { ex: SIWE_NONCE_TTL_SECONDS });
 
   return payload;
 }
@@ -46,20 +45,20 @@ export async function consumeSiweNonce(
   nonce: string
 ): Promise<ConsumedSiweNonceResult> {
   const consumedKey = getConsumedNonceKey(nonce);
-  const didSetConsumed = await redis.setnx(consumedKey, "1");
+  const didSetConsumed = await redis.set(consumedKey, "1", {
+    nx: true,
+    ex: SIWE_NONCE_TTL_SECONDS,
+  });
 
-  if (!didSetConsumed) {
+  if (didSetConsumed !== "OK") {
     return {
       ok: false,
       reason: "replayed",
     };
   }
 
-  await redis.expire(consumedKey, SIWE_NONCE_TTL_SECONDS);
-
   const activeKey = getActiveNonceKey(nonce);
-  const payload = await redis.get<StoredSiweNonce>(activeKey);
-  await redis.del(activeKey);
+  const payload = await redis.getdel<StoredSiweNonce>(activeKey);
 
   if (!payload?.host || !payload?.issuedAt) {
     return {

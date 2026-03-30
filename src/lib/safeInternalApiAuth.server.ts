@@ -137,14 +137,14 @@ async function enforceSafeRateLimit(params: {
       await redis.expire(redisKey, windowSeconds);
     }
 
+    if (requestCount <= params.maxRequests) {
+      return null;
+    }
+
     let retryAfterSeconds = await redis.ttl(redisKey);
     if (typeof retryAfterSeconds !== "number" || retryAfterSeconds < 1) {
       retryAfterSeconds = windowSeconds;
       await redis.expire(redisKey, windowSeconds);
-    }
-
-    if (requestCount <= params.maxRequests) {
-      return null;
     }
 
     return NextResponse.json(
