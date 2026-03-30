@@ -6,6 +6,7 @@ const EXCLUDED_ROUTES_FROM_AUTH = [
   "/spec",
   "/auth/nonce",
   "/auth/verify",
+  "/auth/e2e-token",
   "/votable_supply",
 ];
 const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
