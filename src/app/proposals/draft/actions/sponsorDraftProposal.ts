@@ -189,10 +189,10 @@ export async function onSubmitAction(
       !parsed.data.is_offchain_submission
     ) {
       safeProposalPublish = await upsertSafeTrackedTransaction({
-        daoSlug: draft.dao_slug,
+        daoSlug: draft.dao_slug!,
         kind: "publish_proposal",
         safeAddress: data.safeAddress,
-        chainId: draft.chain_id,
+        chainId: draft.chain_id!,
         safeTxHash: parsed.data.onchain_transaction_hash as `0x${string}`,
         traceContext,
       });
