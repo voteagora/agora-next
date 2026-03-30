@@ -7,6 +7,7 @@ import type {
 
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import { getMiradorServerClient } from "./serverClient";
+import { getTenantTag } from "./tags";
 import {
   MiradorAttributeMap,
   MiradorChainName,
@@ -194,8 +195,10 @@ export async function appendServerTraceEvent({
       trace.addAttributes(attributePayload);
     }
 
-    if (tags && tags.length > 0) {
-      trace.addTags(tags);
+    const tenantTag = getTenantTag();
+    const allTags = [...(tenantTag ? [tenantTag] : []), ...(tags ?? [])];
+    if (allTags.length > 0) {
+      trace.addTags(allTags);
     }
 
     const severity = inferEventSeverity(eventName);
