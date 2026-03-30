@@ -170,7 +170,9 @@ export function CreatePostForm({
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
-                      {!address ? "Wallet not connected" : "Insufficient voting power"}
+                      {!address
+                        ? "Wallet not connected"
+                        : "Insufficient voting power"}
                     </span>
                   )}
                   <div className="text-xs mt-1">

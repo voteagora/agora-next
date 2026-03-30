@@ -97,7 +97,9 @@ export function validateUploadRateLimit(params: {
   return null;
 }
 
-function getDefaultUploadLimit(scope: "inline-image" | "attachment" | "document") {
+function getDefaultUploadLimit(
+  scope: "inline-image" | "attachment" | "document"
+) {
   switch (scope) {
     case "inline-image":
       return DEFAULT_MAX_INLINE_IMAGE_UPLOADS;

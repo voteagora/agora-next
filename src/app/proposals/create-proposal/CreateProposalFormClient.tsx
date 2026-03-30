@@ -204,26 +204,25 @@ export default function CreateProposalFormClient({
     const provider = new BrowserProvider(walletClient.transport, network);
     const signer = new JsonRpcSigner(provider, address);
 
-    const { id, attestationUid } =
-      await createProposalAttestation({
-        contract: contracts.governor.address as `0x${string}`,
-        proposer: rawProposalDataForBackend.proposer,
-        description: rawProposalDataForBackend.description,
-        choices: rawProposalDataForBackend.choices,
-        proposal_type_id: rawProposalDataForBackend.proposal_type_id,
-        start_block: rawProposalDataForBackend.start_block.toString(),
-        end_block: rawProposalDataForBackend.end_block.toString(),
-        proposal_type: parsedProposalType,
-        tiers: rawProposalDataForBackend.tiers,
-        signer,
-        onchain_proposalid: onchainProposalId,
-        maxApprovals: rawProposalDataForBackend.maxApprovals,
-        criteria: rawProposalDataForBackend.criteria,
-        criteriaValue: rawProposalDataForBackend.criteriaValue,
-        calculationOptions: rawProposalDataForBackend.calculationOptions,
-      });
+    const { id, attestationUid } = await createProposalAttestation({
+      contract: contracts.governor.address as `0x${string}`,
+      proposer: rawProposalDataForBackend.proposer,
+      description: rawProposalDataForBackend.description,
+      choices: rawProposalDataForBackend.choices,
+      proposal_type_id: rawProposalDataForBackend.proposal_type_id,
+      start_block: rawProposalDataForBackend.start_block.toString(),
+      end_block: rawProposalDataForBackend.end_block.toString(),
+      proposal_type: parsedProposalType,
+      tiers: rawProposalDataForBackend.tiers,
+      signer,
+      onchain_proposalid: onchainProposalId,
+      maxApprovals: rawProposalDataForBackend.maxApprovals,
+      criteria: rawProposalDataForBackend.criteria,
+      criteriaValue: rawProposalDataForBackend.criteriaValue,
+      calculationOptions: rawProposalDataForBackend.calculationOptions,
+    });
 
-      await createOffchainProposal({
+    await createOffchainProposal({
       proposalData: {
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,

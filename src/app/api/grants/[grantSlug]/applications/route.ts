@@ -210,8 +210,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const normalizedAuthenticatedAddress =
-      authenticatedAddress.toLowerCase();
+    const normalizedAuthenticatedAddress = authenticatedAddress.toLowerCase();
 
     // First, verify the grant exists
     const grant = await getGrant(grantSlug);
