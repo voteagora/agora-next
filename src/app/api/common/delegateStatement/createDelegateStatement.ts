@@ -2,10 +2,8 @@ import "server-only";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import verifyMessage from "@/lib/serverVerifyMessage";
 import Tenant from "@/lib/tenant/tenant";
 import { Prisma } from "@prisma/client";
-import { createDelegateStatementMessage } from "@/lib/delegateStatement/messageFormat";
 import {
   DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER,
   buildStoredDelegateStatementPayload,
@@ -30,39 +28,10 @@ export async function createDelegateStatement({
   const { slug } = Tenant.current();
   const normalizedAddress = address.toLowerCase();
 
-  if (auth.kind === "siwe_jwt") {
-    const verifiedAddress = await verifyJwtAndGetAddress(auth.jwt);
+  const verifiedAddress = await verifyJwtAndGetAddress(auth.jwt);
 
-    if (
-      !verifiedAddress ||
-      verifiedAddress.toLowerCase() !== normalizedAddress
-    ) {
-      throw new Error("Invalid token");
-    }
-  } else {
-    const expectedMessage = createDelegateStatementMessage(delegateStatement, {
-      daoSlug: slug,
-      discord,
-      email,
-      twitter,
-      warpcast,
-      topIssues: delegateStatement.topIssues,
-      topStakeholders: delegateStatement.topStakeholders,
-      scwAddress,
-      notificationPreferences,
-    });
-
-    const valid = await verifyMessage({
-      address,
-      chainId: auth.chainId,
-      message: expectedMessage,
-      signature: auth.signature,
-      allowSafeContractSignature: true,
-    });
-
-    if (!valid) {
-      throw new Error("Invalid signature");
-    }
+  if (!verifiedAddress || verifiedAddress.toLowerCase() !== normalizedAddress) {
+    throw new Error("Invalid token");
   }
 
   const storedPayload = buildStoredDelegateStatementPayload(delegateStatement);
@@ -72,10 +41,7 @@ export async function createDelegateStatement({
     address: normalizedAddress,
     dao_slug: slug,
     message_hash: messageHash,
-    signature:
-      auth.kind === "siwe_jwt"
-        ? DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER
-        : auth.signature,
+    signature: DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER,
     payload: storedPayload as Prisma.InputJsonValue,
     twitter,
     warpcast,

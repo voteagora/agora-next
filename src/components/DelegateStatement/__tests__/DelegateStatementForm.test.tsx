@@ -12,17 +12,10 @@ import DelegateStatementForm from "../DelegateStatementForm";
 import type { DelegateStatementFormValues } from "../CurrentDelegateStatement";
 
 const pushMock = vi.fn();
-const openDialogMock = vi.fn();
 const submitDelegateStatementMock = vi.fn();
 const signMessageAsyncMock = vi.fn();
 const setSaveSuccessMock = vi.fn();
 const ensureSiweSessionMock = vi.fn();
-const { isSafeOffchainMessageTrackingEnabledMock } = vi.hoisted(() => ({
-  isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
-}));
-const originalDelegateStatementAuthMode =
-  process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
-const originalSiweEnabled = process.env.NEXT_PUBLIC_SIWE_ENABLED;
 
 const defaultValues: DelegateStatementFormValues = {
   agreeCodeConduct: true,
@@ -61,19 +54,11 @@ vi.mock("wagmi", () => ({
     address: "0x1234567890123456789012345678901234567890",
     chain: { id: 1 },
   })),
-  useWalletClient: vi.fn(() => ({})),
-  useSignMessage: vi.fn(() => ({
-    signMessageAsync: signMessageAsyncMock,
-  })),
 }));
 
 vi.mock("@/app/delegates/actions", () => ({
   submitDelegateStatement: (...args: unknown[]) =>
     submitDelegateStatementMock(...args),
-}));
-
-vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
-  useOpenDialog: () => openDialogMock,
 }));
 
 vi.mock("@/hooks/useEnsureSiweSession", () => ({
@@ -85,23 +70,6 @@ vi.mock("@/hooks/useEnsureSiweSession", () => ({
     walletType: "eoa",
   }),
 }));
-
-vi.mock("@/lib/safeFeatures", () => ({
-  isSafeOffchainMessageTrackingEnabled:
-    isSafeOffchainMessageTrackingEnabledMock,
-  SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE:
-    "Safe offchain message tracking is disabled for this tenant.",
-}));
-
-vi.mock("@/lib/utils", async () => {
-  const actual =
-    await vi.importActual<typeof import("@/lib/utils")>("@/lib/utils");
-
-  return {
-    ...actual,
-    isSafeWallet: vi.fn(),
-  };
-});
 
 vi.mock("@/hooks/useSmartAccountAddress", () => ({
   useSmartAccountAddress: () => ({
@@ -208,9 +176,6 @@ function createForm(values: DelegateStatementFormValues) {
 describe("DelegateStatementForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(true);
-    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "siwe_jwt";
-    process.env.NEXT_PUBLIC_SIWE_ENABLED = "true";
     ensureSiweSessionMock.mockResolvedValue("jwt-token");
     signMessageAsyncMock.mockResolvedValue("0xabc123");
     submitDelegateStatementMock.mockResolvedValue({});
@@ -218,21 +183,9 @@ describe("DelegateStatementForm", () => {
 
   afterEach(() => {
     cleanup();
-    if (originalDelegateStatementAuthMode === undefined) {
-      delete process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
-    } else {
-      process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE =
-        originalDelegateStatementAuthMode;
-    }
-
-    if (originalSiweEnabled === undefined) {
-      delete process.env.NEXT_PUBLIC_SIWE_ENABLED;
-    } else {
-      process.env.NEXT_PUBLIC_SIWE_ENABLED = originalSiweEnabled;
-    }
   });
 
-  it("submits with a SIWE JWT for EOAs when SIWE auth is enabled", async () => {
+  it("submits with a SIWE JWT for EOAs", async () => {
     render(<DelegateStatementForm form={createForm(defaultValues)} />);
 
     fireEvent.click(
@@ -253,38 +206,6 @@ describe("DelegateStatementForm", () => {
 
     expect(ensureSiweSessionMock).toHaveBeenCalledTimes(1);
     expect(signMessageAsyncMock).not.toHaveBeenCalled();
-    expect(openDialogMock).not.toHaveBeenCalled();
-  });
-
-  it("falls back to signed-message auth when SIWE is disabled", async () => {
-    delete process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE;
-    delete process.env.NEXT_PUBLIC_SIWE_ENABLED;
-
-    const { isSafeWallet } = await import("@/lib/utils");
-    vi.mocked(isSafeWallet).mockResolvedValue(false);
-
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Submit delegate profile" })
-    );
-
-    await waitFor(() => expect(signMessageAsyncMock).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(submitDelegateStatementMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          address: "0x1234567890123456789012345678901234567890",
-          auth: {
-            kind: "signed_message",
-            signature: "0xabc123",
-            chainId: 1,
-          },
-        })
-      )
-    );
-
-    expect(ensureSiweSessionMock).not.toHaveBeenCalled();
-    expect(openDialogMock).not.toHaveBeenCalled();
   });
 
   it("continues submission after Safe SIWE auth succeeds", async () => {
@@ -316,89 +237,5 @@ describe("DelegateStatementForm", () => {
     );
 
     expect(signMessageAsyncMock).not.toHaveBeenCalled();
-  });
-
-  it("opens the shared Safe raw-message dialog when the rollback mode is enabled", async () => {
-    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "signed_message";
-    const { isSafeWallet } = await import("@/lib/utils");
-    vi.mocked(isSafeWallet).mockResolvedValue(true);
-
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Submit delegate profile" })
-    );
-
-    await waitFor(() =>
-      expect(openDialogMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: "SAFE_OFFCHAIN_SIGNING",
-          params: expect.objectContaining({
-            safeAddress: "0x1234567890123456789012345678901234567890",
-            purpose: "delegate_statement",
-            signingKind: "raw_message",
-            signMessage: signMessageAsyncMock,
-            onCompleted: expect.any(Function),
-          }),
-        })
-      )
-    );
-
-    expect(submitDelegateStatementMock).not.toHaveBeenCalled();
-    expect(ensureSiweSessionMock).not.toHaveBeenCalled();
-  });
-
-  it("surfaces a clear error when Safe raw-message tracking is disabled", async () => {
-    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "signed_message";
-    isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(false);
-    const { isSafeWallet } = await import("@/lib/utils");
-    vi.mocked(isSafeWallet).mockResolvedValue(true);
-
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Submit delegate profile" })
-    );
-
-    expect(
-      await screen.findByText(
-        "Safe offchain message tracking is disabled for this tenant."
-      )
-    ).toBeInTheDocument();
-    expect(openDialogMock).not.toHaveBeenCalled();
-    expect(submitDelegateStatementMock).not.toHaveBeenCalled();
-  });
-
-  it("keeps the direct sign-and-submit path for EOAs in rollback mode", async () => {
-    process.env.NEXT_PUBLIC_DELEGATE_STATEMENT_AUTH_MODE = "signed_message";
-    const { isSafeWallet } = await import("@/lib/utils");
-    vi.mocked(isSafeWallet).mockResolvedValue(false);
-
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Submit delegate profile" })
-    );
-
-    await waitFor(() => expect(signMessageAsyncMock).toHaveBeenCalledTimes(1));
-    await waitFor(() =>
-      expect(submitDelegateStatementMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          address: "0x1234567890123456789012345678901234567890",
-          delegateStatement: expect.objectContaining({
-            delegateStatement: "Delegate statement body",
-          }),
-          auth: {
-            kind: "signed_message",
-            signature: "0xabc123",
-            chainId: 1,
-          },
-        })
-      )
-    );
-    expect(pushMock).toHaveBeenCalledWith(
-      "/delegates/0x1234567890123456789012345678901234567890"
-    );
-    expect(ensureSiweSessionMock).not.toHaveBeenCalled();
   });
 });

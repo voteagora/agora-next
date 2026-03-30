@@ -3,12 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDelegateStatement } from "./createDelegateStatement";
 import { DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER } from "@/lib/delegateStatement/persistence";
 
-const { upsertMock, verifyMessageMock, verifyJwtAndGetAddressMock } =
-  vi.hoisted(() => ({
-    upsertMock: vi.fn(),
-    verifyMessageMock: vi.fn(),
-    verifyJwtAndGetAddressMock: vi.fn(),
-  }));
+const { upsertMock, verifyJwtAndGetAddressMock } = vi.hoisted(() => ({
+  upsertMock: vi.fn(),
+  verifyJwtAndGetAddressMock: vi.fn(),
+}));
 
 const address = "0x1234567890123456789012345678901234567890" as const;
 
@@ -46,10 +44,6 @@ vi.mock("@/app/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/serverVerifyMessage", () => ({
-  default: verifyMessageMock,
-}));
-
 vi.mock("@/lib/siweAuth.server", () => ({
   verifyJwtAndGetAddress: verifyJwtAndGetAddressMock,
 }));
@@ -80,7 +74,6 @@ describe("createDelegateStatement", () => {
       },
     });
 
-    expect(verifyMessageMock).not.toHaveBeenCalled();
     expect(upsertMock).toHaveBeenCalledWith(
       expect.objectContaining({
         create: expect.objectContaining({
@@ -121,36 +114,5 @@ describe("createDelegateStatement", () => {
     ).rejects.toThrow("Invalid token");
 
     expect(upsertMock).not.toHaveBeenCalled();
-  });
-
-  it("keeps the signed-message fallback path available", async () => {
-    verifyMessageMock.mockResolvedValue(true);
-
-    await createDelegateStatement({
-      address,
-      delegateStatement,
-      auth: {
-        kind: "signed_message",
-        signature: "0xabc123",
-        chainId: 1,
-      },
-    });
-
-    expect(verifyMessageMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        allowSafeContractSignature: true,
-        address,
-        chainId: 1,
-        signature: "0xabc123",
-        message: expect.stringContaining("Delegate statement body"),
-      })
-    );
-    expect(upsertMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        create: expect.objectContaining({
-          signature: "0xabc123",
-        }),
-      })
-    );
   });
 });
