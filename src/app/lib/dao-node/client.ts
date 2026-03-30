@@ -332,71 +332,88 @@ export const getDelegatesFromDaoNode = async (options?: {
 
     const data = await response.json();
 
-    if (data && data.delegates && data.delegates.length > 0) {
-      const allRawDelegatesFromApi = data.delegates;
-      const totalBeforeInternalPagination = allRawDelegatesFromApi.length;
+    const fromTenantUi = (
+      ui.delegates?.additionalStatementAddresses ?? []
+    ).map((addr) => addr.toLowerCase());
 
-      let delegatesToFetchStatementsFor = [...allRawDelegatesFromApi];
+    const allRawDelegatesFromApi = Array.isArray(data?.delegates)
+      ? data.delegates
+      : [];
 
-      delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(0, 1000);
+    const totalBeforeInternalPagination = allRawDelegatesFromApi.length;
+    const delegatesToFetchStatementsFor = allRawDelegatesFromApi.slice(0, 1000);
 
-      let mappedDelegates: MappedDelegate[] = [];
+    const fromApi = delegatesToFetchStatementsFor.map(
+      (delegate: { addr: string }) => delegate.addr.toLowerCase()
+    );
+    const delegateAddresses = [...new Set([...fromApi, ...fromTenantUi])];
 
-      if (delegatesToFetchStatementsFor.length > 0) {
-        const delegateAddresses = delegatesToFetchStatementsFor.map(
-          (delegate: { addr: string }) => delegate.addr.toLowerCase()
-        );
-
-        const statements = await fetchDelegateStatements({
-          addresses: delegateAddresses,
-        });
-
-        const statementMap: Map<string, any> = new Map();
-        statements.forEach((statement) => {
-          if (statement) {
-            statementMap.set(statement.address.toLowerCase(), statement);
-          }
-        });
-
-        mappedDelegates = delegatesToFetchStatementsFor.map(
-          (delegateFromDaoNode: {
-            addr: string;
-            VP?: string;
-            DC?: number;
-            PR?: number;
-            VPC?: string;
-            MRD?: number;
-            LVB?: number;
-          }) => {
-            const lowerCaseAddress = delegateFromDaoNode.addr.toLowerCase();
-            return {
-              address: lowerCaseAddress,
-              votingPower: {
-                total: delegateFromDaoNode.VP || "0",
-                direct: delegateFromDaoNode.VP || "0",
-                advanced: "0",
-              },
-              statement: statementMap.get(lowerCaseAddress) || null,
-              numOfDelegators: delegateFromDaoNode.DC?.toString() || "0",
-              vpChange7d: delegateFromDaoNode.VPC || "0",
-              participation: delegateFromDaoNode.PR || 0,
-              mostRecentDelegationBlock: delegateFromDaoNode.MRD || 0,
-              lastVoteBlock: delegateFromDaoNode.LVB || 0,
-            };
-          }
-        );
-      }
-
-      return {
-        delegates: mappedDelegates,
-        totalBeforeInternalPagination: totalBeforeInternalPagination,
-      };
-    } else {
+    if (delegateAddresses.length === 0) {
       return {
         delegates: [],
-        totalBeforeInternalPagination: 0,
+        totalBeforeInternalPagination,
       };
     }
+
+    const statements = await fetchDelegateStatements({
+      addresses: delegateAddresses,
+    });
+
+    const statementMap: Map<string, any> = new Map();
+    statements.forEach((statement) => {
+      if (statement) {
+        statementMap.set(statement.address.toLowerCase(), statement);
+      }
+    });
+
+    const mappedDelegates: MappedDelegate[] = delegatesToFetchStatementsFor.map(
+      (delegateFromDaoNode: {
+        addr: string;
+        VP?: string;
+        DC?: number;
+        PR?: number;
+        VPC?: string;
+        MRD?: number;
+        LVB?: number;
+      }) => {
+        const lowerCaseAddress = delegateFromDaoNode.addr.toLowerCase();
+        return {
+          address: lowerCaseAddress,
+          votingPower: {
+            total: delegateFromDaoNode.VP || "0",
+            direct: delegateFromDaoNode.VP || "0",
+            advanced: "0",
+          },
+          statement: statementMap.get(lowerCaseAddress) || null,
+          numOfDelegators: delegateFromDaoNode.DC?.toString() || "0",
+          vpChange7d: delegateFromDaoNode.VPC || "0",
+          participation: delegateFromDaoNode.PR || 0,
+          mostRecentDelegationBlock: delegateFromDaoNode.MRD || 0,
+          lastVoteBlock: delegateFromDaoNode.LVB || 0,
+        };
+      }
+    );
+
+    const inMapped = new Set(mappedDelegates.map((d) => d.address));
+    for (const addr of fromTenantUi) {
+      if (!inMapped.has(addr)) {
+        mappedDelegates.push({
+          address: addr,
+          votingPower: { total: "0", direct: "0", advanced: "0" },
+          statement: statementMap.get(addr) || null,
+          numOfDelegators: "0",
+          vpChange7d: "0",
+          participation: 0,
+          mostRecentDelegationBlock: 0,
+          lastVoteBlock: 0,
+        });
+      }
+    }
+
+    return {
+      delegates: mappedDelegates,
+      totalBeforeInternalPagination,
+    };
   } catch (error) {
     console.error("Error fetching delegates from DAO node:", error);
     return null;

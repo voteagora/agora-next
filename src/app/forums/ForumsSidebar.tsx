@@ -7,7 +7,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import CategoryList from "./CategoryList";
 
-const { namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -24,6 +24,7 @@ export default function ForumsSidebar({
   totalTopicsCount,
   uncategorizedCount = 0,
 }: ForumsSidebarProps) {
+  const dunaEnabled = ui.toggle("duna")?.enabled ?? false;
   const sortedCategories = (categories || [])
     .sort((a, b) => {
       const aTop =
@@ -118,16 +119,18 @@ export default function ForumsSidebar({
           )}
         </div>
         {/* Official DUNA Admin Badge */}
-        <div className="mt-4 pt-4 border-t border-border">
-          <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
-            <div className="flex items-center gap-2 text-sm">
-              <ForumAdminBadge type="ADMIN" />
-              <span className="text-primary font-medium">
-                Official DUNA Admin
-              </span>
+        {dunaEnabled ? (
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <ForumAdminBadge type="ADMIN" />
+                <span className="text-primary font-medium">
+                  Official DUNA Admin
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
       <div>
         <div className="border-t border-border">

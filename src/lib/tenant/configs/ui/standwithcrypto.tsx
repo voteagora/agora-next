@@ -2,22 +2,46 @@
 
 import { TenantUI } from "@/lib/tenant/tenantUI";
 
-import demoHero from "@/assets/tenant/demo_hero.png";
+import SwcBanner from "@/assets/tenant/swc_banner.jpeg";
 import StandWithCryptoLogo from "@/assets/tenant/standwithcrypto_logo.svg";
 import demoDelegate from "@/assets/tenant/demo_delegate.svg";
-import demoDocs from "@/assets/tenant/demo_docs.png";
-import demoVision from "@/assets/tenant/demo_vision.png";
-import demoForum from "@/assets/tenant/demo_forum.png";
-import demoDiscord from "@/assets/tenant/demo_discord.png";
+import demoDocs from "@/assets/tenant/swc_donate.png";
+import demoVision from "@/assets/tenant/swc_optIn.png";
+import demoForum from "@/assets/tenant/swc_voterAttestation.png";
+import demoDiscord from "@/assets/tenant/swc_tweet.png";
 
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
+const SWC_ADDITIONAL_DELEGATE_STATEMENT_ADDRESSES = [
+  ...new Set(
+    [
+      "0xcC0B26236AFa80673b0859312a7eC16d2b72C1ea",
+      "0x8d5237037A590A2dB531F3CfB8f42605cF306f34",
+      "0x4F9CCD8C2d017EaDD0CdAaC6692c9BcD96c92e53",
+      "0xA622279f76ddbed4f2CC986c09244262Dba8f4Ba",
+      "0x2A169e4fBda18AA291608e7Aa8795271d18099F5",
+      "0xF7f8cD8638119d51F963F08f6015d83D39c87768",
+      "0xd1cB31b244d5fd46a0d82EA37b26f8480Fa12E58",
+      "0x9EAa9188035d131dAe52487253cBF8FF90228d94",
+      "0x5eAd0CFb2AcA0a93F1E5977d3a4Dee91f4deB581",
+      "0xbd95620227f47BB21C162836D510cC51E79fe2e8",
+      "0x9E65064B22dE40fD1232C893Df71022Ce92aC30A",
+      "0x0a17024004d0d0b5b5110d5B9E4Fd179Fc99Dc24",
+      "0x22f2F5A4eAD6f42761Bf8A7cD340de684A51fc07",
+      "0x22EdAAE2Fe5e3AC84D9f25723A4d945D8C4c47aD",
+      "0xA4548A273Bc0b08826Dd68CF5a0eaFE24e1CAC65",
+      "0x3D055d9ffD7DeceDC5f01EA8eBE6a3e2dF99dfBa",
+    ].map((a) => a.toLowerCase() as `0x${string}`)
+  ),
+] as `0x${string}`[];
+
 export const standwithcryptoTenantUIConfig = new TenantUI({
   title: "Stand With Crypto Governance",
   logo: StandWithCryptoLogo,
+  logoSize: "40px",
   assets: {
     success: StandWithCryptoLogo,
     pending: StandWithCryptoLogo,
@@ -30,11 +54,12 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     allowed: [],
     advanced: [],
     retired: [],
+    additionalStatementAddresses: SWC_ADDITIONAL_DELEGATE_STATEMENT_ADDRESSES,
   },
   customization: {
     // Approximated from public branding where primary is a strong electric violet
     // https://brandfetch.com/standwithcrypto.org
-    primary: "97 0 255", // #6100FF main brand purple [web:10]
+    primary: "0 0 0",
     secondary: "24 24 27", // dark neutral background
     tertiary: "148 163 184", // slate-ish neutral
     neutral: "248 250 252", // near white background
@@ -89,7 +114,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "Stand With Crypto governance hub",
-      hero: demoHero,
+      hero: SwcBanner,
       description:
         "Mobilizing crypto advocates to support clear, common-sense rules so innovation and jobs stay in America.", // mission summary [page:1][web:4][web:5][web:13]
       meta: {
@@ -106,7 +131,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
       title: "Find and delegate to crypto advocates",
       description:
         "Browse leading advocates, review their stances on crypto policy, and delegate your voting power to amplify their impact.", // aligns with advocacy + policymakers focus [page:2][page:1]
-      hero: demoHero,
+      hero: SwcBanner,
       meta: {
         title: "Delegates | Stand With Crypto",
         description:
@@ -121,7 +146,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
       title: "Proposals and community decisions",
       description:
         "Review active and past governance proposals that shape how Stand With Crypto organizes, funds advocacy, and engages with policymakers.", // tie to US policy [page:2][page:1]
-      hero: demoHero,
+      hero: SwcBanner,
       meta: {
         title: "Proposals | Stand With Crypto",
         description:
@@ -174,7 +199,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     {
       route: "info/about",
       title: "About Stand With Crypto",
-      hero: demoHero,
+      hero: SwcBanner,
       description:
         "Stand With Crypto is a 501(c)(4) nonprofit alliance mobilizing the 52 million American crypto owners to fight for clear, common-sense regulation and keep crypto innovation in America.", // concise about text [page:1][web:4][web:5][web:8][web:13]
       meta: {
@@ -469,7 +494,7 @@ export const standwithcryptoTenantUIConfig = new TenantUI({
     },
     {
       name: "delegates-layout-list",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "info/governance-sections",

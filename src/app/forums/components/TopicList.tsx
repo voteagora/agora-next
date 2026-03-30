@@ -146,6 +146,7 @@ function TopicCard({
   votesLoading,
   onVoteChange,
 }: TopicCardProps) {
+  const dunaEnabled = ui.toggle("duna")?.enabled ?? false;
   const { upvoteTopic, removeUpvoteTopic, checkVPBeforeAction } = useForum();
   const [count, setCount] = useState<number>(topic.upvotes || 0);
   const [upvoteLoading, setUpvoteLoading] = useState<boolean>(false);
@@ -210,7 +211,7 @@ function TopicCard({
               className="w-[42px] h-[42px]"
               size={42}
             />
-            {isAuthorAdmin && (
+            {isAuthorAdmin && dunaEnabled && (
               <ForumAdminBadge
                 className="absolute -bottom-1 -right-1"
                 type={adminRole ? ADMIN_TYPES[adminRole] : "Admin"}
@@ -243,7 +244,7 @@ function TopicCard({
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isAuthorAdmin ? (
+              {isAuthorAdmin && dunaEnabled ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
                 <ENSName address={topic.address || ""} />
