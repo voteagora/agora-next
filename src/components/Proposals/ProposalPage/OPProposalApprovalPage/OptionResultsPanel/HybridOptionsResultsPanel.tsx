@@ -68,7 +68,7 @@ export default function HybridOptionsResultsPanel({
   return (
     <div
       className={cn(
-        "flex flex-col max-h-[calc(100vh-544px)] overflow-y-auto flex-shrink p-4 min-h-[36px]",
+        "flex flex-col flex-1 overflow-y-auto flex-shrink p-4 min-h-0",
         className
       )}
     >

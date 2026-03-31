@@ -40,9 +40,9 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
     "use-archive-for-vote-history"
   )?.enabled;
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "weight",
+    sortKey: "block_number",
     sortOrder: "desc",
-    label: "Most Voting Power",
+    label: "Most Recent",
   });
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
     type: "ALL",
@@ -54,14 +54,15 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
   );
 
   useEffect(() => {
-    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+    const isTimeSortHidden = hideTimeSortOptions || !showVoters;
+    if (isTimeSortHidden && sortOption.sortKey === "block_number") {
       setSortOption({
         sortKey: "weight",
         sortOrder: "desc",
         label: "Most Voting Power",
       });
     }
-  }, [hideTimeSortOptions, sortOption.sortKey]);
+  }, [hideTimeSortOptions, showVoters, sortOption.sortKey]);
 
   const hybridApprovalData =
     proposal.proposalData as ParsedProposalData["HYBRID_APPROVAL"]["kind"];

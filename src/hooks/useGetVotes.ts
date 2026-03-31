@@ -11,7 +11,7 @@ export const useGetVotes = ({
   enabled,
 }: {
   address: `0x${string}`;
-  blockNumber: bigint;
+  blockNumber: bigint | undefined;
   enabled: boolean;
 }) => {
   const client = getPublicClient();
@@ -20,7 +20,7 @@ export const useGetVotes = ({
 
   const res = useQuery({
     enabled: enabled,
-    queryKey: [VOTES_QK, address, blockNumber.toString()],
+    queryKey: [VOTES_QK, address, blockNumber?.toString()],
     queryFn: async () => {
       let votes: bigint;
       if (namespace === TENANT_NAMESPACES.UNISWAP) {

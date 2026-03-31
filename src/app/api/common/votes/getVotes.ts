@@ -388,18 +388,21 @@ function buildHasVotedQuery(
 ): string {
   const isTokenHouse =
     type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
+  const isAll = type === "ALL" && namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (isTokenHouse) {
-    // Token House: Check onchain votes and snapshot votes
-    return `
+  const thQuery = `
       SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
       UNION ALL
       SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
       UNION ALL
       SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'`;
-  }
 
-  return `SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`;
+  const chQuery = `SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`;
+
+  if (isTokenHouse) return thQuery;
+  if (isAll) return `${thQuery} UNION ALL ${chQuery}`;
+
+  return chQuery;
 }
 
 /**
@@ -427,13 +430,12 @@ function buildRelevantDelegatesQuery(
 ): string {
   const isTokenHouse =
     type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
+  const isAll = type === "ALL" && namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (isTokenHouse) {
-    return `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;
-  }
+  const thQuery = `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;
 
   const citizenTypeFilter = getCitizenTypeFilter(type);
-  return `
+  const chQuery = `
       SELECT 
         c."address" as delegate, 
         1 as voting_power, 
@@ -441,6 +443,11 @@ function buildRelevantDelegatesQuery(
         voter_metadata_text
       FROM atlas.citizens_mat c
       WHERE ${citizenTypeFilter}`;
+
+  if (isTokenHouse) return thQuery;
+  if (isAll) return `${thQuery} UNION ALL ${chQuery}`;
+
+  return chQuery;
 }
 
 async function getVotersWhoHaveNotVotedForProposal({
@@ -516,7 +523,7 @@ async function getVotersWhoHaveNotVotedForProposal({
           discord,
           warpcast
         FROM unique_delegates
-        ORDER BY ${sort === "block_number" ? "delegate" : "voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}
+        ORDER BY ${sort === "block_number" ? "delegate" : "voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}, delegate ASC
         OFFSET $4 LIMIT $5`;
 
       const params = [
@@ -709,7 +716,7 @@ async function getVotesForProposal({
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY ${sort === "block_number" ? "block_number" : "weight"} ${sortOrder === "asc" ? "ASC" : "DESC"}
+          ORDER BY ${sort === "block_number" ? "block_number" : "weight"} ${sortOrder === "asc" ? "ASC" : "DESC"}, voter ASC
           OFFSET $3
           LIMIT $4;`;
 

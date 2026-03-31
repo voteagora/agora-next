@@ -50,7 +50,9 @@ export function ProposalSingleNonVoter({
 
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
-    blockNumber: BigInt(proposal.snapshotBlockNumber),
+    blockNumber: proposal.snapshotBlockNumber
+      ? BigInt(proposal.snapshotBlockNumber)
+      : undefined,
     enabled: namespace !== TENANT_NAMESPACES.UNISWAP && !useArchiveVoteHistory,
   });
 

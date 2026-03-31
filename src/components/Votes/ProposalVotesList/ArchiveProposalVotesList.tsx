@@ -132,7 +132,7 @@ export default function ArchiveProposalVotesList({
   }
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
+    <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}

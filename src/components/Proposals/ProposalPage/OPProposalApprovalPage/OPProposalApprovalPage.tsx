@@ -8,16 +8,24 @@ import {
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
 import { TaxFormBanner } from "../TaxFormBanner";
+import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 async function fetchProposalVotes(
   proposalId: string,
-  pagination?: PaginationParams
+  pagination?: PaginationParams,
+  sort?: VotesSort,
+  offchainProposalId?: string,
+  sortOrder?: VotesSortOrder,
+  voterType?: string
 ) {
   "use server";
 
   return fetchVotesForProposal({
     proposalId,
     pagination,
+    sort,
+    sortOrder,
+    voterType,
   });
 }
 

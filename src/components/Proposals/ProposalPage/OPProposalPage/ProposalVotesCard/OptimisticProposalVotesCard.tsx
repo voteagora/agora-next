@@ -45,9 +45,9 @@ const OptimisticProposalVotesCard = ({
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "weight",
+    sortKey: "block_number",
     sortOrder: "desc",
-    label: "Most Voting Power",
+    label: "Most Recent",
   });
   const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
@@ -65,14 +65,15 @@ const OptimisticProposalVotesCard = ({
   );
 
   useEffect(() => {
-    if (hideTimeSortOptions && sortOption.sortKey === "block_number") {
+    const isTimeSortHidden = hideTimeSortOptions || !showVoters;
+    if (isTimeSortHidden && sortOption.sortKey === "block_number") {
       setSortOption({
         sortKey: "weight",
         sortOrder: "desc",
         label: "Most Voting Power",
       });
     }
-  }, [hideTimeSortOptions, sortOption.sortKey]);
+  }, [hideTimeSortOptions, showVoters, sortOption.sortKey]);
 
   const { data: votingData, isSuccess: isVotingDataLoaded } =
     useFetchAllForVoting({
@@ -115,12 +116,12 @@ const OptimisticProposalVotesCard = ({
 
   return (
     <div
-      className={`fixed flex justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"} sm:overflow-y-auto`}
+      className={`fixed flex flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${isClicked ? "bottom-[20px]" : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"} sm:overflow-y-auto`}
       style={{
         transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
       }}
     >
-      <VStack gap={4} className="min-h-0 shrink py-4">
+      <VStack gap={4} className="min-h-0 flex-1 shrink py-4">
         <button
           onClick={handleClick}
           className="border w-10 h-10 rounded-full bg-neutral absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block md:hidden"

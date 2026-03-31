@@ -112,7 +112,7 @@ export default function OptionsResultsPanel({
   return (
     <div
       ref={containerRef}
-      className="flex flex-col flex-1 max-h-[calc(100vh-532px)] overflow-y-scroll flex-shrink px-4 mt-1 [&::-webkit-scrollbar]:hidden"
+      className="flex flex-col flex-1 overflow-y-auto flex-shrink px-4 mt-1 min-h-0 [&::-webkit-scrollbar]:hidden"
     >
       <Accordion
         type="single"

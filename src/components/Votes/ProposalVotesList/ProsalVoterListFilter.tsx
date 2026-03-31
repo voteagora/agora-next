@@ -28,7 +28,11 @@ export default function ProposalVoterListFilter({
   const availableVoterTypes = [
     { type: "ALL", value: "All" },
     ...(showCitizenHouseFilters
-      ? VOTER_TYPES.filter((type) => type.type !== "TH")
+      ? VOTER_TYPES.map((type) =>
+          type.type === "TH"
+            ? { ...type, value: "Token House (Delegates)" }
+            : type
+        )
       : []),
   ];
 

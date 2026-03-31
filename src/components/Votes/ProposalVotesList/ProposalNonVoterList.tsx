@@ -105,23 +105,8 @@ const ProposalNonVoterListContent = ({
       .proposalSettings?.criteria === "THRESHOLD";
 
   // Calculate max height
-  let baseHeight = 437;
-  if (isThresholdCriteria || proposal.proposalType === "SNAPSHOT") {
-    baseHeight = 560;
-  } else if (isApprovalProposal(proposal)) {
-    baseHeight = 527;
-  }
-
-  // Only add 50px for offchainProposalId to account for filter
-  if (offchainProposalId) {
-    baseHeight += 50;
-  }
-
   return (
-    <div
-      className="px-4 pb-4 overflow-y-auto min-h-[36px]"
-      style={{ maxHeight: `calc(100vh - ${baseHeight}px)` }}
-    >
+    <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
       {isFetched && fetchedNonVotes ? (
         <InfiniteScroll
           hasMore={meta?.has_next}

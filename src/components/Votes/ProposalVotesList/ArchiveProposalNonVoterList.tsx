@@ -106,12 +106,7 @@ export default function ArchiveProposalNonVoterList({
 
   return (
     <>
-      <div
-        className="px-4 pb-4 overflow-y-auto min-h-[36px]"
-        style={{
-          maxHeight: "calc(100vh - 437px)",
-        }}
-      >
+      <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
         <InfiniteScroll
           key={selectedVoterType.type}
           hasMore={hasMore}
