@@ -49,6 +49,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const { ui } = Tenant.current();
+  const miradorWebApiKey = process.env.MIRADOR_WEB_API_KEY;
 
   const primary = ui?.customization?.primary || defaults.primary;
   const secondary = ui?.customization?.secondary || defaults.secondary;
@@ -152,7 +153,7 @@ export default async function RootLayout({
 
       <NuqsAdapter>
         <DevTenantProvider>
-          <ClientLayout>
+          <ClientLayout miradorWebApiKey={miradorWebApiKey}>
             <ForumPermissionsProvider>
               <Header />
               <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">

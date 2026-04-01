@@ -127,18 +127,18 @@ export async function createProposalAttestation({
     },
   });
 
-  const receipt = await txResponse.wait();
+  const attestationUid = await txResponse.wait();
 
-  if (!receipt) {
+  if (!attestationUid) {
     console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
+      "Attestation failed or was not indexed. Full response:",
+      attestationUid
     );
-    throw new Error("Transaction failed or was not mined.");
+    throw new Error("Attestation failed or was not indexed.");
   }
 
   return {
-    transactionHash: receipt,
+    attestationUid,
     id,
   };
 }
@@ -162,12 +162,9 @@ export async function cancelProposalAttestation({
     },
   });
 
-  const receipt = await transaction.wait();
+  await transaction.wait();
 
-  return {
-    transactionHash: receipt,
-    attestationUID,
-  };
+  return { attestationUID };
 }
 
 export const signDelegatedAttestation = async ({

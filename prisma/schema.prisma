@@ -66,6 +66,19 @@ model AddressMetadata {
   @@schema("agora")
 }
 
+model SafeTrackedTransaction {
+  safe_tx_hash String   @id @db.VarChar(66)
+  dao_slug     DaoSlug
+  kind         String
+  safe_address String   @db.VarChar(42)
+  chain_id     Int
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([dao_slug, safe_address, kind, created_at], map: "idx_safe_tracked_transactions_lookup")
+  @@map("safe_tracked_transactions")
+  @@schema("agora")
+}
+
 view Citizens {
   address             String
   dao_slug            DaoSlug

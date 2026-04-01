@@ -18,6 +18,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 export const uniswapTenantUIConfig = new TenantUI({
   title: "Uniswap Agora",
   logo: uniswapLogo,
+  dunaTitle: "DUNI",
   logoSize: "40",
   documentColors: ["#E34FB9", "#A83B89", "#754166", "#5C3C53"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.UNISWAP)],
@@ -349,6 +350,26 @@ export const uniswapTenantUIConfig = new TenantUI({
         },
         gatingType: ProposalGatingType?.TOKEN_THRESHOLD,
         allowDraftSharing: true,
+      },
+    },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+      },
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
       },
     },
     {

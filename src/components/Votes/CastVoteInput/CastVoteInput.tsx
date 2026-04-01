@@ -66,6 +66,14 @@ export default function CastVoteInput({
 
   const { ui } = Tenant.current();
 
+  if (proposal.status !== "ACTIVE") {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
+        <DisabledVoteButton reason="Not open to voting" />
+      </div>
+    );
+  }
+
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">

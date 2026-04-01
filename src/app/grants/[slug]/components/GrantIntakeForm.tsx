@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useAccount, useConnect } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
+import { useAccount } from "wagmi";
+import { useModal } from "connectkit";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import DynamicFormField from "./DynamicFormField";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 interface FormField {
   id: string;
@@ -107,10 +109,11 @@ function renderTextWithLinks(text: string) {
 
 export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { isConnected, address } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { setOpen } = useModal();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const grantsFollowXHandle = Tenant.current().ui.grantsFollowXHandle;
+  const { getAuthenticationData } = useProposalActionAuth();
 
   // Build dynamic zod schema from form_schema
   const dynamicSchema = useMemo(() => {
@@ -312,16 +315,29 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
     setIsSubmitting(true);
 
     try {
+      const authData = await getAuthenticationData({
+        action: "submitGrantApplication",
+        grantSlug: grant.slug,
+        applicantAddress: address,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (!authData) {
+        toast.error(
+          "Authentication required. Please sign the message to continue."
+        );
+        setIsSubmitting(false);
+        return;
+      }
+
       // Submit to API
       const response = await fetch(`/api/grants/${grant.slug}/applications`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${authData.jwt}`,
         },
-        body: JSON.stringify({
-          ...data,
-          applicantAddress: address,
-        }),
+        body: JSON.stringify(data),
       });
 
       if (!response.ok) {
@@ -346,11 +362,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   };
 
   const handleConnectWallet = () => {
-    if (connectors.length > 0) {
-      connect({ connector: connectors[0] });
-    } else {
-      toast.error("No wallet connectors available");
-    }
+    setOpen(true);
   };
 
   // Sort dynamic fields by order if available

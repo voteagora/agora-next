@@ -67,6 +67,9 @@ export const TENANT_NAMESPACES = {
 // SIWE localStorage keys
 export const LOCAL_STORAGE_SIWE_JWT_KEY = "agora-siwe-jwt";
 export const LOCAL_STORAGE_SIWE_STAGE_KEY = "agora-siwe-stage";
+export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
+export const SIWE_NONCE_TTL_SECONDS = 10 * 60;
+export const SIWE_LOGIN_TTL_SECONDS = 10 * 60;
 
 // EIP-1271 magic value returned by isValidSignature on success
 export const EIP1271_MAGIC_VALUE = "0x1626ba7e";

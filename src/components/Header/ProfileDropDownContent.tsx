@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { useDisconnect } from "wagmi";
 import { shortAddress } from "@/lib/utils";
 import { rgbStringToHex } from "@/app/lib/utils/color";
@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useProfileData } from "@/hooks/useProfileData";
+import { SiweStatusBadge } from "./SiweStatusBadge";
 
 import ENSAvatar from "../shared/ENSAvatar";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
@@ -18,12 +19,15 @@ import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
+import { ShieldCheckIcon } from "@heroicons/react/20/solid";
 import { Delegation } from "@/app/api/common/delegations/delegation";
 import { useEnsName } from "wagmi";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
+import toast from "react-hot-toast";
 
 interface Props {
   ensName: string | undefined;
@@ -104,6 +108,8 @@ export const ProfileDropDownContent = ({
     canCreateDelegateStatement,
     delegatees,
   } = useProfileData();
+  const { jwt, ensureSession, isSigningIn } = useSiweJwt();
+  const hasSiweSession = !!jwt;
 
   const { ui } = Tenant.current();
   const filteredDelegations = useMemo(() => {
@@ -174,6 +180,7 @@ export const ProfileDropDownContent = ({
             }`}
           >
             <ENSAvatar ensName={ensName} size={60} />
+            <SiweStatusBadge className="w-5 h-5" />
           </div>
           <div className="flex flex-col flex-1">
             {ensName ? (
@@ -318,7 +325,29 @@ export const ProfileDropDownContent = ({
           </div>
         )}
       </div>
-      <div className="p-6 py-[30px] border-t border-line bg-neutral sm:rounded-bl-[16px] sm:rounded-br-[16px]">
+      <div className="p-6 py-[30px] border-t border-line bg-neutral sm:rounded-bl-[16px] sm:rounded-br-[16px] flex flex-col gap-4">
+        {!hasSiweSession && (
+          <div
+            onClick={async () => {
+              try {
+                await ensureSession();
+              } catch {
+                toast.error("Sign-in failed. Please try again.");
+              }
+            }}
+            className={`cursor-pointer flex font-bold ${isSigningIn ? "opacity-50 pointer-events-none" : ""}`}
+          >
+            <ShieldCheckIcon
+              className="w-4 h-4 mr-[10px] self-center"
+              style={{
+                color: rgbStringToHex(ui?.customization?.primary),
+              }}
+            />
+            <span className="text-primary">
+              {isSigningIn ? "Signing in…" : "Sign in with Ethereum"}
+            </span>
+          </div>
+        )}
         <div
           onClick={() => {
             disconnect();
