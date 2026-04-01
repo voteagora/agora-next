@@ -23,8 +23,8 @@ function formatNumber(num: string): string {
 type MetricCardProps = {
   title: string;
   value: string;
-  trend: string;
-  trendDirection: TrendDirection;
+  trend?: string;
+  trendDirection?: TrendDirection;
 };
 
 function TrendUpIcon() {
@@ -95,10 +95,12 @@ function MetricCard({ title, value, trend, trendDirection }: MetricCardProps) {
       >
         {formatNumber(value)}
       </p>
-      <div className="inline-flex items-center gap-2 px-[10px] py-1 rounded-full border border-line self-start">
-        {trendDirection === "up" ? <TrendUpIcon /> : <TrendDownIcon />}
-        <span className="text-sm font-medium text-primary">{trend}</span>
-      </div>
+      {trend && trendDirection && (
+        <div className="inline-flex items-center gap-2 px-[10px] py-1 rounded-full border border-line self-start">
+          {trendDirection === "up" ? <TrendUpIcon /> : <TrendDownIcon />}
+          <span className="text-sm font-medium text-primary">{trend}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -166,32 +168,40 @@ export default function DunaMetricsCards() {
     {
       title: "Total Assets",
       value: String(latestData.TOTAL_ASSETS || 0),
-      ...calculateTrend(latestData.TOTAL_ASSETS, previousData?.TOTAL_ASSETS),
+      ...(previous
+        ? calculateTrend(latestData.TOTAL_ASSETS, previousData?.TOTAL_ASSETS)
+        : {}),
     },
     ...(netProfitOrLoss
       ? [
           {
             title: netProfitOrLoss.title,
             value: String(netProfitOrLoss.value),
-            ...calculateTrend(netProfitOrLoss.value, previousNetProfitOrLoss),
+            ...(previous
+              ? calculateTrend(netProfitOrLoss.value, previousNetProfitOrLoss)
+              : {}),
           },
         ]
       : []),
     {
       title: "Total Operating Expenses",
       value: String(latestData.TOTAL_OPERATING_EXPENSES || 0),
-      ...calculateTrend(
-        latestData.TOTAL_OPERATING_EXPENSES,
-        previousData?.TOTAL_OPERATING_EXPENSES
-      ),
+      ...(previous
+        ? calculateTrend(
+            latestData.TOTAL_OPERATING_EXPENSES,
+            previousData?.TOTAL_OPERATING_EXPENSES
+          )
+        : {}),
     },
     {
       title: "Cash & Cash Equivalents",
       value: String(latestData.CASH_AND_CASH_EQUIVALENTS || 0),
-      ...calculateTrend(
-        latestData.CASH_AND_CASH_EQUIVALENTS,
-        previousData?.CASH_AND_CASH_EQUIVALENTS
-      ),
+      ...(previous
+        ? calculateTrend(
+            latestData.CASH_AND_CASH_EQUIVALENTS,
+            previousData?.CASH_AND_CASH_EQUIVALENTS
+          )
+        : {}),
     },
   ];
 
