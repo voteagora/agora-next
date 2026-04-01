@@ -139,10 +139,10 @@ function calculateTrend(
   }
 
   const direction: TrendDirection = percentChange >= 0 ? "up" : "down";
-  const sign = percentChange >= 0 ? "+" : "";
+  const sign = percentChange < 0 ? "-" : "";
 
   return {
-    trend: `${sign}${percentChange.toFixed(1)}% vs previous`,
+    trend: `${sign}${Math.abs(percentChange).toFixed(1)}% vs previous`,
     trendDirection: direction,
   };
 }
