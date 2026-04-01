@@ -3,6 +3,7 @@
 import React from "react";
 import { useFinancialMetrics } from "@/hooks/useFinancialMetrics";
 import { DaoSlug } from "@prisma/client";
+import Tenant from "@/lib/tenant/tenant";
 
 type TrendDirection = "up" | "down";
 
@@ -107,13 +108,36 @@ function MetricCard({ title, value, trend, trendDirection }: MetricCardProps) {
 
 function calculateTrend(
   current: number | null | undefined,
-  previous: number | null | undefined
+  previous: number | null | undefined,
+  currentIsProfit?: boolean,
+  previousIsProfit?: boolean
 ): { trend: string; trendDirection: TrendDirection } {
   if (!current || !previous) {
     return { trend: "N/A", trendDirection: "up" };
   }
 
-  const percentChange = ((current - previous) / previous) * 100;
+  let percentChange: number;
+
+  // Handle profit/loss transitions specially
+  if (currentIsProfit !== undefined && previousIsProfit !== undefined) {
+    if (currentIsProfit && previousIsProfit) {
+      // Both profit: normal percent change
+      percentChange = ((current - previous) / previous) * 100;
+    } else if (!currentIsProfit && !previousIsProfit) {
+      // Both loss: increasing loss is bad (up means worse)
+      percentChange = ((current - previous) / previous) * 100;
+    } else if (currentIsProfit && !previousIsProfit) {
+      // Loss to profit: positive swing (profit improved by previous loss amount + current profit)
+      percentChange = ((current + previous) / previous) * 100;
+    } else {
+      // Profit to loss: negative swing (profit dropped by 100% + loss amount)
+      percentChange = -((current + previous) / previous) * 100;
+    }
+  } else {
+    // Normal calculation
+    percentChange = ((current - previous) / previous) * 100;
+  }
+
   const direction: TrendDirection = percentChange >= 0 ? "up" : "down";
   const sign = percentChange >= 0 ? "+" : "";
 
@@ -124,7 +148,8 @@ function calculateTrend(
 }
 
 export default function DunaMetricsCards() {
-  const { data, isLoading, error } = useFinancialMetrics(DaoSlug.SYNDICATE);
+  const { slug } = Tenant.current();
+  const { data, isLoading, error } = useFinancialMetrics(slug);
 
   if (isLoading) {
     return (
@@ -161,8 +186,25 @@ export default function DunaMetricsCards() {
       ? { title: "Net Loss", value: latestData.NET_LOSS }
       : null;
 
-  const previousNetProfitOrLoss =
-    previousData?.NET_PROFIT || previousData?.NET_LOSS;
+  const previousNetProfitOrLoss = previousData?.NET_PROFIT
+    ? { value: previousData.NET_PROFIT, isProfit: true }
+    : previousData?.NET_LOSS
+      ? { value: previousData.NET_LOSS, isProfit: false }
+      : null;
+
+  const getProfitLossTrend = () => {
+    if (!netProfitOrLoss || !previous || !previousNetProfitOrLoss) {
+      return {};
+    }
+
+    const currentIsProfit = netProfitOrLoss.title === "Net Profit";
+    return calculateTrend(
+      netProfitOrLoss.value,
+      previousNetProfitOrLoss.value,
+      currentIsProfit,
+      previousNetProfitOrLoss.isProfit
+    );
+  };
 
   const metrics: MetricCardProps[] = [
     {
@@ -177,9 +219,7 @@ export default function DunaMetricsCards() {
           {
             title: netProfitOrLoss.title,
             value: String(netProfitOrLoss.value),
-            ...(previous
-              ? calculateTrend(netProfitOrLoss.value, previousNetProfitOrLoss)
-              : {}),
+            ...getProfitLossTrend(),
           },
         ]
       : []),
