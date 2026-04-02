@@ -10,12 +10,12 @@ test.describe("Delegates List & Delegation Flow", () => {
           count: 2,
           delegates: [
             {
-              address: "whale.eth",
+              address: "delegate-1.eth",
               votingPower: "1000000",
               numOfDelegators: "50",
             },
             {
-              address: "dust.eth",
+              address: "delegate-2.eth",
               votingPower: "0",
               numOfDelegators: "0",
             }
@@ -38,8 +38,8 @@ test.describe("Delegates List & Delegation Flow", () => {
 
   test("renders delegates and simulates delegation click", async ({ page }) => {
     await page.goto("/delegates");
-    await expect(page.getByText("whale.eth")).toBeVisible();
-    await expect(page.getByText("dust.eth")).toBeVisible();
+    await expect(page.getByText("delegate-1.eth")).toBeVisible();
+    await expect(page.getByText("delegate-2.eth")).toBeVisible();
 
     const delegateButton = page.getByRole("button", { name: /Delegate/i }).first();
     if (await delegateButton.isVisible()) {
