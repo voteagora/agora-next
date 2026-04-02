@@ -165,8 +165,6 @@ export default function DunaContentRenderer({
   className,
   enableEmbeds = true,
 }: DunaContentRendererProps) {
-  if (!content) return null;
-
   const { ui } = Tenant.current();
   const [mounted, setMounted] = useState(false);
 
@@ -174,7 +172,7 @@ export default function DunaContentRenderer({
     setMounted(true);
   }, []);
 
-  const decodedContent = decodeHtmlEntities(content);
+  const decodedContent = content ? decodeHtmlEntities(content) : "";
   const isMarkdown = !looksLikeHtml(decodedContent);
 
   const renderedContent = useMemo(() => {
@@ -190,6 +188,8 @@ export default function DunaContentRenderer({
     }
     return parseContentWithEmbeds(decodedContent);
   }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
+
+  if (!content) return null;
 
   return (
     <div
