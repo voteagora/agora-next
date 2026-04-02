@@ -9,5 +9,5 @@ export const handlers = [
   // Mock Create Proposal Transactions
   http.post(/.*\/proposals\/create.*/, () => {
     return HttpResponse.json({ success: true, draftId: "12345" });
-  })
+  }),
 ];
