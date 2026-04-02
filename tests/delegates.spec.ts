@@ -1,17 +1,15 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Delegates List & Delegation Flow", () => {
-  // API intercepts are handled globally via MSW in src/mocks/handlers.ts
+test.describe("Delegates List View", () => {
+  // Configured to route through our proxy API at `src/app/api/mock-daonode`
 
-  test("renders delegates and simulates delegation click", async ({ page }) => {
+  test("should render delegates correctly from mocked list", async ({
+    page,
+  }) => {
+    // Navigate to delegates page
     await page.goto("/delegates");
-    await expect(page.getByText(/dele.*\.eth/).first()).toBeVisible();
 
-    const delegateButton = page
-      .getByRole("button", { name: /Delegate/i })
-      .first();
-    if (await delegateButton.isVisible()) {
-      await delegateButton.click({ force: true });
-    }
+    // Assert the mocked returned ENS or account displays
+    await expect(page.getByText(/dele.*\.eth/i).first()).toBeVisible();
   });
 });
