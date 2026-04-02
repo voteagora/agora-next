@@ -1,5 +1,59 @@
 import sanitizeHtml from "sanitize-html";
 
+function decodeHtmlEntities(text: string): string {
+  const entities: Record<string, string> = {
+    "&lt;": "<",
+    "&gt;": ">",
+    "&amp;": "&",
+    "&quot;": '"',
+    "&#39;": "'",
+    "&nbsp;": " ",
+  };
+
+  let decoded = text;
+  Object.entries(entities).forEach(([entity, value]) => {
+    decoded = decoded.replace(new RegExp(entity, "g"), value);
+  });
+
+  return decoded;
+}
+
+export function sanitizeForumContent(content: string): string {
+  const decoded = decodeHtmlEntities(content);
+
+  return sanitizeHtml(decoded, {
+    allowedTags: [
+      "p",
+      "br",
+      "strong",
+      "em",
+      "s",
+      "code",
+      "ul",
+      "ol",
+      "li",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "blockquote",
+      "a",
+      "img",
+    ],
+    allowedAttributes: {
+      a: ["href", "target", "rel", "class"],
+      img: ["src", "alt", "width", "height", "class"],
+    },
+    allowVulnerableTags: false,
+    disallowedTagsMode: "discard",
+    allowedSchemes: ["http", "https"],
+    allowedSchemesByTag: {
+      a: ["http", "https"],
+      img: ["http", "https"],
+    },
+  });
+}
+
 export function sanitizeContent(content: string): string {
   // Remove dangerous content
   let cleaned = content
