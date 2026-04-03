@@ -168,6 +168,7 @@
     "@aws-sdk/client-dynamodb": "^3.454.0",
     "@next/bundle-analyzer": "^16.0.3",
     "@playwright/test": "^1.59.1",
+    "@synthetixio/synpress": "^4.1.2",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/dom": "^10.4.0",

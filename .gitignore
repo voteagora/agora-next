@@ -56,3 +56,7 @@ dist
 output/
 test-results/
 playwright-report/
+
+# synpress
+.cache-synpress/
+.cache/
