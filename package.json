@@ -18,7 +18,13 @@
     "prettier-src": "prettier -w src/",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:live": "playwright test --project=optimism-live --project=ens-live --project=cyber-live --project=scroll-live",
+    "test:e2e:live:optimism": "playwright test --project=optimism-live",
+    "test:e2e:live:ens": "playwright test --project=ens-live",
+    "test:e2e:live:cyber": "playwright test --project=cyber-live",
+    "test:e2e:live:scroll": "playwright test --project=scroll-live",
+    "test:e2e:live-local": "playwright test --project=live-api"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",

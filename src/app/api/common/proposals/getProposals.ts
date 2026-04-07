@@ -474,7 +474,6 @@ async function getProposal(proposalId: string) {
           } as any;
         }
       }
-
       return findProposal({
         namespace,
         proposalId,

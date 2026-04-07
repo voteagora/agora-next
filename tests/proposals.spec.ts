@@ -15,7 +15,6 @@ test.describe("Proposals List View", () => {
     // 3. Navigate into the specific active proposal
     // The proposal list items usually wrap the title in an anchored link
     await page.locator('a[href^="/proposals/test-active"]').first().click();
-
     // 4. Assert Navigation succeeded by waiting for the detail URL
     await expect(page).toHaveURL(/\/proposals\/test-active/);
   });
