@@ -70,7 +70,7 @@ export function LogoLoader() {
         alt="loading"
         width={36}
         height={36}
-        src={ui.customization?.innerFooterBackground ? logoLight : logo}
+        src={ui.logo}
         className="animate-pulse"
       />
     </div>
