@@ -23,6 +23,9 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "*.svg": ["./tests/mockMedia.ts"],
+      "*.png": ["./tests/mockMedia.ts"],
+      "*.jpg": ["./tests/mockMedia.ts"],
       "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
       "swagger-ui-react": ["./src/lib/shims/SwaggerUI"],
       "@react-native-async-storage/async-storage": [
