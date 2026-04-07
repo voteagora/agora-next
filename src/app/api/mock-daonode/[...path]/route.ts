@@ -13,12 +13,16 @@ export async function GET(
     return NextResponse.json({ result: null });
   }
 
-  if (path.includes("delegate/delegate-")) {
+  if (path.includes("v1/delegate/")) {
     return NextResponse.json({
       delegate: {
-        address: "delegate-1.eth",
+        addr: path.split("/").pop(),
+        address: path.split("/").pop(),
         voting_power: "1000000000000000000000000",
         delegators_count: 50,
+        from_cnt: 50,
+        from_list: [],
+        participation: [10, 10], // Active delegate (100% participation > 0.5 and > 10 proposals)
       },
     });
   }
