@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import Tenant from "../../src/lib/tenant/tenant";
 import { DelegatesPage } from "./pages/DelegatesPage";
 
 test.describe("Delegates List Page Scenarios", () => {
@@ -39,6 +40,9 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-011: VP and delegation info call out banner", async () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("delegates-page-info-banner")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(delegatesPage.infoBanner).toBeVisible();
   });
 
@@ -48,6 +52,9 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-013: delegate encouragement call out", async ({ page }) => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("delegates-page-info-banner")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(
       page.locator(
         '[data-testid="encouragement-banner"], text="Governance starts with you!"'
@@ -101,6 +108,9 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-020: delegate filter includes Issue Categories", async () => {
+    const { ui } = Tenant.current();
+    if (!ui.governanceIssues || ui.governanceIssues.length === 0)
+      test.skip(true, "Tenant disabled this feature");
     await delegatesPage.openFilter();
     await expect(
       delegatesPage.page
@@ -112,6 +122,9 @@ test.describe("Delegates List Page Scenarios", () => {
   test("DEL-LIST-021: delegate filter includes Stakeholders", async ({
     page,
   }) => {
+    const { ui } = Tenant.current();
+    if (!ui.governanceStakeholders || ui.governanceStakeholders.length === 0)
+      test.skip(true, "Tenant disabled this feature");
     await delegatesPage.openFilter();
     await expect(page.locator('text="Stakeholders"')).toBeVisible();
   });

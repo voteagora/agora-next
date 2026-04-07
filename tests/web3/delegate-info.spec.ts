@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-
+import Tenant from "../../src/lib/tenant/tenant";
 test.describe("Delegate Info Page Scenarios", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/delegates/0x1234567890123456789012345678901234567890");
@@ -22,7 +22,9 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-002: VP info tooltip on delegate info card", async ({
     page,
   }) => {
-    // Note: controlled by voting-power-info-tooltip in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.toggle("voting-power-info-tooltip")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('[data-testid="vp-tooltip"]')).toBeVisible();
   });
 
@@ -35,7 +37,9 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-004: info card displays the delegates badges", async ({
     page,
   }) => {
-    // Note: controlled by show-delegate-badges in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.toggle("show-delegate-badges")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(
       page.locator('[data-testid="delegate-badges"], .badge')
     ).toBeVisible();
@@ -44,12 +48,16 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-005: info card displays location and description", async ({
     page,
   }) => {
-    // Note: controlled by show-ens-text-records in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.toggle("show-ens-text-records")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     // Checks for dynamic string rendering associated with ENS text records
   });
 
   test("DEL-INFO-006: info card displays follower counts", async ({ page }) => {
-    // Note: controlled by show-efp-stats in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.toggle("show-efp-stats")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('text="Followers"')).toBeVisible();
     await expect(page.locator('text="Following"')).toBeVisible();
   });
@@ -57,7 +65,9 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-007: delegates/0xaddress page delegate participation", async ({
     page,
   }) => {
-    // Note: controlled by show-participation in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.toggle("show-participation")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(
       page
         .locator('text="Participation"')
@@ -74,7 +84,9 @@ test.describe("Delegate Info Page Scenarios", () => {
   });
 
   test("DEL-INFO-009: delegate page Top Issues", async ({ page }) => {
-    // Note: controlled by governanceIssues in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.governanceIssues || ui.governanceIssues.length === 0)
+      test.skip(true, "Tenant disabled this feature");
     await expect(
       page
         .locator('text="Top Issues"')
@@ -85,7 +97,9 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-010: delegate page Represented Stakeholders", async ({
     page,
   }) => {
-    // Note: controlled by governanceStakeholders in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.governanceStakeholders || ui.governanceStakeholders.length === 0)
+      test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('text="Represented Stakeholders"')).toBeVisible();
   });
 
@@ -96,7 +110,8 @@ test.describe("Delegate Info Page Scenarios", () => {
   test("DEL-INFO-012: delegate page Past Votes filter (On-chain/Snapshot)", async ({
     page,
   }) => {
-    // Note: controlled by DAO slug being ENS
+    const tenant = Tenant.current();
+    if (tenant.slug !== "ENS") test.skip(true, "Feature isolated to ENS");
     await expect(page.locator('text="On-chain votes"')).toBeVisible();
     await expect(page.locator('text="Snapshot votes"')).toBeVisible();
   });
@@ -108,21 +123,24 @@ test.describe("Delegate Info Page Scenarios", () => {
   });
 
   test("DEL-INFO-014: delegate page Discussions", async ({ page }) => {
-    // Note: controlled by forums in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.page("forums")) test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('text="Discussions"')).toBeVisible();
   });
 
   test("DEL-INFO-015: delegate page Discussions Topics Created", async ({
     page,
   }) => {
-    // Note: controlled by forums in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.page("forums")) test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('text="Topics Created"')).toBeVisible();
   });
 
   test("DEL-INFO-016: delegate page Discussions Recent Posts", async ({
     page,
   }) => {
-    // Note: controlled by forums in src/lib/tenant/configs/ui/
+    const { ui } = Tenant.current();
+    if (!ui.page("forums")) test.skip(true, "Tenant disabled this feature");
     await expect(page.locator('text="Recent Posts"')).toBeVisible();
   });
 });
