@@ -18,9 +18,9 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-002: /delegates page returns a list of delegates in list view", async () => {
-    // Some tenants default to list view, or the user clicks the layout toggle.
-    // Assuming UI defaults or there is a layout toggle (we can check both structures).
-    // Let's assert the existence of the table if list view is enabled.
+    const { ui } = Tenant.current();
+    if (!ui.toggle("delegates-layout-list")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(delegatesPage.listViewContainer).toBeVisible();
   });
 
@@ -31,11 +31,17 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-004: when in grid view, delegate card shows participation rate", async () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("show-participation")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     const card = delegatesPage.delegateCards.first();
     await expect(card).toContainText("%"); // The participation is formatted with percentage
   });
 
   test("DEL-LIST-007: delegate row shows 7D change of VP", async () => {
+    const { ui } = Tenant.current();
+    if (ui.toggle("hide-7d-change")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await expect(delegatesPage.sevenDayChangeColumn).toBeVisible();
   });
 
@@ -47,13 +53,16 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-012: VP info tooltip on grid view", async () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("voting-power-info-tooltip")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     // Hovering over the voting power text or info icon should trigger it
     await expect(delegatesPage.vpInfoTooltip).toBeVisible();
   });
 
   test("DEL-LIST-013: delegate encouragement call out", async ({ page }) => {
     const { ui } = Tenant.current();
-    if (!ui.toggle("delegates-page-info-banner")?.enabled)
+    if (!ui.toggle("delegation-encouragement")?.enabled)
       test.skip(true, "Tenant disabled this feature");
     await expect(
       page.locator(
@@ -75,6 +84,9 @@ test.describe("Delegates List Page Scenarios", () => {
   test("DEL-LIST-015: delegate list can be sorted by 7d VP Change Increase/Decrease", async ({
     page,
   }) => {
+    const { ui } = Tenant.current();
+    if (ui.toggle("hide-7d-change")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await page.locator('[data-testid="sort-dropdown"]').click();
     await expect(page.locator('text="7d VP Change Increase"')).toBeVisible();
   });
@@ -96,6 +108,9 @@ test.describe("Delegates List Page Scenarios", () => {
   test("DEL-LIST-018: delegate filter includes Endorsed Delegates", async ({
     page,
   }) => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("delegates/endorsed-filter")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await delegatesPage.openFilter();
     await expect(page.locator('text="Endorsed Delegates"')).toBeVisible();
   });
@@ -103,6 +118,9 @@ test.describe("Delegates List Page Scenarios", () => {
   test("DEL-LIST-019: delegate filter includes Verified Delegates", async ({
     page,
   }) => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("delegates/endorsed-filter")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
     await delegatesPage.openFilter();
     await expect(page.locator('text="Verified Delegates"')).toBeVisible();
   });
