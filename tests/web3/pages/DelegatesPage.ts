@@ -42,7 +42,12 @@ export class DelegatesPage {
     );
   }
 
-  async goto() {
+  async goto(showDialog = false) {
+    if (!showDialog) {
+      await this.page.addInitScript(() => {
+        window.sessionStorage.setItem("agora-delegation-dialog-shown", "true");
+      });
+    }
     await this.page.goto("/delegates");
   }
 

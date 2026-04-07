@@ -1,3 +1,4 @@
+import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 test.describe("Proposal List Page Scenarios", () => {
@@ -44,8 +45,12 @@ test.describe("Proposal List Page Scenarios", () => {
     page,
   }) => {
     await page.locator('[data-testid="proposal-filter-dropdown"]').click();
-    await expect(page.locator('text="Relevant"')).toBeVisible();
-    await expect(page.locator('text="Everything"')).toBeVisible();
+    await expect(
+      page.getByRole("option", { name: "Relevant", exact: false }).first()
+    ).toBeVisible();
+    await expect(
+      page.getByRole("option", { name: "Everything", exact: false }).first()
+    ).toBeVisible();
   });
 
   test("PROP-006: Proposal List filter Temp Check Option", async ({ page }) => {

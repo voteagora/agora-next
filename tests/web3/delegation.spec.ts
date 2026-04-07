@@ -1,7 +1,11 @@
+import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 
 test.describe("Delegation Actions Scenarios", () => {
   test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem("agora-delegation-dialog-shown", "true");
+    });
     await page.goto("/delegates");
   });
 
@@ -21,6 +25,7 @@ test.describe("Delegation Actions Scenarios", () => {
   test("DELEGATION-002: /delegates page delegate button on a delegate row in list view", async ({
     page,
   }) => {
+    await page.goto("/delegates?layout=list");
     await page
       .locator('[data-testid="delegate-row"] button', { hasText: "Delegate" })
       .first()
