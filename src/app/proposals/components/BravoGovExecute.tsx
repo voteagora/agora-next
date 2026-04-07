@@ -6,7 +6,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
@@ -15,6 +15,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { encodeFunctionData } from "viem";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 interface Props {
   proposal: Proposal;
@@ -24,6 +32,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
   const { contracts } = Tenant.current();
   const [canExecute, setCanExecute] = useState(false);
   const [executeTime, setExecuteTime] = useState<Date | undefined>();
+  const traceRef = useRef<FrontendMiradorTrace>(null);
 
   const { data: delayInSeconds, isFetched: executionDelayFetched } =
     useReadContract({
@@ -56,12 +65,38 @@ export const BravoGovExecute = ({ proposal }: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
+      if (traceRef.current) {
+        attachMiradorTransactionArtifacts(traceRef.current, {
+          chainId: contracts.governor.chain.id,
+          txHash: data,
+          txDetails: "Execute governance proposal transaction",
+        });
+        void closeFrontendMiradorFlowTrace(traceRef.current, {
+          reason: "governance_admin_succeeded",
+          eventName: "governance_admin_succeeded",
+          details: { action: "execute", proposalId: proposal.id, transactionHash: data },
+        });
+        traceRef.current = null;
+      }
       toast.success(
         "Proposal Executed. It might take a minute to see the updated status.",
         { duration: 5000 }
       );
     }
     if (isError) {
+      if (traceRef.current) {
+        void closeFrontendMiradorFlowTrace(traceRef.current, {
+          reason: "governance_admin_failed",
+          eventName: "governance_admin_failed",
+          details: {
+            action: "execute",
+            proposalId: proposal.id,
+            error:
+              "shortMessage" in error ? error.shortMessage : error.message,
+          },
+        });
+        traceRef.current = null;
+      }
       const errorMessage =
         "shortMessage" in error ? error.shortMessage : error.message;
 
@@ -69,7 +104,7 @@ export const BravoGovExecute = ({ proposal }: Props) => {
         duration: 5000,
       });
     }
-  }, [isSuccess, isError, error]);
+  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
 
   return (
     <div>
@@ -87,14 +122,40 @@ export const BravoGovExecute = ({ proposal }: Props) => {
             <>
               {!isFetched && (
                 <Button
-                  onClick={() =>
+                  onClick={() => {
+                    const inputData = encodeFunctionData({
+                      abi: contracts.governor.abi as any,
+                      functionName: "execute",
+                      args: [proposal.id],
+                    });
+                    const trace = startFrontendMiradorFlowTrace({
+                      name: "GovernanceAdmin",
+                      flow: MIRADOR_FLOW.governanceAdmin,
+                      step: "execute_submit",
+                      context: {
+                        chainId: contracts.governor.chain.id,
+                        proposalId: proposal.id,
+                      },
+                      tags: ["governance", "admin", "frontend"],
+                      attributes: { action: "execute" },
+                      startEventName: "governance_admin_started",
+                      startEventDetails: {
+                        action: "execute",
+                        proposalId: proposal.id,
+                      },
+                    });
+                    traceRef.current = trace;
+                    attachMiradorTransactionArtifacts(trace, {
+                      chainId: contracts.governor.chain.id,
+                      inputData,
+                    });
                     writeContract({
                       address: contracts.governor.address as `0x${string}`,
                       abi: contracts.governor.abi,
                       functionName: "execute",
                       args: [proposal.id],
-                    })
-                  }
+                    });
+                  }}
                   loading={isLoading}
                 >
                   Execute

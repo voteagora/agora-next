@@ -35,10 +35,7 @@ export function isMiradorSiweLoginTracingEnabled(): boolean {
 }
 
 export function isMiradorEnabled(): boolean {
-  return (
-    isMiradorProposalCreationTracingEnabled() ||
-    isMiradorSiweLoginTracingEnabled()
-  );
+  return getMiradorConfig() !== null;
 }
 
 export function shouldEnableMiradorWebClient(): boolean {

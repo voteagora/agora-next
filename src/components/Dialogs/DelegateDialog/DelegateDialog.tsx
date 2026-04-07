@@ -23,11 +23,23 @@ import Tenant from "@/lib/tenant/tenant";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
-import { formatEther, createWalletClient, custom } from "viem";
+import {
+  formatEther,
+  createWalletClient,
+  custom,
+  encodeFunctionData,
+} from "viem";
 import { getPublicClient } from "@/lib/viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 export function DelegateDialog({
   delegate,
@@ -41,8 +53,9 @@ export function DelegateDialog({
   isDelegationEncouragement?: boolean;
 }) {
   const shouldFetchData = useRef(true);
+  const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const [isReady, setIsReady] = useState(false);
-  const { ui, contracts, token, slug } = Tenant.current();
+  const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const { address: accountAddress } = useAccount();
@@ -101,6 +114,7 @@ export function DelegateDialog({
   const [localDelegateTxHash, setLocalDelegateTxHash] = useState<
     `0x${string}` | undefined
   >(undefined);
+  const directDelegationTxHash = localDelegateTxHash ?? delegateTxHash;
 
   const {
     isLoading: isProcessingDelegation,
@@ -130,7 +144,7 @@ export function DelegateDialog({
           delegator: accountAddress as `0x${string}`,
           transaction_hash: (isGasRelayLive
             ? sponsoredTxnHash
-            : (localDelegateTxHash ?? delegateTxHash)) as `0x${string}`,
+            : directDelegationTxHash) as `0x${string}`,
         },
       });
       if (isDelegationEncouragement) {
@@ -140,17 +154,125 @@ export function DelegateDialog({
             delegator: accountAddress as `0x${string}`,
             transaction_hash: (isGasRelayLive
               ? sponsoredTxnHash
-              : (localDelegateTxHash ?? delegateTxHash)) as `0x${string}`,
+              : directDelegationTxHash) as `0x${string}`,
           },
         });
       }
     }
-  }, [didProcessDelegation]);
+  }, [
+    accountAddress,
+    delegate.address,
+    didProcessDelegation,
+    directDelegationTxHash,
+    isDelegationEncouragement,
+    isGasRelayLive,
+    sponsoredTxnHash,
+  ]);
+
+  useEffect(() => {
+    if (isGasRelayLive || !delegationTraceRef.current) {
+      return;
+    }
+
+    if (didProcessDelegation) {
+      attachMiradorTransactionArtifacts(delegationTraceRef.current, {
+        chainId: contracts.token.chain.id,
+        txHash: directDelegationTxHash,
+        txDetails: "Delegation transaction",
+      });
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_succeeded",
+        eventName: "governance_delegation_succeeded",
+        details: {
+          delegatee: delegate.address,
+          transactionHash: directDelegationTxHash,
+        },
+      });
+      delegationTraceRef.current = null;
+      return;
+    }
+
+    if (didFailDelegation || isError) {
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_failed",
+        eventName: "governance_delegation_failed",
+        details: {
+          delegatee: delegate.address,
+          error: "Delegation transaction failed",
+        },
+      });
+      delegationTraceRef.current = null;
+    }
+  }, [
+    contracts.token.chain.id,
+    delegate.address,
+    didFailDelegation,
+    didProcessDelegation,
+    directDelegationTxHash,
+    isError,
+    isGasRelayLive,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (!delegationTraceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_unmounted",
+        eventName: "governance_delegation_unmounted",
+        details: {
+          delegatee: delegate.address,
+        },
+      });
+      delegationTraceRef.current = null;
+    };
+  }, [delegate.address]);
 
   async function executeDelegate() {
     if (isGasRelayLive) {
       await call();
     } else {
+      if (delegationTraceRef.current) {
+        void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+          reason: "governance_delegation_restarted",
+          eventName: "governance_delegation_restarted",
+          details: {
+            delegatee: delegate.address,
+          },
+        });
+      }
+      const inputData = encodeFunctionData({
+        abi: contracts.token.abi as any,
+        functionName: "delegate",
+        args: [delegate.address],
+      });
+      const trace = startFrontendMiradorFlowTrace({
+        name: "GovernanceDelegation",
+        flow: MIRADOR_FLOW.governanceDelegation,
+        step: "delegation_submit",
+        context: {
+          walletAddress: accountAddress,
+          chainId: contracts.token.chain.id,
+        },
+        tags: ["governance", "delegation", "frontend"],
+        attributes: {
+          delegatee: delegate.address,
+          delegationAction: "delegate",
+        },
+        startEventName: "governance_delegation_started",
+        startEventDetails: {
+          delegatee: delegate.address,
+          action: "delegate",
+        },
+      });
+      delegationTraceRef.current = trace;
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: contracts.token.chain.id,
+        inputData,
+      });
+
       try {
         // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
         const publicClient = getPublicClient(contracts.token.chain);
@@ -168,6 +290,15 @@ export function DelegateDialog({
         });
 
         const txHash = await walletClient.writeContract(request);
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.token.chain.id,
+          inputData:
+            "data" in request && typeof request.data === "string"
+              ? request.data
+              : inputData,
+          txHash,
+          txDetails: "Delegation transaction",
+        });
         setLocalDelegateTxHash(txHash);
       } catch (error) {
         console.error("delegate via viem failed", error);
@@ -182,6 +313,20 @@ export function DelegateDialog({
           });
         } catch (innerError) {
           console.error("delegate via wagmi fallback failed", innerError);
+          void closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_delegation_failed",
+            eventName: "governance_delegation_failed",
+            details: {
+              delegatee: delegate.address,
+              error:
+                innerError instanceof Error
+                  ? innerError.message
+                  : String(innerError),
+            },
+          });
+          if (delegationTraceRef.current === trace) {
+            delegationTraceRef.current = null;
+          }
         }
       }
     }
@@ -226,7 +371,7 @@ export function DelegateDialog({
             hash1={
               isGasRelayLive
                 ? sponsoredTxnHash
-                : (localDelegateTxHash ?? delegateTxHash)
+                : directDelegationTxHash
             }
           />
         </div>

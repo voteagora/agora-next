@@ -8,7 +8,7 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AgoraLoaderSmall,
   LogoLoader,
@@ -20,10 +20,17 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
-import { formatEther, zeroAddress } from "viem";
+import { encodeFunctionData, formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -116,6 +123,7 @@ export function UndelegateDialog({
   ) => Promise<DelegateePayload | null>;
 }) {
   const { ui, contracts, token } = Tenant.current();
+  const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
   const { address: accountAddress } = useAccount();
   const [votingPower, setVotingPower] = useState<string>("");
@@ -194,11 +202,51 @@ export function UndelegateDialog({
     if (isGasRelayLive) {
       await call();
     } else {
+      if (delegationTraceRef.current) {
+        void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+          reason: "governance_delegation_restarted",
+          eventName: "governance_delegation_restarted",
+          details: {
+            delegatee: zeroAddress,
+            action: "undelegate",
+          },
+        });
+      }
+      const inputData = encodeFunctionData({
+        abi: contracts.token.abi as any,
+        functionName: "delegate",
+        args: [zeroAddress],
+      });
+      const trace = startFrontendMiradorFlowTrace({
+        name: "GovernanceDelegation",
+        flow: MIRADOR_FLOW.governanceDelegation,
+        step: "undelegation_submit",
+        context: {
+          walletAddress: accountAddress,
+          chainId: contracts.token.chain.id,
+        },
+        tags: ["governance", "delegation", "frontend"],
+        attributes: {
+          delegatee: zeroAddress,
+          delegationAction: "undelegate",
+        },
+        startEventName: "governance_delegation_started",
+        startEventDetails: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+        },
+      });
+      delegationTraceRef.current = trace;
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: contracts.token.chain.id,
+        inputData,
+      });
       write({
         address: contracts.token.address as any,
         abi: contracts.token.abi,
         functionName: "delegate",
         args: [zeroAddress],
+        chainId: contracts.token.chain.id,
       });
     }
   };
@@ -209,6 +257,23 @@ export function UndelegateDialog({
     }
 
     if (didProcessDelegation) {
+      if (delegationTraceRef.current) {
+        attachMiradorTransactionArtifacts(delegationTraceRef.current, {
+          chainId: contracts.token.chain.id,
+          txHash: delegateTxHash,
+          txDetails: "Undelegation transaction",
+        });
+        void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+          reason: "governance_delegation_succeeded",
+          eventName: "governance_delegation_succeeded",
+          details: {
+            delegatee: zeroAddress,
+            action: "undelegate",
+            transactionHash: delegateTxHash,
+          },
+        });
+        delegationTraceRef.current = null;
+      }
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
@@ -218,7 +283,54 @@ export function UndelegateDialog({
       }
       revalidateData();
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [
+    contracts.token.chain.id,
+    delegate.address,
+    delegate.votingPower.total,
+    delegateTxHash,
+    didProcessDelegation,
+    fetchData,
+    isReady,
+    setRefetchDelegate,
+    votingPower,
+  ]);
+
+  useEffect(() => {
+    if (!delegationTraceRef.current || isGasRelayLive) {
+      return;
+    }
+
+    if (didFailDelegation || isError) {
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_failed",
+        eventName: "governance_delegation_failed",
+        details: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+          error: "Undelegation transaction failed",
+        },
+      });
+      delegationTraceRef.current = null;
+    }
+  }, [didFailDelegation, isError, isGasRelayLive]);
+
+  useEffect(() => {
+    return () => {
+      if (!delegationTraceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_unmounted",
+        eventName: "governance_delegation_unmounted",
+        details: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+        },
+      });
+      delegationTraceRef.current = null;
+    };
+  }, []);
 
   if (!isReady) {
     return (

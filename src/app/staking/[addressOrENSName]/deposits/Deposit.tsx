@@ -1,7 +1,7 @@
 "use client";
 
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { StakedDeposit } from "@/lib/types";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
@@ -22,6 +22,13 @@ import { TOKEN_ALLOWANCE_QK } from "@/hooks/useTokenAllowance";
 import ENSName from "@/components/shared/ENSName";
 import { useVoterStats } from "@/hooks/useVoterStats";
 import { TOTAL_STAKED_QK } from "@/hooks/useTotalStaked";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 interface DepositProps {
   deposit: StakedDeposit;
@@ -31,6 +38,7 @@ interface DepositProps {
 export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const traceRef = useRef<FrontendMiradorTrace>(null);
 
   const { isConnected, address } = useAccount();
   const { data: tokenBalance } = useTokenBalance(address);
@@ -48,6 +56,23 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   useEffect(() => {
     // Refresh route and invalidate cache if withdrawal was processed
     if (didProcessWithdrawal) {
+      if (traceRef.current) {
+        attachMiradorTransactionArtifacts(traceRef.current, {
+          chainId: contracts.staker!.chain.id,
+          txHash: data,
+          txDetails: "Withdraw stake transaction",
+        });
+        void closeFrontendMiradorFlowTrace(traceRef.current, {
+          reason: "staking_withdraw_succeeded",
+          eventName: "staking_withdraw_succeeded",
+          details: {
+            depositId: deposit.id,
+            amount: deposit.amount,
+            transactionHash: data,
+          },
+        });
+        traceRef.current = null;
+      }
       setTimeout(() => {
         Promise.all([
           queryClient.invalidateQueries({
@@ -68,7 +93,35 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
         });
       }, INDEXER_DELAY);
     }
-  }, [didProcessWithdrawal]);
+  }, [
+    contracts.staker,
+    data,
+    deposit.amount,
+    deposit.depositor,
+    deposit.id,
+    didProcessWithdrawal,
+    queryClient,
+    refreshPath,
+    router,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "staking_withdraw_unmounted",
+        eventName: "staking_withdraw_unmounted",
+        details: {
+          depositId: deposit.id,
+          amount: deposit.amount,
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [deposit.amount, deposit.id]);
 
   return (
     <div className="px-5 py-4 w-full">
@@ -139,6 +192,40 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
                     <div
                       className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer"
                       onClick={() => {
+                        if (traceRef.current) {
+                          void closeFrontendMiradorFlowTrace(traceRef.current, {
+                            reason: "staking_withdraw_restarted",
+                            eventName: "staking_withdraw_restarted",
+                            details: {
+                              depositId: deposit.id,
+                              amount: deposit.amount,
+                            },
+                          });
+                        }
+                        const trace = startFrontendMiradorFlowTrace({
+                          name: "StakingAction",
+                          flow: MIRADOR_FLOW.staking,
+                          step: "withdraw_submit",
+                          context: {
+                            walletAddress: deposit.depositor,
+                            chainId: contracts.staker!.chain.id,
+                          },
+                          tags: ["staking", "frontend"],
+                          attributes: {
+                            action: "withdraw",
+                            depositId: deposit.id,
+                            amount: deposit.amount,
+                          },
+                          startEventName: "staking_withdraw_started",
+                          startEventDetails: {
+                            depositId: deposit.id,
+                            amount: deposit.amount,
+                          },
+                        });
+                        traceRef.current = trace;
+                        attachMiradorTransactionArtifacts(trace, {
+                          chainId: contracts.staker!.chain.id,
+                        });
                         writeContract({
                           address: contracts.staker!.address as `0x${string}`,
                           abi: contracts.staker!.abi,

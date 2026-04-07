@@ -22,6 +22,7 @@ export type MiradorTraceContext = {
   source?: MiradorTraceSource;
   walletAddress?: string;
   chainId?: number | string;
+  proposalId?: string;
   branch?: ProposalCreationBranch;
   sessionId?: string;
 };

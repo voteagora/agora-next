@@ -38,6 +38,7 @@ function applyContextAttributes(trace: Trace, context?: MiradorTraceContext) {
     "trace.source": context.source,
     "wallet.address": context.walletAddress,
     "wallet.chainId": context.chainId,
+    "proposal.id": context.proposalId,
     "proposal.branch": context.branch,
     "session.id": context.sessionId,
   };

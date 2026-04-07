@@ -1,5 +1,5 @@
 import { MissingVote } from "@/lib/voteUtils";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
@@ -8,6 +8,14 @@ import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
+import { encodeFunctionData } from "viem";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -33,12 +41,12 @@ const useAdvancedVoting = ({
     isError: _advancedVoteError,
     error: _advancedVoteErrorDetails,
   } = useWriteContract();
-
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
     error: _standardVoteErrorDetails,
   } = useWriteContract();
+
   const [standardVoteError, setStandardVoteError] =
     useState(_standardVoteError);
   const [standardVoteErrorDetails, setStandardVoteErrorDetails] =
@@ -57,28 +65,104 @@ const useAdvancedVoting = ({
   const [advancedTxHash, setAdvancedTxHash] = useState<string | undefined>(
     undefined
   );
+  const traceRef = useRef<FrontendMiradorTrace>(null);
+
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_vote_unmounted",
+        eventName: "governance_vote_unmounted",
+        details: {
+          proposalId,
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [proposalId]);
 
   const write = useCallback(() => {
+    const startVoteTrace = ({
+      step,
+      voteKind,
+      chainId,
+      inputData,
+    }: {
+      step: string;
+      voteKind: "standard" | "advanced";
+      chainId?: number;
+      inputData?: string;
+    }) => {
+      const trace = startFrontendMiradorFlowTrace({
+        name: "GovernanceVote",
+        flow: MIRADOR_FLOW.governanceVote,
+        step,
+        context: {
+          walletAddress: address,
+          chainId,
+          proposalId,
+        },
+        tags: ["governance", "vote", "frontend"],
+        attributes: {
+          voteKind,
+          support,
+          hasReason: Boolean(reason),
+          hasParams: Boolean(params),
+          missingVote,
+          hasAdvancedVp: advancedVP !== null,
+        },
+        startEventName: "governance_vote_started",
+        startEventDetails: {
+          proposalId,
+          voteKind,
+          support,
+        },
+      });
+      traceRef.current = trace;
+      attachMiradorTransactionArtifacts(trace, {
+        chainId,
+        inputData,
+      });
+      return trace;
+    };
+
     const _standardVote = async () => {
       setStandardVoteLoading(true);
+      const functionName = reason
+        ? params
+          ? "castVoteWithReasonAndParams"
+          : "castVoteWithReason"
+        : params
+          ? "castVoteWithReasonAndParams"
+          : "castVote";
+      const args = reason
+        ? params
+          ? [BigInt(proposalId), support, reason, params]
+          : [BigInt(proposalId), support, reason]
+        : params
+          ? [BigInt(proposalId), support, reason, params]
+          : [BigInt(proposalId), support];
+      const inputData = encodeFunctionData({
+        abi: contracts.governor.abi as any,
+        functionName,
+        args: args as any,
+      });
+      const trace = startVoteTrace({
+        step: "standard_vote_submit",
+        voteKind: "standard",
+        chainId: contracts.governor.chain.id,
+        inputData,
+      });
+
       try {
         const directTx = await standardVote({
           address: contracts.governor.address as `0x${string}`,
           abi: contracts.governor.abi,
-          functionName: reason
-            ? params
-              ? "castVoteWithReasonAndParams"
-              : "castVoteWithReason"
-            : params
-              ? "castVoteWithReasonAndParams"
-              : "castVote",
-          args: reason
-            ? params
-              ? [BigInt(proposalId), support, reason, params]
-              : [BigInt(proposalId), support, reason]
-            : params
-              ? [BigInt(proposalId), support, reason, params]
-              : ([BigInt(proposalId), support] as any),
+          functionName,
+          args: args as any,
           chainId: contracts.governor.chain.id,
         });
         const { status, transactionHash } =
@@ -87,23 +171,74 @@ const useAdvancedVoting = ({
             address: address as `0x${string}`,
           });
         if (status === "success") {
+          attachMiradorTransactionArtifacts(trace, {
+            chainId: contracts.governor.chain.id,
+            inputData,
+            submittedTxHash: directTx,
+            submittedTxType:
+              directTx !== transactionHash ? "safe" : "tx",
+            submittedTxDetails:
+              directTx !== transactionHash
+                ? "Submitted Safe governance vote transaction"
+                : "Submitted governance vote transaction",
+            txHash: transactionHash,
+            txDetails: "Governance vote transaction",
+          });
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
               proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
+              support,
+              reason,
+              params,
               voter: address as `0x${string}`,
               transaction_hash: transactionHash,
             },
           });
           setStandardTxHash(transactionHash);
           setStandardVoteSuccess(true);
+          await closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_succeeded",
+            eventName: "governance_vote_succeeded",
+            details: {
+              proposalId,
+              voteKind: "standard",
+              transactionHash,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
+        } else {
+          setStandardVoteError(true);
+          await closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_failed",
+            eventName: "governance_vote_failed",
+            details: {
+              proposalId,
+              voteKind: "standard",
+              error: `Unexpected vote receipt status: ${status}`,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
         }
       } catch (error) {
         setStandardVoteError(true);
         setStandardVoteErrorDetails(error as WriteContractErrorType);
+        await closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "standard",
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
       } finally {
         setStandardVoteLoading(false);
       }
@@ -115,19 +250,32 @@ const useAdvancedVoting = ({
         return;
       }
       setAdvancedVoteLoading(true);
+      const args = [
+        advancedVP,
+        authorityChains as any,
+        BigInt(proposalId),
+        support,
+        reason,
+        params ?? "0x",
+      ];
+      const inputData = encodeFunctionData({
+        abi: contracts.alligator!.abi as any,
+        functionName: "limitedCastVoteWithReasonAndParamsBatched",
+        args: args as any,
+      });
+      const trace = startVoteTrace({
+        step: "advanced_vote_submit",
+        voteKind: "advanced",
+        chainId: contracts.alligator?.chain.id,
+        inputData,
+      });
+
       try {
         const advancedTx = await advancedVote({
           address: contracts.alligator!.address as `0x${string}`,
           abi: contracts.alligator!.abi,
           functionName: "limitedCastVoteWithReasonAndParamsBatched",
-          args: [
-            advancedVP,
-            authorityChains as any,
-            BigInt(proposalId),
-            support,
-            reason,
-            params ?? "0x",
-          ],
+          args: args as any,
           chainId: contracts.alligator?.chain.id,
         });
         const { status, transactionHash } =
@@ -136,33 +284,84 @@ const useAdvancedVoting = ({
             address: address as `0x${string}`,
           });
         if (status === "success") {
+          attachMiradorTransactionArtifacts(trace, {
+            chainId: contracts.alligator?.chain.id,
+            inputData,
+            submittedTxHash: advancedTx,
+            submittedTxType:
+              advancedTx !== transactionHash ? "safe" : "tx",
+            submittedTxDetails:
+              advancedTx !== transactionHash
+                ? "Submitted Safe advanced governance vote transaction"
+                : "Submitted advanced governance vote transaction",
+            txHash: transactionHash,
+            txDetails: "Advanced governance vote transaction",
+          });
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
             event_data: {
               proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
+              support,
+              reason,
+              params,
               voter: address as `0x${string}`,
               transaction_hash: transactionHash,
             },
           });
           setAdvancedTxHash(transactionHash);
           setAdvancedVoteSuccess(true);
+          await closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_succeeded",
+            eventName: "governance_vote_succeeded",
+            details: {
+              proposalId,
+              voteKind: "advanced",
+              transactionHash,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
+        } else {
+          setAdvancedVoteError(true);
+          await closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_failed",
+            eventName: "governance_vote_failed",
+            details: {
+              proposalId,
+              voteKind: "advanced",
+              error: `Unexpected vote receipt status: ${status}`,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
         }
       } catch (error) {
-        // console.error('[useAdvancedVoting] setAdvancedVoteError(true)', error);
         setAdvancedVoteError(true);
         setAdvancedVoteErrorDetails(error as WriteContractErrorType);
+        await closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "advanced",
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
       } finally {
         setAdvancedVoteLoading(false);
       }
     };
+
     const vote = async () => {
       const trackingData: any = {
         dao_slug: "OP",
         proposal_id: BigInt(proposalId),
-        support: support,
+        support,
       };
 
       if (reason) {
@@ -187,12 +386,10 @@ const useAdvancedVoting = ({
           track("Standard Vote", trackingData);
           await _standardVote();
           break;
-
         case "ADVANCED":
           track("Advanced Vote", trackingData);
           await _advancedVote();
           break;
-
         case "BOTH":
           track("Standard + Advanced Vote (single transaction)", trackingData);
           await _advancedVote();
@@ -200,31 +397,27 @@ const useAdvancedVoting = ({
       }
     };
 
-    vote();
+    void vote();
   }, [
-    standardVote,
+    address,
+    advancedVP,
     advancedVote,
+    authorityChains,
+    contracts.alligator,
+    contracts.governor.abi,
+    contracts.governor.address,
+    contracts.governor.chain.id,
     missingVote,
     params,
     proposalId,
     reason,
+    standardVote,
     support,
   ]);
 
   return {
     isLoading:
       missingVote === "DIRECT" ? standardVoteLoading : advancedVoteLoading,
-    /**
-     * TODO: what to do with the errors in SAFE:
-     * - If two txs, they probably go under the same nonce and therefore the second will fail. How are we informing this in the UI?
-     * - The user could also not execute the first tx and leave it for later. How are we informing this in the UI?
-     * - The user could also not execute the second tx and leave it for later. How are we informing this in the UI?
-     * - Sometimes the tx does not execute instantly because the user has some other SAFE txs in the queue and these
-     *   have to be executed first.
-     *
-     * Remember that if waitForTransaction fails it means the txHash does not exist and therefore the SAFE transaction
-     * failed, probably due to a nonce error
-     */
     isError: missingVote === "DIRECT" ? standardVoteError : advancedVoteError,
     resetError: () => {
       if (missingVote === "DIRECT") {

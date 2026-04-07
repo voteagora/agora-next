@@ -11,6 +11,7 @@ import { getTenantTag } from "./tags";
 import {
   MiradorAttributeMap,
   MiradorChainName,
+  MiradorTraceSource,
   MiradorTraceContext,
 } from "./types";
 
@@ -80,6 +81,7 @@ function buildContextAttributes(
     "trace.source": traceContext.source,
     "wallet.address": traceContext.walletAddress,
     "wallet.chainId": traceContext.chainId,
+    "proposal.id": traceContext.proposalId,
     "proposal.branch": traceContext.branch,
     "session.id": traceContext.sessionId,
   };
@@ -234,4 +236,20 @@ export async function appendServerTraceEvent({
       error,
     });
   }
+}
+
+export function withMiradorTraceStep(
+  traceContext: MiradorTraceContext | null | undefined,
+  step: string,
+  source: MiradorTraceSource = "backend"
+): MiradorTraceContext | undefined {
+  if (!traceContext) {
+    return undefined;
+  }
+
+  return {
+    ...traceContext,
+    step,
+    source,
+  };
 }
