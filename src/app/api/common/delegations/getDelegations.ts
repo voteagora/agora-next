@@ -169,40 +169,10 @@ async function getCurrentDelegatorsForAddress({
         );
       }
 
-      const blockNumbers = daoDelegate.from_list
-        .map((d: any) => d.bn ?? d.block_number)
-        .filter(Boolean);
-
-      const [latestBlock, txHashRows] = await Promise.all([
+      const latestBlock =
         daoDelegate.from_list.length > 0
-          ? contracts.token.provider.getBlock("latest")
-          : Promise.resolve(null),
-        blockNumbers.length > 0
-          ? prismaWeb2Client.$queryRawUnsafe<
-              {
-                block_number: bigint;
-                transaction_index: number;
-                transaction_hash: string;
-              }[]
-            >(
-              `SELECT block_number, transaction_index, transaction_hash
-               FROM ${namespace}.delegate_changed_events
-               WHERE to_delegate = $1
-                 AND address = $2
-                 AND block_number IN (${blockNumbers.map((_: any, i: number) => `$${i + 3}`).join(",")})`,
-              address,
-              contracts.token.address,
-              ...blockNumbers.map((bn: any) => BigInt(bn))
-            )
-          : Promise.resolve([]),
-      ]);
-
-      const txHashMap = new Map(
-        txHashRows.map((row) => [
-          `${row.block_number}-${row.transaction_index}`,
-          row.transaction_hash,
-        ])
-      );
+          ? await contracts.token.provider.getBlock("latest")
+          : null;
 
       const mapped = daoDelegate.from_list.map((delegator: any) => {
         const bn = delegator.bn ?? delegator.block_number;
@@ -233,10 +203,9 @@ async function getCurrentDelegatorsForAddress({
           type: "DIRECT" as const,
           amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
           transaction_hash:
-            delegator.txhash ||
-            delegator.transaction_hash ||
-            txHashMap.get(`${bn}-${tid}`) ||
-            "",
+            delegator.txhash || delegator.transaction_hash || "",
+          block_number: bn ? Number(bn) : undefined,
+          transaction_index: tid !== undefined ? Number(tid) : undefined,
         };
       });
 

@@ -7,6 +7,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
+import { useBnAndTidToHash } from "@/hooks/useBnAndTidToHash";
+import { useInView } from "react-intersection-observer";
 
 export default function DelegationToRow({
   delegation,
@@ -15,8 +17,21 @@ export default function DelegationToRow({
   delegation: Delegation;
   tokenBalance?: bigint;
 }) {
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
+  const { data: resolvedHash } = useBnAndTidToHash({
+    blockNumber: delegation.block_number,
+    transactionIndex: delegation.transaction_index,
+    enabled: inView && !delegation.transaction_hash,
+  });
+
+  const txHash = delegation.transaction_hash || resolvedHash;
+
   return (
-    <TableRow>
+    <TableRow ref={ref}>
       <TableCell>
         {TokenAmountDisplay({
           amount: tokenBalance ? tokenBalance : "0",
@@ -33,9 +48,9 @@ export default function DelegationToRow({
         </Link>
       </TableCell>
       <TableCell>
-        {delegation.transaction_hash ? (
+        {txHash ? (
           <a
-            href={getBlockScanUrl(delegation.transaction_hash)}
+            href={getBlockScanUrl(txHash)}
             target="_blank"
             rel="noreferrer noopener"
           >
