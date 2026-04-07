@@ -16,7 +16,8 @@ export const useBnAndTidToHash = ({
       blockNumber,
       transactionIndex,
     ],
-    enabled: enabled,
+    enabled:
+      enabled && blockNumber !== undefined && transactionIndex !== undefined,
     queryFn: () =>
       blockNumberAndTransactionIndexToHash(blockNumber, transactionIndex),
   });
