@@ -21,11 +21,11 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
-  webServer: {
-    command:
-      "UPSTASH_REDIS_REST_URL=http://127.0.0.1:3000/api/mock-daonode/upstash UPSTASH_REDIS_REST_TOKEN=dummy DAONODE_URL_TEMPLATE=http://127.0.0.1:3000/api/mock-daonode/ PORT=3000 npm run dev",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: false,
-    timeout: 120 * 1000,
-  },
+  // webServer: {
+  //   command:
+  //     "UPSTASH_REDIS_REST_URL=http://127.0.0.1:3000/api/mock-daonode/upstash UPSTASH_REDIS_REST_TOKEN=dummy DAONODE_URL_TEMPLATE=http://127.0.0.1:3000/api/mock-daonode/ PORT=3000 npm run dev",
+  //   url: "http://127.0.0.1:3000",
+  //   reuseExistingServer: false,
+  //   timeout: 120 * 1000,
+  // },
 });

@@ -14,17 +14,26 @@ export async function GET(
   }
 
   if (path.includes("v1/delegate/")) {
-    return NextResponse.json({
-      delegate: {
-        addr: path.split("/").pop(),
-        address: path.split("/").pop(),
-        voting_power: "1000000000000000000000000",
-        delegators_count: 50,
-        from_cnt: 50,
-        from_list: [],
-        participation: [10, 10], // Active delegate (100% participation > 0.5 and > 10 proposals)
-      },
-    });
+    const address = path.split("/").pop();
+    const delegateData: any = {
+      addr: address,
+      address: address,
+      voting_power: "1000000000000000000000000",
+      delegators_count: 50,
+      from_cnt: 50,
+      from_list: [],
+      participation: [10, 10], // Active delegate (100% participation > 0.5 and > 10 proposals)
+    };
+
+    if (address?.toLowerCase() === "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266") {
+      delegateData.statement = {
+        payload: {
+          delegateStatement: "This is my mock statement for hardhat 0",
+        },
+      };
+    }
+
+    return NextResponse.json({ delegate: delegateData });
   }
 
   if (path === "v1/delegates") {

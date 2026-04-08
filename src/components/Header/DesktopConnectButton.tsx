@@ -17,6 +17,7 @@ export function DesktopConnectButton() {
       {({ isConnected, show, ensName }) => {
         return (
           <div
+            data-testid="connect-wallet-button"
             onClick={!isConnected ? () => show?.() : undefined}
             className={cn(
               `lg:border text-primary font-medium lg:bg-neutral p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative border-line`
