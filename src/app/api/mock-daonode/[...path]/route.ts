@@ -25,7 +25,9 @@ export async function GET(
       participation: [10, 10], // Active delegate (100% participation > 0.5 and > 10 proposals)
     };
 
-    if (address?.toLowerCase() === "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266") {
+    if (
+      address?.toLowerCase() === "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+    ) {
       delegateData.statement = {
         payload: {
           delegateStatement: "This is my mock statement for hardhat 0",

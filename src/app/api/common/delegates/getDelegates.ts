@@ -815,7 +815,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     );
 
     // Sanitize statement payload to remove email if it exists
-    let sanitizedStatement = (delegate as any)?.statement || (daoNodeDelegate as any)?.delegate?.statement;
+    let sanitizedStatement =
+      (delegate as any)?.statement ||
+      (daoNodeDelegate as any)?.delegate?.statement;
     if (
       sanitizedStatement &&
       sanitizedStatement.payload &&
