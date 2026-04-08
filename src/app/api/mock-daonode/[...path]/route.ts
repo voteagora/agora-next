@@ -211,6 +211,13 @@ export async function POST(
   const path = params.path.join("/");
   console.log("[Mock DAO Node] Intercepted POST /" + path);
 
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      { error: "Mock endpoints are disabled in production." },
+      { status: 401 }
+    );
+  }
+
   if (path.includes("upstash")) {
     return NextResponse.json({ result: null });
   }
