@@ -49,7 +49,9 @@ type RunMiradorTraceOptions<T extends TraceableEasResult> = {
   proposalId?: string;
 };
 
-function getMiradorResultTxHash(result: TraceableEasResult): string | undefined {
+function getMiradorResultTxHash(
+  result: TraceableEasResult
+): string | undefined {
   return result.txHash ?? result.transactionHash;
 }
 

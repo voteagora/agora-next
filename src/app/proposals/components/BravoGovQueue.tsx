@@ -39,7 +39,11 @@ export const BravoGovQueue = ({ proposal }: Props) => {
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "governance_admin_succeeded",
           eventName: "governance_admin_succeeded",
-          details: { action: "queue", proposalId: proposal.id, transactionHash: data },
+          details: {
+            action: "queue",
+            proposalId: proposal.id,
+            transactionHash: data,
+          },
         });
         traceRef.current = null;
       }
@@ -65,7 +69,14 @@ export const BravoGovQueue = ({ proposal }: Props) => {
         duration: 5000,
       });
     }
-  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
+  }, [
+    contracts.governor.chain.id,
+    data,
+    error,
+    isError,
+    isSuccess,
+    proposal.id,
+  ]);
 
   return (
     <>

@@ -48,7 +48,11 @@ export const BravoGovCancel = ({ proposal }: Props) => {
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "governance_admin_succeeded",
           eventName: "governance_admin_succeeded",
-          details: { action: "cancel", proposalId: proposal.id, transactionHash: data },
+          details: {
+            action: "cancel",
+            proposalId: proposal.id,
+            transactionHash: data,
+          },
         });
         traceRef.current = null;
       }
@@ -65,8 +69,7 @@ export const BravoGovCancel = ({ proposal }: Props) => {
           details: {
             action: "cancel",
             proposalId: proposal.id,
-            error:
-              "shortMessage" in error ? error.shortMessage : error.message,
+            error: "shortMessage" in error ? error.shortMessage : error.message,
           },
         });
         traceRef.current = null;
@@ -78,7 +81,14 @@ export const BravoGovCancel = ({ proposal }: Props) => {
         duration: 5000,
       });
     }
-  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
+  }, [
+    contracts.governor.chain.id,
+    data,
+    error,
+    isError,
+    isSuccess,
+    proposal.id,
+  ]);
 
   if (!canCancel) {
     return null;

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
-import { appendServerTraceEvent, withMiradorTraceStep } from "@/lib/mirador/serverTrace";
+import {
+  appendServerTraceEvent,
+  withMiradorTraceStep,
+} from "@/lib/mirador/serverTrace";
 
 export async function POST(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");

@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
-import { appendServerTraceEvent, withMiradorTraceStep } from "@/lib/mirador/serverTrace";
+import {
+  appendServerTraceEvent,
+  withMiradorTraceStep,
+} from "@/lib/mirador/serverTrace";
 
 export async function POST(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -19,7 +22,11 @@ export async function POST(request: NextRequest) {
 
   if (!authResponse.authenticated) {
     await appendServerTraceEvent({
-      traceContext: withMiradorTraceStep(traceContext, "relay_vote_auth", "api"),
+      traceContext: withMiradorTraceStep(
+        traceContext,
+        "relay_vote_auth",
+        "api"
+      ),
       eventName: "relay_vote_auth_failed",
       details: { reason: authResponse.failReason },
     });

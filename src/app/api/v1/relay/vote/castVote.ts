@@ -2,7 +2,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { getPublicClient } from "@/lib/viem";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
-import { appendServerTraceEvent, withMiradorTraceStep } from "@/lib/mirador/serverTrace";
+import {
+  appendServerTraceEvent,
+  withMiradorTraceStep,
+} from "@/lib/mirador/serverTrace";
 import type { MiradorTraceContext } from "@/lib/mirador/types";
 import { createWalletClient, parseSignature, isHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

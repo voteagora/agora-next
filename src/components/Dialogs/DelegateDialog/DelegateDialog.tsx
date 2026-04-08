@@ -368,11 +368,7 @@ export function DelegateDialog({
             Delegation completed!
           </Button>
           <BlockScanUrls
-            hash1={
-              isGasRelayLive
-                ? sponsoredTxnHash
-                : directDelegationTxHash
-            }
+            hash1={isGasRelayLive ? sponsoredTxnHash : directDelegationTxHash}
           />
         </div>
       );

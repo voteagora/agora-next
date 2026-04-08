@@ -78,8 +78,7 @@ export const AgoraGovCancel = ({
           details: {
             action: "cancel",
             proposalId: proposal.id,
-            error:
-              "shortMessage" in error ? error.shortMessage : error.message,
+            error: "shortMessage" in error ? error.shortMessage : error.message,
           },
         });
         traceRef.current = null;
@@ -91,7 +90,14 @@ export const AgoraGovCancel = ({
         duration: 5000,
       });
     }
-  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
+  }, [
+    contracts.governor.chain.id,
+    data,
+    error,
+    isError,
+    isSuccess,
+    proposal.id,
+  ]);
 
   useEffect(() => {
     return () => {

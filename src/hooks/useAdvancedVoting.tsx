@@ -175,8 +175,7 @@ const useAdvancedVoting = ({
             chainId: contracts.governor.chain.id,
             inputData,
             submittedTxHash: directTx,
-            submittedTxType:
-              directTx !== transactionHash ? "safe" : "tx",
+            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
             submittedTxDetails:
               directTx !== transactionHash
                 ? "Submitted Safe governance vote transaction"
@@ -288,8 +287,7 @@ const useAdvancedVoting = ({
             chainId: contracts.alligator?.chain.id,
             inputData,
             submittedTxHash: advancedTx,
-            submittedTxType:
-              advancedTx !== transactionHash ? "safe" : "tx",
+            submittedTxType: advancedTx !== transactionHash ? "safe" : "tx",
             submittedTxDetails:
               advancedTx !== transactionHash
                 ? "Submitted Safe advanced governance vote transaction"

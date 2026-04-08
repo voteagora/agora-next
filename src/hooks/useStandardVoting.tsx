@@ -128,8 +128,7 @@ const useStandardVoting = ({
             chainId: contracts.governor.chain.id,
             inputData,
             submittedTxHash: directTx,
-            submittedTxType:
-              directTx !== transactionHash ? "safe" : "tx",
+            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
             submittedTxDetails:
               directTx !== transactionHash
                 ? "Submitted Safe governance vote transaction"

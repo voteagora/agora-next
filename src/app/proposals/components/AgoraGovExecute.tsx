@@ -97,8 +97,7 @@ export const AgoraGovExecute = ({
           details: {
             action: "execute",
             proposalId: proposal.id,
-            error:
-              "shortMessage" in error ? error.shortMessage : error.message,
+            error: "shortMessage" in error ? error.shortMessage : error.message,
           },
         });
         traceRef.current = null;
@@ -110,7 +109,14 @@ export const AgoraGovExecute = ({
         duration: 10000,
       });
     }
-  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
+  }, [
+    contracts.governor.chain.id,
+    data,
+    error,
+    isError,
+    isSuccess,
+    proposal.id,
+  ]);
 
   useEffect(() => {
     return () => {

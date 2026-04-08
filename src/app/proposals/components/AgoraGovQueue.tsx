@@ -66,8 +66,7 @@ export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
           details: {
             action: "queue",
             proposalId: proposal.id,
-            error:
-              "shortMessage" in error ? error.shortMessage : error.message,
+            error: "shortMessage" in error ? error.shortMessage : error.message,
           },
         });
         traceRef.current = null;
@@ -79,7 +78,14 @@ export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
         duration: 10000,
       });
     }
-  }, [contracts.governor.chain.id, data, error, isError, isSuccess, proposal.id]);
+  }, [
+    contracts.governor.chain.id,
+    data,
+    error,
+    isError,
+    isSuccess,
+    proposal.id,
+  ]);
 
   useEffect(() => {
     return () => {

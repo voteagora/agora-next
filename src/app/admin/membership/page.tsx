@@ -19,7 +19,8 @@ const AdminMembershipPage = () => {
   const tenant = Tenant.current();
   const [address, setAddress] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
-  const traceRef = useRef<ReturnType<typeof startFrontendMiradorFlowTrace>>(null);
+  const traceRef =
+    useRef<ReturnType<typeof startFrontendMiradorFlowTrace>>(null);
 
   const { data: memberBalance } = useReadContract({
     address: tenant.contracts.token.address as `0x${string}`,
@@ -71,7 +72,14 @@ const AdminMembershipPage = () => {
       });
       traceRef.current = null;
     }
-  }, [address, error?.message, isError, isSuccess, tenant.contracts.token.chain.id, txHash]);
+  }, [
+    address,
+    error?.message,
+    isError,
+    isSuccess,
+    tenant.contracts.token.chain.id,
+    txHash,
+  ]);
 
   useEffect(() => {
     return () => {
