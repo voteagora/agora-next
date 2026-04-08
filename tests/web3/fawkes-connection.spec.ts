@@ -4,7 +4,10 @@ import { FawkesClient } from "./utils/fawkesClient";
 test.describe("Fawkes Wallet Headless Connection", () => {
   const IMPERSONATE_ADDRESS = "0x4033Bd6759cAD2E1691F6E18E1D8c1B15e3beC69";
 
-  test("should seamlessly connect via WalletConnect to RainbowKit", async ({ page, context }) => {
+  test("should seamlessly connect via WalletConnect to RainbowKit", async ({
+    page,
+    context,
+  }) => {
     // 1. Initialize headless wallet
     await FawkesClient.createWallet();
 
@@ -32,12 +35,12 @@ test.describe("Fawkes Wallet Headless Connection", () => {
 
     // 4. Extract WC URI from clipboard
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    
+
     // In ConnectKit, the button says "Copy to Clipboard" (or similar icon)
     const copyLinkButton = page.getByText("Copy to Clipboard");
     await expect(copyLinkButton).toBeVisible();
     await copyLinkButton.click();
-    
+
     // ConnectKit sets copied state
     await page.waitForTimeout(500);
 
@@ -58,4 +61,3 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     await expect(profileDropdown).toBeVisible({ timeout: 15000 });
   });
 });
-
