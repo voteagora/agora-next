@@ -61,11 +61,14 @@ test.describe("User Profile Scenarios", () => {
     await page.goto("/delegates");
     await page.waitForLoadState("domcontentloaded");
     
-    // Check if connected by looking for the profile dropdown button
-    const profileDropdown = page.getByTestId("profile-dropdown-button");
-    const isConnected = await profileDropdown.isVisible({ timeout: 2000 }).catch(() => false);
+    // Wait for either wagmi to resolve disconnected (connect button) or connected (profile dropdown)
+    const walletStateLocator = page.locator('[data-testid="connect-wallet-button"], [data-testid="profile-dropdown-button"]');
+    await walletStateLocator.first().waitFor({ state: "visible", timeout: 45000 });
 
-    if (!isConnected) {
+    const profileDropdown = page.getByTestId("profile-dropdown-button");
+    const isAlreadyConnected = await profileDropdown.isVisible();
+
+    if (!isAlreadyConnected) {
       const connectButton = page.getByTestId("connect-wallet-button");
       await connectButton.click();
       
@@ -112,39 +115,36 @@ test.describe("User Profile Scenarios", () => {
     await page.screenshot({ path: "auth-status-final.png" });
   };
 
-  test("USER-PRO-001: View my profile or create statement link on logged in menu", async ({ page }) => {
+  test("USER-PRO-001: View my profile' link on logged in menu", async ({ page }) => {
     await authenticateWallet(page);
 
     const userMenuButton = page.getByTestId("profile-dropdown-button");
     await expect(userMenuButton).toBeVisible({ timeout: 15000 });
     
-    // Check aria-expanded to know if the dropdown is open.
     const isExpanded = await userMenuButton.getAttribute("aria-expanded");
     if (isExpanded !== "true") {
       await userMenuButton.click();
       await page.waitForTimeout(1000);
     }
 
-    const profileLink = page.getByRole("link", { name: /(View my profile|Create delegate statement)/i });
+    const profileLink = page.getByRole("link", { name: "View my profile" });
     await expect(profileLink).toBeVisible({ timeout: 10000 });
   });
 
-  test("USER-PRO-002: Logout link on logged in menu", async ({ page }) => {
+  test("USER-PRO-002: Edit delegate statement' link on logged in menu", async ({ page }) => {
     await authenticateWallet(page);
 
     const userMenuButton = page.getByTestId("profile-dropdown-button");
     await expect(userMenuButton).toBeVisible({ timeout: 15000 });
     
-    // Check aria-expanded to know if the dropdown is open.
     const isExpanded = await userMenuButton.getAttribute("aria-expanded");
     if (isExpanded !== "true") {
       await userMenuButton.click();
       await page.waitForTimeout(1000);
     }
 
-    await page.screenshot({ path: "auth-status-pro002-final.png" });
-    const logoutButton = page.getByText("Logout", { exact: true });
-    await expect(logoutButton).toBeVisible({ timeout: 10000 });
+    const editStatementLink = page.getByRole("link", { name: "Edit delegate statement" });
+    await expect(editStatementLink).toBeVisible({ timeout: 10000 });
   });
 
   test("USER-PRO-003: delegates/create page contains a delegate statement editable text box", async ({ page }) => {
