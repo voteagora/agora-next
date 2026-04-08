@@ -13,6 +13,7 @@ import {
   VotePayload,
   VoterTypes,
   VotesSort,
+  VotesSortOrder,
 } from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
@@ -385,19 +386,23 @@ function buildHasVotedQuery(
   type: VoterTypes["type"],
   offchainProposalId?: string
 ): string {
-  const isTokenHouse = type === "TH";
+  const isTokenHouse =
+    type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
+  const isAll = type === "ALL" && namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (isTokenHouse) {
-    // Token House: Check onchain votes and snapshot votes
-    return `
+  const thQuery = `
       SELECT voter FROM ${namespace}.vote_cast_events WHERE proposal_id = $1 and contract = $3
       UNION ALL
       SELECT voter FROM ${namespace}.${eventsViewName} WHERE proposal_id = $1 and contract = $3
       UNION ALL
       SELECT voter FROM "snapshot".votes WHERE proposal_id = $1 and dao_slug = '${slug}'`;
-  }
 
-  return `SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`;
+  const chQuery = `SELECT LOWER("voter") as voter FROM atlas."votes_with_meta_mat" WHERE "proposal_id" = ${offchainProposalId ? "$6" : "$1"}`;
+
+  if (isTokenHouse) return thQuery;
+  if (isAll) return `${thQuery} UNION ALL ${chQuery}`;
+
+  return chQuery;
 }
 
 /**
@@ -423,14 +428,14 @@ function buildRelevantDelegatesQuery(
   namespace: string,
   type: VoterTypes["type"]
 ): string {
-  const isTokenHouse = type === "TH";
+  const isTokenHouse =
+    type === "TH" || namespace !== TENANT_NAMESPACES.OPTIMISM;
+  const isAll = type === "ALL" && namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  if (isTokenHouse) {
-    return `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;
-  }
+  const thQuery = `SELECT delegate, voting_power, NULL::text as citizen_type, NULL::text as voter_metadata_text FROM ${namespace}.delegates where contract = $2`;
 
   const citizenTypeFilter = getCitizenTypeFilter(type);
-  return `
+  const chQuery = `
       SELECT 
         c."address" as delegate, 
         1 as voting_power, 
@@ -438,6 +443,11 @@ function buildRelevantDelegatesQuery(
         voter_metadata_text
       FROM atlas.citizens_mat c
       WHERE ${citizenTypeFilter}`;
+
+  if (isTokenHouse) return thQuery;
+  if (isAll) return `${thQuery} UNION ALL ${chQuery}`;
+
+  return chQuery;
 }
 
 async function getVotersWhoHaveNotVotedForProposal({
@@ -445,11 +455,15 @@ async function getVotersWhoHaveNotVotedForProposal({
   pagination = { offset: 0, limit: 20 },
   offchainProposalId,
   type = "TH",
+  sort = "weight",
+  sortOrder = "desc",
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   offchainProposalId?: string;
   type?: VoterTypes["type"];
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
@@ -498,7 +512,7 @@ async function getVotersWhoHaveNotVotedForProposal({
           LEFT JOIN agora.delegate_statements ds ON 
             del.delegate = ds.address
             AND ds.dao_slug = 'OP'
-          ORDER BY del.delegate, del.voting_power DESC
+          ORDER BY del.delegate, ${sort === "block_number" ? "del.delegate" : "del.voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}
         )
         SELECT 
           delegate, 
@@ -509,7 +523,7 @@ async function getVotersWhoHaveNotVotedForProposal({
           discord,
           warpcast
         FROM unique_delegates
-        ORDER BY voting_power DESC
+        ORDER BY ${sort === "block_number" ? "delegate" : "voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}, delegate ASC
         OFFSET $4 LIMIT $5`;
 
       const params = [
@@ -587,11 +601,15 @@ async function getVotesForProposal({
   pagination = { offset: 0, limit: 20 },
   sort = "weight",
   offchainProposalId,
+  sortOrder = "desc",
+  voterType = "ALL",
 }: {
   proposalId: string;
   pagination?: PaginationParams;
   sort?: VotesSort;
   offchainProposalId?: string;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 }): Promise<PaginatedResult<Vote[]>> {
   return withMetrics(
     "getVotesForProposal",
@@ -687,6 +705,7 @@ async function getVotesForProposal({
               WHERE proposal_id = $1 AND contract = $2
               ${includeCitizens ? citizenQuery : ""}
             ) t
+            ${voterType !== "ALL" && voterType ? `WHERE ${voterType === "TH" ? "citizen_type IS NULL" : getCitizenTypeFilter(voterType)}` : ""}
             GROUP BY 2,3,4,8,9
             ) av
             LEFT JOIN LATERAL (
@@ -697,7 +716,7 @@ async function getVotesForProposal({
               FROM ${namespace}.proposals_v2 proposals
               WHERE proposals.proposal_id = $1 AND proposals.contract = $2) p ON TRUE
           ) q
-          ORDER BY citizen_type IS NOT NULL DESC, ${sort} DESC
+          ORDER BY ${sort === "block_number" ? "block_number" : "weight"} ${sortOrder === "asc" ? "ASC" : "DESC"}, voter ASC
           OFFSET $3
           LIMIT $4;`;
 

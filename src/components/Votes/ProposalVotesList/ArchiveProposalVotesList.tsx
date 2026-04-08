@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+  Vote,
+} from "@/app/api/common/votes/vote";
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
@@ -13,10 +18,16 @@ const VOTES_PAGE_SIZE = 20;
 
 type ArchiveProposalVotesListProps = {
   proposal: Proposal;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 };
 
 export default function ArchiveProposalVotesList({
   proposal,
+  sort,
+  sortOrder,
+  voterType,
 }: ArchiveProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
@@ -37,6 +48,9 @@ export default function ArchiveProposalVotesList({
     proposalId: proposal.id,
     proposalType,
     startBlock,
+    sort,
+    sortOrder,
+    voterType,
   });
 
   useEffect(() => {
@@ -118,7 +132,7 @@ export default function ArchiveProposalVotesList({
   }
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
+    <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}

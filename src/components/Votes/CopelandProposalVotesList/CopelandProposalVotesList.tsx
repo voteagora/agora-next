@@ -93,7 +93,7 @@ export default function CopelandProposalVotesList({
     isFetched && proposalVotes.length === 0 && userVotes.length === 0;
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
+    <div className={cn("overflow-y-scroll flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}

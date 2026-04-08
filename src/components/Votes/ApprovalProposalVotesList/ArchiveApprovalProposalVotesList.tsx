@@ -163,14 +163,7 @@ export default function ArchiveApprovalProposalVotesList({
   }
 
   return (
-    <div
-      className={cn(
-        "overflow-y-scroll min-h-[36px]",
-        isThresholdCriteria
-          ? "max-h-[calc(100vh-560px)]"
-          : "max-h-[calc(100vh-527px)]"
-      )}
-    >
+    <div className={cn("overflow-y-scroll min-h-[36px]", "flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}

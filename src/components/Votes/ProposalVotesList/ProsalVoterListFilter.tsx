@@ -6,6 +6,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
+import { Listbox } from "@headlessui/react";
+import { ChevronDown } from "lucide-react";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { FilterIcon } from "@/icons/filter";
 import { cn } from "@/lib/utils";
@@ -15,58 +17,64 @@ import { VoterTypes } from "@/app/api/common/votes/vote";
 interface ProposalVoterListFilterProps {
   selectedVoterType: VoterTypes;
   onVoterTypeChange: (type: VoterTypes) => void;
-  isOffchain?: boolean;
+  showCitizenHouseFilters?: boolean;
 }
 
 export default function ProposalVoterListFilter({
   selectedVoterType,
   onVoterTypeChange,
-  isOffchain = false,
+  showCitizenHouseFilters = false,
 }: ProposalVoterListFilterProps) {
-  const availableVoterTypes = isOffchain
-    ? VOTER_TYPES.filter((type) => type.type !== "TH")
-    : VOTER_TYPES;
+  const availableVoterTypes = [
+    { type: "ALL", value: "All" },
+    ...(showCitizenHouseFilters
+      ? VOTER_TYPES.map((type) =>
+          type.type === "TH"
+            ? { ...type, value: "Token House (Delegates)" }
+            : type
+        )
+      : []),
+  ];
+
+  if (availableVoterTypes.length <= 1) return null;
 
   return (
-    <div className="flex flex-row items-center justify-between px-4 py-2">
-      <span>{selectedVoterType.value}</span>
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={`text-tertiary cursor-pointer outline-none`}
-        >
-          <div className="border border-line rounded-lg px-[10px] py-[6px] flex flex-row items-center gap-2">
-            <FilterIcon className="stroke-primary" />
-            <span className="text-primary">Filter</span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuRadioGroup
-            value={selectedVoterType.type}
-            onValueChange={(value: string) => {
-              const selectedType = availableVoterTypes.find(
-                (type) => type.type === value
-              );
-              if (selectedType) onVoterTypeChange(selectedType);
-            }}
-          >
-            {availableVoterTypes.map((type) => (
-              <DropdownMenuRadioItem
-                key={type.value}
-                value={type.type}
-                checked={type.type === selectedVoterType.type}
-                className={cn(
-                  "relative flex cursor-pointer select-none items-center rounded-lg p-3 text-base outline-none transition-colors hover:bg-neutral/50",
-                  type.type === selectedVoterType.type
-                    ? "text-primary"
-                    : "text-secondary"
-                )}
-              >
-                {type.value}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className="relative text-primary flex-1 min-w-0">
+      <Listbox
+        value={selectedVoterType.type}
+        onChange={(value: string) => {
+          const selectedType = availableVoterTypes.find(
+            (type) => type.type === value
+          );
+          if (selectedType) onVoterTypeChange(selectedType);
+        }}
+      >
+        <Listbox.Button className="text-primary w-full bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2 flex items-center justify-between text-[11px] min-h-[32px]">
+          <FilterIcon className="stroke-primary w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+          <span className="text-left flex-1 leading-tight break-words">
+            {selectedVoterType.value}
+          </span>
+          <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
+        </Listbox.Button>
+        <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max shadow-xl">
+          {availableVoterTypes.map((type) => (
+            <Listbox.Option key={type.value} value={type.type}>
+              {({ selected }) => (
+                <div
+                  className={cn(
+                    "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
+                    selected
+                      ? "text-primary bg-wash border-line"
+                      : "text-tertiary border-transparent hover:bg-wash"
+                  )}
+                >
+                  {type.value}
+                </div>
+              )}
+            </Listbox.Option>
+          ))}
+        </Listbox.Options>
+      </Listbox>
     </div>
   );
 }

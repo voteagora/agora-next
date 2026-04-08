@@ -119,7 +119,7 @@ export default function ArchiveCopelandProposalVotesList({
   }
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
+    <div className={cn("overflow-y-scroll flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}

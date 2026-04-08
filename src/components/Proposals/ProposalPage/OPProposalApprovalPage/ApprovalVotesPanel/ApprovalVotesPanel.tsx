@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { motion } from "framer-motion";
 import { VStack, HStack } from "@/components/Layout/Stack";
 import OptionsResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
@@ -14,15 +14,28 @@ import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/Ar
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { PaginationParams } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
+import {
+  Vote,
+  VoterTypes,
+  VotesSort,
+  VotesSortOrder,
+} from "@/app/api/common/votes/vote";
 import { PaginatedResult } from "@/app/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
+import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
 
 type Props = {
   proposal: Proposal;
   fetchVotesForProposal: (
     proposalId: string,
-    pagination?: PaginationParams
+    pagination?: PaginationParams,
+    sort?: VotesSort,
+    offchainProposalId?: string,
+    sortOrder?: VotesSortOrder,
+    voterType?: string
   ) => Promise<PaginatedResult<Vote[]>>;
   fetchUserVotes: (
     proposalId: string,
@@ -43,6 +56,31 @@ export default function ApprovalVotesPanel({
     "use-archive-for-vote-history"
   )?.enabled;
 
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "block_number",
+    sortOrder: "desc",
+    label: "Most Recent",
+  });
+  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
+    type: "ALL",
+    value: "All",
+  });
+
+  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+    selectedVoterType.type
+  );
+
+  useEffect(() => {
+    const isTimeSortHidden = hideTimeSortOptions || !showVoters;
+    if (isTimeSortHidden && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [hideTimeSortOptions, showVoters, sortOption.sortKey]);
+
   function handleTabsChange(index: number) {
     startTransition(() => {
       setActiveTab(index);
@@ -56,9 +94,20 @@ export default function ApprovalVotesPanel({
   // Wrapper functions to match ApprovalProposalVotesList's expected signatures
   const handleFetchVotesForProposal = async (
     proposalId: string,
-    pagination: PaginationParams
+    pagination: PaginationParams,
+    sort?: VotesSort,
+    offchainProposalId?: string,
+    sortOrder?: VotesSortOrder,
+    voterType?: string
   ) => {
-    return fetchVotesForProposal(proposalId, pagination);
+    return fetchVotesForProposal(
+      proposalId,
+      pagination,
+      sort,
+      offchainProposalId,
+      sortOrder,
+      voterType
+    );
   };
 
   const handleFetchUserVotes = async (proposalId: string, address: string) => {
@@ -67,12 +116,12 @@ export default function ApprovalVotesPanel({
 
   return (
     <motion.div
-      className="flex flex-col"
+      className="flex flex-col flex-1 min-h-0"
       initial={{ opacity: 1 }}
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <VStack gap={1} className="relative min-h-0 h-full">
+      <VStack gap={1} className="relative min-h-0 flex-1">
         {/* Tabs */}
         <HStack className="h-12 pt-4 px-4 mb-1">
           {["Results", "Votes"].map((tab, index) => (
@@ -95,13 +144,35 @@ export default function ApprovalVotesPanel({
           <OptionsResultsPanel proposal={proposal} />
         ) : (
           <>
-            <div className="px-4">
+            <div className="px-4 py-3 pb-2 flex flex-col gap-4">
               <ProposalVotesFilter
                 initialSelection={showVoters ? "Voters" : "Hasn't voted"}
                 onSelectionChange={(value) => {
                   setShowVoters(value === "Voters");
                 }}
               />
+              <div className="flex justify-between items-center border-t border-line pt-2">
+                <ProposalVoterListFilter
+                  selectedVoterType={selectedVoterType}
+                  onVoterTypeChange={setSelectedVoterType}
+                  showCitizenHouseFilters={
+                    proposal.proposalType?.includes("HYBRID") || false
+                  }
+                />
+                {showVoters ? (
+                  <ProposalVotesSort
+                    sortOption={sortOption}
+                    onSortChange={setSortOption}
+                    hideTimeSortOptions={hideTimeSortOptions}
+                  />
+                ) : (
+                  <ProposalVotesSort
+                    sortOption={sortOption}
+                    onSortChange={setSortOption}
+                    hideTimeSortOptions={true}
+                  />
+                )}
+              </div>
             </div>
             {useArchiveVoteHistory ? (
               showVoters ? (
@@ -110,7 +181,10 @@ export default function ApprovalVotesPanel({
                   isThresholdCriteria={isThresholdCriteria}
                 />
               ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
+                <ArchiveProposalNonVoterList
+                  proposal={proposal}
+                  selectedVoterType={selectedVoterType}
+                />
               )
             ) : showVoters ? (
               <ApprovalProposalVotesList
@@ -118,9 +192,17 @@ export default function ApprovalVotesPanel({
                 fetchUserVotes={handleFetchUserVotes}
                 proposalId={proposal.id}
                 isThresholdCriteria={isThresholdCriteria}
+                sort={sortOption.sortKey}
+                sortOrder={sortOption.sortOrder}
+                voterType={selectedVoterType.type}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ProposalNonVoterList
+                proposal={proposal}
+                sort={sortOption.sortKey}
+                sortOrder={sortOption.sortOrder}
+                selectedVoterType={selectedVoterType}
+              />
             )}
           </>
         )}
