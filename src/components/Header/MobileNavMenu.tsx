@@ -15,11 +15,16 @@ import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 import { formatNumber } from "@/lib/tokenUtils";
 
 interface MobileNavMenuProps {
+  isVibdaoLocalMode?: boolean;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
+export function MobileNavMenu({
+  isVibdaoLocalMode = false,
+  isOpen,
+  onClose,
+}: MobileNavMenuProps) {
   const pathname = usePathname() || "";
   const { ui, token, contracts } = Tenant.current();
   const { address } = useAccount();
@@ -81,17 +86,45 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasDelegates
+    ...(isVibdaoLocalMode
       ? [
           {
-            name: "Voters",
+            name: "Delegates",
+            href: "/delegates",
+            target: "_self",
+            isActive: pathname.includes("delegates"),
+          },
+          {
+            name: "Donate",
+            href: "/donate",
+            target: "_self",
+            isActive: pathname.includes("donate"),
+          },
+          {
+            name: "Fellows",
+            href: "/fellowship",
+            target: "_self",
+            isActive: pathname.includes("fellowship"),
+          },
+          {
+            name: "Claim",
+            href: "/claim",
+            target: "_self",
+            isActive: pathname.includes("claim"),
+          },
+        ]
+      : []),
+    ...(!isVibdaoLocalMode && hasDelegates
+      ? [
+          {
+            name: "Delegates",
             href: "/delegates",
             target: "_self",
             isActive: pathname.includes("delegates"),
           },
         ]
       : []),
-    ...(hasStaking
+    ...(!isVibdaoLocalMode && hasStaking
       ? [
           {
             name: "Staking",
@@ -101,7 +134,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasRetropgf
+    ...(!isVibdaoLocalMode && hasRetropgf
       ? [
           {
             name: "RetroPGF",
@@ -111,7 +144,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasGrants
+    ...(!isVibdaoLocalMode && hasGrants
       ? [
           {
             name: "Grants",
@@ -121,7 +154,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasInfo
+    ...(!isVibdaoLocalMode && hasInfo
       ? [
           {
             name: "Info",
@@ -131,7 +164,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasComingSoon
+    ...(!isVibdaoLocalMode && hasComingSoon
       ? [
           {
             name: "Governance",
@@ -141,7 +174,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasForums
+    ...(!isVibdaoLocalMode && hasForums
       ? [
           {
             name: "Discussions",
@@ -154,13 +187,19 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   ];
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} side="left" title="Menu">
+    <Drawer
+      isOpen={isOpen}
+      onClose={onClose}
+      side="left"
+      title={isVibdaoLocalMode ? "Governance Menu" : "Menu"}
+    >
       <div className="flex flex-col h-full">
         <div className="pl-4 pr-6 py-8 flex flex-col justify-start items-start text-primary">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
+              prefetch={!isVibdaoLocalMode}
               target={item.target}
               onClick={() => setTimeout(onClose, 100)}
               className={cn(
@@ -175,7 +214,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
         {/* Bottom Sections */}
         <div className="mt-auto text-tertiary text-base font-semibold leading-normal">
-          {(totalSupply > 0 || votableSupply > 0) &&
+          {!isVibdaoLocalMode &&
+            (totalSupply > 0 || votableSupply > 0) &&
             !ui.toggle("footer/hide-total-supply")?.enabled && (
               <div className="p-8 flex flex-col justify-center border-b border-t border-line items-start gap-3">
                 <div className="">
@@ -193,7 +233,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             )}
 
           {/* Links Section */}
-          {(changeLogLink ||
+          {!isVibdaoLocalMode &&
+            (changeLogLink ||
             bugsLink ||
             discordLink ||
             twitterLink ||

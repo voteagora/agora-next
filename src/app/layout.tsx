@@ -1,7 +1,6 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
-import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
@@ -49,6 +48,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isVibdaoLocalMode = process.env.VIBDAO_LOCAL_MODE === "true";
   const { ui } = Tenant.current();
   const miradorWebApiKey = process.env.MIRADOR_WEB_API_KEY;
 
@@ -116,6 +116,17 @@ export default async function RootLayout({
     letterSpacing: letterSpacing,
   } as React.CSSProperties;
 
+  const content = (
+    <>
+      <Header isVibdaoLocalMode={isVibdaoLocalMode} />
+      <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
+        {!isVibdaoLocalMode && <RecentlyReleasedBanner />}
+        {children}
+      </div>
+      {!isVibdaoLocalMode && <DAOMetricsHeader />}
+    </>
+  );
+
   return (
     <html lang="en" style={style} className={ui.theme === "dark" ? "dark" : ""}>
       <head>
@@ -155,15 +166,8 @@ export default async function RootLayout({
       <NuqsAdapter>
         <DevTenantProvider>
           <ClientLayout miradorWebApiKey={miradorWebApiKey}>
-            <ForumPermissionsProvider>
-              <Header />
-              <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">
-                <RecentlyReleasedBanner />
-                {children}
-              </div>
-              <DAOMetricsHeader />
-            </ForumPermissionsProvider>
-            <TenantSwitcher />
+            {isVibdaoLocalMode ? content : <ForumPermissionsProvider>{content}</ForumPermissionsProvider>}
+            {!isVibdaoLocalMode && <TenantSwitcher />}
           </ClientLayout>
         </DevTenantProvider>
       </NuqsAdapter>

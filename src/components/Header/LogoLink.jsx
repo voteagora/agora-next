@@ -3,13 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { instrumentSerif } from "@/styles/fonts";
 
-export default function LogoLink() {
+export default function LogoLink({ isVibdaoLocalMode = false }) {
   const { ui, isProd } = Tenant.current();
   const isDUNA = ui.toggle("duna")?.enabled;
 
   return (
     <Link
-      href="/"
+      href={isVibdaoLocalMode ? "/proposals" : "/"}
       className={`${instrumentSerif.variable} flex flex-row justify-between w-full`}
     >
       <div className="gap-2 h-full flex flex-row items-center w-full">
@@ -30,13 +30,22 @@ export default function LogoLink() {
             {ui.dunaTitle}
           </span>
         )}
-        {!isProd && (
+        {isVibdaoLocalMode ? (
           <>
             <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
             <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line whitespace-nowrap">
-              Test Contracts
+              Local Governance
             </span>
           </>
+        ) : (
+          !isProd && (
+            <>
+              <div className="h-3 w-[2px] bg-line rounded-full hidden sm:block"></div>
+              <span className="hidden sm:block font-semibold text-primary bg-tertiary/10 px-1.5 py-0.5 rounded-lg text-xs border border-line whitespace-nowrap">
+                Test Contracts
+              </span>
+            </>
+          )
         )}
       </div>
     </Link>

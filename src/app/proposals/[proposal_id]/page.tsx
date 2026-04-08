@@ -34,6 +34,7 @@ import {
 import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
 import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";
 import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
+import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 
 export const maxDuration = 60;
 
@@ -131,8 +132,10 @@ async function generateVoterMetadata(
 
   const stringifiedOptions = JSON.stringify(options);
   const preview = `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${support}&blockNumber=${newVote?.blockNumber ?? blockNumber ?? latestBlock?.number}&voteDate=${voteDateToUse ?? timestamp}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`;
+  const metadataBase = getMetadataBaseUrl();
 
   return {
+    metadataBase,
     title: title,
     description: description,
     openGraph: {
@@ -209,8 +212,10 @@ export async function generateMetadata({
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title
   )}&description=${encodeURIComponent(description)}`;
+  const metadataBase = getMetadataBaseUrl();
 
   return {
+    metadataBase,
     title: title,
     description: description,
     openGraph: {

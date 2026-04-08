@@ -10,6 +10,12 @@ import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
 import { getAlchemyId } from "@/lib/alchemyConfig";
+import {
+  getTenantRuntime,
+  getVibdaoLocalTenantConfig,
+  isVibdaoLocalRuntimeEnabled,
+  type TenantRuntime,
+} from "@/lib/vibdao/runtime";
 
 export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
@@ -29,8 +35,22 @@ export default class Tenant {
   private readonly _token: TenantToken;
   private readonly _ui: TenantUI;
   private readonly _brandName: string;
+  private readonly _runtime: TenantRuntime;
 
   private constructor() {
+    if (isVibdaoLocalRuntimeEnabled()) {
+      const local = getVibdaoLocalTenantConfig();
+      this._namespace = local.namespace;
+      this._isProd = local.isProd;
+      this._contracts = local.contracts;
+      this._slug = local.slug;
+      this._token = local.token;
+      this._ui = local.ui;
+      this._brandName = local.brandName;
+      this._runtime = local.runtime;
+      return;
+    }
+
     this._namespace = process.env
       .NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
     this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
@@ -43,6 +63,7 @@ export default class Tenant {
     this._token = TenantTokenFactory.create(this._namespace);
     this._ui = TenantUIFactory.create(this._namespace);
     this._brandName = this.deriveBrandName(this._namespace);
+    this._runtime = getTenantRuntime();
   }
 
   public get contracts(): TenantContracts {
@@ -71,6 +92,10 @@ export default class Tenant {
 
   public get brandName(): string {
     return this._brandName;
+  }
+
+  public get runtime(): TenantRuntime {
+    return this._runtime;
   }
 
   public static current(): Tenant {

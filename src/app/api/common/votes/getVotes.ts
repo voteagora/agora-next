@@ -25,6 +25,11 @@ import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  getLocalAgoraUserVotesForProposal,
+  getLocalAgoraVotesForProposal,
+  isVibdaoLocalMode,
+} from "@/lib/vibdao/agoraAdapter";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -593,6 +598,10 @@ async function getVotesForProposal({
   sort?: VotesSort;
   offchainProposalId?: string;
 }): Promise<PaginatedResult<Vote[]>> {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraVotesForProposal({ proposalId, pagination, sort });
+  }
+
   return withMetrics(
     "getVotesForProposal",
     async () => {
@@ -795,6 +804,10 @@ async function getUserVotesForProposal({
   proposalId: string;
   address: string;
 }) {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraUserVotesForProposal({ proposalId, address });
+  }
+
   return withMetrics("getUserVotesForProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
     const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(

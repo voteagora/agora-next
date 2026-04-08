@@ -11,6 +11,13 @@ import type { DaoSlug } from "@prisma/client";
  */
 export async function getForumAdmins() {
   try {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return {
+        success: true as const,
+        data: [],
+      };
+    }
+
     const { slug } = Tenant.current();
 
     // Fetch users with active roles for this DAO
@@ -71,6 +78,14 @@ export async function checkForumPermissions(
   _categoryId?: number
 ) {
   try {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return {
+        isAdmin: false,
+        canCreateTopics: false,
+        canManageTopics: false,
+      };
+    }
+
     const { slug } = Tenant.current();
     const daoSlug = slug as DaoSlug;
 
@@ -116,6 +131,10 @@ export async function logForumAuditAction(
   targetId: number
 ): Promise<void> {
   try {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return;
+    }
+
     await prismaWeb2Client.forumAuditLog.create({
       data: {
         dao_slug: daoSlug as any,

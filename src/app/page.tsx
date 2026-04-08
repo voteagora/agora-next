@@ -4,11 +4,19 @@ import Tenant from "@/lib/tenant/tenant";
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
 import ComingSoonPage from "@/app/coming-soon/page";
 import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
+import { redirect } from "next/navigation";
 
 // Revalidate cache every 60 seconds
 export const revalidate = 60;
 
 export async function generateMetadata() {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    return {
+      title: "Governance",
+      description: "Local governance workspace powered by Agora routes and VibDAO data.",
+    };
+  }
+
   const { ui } = Tenant.current();
 
   const page = ui.page("proposals");
@@ -45,6 +53,10 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    redirect("/proposals");
+  }
+
   const { ui } = Tenant.current();
 
   // Check if coming-soon is enabled

@@ -3,6 +3,13 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+const DEFAULT_FORUM_SETTINGS = {
+  minVpForTopics: 1,
+  minVpForReplies: 1,
+  minVpForActions: 1,
+  minVpForProposals: 1,
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -13,6 +20,10 @@ export async function GET(request: NextRequest) {
         { error: "daoSlug is required" },
         { status: 400 }
       );
+    }
+
+    if (process.env.VIBDAO_LOCAL_MODE === "true") {
+      return NextResponse.json(DEFAULT_FORUM_SETTINGS);
     }
 
     const result = await prismaWeb2Client.$queryRaw<
@@ -29,13 +40,7 @@ export async function GET(request: NextRequest) {
     `;
 
     if (result.length === 0) {
-      // Return defaults if no settings found
-      return NextResponse.json({
-        minVpForTopics: 1,
-        minVpForReplies: 1,
-        minVpForActions: 1,
-        minVpForProposals: 1,
-      });
+      return NextResponse.json(DEFAULT_FORUM_SETTINGS);
     }
 
     return NextResponse.json({
@@ -46,9 +51,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to fetch forum settings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch forum settings" },
-      { status: 500 }
-    );
+    return NextResponse.json(DEFAULT_FORUM_SETTINGS);
   }
 }

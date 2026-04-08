@@ -858,7 +858,6 @@ async function decodeEnhanced(
   usedMethod: string;
   error?: string;
 }> {
-  if (!etherscanApiKey) throw new Error("Missing API key");
   calldata = calldata.startsWith("0x") ? calldata : "0x" + calldata;
   const functionSelector = calldata.slice(0, 10);
   const formattedOutput = {
@@ -877,6 +876,14 @@ async function decodeEnhanced(
     >,
     usedMethod: "unknown",
   };
+
+  if (!etherscanApiKey) {
+    return {
+      ...formattedOutput,
+      usedMethod: "no-api-key",
+      error: "Missing API key",
+    };
+  }
 
   try {
     const implementationAddress = await cachedGetProxyImplementation(target);

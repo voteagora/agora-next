@@ -1,4 +1,66 @@
-## Getting Started
+## VibDAO Local Mode
+
+为了完成实施文档中的 `Phase 4`，这个仓库额外接入了一套本地可演示的 VibDAO 流程。
+
+本地模式下建议直接使用：
+
+- `/vibdao`
+- `/vibdao/donate`
+- `/vibdao/fellowship`
+- `/vibdao/claim`
+- `/vibdao/proposals`
+- `/vibdao/proposals/new`
+
+当 `.env.local` 里设置 `VIBDAO_LOCAL_MODE=true` 时：
+
+- `/` 会重定向到 `/vibdao`
+- `/delegates` 也会重定向到 `/vibdao`
+- 根布局里会关闭依赖老 Agora 数据库和 DAO Node 的 banner / metrics 组件
+
+### Phase 4 启动方式
+
+如果你在这台 WSL 里运行，先确保使用 Linux Node，而不是 Windows 的 `node.exe/npm`：
+
+```bash
+export PATH="$HOME/.local/node-v20.19.0-linux-x64/bin:$PATH"
+```
+
+然后启动：
+
+```bash
+npm install
+npm run dev
+```
+
+打开：
+
+- `http://localhost:3000/vibdao`
+
+当前已实际验证可用的本地接口 / 页面包括：
+
+- `/api/vibdao/summary`
+- `/api/vibdao/contracts`
+- `/api/vibdao/proposal-metadata/[proposalId]`
+- `/vibdao`
+- `/vibdao/donate`
+- `/vibdao/fellowship`
+- `/vibdao/claim`
+- `/vibdao/proposals`
+- `/vibdao/proposals/new`
+- `/vibdao/proposals/[proposalId]`
+
+### VibDAO Local Routes
+
+This repository now also contains the migrated local VibDAO flow under:
+
+- `/vibdao`
+- `/vibdao/donate`
+- `/vibdao/fellowship`
+- `/vibdao/claim`
+- `/vibdao/proposals`
+- `/vibdao/proposals/new`
+
+These routes read indexed data from the local Vibly Postgres database and write transactions to the local DAO contracts deployment. To use them, set the `VIBDAO_*` and `NEXT_PUBLIC_VIBDAO_*` variables from [env.sample](/home/libingjiang/vibly-dao-app/env.sample).
 
 1. Git clone this repo
 

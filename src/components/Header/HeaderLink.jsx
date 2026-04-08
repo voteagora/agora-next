@@ -3,7 +3,7 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 
 export const HeaderLink = forwardRef(
-  ({ className, children, href, target, isActive, onClick }, ref) => {
+  ({ className, children, href, target, isActive, onClick, prefetch }, ref) => {
     const { ui } = Tenant.current();
 
     const activeClass = isActive
@@ -21,6 +21,7 @@ export const HeaderLink = forwardRef(
         ref={ref}
         href={href}
         target={target}
+        prefetch={prefetch}
         onClick={handleClick}
         className={`px-4 rounded-full text-sm sm:text-base h-[38px] content-center flex items-center relative ${activeClass} ${className || ""}`}
         style={

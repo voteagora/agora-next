@@ -164,6 +164,10 @@ export async function fetchAllDelegatorsInChainsForAddress(
 }
 
 export async function balanceOf(address: string) {
+  if (!Tenant.current().runtime.capabilities.supportsTokenBalanceReads) {
+    return 0n;
+  }
+
   const { contracts } = Tenant.current();
   return contracts.token.contract.balanceOf(address);
 }

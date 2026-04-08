@@ -8,9 +8,14 @@ import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
+import { isVibdaoLocalMode } from "@/lib/vibdao/agoraAdapter";
 
 async function getNeedsMyVoteProposals(address: string) {
   return withMetrics("getNeedsMyVoteProposals", async () => {
+    if (isVibdaoLocalMode()) {
+      return { proposals: [] };
+    }
+
     const { namespace, contracts, ui } = Tenant.current();
 
     const isTimeStampBasedTenant = ui.toggle(

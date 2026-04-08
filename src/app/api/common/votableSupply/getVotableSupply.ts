@@ -3,8 +3,16 @@ import { cache } from "react";
 import { findVotableSupply } from "@/lib/prismaUtils";
 import { unstable_cache } from "next/cache";
 import { getVotableSupplyFromDaoNode } from "@/app/lib/dao-node/client";
+import {
+  getLocalAgoraVotableSupply,
+  isVibdaoLocalMode,
+} from "@/lib/vibdao/agoraAdapter";
 
 async function getVotableSupply() {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraVotableSupply();
+  }
+
   const { namespace, contracts, ui } = Tenant.current();
   const address = contracts.token.address;
 

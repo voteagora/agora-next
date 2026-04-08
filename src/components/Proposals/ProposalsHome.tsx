@@ -17,6 +17,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { UtilityNav } from "@/components/vibdao/UtilityNav";
 
 async function fetchProposals(
   filter: string,
@@ -129,6 +130,11 @@ export default async function ProposalsHome() {
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
+      {process.env.VIBDAO_LOCAL_MODE === "true" && (
+        <div className="max-w-[76rem] px-4 md:px-0 mt-6 mb-10">
+          <UtilityNav />
+        </div>
+      )}
       <DraftsTabsWrapper
         plmEnabled={!!plmEnabled}
         fetchDraftProposals={async (address) => {

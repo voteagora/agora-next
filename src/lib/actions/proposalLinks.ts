@@ -4,6 +4,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { createProposalLinksInternal } from "./proposalLinksInternal";
+import { isVibdaoLocalMode } from "@/lib/vibdao/agoraAdapter";
 
 interface CreateDiscussionProposalLinkParams {
   proposalId: string;
@@ -92,6 +93,10 @@ export async function getProposalLinks({
   targetId,
 }: GetProposalLinksParams) {
   try {
+    if (isVibdaoLocalMode()) {
+      return { success: true, links: [] };
+    }
+
     if (!sourceId && !targetId) {
       return {
         success: false,
@@ -107,6 +112,9 @@ export async function getProposalLinks({
 
     return { success: true, links };
   } catch (error) {
+    if ((error as any)?.code === "P2021") {
+      return { success: true, links: [] };
+    }
     console.error("Error fetching proposal links:", error);
     return { success: false, error: "Failed to fetch proposal links" };
   }
@@ -114,6 +122,10 @@ export async function getProposalLinks({
 
 export async function getForumTopicTempChecks(topicId: string) {
   try {
+    if (isVibdaoLocalMode()) {
+      return { success: true, tempChecks: [] };
+    }
+
     const links = await prismaWeb2Client.proposalLinks.findMany({
       where: {
         sourceId: topicId,
@@ -124,6 +136,12 @@ export async function getForumTopicTempChecks(topicId: string) {
 
     return { success: true, tempChecks: links };
   } catch (error) {
+    if ((error as any)?.code === "P2021") {
+      return {
+        success: true,
+        tempChecks: [],
+      };
+    }
     console.error("Error fetching temp checks for topic:", error);
     return {
       success: false,

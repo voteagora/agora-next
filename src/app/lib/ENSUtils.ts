@@ -4,6 +4,7 @@ import { AlchemyProvider } from "ethers";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { getAlchemyId } from "@/lib/alchemyConfig";
+import Tenant from "@/lib/tenant/tenant";
 
 // Lazy initialization to avoid issues in tests
 const getMainnetProvider = () => {
@@ -13,6 +14,13 @@ const getMainnetProvider = () => {
 
 export const ensNameToAddress = unstable_cache(
   async (nameOrAddress) => {
+    if (!Tenant.current().runtime.capabilities.supportsEns) {
+      if (isAddress(nameOrAddress)) {
+        return nameOrAddress.toLowerCase();
+      }
+      throw new Error("ENS resolution is disabled in local mode");
+    }
+
     if (isAddress(nameOrAddress)) {
       return nameOrAddress;
     }
@@ -34,6 +42,13 @@ export const ensNameToAddress = unstable_cache(
 
 // Only used in OP delegation modal  - use ensNameToAddress instead
 export async function resolveENSName(nameOrAddress: string) {
+  if (!Tenant.current().runtime.capabilities.supportsEns) {
+    if (isAddress(nameOrAddress)) {
+      return nameOrAddress.toLowerCase();
+    }
+    throw new Error("ENS resolution is disabled in local mode");
+  }
+
   if (isAddress(nameOrAddress)) {
     return nameOrAddress;
   }
@@ -53,6 +68,10 @@ export async function resolveENSName(nameOrAddress: string) {
 export async function reverseResolveENSName(
   address: string
 ): Promise<string | null> {
+  if (!Tenant.current().runtime.capabilities.supportsEns) {
+    return null;
+  }
+
   try {
     const mainnetProvider = getMainnetProvider();
     const ensName = await mainnetProvider.lookupAddress(address);
@@ -67,6 +86,10 @@ export async function reverseResolveENSName(
 export async function resolveENSProfileImage(
   address: string
 ): Promise<string | null> {
+  if (!Tenant.current().runtime.capabilities.supportsEns) {
+    return null;
+  }
+
   const lowerCaseAddress = address.toLowerCase();
 
   // Return unless the address is a valid ENS name.
@@ -89,6 +112,12 @@ export async function resolveENSProfileImage(
   Returns the ENS name for the address if it exists, otherwise truncates address
 */
 export async function processAddressOrEnsName(addressOrENSName: string) {
+  if (!Tenant.current().runtime.capabilities.supportsEns) {
+    return isAddress(addressOrENSName)
+      ? truncateAddress(addressOrENSName)
+      : addressOrENSName;
+  }
+
   // Assume resolved ens name
   if (!isAddress(addressOrENSName)) {
     return addressOrENSName;
@@ -113,6 +142,10 @@ export const resolveENSTextRecords: (
   keys: string[]
 ) => Promise<Record<string, string> | null> = unstable_cache(
   async (addressOrENSName: string, keys: string[]) => {
+    if (!Tenant.current().runtime.capabilities.supportsEns) {
+      return null;
+    }
+
     try {
       let name;
       if (isAddress(addressOrENSName)) {
@@ -166,6 +199,10 @@ export const resolveENSTextRecords: (
 */
 export const resolveEFPStats = unstable_cache(
   async (addressOrENSName: string) => {
+    if (!Tenant.current().runtime.capabilities.supportsEfp) {
+      return null;
+    }
+
     try {
       const response = await fetch(
         `https://api.ethfollow.xyz/api/v1/users/${addressOrENSName}/stats`

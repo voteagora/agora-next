@@ -8,6 +8,8 @@ import { permissionService } from "@/server/services/permission.service";
 import type { DaoSlug } from "@prisma/client";
 import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireWalletJwtAuth(request);

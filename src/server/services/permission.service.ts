@@ -11,6 +11,7 @@ import type {
   UserPermission,
 } from "./types";
 import type { DaoSlug } from "@prisma/client";
+import Tenant from "@/lib/tenant/tenant";
 
 export class PermissionService {
   /**
@@ -20,6 +21,10 @@ export class PermissionService {
     context: PermissionContext,
     permission: PermissionCheck
   ): Promise<boolean> {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return false;
+    }
+
     const { address, daoSlug } = context;
     const normalizedAddress = normalizeAddress(address);
     const { module, resource, action } = permission;
@@ -109,6 +114,10 @@ export class PermissionService {
     address: string,
     daoSlug: DaoSlug
   ): Promise<UserPermission[]> {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return [];
+    }
+
     const normalizedAddress = normalizeAddress(address);
 
     // Get user's active roles
@@ -168,6 +177,10 @@ export class PermissionService {
    * Get permission matrix (all permissions grouped by module and resource)
    */
   async getPermissionMatrix() {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return {};
+    }
+
     const permissions = await db.permission.findMany({
       orderBy: [{ module: "asc" }, { resource: "asc" }, { action: "asc" }],
     });
@@ -204,6 +217,10 @@ export class PermissionService {
     action: string,
     daoSlug: DaoSlug
   ): Promise<string[]> {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return [];
+    }
+
     const userRoles = await db.forumUserRole.findMany({
       where: {
         isActive: true,
@@ -234,6 +251,10 @@ export class PermissionService {
    * Check if user is a super admin (system-wide role with daoSlug = null)
    */
   async isSuperAdmin(address: string): Promise<boolean> {
+    if (!Tenant.current().runtime.capabilities.supportsForumRbac) {
+      return false;
+    }
+
     const normalizedAddress = address.toLowerCase();
     const superAdminRole = await db.forumUserRole.findFirst({
       where: {

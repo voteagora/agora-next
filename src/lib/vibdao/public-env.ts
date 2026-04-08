@@ -1,0 +1,4 @@
+export const publicEnv = {
+  NEXT_PUBLIC_VIBDAO_CHAIN_RPC_URL: process.env.NEXT_PUBLIC_VIBDAO_CHAIN_RPC_URL ?? 'http://127.0.0.1:8545',
+  NEXT_PUBLIC_VIBDAO_CHAIN_ID: Number(process.env.NEXT_PUBLIC_VIBDAO_CHAIN_ID ?? '31337'),
+};

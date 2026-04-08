@@ -19,11 +19,21 @@ interface VPCheckResult {
   currentVP?: number;
 }
 
+const DEFAULT_FORUM_SETTINGS: ForumSettings = {
+  minVpForTopics: 1,
+  minVpForReplies: 1,
+  minVpForActions: 1,
+};
+
 /**
  * Fetch forum settings for a DAO directly from database
  * Cached with React cache for performance
  */
 async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    return DEFAULT_FORUM_SETTINGS;
+  }
+
   try {
     const result = await prismaWeb2Client.$queryRaw<
       Array<{
@@ -38,12 +48,7 @@ async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
     `;
 
     if (result.length === 0) {
-      // Return defaults if no settings found
-      return {
-        minVpForTopics: 1,
-        minVpForReplies: 1,
-        minVpForActions: 1,
-      };
+      return DEFAULT_FORUM_SETTINGS;
     }
 
     return {
@@ -53,12 +58,7 @@ async function getForumSettingsFromDB(daoSlug: string): Promise<ForumSettings> {
     };
   } catch (error) {
     console.error("Error fetching forum settings from DB:", error);
-    // Return defaults on error
-    return {
-      minVpForTopics: 1,
-      minVpForReplies: 1,
-      minVpForActions: 1,
-    };
+    return DEFAULT_FORUM_SETTINGS;
   }
 }
 

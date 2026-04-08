@@ -1,0 +1,366 @@
+.vibdao-root {
+  --bg: #f2ede3;
+  --panel: rgba(252, 248, 241, 0.88);
+  --panel-strong: #fffaf1;
+  --text: #1f2a22;
+  --muted: #546158;
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --line: rgba(31, 42, 34, 0.14);
+  --shadow: 0 24px 80px rgba(43, 37, 25, 0.12);
+  --radius: 24px;
+  --radius-sm: 16px;
+  --sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.16), transparent 30%),
+    radial-gradient(circle at right, rgba(198, 127, 59, 0.14), transparent 28%),
+    linear-gradient(180deg, #f7f1e6 0%, #efe4d0 100%);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+.vibdao-root,
+.vibdao-root * {
+  box-sizing: border-box;
+}
+
+.vibdao-root {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.vibdao-root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.vibdao-root button,
+.vibdao-root input,
+.vibdao-root select,
+.vibdao-root textarea {
+  font: inherit;
+}
+
+.vibdao-root table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.vibdao-root th,
+.vibdao-root td {
+  padding: 0.9rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.vibdao-root th {
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.vibdao-root .shell {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.vibdao-root .sidebar {
+  padding: 2rem 1.4rem;
+  border-right: 1px solid var(--line);
+  background: rgba(255, 250, 241, 0.55);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.vibdao-root .content {
+  padding: 2rem;
+}
+
+.vibdao-root .brand h1,
+.vibdao-root .heroCard h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.vibdao-root .brand h1 {
+  font-size: 2rem;
+}
+
+.vibdao-root .heroCard h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.vibdao-root .eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--accent-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.vibdao-root .muted {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.vibdao-root .warning {
+  margin: 0;
+  color: #b45309;
+}
+
+.vibdao-root .nav {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.vibdao-root .navLink,
+.vibdao-root .button,
+.vibdao-root .button.secondary {
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.vibdao-root .navLink {
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.vibdao-root .navLink:hover,
+.vibdao-root .button:hover,
+.vibdao-root .button.secondary:hover {
+  transform: translateY(-1px);
+}
+
+.vibdao-root .navLink:hover {
+  border-color: var(--line);
+}
+
+.vibdao-root .page {
+  display: grid;
+  gap: 1.3rem;
+}
+
+.vibdao-root .heroCard,
+.vibdao-root .panel,
+.vibdao-root .proposalCard {
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+}
+
+.vibdao-root .heroCard {
+  padding: 2rem;
+  display: grid;
+  gap: 1.2rem;
+}
+
+.vibdao-root .panel,
+.vibdao-root .proposalCard {
+  padding: 1.3rem;
+}
+
+.vibdao-root .panelHeader,
+.vibdao-root .proposalTop,
+.vibdao-root .walletRow,
+.vibdao-root .metricInline,
+.vibdao-root .buttonRow,
+.vibdao-root .rowCard,
+.vibdao-root .listCard,
+.vibdao-root .listMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.vibdao-root .panelHeader {
+  margin-bottom: 1rem;
+}
+
+.vibdao-root .panelHeader h3,
+.vibdao-root .proposalCard h3 {
+  margin: 0;
+}
+
+.vibdao-root .gridTwo,
+.vibdao-root .statsGrid,
+.vibdao-root .gridThree {
+  display: grid;
+  gap: 1rem;
+}
+
+.vibdao-root .gridTwo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vibdao-root .gridThree,
+.vibdao-root .statsGrid {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.vibdao-root .statCard,
+.vibdao-root .metricBox {
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.vibdao-root .statCard span,
+.vibdao-root .metricBox span {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.vibdao-root .statCard strong,
+.vibdao-root .metricBox strong {
+  font-size: 1.3rem;
+  font-family: var(--serif);
+}
+
+.vibdao-root .stackXs,
+.vibdao-root .stackSm,
+.vibdao-root .stackMd {
+  display: grid;
+}
+
+.vibdao-root .stackXs {
+  gap: 0.35rem;
+}
+
+.vibdao-root .stackSm {
+  gap: 0.7rem;
+}
+
+.vibdao-root .stackMd {
+  gap: 1rem;
+}
+
+.vibdao-root .field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.vibdao-root .field span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.vibdao-root .field input,
+.vibdao-root .field select,
+.vibdao-root .field textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.vibdao-root .button,
+.vibdao-root .button.secondary {
+  border-radius: 999px;
+  padding: 0.9rem 1.2rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.vibdao-root .button {
+  background: linear-gradient(135deg, #0f766e 0%, #1f8f80 100%);
+  color: white;
+}
+
+.vibdao-root .button.secondary {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.vibdao-root .button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.vibdao-root .pill {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.12);
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.vibdao-root .textLink {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.vibdao-root .listCard,
+.vibdao-root .rowCard {
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.vibdao-root .listCard:hover,
+.vibdao-root .proposalCard:hover {
+  border-color: rgba(15, 118, 110, 0.3);
+}
+
+.vibdao-root .tableWrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 1024px) {
+  .vibdao-root .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .vibdao-root .sidebar {
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 720px) {
+  .vibdao-root .content,
+  .vibdao-root .sidebar {
+    padding: 1rem;
+  }
+
+  .vibdao-root .gridTwo {
+    grid-template-columns: 1fr;
+  }
+
+  .vibdao-root .panelHeader,
+  .vibdao-root .proposalTop,
+  .vibdao-root .walletRow,
+  .vibdao-root .metricInline,
+  .vibdao-root .buttonRow,
+  .vibdao-root .rowCard,
+  .vibdao-root .listCard,
+  .vibdao-root .listMeta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

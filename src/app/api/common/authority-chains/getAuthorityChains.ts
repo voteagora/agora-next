@@ -11,6 +11,10 @@ async function getAuthorityChains({
   address: string;
   blockNumber: number;
 }): Promise<Array<string[]>> {
+  if (!Tenant.current().runtime.capabilities.supportsAuthorityChains) {
+    return [[address.toLowerCase()]];
+  }
+
   const { namespace, contracts, ui } = Tenant.current();
   const chainsQuery = (await prismaWeb2Client.$queryRawUnsafe(
     `

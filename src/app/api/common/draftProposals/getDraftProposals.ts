@@ -4,6 +4,10 @@ import { DraftProposal } from "@/app/proposals/draft/types";
 import { cache } from "react";
 
 const getDraftProposalByUuidInternal = async (uuid: string) => {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    return null;
+  }
+
   const include = {
     transactions: {
       orderBy: { order: "asc" as const },

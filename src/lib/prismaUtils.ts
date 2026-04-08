@@ -1,6 +1,7 @@
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { TENANT_NAMESPACES } from "./constants";
 import { TenantNamespace } from "./types";
+import Tenant from "@/lib/tenant/tenant";
 
 export function findDelagatee({
   namespace,
@@ -11,6 +12,10 @@ export function findDelagatee({
   address: string;
   contract?: string;
 }) {
+  if (!Tenant.current().runtime.capabilities.supportsAdvancedDelegation) {
+    return Promise.resolve(null);
+  }
+
   const condition = {
     where: {
       delegator: address.toLowerCase(),
@@ -70,6 +75,10 @@ export function findAdvancedDelegatee({
   address: string;
   contract?: string;
 }) {
+  if (!Tenant.current().runtime.capabilities.supportsAdvancedDelegation) {
+    return Promise.resolve([]);
+  }
+
   const condition = {
     where: {
       from: address.toLowerCase(),

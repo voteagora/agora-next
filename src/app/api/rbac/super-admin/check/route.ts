@@ -7,6 +7,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { permissionService } from "@/server/services/permission.service";
 import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireWalletJwtAuth(request);

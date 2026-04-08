@@ -27,6 +27,11 @@ import {
   getDelegatesFromDaoNode,
   getDelegateVotingPowerFromDaoNode,
 } from "@/app/lib/dao-node/client";
+import {
+  getLocalAgoraDelegate,
+  getLocalAgoraDelegates,
+  isVibdaoLocalMode,
+} from "@/lib/vibdao/agoraAdapter";
 
 // Create a cached version of getDelegatesFromDaoNode
 const cachedGetDelegatesFromDaoNode = unstable_cache(
@@ -78,6 +83,10 @@ async function getDelegates({
   };
   showParticipation?: boolean;
 }): Promise<PaginatedResult<DelegateChunk[]>> {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraDelegates({ pagination, sort });
+  }
+
   return withMetrics(
     "getDelegates",
     async () => {
@@ -648,6 +657,14 @@ async function getDelegates({
 }
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
+  if (isVibdaoLocalMode()) {
+    const delegate = await getLocalAgoraDelegate(addressOrENSName);
+    if (!delegate) {
+      throw new Error(`Delegate ${addressOrENSName} not found`);
+    }
+    return delegate;
+  }
+
   return withMetrics("getDelegate", async () => {
     const { namespace, contracts, slug, ui } = Tenant.current();
     const address = isAddress(addressOrENSName)

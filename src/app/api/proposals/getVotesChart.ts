@@ -3,12 +3,26 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { fetchRawProposalVotesFromArchive } from "@/lib/archiveUtils";
+import { isVibdaoLocalMode } from "@/lib/vibdao/agoraAdapter";
+import { getProposalById } from "@/lib/vibdao/data";
 
 export async function getVotesChart({
   proposalId,
 }: {
   proposalId: string;
 }): Promise<any[]> {
+  if (isVibdaoLocalMode()) {
+    const proposal = await getProposalById(proposalId);
+    if (!proposal) return [];
+
+    return proposal.votes.map((vote) => ({
+      voter: vote.voter,
+      support: vote.support,
+      weight: vote.weight,
+      block_number: Number(vote.blockNumber),
+    }));
+  }
+
   const { namespace, contracts, ui } = Tenant.current();
   const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 

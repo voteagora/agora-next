@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { Metadata, ResolvingMetadata } from "next";
+import { isAddress } from "viem";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
@@ -28,6 +29,8 @@ import DiscussionsContainerWrapper, {
   DiscussionsContainerSkeleton,
 } from "@/components/Delegates/Discussions/DiscussionsContainerWrapper";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
+import { getAddressClaims, getAddressDonations } from "@/lib/vibdao/data";
+import { PanelRow } from "@/components/Delegates/DelegateCard/DelegateCard";
 
 export const dynamic = "force-dynamic"; // needed for both app and e2e
 export const revalidate = 0;
@@ -36,11 +39,21 @@ export async function generateMetadata(
   { params }: { params: { addressOrENSName: string } },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const supportsEns = Tenant.current().runtime.capabilities.supportsEns;
+
   // cache ENS address upfront for all subsequent queries
   // TODO: change subqueries to use react cache
   const [address, ensOrTruncatedAddress] = await Promise.all([
-    ensNameToAddress(params.addressOrENSName),
-    processAddressOrEnsName(params.addressOrENSName),
+    supportsEns
+      ? ensNameToAddress(params.addressOrENSName)
+      : Promise.resolve(params.addressOrENSName),
+    supportsEns
+      ? processAddressOrEnsName(params.addressOrENSName)
+      : Promise.resolve(
+          isAddress(params.addressOrENSName)
+            ? `${params.addressOrENSName.slice(0, 6)}...${params.addressOrENSName.slice(-4)}`
+            : params.addressOrENSName
+        ),
   ]);
 
   const delegate = await fetchDelegate(address);
@@ -92,6 +105,50 @@ export default async function Page({
   params: { addressOrENSName: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    const address = isAddress(addressOrENSName)
+      ? addressOrENSName.toLowerCase()
+      : addressOrENSName;
+    const delegate = await fetchDelegate(address);
+
+    if (!delegate) {
+      return <ResourceNotFound message="Hmm... can't find that participant." />;
+    }
+
+    const [donations, claims] = await Promise.all([
+      getAddressDonations(address),
+      getAddressClaims(address),
+    ]);
+
+    return (
+      <div className="flex flex-col md:flex-row items-start gap-6 justify-between mt-12 w-full max-w-full">
+        <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
+          <DelegateCard delegate={delegate} />
+        </div>
+        <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full gap-8">
+          <DelegateStatementWrapper delegate={delegate} />
+
+          <div className="rounded-xl border border-line shadow-newDefault bg-neutral p-6">
+            <h2 className="text-2xl font-bold text-primary mb-4">
+              Governance Activity
+            </h2>
+            <div className="flex flex-col gap-4">
+              <PanelRow
+                title="Matched donations"
+                detail={String(donations.length)}
+              />
+              <PanelRow title="Salary claims" detail={String(claims.length)} />
+              <PanelRow
+                title="Voting participation"
+                detail={`${delegate.participation.toFixed(1)}%`}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const { ui } = Tenant.current();
   const address = await ensNameToAddress(addressOrENSName);
 

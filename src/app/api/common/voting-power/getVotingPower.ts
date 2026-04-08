@@ -46,6 +46,14 @@ async function getVotingPowerForProposalByAddress({
   proposalId: string;
 }): Promise<VotingPowerData> {
   return withMetrics("getVotingPowerForProposalByAddress", async () => {
+    if (!Tenant.current().runtime.capabilities.supportsTokenBalanceReads) {
+      return {
+        directVP: "0",
+        advancedVP: "0",
+        totalVP: "0",
+      };
+    }
+
     const { namespace, contracts } = Tenant.current();
     const votingPowerQuery = prismaWeb3Client.$queryRawUnsafe<
       VotingPowerSnapsPayload[]
@@ -152,6 +160,14 @@ async function getCurrentVotingPowerForAddress({
   address: string;
 }): Promise<VotingPowerData> {
   return withMetrics("getCurrentVotingPowerForAddress", async () => {
+    if (!Tenant.current().runtime.capabilities.supportsTokenBalanceReads) {
+      return {
+        directVP: "0",
+        advancedVP: "0",
+        totalVP: "0",
+      };
+    }
+
     const { namespace, contracts, ui } = Tenant.current();
     const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
 
@@ -213,6 +229,10 @@ async function getVotingPowerAvailableForSubdelegationForAddress({
   return withMetrics(
     "getVotingPowerAvailableForSubdelegationForAddress",
     async () => {
+      if (!Tenant.current().runtime.capabilities.supportsAdvancedDelegation) {
+        return "0";
+      }
+
       const { namespace, contracts } = Tenant.current();
       const advancedVotingPower = await findAdvancedVotingPower({
         namespace,
@@ -256,6 +276,10 @@ async function getVotingPowerAvailableForDirectDelegationForAddress({
   return withMetrics(
     "getVotingPowerAvailableForDirectDelegationForAddress",
     async () => {
+      if (!Tenant.current().runtime.capabilities.supportsTokenBalanceReads) {
+        return 0n;
+      }
+
       const { contracts } = Tenant.current();
       return contracts.token.contract.balanceOf(address);
     }
@@ -275,6 +299,10 @@ async function isAddressDelegatingToProxy({
   address: string;
 }): Promise<boolean> {
   return withMetrics("isAddressDelegatingToProxy", async () => {
+    if (!Tenant.current().runtime.capabilities.supportsAdvancedDelegation) {
+      return false;
+    }
+
     const { namespace } = Tenant.current();
     const [proxyAddress, delegatee] = await Promise.all([
       getProxyAddress(address),

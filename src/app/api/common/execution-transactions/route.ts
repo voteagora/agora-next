@@ -3,6 +3,8 @@ import { ExecutionTransaction } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const { namespace } = Tenant.current();

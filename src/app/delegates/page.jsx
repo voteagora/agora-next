@@ -10,6 +10,14 @@ import { getMetadataBaseUrl } from "@/app/lib/utils/metadata";
 export const dynamic = "force-dynamic"; //nuqs does not consider params changes for filters otherwise
 
 export async function generateMetadata({}, parent) {
+  if (process.env.VIBDAO_LOCAL_MODE === "true") {
+    return {
+      title: "Delegates",
+      description:
+        "Browse local governance participants through the Agora delegates experience.",
+    };
+  }
+
   const { ui } = Tenant.current();
   const page = ui.page("delegates");
   const { title, description, imageTitle, imageDescription } = page.meta;

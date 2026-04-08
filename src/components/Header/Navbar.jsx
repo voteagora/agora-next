@@ -7,7 +7,7 @@ import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useRef, useState, useEffect } from "react";
 
-export default function Navbar() {
+export default function Navbar({ isVibdaoLocalMode = false }) {
   const pathname = usePathname();
   const { ui } = Tenant.current();
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
@@ -19,6 +19,7 @@ export default function Navbar() {
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
   const hasComingSoon =
     ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
+  const localPrefetch = !isVibdaoLocalMode;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -94,6 +95,7 @@ export default function Navbar() {
           }}
           href={hasProposalsHref ? ui.page("proposals")?.href : "/proposals"}
           target={hasProposalsHref ? "_blank" : "_self"}
+          prefetch={localPrefetch}
           isActive={activeNavItem === "proposals"}
           onClick={() => handleNavClick("proposals")}
         >
@@ -101,7 +103,56 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {hasComingSoon && (
+      {isVibdaoLocalMode && (
+        <>
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.delegates = el;
+            }}
+            href="/delegates"
+            prefetch={localPrefetch}
+            isActive={activeNavItem === "delegates"}
+            onClick={() => handleNavClick("delegates")}
+          >
+            Delegates
+          </HeaderLink>
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.donate = el;
+            }}
+            href="/donate"
+            prefetch={localPrefetch}
+            isActive={activeNavItem === "donate"}
+            onClick={() => handleNavClick("donate")}
+          >
+            Donate
+          </HeaderLink>
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.fellowship = el;
+            }}
+            href="/fellowship"
+            prefetch={localPrefetch}
+            isActive={activeNavItem === "fellowship"}
+            onClick={() => handleNavClick("fellowship")}
+          >
+            Fellows
+          </HeaderLink>
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.claim = el;
+            }}
+            href="/claim"
+            prefetch={localPrefetch}
+            isActive={activeNavItem === "claim"}
+            onClick={() => handleNavClick("claim")}
+          >
+            Claim
+          </HeaderLink>
+        </>
+      )}
+
+      {!isVibdaoLocalMode && hasComingSoon && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current["coming-soon"] = el;
@@ -114,7 +165,7 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("forums") && ui.toggle("forums").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("forums") && ui.toggle("forums").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.forums = el;
@@ -126,7 +177,7 @@ export default function Navbar() {
           Discussions
         </HeaderLink>
       )}
-      {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("delegates") && ui.toggle("delegates").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.delegates = el;
@@ -135,11 +186,11 @@ export default function Navbar() {
           isActive={activeNavItem === "delegates"}
           onClick={() => handleNavClick("delegates")}
         >
-          Voters
+          Delegates
         </HeaderLink>
       )}
 
-      {ui.toggle("staking") && ui.toggle("staking").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("staking") && ui.toggle("staking").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.staking = el;
@@ -152,7 +203,7 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("retropgf") && ui.toggle("retropgf").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("retropgf") && ui.toggle("retropgf").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.retropgf = el;
@@ -165,7 +216,7 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("grants") && ui.toggle("grants").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("grants") && ui.toggle("grants").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.grants = el;
@@ -178,7 +229,7 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("info") && ui.toggle("info").enabled && (
+      {!isVibdaoLocalMode && ui.toggle("info") && ui.toggle("info").enabled && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.info = el;

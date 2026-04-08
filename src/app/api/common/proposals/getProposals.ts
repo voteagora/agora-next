@@ -39,6 +39,11 @@ import {
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 import { fetchProposalTaxFormMetadata } from "./getProposalTaxFormMetadata";
+import {
+  getLocalAgoraProposal,
+  getLocalAgoraProposals,
+  isVibdaoLocalMode,
+} from "@/lib/vibdao/agoraAdapter";
 
 // Helper function to fetch proposals from DAO Node
 async function fetchProposalsFromDaoNode(
@@ -301,6 +306,10 @@ export async function getProposals({
   pagination: PaginationParams;
   type?: string;
 }): Promise<PaginatedResult<Proposal[]>> {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraProposals({ pagination, filter });
+  }
+
   return withMetrics(
     "getProposals",
     async () => {
@@ -371,6 +380,10 @@ export async function getProposals({
 }
 
 async function getProposal(proposalId: string) {
+  if (isVibdaoLocalMode()) {
+    return getLocalAgoraProposal(proposalId);
+  }
+
   return withMetrics("getProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
@@ -469,6 +482,10 @@ async function getProposal(proposalId: string) {
 }
 
 async function getProposalTypes() {
+  if (isVibdaoLocalMode()) {
+    return [];
+  }
+
   return withMetrics("getProposalTypes", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
@@ -620,6 +637,10 @@ async function getProposalTypes() {
 
 async function getDraftProposals(address: `0x${string}`) {
   return withMetrics("getDraftProposals", async () => {
+    if (isVibdaoLocalMode()) {
+      return [];
+    }
+
     const { contracts } = Tenant.current();
     return await prismaWeb2Client.proposalDraft.findMany({
       where: {
@@ -646,6 +667,10 @@ async function getDraftProposals(address: `0x${string}`) {
 
 async function getDraftProposalForSponsor(address: `0x${string}`) {
   return withMetrics("getDraftProposalForSponsor", async () => {
+    if (isVibdaoLocalMode()) {
+      return [];
+    }
+
     const { contracts } = Tenant.current();
     return await prismaWeb2Client.proposalDraft.findMany({
       where: {
@@ -672,6 +697,14 @@ async function getDraftProposalForSponsor(address: `0x${string}`) {
 
 async function getTotalProposalsCount(): Promise<number> {
   return withMetrics("getTotalProposalsCount", async () => {
+    if (isVibdaoLocalMode()) {
+      const proposals = await getLocalAgoraProposals({
+        filter: "all",
+        pagination: { limit: 500, offset: 0 },
+      });
+      return proposals.data.length;
+    }
+
     const { namespace, contracts } = Tenant.current();
     return getProposalsCount({
       namespace,

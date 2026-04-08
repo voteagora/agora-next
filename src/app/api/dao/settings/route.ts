@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

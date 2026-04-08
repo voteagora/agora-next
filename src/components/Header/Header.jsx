@@ -9,11 +9,9 @@ import LogoLink from "./LogoLink";
 import { ConnectButton } from "./ConnectButton";
 import MobileNavMenu from "./MobileNavMenu";
 import { HamburgerIcon } from "@/icons/HamburgerIcon";
-import Tenant from "@/lib/tenant/tenant";
 
-export default function Header() {
+export default function Header({ isVibdaoLocalMode = false }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { ui } = Tenant.current();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -28,18 +26,19 @@ export default function Header() {
             onClick={toggleMobileMenu}
           />
           <div className="sm:w-full flex justify-start">
-            <LogoLink />
+            <LogoLink isVibdaoLocalMode={isVibdaoLocalMode} />
           </div>
           <div className="w-full justify-center hidden sm:flex">
-            <Navbar />
+            <Navbar isVibdaoLocalMode={isVibdaoLocalMode} />
           </div>
           <div className="min-w-[24px] sm:w-full flex justify-end content-end">
-            <ConnectButton />
+            <ConnectButton isVibdaoLocalMode={isVibdaoLocalMode} />
           </div>
         </HStack>
       </VStack>
 
       <MobileNavMenu
+        isVibdaoLocalMode={isVibdaoLocalMode}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
