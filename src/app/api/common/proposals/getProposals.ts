@@ -208,57 +208,6 @@ async function fetchInitialProposals(
             contracts
           );
         }
-        if (process.env.DAONODE_URL_TEMPLATE?.includes("mock-daonode")) {
-          return [
-            {
-              proposal_id: "test-active",
-              proposer: "0x1111111111111111111111111111111111111111",
-              description:
-                "# Mock Active Proposal\nThis is an active proposal.",
-              created_block: 1000000n,
-              start_block: 2000000n,
-              end_block: 90000000n,
-              proposal_data: "0x",
-              proposal_results: {
-                "no-param": { "0": "0", "1": "0", "2": "0" },
-              },
-              proposal_type: "STANDARD",
-              proposal_type_data: null,
-            },
-            {
-              proposal_id: "test-defeated",
-              proposer: "0x2222222222222222222222222222222222222222",
-              description: "# Mock Defeated Proposal\nDef prop.",
-              created_block: 1000000n,
-              start_block: 2000000n,
-              end_block: 3000000n,
-              proposal_data: "0x",
-              proposal_results: {
-                "no-param": {
-                  "0": "1000000000000000000000000",
-                  "1": "0",
-                  "2": "0",
-                },
-              },
-              proposal_type: "STANDARD",
-              proposal_type_data: null,
-            },
-            {
-              proposal_id: "test-draft",
-              proposer: "0x7897897897897897897897897897897897897897",
-              description: "# Mock Pending/Draft Proposal\nPending prop",
-              created_block: 99000000n,
-              start_block: 99000000n,
-              end_block: 99990000n,
-              proposal_data: "0x",
-              proposal_results: {
-                "no-param": { "0": "0", "1": "0", "2": "0" },
-              },
-              proposal_type: "STANDARD",
-              proposal_type_data: null,
-            },
-          ] as any;
-        }
 
         return (await findProposalsQueryFromDB({
           namespace,
@@ -436,45 +385,6 @@ async function getProposal(proposalId: string) {
     )?.enabled;
 
     const getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
-      if (process.env.DAONODE_URL_TEMPLATE?.includes("mock-daonode")) {
-        if (proposalId === "test-active") {
-          return {
-            proposal_id: "test-active",
-            proposer: "0x1111111111111111111111111111111111111111",
-            description:
-              "# Mock Active Proposal for Voting\nThis is a mock active proposal.",
-            created_block: 1000000n,
-            start_block: 2000000n,
-            end_block: 90000000n,
-            proposal_data: "0x",
-            proposal_results: { "no-param": { "0": "0", "1": "0", "2": "0" } },
-            proposal_type: "STANDARD",
-            proposal_type_data: null,
-          } as any;
-        }
-        if (proposalId === "test-defeated") {
-          return {
-            proposal_id: "test-defeated",
-            proposer: "0x2222222222222222222222222222222222222222",
-            description:
-              "# Mock Defeated Proposal\nThis is a mock defeated proposal.",
-            created_block: 1000000n,
-            start_block: 2000000n,
-            end_block: 3000000n,
-            proposal_data: "0x",
-            proposal_results: {
-              "no-param": {
-                "0": "1000000000000000000000000",
-                "1": "500000000000000000000",
-                "2": "0",
-              },
-            },
-            proposal_type: "STANDARD",
-            proposal_type_data: null,
-          } as any;
-        }
-      }
-
       return findProposal({
         namespace,
         proposalId,
