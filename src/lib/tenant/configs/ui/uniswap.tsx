@@ -263,8 +263,8 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+            ? "0x24B161467CB041b4AbC3E51c1b51f78c1cB4A6E1"
+            : "0xc40f6ea5223654dCC78Bb0614982Dc94735AE119",
         minBalance: "0.1",
         minVPToUseGasRelay: "10",
       },
@@ -275,8 +275,8 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+            ? "0x24B161467CB041b4AbC3E51c1b51f78c1cB4A6E1"
+            : "0xc40f6ea5223654dCC78Bb0614982Dc94735AE119",
         minBalance: "0.1",
         minVPToUseGasRelay: "10",
       },
