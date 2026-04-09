@@ -207,7 +207,9 @@ const AdminMembershipPage = () => {
           <button
             className="bg-blue-500 text-white p-2 rounded-md"
             onClick={handleAddMember}
-            disabled={isSubmittingAddMember || (!!txHash && !isSuccess && !isError)}
+            disabled={
+              isSubmittingAddMember || (!!txHash && !isSuccess && !isError)
+            }
           >
             Add Member
           </button>

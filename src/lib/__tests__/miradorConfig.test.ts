@@ -65,9 +65,7 @@ describe("mirador config", () => {
       },
     });
 
-    expect(isMiradorFlowTracingEnabled(MIRADOR_FLOW.governanceVote)).toBe(
-      true
-    );
+    expect(isMiradorFlowTracingEnabled(MIRADOR_FLOW.governanceVote)).toBe(true);
   });
 
   it("maps SIWE-backed flows to the existing siweLoginTracing flag", async () => {
