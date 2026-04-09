@@ -12,6 +12,7 @@ import {
   MiradorFlow,
   MiradorTraceContext,
 } from "./types";
+import { isMiradorFlowTracingEnabled } from "./config";
 import { getMiradorWebClient } from "./webClient";
 
 type MiradorTrace = Trace & Web3Methods;
@@ -65,6 +66,10 @@ function applyAttributes(trace: Trace, attributes?: MiradorAttributeMap) {
 export function startMiradorTrace(
   options: StartMiradorTraceOptions
 ): MiradorTrace | null {
+  if (!isMiradorFlowTracingEnabled(options.flow)) {
+    return null;
+  }
+
   const client = getMiradorWebClient();
   if (!client) {
     return null;

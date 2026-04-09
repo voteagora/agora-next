@@ -3,8 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { getMiradorServerClientMock } = vi.hoisted(() => ({
   getMiradorServerClientMock: vi.fn(),
 }));
+const { isMiradorFlowTracingEnabledMock } = vi.hoisted(() => ({
+  isMiradorFlowTracingEnabledMock: vi.fn(() => true),
+}));
 
 vi.mock("server-only", () => ({}));
+
+vi.mock("@/lib/mirador/config", () => ({
+  isMiradorFlowTracingEnabled: isMiradorFlowTracingEnabledMock,
+}));
 
 vi.mock("@/lib/mirador/serverClient", () => ({
   getMiradorServerClient: getMiradorServerClientMock,
@@ -15,6 +22,7 @@ import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 describe("serverTrace", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    isMiradorFlowTracingEnabledMock.mockReturnValue(true);
   });
 
   it("forwards tx, safe message, and safe tx hints through the web3 plugin", async () => {
@@ -163,5 +171,16 @@ describe("serverTrace", () => {
       '{"reason":"timeout"}'
     );
     expect(trace.info).not.toHaveBeenCalled();
+  });
+
+  it("skips appending events for disabled flows", async () => {
+    isMiradorFlowTracingEnabledMock.mockReturnValue(false);
+
+    await appendServerTraceEvent({
+      traceContext: { traceId: "trace-id", flow: "governance_vote" },
+      eventName: "governance_vote_started",
+    });
+
+    expect(getMiradorServerClientMock).not.toHaveBeenCalled();
   });
 });

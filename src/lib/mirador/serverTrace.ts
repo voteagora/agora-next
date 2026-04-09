@@ -6,6 +6,7 @@ import type {
 } from "@miradorlabs/nodejs-sdk";
 
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
+import { isMiradorFlowTracingEnabled } from "./config";
 import { getMiradorServerClient } from "./serverClient";
 import { getTenantTag } from "./tags";
 import {
@@ -159,6 +160,10 @@ export async function appendServerTraceEvent({
   safeTxHints,
   txInputData,
 }: AppendServerTraceEventArgs): Promise<void> {
+  if (traceContext?.flow && !isMiradorFlowTracingEnabled(traceContext.flow)) {
+    return;
+  }
+
   const traceId = traceContext?.traceId;
   if (!traceId) {
     if (process.env.NODE_ENV !== "production" && !hasWarnedMissingTraceId) {

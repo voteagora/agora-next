@@ -32,13 +32,13 @@ class AgoraAPI {
    * POST request to the Agora API.
    */
   async post(endpoint, version = "v1", data, extraHeaders = {}) {
+    const headers = new Headers(extraHeaders);
+    headers.set("authorization", this.bearerToken);
+    headers.set("Content-Type", "application/json");
+
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "POST",
-      headers: {
-        authorization: this.bearerToken,
-        "Content-Type": "application/json",
-        ...extraHeaders,
-      },
+      headers,
       body: JSON.stringify(data),
     });
 

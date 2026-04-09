@@ -78,12 +78,41 @@ export const BravoGovQueue = ({ proposal }: Props) => {
     proposal.id,
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_unmounted",
+        eventName: "governance_admin_unmounted",
+        details: {
+          action: "queue",
+          proposalId: proposal.id,
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [proposal.id]);
+
   return (
     <>
       {!isFetched && (
         <Button
           loading={isLoading}
           onClick={() => {
+            if (traceRef.current) {
+              void closeFrontendMiradorFlowTrace(traceRef.current, {
+                reason: "governance_admin_restarted",
+                eventName: "governance_admin_restarted",
+                details: {
+                  action: "queue",
+                  proposalId: proposal.id,
+                },
+              });
+            }
+
             const inputData = encodeFunctionData({
               abi: contracts.governor.abi as any,
               functionName: "queue",

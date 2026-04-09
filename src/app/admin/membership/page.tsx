@@ -11,6 +11,7 @@ import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import {
   attachMiradorTransactionArtifacts,
   closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
 import { encodeFunctionData } from "viem";
@@ -19,8 +20,9 @@ const AdminMembershipPage = () => {
   const tenant = Tenant.current();
   const [address, setAddress] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
-  const traceRef =
-    useRef<ReturnType<typeof startFrontendMiradorFlowTrace>>(null);
+  const traceRef = useRef<FrontendMiradorTrace>(null);
+  const latestAddressRef = useRef(address);
+  const activeMemberAddressRef = useRef<string | null>(null);
 
   const { data: memberBalance } = useReadContract({
     address: tenant.contracts.token.address as `0x${string}`,
@@ -30,12 +32,19 @@ const AdminMembershipPage = () => {
     chainId: tenant.contracts.token.chain.id,
   });
 
-  const { writeContractAsync: addMember, error: addMemberError } =
-    useWriteContract();
+  const {
+    writeContractAsync: addMember,
+    error: addMemberError,
+    isPending: isSubmittingAddMember,
+  } = useWriteContract();
   const { isSuccess, isError, error } = useWaitForTransactionReceipt({
     hash: txHash,
     chainId: tenant.contracts.token.chain.id,
   });
+
+  useEffect(() => {
+    latestAddressRef.current = address;
+  }, [address]);
 
   useEffect(() => {
     if (!traceRef.current || !txHash) {
@@ -52,11 +61,13 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_succeeded",
         eventName: "membership_admin_succeeded",
         details: {
-          memberAddress: address,
+          memberAddress:
+            activeMemberAddressRef.current ?? latestAddressRef.current,
           transactionHash: txHash,
         },
       });
       traceRef.current = null;
+      activeMemberAddressRef.current = null;
       return;
     }
 
@@ -65,15 +76,16 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_failed",
         eventName: "membership_admin_failed",
         details: {
-          memberAddress: address,
+          memberAddress:
+            activeMemberAddressRef.current ?? latestAddressRef.current,
           transactionHash: txHash,
           error: error?.message,
         },
       });
       traceRef.current = null;
+      activeMemberAddressRef.current = null;
     }
   }, [
-    address,
     error?.message,
     isError,
     isSuccess,
@@ -91,19 +103,34 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_unmounted",
         eventName: "membership_admin_unmounted",
         details: {
-          memberAddress: address,
+          memberAddress:
+            activeMemberAddressRef.current ?? latestAddressRef.current,
         },
       });
       traceRef.current = null;
+      activeMemberAddressRef.current = null;
     };
-  }, [address]);
+  }, []);
 
   const handleAddMember = async () => {
+    const memberAddress = address;
     const inputData = encodeFunctionData({
       abi: tenant.contracts.token.abi as any,
       functionName: "safeMint",
-      args: [address as `0x${string}`],
+      args: [memberAddress as `0x${string}`],
     });
+
+    if (traceRef.current) {
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "membership_admin_restarted",
+        eventName: "membership_admin_restarted",
+        details: {
+          memberAddress:
+            activeMemberAddressRef.current ?? latestAddressRef.current,
+        },
+      });
+    }
+
     const trace = startFrontendMiradorFlowTrace({
       name: "MembershipAdmin",
       flow: MIRADOR_FLOW.membershipAdmin,
@@ -114,12 +141,12 @@ const AdminMembershipPage = () => {
       tags: ["admin", "membership", "frontend"],
       attributes: {
         action: "safe_mint",
-        memberAddress: address,
+        memberAddress,
       },
       startEventName: "membership_admin_started",
       startEventDetails: {
         action: "safe_mint",
-        memberAddress: address,
+        memberAddress,
       },
     });
     attachMiradorTransactionArtifacts(trace, {
@@ -127,13 +154,14 @@ const AdminMembershipPage = () => {
       inputData,
     });
     traceRef.current = trace;
+    activeMemberAddressRef.current = memberAddress;
 
     try {
       const hash = await addMember({
         address: tenant.contracts.token.address as `0x${string}`,
         abi: tenant.contracts.token.abi,
         functionName: "safeMint",
-        args: [address as `0x${string}`],
+        args: [memberAddress as `0x${string}`],
         chainId: tenant.contracts.token.chain.id,
       });
       attachMiradorTransactionArtifacts(trace, {
@@ -148,7 +176,7 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_failed",
         eventName: "membership_admin_failed",
         details: {
-          memberAddress: address,
+          memberAddress,
           error:
             submitError instanceof Error
               ? submitError.message
@@ -157,6 +185,7 @@ const AdminMembershipPage = () => {
       });
       if (traceRef.current === trace) {
         traceRef.current = null;
+        activeMemberAddressRef.current = null;
       }
     }
   };
@@ -178,6 +207,7 @@ const AdminMembershipPage = () => {
           <button
             className="bg-blue-500 text-white p-2 rounded-md"
             onClick={handleAddMember}
+            disabled={isSubmittingAddMember || (!!txHash && !isSuccess && !isError)}
           >
             Add Member
           </button>

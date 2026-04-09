@@ -116,6 +116,23 @@ export const UpdateVotableSupplyOracle = ({
     }
   }, [chainId, isTxConfirmed, queryClient, refetchVotableSupplyOracle, txHash]);
 
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_unmounted",
+        eventName: "governance_admin_unmounted",
+        details: {
+          action: "update_votable_supply",
+        },
+      });
+      traceRef.current = null;
+    };
+  }, []);
+
   const handleUpdateSupply = async () => {
     const supplyInWei = BigInt(presentVotableSupply);
     const inputData = encodeFunctionData({
@@ -123,6 +140,17 @@ export const UpdateVotableSupplyOracle = ({
       functionName: "_updateVotableSupply",
       args: [supplyInWei],
     });
+
+    if (traceRef.current) {
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_restarted",
+        eventName: "governance_admin_restarted",
+        details: {
+          action: "update_votable_supply",
+        },
+      });
+    }
+
     const trace = startFrontendMiradorFlowTrace({
       name: "GovernanceAdmin",
       flow: MIRADOR_FLOW.governanceAdmin,

@@ -79,15 +79,6 @@ export const OffchainCancel = ({ proposal }: Props) => {
       };
       const authData = await getAuthenticationData(messagePayload);
       if (!authData) {
-        await closeFrontendMiradorFlowTrace(trace, {
-          reason: "proposal_attestation_failed",
-          eventName: "proposal_attestation_failed",
-          details: {
-            action: "cancel_offchain_proposal",
-            proposalId: proposal.id,
-            error: "Authentication failed",
-          },
-        });
         throw new Error("Authentication failed");
       }
 

@@ -132,6 +132,24 @@ export const OZGovExecute = ({ proposal }: Props) => {
     proposal.id,
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_unmounted",
+        eventName: "governance_admin_unmounted",
+        details: {
+          action: "execute",
+          proposalId: proposal.id,
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [proposal.id]);
+
   return (
     <div>
       <TooltipProvider delayDuration={0}>
@@ -149,6 +167,17 @@ export const OZGovExecute = ({ proposal }: Props) => {
               {!isFetched && (
                 <Button
                   onClick={() => {
+                    if (traceRef.current) {
+                      void closeFrontendMiradorFlowTrace(traceRef.current, {
+                        reason: "governance_admin_restarted",
+                        eventName: "governance_admin_restarted",
+                        details: {
+                          action: "execute",
+                          proposalId: proposal.id,
+                        },
+                      });
+                    }
+
                     const args = proposalToCallArgs(proposal);
                     const inputData = encodeFunctionData({
                       abi: contracts.governor!.abi as any,

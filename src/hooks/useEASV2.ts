@@ -86,7 +86,7 @@ export function useEASV2() {
     failureEventName,
     successDetails,
     action,
-    chainId = contracts.governor.chain.id,
+    chainId = contracts.token.chain.id,
     proposalId,
   }: RunMiradorTraceOptions<T>): Promise<T> => {
     const trace = startFrontendMiradorFlowTrace({
