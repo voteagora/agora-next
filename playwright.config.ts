@@ -14,6 +14,7 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:3000",
     trace: "on-first-retry",
+    video: "on",
   },
   projects: [
     {
@@ -34,6 +35,8 @@ export default defineConfig({
       url: "http://127.0.0.1:4000/wallet/status",
       reuseExistingServer: true,
       timeout: 120 * 1000,
-    }
+      stdout: "pipe",
+      stderr: "pipe",
+    },
   ],
 });

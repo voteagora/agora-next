@@ -9,6 +9,8 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     context,
   }) => {
     // 1. Initialize headless wallet
+    // To initialize with a specific seed phrase, provide a mnemonic:
+    // await FawkesClient.createWallet({ mnemonic: "word1 word2..." });
     await FawkesClient.createWallet();
 
     // 2. Navigate to delegates page
@@ -59,5 +61,8 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     // 6. Verify successful connection by waiting for the profile dropdown button
     const profileDropdown = page.getByTestId("profile-dropdown-button");
     await expect(profileDropdown).toBeVisible({ timeout: 15000 });
+
+    // 7. Pause the execution here so you can record your video or inspect the DOM
+    await page.pause();
   });
 });
