@@ -159,15 +159,7 @@ export function DelegateDialog({
         });
       }
     }
-  }, [
-    accountAddress,
-    delegate.address,
-    didProcessDelegation,
-    directDelegationTxHash,
-    isDelegationEncouragement,
-    isGasRelayLive,
-    sponsoredTxnHash,
-  ]);
+  }, [didProcessDelegation]);
 
   useEffect(() => {
     if (isGasRelayLive || !delegationTraceRef.current) {

@@ -283,17 +283,7 @@ export function UndelegateDialog({
       }
       revalidateData();
     }
-  }, [
-    contracts.token.chain.id,
-    delegate.address,
-    delegate.votingPower.total,
-    delegateTxHash,
-    didProcessDelegation,
-    fetchData,
-    isReady,
-    setRefetchDelegate,
-    votingPower,
-  ]);
+  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
 
   useEffect(() => {
     if (!delegationTraceRef.current || isGasRelayLive) {

@@ -114,7 +114,7 @@ export const UpdateVotableSupplyOracle = ({
       refetchVotableSupplyOracle();
       setTxHash(undefined);
     }
-  }, [chainId, isTxConfirmed, queryClient, refetchVotableSupplyOracle, txHash]);
+  }, [isTxConfirmed, queryClient, refetchVotableSupplyOracle]);
 
   useEffect(() => {
     return () => {

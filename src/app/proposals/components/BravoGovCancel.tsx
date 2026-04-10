@@ -81,14 +81,7 @@ export const BravoGovCancel = ({ proposal }: Props) => {
         duration: 5000,
       });
     }
-  }, [
-    contracts.governor.chain.id,
-    data,
-    error,
-    isError,
-    isSuccess,
-    proposal.id,
-  ]);
+  }, [isSuccess, isError, error]);
 
   useEffect(() => {
     return () => {

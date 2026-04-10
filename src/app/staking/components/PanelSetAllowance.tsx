@@ -72,14 +72,7 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
         queryKey: [TOKEN_ALLOWANCE_QK],
       });
     }
-  }, [
-    amount,
-    config?.request,
-    contracts.token.chain.id,
-    data,
-    didUpdateAllowance,
-    queryClient,
-  ]);
+  }, [didUpdateAllowance, queryClient]);
 
   useEffect(() => {
     return () => {

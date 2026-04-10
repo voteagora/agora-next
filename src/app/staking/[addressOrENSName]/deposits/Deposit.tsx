@@ -93,17 +93,7 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
         });
       }, INDEXER_DELAY);
     }
-  }, [
-    contracts.staker,
-    data,
-    deposit.amount,
-    deposit.depositor,
-    deposit.id,
-    didProcessWithdrawal,
-    queryClient,
-    refreshPath,
-    router,
-  ]);
+  }, [didProcessWithdrawal]);
 
   useEffect(() => {
     return () => {

@@ -78,14 +78,7 @@ export const AgoraGovQueue = ({ proposal, className, style }: Props) => {
         duration: 10000,
       });
     }
-  }, [
-    contracts.governor.chain.id,
-    data,
-    error,
-    isError,
-    isSuccess,
-    proposal.id,
-  ]);
+  }, [isSuccess, isError, error]);
 
   useEffect(() => {
     return () => {
