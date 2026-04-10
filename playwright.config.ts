@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd());
 
 export default defineConfig({
   testDir: "./tests",
@@ -36,6 +38,9 @@ export default defineConfig({
       timeout: 120 * 1000,
       stdout: "pipe",
       stderr: "pipe",
+      env: {
+        WALLET_CONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID as string,
+      },
     },
   ],
 });
