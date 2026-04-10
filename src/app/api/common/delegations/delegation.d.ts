@@ -11,4 +11,6 @@ export type Delegation = {
   type: "DIRECT" | "ADVANCED";
   amount: "FULL" | "PARTIAL";
   transaction_hash: string;
+  block_number?: number;
+  transaction_index?: number;
 };

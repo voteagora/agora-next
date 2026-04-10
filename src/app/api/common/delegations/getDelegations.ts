@@ -30,22 +30,65 @@ async function getCurrentDelegateesForAddress({
   address: string;
 }): Promise<Delegation[]> {
   return withMetrics("getCurrentDelegateesForAddress", async () => {
-    const { namespace, contracts, ui } = Tenant.current();
+    const { namespace, contracts } = Tenant.current();
+    const tokenContractAddress = contracts.token.address.toLowerCase();
 
     const getDirectDelegatee = async () => {
       const delegatee = await findDelagatee({
         namespace,
         address,
-        contract: contracts.token.address,
+        contract: tokenContractAddress,
       });
 
+      if (!delegatee) {
+        return null;
+      }
+
+      const [[directDelegationEvent], proxyAddress] = await Promise.all([
+        prismaWeb2Client.$queryRawUnsafe<
+          {
+            block_number: bigint;
+            transaction_index: number;
+            transaction_hash: string | null;
+          }[]
+        >(
+          `
+            SELECT
+              block_number,
+              transaction_index,
+              transaction_hash
+            FROM
+              ${namespace}.delegate_changed_events
+            WHERE
+              delegator = $1 AND address = $2
+            ORDER BY
+              block_number DESC,
+              transaction_index DESC,
+              log_index DESC
+            LIMIT 1
+          `,
+          address,
+          tokenContractAddress
+        ),
+        namespace === TENANT_NAMESPACES.OPTIMISM
+          ? getProxyAddress(address)
+          : Promise.resolve(null),
+      ]);
+
       if (namespace === TENANT_NAMESPACES.OPTIMISM) {
-        const proxyAddress = await getProxyAddress(address);
-        if (delegatee?.delegatee === proxyAddress?.toLowerCase()) {
+        if (delegatee.delegatee === proxyAddress?.toLowerCase()) {
           return null;
         }
       }
-      return delegatee;
+
+      return {
+        ...delegatee,
+        block_number:
+          directDelegationEvent?.block_number ?? delegatee.block_number,
+        transaction_index: directDelegationEvent?.transaction_index,
+        transaction_hash:
+          delegatee.transaction_hash || directDelegationEvent?.transaction_hash,
+      };
     };
 
     let advancedDelegatees;
@@ -92,6 +135,7 @@ async function getCurrentDelegateesForAddress({
               ? ("FULL" as const)
               : ("PARTIAL" as const),
           transaction_hash: advancedDelegatee.transaction_hash || "",
+          block_number: Number(advancedDelegatee.block_number),
         };
       }
     );
@@ -115,6 +159,12 @@ async function getCurrentDelegateesForAddress({
       type: "DIRECT" as const,
       amount: "FULL" as const,
       transaction_hash: directDelegatee.transaction_hash || "",
+      block_number: Number(directDelegatee.block_number),
+      transaction_index:
+        directDelegatee.transaction_index === null ||
+        directDelegatee.transaction_index === undefined
+          ? undefined
+          : Number(directDelegatee.transaction_index),
     };
 
     return directDelegateeData
@@ -176,6 +226,7 @@ async function getCurrentDelegatorsForAddress({
 
       const mapped = daoDelegate.from_list.map((delegator: any) => {
         const bn = delegator.bn ?? delegator.block_number;
+        const tid = delegator.tid;
         const pct = delegator.percentage;
         const balance = BigInt(delegator.balance ?? 0);
         const isFull =
@@ -203,6 +254,8 @@ async function getCurrentDelegatorsForAddress({
           amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
           transaction_hash:
             delegator.txhash || delegator.transaction_hash || "",
+          block_number: bn ? Number(bn) : undefined,
+          transaction_index: tid !== undefined ? Number(tid) : undefined,
         };
       });
 
@@ -249,6 +302,7 @@ async function getCurrentDelegatorsForAddress({
                                     delegated_amount as allowance,
                                     'ADVANCED' AS type,
                                     block_number,
+                                    null::integer as transaction_index,
                                     CASE WHEN delegated_share >= 1 THEN 'FULL' ELSE 'PARTIAL' END as amount,
                                     transaction_hash
                                   FROM
@@ -264,6 +318,7 @@ async function getCurrentDelegatorsForAddress({
                                     null::numeric as allowance,
                                     'ADVANCED' AS type,
                                     null::numeric as block_number,
+                                    null::integer as transaction_index,
                                     'FULL' as amount,
                                     null::text as transaction_hash)
                                     select * from ghost
@@ -280,6 +335,7 @@ async function getCurrentDelegatorsForAddress({
                                     NULL::numeric AS allowance,
                                     'DIRECT' AS type,
                                     block_number,
+                                    NULL::integer AS transaction_index,
                                     'FULL' AS amount,
                                     transaction_hash
                                   FROM
@@ -296,6 +352,7 @@ async function getCurrentDelegatorsForAddress({
                   null::numeric as allowance,
                   'DIRECT' AS type,
                   null::numeric as block_number,
+                  null::integer as transaction_index,
                   'FULL' as amount,
                   null::text as transaction_hash)
                   select * from ghost
@@ -327,6 +384,7 @@ async function getCurrentDelegatorsForAddress({
                                                      null::numeric as allowance,
                                                      'DIRECT' as type,
                                                      block_number,
+                                                     transaction_index,
                                                      'FULL' as amount,
                                                      transaction_hash from latest_delegations where LOWER(to_delegate) = LOWER($1)`;
     } else {
@@ -337,6 +395,7 @@ async function getCurrentDelegatorsForAddress({
                 null::numeric as allowance,
                 'DIRECT' as type,
                 block_number,
+                transaction_index,
                 'FULL' as amount,
                 transaction_hash
               FROM (
@@ -390,7 +449,8 @@ async function getCurrentDelegatorsForAddress({
             to: string;
             allowance: Prisma.Decimal;
             type: "DIRECT" | "ADVANCED";
-            block_number: bigint;
+            block_number: bigint | null;
+            transaction_index: number | null;
             amount: "FULL" | "PARTIAL";
             transaction_hash: string;
           }[]
@@ -417,12 +477,21 @@ async function getCurrentDelegatorsForAddress({
                 await contracts.token.contract.balanceOf(delegator.from)
               ).toString(),
         percentage: "0", // Only used in Agora token partial delegation
-        timestamp: latestBlock
-          ? getHumanBlockTime(delegator.block_number, latestBlock, true)
-          : null,
+        timestamp:
+          latestBlock && delegator.block_number !== null
+            ? getHumanBlockTime(delegator.block_number, latestBlock, true)
+            : null,
         type: delegator.type,
         amount: delegator.amount,
-        transaction_hash: delegator.transaction_hash,
+        transaction_hash: delegator.transaction_hash || "",
+        block_number:
+          delegator.block_number === null
+            ? undefined
+            : Number(delegator.block_number),
+        transaction_index:
+          delegator.transaction_index === null
+            ? undefined
+            : Number(delegator.transaction_index),
       }))
     );
 
