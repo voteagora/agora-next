@@ -118,7 +118,7 @@ export function useEASV2() {
         txHash: getMiradorResultTxHash(result),
         txDetails,
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: successEventName,
         eventName: successEventName,
         details: {
@@ -137,7 +137,7 @@ export function useEASV2() {
         txHash: failedTxContext.txHash,
         txDetails,
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: failureEventName,
         eventName: failureEventName,
         details: {

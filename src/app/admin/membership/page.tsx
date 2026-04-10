@@ -166,7 +166,7 @@ const AdminMembershipPage = () => {
       });
       setTxHash(hash);
     } catch (submitError) {
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "membership_admin_failed",
         eventName: "membership_admin_failed",
         details: {

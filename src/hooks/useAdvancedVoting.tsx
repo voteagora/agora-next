@@ -196,7 +196,7 @@ const useAdvancedVoting = ({
           });
           setStandardTxHash(transactionHash);
           setStandardVoteSuccess(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",
             details: {
@@ -210,7 +210,7 @@ const useAdvancedVoting = ({
           }
         } else {
           setStandardVoteError(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_failed",
             eventName: "governance_vote_failed",
             details: {
@@ -226,7 +226,7 @@ const useAdvancedVoting = ({
       } catch (error) {
         setStandardVoteError(true);
         setStandardVoteErrorDetails(error as WriteContractErrorType);
-        await closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_failed",
           eventName: "governance_vote_failed",
           details: {
@@ -308,7 +308,7 @@ const useAdvancedVoting = ({
           });
           setAdvancedTxHash(transactionHash);
           setAdvancedVoteSuccess(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",
             details: {
@@ -322,7 +322,7 @@ const useAdvancedVoting = ({
           }
         } else {
           setAdvancedVoteError(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_failed",
             eventName: "governance_vote_failed",
             details: {
@@ -338,7 +338,7 @@ const useAdvancedVoting = ({
       } catch (error) {
         setAdvancedVoteError(true);
         setAdvancedVoteErrorDetails(error as WriteContractErrorType);
-        await closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_failed",
           eventName: "governance_vote_failed",
           details: {

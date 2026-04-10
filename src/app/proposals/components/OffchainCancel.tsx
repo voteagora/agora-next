@@ -124,7 +124,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         traceContext,
       });
 
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "proposal_attestation_succeeded",
         eventName: "proposal_attestation_succeeded",
         details: {
@@ -144,7 +144,7 @@ export const OffchainCancel = ({ proposal }: Props) => {
         txHash: failedTxContext.txHash,
         txDetails: "Offchain proposal cancellation attestation transaction",
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "proposal_attestation_failed",
         eventName: "proposal_attestation_failed",
         details: {

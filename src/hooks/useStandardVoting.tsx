@@ -150,7 +150,7 @@ const useStandardVoting = ({
             },
           });
           setStandardVoteSuccess(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",
             details: {
@@ -164,7 +164,7 @@ const useStandardVoting = ({
           }
         } else {
           setStandardVoteError(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_failed",
             eventName: "governance_vote_failed",
             details: {
@@ -180,7 +180,7 @@ const useStandardVoting = ({
       } catch (error) {
         setStandardVoteError(true);
         setStandardVoteErrorDetails(error as WriteContractErrorType);
-        await closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_failed",
           eventName: "governance_vote_failed",
           details: {

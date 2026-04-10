@@ -200,7 +200,7 @@ const OffchainProposalAction = ({
       };
       const auth = await getAuthenticationData(messagePayload);
       if (!auth) {
-        await closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "proposal_attestation_failed",
           eventName: "proposal_attestation_failed",
           details: {
@@ -289,7 +289,7 @@ const OffchainProposalAction = ({
         creatorAddress: address as `0x${string}`,
         jwt: auth.jwt,
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "proposal_attestation_succeeded",
         eventName: "proposal_attestation_succeeded",
         details: {
@@ -308,7 +308,7 @@ const OffchainProposalAction = ({
         txHash: failedTxContext.txHash,
         txDetails: "Offchain proposal attestation transaction",
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "proposal_attestation_failed",
         eventName: "proposal_attestation_failed",
         details: {

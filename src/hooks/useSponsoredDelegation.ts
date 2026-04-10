@@ -171,7 +171,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
           ? "Sponsored undelegation transaction"
           : "Sponsored delegation transaction",
       });
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "governance_delegation_submitted",
         eventName: "governance_delegation_submitted",
         details: {
@@ -187,7 +187,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
       setTxHash(hash);
       setIsFetched(true);
     } catch (error) {
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {

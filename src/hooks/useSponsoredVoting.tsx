@@ -180,7 +180,7 @@ const useSponsoredVoting = ({
               transaction_hash: voteTxHash,
             },
           });
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",
             details: {
@@ -194,7 +194,7 @@ const useSponsoredVoting = ({
           }
         } else {
           setSponsoredVoteError(true);
-          await closeFrontendMiradorFlowTrace(trace, {
+          void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_failed",
             eventName: "governance_vote_failed",
             details: {
@@ -211,7 +211,7 @@ const useSponsoredVoting = ({
         setError(error);
         setSponsoredVoteError(true);
         setWaitingForSignature(false);
-        await closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_failed",
           eventName: "governance_vote_failed",
           details: {

@@ -193,7 +193,7 @@ export const UpdateVotableSupplyOracle = ({
       });
     } catch (err) {
       console.error("Error updating votable supply:", err);
-      await closeFrontendMiradorFlowTrace(trace, {
+      void closeFrontendMiradorFlowTrace(trace, {
         reason: "governance_admin_failed",
         eventName: "governance_admin_failed",
         details: {
