@@ -6,6 +6,8 @@ import {
   http,
 } from "viem";
 import {
+  arbitrum,
+  arbitrumSepolia,
   base,
   bsc,
   cyber,
@@ -113,6 +115,10 @@ export const getChainById = (chainId: number): Chain | null => {
       return linea;
     case lineaSepolia.id:
       return lineaSepolia;
+    case arbitrum.id:
+      return arbitrum;
+    case arbitrumSepolia.id:
+      return arbitrumSepolia;
     case base.id:
       return base;
     case bsc.id:
