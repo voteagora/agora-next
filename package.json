@@ -18,7 +18,8 @@
     "prettier-src": "prettier -w src/",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:ab": "playwright test tests/ab-runner/regression.spec.ts"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",
@@ -156,13 +157,15 @@
     "viem": "^2.37.0",
     "@wagmi/core": "^2.22.1",
     "@noble/hashes": "^1.5.0",
-    "@noble/curves": "^1.6.0"
+    "@noble/curves": "^1.6.0",
+    "@reown/walletkit": "1.2.2"
   },
   "overrides": {
     "viem": "^2.37.0",
     "@wagmi/core": "^2.22.1",
     "@noble/hashes": "^1.5.0",
-    "@noble/curves": "^1.6.0"
+    "@noble/curves": "^1.6.0",
+    "@reown/walletkit": "1.2.2"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
@@ -176,6 +179,8 @@
     "@typechain/ethers-v6": "^0.5.1",
     "@types/d3": "^7.4.3",
     "@types/node": "^22.7.5",
+    "@types/pixelmatch": "^5.2.6",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.25",
     "@types/react-infinite-scroller": "^1.2.5",
@@ -191,6 +196,8 @@
     "fawkes-wallet": "github:voteagora/fawkes-wallet",
     "jsdom": "^26.0.0",
     "msw": "^2.12.14",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.2.5",
     "sass": "^1.62.1",
     "ts-node": "^10.9.2",

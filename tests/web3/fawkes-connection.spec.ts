@@ -4,9 +4,14 @@ import { FawkesClient } from "./utils/fawkesClient";
 test.describe("Fawkes Wallet Headless Connection", () => {
   const IMPERSONATE_ADDRESS = "0x4033Bd6759cAD2E1691F6E18E1D8c1B15e3beC69";
 
-  test("should seamlessly connect via WalletConnect to RainbowKit", async ({ page, context }) => {
+  test("should seamlessly connect via WalletConnect to RainbowKit", async ({
+    page,
+    context,
+  }) => {
     // 1. Initialize headless wallet
-    await FawkesClient.createWallet({ address: IMPERSONATE_ADDRESS });
+    // To initialize with a specific seed phrase, provide a mnemonic:
+    // await FawkesClient.createWallet({ mnemonic: "word1 word2..." });
+    await FawkesClient.createWallet();
 
     // 2. Navigate to delegates page
     await page.goto("/delegates");
@@ -19,23 +24,28 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     await page.reload();
 
     // 3. Open WalletConnect modal
-    const connectButton = page.getByRole("button", { name: /Connect Wallet/i }).first();
+    const connectButton = page.getByTestId("connect-wallet-button").first();
     await expect(connectButton).toBeVisible();
     await connectButton.click();
 
-    const wcOption = page.locator("button").filter({ hasText: "WalletConnect" });
-    await expect(wcOption).toBeVisible();
-    await wcOption.click();
-
-    await page.waitForTimeout(2000); 
+    await page.waitForTimeout(2000);
+    // In ConnectKit, WalletConnect is usually accessed via "Other Wallets"
+    const otherWallets = page.getByText("Other Wallets", { exact: false });
+    if (await otherWallets.isVisible()) {
+      await otherWallets.click();
+    }
 
     // 4. Extract WC URI from clipboard
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    
-    const copyLinkButton = page.getByRole("button", { name: /Copy Link/i });
+
+    // In ConnectKit, the button says "Copy to Clipboard" (or similar icon)
+    const copyLinkButton = page.getByText("Copy to Clipboard");
     await expect(copyLinkButton).toBeVisible();
     await copyLinkButton.click();
-    
+
+    // ConnectKit sets copied state
+    await page.waitForTimeout(500);
+
     const wcUri = await page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
@@ -48,8 +58,11 @@ test.describe("Fawkes Wallet Headless Connection", () => {
 
     await FawkesClient.approveSession();
 
-    // 6. Verify successful connection
-    await expect(connectButton).not.toBeVisible({ timeout: 10000 });
+    // 6. Verify successful connection by waiting for the profile dropdown button
+    const profileDropdown = page.getByTestId("profile-dropdown-button");
+    await expect(profileDropdown).toBeVisible({ timeout: 15000 });
+
+    // 7. Pause the execution here so you can record your video or inspect the DOM
+    await page.pause();
   });
 });
-
