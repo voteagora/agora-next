@@ -102,22 +102,13 @@ export default defineConfig({
         baseURL: "https://gov.scroll.io",
       },
       testMatch: /tests\/tenants\/scroll-live\.spec\.ts/,
-    }
-  ],
-  webServer: [
-    {
-      command:
-        "ENABLE_E2E_MOCKS=true DAONODE_URL_TEMPLATE=https://dao-node-{TENANT_NAMESPACE}-test-dev.up.railway.app/ UPSTASH_REDIS_REST_URL=http://localhost:9999/upstash UPSTASH_REDIS_REST_TOKEN=dummy NEXT_PUBLIC_FORK_NODE_URL=http://localhost:9999/rpc PORT=3000 npm run dev",
-      url: "http://127.0.0.1:3000",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-    {
-      command:
-        "DAONODE_URL_TEMPLATE=https://dao-node-{TENANT_NAMESPACE}-test-dev.up.railway.app/ UPSTASH_REDIS_REST_URL=http://localhost:9999/upstash UPSTASH_REDIS_REST_TOKEN=dummy PORT=3001 npm run dev",
-      url: "http://127.0.0.1:3001",
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
     },
   ],
+  webServer: {
+    command:
+      "UPSTASH_REDIS_REST_URL=http://127.0.0.1:3000/api/mock-daonode/upstash UPSTASH_REDIS_REST_TOKEN=dummy DAONODE_URL_TEMPLATE=http://127.0.0.1:3000/api/mock-daonode/ PORT=3000 npm run dev",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: false,
+    timeout: 120 * 1000,
+  },
 });

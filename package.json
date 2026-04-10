@@ -23,8 +23,7 @@
     "test:e2e:live:optimism": "playwright test --project=optimism-live",
     "test:e2e:live:ens": "playwright test --project=ens-live",
     "test:e2e:live:cyber": "playwright test --project=cyber-live",
-    "test:e2e:live:scroll": "playwright test --project=scroll-live",
-    "test:e2e:live-local": "playwright test --project=live-api"
+    "test:e2e:live:scroll": "playwright test --project=scroll-live"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",
