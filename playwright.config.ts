@@ -1,4 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import { loadEnvConfig } from "@next/env";
+loadEnvConfig(process.cwd());
+
+if (!process.env.WALLET_CONNECT_PROJECT_ID && process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
+  process.env.WALLET_CONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+}
+
+if (!process.env.JSON_RPC_URL && process.env.NEXT_PUBLIC_ALCHEMY_ID) {
+  process.env.JSON_RPC_URL = `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+}
 
 export default defineConfig({
   testDir: "./tests",
