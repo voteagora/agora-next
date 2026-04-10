@@ -44,7 +44,7 @@ export async function delegateBySignatureApi({
     transport,
   });
 
-  await appendServerTraceEvent({
+  appendServerTraceEvent({
     traceContext: withMiradorTraceStep(
       traceContext,
       "relay_delegate_write_start",
@@ -63,7 +63,7 @@ export async function delegateBySignatureApi({
     const txHash = await walletClient.writeContract(request);
     const miradorChain = getMiradorChainNameFromChainId(governor.chain.id);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_delegate_write_success",
@@ -90,7 +90,7 @@ export async function delegateBySignatureApi({
 
     return txHash;
   } catch (error) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_delegate_write_failed",

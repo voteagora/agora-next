@@ -41,7 +41,7 @@ export async function voteBySignatureApi({
     transport,
   });
 
-  await appendServerTraceEvent({
+  appendServerTraceEvent({
     traceContext: withMiradorTraceStep(
       traceContext,
       "relay_vote_write_start",
@@ -59,7 +59,7 @@ export async function voteBySignatureApi({
     const txHash = await walletClient.writeContract(request);
     const miradorChain = getMiradorChainNameFromChainId(governor.chain.id);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_vote_write_success",
@@ -85,7 +85,7 @@ export async function voteBySignatureApi({
 
     return txHash;
   } catch (error) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_vote_write_failed",

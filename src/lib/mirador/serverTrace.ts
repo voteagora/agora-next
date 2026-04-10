@@ -159,38 +159,39 @@ export async function appendServerTraceEvent({
   safeMessageHints,
   safeTxHints,
   txInputData,
-}: AppendServerTraceEventArgs): Promise<void> {
-  if (traceContext?.flow && !isMiradorFlowTracingEnabled(traceContext.flow)) {
-    return;
-  }
-
+}: AppendServerTraceEventArgs): void {
   const traceId = traceContext?.traceId;
-  if (!traceId) {
-    if (process.env.NODE_ENV !== "production" && !hasWarnedMissingTraceId) {
-      hasWarnedMissingTraceId = true;
-      console.warn(
-        "Mirador server trace event skipped because traceId is missing.",
-        {
-          eventName,
-          flow: traceContext?.flow,
-          step: traceContext?.step,
-        }
-      );
-    }
-    return;
-  }
-
-  const client = getMiradorServerClient();
-  if (!client) {
-    return;
-  }
-
-  const attributePayload = normalizeMiradorAttributePayload({
-    ...buildContextAttributes(traceContext),
-    ...attributes,
-  });
 
   try {
+    if (traceContext?.flow && !isMiradorFlowTracingEnabled(traceContext.flow)) {
+      return;
+    }
+
+    if (!traceId) {
+      if (process.env.NODE_ENV !== "production" && !hasWarnedMissingTraceId) {
+        hasWarnedMissingTraceId = true;
+        console.warn(
+          "Mirador server trace event skipped because traceId is missing.",
+          {
+            eventName,
+            flow: traceContext?.flow,
+            step: traceContext?.step,
+          }
+        );
+      }
+      return;
+    }
+
+    const client = getMiradorServerClient();
+    if (!client) {
+      return;
+    }
+
+    const attributePayload = normalizeMiradorAttributePayload({
+      ...buildContextAttributes(traceContext),
+      ...attributes,
+    });
+
     const trace = client.trace({
       name: traceContext?.flow ?? MIRADOR_SERVER_DEFAULT_TRACE_NAME,
       traceId,
@@ -233,6 +234,7 @@ export async function appendServerTraceEvent({
       web3Trace.web3.safe.addTxHint(hint.safeTxHash, hint.chain, hint.details);
     }
 
+    // Mirador's server SDK enqueues the flush and returns immediately.
     trace.flush();
   } catch (error) {
     console.error("Failed to append Mirador server trace event", {

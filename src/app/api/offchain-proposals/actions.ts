@@ -109,7 +109,7 @@ export async function createOffchainProposal({
       },
     });
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,
@@ -131,7 +131,7 @@ export async function createOffchainProposal({
     };
   } catch (error: any) {
     console.error("Error creating off-chain proposal:", error);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,
@@ -180,7 +180,7 @@ export async function cancelOffchainProposal({
       },
     });
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,
@@ -202,7 +202,7 @@ export async function cancelOffchainProposal({
     };
   } catch (error: any) {
     console.error("Error cancelling off-chain proposal:", error);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,

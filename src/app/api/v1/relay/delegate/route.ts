@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_delegate_auth",
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       expiry: z.number(),
     });
     const parsedBody = delegateRequestSchema.parse(body);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_delegate_request_validated",
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(delegateTxHash);
   } catch (e: any) {
     console.error("Error in delegate route", e);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_delegate_request_failed",

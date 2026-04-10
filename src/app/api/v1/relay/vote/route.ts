@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_vote_auth",
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     });
 
     const parsedBody = voteRequestSchema.parse(body);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_vote_request_validated",
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
     return NextResponse.json(voteTxHash);
   } catch (e: any) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
         "relay_vote_request_failed",

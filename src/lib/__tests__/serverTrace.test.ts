@@ -25,7 +25,7 @@ describe("serverTrace", () => {
     isMiradorFlowTracingEnabledMock.mockReturnValue(true);
   });
 
-  it("forwards tx, safe message, and safe tx hints through the web3 plugin", async () => {
+  it("forwards tx, safe message, and safe tx hints through the web3 plugin", () => {
     const trace = {
       addAttributes: vi.fn(),
       addTags: vi.fn(),
@@ -50,7 +50,7 @@ describe("serverTrace", () => {
 
     getMiradorServerClientMock.mockReturnValue(client);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: {
         traceId: "trace-id",
         flow: "proposal_creation",
@@ -109,7 +109,7 @@ describe("serverTrace", () => {
     expect(trace.flush).toHaveBeenCalledTimes(1);
   });
 
-  it("uses info severity for success events", async () => {
+  it("uses info severity for success events", () => {
     const trace = {
       addAttributes: vi.fn(),
       addTags: vi.fn(),
@@ -128,7 +128,7 @@ describe("serverTrace", () => {
 
     getMiradorServerClientMock.mockReturnValue(client);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: { traceId: "trace-id", flow: "proposal_creation" },
       eventName: "proposal_publish_succeeded",
     });
@@ -141,7 +141,7 @@ describe("serverTrace", () => {
     expect(trace.error).not.toHaveBeenCalled();
   });
 
-  it("uses error severity for failed events", async () => {
+  it("uses error severity for failed events", () => {
     const trace = {
       addAttributes: vi.fn(),
       addTags: vi.fn(),
@@ -160,7 +160,7 @@ describe("serverTrace", () => {
 
     getMiradorServerClientMock.mockReturnValue(client);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: { traceId: "trace-id", flow: "proposal_creation" },
       eventName: "proposal_publish_failed",
       details: { reason: "timeout" },
@@ -173,10 +173,10 @@ describe("serverTrace", () => {
     expect(trace.info).not.toHaveBeenCalled();
   });
 
-  it("skips appending events for disabled flows", async () => {
+  it("skips appending events for disabled flows", () => {
     isMiradorFlowTracingEnabledMock.mockReturnValue(false);
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: { traceId: "trace-id", flow: "governance_vote" },
       eventName: "governance_vote_started",
     });

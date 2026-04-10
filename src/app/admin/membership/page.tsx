@@ -21,7 +21,6 @@ const AdminMembershipPage = () => {
   const [address, setAddress] = useState("");
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
   const traceRef = useRef<FrontendMiradorTrace>(null);
-  const latestAddressRef = useRef(address);
   const activeMemberAddressRef = useRef<string | null>(null);
 
   const { data: memberBalance } = useReadContract({
@@ -43,13 +42,11 @@ const AdminMembershipPage = () => {
   });
 
   useEffect(() => {
-    latestAddressRef.current = address;
-  }, [address]);
-
-  useEffect(() => {
-    if (!traceRef.current || !txHash) {
+    if (!txHash) {
       return;
     }
+
+    const trackedMemberAddress = activeMemberAddressRef.current ?? address;
 
     if (isSuccess) {
       attachMiradorTransactionArtifacts(traceRef.current, {
@@ -61,8 +58,7 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_succeeded",
         eventName: "membership_admin_succeeded",
         details: {
-          memberAddress:
-            activeMemberAddressRef.current ?? latestAddressRef.current,
+          memberAddress: trackedMemberAddress,
           transactionHash: txHash,
         },
       });
@@ -76,8 +72,7 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_failed",
         eventName: "membership_admin_failed",
         details: {
-          memberAddress:
-            activeMemberAddressRef.current ?? latestAddressRef.current,
+          memberAddress: trackedMemberAddress,
           transactionHash: txHash,
           error: error?.message,
         },
@@ -86,6 +81,7 @@ const AdminMembershipPage = () => {
       activeMemberAddressRef.current = null;
     }
   }, [
+    address,
     error?.message,
     isError,
     isSuccess,
@@ -103,8 +99,7 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_unmounted",
         eventName: "membership_admin_unmounted",
         details: {
-          memberAddress:
-            activeMemberAddressRef.current ?? latestAddressRef.current,
+          memberAddress: activeMemberAddressRef.current,
         },
       });
       traceRef.current = null;
@@ -125,8 +120,7 @@ const AdminMembershipPage = () => {
         reason: "membership_admin_restarted",
         eventName: "membership_admin_restarted",
         details: {
-          memberAddress:
-            activeMemberAddressRef.current ?? latestAddressRef.current,
+          memberAddress: activeMemberAddressRef.current ?? address,
         },
       });
     }
