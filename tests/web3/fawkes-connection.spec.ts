@@ -2,7 +2,6 @@ import { test, expect } from "@playwright/test";
 import { FawkesClient } from "./utils/fawkesClient";
 
 test.describe("Fawkes Wallet Headless Connection", () => {
-  const IMPERSONATE_ADDRESS = "0x4033Bd6759cAD2E1691F6E18E1D8c1B15e3beC69";
 
   test("should seamlessly connect via WalletConnect to RainbowKit", async ({
     page,
@@ -66,3 +65,4 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     await page.pause();
   });
 });
+
