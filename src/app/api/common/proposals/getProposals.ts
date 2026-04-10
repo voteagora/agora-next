@@ -208,7 +208,6 @@ async function fetchInitialProposals(
             contracts
           );
         }
-
         return (await findProposalsQueryFromDB({
           namespace,
           skip,
@@ -384,13 +383,13 @@ async function getProposal(proposalId: string) {
       "use-timestamp-for-proposals"
     )?.enabled;
 
-    const getProposalExecution = doInSpan({ name: "getProposal" }, async () => {
-      return findProposal({
+    const getProposalExecution = doInSpan({ name: "getProposal" }, async () =>
+      findProposal({
         namespace,
         proposalId,
         contract: contracts.governor.address,
-      });
-    });
+      })
+    );
 
     const getOffchainProposal = doInSpan(
       { name: "getOffchainProposal" },

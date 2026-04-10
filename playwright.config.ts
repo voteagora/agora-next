@@ -24,8 +24,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command:
-        "UPSTASH_REDIS_REST_URL=http://127.0.0.1:3000/api/mock-daonode/upstash UPSTASH_REDIS_REST_TOKEN=dummy DAONODE_URL_TEMPLATE=http://127.0.0.1:3000/api/mock-daonode/ PORT=3000 npm run dev",
+      command: "PORT=3000 npm run dev",
       url: "http://127.0.0.1:3000",
       reuseExistingServer: true,
       timeout: 120 * 1000,
