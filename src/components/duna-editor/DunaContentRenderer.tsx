@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState, useLayoutEffect } from "react";
 import { cn } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
@@ -31,6 +30,16 @@ interface DunaContentRendererProps {
   className?: string;
   enableEmbeds?: boolean;
 }
+
+/** Typography plugin sets --tw-prose-body (grey) on children; these utilities bind copy to tenant --primary. */
+const PROSE_PRIMARY_BODY =
+  "text-primary prose-p:text-primary prose-blockquote:text-primary prose-code:text-primary prose-pre:text-primary prose-headings:text-primary prose-strong:text-primary prose-b:text-primary prose-em:text-primary prose-i:text-primary prose-del:text-primary prose-ins:text-primary prose-mark:text-primary prose-s:text-primary prose-li:text-primary prose-ul:text-primary prose-ol:text-primary prose-td:text-primary prose-th:text-primary";
+
+const PROSE_LINKS =
+  "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-a:font-medium";
+
+const PROSE_MEDIA =
+  "prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:my-2";
 
 function isInternalEmbeddableLink(href: string): boolean {
   if (typeof window === "undefined") {
@@ -178,7 +187,14 @@ export default function DunaContentRenderer({
   const renderedContent = useMemo(() => {
     if (isMarkdown) {
       return (
-        <div className="p-4 prose prose-sm max-w-none">
+        <div
+          className={cn(
+            "p-4 prose prose-sm max-w-none",
+            PROSE_PRIMARY_BODY,
+            PROSE_LINKS,
+            PROSE_MEDIA
+          )}
+        >
           <Markdown content={decodedContent} originalHierarchy />
         </div>
       );
@@ -189,21 +205,16 @@ export default function DunaContentRenderer({
     return parseContentWithEmbeds(decodedContent);
   }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
 
-  // Only use white text for dark themes (e.g. Towns). Light themes (Shape, Syndicate)
-  // need dark text for visibility on light backgrounds.
-  const useDarkThemeProse = ui.theme === "dark";
-
   if (!content) return null;
 
   return (
     <div
       data-testid="duna-content"
       className={cn(
-        "text-sm text-primary prose prose-sm max-w-none",
-        useDarkThemeProse
-          ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white prose-img:rounded-lg"
-          : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-img:rounded-lg",
-        "prose-a:font-medium prose-img:max-w-full prose-img:h-auto prose-img:my-2",
+        "text-sm prose prose-sm max-w-none",
+        PROSE_PRIMARY_BODY,
+        PROSE_LINKS,
+        PROSE_MEDIA,
         className
       )}
       style={{
