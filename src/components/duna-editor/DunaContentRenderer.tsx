@@ -199,7 +199,7 @@ export default function DunaContentRenderer({
     <div
       data-testid="duna-content"
       className={cn(
-        "text-sm prose prose-sm max-w-none",
+        "text-sm text-primary prose prose-sm max-w-none",
         useDarkThemeProse
           ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white prose-img:rounded-lg"
           : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-img:rounded-lg",
@@ -207,8 +207,6 @@ export default function DunaContentRenderer({
         className
       )}
       style={{
-        // Force some basic styling to ensure content is visible
-        color: useDarkThemeProse ? "white" : "inherit",
         fontSize: "inherit",
         lineHeight: "inherit",
       }}

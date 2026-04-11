@@ -444,7 +444,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                 <div className="mt-2 mb-4 break-words">
                   <DunaContentRenderer
                     content={topicBody}
-                    className="text-secondary text-sm leading-relaxed break-words"
+                    className="text-sm leading-relaxed break-words"
                   />
                 </div>
 
