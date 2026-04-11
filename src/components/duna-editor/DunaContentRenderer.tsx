@@ -1,9 +1,14 @@
 "use client";
 
 import React, { useMemo, useState, useLayoutEffect } from "react";
-import { cn } from "@/lib/utils";
+import {
+  PROSE_LINKS,
+  PROSE_MEDIA,
+  PROSE_PRIMARY_BODY,
+} from "@/components/duna-editor/proseThemeClasses";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { cn } from "@/lib/utils";
 
 // Function to decode HTML entities
 function decodeHtmlEntities(text: string): string {
@@ -30,16 +35,6 @@ interface DunaContentRendererProps {
   className?: string;
   enableEmbeds?: boolean;
 }
-
-/** Typography plugin sets --tw-prose-body (grey) on children; these utilities bind copy to tenant --primary. */
-const PROSE_PRIMARY_BODY =
-  "text-primary prose-p:text-primary prose-blockquote:text-primary prose-code:text-primary prose-pre:text-primary prose-headings:text-primary prose-strong:text-primary prose-b:text-primary prose-em:text-primary prose-i:text-primary prose-del:text-primary prose-ins:text-primary prose-mark:text-primary prose-s:text-primary prose-li:text-primary prose-ul:text-primary prose-ol:text-primary prose-td:text-primary prose-th:text-primary";
-
-const PROSE_LINKS =
-  "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-a:font-medium";
-
-const PROSE_MEDIA =
-  "prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:my-2";
 
 function isInternalEmbeddableLink(href: string): boolean {
   if (typeof window === "undefined") {

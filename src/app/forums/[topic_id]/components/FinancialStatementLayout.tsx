@@ -5,9 +5,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  PROSE_LINKS,
+  PROSE_MEDIA,
+  PROSE_PRIMARY_BODY,
+} from "@/components/duna-editor/proseThemeClasses";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -30,10 +36,20 @@ export default function FinancialStatementLayout({
   isOnArticlePage = false,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const tenant = Tenant.current();
+
+  const primaryRgb = tenant.ui?.customization?.primary ?? "23 23 23";
+  const secondaryRgb = tenant.ui?.customization?.secondary ?? "64 64 64";
+
+  const rgbCss = (triplet: string) =>
+    `rgb(${triplet.trim().split(/\s+/).join(", ")})`;
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
+
+    const bodyColor = rgbCss(primaryRgb);
+    const linkColor = rgbCss(secondaryRgb);
 
     const resizeIframe = () => {
       try {
@@ -61,6 +77,15 @@ export default function FinancialStatementLayout({
               padding: 0;
               overflow-x: hidden !important;
               overflow-y: visible !important;
+              color: ${bodyColor} !important;
+            }
+            p, li, td, th, label,
+            h1, h2, h3, h4, h5, h6,
+            div, span {
+              color: ${bodyColor} !important;
+            }
+            a {
+              color: ${linkColor} !important;
             }
             img, svg, canvas {
               max-width: 100% !important;
@@ -167,7 +192,7 @@ export default function FinancialStatementLayout({
       window.removeEventListener("resize", handleResize);
       clearTimeout((handleResize as any).timeout);
     };
-  }, [content]);
+  }, [content, primaryRgb, secondaryRgb]);
 
   const handleScrollToComments = () => {
     const commentsSection = document.getElementById("forum-thread-section");
@@ -176,7 +201,6 @@ export default function FinancialStatementLayout({
     }
   };
 
-  const tenant = Tenant.current();
   const { namespace } = tenant;
   const mode = tenant.ui.theme;
   const hideDiscussButton =
@@ -248,7 +272,14 @@ export default function FinancialStatementLayout({
               style={{ display: "block" }}
             />
           ) : (
-            <div className="p-4 prose prose-sm max-w-none">
+            <div
+              className={cn(
+                "p-4 prose prose-sm max-w-none text-primary",
+                PROSE_PRIMARY_BODY,
+                PROSE_LINKS,
+                PROSE_MEDIA
+              )}
+            >
               <Markdown content={content} originalHierarchy />
             </div>
           )}
