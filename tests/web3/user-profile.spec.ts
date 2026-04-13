@@ -1,39 +1,32 @@
 import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
-import { MockWallet } from "./utils/mockWallet";
+import { FawkesClient } from "./utils/fawkesClient";
 
-test.describe("User Profile Scenarios", () => {
-  let mockWallet: MockWallet;
-
+test.describe.serial("User Profile Scenarios", () => {
   test.beforeEach(async ({ page }) => {
-    // Generate a fresh random wallet for each test to avoid state bleeding
-    // Use Hardhat Account 0 to be deterministic for Mock DAO node
-    mockWallet = new MockWallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
-    // Inject the mock into the page
-    await mockWallet.inject(page, 10); // 10 is Optimism ID
-
     // Suppress encouragement dialog
     await page.addInitScript(() => {
       sessionStorage.setItem("agora-delegation-dialog-shown", "true");
     });
   });
 
-  const authenticateWallet = async (page: any) => {
-    // Intercept SIWE endpoints so they don't hit the real Next.js API (which requires Redis)
+  const authenticateWallet = async (page: any, context: any) => {
+    // Intercept SIWE endpoints to decouple from local DAONode DNS failures
     await page.route("**/api/v1/auth/nonce", async (route: any) => {
-      await route.fulfill({ status: 200, json: { nonce: "mocknonce1234567890" } });
+      await route.fulfill({
+        status: 200,
+        json: { nonce: "mocknonce1234567890" },
+      });
     });
 
     const mockJwtPayload = {
       siwe: {
-        address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-        chainId: "10"
+        address: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478c",
+        chainId: "10",
       },
-      exp: Math.floor(Date.now() / 1000) + 3600
+      exp: Math.floor(Date.now() / 1000) + 3600,
     };
-    
-    // Create a dummy valid JWT (header.payload.signature)
     const validMockJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(JSON.stringify(mockJwtPayload)).toString("base64")}.mocksignature`;
 
     await page.route("**/api/v1/auth/verify", async (route: any) => {
@@ -42,8 +35,8 @@ test.describe("User Profile Scenarios", () => {
         json: {
           access_token: validMockJwt,
           expires_in: 3600,
-          token_type: "Bearer"
-        }
+          token_type: "Bearer",
+        },
       });
     });
 
@@ -53,74 +46,72 @@ test.describe("User Profile Scenarios", () => {
         json: {
           access_token: validMockJwt,
           expires_in: 3600,
-          token_type: "Bearer"
-        }
+          token_type: "Bearer",
+        },
       });
+    });
+
+    await FawkesClient.createWallet({
+      mnemonic: "test test test test test test test test test test test junk",
     });
 
     await page.goto("/delegates");
     await page.waitForLoadState("domcontentloaded");
-    
-    // Wait for either wagmi to resolve disconnected (connect button) or connected (profile dropdown)
-    const walletStateLocator = page.locator('[data-testid="connect-wallet-button"], [data-testid="profile-dropdown-button"]');
-    await walletStateLocator.first().waitFor({ state: "visible", timeout: 45000 });
 
-    const profileDropdown = page.getByTestId("profile-dropdown-button");
-    const isAlreadyConnected = await profileDropdown.isVisible();
+    const connectButton = page.getByTestId("connect-wallet-button").first();
+    const isConnVisible = await connectButton
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
 
-    if (!isAlreadyConnected) {
-      const connectButton = page.getByTestId("connect-wallet-button");
+    if (isConnVisible) {
       await connectButton.click();
-      
-      // Wait for the ConnectKit modal to appear
       await page.waitForTimeout(1000);
-      const buttons = await page.locator("button").allTextContents();
-      
-      const targetButtonText = buttons.find((text: string) => /MetaMask|Browser Wallet|Injected/i.test(text));
-      if (targetButtonText) {
-        await page.locator("button").filter({ hasText: targetButtonText }).first().click();
-      } else {
-        await page.locator('.ck-wallet-option').first().click().catch(() => {});
-      }
+
+      const otherWallets = page.getByText("Other Wallets", { exact: false });
+      if (await otherWallets.isVisible()) await otherWallets.click();
+
+      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+      const copyLinkButton = page.getByText("Copy to Clipboard");
+      await copyLinkButton.click();
+      await page.waitForTimeout(500);
+
+      const wcUri = await page.evaluate(
+        async () => await navigator.clipboard.readText()
+      );
+      await FawkesClient.connect(wcUri);
+      await page.waitForTimeout(1000);
+      await FawkesClient.approveSession();
     }
 
-    // Wait and verify we are connected
-    await expect(profileDropdown).toBeVisible({ timeout: 10000 });
+    const profileDropdown = page.getByTestId("profile-dropdown-button");
+    await expect(profileDropdown).toBeVisible({ timeout: 15000 });
 
-    // Open the dropdown to see if we need to Sign In with Ethereum
     await profileDropdown.click();
     await page.waitForTimeout(1000);
 
     const signInButton = page.getByText(/Sign in with Ethereum/i).first();
-    const isSignInVisible = await signInButton.isVisible({ timeout: 2000 }).catch(() => false);
-    console.log("SIWE button visible: ", isSignInVisible);
-    if (isSignInVisible) {
+    if (await signInButton.isVisible({ timeout: 2000 }).catch(() => false)) {
       await signInButton.click();
-      
-      // Wait for ConnectKit specific SIWE modal to see if we need to click "Sign In" inside it
+      await expect(async () => {
+        const status = await FawkesClient.getStatus();
+        expect(Object.keys(status.pendingRequests).length).toBeGreaterThan(0);
+      }).toPass({ timeout: 10000 });
+      await FawkesClient.approveRequest();
       await page.waitForTimeout(1000);
-      await page.screenshot({ path: "auth-status-ck-modal.png" });
-      const ckSignInModalButton = page.getByRole("button", { name: /Sign In|Verify/i }).filter({ hasText: /^(Sign In|Verify)$/i }).first();
-      if (await ckSignInModalButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await ckSignInModalButton.click();
-        await page.waitForTimeout(2000);
-      }
     } else {
-      // It was already signed in (or SIWE not needed), so close the dropdown
-      // so we don't pollute the test state!
       await profileDropdown.click();
-      await page.waitForTimeout(500);
     }
-    
-    await page.screenshot({ path: "auth-status-final.png" });
   };
 
-  test("USER-PRO-001: View my profile' link on logged in menu", async ({ page }) => {
-    await authenticateWallet(page);
+  test("USER-PRO-001: View my profile' link on logged in menu", async ({
+    page,
+    context,
+  }) => {
+    await authenticateWallet(page, context);
 
     const userMenuButton = page.getByTestId("profile-dropdown-button");
     await expect(userMenuButton).toBeVisible({ timeout: 15000 });
-    
+
     const isExpanded = await userMenuButton.getAttribute("aria-expanded");
     if (isExpanded !== "true") {
       await userMenuButton.click();
@@ -131,24 +122,32 @@ test.describe("User Profile Scenarios", () => {
     await expect(profileLink).toBeVisible({ timeout: 10000 });
   });
 
-  test("USER-PRO-002: Edit delegate statement' link on logged in menu", async ({ page }) => {
-    await authenticateWallet(page);
+  test("USER-PRO-002: Edit delegate statement' link on logged in menu", async ({
+    page,
+    context,
+  }) => {
+    await authenticateWallet(page, context);
 
     const userMenuButton = page.getByTestId("profile-dropdown-button");
     await expect(userMenuButton).toBeVisible({ timeout: 15000 });
-    
+
     const isExpanded = await userMenuButton.getAttribute("aria-expanded");
     if (isExpanded !== "true") {
       await userMenuButton.click();
       await page.waitForTimeout(1000);
     }
 
-    const editStatementLink = page.getByRole("link", { name: "Edit delegate statement" });
+    const editStatementLink = page.getByRole("link", {
+      name: "Edit delegate statement",
+    });
     await expect(editStatementLink).toBeVisible({ timeout: 10000 });
   });
 
-  test("USER-PRO-003: delegates/create page contains a delegate statement editable text box", async ({ page }) => {
-    await authenticateWallet(page);
+  test("USER-PRO-003: delegates/create page contains a delegate statement editable text box", async ({
+    page,
+    context,
+  }) => {
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
@@ -156,12 +155,15 @@ test.describe("User Profile Scenarios", () => {
     await expect(statementBox).toBeVisible({ timeout: 15000 });
   });
 
-  test("USER-PRO-004: delegates/create page contains a View Template link", async ({ page }) => {
+  test("USER-PRO-004: delegates/create page contains a View Template link", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.toggle("delegate-statement-template")?.enabled)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
@@ -169,8 +171,11 @@ test.describe("User Profile Scenarios", () => {
     await expect(templateLinks.first()).toBeVisible();
   });
 
-  test("USER-PRO-005: delegates/create page allows user to save social links", async ({ page }) => {
-    await authenticateWallet(page);
+  test("USER-PRO-005: delegates/create page allows user to save social links", async ({
+    page,
+    context,
+  }) => {
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
@@ -180,67 +185,93 @@ test.describe("User Profile Scenarios", () => {
     await expect(discordInput).toBeVisible({ timeout: 15000 });
   });
 
-  test("USER-PRO-006: delegates/create page code of conduct checkbox", async ({ page }) => {
+  test("USER-PRO-006: delegates/create page code of conduct checkbox", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.toggle("delegates/code-of-conduct")?.enabled)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
-    const conductLabel = page.getByText(/agree with the/i).filter({ hasText: /code of conduct/i });
+    const conductLabel = page
+      .getByText(/agree with the/i)
+      .filter({ hasText: /code of conduct/i });
     await expect(conductLabel.first()).toBeVisible({ timeout: 15000 });
   });
 
-  test("USER-PRO-007: delegates/create page DAO principles checkbox", async ({ page }) => {
+  test("USER-PRO-007: delegates/create page DAO principles checkbox", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.toggle("delegates/dao-principles")?.enabled)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
-    const principlesLabel = page.getByText(/agree with the/i).filter({ hasText: /principles/i });
+    const principlesLabel = page
+      .getByText(/agree with the/i)
+      .filter({ hasText: /principles/i });
     await expect(principlesLabel.first()).toBeVisible({ timeout: 15000 });
   });
 
-  test("USER-PRO-008: delegates/create page email subscription checkbox", async ({ page }) => {
+  test("USER-PRO-008: delegates/create page email subscription checkbox", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.toggle("email-subscriptions")?.enabled)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
-    const emailPref = page.locator("button[role='checkbox']").filter({ hasText: /Notify me/i }).or(page.locator("input[name='email']"));
+    const emailPref = page
+      .locator("button[role='checkbox']")
+      .filter({ hasText: /Notify me/i })
+      .or(page.locator("input[name='email']"));
     await expect(emailPref.first()).toBeVisible();
   });
-  test("USER-PRO-009: delegates/create page allows user to configure governance issues", async ({ page }) => {
+  test("USER-PRO-009: delegates/create page allows user to configure governance issues", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.governanceIssues || ui.governanceIssues.length === 0)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
-    const issuesHeader = page.getByRole("heading", { name: "Views on top issues" });
+    const issuesHeader = page.getByRole("heading", {
+      name: "Views on top issues",
+    });
     await expect(issuesHeader).toBeVisible({ timeout: 15000 });
   });
 
-  test("USER-PRO-010: delegates/create page allows user to configure a represented stakeholder", async ({ page }) => {
+  test("USER-PRO-010: delegates/create page allows user to configure a represented stakeholder", async ({
+    page,
+    context,
+  }) => {
     const { ui } = Tenant.current();
     if (!ui.governanceStakeholders || ui.governanceStakeholders.length === 0)
       test.skip(true, "Tenant disabled this feature");
 
-    await authenticateWallet(page);
+    await authenticateWallet(page, context);
     await page.goto("/delegates/create");
     await page.waitForLoadState("domcontentloaded");
 
-    const stakeholderHeader = page.getByRole("heading", { name: "Top stakeholders" });
+    const stakeholderHeader = page.getByRole("heading", {
+      name: "Top stakeholders",
+    });
     await expect(stakeholderHeader).toBeVisible({ timeout: 15000 });
   });
 });
