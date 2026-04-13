@@ -1,3 +1,4 @@
+import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 
