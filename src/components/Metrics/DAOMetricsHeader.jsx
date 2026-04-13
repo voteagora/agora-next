@@ -113,6 +113,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className="min-w-[24px]"
+                      data-testid="footer-discord-link"
                     >
                       <Image src={discord} alt={discordLink.title} />
                     </a>
@@ -123,6 +124,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className="text-center"
+                      data-testid="footer-governance-forum-link"
                     >
                       {governanceForumLink.title}
                     </a>
@@ -133,6 +135,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className="text-center"
+                      data-testid="footer-bugs-link"
                     >
                       {bugsLink.title}
                     </a>
@@ -141,6 +144,7 @@ export default function DAOMetricsHeader() {
                     <Link
                       href={changeLogLink.url}
                       className={`text-center ${needToHideLinksOnSmallScreens ? "hidden lg:inline" : ""}`}
+                      data-testid="footer-changelog-link"
                     >
                       {changeLogLink.title}
                     </Link>
@@ -151,6 +155,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className={`text-center ${needToHideLinksOnSmallScreens ? "hidden lg:inline" : ""}`}
+                      data-testid="footer-faq-link"
                     >
                       {faqLink.title}
                     </a>
@@ -170,6 +175,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className="flex items-center"
+                      data-testid="footer-twitter-link"
                     >
                       <Image
                         src={XIcon}
@@ -187,6 +193,7 @@ export default function DAOMetricsHeader() {
                       rel="noreferrer nonopener"
                       target="_blank"
                       className="flex items-center"
+                      data-testid="footer-farcaster-link"
                     >
                       <Image
                         src={FarcasterIcon}
@@ -204,7 +211,10 @@ export default function DAOMetricsHeader() {
                 <div className="flex px-6 gap-6 border-l border-line text-tertiary">
                   <HoverCard openDelay={100} closeDelay={100}>
                     <HoverCardTrigger className="flex">
-                      <span className="cursor-default content-center">
+                      <span
+                        className="cursor-default content-center"
+                        data-testid="footer-total-supply"
+                      >
                         {isLoading ? "-" : formattedMetrics.totalSupply}{" "}
                         {token.symbol} total supply
                       </span>
@@ -221,7 +231,10 @@ export default function DAOMetricsHeader() {
                     contracts.token.isERC20() | contracts.token.isERC721() && (
                       <HoverCard openDelay={100} closeDelay={100}>
                         <HoverCardTrigger className="flex">
-                          <span className="cursor-default content-center">
+                          <span
+                            className="cursor-default content-center"
+                            data-testid="footer-votable-supply"
+                          >
                             {isLoading ? "-" : formattedMetrics.votableSupply}{" "}
                             {token.symbol} votable supply
                           </span>
