@@ -2,7 +2,7 @@ import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 
-test.describe("Proposal Creation & List - Missing Scenarios", () => {
+test.describe("Proposal Creation & List", () => {
   test.beforeEach(async ({ page }) => {
     // Suppress encouragement dialog
     await page.addInitScript(() => {

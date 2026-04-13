@@ -2,7 +2,7 @@ import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 
-test.describe("Delegates List Page - Missing Scenarios", () => {
+test.describe("Delegates List Page", () => {
   test.beforeEach(async ({ page }) => {
     // Suppress encouragement dialog and set grid view off
     await page.addInitScript(() => {
