@@ -8,6 +8,7 @@ import {
 } from "@/components/duna-editor/proseThemeClasses";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 
 // Function to decode HTML entities
