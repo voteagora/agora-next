@@ -36,7 +36,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   for (const route of routesToDiff) {
     // Generate isolated tests
     test(`Diff pass/fail -> expected/diff for route "${route}"`, async () => {
-      test.setTimeout(60000); // 1-minute timeout for cross-origin loading/rendering
+      test.setTimeout(300000); // 5-minute timeout to guarantee absolute exhaustion of Infinite Loaders for ALL proposals
       await engine.diffRoute(route, pageA, pageB);
     });
   }

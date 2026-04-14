@@ -235,14 +235,25 @@ export class ABRunnerEngine {
         }
         index++;
       }
+    }
 
-      // 5. Capture screenshots using the natively expanded viewport (no fullPage flag needed)
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_Prod_FullPage_Highlights.png`),
-      });
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_Branch_FullPage_Highlights.png`),
-      });
+    // 5. Capture screenshots unconditionally so they're always visibly accessible
+    await pageA.screenshot({
+      path: path.join(artifactsDir, `00_Prod_FullPage_Highlights.png`),
+    });
+    await pageB.screenshot({
+      path: path.join(artifactsDir, `00_Branch_FullPage_Highlights.png`),
+    });
+
+    if (drifts.length > 0) {
+      fs.writeFileSync(
+        path.join(artifactsDir, `treeA.json`),
+        JSON.stringify(treeA, null, 2)
+      );
+      fs.writeFileSync(
+        path.join(artifactsDir, `treeB.json`),
+        JSON.stringify(treeB, null, 2)
+      );
 
       fs.writeFileSync(
         path.join(artifactsDir, `report.json`),
@@ -251,6 +262,10 @@ export class ABRunnerEngine {
 
       console.log(
         `❌ Diff artifacts saved to: ${artifactsDir} for route ${route}`
+      );
+    } else {
+      console.log(
+        `✅ 0 Drifts. Baseline full-page screenshots saved to: ${artifactsDir} for route ${route}`
       );
     }
 
@@ -361,6 +376,7 @@ export class ABRunnerEngine {
           }
           let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
           let testid = curr.getAttribute("data-testid");
+          let href = curr.getAttribute("href");
 
           if (testid) {
             selector =
@@ -370,13 +386,19 @@ export class ABRunnerEngine {
             break; // Stop climbing! Anchor the path to the data-testid so it survives high-level layout container mutations
           }
 
+          if (href && href.length > 2) {
+            selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
+            path.unshift(selector);
+            break; // Strong anchor for dynamic cards lacking test-ids (like Proposal cards)
+          }
+
           path.unshift(selector);
           curr = curr.parentElement;
         }
 
         const finalPath = path.join(" > ");
-        // Ensure playright can query it from root if it didn't anchor with testid
-        if (finalPath.includes("data-testid")) {
+        // Ensure playright can query it from root if it didn't anchor with testid or href
+        if (finalPath.includes("data-testid") || finalPath.includes("href=")) {
           return finalPath;
         }
         return "body > " + finalPath;
