@@ -159,17 +159,26 @@ export const calculateTieredVeto = (
     return { vetoTriggered: false };
   }
 
+  const atlasOutcome: EasAtlasVoteOutcome | undefined =
+    "APP" in offchainData || "USER" in offchainData || "CHAIN" in offchainData
+      ? offchainData
+      : undefined;
+
   // Calculate veto percentages for each group
-  const getVetoPercentage = (groupKey: string, eligible: number): number => {
-    const groupData = offchainData![groupKey as keyof typeof offchainData];
+  const getVetoPercentage = (
+    groupKey: "APP" | "USER" | "CHAIN",
+    eligible: number
+  ): number => {
+    if (!atlasOutcome) return 0;
+    const groupData = atlasOutcome[groupKey];
     if (!groupData || typeof groupData !== "object") return 0;
     const against = Number((groupData as Record<string, unknown>)["0"] ?? 0);
     return eligible > 0 ? (against / eligible) * 100 : 0;
   };
 
-  const appVeto = getVetoPercentage("apps", OFFCHAIN_THRESHOLDS.APP);
-  const userVeto = getVetoPercentage("users", OFFCHAIN_THRESHOLDS.USER);
-  const chainVeto = getVetoPercentage("chains", OFFCHAIN_THRESHOLDS.CHAIN);
+  const appVeto = getVetoPercentage("APP", OFFCHAIN_THRESHOLDS.APP);
+  const userVeto = getVetoPercentage("USER", OFFCHAIN_THRESHOLDS.USER);
+  const chainVeto = getVetoPercentage("CHAIN", OFFCHAIN_THRESHOLDS.CHAIN);
 
   // For OFFCHAIN_OPTIMISTIC_TIERED: average veto across 3 groups
   const proposalType = deriveProposalType(proposal);

@@ -219,10 +219,10 @@ export const deriveStandardStatus = (
     const quorumMet = quorumVotes >= Number(thresholds.quorum);
 
     if (quorumMet && hasMetThreshold) {
-      return "DEFEATED";
+      return "SUCCEEDED";
     }
 
-    return "SUCCEEDED";
+    return "DEFEATED";
   } else if (isEasOodaoSource(proposal)) {
     // eas-oodao: token-holders outcome - use BigInt
     const outcome = proposal.outcome as

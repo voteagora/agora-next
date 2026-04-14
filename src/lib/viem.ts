@@ -13,6 +13,7 @@ import {
   cyber,
   mainnet,
   optimism,
+  optimismSepolia,
   scroll,
   sepolia,
   linea,
@@ -52,6 +53,11 @@ export const getWalletClient = (chainId: number) => {
     case optimism.id:
       return createWalletClient({
         chain: optimism,
+        transport,
+      });
+    case optimismSepolia.id:
+      return createWalletClient({
+        chain: optimismSepolia,
         transport,
       });
     case cyber.id:
@@ -103,6 +109,8 @@ export const getChainById = (chainId: number): Chain | null => {
       return sepolia;
     case optimism.id:
       return optimism;
+    case optimismSepolia.id:
+      return optimismSepolia;
     case cyber.id:
       return cyber;
     case deriveTestnet.id:

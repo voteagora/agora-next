@@ -121,7 +121,7 @@ describe("deriveOptimisticStatus – OPTIMISTIC eas-oodao", () => {
 
 // ---------------------------------------------------------------------------
 // HYBRID_OPTIMISTIC_TIERED
-// calculateTieredVeto uses lowercase "apps"/"users"/"chains" keys in offchainData
+// Archive data uses uppercase citizen buckets (APP/USER/CHAIN)
 // Defaults: HYBRID_OPTIMISTIC_TIERED_THRESHOLD = [55, 45, 35]
 // delegateVeto = (delegateAgainst / totalVotingPower) * 100
 // ---------------------------------------------------------------------------
@@ -145,10 +145,9 @@ describe("deriveOptimisticStatus – HYBRID_OPTIMISTIC_TIERED", () => {
       total_voting_power_at_start: totalVP,
       govless_proposal: {
         outcome: {
-          // calculateTieredVeto looks for lowercase keys "apps", "users", "chains"
-          apps: { "0": appsAgainst },
-          users: { "0": usersAgainst },
-          chains: { "0": chainsAgainst },
+          APP: { "0": appsAgainst },
+          USER: { "0": usersAgainst },
+          CHAIN: { "0": chainsAgainst },
         },
         ...(customTiers ? { tiers: customTiers } : {}),
       },
@@ -221,10 +220,9 @@ describe("deriveOptimisticStatus – OFFCHAIN_OPTIMISTIC", () => {
       proposal_type: "OPTIMISTIC",
       onchain_proposalid: 0, // pure offchain
       outcome: {
-        // calculateTieredVeto uses lowercase "apps"/"users"/"chains"
-        apps: { "0": appsAgainst },
-        users: { "0": usersAgainst },
-        chains: { "0": chainsAgainst },
+        APP: { "0": appsAgainst },
+        USER: { "0": usersAgainst },
+        CHAIN: { "0": chainsAgainst },
       },
     });
   }
@@ -277,9 +275,9 @@ describe("deriveOptimisticStatus – OFFCHAIN_OPTIMISTIC_TIERED", () => {
       proposal_type: "OPTIMISTIC_TIERED",
       onchain_proposalid: 0,
       outcome: {
-        apps: { "0": appsAgainst },
-        users: { "0": usersAgainst },
-        chains: { "0": chainsAgainst },
+        APP: { "0": appsAgainst },
+        USER: { "0": usersAgainst },
+        CHAIN: { "0": chainsAgainst },
       },
       ...(customTiers ? { tiers: customTiers } : {}),
     });

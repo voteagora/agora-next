@@ -183,8 +183,9 @@ export const deriveApprovalStatus = (
         weightedPct +=
           (chainVotes / eligibleVoters.chains) * weights.chains * 100;
 
-        // criteriaValue is in basis points (10000 = 100%)
-        const thresholdPct = Number(criteriaValue) / 10000;
+        // criteriaValue is in basis points (10000 = 100%), while
+        // weightedPct is already expressed as a 0-100 percentage.
+        const thresholdPct = Number(criteriaValue) / 100;
         if (weightedPct >= thresholdPct) {
           return "SUCCEEDED";
         }

@@ -235,6 +235,27 @@ describe("deriveApprovalStatus – HYBRID_APPROVAL", () => {
     expect(deriveApprovalStatus(p, "HYBRID_APPROVAL", 0)).toBe("SUCCEEDED");
   });
 
+  it("DEFEATED – THRESHOLD criteria compares against percentage, not fraction", () => {
+    // uniqueParticipation=30 (meets quorum from delegate participation)
+    // opt0DelegateVotes=200 -> weightedPct=200/2000*0.5*100 = 5%
+    // criteriaValue=3000bps = 30%, so this must fail
+    const p = makeHybridApproval(
+      "1000",
+      "200",
+      "600",
+      0,
+      0,
+      0,
+      0,
+      "3000",
+      "200",
+      0,
+      0,
+      0
+    );
+    expect(deriveApprovalStatus(p, "HYBRID_APPROVAL", 0)).toBe("DEFEATED");
+  });
+
   it("DEFEATED – THRESHOLD criteria, option weighted% below threshold", () => {
     // uniqueParticipation=30 (meets quorum from delegate participation)
     // criteriaValue=8000bps → thresholdPct=8000/10000=0.8

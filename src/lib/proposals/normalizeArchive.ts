@@ -86,6 +86,24 @@ const normalizeOption = (proposal: ArchiveListProposal) => {
   };
 };
 
+const getOffchainProposalId = (
+  proposal: ArchiveListProposal,
+  proposalType: ProposalType
+): string | undefined => {
+  if (proposalType.startsWith("OFFCHAIN")) {
+    return String(proposal.id);
+  }
+
+  if (!proposal.hybrid || !proposal.govless_proposal) {
+    return undefined;
+  }
+
+  const candidateId =
+    proposal.govless_proposal.id ?? proposal.govless_proposal.uid;
+
+  return candidateId ? String(candidateId) : undefined;
+};
+
 // =============================================================================
 // Base Normalization (common to all proposal types)
 // =============================================================================
@@ -783,6 +801,10 @@ export async function archiveToProposal(
   let archiveProposal = proposal as ArchiveListProposal;
   const proposalType = deriveProposalType(archiveProposal);
   const base = await normalizeBase(archiveProposal, options, latestBlock);
+  const offchainProposalId = getOffchainProposalId(
+    archiveProposal,
+    proposalType
+  );
 
   // Add archive metadata
   const rawTag = Array.isArray(archiveProposal.tags)
@@ -855,6 +877,7 @@ export async function archiveToProposal(
 
   return {
     ...normalizedProposal,
+    offchainProposalId,
     archiveMetadata,
   } as Proposal & { archiveMetadata: typeof archiveMetadata };
 }

@@ -181,23 +181,19 @@ describe("deriveStandardStatus – HYBRID_STANDARD", () => {
 });
 
 // ---------------------------------------------------------------------------
-// OFFCHAIN_STANDARD (eas-atlas) – inverted logic
+// OFFCHAIN_STANDARD (eas-atlas)
 // ---------------------------------------------------------------------------
 
 describe("deriveStandardStatus – OFFCHAIN_STANDARD (eas-atlas)", () => {
-  it("returns DEFEATED (inverted logic) when no votes exist", () => {
-    // eas-atlas thresholds are always 0; with 0 forVotes, against=0:
-    // quorumMet=true (quorumVotes≥0), hasMetThreshold=true (threshold=0)
-    // inverted: if (quorumMet && hasMetThreshold) return "DEFEATED"
+  it("returns SUCCEEDED when no thresholds block passage", () => {
     const p = makeAtlasBase({
       proposal_type: "STANDARD",
       outcome: { USER: { "1": 0, "0": 0 }, APP: {}, CHAIN: {} },
     });
-    expect(deriveStandardStatus(p, "OFFCHAIN_STANDARD", 0)).toBe("DEFEATED");
+    expect(deriveStandardStatus(p, "OFFCHAIN_STANDARD", 0)).toBe("SUCCEEDED");
   });
 
-  it("always returns DEFEATED for eas-atlas (zero thresholds from resolveArchiveThresholds)", () => {
-    // With any votes, eas-atlas always returns DEFEATED due to inverted logic + zero thresholds
+  it("returns SUCCEEDED when citizen votes are present", () => {
     const p = makeAtlasBase({
       proposal_type: "STANDARD",
       outcome: {
@@ -206,6 +202,6 @@ describe("deriveStandardStatus – OFFCHAIN_STANDARD (eas-atlas)", () => {
         CHAIN: { "1": 10 },
       },
     });
-    expect(deriveStandardStatus(p, "OFFCHAIN_STANDARD", 0)).toBe("DEFEATED");
+    expect(deriveStandardStatus(p, "OFFCHAIN_STANDARD", 0)).toBe("SUCCEEDED");
   });
 });
