@@ -26,7 +26,6 @@ import {
 } from "@/lib/forumUtils";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
@@ -111,14 +110,6 @@ async function loadTopic(topicIdParam: string): Promise<TopicBundle | null> {
   };
 }
 
-function buildDescription(content: string, title: string): string {
-  const plain = stripHtmlToText(content);
-  if (plain) {
-    return truncateForMeta(plain);
-  }
-  return truncateForMeta(`Discussion: ${title}`);
-}
-
 function extractPostId(postParam: string | undefined): number | null {
   if (!postParam) return null;
   const postId = Number(postParam);
@@ -166,7 +157,6 @@ export async function generateMetadata({
     : null;
 
   let canonicalUrl = `${baseUrl}${canonicalPath}`;
-  let description: string;
   let metaTitle: string;
   let ogImageUrl: string;
   let authorAddress: string;
@@ -175,7 +165,6 @@ export async function generateMetadata({
 
   if (specificPost) {
     canonicalUrl = `${baseUrl}${canonicalPath}?post=${postId}`;
-    description = buildDescription(specificPost.content, transformed.title);
     const suffix = ` | ${brandName} Forum`;
     metaTitle = truncateTitleForMeta(
       `Comment on: ${transformed.title}`,
@@ -192,10 +181,6 @@ export async function generateMetadata({
       truncateAddress(authorAddress) || authorAddress
     )}&isPost=true`;
   } else {
-    description = buildDescription(
-      transformed.content || "",
-      transformed.title
-    );
     const suffix = ` | ${brandName} Forum`;
     metaTitle = truncateTitleForMeta(transformed.title, suffix, 60);
     authorAddress = transformed.author;
@@ -211,7 +196,6 @@ export async function generateMetadata({
 
   return {
     title: metaTitle,
-    description,
     alternates: {
       canonical: canonicalUrl,
     },
@@ -219,7 +203,6 @@ export async function generateMetadata({
       type: "article",
       url: canonicalUrl,
       title: metaTitle,
-      description,
       siteName: `${brandName} Forum`,
       publishedTime: createdAt,
       modifiedTime: updatedAt,
@@ -236,7 +219,6 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
-      description,
       images: [ogImageUrl],
     },
   };
