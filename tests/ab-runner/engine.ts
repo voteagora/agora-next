@@ -36,9 +36,19 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "domcontentloaded" }),
-      pageB.goto(targetB, { waitUntil: "domcontentloaded" }),
+      pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {}),
+      pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
     ]);
+
+    await Promise.all([
+      pageA.waitForSelector("body", { timeout: 15000 }).catch(() => {}),
+      pageB.waitForSelector("body", { timeout: 15000 }).catch(() => {}),
+    ]);
+
+    // Hide sticky toolbars like Vercel Live Preview which shift local footers
+    const globalHide = `vercel-live-feedback, #vercel-live-button, #vercel-live-feedback { display: none !important; opacity: 0 !important; visibility: hidden !important; }`;
+    await pageA.addStyleTag({ content: globalHide }).catch(() => {});
+    await pageB.addStyleTag({ content: globalHide }).catch(() => {});
 
     if (override.ignoreSelectors && override.ignoreSelectors.length > 0) {
       const maskStyles =
@@ -230,7 +240,7 @@ export class ABRunnerEngine {
     // Explicitly grant Next.js/React hydration time to remount top-level banner components that were virtualized/unmounted
     await page.waitForTimeout(2000);
 
-    // Explicitly force Playwright to wait for all banner <img/> components to physically decode and paint
+    // Explicitly force Playwright to wait for all <img/> components to physically decode and paint
     await page.evaluate(async () => {
       const images = Array.from(document.images);
       await Promise.all(
@@ -261,7 +271,7 @@ export class ABRunnerEngine {
 
           return {
             tag: el.tagName.toLowerCase(),
-            text: (el as HTMLElement).innerText?.trim().substring(0, 50),
+            text: (el as HTMLElement).innerText?.trim() || "",
             rect: {
               x: rect.x + window.scrollY,
               y: rect.y + window.scrollY,
