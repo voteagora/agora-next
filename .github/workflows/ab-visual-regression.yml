@@ -1,0 +1,71 @@
+name: A/B Visual Regression Tests
+run-name: ${{ github.actor }} - Visual Regression - ${{ github.repository }}
+
+on:
+  pull_request:
+    branches:
+      - "main"
+      - "feature/*"
+  push:
+    branches:
+      - "main"
+
+jobs:
+  visual-regression:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: postgres://vercel:6uCyigrqdzZQh5bidsFb33hB@34.168.197.190/prod
+      NEXT_PUBLIC_AGORA_ENV: production
+      DAONODE_URL_TEMPLATE: https://optimism.agoradata.xyz
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run A/B Regression Tests
+        run: npm run test:ab
+
+      - name: Generate A/B Diff Markdown
+        id: generate_md
+        if: always()
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "diff_md<<$EOF" >> "$GITHUB_OUTPUT"
+          node scripts/ci-ab-report.js >> "$GITHUB_OUTPUT"
+          echo "$EOF" >> "$GITHUB_OUTPUT"
+          
+          # Print to Actions UI Summary
+          node scripts/ci-ab-report.js >> $GITHUB_STEP_SUMMARY
+
+      - name: Post PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: always() && github.event_name == 'pull_request'
+        with:
+          header: ab-visual-regression
+          message: ${{ steps.generate_md.outputs.diff_md }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: AB-Visual-Diff-Highlights
+          path: test-results/ab-diffs/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-ab
+          path: playwright-report/
+          retention-days: 14
