@@ -114,12 +114,15 @@ export class ABRunnerEngine {
     const isDiff = drifts.length > 0;
 
     if (override.expectDiff ? !isDiff : isDiff) {
-      const safeRoute = route.replace(/\//g, "_") || "_home";
+      const safeRouteName =
+        route === "/"
+          ? "index-page"
+          : route.replace(/^\//, "").replace(/\//g, "-");
       const artifactsDir = path.join(
         process.cwd(),
         "test-results",
         "ab-diffs",
-        safeRoute
+        safeRouteName
       );
       const cropsDir = path.join(artifactsDir, "focused-crops");
 
@@ -184,13 +187,32 @@ export class ABRunnerEngine {
         index++;
       }
 
-      // 5. Capture full page screenshots
+      // 5. Expand viewport manually to match scroll height before screenshot
+      // This forces React to repaint virtualized/lazy-loaded rows that would otherwise appear as blank white spaces in Playwright's native fullPage screenshot.
+      const heightA = await pageA.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      );
+      const heightB = await pageB.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      );
+
+      await pageA.setViewportSize({ width: 1280, height: heightA });
+      await pageB.setViewportSize({ width: 1280, height: heightB });
+
+      // Give React/Tailwind complete time to hydrate the newly massive viewport
+      await pageA.waitForTimeout(3000);
+
+      // Capture screenshots using the natively expanded viewport (no fullPage flag needed)
       await pageA.screenshot({
-        fullPage: true,
         path: path.join(artifactsDir, `00_Prod_FullPage_Highlights.png`),
       });
       await pageB.screenshot({
-        fullPage: true,
         path: path.join(artifactsDir, `00_Branch_FullPage_Highlights.png`),
       });
 
@@ -238,21 +260,8 @@ export class ABRunnerEngine {
     await page.evaluate(() => window.scrollTo(0, 0));
 
     // Explicitly grant Next.js/React hydration time to remount top-level banner components that were virtualized/unmounted
-    await page.waitForTimeout(2000);
-
-    // Explicitly force Playwright to wait for all <img/> components to physically decode and paint
-    await page.evaluate(async () => {
-      const images = Array.from(document.images);
-      await Promise.all(
-        images.map((img) => {
-          if (img.complete) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve; // Continue even if one fails
-          });
-        })
-      );
-    });
+    // We use a safe static delay instead of relying on img.complete, as Next.js lazy-loading suppresses onload events for off-screen images.
+    await page.waitForTimeout(4000);
   }
 
   private async extractDOMTree(page: Page) {
