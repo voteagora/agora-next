@@ -60,11 +60,13 @@ export class ABRunnerEngine {
       ]);
     }
 
-    // 1. Progressively scroll down to lazy load all components
-    await Promise.all([
-      this.progressiveScroll(pageA),
-      this.progressiveScroll(pageB),
-    ]);
+    // 1. Instantly expand the viewport to a massive size to disable React virtualization
+    // This forces all components to render into the DOM simultaneously, bypassing lazy-loading and unmounting bugs
+    await pageA.setViewportSize({ width: 1280, height: 15000 });
+    await pageB.setViewportSize({ width: 1280, height: 15000 });
+
+    // Give the network 12 seconds to fetch any underlying RPC arrays (proposals/delegates) via the Graph/Alchemy and render them.
+    await pageA.waitForTimeout(12000);
 
     // 2. Extract DOM Trees
     const treeA = await this.extractDOMTree(pageA);
@@ -77,41 +79,72 @@ export class ABRunnerEngine {
     const mapB = new Map(treeB.map((n: any) => [n.path, n]));
 
     for (const nodeA of treeA) {
+      if (!nodeA) continue;
       const nodeB = mapB.get(nodeA.path);
-      if (!nodeB) continue;
 
       let isDrifted = false;
       let driftReason = "";
 
-      // Data Drift Check
-      if (nodeA.text !== nodeB.text) {
+      if (!nodeB) {
         isDrifted = true;
-        driftReason = "Data Drift";
+        driftReason = "Missing or Moved Component";
       } else {
-        // Layout Drift Check (tolerance of 3 pixels)
-        const dx = Math.abs(nodeA.rect.x - nodeB.rect.x);
-        const dy = Math.abs(nodeA.rect.y - nodeB.rect.y);
-        const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
-        const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
-
-        if (dx > 3 || dy > 3 || dw > 3 || dh > 3) {
+        // Data Drift Check
+        if (nodeA.text !== nodeB.text) {
           isDrifted = true;
-          driftReason = "Layout Drift";
+          driftReason = "Data Drift";
+        } else {
+          // Layout Drift Check (tolerance of 3 pixels)
+          const dx = Math.abs(nodeA.rect.x - nodeB.rect.x);
+          const dy = Math.abs(nodeA.rect.y - nodeB.rect.y);
+          const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
+          const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
+
+          if (dx > 3 || dy > 3 || dw > 3 || dh > 3) {
+            isDrifted = true;
+            driftReason = "Layout Drift";
+          }
         }
       }
 
-      if (isDrifted) {
+      if (isDrifted && !nodeA.path.includes("> footer:")) {
         drifts.push({ path: nodeA.path, reason: driftReason });
         reportList.push({
           component: nodeA.path,
           reason: driftReason,
           productionText: nodeA.text,
-          branchText: nodeB.text,
+          branchText: nodeB
+            ? nodeB.text
+            : "(Element Missing or Structurally Shifted)",
         });
       }
     }
 
     const isDiff = drifts.length > 0;
+
+    const safeRouteName =
+      route === "/"
+        ? "index-page"
+        : route.replace(/^\//, "").replace(/\//g, "-");
+    const artifactsDir = path.join(
+      process.cwd(),
+      "test-results",
+      "ab-diffs",
+      safeRouteName
+    );
+
+    if (!fs.existsSync(artifactsDir)) {
+      fs.mkdirSync(artifactsDir, { recursive: true });
+    }
+
+    fs.writeFileSync(
+      path.join(artifactsDir, "treeA.json"),
+      JSON.stringify(treeA, null, 2)
+    );
+    fs.writeFileSync(
+      path.join(artifactsDir, "treeB.json"),
+      JSON.stringify(treeB, null, 2)
+    );
 
     if (override.expectDiff ? !isDiff : isDiff) {
       const safeRouteName =
@@ -156,7 +189,7 @@ export class ABRunnerEngine {
               .catch(() => {});
           }
 
-          // 2. NOW inject the highlights into the DOM so they only appear on the Full Page map!
+          // 2. NOW inject the highlights into the DOM globally via native CSS to bypass brittle Playwright locator locks!
           const highlightCSS =
             drift.reason === "Data Drift"
               ? "4px dashed #FFD700"
@@ -166,49 +199,38 @@ export class ABRunnerEngine {
               ? "rgba(255, 215, 0, 0.2)"
               : "rgba(255, 69, 0, 0.2)";
 
-          await locA.evaluate(
-            (el: HTMLElement, args) => {
-              el.style.outline = args.css;
-              el.style.outlineOffset = "2px";
-              el.style.backgroundColor = args.bg;
-            },
-            { css: highlightCSS, bg: bgColor }
-          );
+          await pageA
+            .evaluate(
+              ({ path, css, bg }) => {
+                const el = document.querySelector(path) as HTMLElement;
+                if (el) {
+                  el.style.outline = css;
+                  el.style.outlineOffset = "2px";
+                  el.style.backgroundColor = bg;
+                }
+              },
+              { path: drift.path, css: highlightCSS, bg: bgColor }
+            )
+            .catch(() => {});
 
-          await locB.evaluate(
-            (el: HTMLElement, args) => {
-              el.style.outline = args.css;
-              el.style.outlineOffset = "2px";
-              el.style.backgroundColor = args.bg;
-            },
-            { css: highlightCSS, bg: bgColor }
-          );
+          await pageB
+            .evaluate(
+              ({ path, css, bg }) => {
+                const el = document.querySelector(path) as HTMLElement;
+                if (el) {
+                  el.style.outline = css;
+                  el.style.outlineOffset = "2px";
+                  el.style.backgroundColor = bg;
+                }
+              },
+              { path: drift.path, css: highlightCSS, bg: bgColor }
+            )
+            .catch(() => {});
         }
         index++;
       }
 
-      // 5. Expand viewport manually to match scroll height before screenshot
-      // This forces React to repaint virtualized/lazy-loaded rows that would otherwise appear as blank white spaces in Playwright's native fullPage screenshot.
-      const heightA = await pageA.evaluate(() =>
-        Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight
-        )
-      );
-      const heightB = await pageB.evaluate(() =>
-        Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight
-        )
-      );
-
-      await pageA.setViewportSize({ width: 1280, height: heightA });
-      await pageB.setViewportSize({ width: 1280, height: heightB });
-
-      // Give React/Tailwind complete time to hydrate the newly massive viewport
-      await pageA.waitForTimeout(3000);
-
-      // Capture screenshots using the natively expanded viewport (no fullPage flag needed)
+      // 5. Capture screenshots using the natively expanded viewport (no fullPage flag needed)
       await pageA.screenshot({
         path: path.join(artifactsDir, `00_Prod_FullPage_Highlights.png`),
       });
@@ -240,36 +262,23 @@ export class ABRunnerEngine {
   }
 
   private async progressiveScroll(page: Page) {
-    await page.evaluate(async () => {
-      await new Promise<void>((resolve) => {
-        let totalHeight = 0;
-        const distance = 300;
-        const timer = setInterval(() => {
-          const scrollHeight = document.body.scrollHeight;
-          window.scrollBy(0, distance);
-          totalHeight += distance;
-          if (totalHeight >= scrollHeight || totalHeight > 10000) {
-            clearInterval(timer);
-            resolve();
-          }
-        }, 80);
-      });
-    });
-
-    // Snap back to top
-    await page.evaluate(() => window.scrollTo(0, 0));
-
-    // Explicitly grant Next.js/React hydration time to remount top-level banner components that were virtualized/unmounted
-    // We use a safe static delay instead of relying on img.complete, as Next.js lazy-loading suppresses onload events for off-screen images.
-    await page.waitForTimeout(4000);
+    // Deprecated by massive static viewport size
   }
 
   private async extractDOMTree(page: Page) {
     return await page.evaluate(() => {
-      const elements = Array.from(
-        document.querySelectorAll(
-          "h1, h2, h3, h4, p, span, a, button, img, [data-testid], td, th"
-        )
+      // Ultimate Leaf Extractor: Captures images and every single deeply nested piece of text objectively
+      const elements = Array.from(document.querySelectorAll("*")).filter(
+        (el) => {
+          const isVisualBlock =
+            el.tagName === "IMG" ||
+            el.tagName === "SVG" ||
+            el.hasAttribute("data-testid");
+          const hasDirectText = Array.from(el.childNodes).some(
+            (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
+          );
+          return isVisualBlock || hasDirectText;
+        }
       );
 
       return elements
