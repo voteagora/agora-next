@@ -268,23 +268,42 @@ export class ABRunnerEngine {
   }
 
   private async progressiveScroll(page: Page) {
+    // Crucial: Wait for initial NextJS hydration and Web3 data fetching on preview deployments
+    await page.waitForTimeout(8000);
+
     let lastHeight = 0;
-    let currentHeight = await page.evaluate(() => document.body.scrollHeight);
+
+    // Evaluate maximum scrollable depth across the document including inner overflow containers
+    let getScrollHeight = () =>
+      Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        ...Array.from(document.querySelectorAll("*")).map((e) => e.scrollHeight)
+      );
+
+    let currentHeight = await page.evaluate(getScrollHeight);
     let attempts = 0;
 
     await page.setViewportSize({ width: 1280, height: 1080 });
 
-    while (lastHeight !== currentHeight && attempts < 10) {
+    // Position mouse centrally to target inner scrollable containers with hardware scroll
+    await page.mouse.move(640, 500);
+
+    while (lastHeight !== currentHeight && attempts < 15) {
       lastHeight = currentHeight;
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(1500);
-      currentHeight = await page.evaluate(() => document.body.scrollHeight);
+      await page.mouse.wheel(0, 10000); // Simulate aggressive hardware wheel down
+      await page.waitForTimeout(2000);
+      currentHeight = await page.evaluate(getScrollHeight);
       attempts++;
     }
 
+    // Expand the viewport cleanly to capture the full page without stitching issues
     await page.setViewportSize({ width: 1280, height: currentHeight + 200 });
+
+    // Snap back to top and physically scroll back up to trigger any sticky/dynamic header intersection observers
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(1000);
+    await page.mouse.wheel(0, -100000);
+    await page.waitForTimeout(2000);
   }
 
   private async extractDOMTree(page: Page) {
