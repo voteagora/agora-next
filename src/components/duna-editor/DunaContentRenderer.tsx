@@ -8,28 +8,9 @@ import {
 } from "@/components/duna-editor/proseThemeClasses";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { sanitizeForumContent } from "@/lib/sanitizationUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
-
-// Function to decode HTML entities
-function decodeHtmlEntities(text: string): string {
-  // More robust HTML entity decoding
-  const entities: { [key: string]: string } = {
-    "&lt;": "<",
-    "&gt;": ">",
-    "&amp;": "&",
-    "&quot;": '"',
-    "&#39;": "'",
-    "&nbsp;": " ",
-  };
-
-  let decoded = text;
-  Object.entries(entities).forEach(([entity, char]) => {
-    decoded = decoded.replace(new RegExp(entity, "g"), char);
-  });
-
-  return decoded;
-}
 
 interface DunaContentRendererProps {
   content: string;
@@ -177,8 +158,11 @@ export default function DunaContentRenderer({
     setMounted(true);
   }, []);
 
-  const decodedContent = decodeHtmlEntities(content);
-  const isMarkdown = !looksLikeHtml(decodedContent);
+  const sanitizedContent = useMemo(
+    () => sanitizeForumContent(content),
+    [content]
+  );
+  const isMarkdown = !looksLikeHtml(sanitizedContent);
 
   const renderedContent = useMemo(() => {
     if (isMarkdown) {
@@ -191,15 +175,15 @@ export default function DunaContentRenderer({
             PROSE_MEDIA
           )}
         >
-          <Markdown content={decodedContent} originalHierarchy />
+          <Markdown content={sanitizedContent} originalHierarchy />
         </div>
       );
     }
     if (!enableEmbeds || !mounted) {
-      return <div dangerouslySetInnerHTML={{ __html: decodedContent }} />;
+      return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
     }
-    return parseContentWithEmbeds(decodedContent);
-  }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
+    return parseContentWithEmbeds(sanitizedContent);
+  }, [enableEmbeds, isMarkdown, mounted, sanitizedContent]);
 
   if (!content) return null;
 

@@ -16,6 +16,7 @@ const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
   Since our API is open to the public, we need to set CORS headers to
   allow all origins. This is done by setting preflight headers for OPTIONS
   requests and standard headers for all other requests.
+  
 */
 
 function setOptionsCorsHeaders(request: Request) {
