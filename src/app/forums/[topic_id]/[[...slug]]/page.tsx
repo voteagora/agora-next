@@ -188,7 +188,7 @@ export async function generateMetadata({
 
     ogImageUrl = `${baseUrl}/api/images/og/generic?title=${encodeURIComponent(
       transformed.title
-    )}&author=${encodeURIComponent(
+    )}&description=&author=${encodeURIComponent(
       truncateAddress(authorAddress) || authorAddress
     )}&isPost=true`;
   } else {
@@ -206,7 +206,7 @@ export async function generateMetadata({
 
     ogImageUrl = `${baseUrl}/api/images/og/generic?title=${encodeURIComponent(
       transformed.title
-    )}`;
+    )}&description=`;
   }
 
   return {
