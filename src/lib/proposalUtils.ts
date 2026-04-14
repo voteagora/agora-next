@@ -1664,7 +1664,10 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
     finalApproval: talliesData.finalApproval,
     totalForVotesPercentage: Number(calculatedTotalForVotes.toFixed(2)),
     totalAgainstVotesPercentage: Number(calculatedTotalAgainstVotes.toFixed(2)),
-    totalAbstainVotesPercentage: Number(calculatedTotalAbstainVotes.toFixed(2)),
+    totalAbstainVotesPercentage:
+      calculationOptions === 0
+        ? Number(calculatedTotalAbstainVotes.toFixed(2))
+        : 0,
   };
 }
 

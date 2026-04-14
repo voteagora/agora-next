@@ -6,6 +6,7 @@
  */
 
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Block } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 import {
   deriveStatus,
@@ -99,7 +100,8 @@ type NormalizedBase = Omit<
 
 async function normalizeBase(
   proposal: ArchiveListProposal,
-  options: NormalizeArchiveOptions
+  options: NormalizeArchiveOptions,
+  latestBlock?: Block | null
 ): Promise<NormalizedBase> {
   const decimals = options.tokenDecimals ?? 18;
   const statusKey = deriveStatus(proposal, decimals);
@@ -108,8 +110,6 @@ async function normalizeBase(
     ? statusKey
     : "ACTIVE";
 
-  const { contracts } = Tenant.current();
-  const latestBlock = await contracts.token.provider.getBlock("latest");
   const timeStatus = deriveTimeStatus(
     proposal,
     normalizedStatusKey,
@@ -777,9 +777,12 @@ export async function archiveToProposal(
   proposal: ArchiveProposalInput,
   options: NormalizeArchiveOptions = {}
 ): Promise<Proposal> {
+  const { contracts } = Tenant.current();
+  const latestBlock = await contracts.token.provider.getBlock("latest");
+
   let archiveProposal = proposal as ArchiveListProposal;
   const proposalType = deriveProposalType(archiveProposal);
-  const base = await normalizeBase(archiveProposal, options);
+  const base = await normalizeBase(archiveProposal, options, latestBlock);
 
   // Add archive metadata
   const rawTag = Array.isArray(archiveProposal.tags)

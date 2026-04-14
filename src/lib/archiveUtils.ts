@@ -88,9 +88,6 @@ async function fetchArchiveNdjson<T>(url: string): Promise<T[]> {
     const decoder = new TextDecoder();
     ndjsonText = decoder.decode(arrayBuffer);
   }
-  console.log(
-    `Fetched and parsed NDJSON from ${url}: ${ndjsonText.substring(0, 100)}...`
-  );
   return parseNDJSON<T>(ndjsonText);
 }
 

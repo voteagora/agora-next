@@ -99,8 +99,8 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
   HYBRID_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
   OFFCHAIN_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
 
-  // Snapshot - handled specially for Copeland
-  SNAPSHOT: CopelandProposalPage,
+  // SNAPSHOT is not in the registry — Copeland (the only SNAPSHOT sub-type)
+  // is handled by requiresSpecialHandling() before this registry is consulted.
 };
 
 /**
