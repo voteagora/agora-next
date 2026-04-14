@@ -24,12 +24,18 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  reporter: "html",
   use: {
     baseURL: "http://127.0.0.1:3000",
-    trace: "on-first-retry",
-    video: "on",
+    trace: process.env.URL_A && process.env.URL_B ? "off" : "on-first-retry",
+    video: process.env.URL_A && process.env.URL_B ? "off" : "on",
+    screenshot: process.env.URL_A && process.env.URL_B ? "off" : "on",
   },
+  preserveOutput: process.env.URL_A && process.env.URL_B ? "never" : "always",
+  reporter: process.env.URL_A && process.env.URL_B ? "list" : "html",
+  outputDir:
+    process.env.URL_A && process.env.URL_B
+      ? "/tmp/playwright-ab-discard"
+      : "test-results",
   projects: [
     {
       name: "chromium",
