@@ -49,11 +49,15 @@ function isPdfGeneratedHtml(content: string): boolean {
     /\.t\s*\{[^}]*position\s*:/i.test(content);
 
   // Check for transform-origin positioning (used for precise PDF text placement)
-  const hasTransformOrigin =
-    /transform-origin\s*:\s*\d+px\s+\d+px/i.test(content);
+  const hasTransformOrigin = /transform-origin\s*:\s*\d+px\s+\d+px/i.test(
+    content
+  );
 
   // Content is PDF-generated if it has CIDFont OR multiple other PDF indicators
-  return hasCidFont || (hasTextContainer && (hasPdfTextClasses || hasTransformOrigin));
+  return (
+    hasCidFont ||
+    (hasTextContainer && (hasPdfTextClasses || hasTransformOrigin))
+  );
 }
 
 export default function FinancialStatementLayout({
