@@ -127,6 +127,23 @@ export class ABRunnerEngine {
           await locA.scrollIntoViewIfNeeded();
           await locB.scrollIntoViewIfNeeded();
 
+          // 1. Take organized individual clean crops (un-highlighted, as requested)
+          if (index <= 15) {
+            await locA
+              .screenshot({
+                path: path.join(cropsDir, `drift_${index}_Prod.png`),
+                margin: 30,
+              } as any)
+              .catch(() => {});
+            await locB
+              .screenshot({
+                path: path.join(cropsDir, `drift_${index}_Branch.png`),
+                margin: 30,
+              } as any)
+              .catch(() => {});
+          }
+
+          // 2. NOW inject the highlights into the DOM so they only appear on the Full Page map!
           const highlightCSS =
             drift.reason === "Data Drift"
               ? "4px dashed #FFD700"
@@ -153,22 +170,6 @@ export class ABRunnerEngine {
             },
             { css: highlightCSS, bg: bgColor }
           );
-
-          // Take organized individual cropped screenshots (limited to 15 to avoid excessive outputs)
-          if (index <= 15) {
-            await locA
-              .screenshot({
-                path: path.join(cropsDir, `drift_${index}_Prod.png`),
-                margin: 30,
-              } as any)
-              .catch(() => {});
-            await locB
-              .screenshot({
-                path: path.join(cropsDir, `drift_${index}_Branch.png`),
-                margin: 30,
-              } as any)
-              .catch(() => {});
-          }
         }
         index++;
       }
@@ -217,11 +218,30 @@ export class ABRunnerEngine {
           totalHeight += distance;
           if (totalHeight >= scrollHeight || totalHeight > 10000) {
             clearInterval(timer);
-            window.scrollTo(0, 0); // Snap back to top to restore sticky/layout elements
-            setTimeout(resolve, 800);
+            resolve();
           }
         }, 80);
       });
+    });
+
+    // Snap back to top
+    await page.evaluate(() => window.scrollTo(0, 0));
+
+    // Explicitly grant Next.js/React hydration time to remount top-level banner components that were virtualized/unmounted
+    await page.waitForTimeout(2000);
+
+    // Explicitly force Playwright to wait for all banner <img/> components to physically decode and paint
+    await page.evaluate(async () => {
+      const images = Array.from(document.images);
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve; // Continue even if one fails
+          });
+        })
+      );
     });
   }
 
