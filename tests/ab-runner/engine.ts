@@ -60,13 +60,11 @@ export class ABRunnerEngine {
       ]);
     }
 
-    // 1. Instantly expand the viewport to a massive size to disable React virtualization
-    // This forces all components to render into the DOM simultaneously, bypassing lazy-loading and unmounting bugs
-    await pageA.setViewportSize({ width: 1280, height: 15000 });
-    await pageB.setViewportSize({ width: 1280, height: 15000 });
-
-    // Give the network 12 seconds to fetch any underlying RPC arrays (proposals/delegates) via the Graph/Alchemy and render them.
-    await pageA.waitForTimeout(12000);
+    // 1. Trigger infinite loaders via progressive scroll, then fit viewport accurately
+    await Promise.all([
+      this.progressiveScroll(pageA),
+      this.progressiveScroll(pageB),
+    ]);
 
     // 2. Extract DOM Trees
     const treeA = await this.extractDOMTree(pageA);
@@ -169,18 +167,22 @@ export class ABRunnerEngine {
         const locA = pageA.locator(drift.path).first();
         const locB = pageB.locator(drift.path).first();
 
-        if ((await locA.count()) > 0 && (await locB.count()) > 0) {
-          await locA.scrollIntoViewIfNeeded();
-          await locB.scrollIntoViewIfNeeded();
+        const countA = await locA.count();
+        const countB = await locB.count();
 
-          // 1. Take organized individual clean crops (un-highlighted, as requested)
-          if (index <= 15) {
+        // 1. Take organized individual clean crops (un-highlighted, as requested)
+        if (index <= 15) {
+          if (countA > 0) {
+            await locA.scrollIntoViewIfNeeded().catch(() => {});
             await locA
               .screenshot({
                 path: path.join(cropsDir, `drift_${index}_Prod.png`),
                 margin: 30,
               } as any)
               .catch(() => {});
+          }
+          if (countB > 0) {
+            await locB.scrollIntoViewIfNeeded().catch(() => {});
             await locB
               .screenshot({
                 path: path.join(cropsDir, `drift_${index}_Branch.png`),
@@ -188,17 +190,19 @@ export class ABRunnerEngine {
               } as any)
               .catch(() => {});
           }
+        }
 
-          // 2. NOW inject the highlights into the DOM globally via native CSS to bypass brittle Playwright locator locks!
-          const highlightCSS =
-            drift.reason === "Data Drift"
-              ? "4px dashed #FFD700"
-              : "4px dashed #FF4500";
-          const bgColor =
-            drift.reason === "Data Drift"
-              ? "rgba(255, 215, 0, 0.2)"
-              : "rgba(255, 69, 0, 0.2)";
+        // 2. NOW inject the highlights into the DOM globally via native CSS to bypass brittle Playwright locator locks!
+        const highlightCSS =
+          drift.reason === "Data Drift"
+            ? "4px dashed #FFD700"
+            : "4px dashed #FF4500";
+        const bgColor =
+          drift.reason === "Data Drift"
+            ? "rgba(255, 215, 0, 0.2)"
+            : "rgba(255, 69, 0, 0.2)";
 
+        if (countA > 0) {
           await pageA
             .evaluate(
               ({ path, css, bg }) => {
@@ -212,7 +216,9 @@ export class ABRunnerEngine {
               { path: drift.path, css: highlightCSS, bg: bgColor }
             )
             .catch(() => {});
+        }
 
+        if (countB > 0) {
           await pageB
             .evaluate(
               ({ path, css, bg }) => {
@@ -262,7 +268,23 @@ export class ABRunnerEngine {
   }
 
   private async progressiveScroll(page: Page) {
-    // Deprecated by massive static viewport size
+    let lastHeight = 0;
+    let currentHeight = await page.evaluate(() => document.body.scrollHeight);
+    let attempts = 0;
+
+    await page.setViewportSize({ width: 1280, height: 1080 });
+
+    while (lastHeight !== currentHeight && attempts < 10) {
+      lastHeight = currentHeight;
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(1500);
+      currentHeight = await page.evaluate(() => document.body.scrollHeight);
+      attempts++;
+    }
+
+    await page.setViewportSize({ width: 1280, height: currentHeight + 200 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(1000);
   }
 
   private async extractDOMTree(page: Page) {
