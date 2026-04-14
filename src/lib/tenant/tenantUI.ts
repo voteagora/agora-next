@@ -26,6 +26,16 @@ export type UIGasRelayConfig = {
   minVPToUseGasRelay: string;
 };
 
+export type UIMiradorConfig = {
+  proposalCreation?: boolean;
+  siweLoginTracing?: boolean;
+};
+
+export type UISafeTrackingConfig = {
+  offchainMessageTracking?: boolean;
+  onchainTransactionTracking?: boolean;
+};
+
 // UI config exists to give tenant specifc config options to a UI toggle
 // the canonical example is wanting to allow tenants to customize
 // their proposal lifecycle feature
@@ -76,7 +86,9 @@ type UIConfig =
   | UIInfoBannerConfig
   | UIDunaDisclosuresConfig
   | UITaxFormConfig
-  | UIFinancialStatementsConfig;
+  | UIFinancialStatementsConfig
+  | UIMiradorConfig
+  | UISafeTrackingConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
@@ -95,12 +107,14 @@ export type UILink = {
   name: string;
   title: string;
   url: string;
-  image?: string | StaticImageData;
+  image?: UIImageSource;
 };
+
+export type UIImageSource = string | StaticImageData;
 
 type UIPage = {
   description: string | React.ReactNode;
-  hero?: StaticImageData | string;
+  hero?: UIImageSource;
   href?: string;
   links?: UILink[];
   route: string;
@@ -155,12 +169,13 @@ type TenantUIParams = {
   governanceStakeholders?: UIGovernanceStakeholder[];
   hideAgoraBranding?: boolean;
   links?: UILink[];
-  logo: string;
+  logo: UIImageSource;
   logoSize?: string;
   organization?: UIOrganization;
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
   title: string;
+  dunaTitle?: string;
   toggles?: UIToggle[];
   tokens?: TenantToken[];
   customization?: {
@@ -224,13 +239,14 @@ export class TenantUI {
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hideAgoraBranding?: boolean;
   private _links?: UILink[];
-  private _logo: string;
+  private _logo: UIImageSource;
   private _logoSize?: string;
   private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
   private _tokens?: TenantToken[];
+  private _dunaTitle?: string;
   private _customization?: {
     primary?: string;
     secondary?: string;
@@ -310,6 +326,7 @@ export class TenantUI {
     tacticalStrings,
     theme,
     tokens,
+    dunaTitle,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -332,6 +349,7 @@ export class TenantUI {
     this._tacticalStrings = tacticalStrings;
     this._theme = theme ?? "light";
     this._tokens = tokens;
+    this._dunaTitle = dunaTitle;
   }
 
   public get assets(): UIAssets {
@@ -362,8 +380,12 @@ export class TenantUI {
     return this._title;
   }
 
-  public get logo(): string {
+  public get logo(): UIImageSource {
     return this._logo;
+  }
+
+  public get dunaTitle(): string | undefined {
+    return this._dunaTitle;
   }
 
   public get logoSize(): string | undefined {

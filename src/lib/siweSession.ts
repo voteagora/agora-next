@@ -5,6 +5,8 @@ import {
   LOCAL_STORAGE_SIWE_STAGE_KEY,
 } from "@/lib/constants";
 
+export const SIWE_SESSION_CHANGE_EVENT = "agora:siwe-session-change";
+
 type StoredJwtContainer = {
   access_token?: string;
 };
@@ -24,11 +26,19 @@ export type StoredSiweSession = {
   exp?: number;
 };
 
+export function notifyStoredSiweSessionChanged(): void {
+  if (typeof window === "undefined") return;
+
+  window.dispatchEvent(new Event(SIWE_SESSION_CHANGE_EVENT));
+}
+
 export function clearStoredSiweSession(): void {
   try {
     localStorage.removeItem(LOCAL_STORAGE_SIWE_JWT_KEY);
     localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
   } catch {}
+
+  notifyStoredSiweSessionChanged();
 }
 
 function readStoredJwtFromStorage(): string | null {
@@ -98,7 +108,6 @@ export function getStoredSiweSession(options?: {
   if (options?.expectedAddress) {
     const expected = normalizeAddress(options.expectedAddress);
     if (expected !== normalized) {
-      clearStoredSiweSession();
       return null;
     }
   }

@@ -8,8 +8,6 @@ import { onSubmitAction as deleteAction } from "../actions/deleteDraftProposal";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
-import { useSIWE } from "connectkit";
-import { getStoredSiweJwt, waitForStoredSiweJwt } from "@/lib/siweSession";
 
 const DeleteDraftButton = ({
   proposalId,
@@ -53,7 +51,6 @@ export const DeleteDraftProposalDialog = ({
   const [isPending, setIsPending] = useState(false);
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
-  const { signIn } = useSIWE();
   return (
     <div>
       <h3 className="text-center text-primary font-semibold text-lg mb-1">
@@ -80,34 +77,12 @@ export const DeleteDraftProposalDialog = ({
             if (isPending) return;
             setIsPending(true);
             try {
-              let jwt = getStoredSiweJwt({ expectedAddress: address });
-              if (!jwt) {
-                try {
-                  await signIn();
-                  jwt = await waitForStoredSiweJwt({
-                    expectedAddress: address,
-                    timeoutMs: 10_000,
-                    intervalMs: 200,
-                  });
-                } catch (e) {
-                  toast("Sign-in cancelled or failed. Please try again.");
-                  setIsPending(false);
-                  return;
-                }
-                if (!jwt) {
-                  toast("Session expired. Please sign in to continue.");
-                  setIsPending(false);
-                  return;
-                }
-              }
-
-              const messagePayload = {
+              const auth = await getAuthenticationData({
                 action: "deleteDraft",
                 draftProposalId: proposalId,
                 creatorAddress: address,
                 timestamp: new Date().toISOString(),
-              };
-              const auth = await getAuthenticationData(messagePayload);
+              });
               if (!auth || !address) {
                 setIsPending(false);
                 return;
@@ -115,8 +90,6 @@ export const DeleteDraftProposalDialog = ({
 
               const result = await deleteAction(proposalId, {
                 address: address as `0x${string}`,
-                message: auth.message,
-                signature: auth.signature,
                 jwt: auth.jwt,
               });
 

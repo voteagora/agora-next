@@ -7,6 +7,9 @@ import { sendGrantConfirmationEmail } from "@/lib/email/mailgun";
 import { getGrant } from "@/app/api/common/grants/getGrant";
 import { emitBroadcastEvent } from "@/lib/notification-center/emitter";
 import { PermissionService } from "@/server/services/permission.service";
+import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { extractBearerTokenFromHeader } from "@/app/lib/auth/edgeAuth";
+import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
 
 export const revalidate = 0;
 
@@ -194,6 +197,21 @@ export async function POST(
   const { grantSlug } = params;
 
   try {
+    const authResponse = await authenticateApiUser(req);
+    const bearerToken = extractBearerTokenFromHeader(
+      req.headers.get("Authorization")
+    );
+    const authenticatedAddress =
+      authResponse.authenticated && authResponse.type === "jwt" && bearerToken
+        ? await verifyJwtAndGetAddress(bearerToken)
+        : null;
+
+    if (!authenticatedAddress) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const normalizedAuthenticatedAddress = authenticatedAddress.toLowerCase();
+
     // First, verify the grant exists
     const grant = await getGrant(grantSlug);
     if (!grant || !grant.active) {
@@ -232,9 +250,17 @@ export async function POST(
     // Validate input
     const validatedData = dynamicSchema.parse(payload);
 
+    if (
+      validatedData.applicantAddress &&
+      validatedData.applicantAddress.toLowerCase() !==
+        normalizedAuthenticatedAddress
+    ) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     // Build application data blob - include all form fields dynamically
     const applicationData = {
-      applicantAddress: validatedData.applicantAddress || "",
+      applicantAddress: normalizedAuthenticatedAddress,
       // Include all dynamic form fields
       ...Object.keys(validatedData)
         .filter((key) => key !== "applicantAddress")
@@ -327,11 +353,11 @@ export async function POST(
     const grantId = grant.id;
 
     // 2) Check for duplicate application
-    const applicantAddress = validatedData.applicantAddress || "";
+    const applicantAddress = normalizedAuthenticatedAddress;
     const existingApp = await prismaWeb2Client.$queryRaw<Array<{ id: string }>>(
       Prisma.sql`
         SELECT id FROM alltenant.grant_applications 
-        WHERE grant_id = ${grantId} AND applicant_address = ${applicantAddress}
+        WHERE grant_id = ${grantId} AND lower(applicant_address) = ${applicantAddress}
       `
     );
 

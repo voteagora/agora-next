@@ -141,8 +141,6 @@ const RequestSponsorshipForm = ({
               draftProposalId: draftProposal.id,
               sponsor_address: address,
               creatorAddress: creatorAddress as `0x${string}`,
-              message: auth.message,
-              signature: auth.signature,
               jwt: auth.jwt,
             });
             setIsPending(false);

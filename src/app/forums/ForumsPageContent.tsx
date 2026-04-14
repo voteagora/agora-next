@@ -61,8 +61,19 @@ export default async function ForumsPageContent({
         description={description}
         isDuna={categoryTitle === "DUNA"}
       />
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
-        <div className="flex-1 min-w-0">
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Mobile: categories (filters) above the list, matching proposals-style layout */}
+        <div className="order-1 w-full min-w-0 lg:order-2 lg:w-80 lg:flex-shrink-0">
+          <ForumsSidebar
+            selectedCategoryId={selectedCategoryId}
+            categories={categories}
+            latestPost={latestPost}
+            totalTopicsCount={totalCount}
+            uncategorizedCount={uncategorizedCount}
+          />
+        </div>
+
+        <div className="order-2 min-w-0 flex-1 lg:order-1">
           <div className="space-y-3">
             {sortedTopics.length === 0 ? (
               <div className="text-center py-12">
@@ -72,16 +83,6 @@ export default async function ForumsPageContent({
               <TopicList topics={sortedTopics} admins={admins} />
             )}
           </div>
-        </div>
-
-        <div className="w-full lg:w-80 lg:flex-shrink-0">
-          <ForumsSidebar
-            selectedCategoryId={selectedCategoryId}
-            categories={categories}
-            latestPost={latestPost}
-            totalTopicsCount={totalCount}
-            uncategorizedCount={uncategorizedCount}
-          />
         </div>
       </div>
     </div>

@@ -58,8 +58,6 @@ const SocialProposalAction = ({
             draftProposalId: draftProposal.id,
             snapshot_link: snapshotLink,
             creatorAddress: address as `0x${string}`,
-            message: auth.message,
-            signature: auth.signature,
             jwt: auth.jwt,
           });
 

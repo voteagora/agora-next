@@ -95,7 +95,7 @@ export function UpdatedButton({
                 type === "secondary" && !themeIsDark && "text-black",
                 type === "destructive" && !themeIsDark && "text-red-500",
                 type === "link" && "",
-                "font-medium flex flex-row space-x-2 items-center justify-center"
+                "font-medium flex flex-row space-x-2 items-center justify-center opacity-80"
               )}
             >
               <LoadingSpinner
@@ -104,10 +104,10 @@ export function UpdatedButton({
                   type === "secondary" && !themeIsDark && "text-black",
                   type === "destructive" && !themeIsDark && "text-red-500",
                   type === "link" && "",
-                  "font-medium"
+                  "font-medium w-4 h-4"
                 )}
               />
-              <p>loading...</p>
+              <span>{children}</span>
             </span>
           ) : (
             children

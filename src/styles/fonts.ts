@@ -77,8 +77,21 @@ export const chivoMono = localFont({
   display: "swap",
 });
 
+export const instrumentSerif = localFont({
+  src: [
+    {
+      path: "../../public/fonts/InstrumentSerif-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-instrument-serif",
+  display: "swap",
+});
+
 export const fontMapper = {
   "font-inter": inter,
   "font-rajdhani": rajdhani,
   "font-chivoMono": chivoMono,
+  "font-instrument-serif": instrumentSerif,
 } as Record<string, NextFontWithVariable>;

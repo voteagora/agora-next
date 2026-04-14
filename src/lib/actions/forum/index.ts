@@ -5,6 +5,7 @@ export {
   getForumTopicsByUser,
   createForumTopic,
   deleteForumTopic,
+  deleteForumTopicWithAuth,
   softDeleteForumTopic,
   restoreForumTopic,
   archiveForumTopic,
@@ -40,7 +41,6 @@ export {
 // Attachments
 export {
   getForumAttachments,
-  uploadFileToIPFS,
   uploadDocumentFromBase64,
   deleteForumAttachment,
   archiveForumAttachment,

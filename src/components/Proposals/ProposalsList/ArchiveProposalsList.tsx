@@ -14,6 +14,30 @@ import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
 import { proposalsFilterOptions } from "@/lib/constants";
+import { UpdatedButton } from "@/components/Button";
+import { DaoSlug } from "@prisma/client";
+
+function normalizeProposalKwargs(
+  kwargs: unknown
+): Record<string, unknown> | undefined {
+  if (!kwargs) {
+    return {};
+  }
+
+  if (typeof kwargs === "string") {
+    try {
+      return JSON.parse(kwargs.replace(/'/g, '"'));
+    } catch {
+      return {};
+    }
+  }
+
+  if (typeof kwargs === "object") {
+    return kwargs as Record<string, unknown>;
+  }
+
+  return {};
+}
 
 export default function ArchiveProposalsList({
   proposals,
@@ -32,12 +56,29 @@ export default function ArchiveProposalsList({
   const searchParams = useSearchParams();
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
+  const { ui, slug } = Tenant.current();
+
+  let tenantSupportsProposalLifecycle =
+    ui.toggle("proposal-lifecycle")?.enabled;
+
+  if (slug === DaoSlug.OP) {
+    const proposalCreators = [
+      "0xe538f6f407937ffDEe9B2704F9096c31c64e63A8", // Op Gov Manager for Prod
+      "0xE4553b743E74dA3424Ac51f8C1E586fd43aE226F",
+      "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB", // Dev Wallet for testing on op-sepolia
+      "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
+      "0x4a6894Dd556fab996f8D50b521f900CAEedC168e", // Jonas's test EOA
+      "0xcC0B26236AFa80673b0859312a7eC16d2b72C1ea",
+    ];
+
+    tenantSupportsProposalLifecycle = proposalCreators.includes(address || "");
+  }
 
   const filteredProposals = React.useMemo(() => {
     if (filter === proposalsFilterOptions.everything.filter) {
       return proposals.map((proposal) => ({
         ...proposal,
-        kwargs: proposal.kwargs,
+        kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
     }
 
@@ -56,7 +97,7 @@ export default function ArchiveProposalsList({
       )
       .map((proposal) => ({
         ...proposal,
-        kwargs: proposal.kwargs,
+        kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
   }, [filter, proposals]);
 
@@ -71,10 +112,10 @@ export default function ArchiveProposalsList({
   const tokenDecimals = token?.decimals ?? 18;
 
   // Check if banner is configured and visible
-  const { ui } = Tenant.current();
   const bannerConfig = ui.toggle("proposals-page-info-banner");
   const isBannerEnabled = bannerConfig?.enabled && bannerConfig?.config;
   const isBannerVisible = useInfoBannerVisibility("proposals-page-info-banner");
+  const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
   return (
     <div className="flex flex-col max-w-[76rem]">
@@ -82,7 +123,21 @@ export default function ArchiveProposalsList({
         <PageHeader headerText="All Proposals" />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
-          {address && <CreateProposalDraftButton address={address} />}
+          {address ? (
+            isEASV2Enabled && tenantSupportsProposalLifecycle ? (
+              <UpdatedButton
+                variant="rounded"
+                type="primary"
+                onClick={async () => {
+                  window.location.href = `/create`;
+                }}
+              >
+                Create proposal
+              </UpdatedButton>
+            ) : (
+              <CreateProposalDraftButton address={address} />
+            )
+          ) : null}
         </div>
       </div>
 

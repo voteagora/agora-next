@@ -426,6 +426,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
           )}
           <VoteOnAtlas
             offchainProposalId={proposal.offchainProposalId || proposal.id}
+            isVotingOpen={proposal.status === "ACTIVE"}
           />
         </div>
       </div>

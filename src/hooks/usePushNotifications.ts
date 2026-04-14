@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useAccount } from "wagmi";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 const URL_BASE64_TO_UINT8_ARRAY = (base64String: string) => {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -54,6 +55,10 @@ interface UsePushNotificationsReturn {
 }
 
 export const usePushNotifications = (): UsePushNotificationsReturn => {
+  const { address } = useAccount();
+  const { ensureSession } = useSiweJwt({
+    expectedAddress: address?.toLowerCase(),
+  });
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscription, setSubscription] = useState<PushSubscription | null>(
@@ -82,74 +87,77 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
     }
   }, []);
 
-  const subscribe = useCallback(async (address: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      if (!address) throw new Error("Address is required");
+  const subscribe = useCallback(
+    async (address: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        if (!address) throw new Error("Address is required");
 
-      const token = getStoredSiweJwt({ expectedAddress: address });
-      if (!token) {
-        throw new Error("Please sign in to enable push notifications");
+        const token = await ensureSession();
+        if (!token) {
+          throw new Error("Please sign in to enable push notifications");
+        }
+
+        // 1. Request Permission
+        const permissionResult = await Notification.requestPermission();
+
+        setPermission(permissionResult);
+        if (permissionResult !== "granted") {
+          throw new Error("Permission denied");
+        }
+
+        // 2. Fetch VAPID Key from Proxy
+        const configRes = await fetch("/api/common/notifications/config");
+        if (!configRes.ok) {
+          throw new Error(
+            await readErrorMessage(configRes, "Failed to fetch VAPID key")
+          );
+        }
+
+        const { vapidPublicKey } = await configRes.json();
+
+        if (!vapidPublicKey) {
+          throw new Error("VAPID Public Key not found");
+        }
+
+        // 3. Register Service Worker
+        const registration = await navigator.serviceWorker.register("/sw.js");
+        await navigator.serviceWorker.ready;
+
+        // 4. Subscribe
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: URL_BASE64_TO_UINT8_ARRAY(vapidPublicKey),
+        });
+
+        // 5. Send to Server (Hub Proxy)
+        const res = await fetch("/api/common/notifications/subscriptions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ subscription }),
+        });
+
+        if (!res.ok) {
+          await subscription.unsubscribe();
+          throw new Error(
+            await readErrorMessage(res, "Failed to register push subscription")
+          );
+        }
+
+        setIsSubscribed(true);
+        setSubscription(subscription);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to subscribe");
+      } finally {
+        setLoading(false);
       }
-
-      // 1. Request Permission
-      const permissionResult = await Notification.requestPermission();
-
-      setPermission(permissionResult);
-      if (permissionResult !== "granted") {
-        throw new Error("Permission denied");
-      }
-
-      // 2. Fetch VAPID Key from Proxy
-      const configRes = await fetch("/api/common/notifications/config");
-      if (!configRes.ok) {
-        throw new Error(
-          await readErrorMessage(configRes, "Failed to fetch VAPID key")
-        );
-      }
-
-      const { vapidPublicKey } = await configRes.json();
-
-      if (!vapidPublicKey) {
-        throw new Error("VAPID Public Key not found");
-      }
-
-      // 3. Register Service Worker
-      const registration = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
-
-      // 4. Subscribe
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: URL_BASE64_TO_UINT8_ARRAY(vapidPublicKey),
-      });
-
-      // 5. Send to Server (Hub Proxy)
-      const res = await fetch("/api/common/notifications/subscriptions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ subscription }),
-      });
-
-      if (!res.ok) {
-        await subscription.unsubscribe();
-        throw new Error(
-          await readErrorMessage(res, "Failed to register push subscription")
-        );
-      }
-
-      setIsSubscribed(true);
-      setSubscription(subscription);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to subscribe");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [ensureSession]
+  );
 
   const unsubscribe = useCallback(async () => {
     setLoading(true);
@@ -165,7 +173,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
       setIsSubscribed(false);
       setSubscription(null);
 
-      const token = getStoredSiweJwt();
+      const token = await ensureSession();
       if (!token) {
         throw new Error(
           "Please sign in to finish disabling push notifications"
@@ -189,7 +197,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [ensureSession]);
 
   return {
     isSupported,
