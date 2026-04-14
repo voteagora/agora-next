@@ -301,8 +301,8 @@ export class ABRunnerEngine {
         })
         .filter(Boolean);
 
-      function getValidCSSPath(el: Element): string {
-        const path = [];
+      function getValidCSSPath(el: Element) {
+        const path: string[] = [];
         let curr: Element | null = el;
         while (
           curr &&
@@ -319,17 +319,26 @@ export class ABRunnerEngine {
             if (sibling.tagName === curr.tagName) index++;
           }
           let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
-
           let testid = curr.getAttribute("data-testid");
-          if (testid)
+
+          if (testid) {
             selector =
               curr.tagName.toLowerCase() +
               `[data-testid="${testid}"]:nth-of-type(${index})`;
+            path.unshift(selector);
+            break; // Stop climbing! Anchor the path to the data-testid so it survives high-level layout container mutations
+          }
 
           path.unshift(selector);
           curr = curr.parentElement;
         }
-        return "body > " + path.join(" > ");
+
+        const finalPath = path.join(" > ");
+        // Ensure playright can query it from root if it didn't anchor with testid
+        if (finalPath.includes("data-testid")) {
+          return finalPath;
+        }
+        return "body > " + finalPath;
       }
     });
   }
