@@ -36,8 +36,8 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "networkidle" }),
-      pageB.goto(targetB, { waitUntil: "networkidle" }),
+      pageA.goto(targetA, { waitUntil: "domcontentloaded" }),
+      pageB.goto(targetB, { waitUntil: "domcontentloaded" }),
     ]);
 
     if (override.ignoreSelectors && override.ignoreSelectors.length > 0) {
@@ -282,21 +282,23 @@ export class ABRunnerEngine {
           curr.tagName.toLowerCase() !== "body" &&
           curr.tagName.toLowerCase() !== "html"
         ) {
-          let id = curr.id;
-          if (id && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(id)) {
-            path.unshift(`${curr.tagName.toLowerCase()}#${id}`);
-            break;
-          } else {
-            let index = 1;
-            for (
-              let sibling = curr.previousElementSibling;
-              sibling;
-              sibling = sibling.previousElementSibling
-            ) {
-              if (sibling.tagName === curr.tagName) index++;
-            }
-            path.unshift(`${curr.tagName.toLowerCase()}:nth-of-type(${index})`);
+          let index = 1;
+          for (
+            let sibling = curr.previousElementSibling;
+            sibling;
+            sibling = sibling.previousElementSibling
+          ) {
+            if (sibling.tagName === curr.tagName) index++;
           }
+          let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
+
+          let testid = curr.getAttribute("data-testid");
+          if (testid)
+            selector =
+              curr.tagName.toLowerCase() +
+              `[data-testid="${testid}"]:nth-of-type(${index})`;
+
+          path.unshift(selector);
           curr = curr.parentElement;
         }
         return "body > " + path.join(" > ");
