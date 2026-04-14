@@ -28,6 +28,34 @@ function looksLikeHtml(text: string): boolean {
   return t.startsWith("<") || t.includes("</");
 }
 
+/**
+ * Detects if HTML content was generated from a PDF conversion.
+ * PDF converters produce HTML with distinctive patterns:
+ * - CIDFont font-face declarations (e.g., CIDFont-F1_8, CIDFont-F2_g)
+ * - Text container divs with id="text-container"
+ * - Specific class patterns like .t, .s0, .s1 for text positioning
+ * - transform-origin inline styles for precise text placement
+ */
+function isPdfGeneratedHtml(content: string): boolean {
+  // Check for CIDFont font-face declarations (most reliable indicator)
+  const hasCidFont = /CIDFont-F\d+/i.test(content);
+
+  // Check for text-container div (common in pdf2htmlEX output)
+  const hasTextContainer = /id\s*=\s*["']text-container["']/i.test(content);
+
+  // Check for PDF-specific class patterns (.t class with .s0, .s1, etc.)
+  const hasPdfTextClasses =
+    /class\s*=\s*["']t\s+s\d+["']/i.test(content) ||
+    /\.t\s*\{[^}]*position\s*:/i.test(content);
+
+  // Check for transform-origin positioning (used for precise PDF text placement)
+  const hasTransformOrigin =
+    /transform-origin\s*:\s*\d+px\s+\d+px/i.test(content);
+
+  // Content is PDF-generated if it has CIDFont OR multiple other PDF indicators
+  return hasCidFont || (hasTextContainer && (hasPdfTextClasses || hasTransformOrigin));
+}
+
 export default function FinancialStatementLayout({
   topicId,
   title,
@@ -43,6 +71,9 @@ export default function FinancialStatementLayout({
 
   const rgbCss = (triplet: string) =>
     `rgb(${triplet.trim().split(/\s+/).join(", ")})`;
+
+  // Detect if content is PDF-generated HTML (has its own styling) vs regular HTML
+  const isPdfContent = isPdfGeneratedHtml(content);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -68,32 +99,54 @@ export default function FinancialStatementLayout({
         if (!existingStyle) {
           const style = iframeDocument.createElement("style");
           style.id = "responsive-pdf-style";
-          style.textContent = `
+          // For PDF-generated content: only layout styles (PDF has its own text colors)
+          // For regular HTML content: also apply tenant text colors for visibility on dark themes
+          style.textContent = isPdfContent
+            ? `
             * {
               box-sizing: border-box;
             }
             html, body {
               margin: 0;
               padding: 0;
-              overflow-x: hidden !important;
-              overflow-y: visible !important;
-              color: ${bodyColor} !important;
+              overflow-x: hidden;
+              overflow-y: visible;
+            }
+            img, svg, canvas {
+              max-width: 100%;
+              height: auto;
+            }
+            table {
+              max-width: 100%;
+              table-layout: auto;
+            }
+          `
+            : `
+            * {
+              box-sizing: border-box;
+            }
+            html, body {
+              margin: 0;
+              padding: 0;
+              overflow-x: hidden;
+              overflow-y: visible;
+              color: ${bodyColor};
             }
             p, li, td, th, label,
             h1, h2, h3, h4, h5, h6,
             div, span {
-              color: ${bodyColor} !important;
+              color: ${bodyColor};
             }
             a {
-              color: ${linkColor} !important;
+              color: ${linkColor};
             }
             img, svg, canvas {
-              max-width: 100% !important;
-              height: auto !important;
+              max-width: 100%;
+              height: auto;
             }
             table {
-              max-width: 100% !important;
-              table-layout: auto !important;
+              max-width: 100%;
+              table-layout: auto;
             }
           `;
           iframeDocument.head.appendChild(style);
@@ -192,7 +245,7 @@ export default function FinancialStatementLayout({
       window.removeEventListener("resize", handleResize);
       clearTimeout((handleResize as any).timeout);
     };
-  }, [content, primaryRgb, secondaryRgb]);
+  }, [content, isPdfContent, primaryRgb, secondaryRgb]);
 
   const handleScrollToComments = () => {
     const commentsSection = document.getElementById("forum-thread-section");
