@@ -384,6 +384,10 @@ export class TenantUI {
     return this._logo;
   }
 
+  public get dunaTitle(): string | undefined {
+    return this._dunaTitle;
+  }
+
   public get logoSize(): string | undefined {
     return this._logoSize;
   }
