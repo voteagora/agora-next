@@ -42,8 +42,13 @@ export class ABRunnerEngine {
 
     await Promise.all([pageA.waitForTimeout(1500), pageB.waitForTimeout(1500)]);
 
-    // Hide Vercel Live Preview toolbar to prevent layout shifts
-    const globalHide = `vercel-live-feedback, #vercel-live-button, #vercel-live-feedback { display: none !important; opacity: 0 !important; visibility: hidden !important; }`;
+    // Hide Vercel Live Preview toolbar and any overlay Modals/Dialogs/Banners to prevent layout shifts and blocked screenshots
+    const globalHide = `
+      vercel-live-feedback, #vercel-live-button, #vercel-live-feedback,
+      [role="dialog"], dialog, .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"]
+      { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+      body { overflow: auto !important; padding-right: 0 !important; }
+    `;
     await pageA.addStyleTag({ content: globalHide }).catch(() => {});
     await pageB.addStyleTag({ content: globalHide }).catch(() => {});
 
@@ -63,6 +68,30 @@ export class ABRunnerEngine {
       this.progressiveScroll(pageB, route),
     ]);
 
+    // Aggressively dismiss accessible modals via Escape and hide standard portals
+    await Promise.all([
+      pageA.keyboard.press("Escape").catch(() => {}),
+      pageB.keyboard.press("Escape").catch(() => {}),
+      pageA
+        .evaluate(() => {
+          document
+            .querySelectorAll(
+              '[data-radix-portal], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+            )
+            .forEach((el) => ((el as any).style.display = "none"));
+        })
+        .catch(() => {}),
+      pageB
+        .evaluate(() => {
+          document
+            .querySelectorAll(
+              '[data-radix-portal], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+            )
+            .forEach((el) => ((el as any).style.display = "none"));
+        })
+        .catch(() => {}),
+    ]);
+
     // 2. Extract DOM trees
     const treeA = await this.extractDOMTree(pageA, route);
     const treeB = await this.extractDOMTree(pageB, route);
@@ -74,7 +103,6 @@ export class ABRunnerEngine {
 
     for (const nodeA of treeA) {
       if (!nodeA) continue;
-      if (nodeA.path.includes("> footer:")) continue;
 
       const nodeB = mapB.get(nodeA.path);
 
@@ -221,8 +249,7 @@ export class ABRunnerEngine {
                 await locA
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
-                    margin: 30,
-                  } as any)
+                  })
                   .catch(() => {});
               }
             } catch {}
@@ -235,8 +262,7 @@ export class ABRunnerEngine {
                 await locB
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
-                    margin: 30,
-                  } as any)
+                  })
                   .catch(() => {});
               }
             } catch {}
@@ -372,6 +398,8 @@ export class ABRunnerEngine {
       const allElements = document.querySelectorAll(scope);
       const elements = Array.from(allElements)
         .filter((el) => {
+          if (el.closest("footer")) return false; // Hard reject all footer elements and their children
+
           const isVisualBlock =
             el.tagName === "IMG" ||
             el.tagName === "SVG" ||
