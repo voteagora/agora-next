@@ -56,11 +56,11 @@ export class ABRunnerEngine {
         .catch(() => {}),
     ]);
 
-    // Hide Vercel Live Preview toolbar and any overlay Modals/Dialogs/Banners to prevent layout shifts and blocked screenshots
+    // Hide Vercel Live Preview toolbar and exclusively target true Modals/Dialogs/Banners to avoid erasing standard UI headers
     const globalHide = `
-      vercel-live-feedback, #vercel-live-button, #vercel-live-feedback,
-      [role="dialog"], dialog, .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"],
-      div[aria-modal="true"], #connectkit-modal, body > div[class*="fixed"][class*="z-50"]
+      vercel-live-feedback, #vercel-live-button, #vercel-live-feedback, [data-vercel-edit-button], [data-vercel-toolbar],
+      .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"],
+      div[aria-modal="true"], #connectkit-modal
       { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
       body { overflow: auto !important; padding-right: 0 !important; }
     `;
@@ -91,7 +91,7 @@ export class ABRunnerEngine {
         .evaluate(() => {
           document
             .querySelectorAll(
-              '[data-radix-portal], [aria-modal="true"], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+              '[data-radix-portal], [aria-modal="true"], [data-state="open"], #connectkit-modal, [data-vercel-toolbar]'
             )
             .forEach((el) => ((el as any).style.display = "none"));
         })
@@ -100,7 +100,7 @@ export class ABRunnerEngine {
         .evaluate(() => {
           document
             .querySelectorAll(
-              '[data-radix-portal], [aria-modal="true"], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+              '[data-radix-portal], [aria-modal="true"], [data-state="open"], #connectkit-modal, [data-vercel-toolbar]'
             )
             .forEach((el) => ((el as any).style.display = "none"));
         })
@@ -395,7 +395,7 @@ export class ABRunnerEngine {
     let lastCount = 0;
     let stableRounds = 0;
 
-    const getScrollHeight = () => document.body.scrollHeight;
+    const getScrollHeight = () => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
     const getListCount = () =>
       document.querySelectorAll(
         "a[href*='/proposals/'], a[href*='/delegates/'], a[href*='/voters/']"
@@ -410,7 +410,7 @@ export class ABRunnerEngine {
 
     while (attempts < maxAttempts) {
       await page.mouse.wheel(0, 15000);
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.evaluate(() => window.scrollTo(0, Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)));
       await page.waitForTimeout(2000);
 
       currentHeight = await page.evaluate(getScrollHeight);
@@ -458,6 +458,11 @@ export class ABRunnerEngine {
       const allElements = document.querySelectorAll(scope);
       const elements = Array.from(allElements)
         .filter((el) => {
+          if (el.closest("vercel-live-feedback") || el.closest("[data-vercel-toolbar]")) return false;
+          
+          const text = el.textContent?.trim();
+          if (text === "Loading" || text === "Loading...") return false;
+          
           const isVisualBlock =
             el.tagName === "IMG" ||
             el.tagName === "SVG" ||
