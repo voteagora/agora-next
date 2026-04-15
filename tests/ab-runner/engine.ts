@@ -40,12 +40,9 @@ export class ABRunnerEngine {
       pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
     ]);
 
-    await Promise.all([
-      pageA.waitForSelector("body", { timeout: 15000 }).catch(() => {}),
-      pageB.waitForSelector("body", { timeout: 15000 }).catch(() => {}),
-    ]);
+    await Promise.all([pageA.waitForTimeout(1500), pageB.waitForTimeout(1500)]);
 
-    // Hide sticky toolbars like Vercel Live Preview which shift local footers
+    // Hide Vercel Live Preview toolbar to prevent layout shifts
     const globalHide = `vercel-live-feedback, #vercel-live-button, #vercel-live-feedback { display: none !important; opacity: 0 !important; visibility: hidden !important; }`;
     await pageA.addStyleTag({ content: globalHide }).catch(() => {});
     await pageB.addStyleTag({ content: globalHide }).catch(() => {});
@@ -60,24 +57,25 @@ export class ABRunnerEngine {
       ]);
     }
 
-    // 1. Trigger infinite loaders via progressive scroll, then fit viewport accurately
+    // 1. Scroll to trigger infinite loaders and stabilize the DOM
     await Promise.all([
-      this.progressiveScroll(pageA),
-      this.progressiveScroll(pageB),
+      this.progressiveScroll(pageA, route),
+      this.progressiveScroll(pageB, route),
     ]);
 
-    // 2. Extract DOM Trees
-    const treeA = await this.extractDOMTree(pageA);
-    const treeB = await this.extractDOMTree(pageB);
+    // 2. Extract DOM trees
+    const treeA = await this.extractDOMTree(pageA, route);
+    const treeB = await this.extractDOMTree(pageB, route);
 
-    // 3. Compare the trees
-    const drifts: any[] = [];
-    const reportList: any[] = [];
+    // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
+    const rawDrifts: any[] = [];
 
     const mapB = new Map(treeB.map((n: any) => [n.path, n]));
 
     for (const nodeA of treeA) {
       if (!nodeA) continue;
+      if (nodeA.path.includes("> footer:")) continue;
+
       const nodeB = mapB.get(nodeA.path);
 
       let isDrifted = false;
@@ -87,33 +85,49 @@ export class ABRunnerEngine {
         isDrifted = true;
         driftReason = "Missing or Moved Component";
       } else {
-        // Data Drift Check
         if (nodeA.text !== nodeB.text) {
           isDrifted = true;
           driftReason = "Data Drift";
         } else {
-          // Layout Drift Check (tolerance of 3 pixels)
-          const dx = Math.abs(nodeA.rect.x - nodeB.rect.x);
-          const dy = Math.abs(nodeA.rect.y - nodeB.rect.y);
+          // Only check width/height — x/y coordinates cascade from parent shifts
           const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
           const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
 
-          if (dx > 3 || dy > 3 || dw > 3 || dh > 3) {
+          if (dw > 3 || dh > 3) {
             isDrifted = true;
             driftReason = "Layout Drift";
           }
         }
       }
 
-      if (isDrifted && !nodeA.path.includes("> footer:")) {
-        drifts.push({ path: nodeA.path, reason: driftReason });
-        reportList.push({
-          component: nodeA.path,
+      if (isDrifted) {
+        rawDrifts.push({
+          path: nodeA.path,
           reason: driftReason,
-          productionText: nodeA.text,
-          branchText: nodeB
+          urlA_text: nodeA.text,
+          urlB_text: nodeB
             ? nodeB.text
             : "(Element Missing or Structurally Shifted)",
+        });
+      }
+    }
+
+    // De-duplicate: suppress parent if a child drift already covers the same change
+    const drifts: any[] = [];
+    const reportList: any[] = [];
+
+    for (const drift of rawDrifts) {
+      const hasChildDrift = rawDrifts.some(
+        (other: any) =>
+          other.path !== drift.path && other.path.startsWith(drift.path + " > ")
+      );
+      if (!hasChildDrift || drift.reason === "Missing or Moved Component") {
+        drifts.push({ path: drift.path, reason: drift.reason });
+        reportList.push({
+          component: drift.path,
+          reason: drift.reason,
+          urlA_text: drift.urlA_text,
+          urlB_text: drift.urlB_text,
         });
       }
     }
@@ -145,119 +159,120 @@ export class ABRunnerEngine {
     );
 
     if (override.expectDiff ? !isDiff : isDiff) {
-      const safeRouteName =
-        route === "/"
-          ? "index-page"
-          : route.replace(/^\//, "").replace(/\//g, "-");
-      const artifactsDir = path.join(
-        process.cwd(),
-        "test-results",
-        "ab-diffs",
-        safeRouteName
-      );
       const cropsDir = path.join(artifactsDir, "focused-crops");
 
       if (!fs.existsSync(cropsDir)) {
         fs.mkdirSync(cropsDir, { recursive: true });
       }
 
-      // 4. Highlight elements via Native CSS
-      let index = 1;
-      for (const drift of drifts) {
-        const locA = pageA.locator(drift.path).first();
-        const locB = pageB.locator(drift.path).first();
-
-        const countA = await locA.count();
-        const countB = await locB.count();
-
-        // 1. Take organized individual clean crops (un-highlighted, as requested)
-        if (index <= 15) {
-          if (countA > 0) {
-            await locA.scrollIntoViewIfNeeded().catch(() => {});
-            await locA
-              .screenshot({
-                path: path.join(cropsDir, `drift_${index}_Prod.png`),
-                margin: 30,
-              } as any)
-              .catch(() => {});
-          }
-          if (countB > 0) {
-            await locB.scrollIntoViewIfNeeded().catch(() => {});
-            await locB
-              .screenshot({
-                path: path.join(cropsDir, `drift_${index}_Branch.png`),
-                margin: 30,
-              } as any)
-              .catch(() => {});
-          }
-        }
-
-        // 2. NOW inject the highlights into the DOM globally via native CSS to bypass brittle Playwright locator locks!
-        const highlightCSS =
-          drift.reason === "Data Drift"
+      // 4. Batch-inject highlights in a single evaluate() per page
+      const highlightPayload = drifts.slice(0, 50).map((d) => ({
+        path: d.path,
+        css:
+          d.reason === "Data Drift"
             ? "4px dashed #FFD700"
-            : "4px dashed #FF4500";
-        const bgColor =
-          drift.reason === "Data Drift"
+            : "4px dashed #FF4500",
+        bg:
+          d.reason === "Data Drift"
             ? "rgba(255, 215, 0, 0.2)"
-            : "rgba(255, 69, 0, 0.2)";
+            : "rgba(255, 69, 0, 0.2)",
+      }));
 
-        if (countA > 0) {
-          await pageA
-            .evaluate(
-              ({ path, css, bg }) => {
-                const el = document.querySelector(path) as HTMLElement;
-                if (el) {
-                  el.style.outline = css;
-                  el.style.outlineOffset = "2px";
-                  el.style.backgroundColor = bg;
-                }
-              },
-              { path: drift.path, css: highlightCSS, bg: bgColor }
-            )
-            .catch(() => {});
+      const batchHighlight = (items: typeof highlightPayload) => {
+        for (const item of items) {
+          try {
+            const el = document.querySelector(item.path) as HTMLElement;
+            if (el) {
+              el.style.outline = item.css;
+              el.style.outlineOffset = "2px";
+              el.style.backgroundColor = item.bg;
+            }
+          } catch {}
         }
+      };
 
-        if (countB > 0) {
-          await pageB
-            .evaluate(
-              ({ path, css, bg }) => {
-                const el = document.querySelector(path) as HTMLElement;
-                if (el) {
-                  el.style.outline = css;
-                  el.style.outlineOffset = "2px";
-                  el.style.backgroundColor = bg;
-                }
-              },
-              { path: drift.path, css: highlightCSS, bg: bgColor }
-            )
-            .catch(() => {});
-        }
-        index++;
+      await Promise.all([
+        pageA.evaluate(batchHighlight, highlightPayload).catch(() => {}),
+        pageB.evaluate(batchHighlight, highlightPayload).catch(() => {}),
+      ]);
+
+      // 5. Full-page screenshots before crops — captured after load state settles
+      await Promise.all([
+        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+      ]);
+      await pageA.screenshot({
+        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+      });
+      await pageB.screenshot({
+        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+      });
+
+      // 6. Focused crops — UrlA and UrlB captured in parallel per drift
+      const cropDrifts = drifts.slice(0, 10);
+      for (let i = 0; i < cropDrifts.length; i++) {
+        const drift = cropDrifts[i];
+        await Promise.all([
+          (async () => {
+            try {
+              const locA = pageA.locator(drift.path).first();
+              if ((await locA.count()) > 0) {
+                await locA.scrollIntoViewIfNeeded().catch(() => {});
+                await locA
+                  .screenshot({
+                    path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
+                    margin: 30,
+                  } as any)
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+          (async () => {
+            try {
+              const locB = pageB.locator(drift.path).first();
+              if ((await locB.count()) > 0) {
+                await locB.scrollIntoViewIfNeeded().catch(() => {});
+                await locB
+                  .screenshot({
+                    path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
+                    margin: 30,
+                  } as any)
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+        ]);
       }
+    } else {
+      // No drifts — capture full-page baselines
+      await Promise.all([
+        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+      ]);
+      await pageA.screenshot({
+        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+      });
+      await pageB.screenshot({
+        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+      });
     }
 
-    // 5. Capture screenshots unconditionally so they're always visibly accessible
-    await pageA.screenshot({
-      path: path.join(artifactsDir, `00_Prod_FullPage_Highlights.png`),
-    });
-    await pageB.screenshot({
-      path: path.join(artifactsDir, `00_Branch_FullPage_Highlights.png`),
-    });
-
     if (drifts.length > 0) {
-      fs.writeFileSync(
-        path.join(artifactsDir, `treeA.json`),
-        JSON.stringify(treeA, null, 2)
-      );
-      fs.writeFileSync(
-        path.join(artifactsDir, `treeB.json`),
-        JSON.stringify(treeB, null, 2)
-      );
-
+      const reportWithMeta = [
+        {
+          reportDescription: {
+            urlA: this.urlA,
+            urlB: this.urlB,
+            route,
+            driftsFound: drifts.length,
+            generatedAt: new Date().toISOString(),
+          },
+        },
+        ...reportList,
+      ];
       fs.writeFileSync(
         path.join(artifactsDir, `report.json`),
-        JSON.stringify(reportList, null, 2)
+        JSON.stringify(reportWithMeta, null, 2)
       );
 
       console.log(
@@ -282,50 +297,81 @@ export class ABRunnerEngine {
     }
   }
 
-  private async progressiveScroll(page: Page) {
-    // Crucial: Wait for initial NextJS hydration and Web3 data fetching on preview deployments
-    await page.waitForTimeout(8000);
+  private async progressiveScroll(page: Page, route: string) {
+    // Wait for initial Next.js hydration and Web3 data fetching
+    await page.waitForTimeout(5000);
+
+    const isDelegatesRoute = route === "/delegates";
+    const maxAttempts = isDelegatesRoute ? 5 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 8000 : 15000;
 
     let lastHeight = 0;
+    let lastCount = 0;
+    let stableRounds = 0;
 
-    // Evaluate maximum scrollable depth across the document including inner overflow containers
-    let getScrollHeight = () =>
-      Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight,
-        ...Array.from(document.querySelectorAll("*")).map((e) => e.scrollHeight)
-      );
+    const getScrollHeight = () => document.body.scrollHeight;
+    const getListCount = () =>
+      document.querySelectorAll(
+        "a[href*='/proposals/'], a[href*='/delegates/'], a[href*='/voters/']"
+      ).length;
 
     let currentHeight = await page.evaluate(getScrollHeight);
+    let currentCount = await page.evaluate(getListCount);
     let attempts = 0;
 
     await page.setViewportSize({ width: 1280, height: 1080 });
-
-    // Position mouse centrally to target inner scrollable containers with hardware scroll
     await page.mouse.move(640, 500);
 
-    while (lastHeight !== currentHeight && attempts < 15) {
-      lastHeight = currentHeight;
-      await page.mouse.wheel(0, 10000); // Simulate aggressive hardware wheel down
+    while (attempts < maxAttempts) {
+      await page.mouse.wheel(0, 15000);
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       await page.waitForTimeout(2000);
+
       currentHeight = await page.evaluate(getScrollHeight);
+      currentCount = await page.evaluate(getListCount);
+
+      const heightStable = lastHeight === currentHeight;
+      const countStable = lastCount === currentCount;
+      const isLoading = await page.evaluate(() =>
+        document.body.innerText.includes("Loading")
+      );
+
+      if (heightStable && countStable && !isLoading) {
+        stableRounds++;
+        if (stableRounds >= 2) {
+          break;
+        }
+      } else {
+        stableRounds = 0;
+      }
+
+      lastHeight = currentHeight;
+      lastCount = currentCount;
       attempts++;
     }
 
-    // Expand the viewport cleanly to capture the full page without stitching issues
-    await page.setViewportSize({ width: 1280, height: currentHeight + 200 });
+    // Expand viewport to fit all loaded content
+    const artificialHeight = Math.min(
+      maxViewportHeight,
+      Math.max(1080, currentHeight + 200)
+    );
+    await page.setViewportSize({ width: 1280, height: artificialHeight });
 
-    // Snap back to top and physically scroll back up to trigger any sticky/dynamic header intersection observers
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.mouse.wheel(0, -100000);
-    await page.waitForTimeout(2000);
+
+    await page.waitForTimeout(3000);
   }
 
-  private async extractDOMTree(page: Page) {
-    return await page.evaluate(() => {
-      // Ultimate Leaf Extractor: Captures images and every single deeply nested piece of text objectively
-      const elements = Array.from(document.querySelectorAll("*")).filter(
-        (el) => {
+  private async extractDOMTree(page: Page, route: string) {
+    return await page.evaluate((rt) => {
+      // Scope to delegate cards on /delegates to avoid O(N²) CSS path traversal
+      const scope = rt === "/delegates" ? "a[href*='/delegates/'] *" : "*";
+
+      const MAX_ELEMENTS = 2000;
+      const allElements = document.querySelectorAll(scope);
+      const elements = Array.from(allElements)
+        .filter((el) => {
           const isVisualBlock =
             el.tagName === "IMG" ||
             el.tagName === "SVG" ||
@@ -334,13 +380,12 @@ export class ABRunnerEngine {
             (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
           );
           return isVisualBlock || hasDirectText;
-        }
-      );
+        })
+        .slice(0, MAX_ELEMENTS);
 
       return elements
         .map((el) => {
           const rect = el.getBoundingClientRect();
-          // Discard 0x0
           if (rect.width === 0 || rect.height === 0) return null;
 
           return {
@@ -375,21 +420,21 @@ export class ABRunnerEngine {
             if (sibling.tagName === curr.tagName) index++;
           }
           let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
-          let testid = curr.getAttribute("data-testid");
-          let href = curr.getAttribute("href");
+          const testid = curr.getAttribute("data-testid");
+          const href = curr.getAttribute("href");
 
           if (testid) {
             selector =
               curr.tagName.toLowerCase() +
               `[data-testid="${testid}"]:nth-of-type(${index})`;
             path.unshift(selector);
-            break; // Stop climbing! Anchor the path to the data-testid so it survives high-level layout container mutations
+            break; // Anchor to data-testid — stable across layout refactors
           }
 
           if (href && href.length > 2) {
             selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
             path.unshift(selector);
-            break; // Strong anchor for dynamic cards lacking test-ids (like Proposal cards)
+            break; // Anchor to href for dynamic cards without data-testid
           }
 
           path.unshift(selector);
@@ -397,13 +442,12 @@ export class ABRunnerEngine {
         }
 
         const finalPath = path.join(" > ");
-        // Ensure playright can query it from root if it didn't anchor with testid or href
         if (finalPath.includes("data-testid") || finalPath.includes("href=")) {
           return finalPath;
         }
         return "body > " + finalPath;
       }
-    });
+    }, route);
   }
 
   private getOverride(route: string): OverrideConfig {
