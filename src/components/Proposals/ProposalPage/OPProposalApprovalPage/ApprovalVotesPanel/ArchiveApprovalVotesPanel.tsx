@@ -50,6 +50,11 @@ export default function ArchiveApprovalVotesPanel({ proposal }: Props) {
               className="text-base font-semibold pr-4 cursor-pointer"
             >
               <span
+                data-testid={
+                  tab === "Results"
+                    ? "proposal-results-tab"
+                    : "proposal-votes-tab"
+                }
                 className={
                   activeTab === index + 1 ? "text-secondary" : "text-tertiary"
                 }
