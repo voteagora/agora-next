@@ -94,6 +94,7 @@ export const DelegatesFilter = () => {
       onReset={resetAllFiltersToUrl}
       isOpen={isOpen}
       onOpenChange={onFilterClose}
+      testId="filter-dropdown"
     >
       {/* Filter Chips */}
       <div className="self-stretch px-2.5 py-6 bg-wash flex flex-col justify-start items-start">

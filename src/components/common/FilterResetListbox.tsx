@@ -28,6 +28,7 @@ export type FilterResetListboxProps = {
   onOpenChange?: (open: boolean) => void;
   borderBelowLabel?: boolean;
   animateFromBottom?: boolean;
+  testId?: string;
 };
 
 const FilterResetListbox = ({
@@ -40,6 +41,7 @@ const FilterResetListbox = ({
   onOpenChange,
   borderBelowLabel = true,
   animateFromBottom = false,
+  testId,
 }: FilterResetListboxProps) => {
   const [open, setOpen] = React.useState(false);
 
@@ -63,6 +65,7 @@ const FilterResetListbox = ({
     return (
       <div className="relative">
         <button
+          data-testid={testId}
           className={cn(
             "px-[12px] md:p-[10px] rounded-sm md:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
             hasActiveFilters
@@ -152,6 +155,7 @@ const FilterResetListbox = ({
     >
       <DropdownMenu.Trigger asChild>
         <button
+          data-testid={testId}
           className={cn(
             "px-[12px] md:p-[10px] rounded-sm md:rounded-lg border border-line inline-flex gap-[6px] items-center leading-none h-[42px] relative",
             hasActiveFilters

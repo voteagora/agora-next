@@ -1,0 +1,32 @@
+
+> agora-next@0.1.0 dev
+> npm run generate-typechain & npx prisma generate & next dev
+
+
+> agora-next@0.1.0 generate-typechain
+> typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env
+  - Experiments (use with caution):
+    · instrumentationHook
+
+ ✓ Starting...
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+Successfully generated 43 typings!
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 770ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+ ○ Compiling /instrumentation ...
+ ✓ Compiled /instrumentation in 1772ms (647 modules)
+ ✓ Ready in 4.4s
+ ○ Compiling /api/mock-daonode/[...path] ...
+ ✓ Compiled /api/mock-daonode/[...path] in 3.8s (668 modules)
+[Mock DAO Node] Intercepted GET /v1/proposals/test-defeated
+ GET /api/mock-daonode/v1/proposals/test-defeated 200 in 4127ms
