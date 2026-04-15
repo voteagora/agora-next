@@ -642,7 +642,7 @@ export const isSafeWallet = async (address: Address, chainId?: number) => {
     return false;
   }
 
-  const publicClient = getPublicClient(chain);
+  const publicClient = getPublicClient(chain || undefined);
 
   try {
     const threshold = await publicClient.readContract({

@@ -28,6 +28,7 @@ export default function DelegatesSortFilter() {
       onReset={resetSort}
       isOpen={isOpen}
       onOpenChange={setIsOpen}
+      testId="sort-dropdown"
     >
       <div className="self-stretch p-3 flex flex-col gap-2">
         <DropdownMenu.RadioGroup
