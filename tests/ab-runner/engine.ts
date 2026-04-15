@@ -40,7 +40,21 @@ export class ABRunnerEngine {
       pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
     ]);
 
-    await Promise.all([pageA.waitForTimeout(1500), pageB.waitForTimeout(1500)]);
+    // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
+    await Promise.all([
+      pageA
+        .waitForFunction(
+          () => document.body && document.body.innerText.trim().length > 50,
+          { timeout: 15000 }
+        )
+        .catch(() => {}),
+      pageB
+        .waitForFunction(
+          () => document.body && document.body.innerText.trim().length > 50,
+          { timeout: 15000 }
+        )
+        .catch(() => {}),
+    ]);
 
     // Hide Vercel Live Preview toolbar and any overlay Modals/Dialogs/Banners to prevent layout shifts and blocked screenshots
     const globalHide = `
@@ -228,6 +242,27 @@ export class ABRunnerEngine {
         pageB.evaluate(batchHighlight, highlightPayload).catch(() => {}),
       ]);
 
+      // Inject Source URL Overlay requested by Jeff
+      const injectOverlay = async (p: Page, label: string, u: string) => {
+        await p
+          .evaluate(
+            ({ l, base }) => {
+              const el = document.createElement("div");
+              el.innerHTML = `<strong>${l}</strong> <br/> <small style="opacity: 0.8">${base}</small>`;
+              el.style.cssText =
+                "position: fixed; bottom: 20px; left: 20px; z-index: 2147483647; background: rgba(0,0,0,0.8); color: #fff; padding: 12px 16px; font-family: monospace; font-size: 14px; border-radius: 8px; border: 1px solid #444; box-shadow: 0 4px 12px rgba(0,0,0,0.5); pointer-events: none;";
+              document.body.appendChild(el);
+            },
+            { l: label, base: u }
+          )
+          .catch(() => {});
+      };
+
+      await Promise.all([
+        injectOverlay(pageA, "A (Production)", this.urlA),
+        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+      ]);
+
       // 5. Full-page screenshots before crops — captured after load state settles
       await Promise.all([
         pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
@@ -274,6 +309,27 @@ export class ABRunnerEngine {
         ]);
       }
     } else {
+      // Inject Source URL Overlay requested by Jeff
+      const injectOverlay = async (p: Page, label: string, u: string) => {
+        await p
+          .evaluate(
+            ({ l, base }) => {
+              const el = document.createElement("div");
+              el.innerHTML = `<strong>${l}</strong> <br/> <small style="opacity: 0.8">${base}</small>`;
+              el.style.cssText =
+                "position: fixed; bottom: 20px; left: 20px; z-index: 2147483647; background: rgba(0,0,0,0.8); color: #fff; padding: 12px 16px; font-family: monospace; font-size: 14px; border-radius: 8px; border: 1px solid #444; box-shadow: 0 4px 12px rgba(0,0,0,0.5); pointer-events: none;";
+              document.body.appendChild(el);
+            },
+            { l: label, base: u }
+          )
+          .catch(() => {});
+      };
+
+      await Promise.all([
+        injectOverlay(pageA, "A (Production)", this.urlA),
+        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+      ]);
+
       // No drifts — capture full-page baselines
       await Promise.all([
         pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
