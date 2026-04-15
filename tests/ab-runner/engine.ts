@@ -45,7 +45,8 @@ export class ABRunnerEngine {
     // Hide Vercel Live Preview toolbar and any overlay Modals/Dialogs/Banners to prevent layout shifts and blocked screenshots
     const globalHide = `
       vercel-live-feedback, #vercel-live-button, #vercel-live-feedback,
-      [role="dialog"], dialog, .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"]
+      [role="dialog"], dialog, .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"],
+      div[aria-modal="true"], #connectkit-modal, body > div[class*="fixed"][class*="z-50"]
       { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
       body { overflow: auto !important; padding-right: 0 !important; }
     `;
@@ -76,7 +77,7 @@ export class ABRunnerEngine {
         .evaluate(() => {
           document
             .querySelectorAll(
-              '[data-radix-portal], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+              '[data-radix-portal], [aria-modal="true"], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
             )
             .forEach((el) => ((el as any).style.display = "none"));
         })
@@ -85,7 +86,7 @@ export class ABRunnerEngine {
         .evaluate(() => {
           document
             .querySelectorAll(
-              '[data-radix-portal], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
+              '[data-radix-portal], [aria-modal="true"], [role="dialog"], [data-state="open"], .fixed.inset-0, [class*="z-[100]"], [class*="z-50"]'
             )
             .forEach((el) => ((el as any).style.display = "none"));
         })
@@ -118,12 +119,15 @@ export class ABRunnerEngine {
           driftReason = "Data Drift";
         } else {
           // Only check width/height — x/y coordinates cascade from parent shifts
-          const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
-          const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
+          // We explicitely skip Layout check for Footer items since footer y-shifts on content height
+          if (!nodeA.isFooter) {
+            const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
+            const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
 
-          if (dw > 3 || dh > 3) {
-            isDrifted = true;
-            driftReason = "Layout Drift";
+            if (dw > 3 || dh > 3) {
+              isDrifted = true;
+              driftReason = "Layout Drift";
+            }
           }
         }
       }
@@ -398,8 +402,6 @@ export class ABRunnerEngine {
       const allElements = document.querySelectorAll(scope);
       const elements = Array.from(allElements)
         .filter((el) => {
-          if (el.closest("footer")) return false; // Hard reject all footer elements and their children
-
           const isVisualBlock =
             el.tagName === "IMG" ||
             el.tagName === "SVG" ||
@@ -426,6 +428,7 @@ export class ABRunnerEngine {
               height: rect.height,
             },
             path: getValidCSSPath(el),
+            isFooter: !!el.closest("footer"),
           };
         })
         .filter(Boolean);
