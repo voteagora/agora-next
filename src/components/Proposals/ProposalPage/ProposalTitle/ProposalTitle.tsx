@@ -54,7 +54,12 @@ export default function ProposalTitle({
           </a>
         </div>
       )}
-      <h2 className="font-black text-2xl text-primary">{title}</h2>
+      <h2
+        data-testid="proposal-title"
+        className="font-black text-2xl text-primary"
+      >
+        {title}
+      </h2>
     </div>
   );
 }
