@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+const byTestIdOrText = (page: any, testId: string, text: RegExp | string) =>
+  page.getByTestId(testId).or(page.getByText(text).first()).first();
+
 /**
  * Live tests for ENS DAO — https://agora.ensdao.org
  *
@@ -32,25 +35,39 @@ test.describe("[ens] Standard (OZ-gov) — [EP 6.23] Endowment permissions to ka
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/EP 6\.23|Endowment.*karpatkey/i).first()
-    ).toBeVisible();
+      byTestIdOrText(page, "proposal-title", /EP 6\.23|Endowment.*karpatkey/i)
+    ).toContainText(/EP 6\.23|Endowment.*karpatkey/i);
   });
 
   test("should show EXECUTED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // OZ-gov standard proposals that pass and execute show EXECUTED
-    await expect(page.getByText("EXECUTED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^EXECUTED$/)
+    ).toHaveText("EXECUTED");
   });
 
-  test("should display FOR / AGAINST vote counts and quorum (OZ-gov standard)", async ({ page }) => {
+  test("should display FOR / AGAINST vote counts and quorum (OZ-gov standard)", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // OZ-gov standard proposals render FOR / AGAINST labels and Quorum
-    await expect(page.getByText(/FOR\s*-/i).first()).toBeVisible();
-    await expect(page.getByText(/AGAINST\s*-/i).first()).toBeVisible();
-    await expect(page.getByText(/Quorum/i).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-for", /FOR\s*-/i)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-against", /AGAINST\s*-/i)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-quorum", /Quorum/i)
+    ).toBeVisible();
     // Exact vote totals scraped from live page 2026-04-08
-    await expect(page.getByText(/1,229,861/).first()).toBeVisible(); // FOR
-    await expect(page.getByText(/1,000,000/).first()).toBeVisible(); // quorum threshold
+    await expect(
+      byTestIdOrText(page, "proposal-votes-for", /1,229,861/)
+    ).toContainText(/1,229,861/); // FOR
+    await expect(
+      byTestIdOrText(page, "proposal-votes-quorum", /1,000,000/)
+    ).toContainText(/1,000,000/); // quorum threshold
   });
 });
 
@@ -71,20 +88,33 @@ test.describe("[ens] Snapshot Copeland (ranked-choice) — [EP 6.10] Select prov
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/EP 6\.10|Select providers|Service Provider Program/i).first()
-    ).toBeVisible();
+      byTestIdOrText(
+        page,
+        "proposal-title",
+        /EP 6\.10|Select providers|Service Provider Program/i
+      )
+    ).toContainText(/EP 6\.10|Select providers|Service Provider Program/i);
   });
 
   test("should show CLOSED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Snapshot copeland proposals that are finished show CLOSED
-    await expect(page.getByText("CLOSED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^CLOSED$/)
+    ).toHaveText("CLOSED");
   });
 
-  test("should render ranked-choice / copeland voting results", async ({ page }) => {
+  test("should render ranked-choice / copeland voting results", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Copeland/ranked-choice proposals render a results panel with candidates
     // (not a simple FOR / AGAINST summary)
-    await expect(page.getByText(/Results|Rank|Provider/i).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-panel", /Results|Rank|Provider/i)
+    ).toBeVisible();
   });
 });

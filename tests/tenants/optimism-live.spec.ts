@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+const byTestIdOrText = (page: any, testId: string, text: RegExp | string) =>
+  page.getByTestId(testId).or(page.getByText(text).first()).first();
+
 /**
  * Live tests for Optimism — https://vote.optimism.io
  *
@@ -37,31 +40,53 @@ test.describe("[optimism] Standard TH — Security Council S7 Retroactive Fundin
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Security Council Season 7 Retroactive/i).first()
-    ).toBeVisible();
+      byTestIdOrText(
+        page,
+        "proposal-title",
+        /Security Council Season 7 Retroactive/i
+      )
+    ).toContainText(/Security Council Season 7 Retroactive/i);
   });
 
   test("should show EXECUTED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Standard proposals that pass and are executed show EXECUTED
-    await expect(page.getByText("EXECUTED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^EXECUTED$/)
+    ).toHaveText("EXECUTED");
   });
 
-  test("should display FOR / AGAINST vote counts and quorum", async ({ page }) => {
+  test("should display FOR / AGAINST vote counts and quorum", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Standard proposal vote summary: FOR -, AGAINST -, Quorum
-    await expect(page.getByText(/FOR\s*-/i).first()).toBeVisible();
-    await expect(page.getByText(/AGAINST\s*-/i).first()).toBeVisible();
-    await expect(page.getByText(/Quorum/i).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-for", /FOR\s*-/i)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-against", /AGAINST\s*-/i)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-votes-quorum", /Quorum/i)
+    ).toBeVisible();
     // Exact vote totals scraped from live page 2026-04-08
-    await expect(page.getByText(/29,048,440/).first()).toBeVisible(); // quorum threshold
-    await expect(page.getByText(/46,330,175/).first()).toBeVisible(); // FOR
-    await expect(page.getByText(/48,220/).first()).toBeVisible();     // AGAINST
+    await expect(
+      byTestIdOrText(page, "proposal-votes-quorum", /29,048,440/)
+    ).toContainText(/29,048,440/); // quorum threshold
+    await expect(
+      byTestIdOrText(page, "proposal-votes-for", /46,330,175/)
+    ).toContainText(/46,330,175/); // FOR
+    await expect(
+      byTestIdOrText(page, "proposal-votes-against", /48,220/)
+    ).toContainText(/48,220/); // AGAINST
   });
 
   test("should show voting activity section", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText(/Voting activity/i).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-voting-activity-title", /Voting activity/i)
+    ).toBeVisible();
   });
 });
 
@@ -82,20 +107,33 @@ test.describe("[optimism] Approval TH — Security Council Elections: Cohort A L
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Security Council Elections.*Cohort A/i).first()
-    ).toBeVisible();
+      byTestIdOrText(
+        page,
+        "proposal-title",
+        /Security Council Elections.*Cohort A/i
+      )
+    ).toContainText(/Security Council Elections.*Cohort A/i);
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Approval proposals that meet quorum show SUCCEEDED
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
-  test("should render the results panel with candidate details", async ({ page }) => {
+  test("should render the results panel with candidate details", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Approval proposals for a single nominee: shows candidate results panel instead of FOR/AGAINST
-    await expect(page.getByText("Results", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-panel", /^Results$/)
+    ).toBeVisible();
     await expect(page.getByText("alisha").first()).toBeVisible();
     await expect(page.getByText("100.00%").first()).toBeVisible();
   });
@@ -118,24 +156,40 @@ test.describe("[optimism] Optimistic TH — S8 Governance Fund Mission: Develope
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Developer Advisory Board/i).first()
-    ).toBeVisible();
+      byTestIdOrText(page, "proposal-title", /Developer Advisory Board/i)
+    ).toContainText(/Developer Advisory Board/i);
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Optimistic proposals that were not vetoed show SUCCEEDED
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
-  test("should display optimistic approval mechanics and veto threshold", async ({ page }) => {
+  test("should display optimistic approval mechanics and veto threshold", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Optimistic proposals: veto-unless mechanic — pass unless 20% vetoes
-    await expect(page.getByText(/Voting activity/i).first()).toBeVisible();
-    await expect(page.getByText(/optimistically/i).first()).toBeVisible();
     await expect(
-      page.getByText(/automatically pass unless 20% of the votable supply/i).first()
+      byTestIdOrText(page, "proposal-voting-activity-title", /Voting activity/i)
     ).toBeVisible();
+    await expect(
+      byTestIdOrText(
+        page,
+        "proposal-optimistic-summary-title",
+        /optimistically/i
+      )
+    ).toContainText(/optimistically/i);
+    await expect(
+      byTestIdOrText(
+        page,
+        "proposal-optimistic-summary-description",
+        /automatically pass unless 20% of the votable supply/i
+      )
+    ).toContainText(/automatically pass unless 20% of the votable supply/i);
     // Exact veto percentage scraped from live page 2026-04-08
     await expect(
       page.getByText(/1\.34% \(1,048,876 OP\) is against/i).first()
@@ -160,21 +214,30 @@ test.describe("[optimism] Optimistic CH — S8 Retro Funding Mission: Developer 
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Developer Tooling/i).first()
-    ).toBeVisible();
+      byTestIdOrText(page, "proposal-title", /Developer Tooling/i)
+    ).toContainText(/Developer Tooling/i);
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
-  test("should display the optimistic voter breakdown results", async ({ page }) => {
+  test("should display the optimistic voter breakdown results", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("Results", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-panel", /^Results$/)
+    ).toBeVisible();
     await expect(page.getByText("Total Votes").first()).toBeVisible();
     await expect(page.getByText("5.1%").first()).toBeVisible();
-    
+
     // Verify voter groups
     await expect(page.getByText("Chains").first()).toBeVisible();
     await expect(page.getByText("Apps").first()).toBeVisible();
@@ -199,19 +262,30 @@ test.describe("[optimism] Standard JH — Season 8: Intent Ratification", () => 
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Season 8.*Intent Ratification|Intent Ratification/i).first()
-    ).toBeVisible();
+      byTestIdOrText(
+        page,
+        "proposal-title",
+        /Season 8.*Intent Ratification|Intent Ratification/i
+      )
+    ).toContainText(/Season 8.*Intent Ratification|Intent Ratification/i);
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
   test("should render house-specific vote results", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Standard JH proposals show Results tab with FOR/ABSTAIN/AGAINST column and house breakdown
-    await expect(page.getByText("Results", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-panel", /^GROUP$/)
+    ).toBeVisible();
     await expect(page.getByText("GROUP").first()).toBeVisible();
     await expect(page.getByText("FOR").first()).toBeVisible();
     await expect(page.getByText("AGAINST").first()).toBeVisible();
@@ -238,20 +312,37 @@ test.describe("[optimism] Approval JH — Developer Advisory Board Election: Mem
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Developer Advisory Board.*Members|Developer Advisory Board/i).first()
-    ).toBeVisible();
+      byTestIdOrText(
+        page,
+        "proposal-title",
+        /Developer Advisory Board.*Members|Developer Advisory Board/i
+      )
+    ).toContainText(
+      /Developer Advisory Board.*Members|Developer Advisory Board/i
+    );
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
-  test("should render the approval voting panel with candidates and results", async ({ page }) => {
+  test("should render the approval voting panel with candidates and results", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     // Approval JH: multi-candidate approval vote — renders a results/candidates panel
-    await expect(page.getByText("Results", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText("Votes", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-panel", /^Votes$/)
+    ).toBeVisible();
+    await expect(
+      page.getByText("Votes", { exact: true }).first()
+    ).toBeVisible();
   });
 });
 
@@ -272,19 +363,39 @@ test.describe("[optimism] Optimistic JH — Maintenance Upgrade: 16a", () => {
   test("should display the proposal title", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
     await expect(
-      page.getByText(/Maintenance Upgrade.*16a|16a/i).first()
-    ).toBeVisible();
+      byTestIdOrText(page, "proposal-title", /Maintenance Upgrade.*16a|16a/i)
+    ).toContainText(/Maintenance Upgrade.*16a|16a/i);
   });
 
   test("should show SUCCEEDED status badge", async ({ page }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("SUCCEEDED", { exact: true }).first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-status-badge", /^SUCCEEDED$/)
+    ).toHaveText("SUCCEEDED");
   });
 
-  test("should display the optimistic veto threshold and breakdown", async ({ page }) => {
+  test("should display the optimistic veto threshold and breakdown", async ({
+    page,
+  }) => {
     await page.goto(`/proposals/${PROPOSAL_ID}`);
-    await expect(page.getByText("Results", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText("Proposal has passed").first()).toBeVisible();
-    await expect(page.getByText("One of three thresholds are applied, based on the number of groups signaling to veto.").first()).toBeVisible();
+    await expect(
+      byTestIdOrText(page, "proposal-results-tab", /^Results$/)
+    ).toBeVisible();
+    await expect(
+      byTestIdOrText(
+        page,
+        "proposal-optimistic-summary-title",
+        "Proposal has passed"
+      )
+    ).toContainText("Proposal has passed");
+    await expect(
+      byTestIdOrText(
+        page,
+        "proposal-optimistic-summary-description",
+        "One of three thresholds are applied, based on the number of groups signaling to veto."
+      )
+    ).toContainText(
+      "One of three thresholds are applied, based on the number of groups signaling to veto."
+    );
   });
 });
