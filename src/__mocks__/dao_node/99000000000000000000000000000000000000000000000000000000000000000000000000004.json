@@ -1,0 +1,58 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "139798607",
+  "calldatas": [
+    "0xa9059cbb0000000000000000000000001234567890123456789012345678901234567890"
+  ],
+  "data_eng_properties": {
+    "hash": "synthetic-standard-queued-recent",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "description": "# [SYNTHETIC] Standard proposal — queued (recent)\n\nQueued ~1 day ago with pending onchain actions; should report QUEUED.",
+  "end_block": 140057807,
+  "end_blocktime": 1755714391,
+  "hybrid": false,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000004",
+  "lifecycle_stage": "QUEUED",
+  "log_index": 1,
+  "num_of_votes": 4200,
+  "proposal_type_id": 0,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "default",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "queue_event": {
+    "block_number": "140057946",
+    "eta": 1776124800,
+    "id": "99000000000000000000000000000000000000000000000000000000000000000000000000004",
+    "log_index": 31,
+    "timestamp": 1776038400,
+    "transaction_hash": "0x00000000000000000000000000000000000000000000000000000000000000c4",
+    "transaction_index": 19
+  },
+  "quorum": "29048439693532197051157636",
+  "signatures": ["transfer(address,uint256)"],
+  "start_block": 139798607,
+  "start_blocktime": 1755195991,
+  "targets": ["0x4200000000000000000000000000000000000042"],
+  "timestamp": 1755195991,
+  "title": "[SYNTHETIC] Standard — Queued Recent",
+  "total_voting_power_at_start": "96828132311773990170525455",
+  "totals": {
+    "no-param": {
+      "0": "1000000000000000000000000",
+      "1": "35000000000000000000000000",
+      "2": "500000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000004",
+  "transaction_index": 1,
+  "values": [0],
+  "voting_module_name": "standard"
+}

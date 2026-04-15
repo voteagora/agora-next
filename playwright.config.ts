@@ -24,6 +24,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
+  globalSetup: "./tests/global-setup.ts",
   use: {
     baseURL: "http://127.0.0.1:3000",
     trace: process.env.URL_A && process.env.URL_B ? "off" : "on-first-retry",
@@ -47,9 +48,12 @@ export default defineConfig({
       ? undefined
       : [
           {
-            command: "PORT=3000 npm run dev",
+            // ARCHIVE_GCS_BUCKET_OVERRIDE redirects GCS fetches to the local
+            // mock server started by globalSetup (tests/global-setup.ts).
+            command:
+              "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3000 npm run dev",
             url: "http://127.0.0.1:3000",
-            reuseExistingServer: true,
+            reuseExistingServer: !process.env.CI,
             timeout: 120 * 1000,
           },
           {

@@ -1,0 +1,64 @@
+{
+  "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+  "calculationOptions": 0,
+  "chain_id": "10",
+  "choices": [],
+  "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+  "created_blocktime": 1753386167,
+  "criteria": 99,
+  "criteria_value": 0,
+  "data_eng_properties": {
+    "hash": "synthetic-offchain-standard-defeated-quorum",
+    "liveness": "archived",
+    "source": "eas-atlas"
+  },
+  "description": "# [SYNTHETIC] Offchain Standard — defeated (quorum not met)\n\nAggregate citizen participation stays below the quorum. NOTE: current deriveStatus for eas-atlas returns SUCCEEDED because resolveArchiveThresholds hardcodes quorum=0 for eas-atlas. This fixture represents the intended DEFEATED data shape.",
+  "end_block": 139152890,
+  "end_blocktime": 1753904557,
+  "expirationTime": 0,
+  "hybrid": false,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000015",
+  "max_approvals": 0,
+  "num_of_votes": 12,
+  "onchain_proposalid": 0,
+  "outcome": {
+    "APP": {
+      "0": 1,
+      "1": 2,
+      "2": 0
+    },
+    "CHAIN": {
+      "0": 0,
+      "1": 1,
+      "2": 0
+    },
+    "USER": {
+      "0": 2,
+      "1": 6,
+      "2": 0
+    }
+  },
+  "proposal_type": "STANDARD",
+  "proposal_type_id": 5,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "Default - Standard",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+  "proposer_ens": null,
+  "recipient": "0x0000000000000000",
+  "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+  "revocable": true,
+  "revocationTime": 0,
+  "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+  "start_block": 138893690,
+  "start_blocktime": 1753386157,
+  "tiers": [],
+  "time": 1753386167,
+  "title": "[SYNTHETIC] Offchain Standard — Quorum Not Met",
+  "uid": "0x0000000000000000000000000000000000000000000000000000000000000015"
+}

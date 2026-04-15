@@ -49,7 +49,10 @@ export const VotesGroupTable: React.FC<VotesGroupTableProps> = ({
           key={index}
           className="self-stretch inline-flex justify-between items-center font-semibold"
         >
-          <div className="text-primary text-xs leading-none min-w-[60px]">
+          <div
+            data-testid={`proposal-vote-group-${group.name.toLowerCase().replace(/\s+/g, "-")}`}
+            className="text-primary text-xs leading-none min-w-[60px]"
+          >
             {group.name}
           </div>
           <div className="contents lg:flex justify-between items-center">
@@ -59,6 +62,7 @@ export const VotesGroupTable: React.FC<VotesGroupTableProps> = ({
                 className={`flex justify-center lg:justify-end items-center ${column.width || "w-[60px]"}`}
               >
                 <div
+                  data-testid={`proposal-vote-group-${group.name.toLowerCase().replace(/\s+/g, "-")}-${column.key}`}
                   className={`text-xs leading-tight ${column.textColorClass || "text-primary"}`}
                 >
                   {column.formatter

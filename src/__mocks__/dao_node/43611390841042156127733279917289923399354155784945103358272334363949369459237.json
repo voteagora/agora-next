@@ -1,0 +1,46 @@
+{
+  "after_end_block": false,
+  "after_start_block": false,
+  "block_number": "138897343",
+  "data_eng_properties": {
+    "hash": "ddb35a8b3fdbb87bb39d341525f76cb6345c1bf34320b2446b9c80c7bc29fab0",
+    "liveness": "live",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [[2000, true]],
+  "description": "# S8 Governance Fund Mission: Developer Advisory Board\n\n**This is an optimistic approval. You should only cast a vote if you want to veto this proposal.**\u00a0You can read more about this proposal type in our\u00a0[operating manual](https://github.com/ethereum-optimism/OPerating-manual/blob/main/manual.md).\n\nThis proposal seeks to approve a mission funded by the Governance Fund:\n\n**Developer Advisory Board**\n\n**Goal:**\u00a0Fund audits & technical missions to boost developer adoption.\n\n**Budget:**\u00a0949k OP\n\nYou can read about the proposal in its entirety\u00a0[here](https://gov.optimism.io/t/s8-governance-fund-missions/10004#p-44526-developer-advisory-board-mission-3).",
+  "end_block": 139156543,
+  "end_blocktime": 1753911863,
+  "hybrid": false,
+  "id": "43611390841042156127733279917289923399354155784945103358272334363949369459237",
+  "lifecycle_stage": "SUCCEEDED",
+  "log_index": 72,
+  "num_of_votes": 3961,
+  "proposal_data": "00000000000000000000000000000000000000000000000000000000000007d00000000000000000000000000000000000000000000000000000000000000001",
+  "proposal_type_id": 2,
+  "proposal_type_info": {
+    "approval_threshold": 0,
+    "module": null,
+    "name": "Optimistic",
+    "quorum": 0,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "34810871407579755069545456",
+  "start_block": 138897343,
+  "start_blocktime": 1753393463,
+  "timestamp": 1753393463,
+  "title": "S8 Governance Fund Mission: Developer Advisory Board",
+  "total_voting_power_at_start": "116036238025265850231818187",
+  "totals": {
+    "no-param": {
+      "0": "1048876386614631985003741",
+      "1": "4442279692041357431",
+      "2": "2579472335678084488"
+    }
+  },
+  "transaction_hash": "0x10b3a5c375277dfcfc6de7253e4d472321ba9f5605ef00adbb10c3a59a92cf60",
+  "transaction_index": 34,
+  "voting_module": "0x8980c97f0e8a3a69831139e51003e65238f1f343",
+  "voting_module_name": "optimistic"
+}

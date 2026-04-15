@@ -1,0 +1,102 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "137683763",
+  "calldatas": [""],
+  "data_eng_properties": {
+    "hash": "synthetic-hybrid-standard-defeated",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "description": "# [SYNTHETIC] Hybrid Standard — weighted quorum / threshold not met\n\nDelegate against > for and citizen houses lean against. Weighted for% falls below the 60% approval threshold.",
+  "end_block": 137942963,
+  "end_blocktime": 1751484703,
+  "govless_proposal": {
+    "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "calculationOptions": 0,
+    "chain_id": "10",
+    "choices": [],
+    "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+    "created_blocktime": 1750966303,
+    "criteria": 99,
+    "criteria_value": 0,
+    "data_eng_properties": {
+      "hash": "synthetic-hybrid-standard-defeated-govless",
+      "liveness": "archived",
+      "source": "eas-atlas"
+    },
+    "end_block": 137942504,
+    "end_blocktime": 1751483785,
+    "expirationTime": 0,
+    "hybrid": true,
+    "id": "99000000000000000000000000000000000000000000000000000000000000000000000000106",
+    "max_approvals": 0,
+    "num_of_votes": 430,
+    "onchain_proposalid": 99000000000000000000000000000000000000000000000000000000000000000000000000006,
+    "outcome": {
+      "APP": {
+        "0": 30,
+        "1": 10,
+        "2": 5
+      },
+      "CHAIN": {
+        "0": 5,
+        "1": 2,
+        "2": 1
+      },
+      "USER": {
+        "0": 300,
+        "1": 100,
+        "2": 20
+      }
+    },
+    "proposal_type": "STANDARD",
+    "proposal_type_id": 5,
+    "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+    "proposer_ens": null,
+    "recipient": "0x0000000000000000",
+    "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+    "revocable": true,
+    "revocationTime": 0,
+    "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+    "start_block": 137683304,
+    "start_blocktime": 1750965385,
+    "tiers": [],
+    "time": 1750966303,
+    "uid": "0x0000000000000000000000000000000000000000000000000000000000000106"
+  },
+  "hybrid": true,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000006",
+  "lifecycle_stage": "DEFEATED",
+  "log_index": 1,
+  "num_of_votes": 430,
+  "proposal_type_id": 5,
+  "proposal_type_info": {
+    "approval_threshold": 6000,
+    "module": null,
+    "name": "Joint House Standard  - [basic]",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "34810871407579755069545456",
+  "signatures": [""],
+  "start_block": 137683763,
+  "start_blocktime": 1750966303,
+  "targets": ["0x0000000000000000000000000000000000000000"],
+  "timestamp": 1750966303,
+  "title": "[SYNTHETIC] Hybrid Standard — Defeated",
+  "total_voting_power_at_start": "116036238025265850231818187",
+  "totals": {
+    "no-param": {
+      "0": "10000000000000000000000000",
+      "1": "2000000000000000000000000",
+      "2": "1000000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000006",
+  "transaction_index": 1,
+  "values": [0],
+  "voting_module_name": "standard"
+}

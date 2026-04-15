@@ -294,9 +294,10 @@ export type EASApprovalCriteria =
 export const EAS_DEFAULT_OPTIMISTIC_TIERS = [20, 20, 20];
 
 export const ARCHIVE_GCS_BUCKET =
-  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+  process.env.ARCHIVE_GCS_BUCKET_OVERRIDE ||
+  (process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
-    : "https://storage.googleapis.com/cpls-usmr-dev-test-25q4";
+    : "https://storage.googleapis.com/cpls-usmr-dev-test-25q4");
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;

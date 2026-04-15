@@ -146,6 +146,7 @@ const QuorumStatus = ({
           </div>
           <div className="flex justify-start items-center gap-1">
             <div
+              data-testid="proposal-quorum-status"
               className={cn(
                 "text-right justify-center text-xs font-semibold",
                 quorumMet ? "text-positive" : "text-negative"
