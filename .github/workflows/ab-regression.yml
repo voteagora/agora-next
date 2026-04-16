@@ -1,6 +1,9 @@
 name: A/B Visual Regression Tests
 
 on:
+  push:
+    branches:
+      - 'feature/visual-ab-runner'
   workflow_dispatch:
     inputs:
       url_a:
@@ -11,6 +14,7 @@ on:
       url_b:
         description: "Preview URL to Compare (Vercel Branch Deployment)"
         required: true
+        default: "https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/"
         type: string
 
 jobs:
