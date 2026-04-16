@@ -1,4 +1,4 @@
-name: Agora Visual A/B Regression
+name: A/B Visual Regression Tests
 
 on:
   workflow_dispatch:
