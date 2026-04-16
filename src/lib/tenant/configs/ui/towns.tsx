@@ -36,7 +36,7 @@ export const townsTenantUIConfig = new TenantUI({
       chainId: 8453,
     },
   ],
-  hideAgoraBranding: true,
+  hideAgoraBranding: false,
 
   assets: {
     success: townsSuccess,
