@@ -60,7 +60,7 @@ export class ABRunnerEngine {
     const globalHide = `
       vercel-live-feedback, #vercel-live-button, #vercel-live-feedback, [data-vercel-edit-button], [data-vercel-toolbar],
       .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"],
-      div[aria-modal="true"], #connectkit-modal
+      div[aria-modal="true"], #connectkit-modal, [role="dialog"], dialog, [data-radix-portal]
       { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
       body { overflow: auto !important; padding-right: 0 !important; }
     `;
