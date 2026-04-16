@@ -98,34 +98,40 @@ export class ABRunnerEngine {
       ]);
     }
 
+    // Inject a permanent, indestructible CSS barrier against Modals and Overlays
+    // This protects both the DOM text extraction and the screenshot pixels from late-hydrating portals.
+    const injectModalBarrier = async (p: Page) => {
+      await p
+        .evaluate(() => {
+          const s = document.createElement("style");
+          s.innerHTML = `
+            dialog, [role="dialog"], [aria-modal="true"], [data-radix-portal], 
+            #connectkit-modal, [data-vercel-toolbar], [data-state="open"][class*="inset-0"] {
+              display: none !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+              z-index: -9999 !important;
+            }
+          `;
+          document.head.appendChild(s);
+        })
+        .catch(() => {});
+    };
+
+    await Promise.all([
+      injectModalBarrier(pageA),
+      injectModalBarrier(pageB),
+    ]);
+
     // 1. Scroll to trigger infinite loaders and stabilize the DOM
     await Promise.all([
       this.progressiveScroll(pageA, route),
       this.progressiveScroll(pageB, route),
     ]);
 
-    // Aggressively dismiss accessible modals via Escape and hide standard portals
     await Promise.all([
       pageA.keyboard.press("Escape").catch(() => {}),
       pageB.keyboard.press("Escape").catch(() => {}),
-      pageA
-        .evaluate(() => {
-          document
-            .querySelectorAll(
-              '[data-radix-portal], [aria-modal="true"], [data-state="open"], #connectkit-modal, [data-vercel-toolbar]'
-            )
-            .forEach((el) => ((el as any).style.display = "none"));
-        })
-        .catch(() => {}),
-      pageB
-        .evaluate(() => {
-          document
-            .querySelectorAll(
-              '[data-radix-portal], [aria-modal="true"], [data-state="open"], #connectkit-modal, [data-vercel-toolbar]'
-            )
-            .forEach((el) => ((el as any).style.display = "none"));
-        })
-        .catch(() => {}),
     ]);
 
     // 2. Extract DOM trees
