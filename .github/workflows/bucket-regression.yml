@@ -1,4 +1,4 @@
-name: Visual A/B Regression Runner
+name: Bucket Artifacts Regression
 
 on:
   push:
