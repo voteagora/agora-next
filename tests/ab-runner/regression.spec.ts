@@ -1,5 +1,7 @@
 import { test, chromium, BrowserContext, Page } from "@playwright/test";
 import { ABRunnerEngine } from "./engine";
+import dotenv from "dotenv";
+dotenv.config();
 
 test.describe("Visual Regression A/B Diff Runner", () => {
   let engine: ABRunnerEngine;
@@ -42,12 +44,17 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   test(`Diff pass/fail -> expected/diff for proposals-by-type-tenant`, async () => {
     test.setTimeout(600000); // 10 minutes to allow multiple deep proposals
     
-    const targetUrl = process.env.URL_A || "http://127.0.0.1:3000";
-    console.log(`[Dynamic] Fetching available proposal types from ${targetUrl}...`);
+    // We strictly use the local host to map proposals to avoid 401s from Production API Keys mismatch
+    const mappingUrl = "http://127.0.0.1:3000";
+    console.log(`[Dynamic] Fetching available proposal types from ${mappingUrl}...`);
     
     try {
-      const response = await fetch(`${targetUrl}/api/v1/proposals?limit=100`);
-      if (!response.ok) throw new Error("Failed to fetch proposals API");
+      const response = await fetch(`${mappingUrl}/api/v1/proposals?limit=100`, {
+        headers: {
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_AGORA_API_KEY}`
+        }
+      });
+      if (!response.ok) throw new Error(`Failed to fetch proposals API: ${response.status} ${response.statusText}`);
       
       const resJson = await response.json();
       const proposals = resJson.data || resJson || [];
