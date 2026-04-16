@@ -1,9 +1,17 @@
 name: Visual A/B Regression Runner
 
 on:
-  push:
-    branches:
-      - feature/visual-ab-runner
+  workflow_dispatch:
+    inputs:
+      url_a:
+        description: "Base Production URL (e.g. https://vote.optimism.io)"
+        required: true
+        default: "https://vote.optimism.io"
+        type: string
+      url_b:
+        description: "Preview URL to Compare (Vercel Branch Deployment)"
+        required: true
+        type: string
 
 jobs:
   visual-regression:
@@ -31,8 +39,8 @@ jobs:
 
       - name: Run A/B Regression Engine
         env:
-          URL_A: 'https://vote.optimism.io'
-          URL_B: 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app'
+          URL_A: ${{ inputs.url_a }}
+          URL_B: ${{ inputs.url_b }}
         run: npm run test:ab
 
       - name: Google Auth
