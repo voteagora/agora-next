@@ -1,9 +1,6 @@
 name: A/B Visual Regression Tests
 
 on:
-  push:
-    branches:
-      - feature/visual-ab-runner
   workflow_dispatch:
     inputs:
       url_a:
