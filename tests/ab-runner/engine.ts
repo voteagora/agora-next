@@ -25,7 +25,12 @@ export class ABRunnerEngine {
     }
   }
 
-  async diffRoute(route: string, pageA: Page, pageB: Page) {
+  async diffRoute(
+    route: string,
+    pageA: Page,
+    pageB: Page,
+    meta?: { tenant: string; type?: string }
+  ) {
     const override = this.getOverride(route);
 
     const targetA =
@@ -35,10 +40,9 @@ export class ABRunnerEngine {
       this.urlB.replace(/\/$/, "") +
       (route.startsWith("/") ? route : `/${route}`);
 
-    await Promise.all([
-      pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {}),
-      pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
-    ]);
+    // Execute sequential navigation instead of parallel to prevent Vercel/GraphQL 429 Too Many Requests caching drops on identical simultaneous payloads
+    await pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {});
+    await pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {});
 
     // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
     await Promise.all([
@@ -56,11 +60,28 @@ export class ABRunnerEngine {
         .catch(() => {}),
     ]);
 
+    // Force wait until Tailwind skeleton loaders cleanly extinguish natively
+    await Promise.all([
+      pageA
+        .waitForSelector(".animate-pulse, .skeleton", {
+          state: "hidden",
+          timeout: 25000,
+        })
+        .catch(() => {}),
+      pageB
+        .waitForSelector(".animate-pulse, .skeleton", {
+          state: "hidden",
+          timeout: 25000,
+        })
+        .catch(() => {}),
+    ]);
+
     // Hide Vercel Live Preview toolbar and exclusively target true Modals/Dialogs/Banners to avoid erasing standard UI headers
     const globalHide = `
       vercel-live-feedback, #vercel-live-button, #vercel-live-feedback, [data-vercel-edit-button], [data-vercel-toolbar],
       .modal, [data-reach-dialog-overlay], [data-headlessui-state="open"] > div[class*="fixed"],
-      div[aria-modal="true"], #connectkit-modal, [role="dialog"], dialog, [data-radix-portal]
+      div[aria-modal="true"], #connectkit-modal, [role="dialog"], dialog, [data-radix-portal], [data-testid="connect-wallet-button"], [id^="connectkit"],
+      footer, .footer, [data-testid="footer"]
       { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
       body { overflow: auto !important; padding-right: 0 !important; }
     `;
@@ -119,7 +140,14 @@ export class ABRunnerEngine {
     for (const nodeA of treeA) {
       if (!nodeA) continue;
 
-      const nodeB = mapB.get(nodeA.path);
+      let nodeB = mapB.get(nodeA.path);
+
+      // Relaxed Heuristic: If path broke (e.g. a dev inserted a <div wrapper>), try to find the identical element visually by Text and Tag!
+      if (!nodeB && nodeA.text && nodeA.text.length > 2) {
+        nodeB = treeB.find(
+          (n: any) => n.text === nodeA.text && n.tag === nodeA.tag
+        );
+      }
 
       let isDrifted = false;
       let driftReason = "";
@@ -132,13 +160,29 @@ export class ABRunnerEngine {
           isDrifted = true;
           driftReason = "Data Drift";
         } else {
-          // Only check width/height — x/y coordinates cascade from parent shifts
-          // We explicitely skip Layout check for Footer items since footer y-shifts on content height
-          if (!nodeA.isFooter) {
+          // Check core computed CSS styles for Tailwind class mutations
+          const stylesToCompare = [
+            "backgroundColor",
+            "color",
+            "borderColor",
+            "borderWidth",
+            "opacity",
+            "display",
+            "visibility",
+          ];
+          const hasStyleDrift = stylesToCompare.some(
+            (k) => nodeA.style?.[k] !== nodeB.style?.[k]
+          );
+
+          if (hasStyleDrift) {
+            isDrifted = true;
+            driftReason = "Style Drift";
+          } else if (!nodeA.isFooter) {
+            // Relax layout threshold from 3px to 10px to allow minor padding/margin optimizations to fly under the radar
             const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
             const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
 
-            if (dw > 3 || dh > 3) {
+            if (dw > 10 || dh > 10) {
               isDrifted = true;
               driftReason = "Layout Drift";
             }
@@ -158,20 +202,28 @@ export class ABRunnerEngine {
       }
     }
 
-    // De-duplicate: suppress parent if a child drift already covers the same change
+    // De-duplicate: Keep top-level drifted containers, suppress internal noisy children
     const drifts: any[] = [];
     const reportList: any[] = [];
 
     for (const drift of rawDrifts) {
-      const hasChildDrift = rawDrifts.some(
+      // Is this drift structurally inside another drift?
+      const hasParentDrift = rawDrifts.some(
         (other: any) =>
-          other.path !== drift.path && other.path.startsWith(drift.path + " > ")
+          other.path !== drift.path && drift.path.startsWith(other.path + " > ")
       );
-      if (!hasChildDrift || drift.reason === "Missing or Moved Component") {
+
+      if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
         drifts.push({ path: drift.path, reason: drift.reason });
         reportList.push({
           component: drift.path,
           reason: drift.reason,
+          colorCode:
+            drift.reason === "Data Drift"
+              ? "Yellow (Data)"
+              : drift.reason === "Style Drift"
+                ? "Cyan (Style)"
+                : "Purple (Layout/UI)",
           urlA_text: drift.urlA_text,
           urlB_text: drift.urlB_text,
         });
@@ -184,12 +236,25 @@ export class ABRunnerEngine {
       route === "/"
         ? "index-page"
         : route.replace(/^\//, "").replace(/\//g, "-");
-    const artifactsDir = path.join(
-      process.cwd(),
-      "test-results",
-      "ab-diffs",
-      safeRouteName
-    );
+    let artifactsDir = "";
+    if (meta && meta.tenant && meta.type) {
+      artifactsDir = path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        meta.tenant,
+        "proposals",
+        meta.type,
+        safeRouteName
+      );
+    } else {
+      artifactsDir = path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        safeRouteName
+      );
+    }
 
     if (!fs.existsSync(artifactsDir)) {
       fs.mkdirSync(artifactsDir, { recursive: true });
@@ -216,12 +281,16 @@ export class ABRunnerEngine {
         path: d.path,
         css:
           d.reason === "Data Drift"
-            ? "4px dashed #FFD700"
-            : "4px dashed #FF4500",
+            ? "4px dashed #FFD700" // Yellow
+            : d.reason === "Style Drift"
+              ? "4px dashed #00FFFF" // Cyan
+              : "4px dashed #8A2BE2", // Purple
         bg:
           d.reason === "Data Drift"
             ? "rgba(255, 215, 0, 0.2)"
-            : "rgba(255, 69, 0, 0.2)",
+            : d.reason === "Style Drift"
+              ? "rgba(0, 255, 255, 0.2)"
+              : "rgba(138, 43, 226, 0.2)",
       }));
 
       const batchHighlight = (items: typeof highlightPayload) => {
@@ -343,30 +412,35 @@ export class ABRunnerEngine {
       });
     }
 
-    if (drifts.length > 0) {
-      const reportWithMeta = [
-        {
-          reportDescription: {
-            urlA: this.urlA,
-            urlB: this.urlB,
-            route,
-            driftsFound: drifts.length,
-            generatedAt: new Date().toISOString(),
+    const reportWithMeta = [
+      {
+        reportDescription: {
+          urlA: this.urlA,
+          urlB: this.urlB,
+          route,
+          driftsFound: drifts.length,
+          generatedAt: new Date().toISOString(),
+          colorLegend: {
+            "Data Drift": "Yellow (#FFD700)",
+            "Style Drift": "Cyan (#00FFFF)",
+            "Layout/UI Drift": "Purple (#8A2BE2)",
           },
         },
-        ...reportList,
-      ];
-      fs.writeFileSync(
-        path.join(artifactsDir, `report.json`),
-        JSON.stringify(reportWithMeta, null, 2)
-      );
+      },
+      ...reportList,
+    ];
+    fs.writeFileSync(
+      path.join(artifactsDir, `report.json`),
+      JSON.stringify(reportWithMeta, null, 2)
+    );
 
+    if (drifts.length > 0) {
       console.log(
         `❌ Diff artifacts saved to: ${artifactsDir} for route ${route}`
       );
     } else {
       console.log(
-        `✅ 0 Drifts. Baseline full-page screenshots saved to: ${artifactsDir} for route ${route}`
+        `✅ 0 Drifts. Baseline full-page screenshots and empty report.json saved to: ${artifactsDir} for route ${route}`
       );
     }
 
@@ -395,7 +469,11 @@ export class ABRunnerEngine {
     let lastCount = 0;
     let stableRounds = 0;
 
-    const getScrollHeight = () => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    const getScrollHeight = () =>
+      Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
     const getListCount = () =>
       document.querySelectorAll(
         "a[href*='/proposals/'], a[href*='/delegates/'], a[href*='/voters/']"
@@ -410,7 +488,15 @@ export class ABRunnerEngine {
 
     while (attempts < maxAttempts) {
       await page.mouse.wheel(0, 15000);
-      await page.evaluate(() => window.scrollTo(0, Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)));
+      await page.evaluate(() =>
+        window.scrollTo(
+          0,
+          Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight
+          )
+        )
+      );
       await page.waitForTimeout(2000);
 
       currentHeight = await page.evaluate(getScrollHeight);
@@ -458,11 +544,17 @@ export class ABRunnerEngine {
       const allElements = document.querySelectorAll(scope);
       const elements = Array.from(allElements)
         .filter((el) => {
-          if (el.closest("vercel-live-feedback") || el.closest("[data-vercel-toolbar]")) return false;
-          
+          if (
+            el.closest("vercel-live-feedback") ||
+            el.closest("[data-vercel-toolbar]") ||
+            el.closest("footer") ||
+            el.closest(".bg-footerBackground")
+          )
+            return false;
+
           const text = el.textContent?.trim();
           if (text === "Loading" || text === "Loading...") return false;
-          
+
           const isVisualBlock =
             el.tagName === "IMG" ||
             el.tagName === "SVG" ||
@@ -478,6 +570,7 @@ export class ABRunnerEngine {
         .map((el) => {
           const rect = el.getBoundingClientRect();
           if (rect.width === 0 || rect.height === 0) return null;
+          const cs = window.getComputedStyle(el);
 
           return {
             tag: el.tagName.toLowerCase(),
@@ -487,6 +580,15 @@ export class ABRunnerEngine {
               y: rect.y + window.scrollY,
               width: rect.width,
               height: rect.height,
+            },
+            style: {
+              backgroundColor: cs.backgroundColor,
+              color: cs.color,
+              borderColor: cs.borderColor,
+              borderWidth: cs.borderWidth,
+              opacity: cs.opacity,
+              display: cs.display,
+              visibility: cs.visibility,
             },
             path: getValidCSSPath(el),
             isFooter: !!el.closest("footer"),

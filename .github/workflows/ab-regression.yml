@@ -1,4 +1,4 @@
-name: Visual A/B Regression Runner
+name: A/B Visual Regression Tests
 
 on:
   workflow_dispatch:
