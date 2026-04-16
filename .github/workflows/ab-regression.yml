@@ -1,4 +1,4 @@
-name: A/B Visual Regression Tests
+name: Visual A/B Regression Runner
 
 on:
   push:
@@ -43,8 +43,8 @@ jobs:
 
       - name: Run A/B Regression Engine
         env:
-          URL_A: ${{ inputs.url_a }}
-          URL_B: ${{ inputs.url_b }}
+          URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
+          URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
         run: npm run test:ab
 
       - name: Google Auth
