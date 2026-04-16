@@ -48,12 +48,14 @@ jobs:
         run: npm run test:ab -- -g "proposals-by-type"
 
       - name: Google Auth
+        if: always()
         id: auth
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
 
       - name: Set up Cloud SDK
+        if: always()
         uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: "silent-turbine-390703"
