@@ -1,6 +1,9 @@
 name: A/B Visual Regression Tests
 
 on:
+  push:
+    branches:
+      - feature/visual-ab-runner
   workflow_dispatch:
     inputs:
       url_a:
@@ -40,8 +43,8 @@ jobs:
       - name: Run A/B Regression Engine
         continue-on-error: true
         env:
-          URL_A: ${{ inputs.url_a }}
-          URL_B: ${{ inputs.url_b }}
+          URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
+          URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
         run: npm run test:ab
 
       - name: Google Auth
