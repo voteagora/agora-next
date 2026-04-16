@@ -63,7 +63,24 @@ export default function Markdown({
             "--color-border-muted": toRGBA(line, 1),
             "--color-canvas-subtle": toRGBA(tertiary, 0.05),
             "--color-prettylights-syntax-entity-tag": toRGBA(positive, 1),
+            // Keep Tailwind Typography (`.prose`) colors aligned with wmde styles
+            // so render output is consistent across dev/prod stylesheet ordering.
+            "--tw-prose-body": toRGBA(secondary, 1),
+            "--tw-prose-headings": toRGBA(primary, 1),
+            "--tw-prose-lead": toRGBA(secondary, 1),
+            "--tw-prose-links": toRGBA(primary, 1),
             "--tw-prose-bold": toRGBA(secondary, 1),
+            "--tw-prose-counters": toRGBA(secondary, 1),
+            "--tw-prose-bullets": toRGBA(secondary, 1),
+            "--tw-prose-hr": toRGBA(line, 1),
+            "--tw-prose-quotes": toRGBA(secondary, 1),
+            "--tw-prose-quote-borders": toRGBA(line, 1),
+            "--tw-prose-captions": toRGBA(tertiary, 1),
+            "--tw-prose-code": toRGBA(secondary, 1),
+            "--tw-prose-pre-code": toRGBA(secondary, 1),
+            "--tw-prose-pre-bg": toRGBA(tertiary, 0.05),
+            "--tw-prose-th-borders": toRGBA(line, 1),
+            "--tw-prose-td-borders": toRGBA(line, 1),
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
