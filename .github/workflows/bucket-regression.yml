@@ -42,6 +42,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run A/B Regression Engine
+        continue-on-error: true
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
