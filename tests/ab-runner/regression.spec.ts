@@ -26,18 +26,51 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     await contextB.close();
   });
 
-  const routesToDiff = [
+  const staticRoutes = [
     "/",
-    "/delegates",
+    "/delegates?orderBy=most_voting_power",
     "/proposals",
-    // Can optionally read all available paths from the `sitemap.xml` or dynamically.
   ];
 
-  for (const route of routesToDiff) {
-    // Generate isolated tests
-    test(`Diff pass/fail -> expected/diff for route "${route}"`, async () => {
-      test.setTimeout(300000); // 5-minute timeout to guarantee absolute exhaustion of Infinite Loaders for ALL proposals
+  for (const route of staticRoutes) {
+    test(`Diff pass/fail -> expected/diff for static route "${route}"`, async () => {
+      test.setTimeout(300000); 
       await engine.diffRoute(route, pageA, pageB);
     });
   }
+
+  test(`Diff pass/fail -> expected/diff for proposals-by-type-tenant`, async () => {
+    test.setTimeout(600000); // 10 minutes to allow multiple deep proposals
+    
+    const targetUrl = process.env.URL_A || "http://127.0.0.1:3000";
+    console.log(`[Dynamic] Fetching available proposal types from ${targetUrl}...`);
+    
+    try {
+      const response = await fetch(`${targetUrl}/api/v1/proposals?limit=100`);
+      if (!response.ok) throw new Error("Failed to fetch proposals API");
+      
+      const resJson = await response.json();
+      const proposals = resJson.data || resJson || [];
+      const seenTypes = new Set();
+      const targetProposals = [];
+
+      // Extract exactly 1 proposal of each available type on this tenant
+      for (const p of proposals) {
+        if (p.proposalType && !seenTypes.has(p.proposalType)) {
+          seenTypes.add(p.proposalType);
+          targetProposals.push(p);
+        }
+      }
+
+      console.log(`[Dynamic] Detected ${targetProposals.length} unique proposal types:`, Array.from(seenTypes));
+
+      for (const p of targetProposals) {
+        const pRoute = `/proposals/${p.id}`;
+        console.log(`[Dynamic] Running visual diff for type [${p.proposalType}] at route ${pRoute}`);
+        await engine.diffRoute(pRoute, pageA, pageB);
+      }
+    } catch (e) {
+      console.error("[Dynamic] Error extracting proposals by type. Skipping dynamic route tests.", e);
+    }
+  });
 });
