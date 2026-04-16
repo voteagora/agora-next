@@ -1,9 +1,6 @@
 name: Bucket Artifacts Regression
 
 on:
-  push:
-    branches:
-      - 'feature/visual-ab-runner'
   workflow_dispatch:
     inputs:
       url_a:
@@ -14,7 +11,6 @@ on:
       url_b:
         description: "Preview URL to Compare (Vercel Branch Deployment)"
         required: true
-        default: "https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/"
         type: string
 
 jobs:
@@ -44,8 +40,8 @@ jobs:
       - name: Run A/B Regression Engine
         continue-on-error: true
         env:
-          URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
-          URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
+          URL_A: ${{ inputs.url_a }}
+          URL_B: ${{ inputs.url_b }}
         run: npm run test:ab -- -g "proposals-by-type"
 
       - name: Google Auth
