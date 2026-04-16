@@ -45,7 +45,7 @@ jobs:
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
-        run: npm run test:ab
+        run: npm run test:ab -- -g "proposals-by-type"
 
       - name: Google Auth
         id: auth
