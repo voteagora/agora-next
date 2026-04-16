@@ -18,7 +18,7 @@ import { gzipSync } from "zlib";
 
 export const MOCK_ARCHIVE_SERVER_PORT = 9191;
 
-const MOCK_ROOT = join(__dirname, "../../src/__mocks__");
+const MOCK_ROOT = join(__dirname, "../__mocks__");
 
 function buildNdjsonGz(source: "dao_node" | "eas-atlas"): Buffer {
   const dir = join(MOCK_ROOT, source);

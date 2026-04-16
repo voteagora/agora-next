@@ -4,7 +4,7 @@ import { join } from "path";
 import "./helpers";
 import { deriveStatus } from "../deriveStatus";
 
-const MOCK_ROOT = join(__dirname, "../../../../__mocks__");
+const MOCK_ROOT = join(__dirname, "../../../../../tests/__mocks__");
 
 /**
  * Expected final status for each mock fixture, keyed by proposal id.

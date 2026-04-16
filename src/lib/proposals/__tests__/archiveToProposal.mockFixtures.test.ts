@@ -45,7 +45,7 @@ import { archiveToProposal } from "../normalizeArchive";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const MOCK_ROOT = join(__dirname, "../../../__mocks__");
+const MOCK_ROOT = join(__dirname, "../../../../tests/__mocks__");
 
 function load(source: "dao_node" | "eas-atlas", id: string) {
   return JSON.parse(

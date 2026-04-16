@@ -3,7 +3,7 @@
  *
  * The mock CPLS server (started in tests/global-setup.ts) intercepts GCS
  * requests made by the Next.js server, serving fixtures from
- * src/__mocks__/dao_node/ and src/__mocks__/eas-atlas/.
+ * tests/__mocks__/dao_node/ and tests/__mocks__/eas-atlas/.
  *
  * List-page assertions use `data-testid="proposal-list-item-{id}"` on the row
  * and `data-testid="proposal-status"` for the status pill.
@@ -332,16 +332,19 @@ test.describe("Proposals archive detail – Hybrid Standard", () => {
 });
 
 test.describe("Proposals archive detail – Approval", () => {
-  test("APPROVAL defeated: results panel visible + badge", async ({ page }) => {
+  test("APPROVAL defeated: results panel visible + badge + specific values", async ({ page }) => {
     await gotoDetail(page, syntheticId(7));
 
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
       "DEFEATED"
     );
     await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
+    await expect(page.locator("text=Quorum 25,631,045").first()).toBeVisible();
+    await expect(page.locator("text=Current 500,000").first()).toBeVisible();
+    await expect(page.getByText("alisha")).toBeVisible();
   });
 
-  test("HYBRID_APPROVAL succeeded: results panel visible + badge", async ({
+  test("HYBRID_APPROVAL succeeded: results panel visible + badge + specific values", async ({
     page,
   }) => {
     await gotoDetail(page, syntheticId(10));
@@ -350,6 +353,9 @@ test.describe("Proposals archive detail – Approval", () => {
       "SUCCEEDED"
     );
     await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
+    await expect(page.getByText("Candidate A")).toBeVisible();
+    await expect(page.getByText("Candidate B")).toBeVisible();
+    await expect(page.getByText("Candidate C")).toBeVisible();
   });
 });
 
@@ -382,8 +388,9 @@ test.describe("Proposals archive detail – Optimistic", () => {
   test("HYBRID_OPTIMISTIC_TIERED vetoed: Proposal Vetoed title + veto tier explanation + all veto groups", async ({
     page,
   }) => {
-    // fixture 012: tiers=[55,45,35], delegates≈62% and users=60% both ≥ 55%
-    //   → twoGroups tier tripped (2 groups exceed 55%)
+    // fixture 012: tiers=[55,45,35] stored → normalized /100 → [0.55,0.45,0.35]%
+    // all 4 groups (delegates≈62%, users=60%, apps=5%, chains≈6.7%) exceed the
+    // fourGroups threshold of 0.35% → 4 groups tripped 0.35%-threshold
     await gotoDetail(page, syntheticId(12));
 
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
@@ -394,7 +401,7 @@ test.describe("Proposals archive detail – Optimistic", () => {
     ).toHaveText("Proposal Vetoed");
     await expect(
       page.getByTestId("proposal-optimistic-summary-description")
-    ).toContainText("2 groups tripped the 55%-threshold");
+    ).toContainText("4 groups tripped the 0.35%-threshold");
     // Tiered card shows individual veto-group bars
     for (const group of ["chains", "apps", "users", "delegates"]) {
       await expect(
@@ -470,7 +477,7 @@ test.describe("Proposals archive detail – Offchain Optimistic", () => {
 });
 
 test.describe("Proposals archive detail – Offchain Approval", () => {
-  test("OFFCHAIN_APPROVAL succeeded: results panel + badge", async ({
+  test("OFFCHAIN_APPROVAL succeeded: results panel + badge + specific values", async ({
     page,
   }) => {
     await gotoDetail(page, syntheticId(17));
@@ -479,12 +486,32 @@ test.describe("Proposals archive detail – Offchain Approval", () => {
       "SUCCEEDED"
     );
     await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
+    await expect(page.locator("text=Current 0.00%").first()).toBeVisible();
+    await expect(page.getByText("Candidate A")).toBeVisible();
+    await expect(page.getByText("Candidate B")).toBeVisible();
+    await expect(page.getByText("Candidate C")).toBeVisible();
   });
 
-  test("OFFCHAIN_APPROVAL defeated: results panel + badge", async ({
+  test("OFFCHAIN_APPROVAL defeated: results panel + badge + specific values", async ({
     page,
   }) => {
     await gotoDetail(page, syntheticId(18));
+
+    await expect(page.getByTestId("proposal-status-badge")).toHaveText(
+      "DEFEATED"
+    );
+    await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
+    await expect(page.locator("text=Quorum 100").first()).toBeVisible();
+    await expect(page.getByText("Candidate A")).toBeVisible();
+    await expect(page.getByText("Candidate B")).toBeVisible();
+  });
+
+  test("OFFCHAIN_APPROVAL defeated (threshold unreachable): results panel + badge", async ({
+    page,
+  }) => {
+    // fixture 019: criteria_value is astronomically high → no option qualifies
+    // quorum=0 so participation passes, but threshold is never met → DEFEATED
+    await gotoDetail(page, syntheticId(19));
 
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
       "DEFEATED"
@@ -584,11 +611,11 @@ test.describe("Proposals archive detail – Real archived proposals", () => {
     }
   });
 
-  test("Real dao_node HYBRID_STANDARD succeeded: quorum Met + group vote counts + weights", async ({
+  test("Real dao_node HYBRID_STANDARD succeeded: quorum Met + all group for/against/abstain", async ({
     page,
   }) => {
-    // govless outcome: APP→for=3, CHAIN→for=5, USER→against=9,for=537,abstain=22
-    // HYBRID_VOTE_WEIGHTS: delegates=50%, chains/apps/users=16.67% each
+    // Delegate totals (wei): for=51160701912226686844288849, against=1236339060163982872618718, abstain=682760771180322714797638
+    // Citizen outcomes (voter counts): CHAIN→for=5, APP→for=3, USER→against=9,for=537,abstain=22
     await gotoDetail(
       page,
       "77379844029098348047245706083901850540159595802129942495264753179306805786028"
@@ -604,13 +631,37 @@ test.describe("Proposals archive detail – Real archived proposals", () => {
         page.getByTestId(`proposal-vote-group-${group}`)
       ).toBeVisible();
     }
-    // Citizen group voter counts (raw counts, not wei)
+    // Delegates: wei amounts formatted as compact tokens (tokenUtils.formatNumber, 4 sig figs)
+    await expect(
+      page.getByTestId("proposal-vote-group-delegates-forVotes")
+    ).toHaveText("51.16M");
+    await expect(
+      page.getByTestId("proposal-vote-group-delegates-againstVotes")
+    ).toHaveText("1.236M");
+    await expect(
+      page.getByTestId("proposal-vote-group-delegates-abstainVotes")
+    ).toHaveText("682.8K");
+    // Chains: voter counts
     await expect(
       page.getByTestId("proposal-vote-group-chains-forVotes")
     ).toHaveText("5");
     await expect(
+      page.getByTestId("proposal-vote-group-chains-againstVotes")
+    ).toHaveText("0");
+    await expect(
+      page.getByTestId("proposal-vote-group-chains-abstainVotes")
+    ).toHaveText("0");
+    // Apps: voter counts
+    await expect(
       page.getByTestId("proposal-vote-group-apps-forVotes")
     ).toHaveText("3");
+    await expect(
+      page.getByTestId("proposal-vote-group-apps-againstVotes")
+    ).toHaveText("0");
+    await expect(
+      page.getByTestId("proposal-vote-group-apps-abstainVotes")
+    ).toHaveText("0");
+    // Users: voter counts
     await expect(
       page.getByTestId("proposal-vote-group-users-forVotes")
     ).toHaveText("537");
@@ -620,13 +671,6 @@ test.describe("Proposals archive detail – Real archived proposals", () => {
     await expect(
       page.getByTestId("proposal-vote-group-users-abstainVotes")
     ).toHaveText("22");
-    // Group vote-weight columns
-    await expect(
-      page.getByTestId("proposal-vote-group-delegates-weight")
-    ).toHaveText("50.00");
-    await expect(
-      page.getByTestId("proposal-vote-group-chains-weight")
-    ).toHaveText("16.67");
   });
 
   test("Real dao_node OPTIMISTIC succeeded: exact optimistic summary values", async ({

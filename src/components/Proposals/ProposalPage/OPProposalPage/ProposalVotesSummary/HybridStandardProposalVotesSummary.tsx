@@ -43,23 +43,23 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   let voteGroups = [
     {
       name: "Chains",
-      forVotes: proposalResults.CHAIN.for || "0",
-      againstVotes: proposalResults.CHAIN.against || "0",
-      abstainVotes: proposalResults.CHAIN.abstain || "0",
+      forVotes: (proposalResults.CHAIN.for || "0").toString(),
+      againstVotes: (proposalResults.CHAIN.against || "0").toString(),
+      abstainVotes: (proposalResults.CHAIN.abstain || "0").toString(),
       weight: (categoryWeight * 100).toFixed(2),
     },
     {
       name: "Apps", // Corresponds to APP in offchainResults
-      forVotes: proposalResults.APP.for || "0",
-      againstVotes: proposalResults.APP.against || "0",
-      abstainVotes: proposalResults.APP.abstain || "0",
+      forVotes: (proposalResults.APP.for || "0").toString(),
+      againstVotes: (proposalResults.APP.against || "0").toString(),
+      abstainVotes: (proposalResults.APP.abstain || "0").toString(),
       weight: (categoryWeight * 100).toFixed(2),
     },
     {
       name: "Users",
-      forVotes: proposalResults.USER.for || "0",
-      againstVotes: proposalResults.USER.against || "0",
-      abstainVotes: proposalResults.USER.abstain || "0",
+      forVotes: (proposalResults.USER.for || "0").toString(),
+      againstVotes: (proposalResults.USER.against || "0").toString(),
+      abstainVotes: (proposalResults.USER.abstain || "0").toString(),
       weight: (categoryWeight * 100).toFixed(2),
     },
   ];

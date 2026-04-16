@@ -69,7 +69,7 @@ import { ArchiveProposalRow } from "../ArchiveProposalRow";
 
 // ── Fixture helpers ───────────────────────────────────────────────────────────
 
-const MOCK_ROOT = join(__dirname, "../../../../../__mocks__");
+const MOCK_ROOT = join(__dirname, "../../../../../../tests/__mocks__");
 
 function loadProposal(source: "dao_node" | "eas-atlas", id: string) {
   return JSON.parse(
