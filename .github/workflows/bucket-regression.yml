@@ -1,4 +1,4 @@
-name: Bucket Artifacts Regression
+name: Agora Visual A/B Regression
 
 on:
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
         env:
           URL_A: ${{ inputs.url_a }}
           URL_B: ${{ inputs.url_b }}
-        run: npm run test:ab -- -g "proposals-by-type"
+        run: npm run test:ab
 
       - name: Google Auth
         if: always()
