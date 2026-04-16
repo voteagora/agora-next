@@ -112,7 +112,7 @@ export const useScwVoting = ({
           txHash: txn.hash,
           txDetails: "Smart account governance vote transaction",
         });
-        return closeFrontendMiradorFlowTrace(trace, {
+        void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_succeeded",
           eventName: "governance_vote_succeeded",
           details: {
@@ -120,11 +120,10 @@ export const useScwVoting = ({
             voteKind: "scw",
             transactionHash: txn.hash,
           },
-        }).finally(() => {
-          if (traceRef.current === trace) {
-            traceRef.current = null;
-          }
         });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
       })
       .catch((error) => {
         setIsLoading(false);
