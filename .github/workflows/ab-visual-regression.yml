@@ -41,7 +41,7 @@ jobs:
         continue-on-error: true
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
-          URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
+          URL_B: ${{ inputs.url_b }}
         run: npm run test:ab
 
       - name: Google Auth
