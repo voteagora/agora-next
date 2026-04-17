@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -15,6 +15,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import MarkdownToc from "./MarkdownToc";
+import { hasMarkdownHeadings } from "./markdownHeadings";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -282,6 +283,10 @@ export default function FinancialStatementLayout({
   const discussButtonText = isOnArticlePage ? "Discuss on forums" : "Discuss";
 
   const metadataString = `${topicId}-${title}`;
+  const showMarkdownToc = useMemo(
+    () => !looksLikeHtml(content) && hasMarkdownHeadings(content),
+    [content]
+  );
   const { svg: patternSvg } = generatePatternSvg(
     metadataString,
     600,
@@ -348,14 +353,26 @@ export default function FinancialStatementLayout({
             {children}
           </>
         ) : (
-          <div className="flex gap-6 items-start">
-            <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
-              <MarkdownToc
-                content={content}
-                className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
-              />
-            </aside>
-            <div className="flex-1 min-w-0 flex flex-col gap-8">
+          <div
+            className={cn(
+              "flex items-start",
+              showMarkdownToc ? "gap-6" : "flex-col"
+            )}
+          >
+            {showMarkdownToc && (
+              <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
+                <MarkdownToc
+                  content={content}
+                  className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
+                />
+              </aside>
+            )}
+            <div
+              className={cn(
+                "min-w-0 flex flex-col gap-8",
+                showMarkdownToc ? "flex-1" : "w-full"
+              )}
+            >
               <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
                 <div
                   className={cn(
