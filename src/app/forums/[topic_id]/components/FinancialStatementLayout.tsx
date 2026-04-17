@@ -22,7 +22,6 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
-  hideInlineToc?: boolean;
 }
 
 function looksLikeHtml(text: string): boolean {
@@ -68,7 +67,6 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
-  hideInlineToc = false,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const tenant = Tenant.current();
@@ -321,8 +319,8 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
-          {looksLikeHtml(content) ? (
+        {looksLikeHtml(content) ? (
+          <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
             <iframe
               ref={iframeRef}
               srcDoc={content}
@@ -331,9 +329,13 @@ export default function FinancialStatementLayout({
               sandbox="allow-same-origin allow-scripts"
               style={{ display: "block" }}
             />
-          ) : (
-            <>
-              {!hideInlineToc && <MarkdownToc content={content} />}
+          </div>
+        ) : (
+          <div className="flex gap-6 items-start">
+            <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
+              <MarkdownToc content={content} className="p-4" />
+            </aside>
+            <div className="flex-1 min-w-0 bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
               <div
                 className={cn(
                   "p-4 prose prose-sm max-w-none text-primary",
@@ -344,9 +346,9 @@ export default function FinancialStatementLayout({
               >
                 <Markdown content={content} originalHierarchy />
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
