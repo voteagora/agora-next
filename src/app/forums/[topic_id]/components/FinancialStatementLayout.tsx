@@ -352,27 +352,43 @@ export default function FinancialStatementLayout({
             </div>
             {children}
           </>
-        ) : (
-          <div
-            className={cn(
-              "flex items-start",
-              showMarkdownToc ? "gap-6" : "flex-col"
-            )}
-          >
-            {showMarkdownToc && (
+        ) : showMarkdownToc ? (
+          <>
+            <div className="flex items-start gap-6">
               <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
                 <MarkdownToc
                   content={content}
                   className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
                 />
               </aside>
-            )}
-            <div
-              className={cn(
-                "min-w-0 flex flex-col gap-8",
-                showMarkdownToc ? "flex-1" : "w-full"
-              )}
-            >
+              <div className="min-w-0 flex-1 flex flex-col">
+                <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                  <div
+                    className={cn(
+                      "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
+                      PROSE_PRIMARY_BODY,
+                      PROSE_LINKS,
+                      PROSE_MEDIA
+                    )}
+                  >
+                    <Markdown content={content} originalHierarchy />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {children != null ? (
+              <div className="mt-8 flex items-start gap-6">
+                <div
+                  className="hidden lg:block w-64 flex-shrink-0"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 w-full">{children}</div>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="flex flex-col items-start">
+            <div className="min-w-0 flex flex-col gap-8 w-full">
               <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
                 <div
                   className={cn(
