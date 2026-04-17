@@ -1,6 +1,8 @@
 import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
+import { setupFawkes } from "./utils/fawkes-setup";
+
 test.describe("Proposal List Page Scenarios", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/proposals");
@@ -17,28 +19,69 @@ test.describe("Proposal List Page Scenarios", () => {
     ).toBeVisible();
   });
 
-  test("PROP-002: Create Proposal button visibility", async ({ page }) => {
-    // Button is not visible if the user is not logged in / visible if logged in.
-    test.skip(
-      true,
-      "Requires Synpress authentication flow or logged out strict check"
-    );
-  });
-
-  test("PROP-003: Create Proposal button popup", async ({ page }) => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("safe-proposal-choice")?.enabled)
-      test.skip(true, "Tenant disabled this feature");
-    test.skip(true, "Requires Synpress authentication flow");
-  });
-
-  test("PROP-004: Proposal Choose Proposal Flow pop up interactions", async ({
+  test("PROP-002: Create Proposal button visibility for connected user", async ({
     page,
+    context,
+  }) => {
+    await setupFawkes(page, context);
+    await page.goto("/proposals");
+
+    // Create proposal button should be visible when authenticated
+    const createBtn = page
+      .getByRole("button", { name: /Create Proposal/i })
+      .first()
+      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+
+    await expect(createBtn).toBeVisible({ timeout: 15000 });
+  });
+
+  test("PROP-003: Create Proposal button popup choice", async ({
+    page,
+    context,
   }) => {
     const { ui } = Tenant.current();
     if (!ui.toggle("safe-proposal-choice")?.enabled)
       test.skip(true, "Tenant disabled this feature");
-    test.skip(true, "Requires Synpress authentication flow");
+
+    await setupFawkes(page, context);
+    await page.goto("/proposals");
+
+    const createBtn = page
+      .getByRole("button", { name: /Create Proposal/i })
+      .first()
+      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+    await createBtn.click();
+
+    // Verify popup interaction for Safe proposals if applicable
+    const popupText = page.getByText(/Create as/i).first();
+    await expect(popupText).toBeVisible({ timeout: 10000 });
+  });
+
+  test("PROP-004: Proposal Choose Proposal Flow pop up interactions", async ({
+    page,
+    context,
+  }) => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("safe-proposal-choice")?.enabled)
+      test.skip(true, "Tenant disabled this feature");
+
+    await setupFawkes(page, context);
+    await page.goto("/proposals");
+
+    const createBtn = page
+      .getByRole("button", { name: /Create Proposal/i })
+      .first()
+      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+    await createBtn.click();
+
+    // Select the direct governance track if available
+    const directTrackBtn = page
+      .getByRole("button", { name: /Standard/i })
+      .first();
+    if (await directTrackBtn.isVisible()) {
+      await directTrackBtn.click();
+      await expect(page).toHaveURL(/.*create-proposal/);
+    }
   });
 
   test("PROP-005: Proposal List filter includes Relevant and Everything", async ({

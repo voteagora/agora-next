@@ -2,6 +2,7 @@ import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 import { FawkesClient } from "./utils/fawkesClient";
+import { setupFawkes } from "./utils/fawkes-setup";
 
 test.describe.serial("User Profile Scenarios", () => {
   test.beforeEach(async ({ page }) => {
@@ -12,95 +13,7 @@ test.describe.serial("User Profile Scenarios", () => {
   });
 
   const authenticateWallet = async (page: any, context: any) => {
-    // Intercept SIWE endpoints to decouple from local DAONode DNS failures
-    await page.route("**/api/v1/auth/nonce", async (route: any) => {
-      await route.fulfill({
-        status: 200,
-        json: { nonce: "mocknonce1234567890" },
-      });
-    });
-
-    const mockJwtPayload = {
-      siwe: {
-        address: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478c",
-        chainId: "10",
-      },
-      exp: Math.floor(Date.now() / 1000) + 3600,
-    };
-    const validMockJwt = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${Buffer.from(JSON.stringify(mockJwtPayload)).toString("base64")}.mocksignature`;
-
-    await page.route("**/api/v1/auth/verify", async (route: any) => {
-      await route.fulfill({
-        status: 200,
-        json: {
-          access_token: validMockJwt,
-          expires_in: 3600,
-          token_type: "Bearer",
-        },
-      });
-    });
-
-    await page.route("**/api/v1/auth/session", async (route: any) => {
-      await route.fulfill({
-        status: 200,
-        json: {
-          access_token: validMockJwt,
-          expires_in: 3600,
-          token_type: "Bearer",
-        },
-      });
-    });
-
-    await FawkesClient.createWallet({
-      mnemonic: "test test test test test test test test test test test junk",
-    });
-
-    await page.goto("/delegates");
-    await page.waitForLoadState("domcontentloaded");
-
-    const connectButton = page.getByTestId("connect-wallet-button").first();
-    const isConnVisible = await connectButton
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-
-    if (isConnVisible) {
-      await connectButton.click();
-      await page.waitForTimeout(1000);
-
-      const otherWallets = page.getByText("Other Wallets", { exact: false });
-      if (await otherWallets.isVisible()) await otherWallets.click();
-
-      await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-      const copyLinkButton = page.getByText("Copy to Clipboard");
-      await copyLinkButton.click();
-      await page.waitForTimeout(500);
-
-      const wcUri = await page.evaluate(
-        async () => await navigator.clipboard.readText()
-      );
-      await FawkesClient.connect(wcUri);
-      await page.waitForTimeout(1000);
-      await FawkesClient.approveSession();
-    }
-
-    const profileDropdown = page.getByTestId("profile-dropdown-button");
-    await expect(profileDropdown).toBeVisible({ timeout: 15000 });
-
-    await profileDropdown.click();
-    await page.waitForTimeout(1000);
-
-    const signInButton = page.getByText(/Sign in with Ethereum/i).first();
-    if (await signInButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await signInButton.click();
-      await expect(async () => {
-        const status = await FawkesClient.getStatus();
-        expect(Object.keys(status.pendingRequests).length).toBeGreaterThan(0);
-      }).toPass({ timeout: 10000 });
-      await FawkesClient.approveRequest();
-      await page.waitForTimeout(1000);
-    } else {
-      await profileDropdown.click();
-    }
+    await setupFawkes(page, context);
   };
 
   test("USER-PRO-001: View my profile' link on logged in menu", async ({

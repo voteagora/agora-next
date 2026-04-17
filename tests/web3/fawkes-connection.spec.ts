@@ -2,7 +2,6 @@ import { test, expect } from "@playwright/test";
 import { FawkesClient } from "./utils/fawkesClient";
 
 test.describe("Fawkes Wallet Headless Connection", () => {
-
   test("should seamlessly connect via WalletConnect to RainbowKit", async ({
     page,
     context,
@@ -65,4 +64,3 @@ test.describe("Fawkes Wallet Headless Connection", () => {
     await page.pause();
   });
 });
-
