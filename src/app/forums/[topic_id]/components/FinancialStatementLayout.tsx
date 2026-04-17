@@ -289,7 +289,7 @@ export default function FinancialStatementLayout({
         </div>
       )}
       <div
-        className={`${isOnArticlePage ? "max-w-5xl" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
+        className={`${isOnArticlePage ? "" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
       >
         <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-6">
           {title}
