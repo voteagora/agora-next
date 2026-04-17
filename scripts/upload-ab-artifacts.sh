@@ -15,11 +15,12 @@ fi
 
 TARGET_DIR="gs://agora-ab-artifacts/manual-local-run"
 
-if [ -n "$GITHUB_SHA" ]; then
-    SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+if [ -n "$GITHUB_SHA" ]; then    
+    DATE_STR=$(date +'%Y-%m-%d')
+    ACTOR=${GITHUB_ACTOR:-"cli"}
     
-    # Generic manual-runs categorization decoupled from rigid branch names since inputs are fully parametric
-    TARGET_DIR="gs://agora-ab-artifacts/manual-runs/run-${GITHUB_RUN_ID}_sha-${SHORT_SHA}"
+    # Clean, parametric reporting taxonomy: reports / YYYY-MM-DD / username_run-ID
+    TARGET_DIR="gs://agora-ab-artifacts/reports/${DATE_STR}/${ACTOR}_run-${GITHUB_RUN_ID}"
 fi
 
 echo "Uploading artifacts to $TARGET_DIR..."
