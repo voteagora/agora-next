@@ -629,7 +629,10 @@ export class ABRunnerEngine {
 
           return {
             tag: el.tagName.toLowerCase(),
-            text: (el as HTMLElement).innerText?.trim() || "",
+            text:
+              ((el as HTMLElement).innerText || "")
+                .replace(/\s+/g, " ")
+                .trim(),
             rect: {
               x: rect.x + window.scrollY,
               y: rect.y + window.scrollY,
