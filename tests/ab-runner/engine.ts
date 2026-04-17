@@ -141,12 +141,18 @@ export class ABRunnerEngine {
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
     const rawDrifts: any[] = [];
 
-    const mapB = new Map(treeB.map((n: any) => [n.path, n]));
+    // Map B groups by path to handle duplicated identical paths (like multiple identical <a href>) natively without cross-wiring
+    const mapB = new Map<string, any[]>();
+    for (const n of treeB) {
+      if (!mapB.has(n.path)) mapB.set(n.path, []);
+      mapB.get(n.path)!.push(n);
+    }
 
     for (const nodeA of treeA) {
       if (!nodeA) continue;
 
-      let nodeB = mapB.get(nodeA.path);
+      const nodesListB = mapB.get(nodeA.path) || [];
+      let nodeB = nodesListB.length > 0 ? nodesListB.shift() : undefined;
 
       // Relaxed Heuristic: If path broke (e.g. a dev inserted a <div wrapper>), try to find the identical element visually by Text and Tag!
       if (!nodeB && nodeA.text && nodeA.text.length > 2) {
