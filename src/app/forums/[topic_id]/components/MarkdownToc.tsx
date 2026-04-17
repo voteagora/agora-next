@@ -39,7 +39,7 @@ function TocItem({ node }: { node: TocNode }) {
 
 function TocList({ nodes, root }: { nodes: TocNode[]; root?: boolean }) {
   return (
-    <ul className={root ? "space-y-1" : "pl-4 space-y-1 mt-1"}>
+    <ul className={root ? "space-y-1" : "list-disc pl-4 space-y-1 mt-1"}>
       {nodes.map((node) => (
         <TocItem key={node.slug} node={node} />
       ))}
