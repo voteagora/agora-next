@@ -335,6 +335,7 @@ export const syndicateTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-proposal-types",
+
       enabled: false,
     },
     {
