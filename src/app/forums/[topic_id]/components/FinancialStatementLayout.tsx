@@ -344,8 +344,11 @@ export default function FinancialStatementLayout({
           </div>
         ) : (
           <div className="flex gap-6 items-start">
-            <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
-              <MarkdownToc content={content} className="p-4" />
+            <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
+              <MarkdownToc
+                content={content}
+                className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
+              />
             </aside>
             <div className="flex-1 min-w-0 bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
               <div
