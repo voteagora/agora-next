@@ -1,97 +1,98 @@
 @import "@/styles/variables.scss";
 
-.proposal_description_md {
-  :global(.wmde-markdown table) {
-    display: table !important;
-    width: 100% !important;
-    table-layout: fixed !important;
-  }
-
-  :global(.wmde-markdown ol) {
-    list-style-type: decimal !important;
-    padding-left: 2rem !important;
-  }
-
-  :global(.wmde-markdown ul) {
-    list-style-type: disc !important;
-    padding-left: 2rem !important;
-  }
-
-  :global(.wmde-markdown li) {
-    display: list-item !important;
-  }
-}
-.code {
-  :global(.wmde-markdown pre code),
-  :global(.wmde-markdown pre tt) {
-    color: rgb(var(--primary)) !important;
-  }
-}
-
 .agora_markdown {
-  h1 {
-    font-size: $font-size-2xl;
-  }
+  :global(.wmde-markdown) {
+    background: transparent;
 
-  h2 {
-    font-size: $font-size-xl;
-    margin-bottom: $spacing-2;
-    margin-top: $spacing-8;
-  }
+    h1 {
+      color: rgb(var(--primary));
+      font-size: $font-size-2xl;
+      font-weight: 700;
+    }
 
-  h3 {
-    font-size: $font-size-lg;
-    margin-bottom: $spacing-2;
-    margin-top: $spacing-8;
-  }
+    h2 {
+      color: rgb(var(--primary));
+      font-size: $font-size-xl;
+      font-weight: 700;
+      margin-top: $spacing-8;
+      margin-bottom: $spacing-2;
+    }
 
-  h4 {
-    font-size: $font-size-lg;
-    margin-bottom: $spacing-2;
-    margin-top: $spacing-8;
-  }
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: rgb(var(--secondary));
+      font-size: $font-size-lg;
+      font-weight: 700;
+      margin-top: $spacing-8;
+      margin-bottom: $spacing-2;
+    }
 
-  h5 {
-    font-size: $font-size-lg;
-    margin-bottom: $spacing-2;
-    margin-top: $spacing-8;
-  }
+    p {
+      word-break: break-word;
+    }
 
-  h6 {
-    font-size: $font-size-lg;
-    margin-bottom: $spacing-2;
-    margin-top: $spacing-8;
-  }
+    a {
+      color: rgb(var(--secondary));
+      text-decoration: underline;
+      font-weight: inherit;
+      padding-bottom: 1px;
+      border-bottom: 1px solid rgb(var(--line));
+      transition: 200ms all;
+    }
 
-  pre {
-    border-radius: $border-radius-lg;
-  }
+    ul,
+    ol {
+      padding-left: 2rem !important;
+    }
 
-  ul,
-  ol {
-    padding-left: 1rem;
-  }
+    ul {
+      list-style-type: disc !important;
+    }
 
-  li {
-    padding-left: $spacing-0;
-  }
+    ol {
+      list-style-type: decimal !important;
+    }
 
-  img {
-    border-radius: $border-radius-lg;
-  }
+    li {
+      display: list-item !important;
+      padding-left: 0;
+    }
 
-  a {
-    text-decoration: none;
-    font-weight: inherit;
-    padding-bottom: 1px;
-    transition: 200ms all;
-  }
+    li::marker {
+      color: rgb(var(--primary));
+    }
 
-  p {
-    word-break: break-word;
-  }
+    table {
+      display: table !important;
+      width: 100% !important;
+      table-layout: fixed !important;
+      overflow-x: auto;
+    }
 
-  pre {
-    white-space: pre-wrap;
+    td {
+      min-width: 140px;
+    }
+
+    code {
+      color: rgb(var(--tertiary));
+      background: rgb(var(--wash));
+      border-radius: $border-radius-lg;
+    }
+
+    pre {
+      border-radius: $border-radius-lg;
+      white-space: pre-wrap;
+
+      code,
+      tt {
+        color: rgb(var(--tertiary));
+      }
+    }
+
+    img {
+      border-radius: $border-radius-lg;
+    }
   }
 }

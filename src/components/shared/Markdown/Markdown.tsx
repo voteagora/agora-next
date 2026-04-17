@@ -10,13 +10,8 @@ const defaults = {
   primary: "23 23 23",
   secondary: "64 64 64",
   tertiary: "115 115 115",
-  neutral: "255 255 255",
-  wash: "250 250 250",
   line: "229 229 229",
   positive: "0 153 43",
-  negative: "197 47 0",
-  brandPrimary: "23 23 23",
-  brandSecondary: "255 255 255",
   font: "var(--font-inter)",
 };
 
@@ -47,8 +42,7 @@ export default function Markdown({
   return (
     <div
       className={cn(
-        styles.proposal_description_md,
-        styles.code,
+        styles.agora_markdown,
         "max-w-full text-primary",
         wrapperClassName
       )}
@@ -63,46 +57,10 @@ export default function Markdown({
             "--color-border-muted": toRGBA(line, 1),
             "--color-canvas-subtle": toRGBA(tertiary, 0.05),
             "--color-prettylights-syntax-entity-tag": toRGBA(positive, 1),
-            // Keep Tailwind Typography (`.prose`) colors aligned with wmde styles
-            // so render output is consistent across dev/prod stylesheet ordering.
-            "--tw-prose-body": toRGBA(secondary, 1),
-            "--tw-prose-headings": toRGBA(primary, 1),
-            "--tw-prose-lead": toRGBA(secondary, 1),
-            "--tw-prose-links": toRGBA(primary, 1),
-            "--tw-prose-bold": toRGBA(secondary, 1),
-            "--tw-prose-counters": toRGBA(secondary, 1),
-            "--tw-prose-bullets": toRGBA(secondary, 1),
-            "--tw-prose-hr": toRGBA(line, 1),
-            "--tw-prose-quotes": toRGBA(secondary, 1),
-            "--tw-prose-quote-borders": toRGBA(line, 1),
-            "--tw-prose-captions": toRGBA(tertiary, 1),
-            "--tw-prose-code": toRGBA(secondary, 1),
-            "--tw-prose-pre-code": toRGBA(secondary, 1),
-            "--tw-prose-pre-bg": toRGBA(tertiary, 0.05),
-            "--tw-prose-th-borders": toRGBA(line, 1),
-            "--tw-prose-td-borders": toRGBA(line, 1),
             fontFamily: defaults.font,
           } as React.CSSProperties
         }
-        className={cn(
-          "h-full",
-          "py-3",
-          "max-w-full",
-          "bg-transparent",
-          "prose",
-          "prose-code:bg-wash",
-          "prose-code:text-tertiary",
-          "prose-pre:text-tertiary",
-          "prose-table:overflow-x-auto",
-          "prose-td:min-w-[140px]",
-          "prose-h1:text-primary",
-          "prose-h2:text-primary",
-          "prose-h3:text-secondary",
-          "prose-h4:text-secondary",
-          "prose-h5:text-secondary",
-          "prose-h6:text-secondary",
-          className
-        )}
+        className={cn("h-full py-3 max-w-full", className)}
         wrapperElement={{ "data-color-mode": "light" }}
         rehypePlugins={[() => rehypeExternalLinks({ target: "_blank" })]}
         components={{
