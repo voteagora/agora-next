@@ -5,26 +5,7 @@ import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
-
-// Function to decode HTML entities
-function decodeHtmlEntities(text: string): string {
-  // More robust HTML entity decoding
-  const entities: { [key: string]: string } = {
-    "&lt;": "<",
-    "&gt;": ">",
-    "&amp;": "&",
-    "&quot;": '"',
-    "&#39;": "'",
-    "&nbsp;": " ",
-  };
-
-  let decoded = text;
-  Object.entries(entities).forEach(([entity, char]) => {
-    decoded = decoded.replace(new RegExp(entity, "g"), char);
-  });
-
-  return decoded;
-}
+import { sanitizeForumContent } from "@/lib/sanitizationUtils";
 
 interface DunaContentRendererProps {
   content: string;
@@ -172,22 +153,24 @@ export default function DunaContentRenderer({
     setMounted(true);
   }, []);
 
-  const decodedContent = content ? decodeHtmlEntities(content) : "";
-  const isMarkdown = !looksLikeHtml(decodedContent);
-
+  const sanitizedContent = useMemo(
+    () => sanitizeForumContent(content),
+    [content]
+  );
+  const isMarkdown = !looksLikeHtml(sanitizedContent);
   const renderedContent = useMemo(() => {
     if (isMarkdown) {
       return (
         <div className="p-4 prose prose-sm max-w-none">
-          <Markdown content={decodedContent} originalHierarchy />
+          <Markdown content={sanitizedContent} originalHierarchy />
         </div>
       );
     }
     if (!enableEmbeds || !mounted) {
-      return <div dangerouslySetInnerHTML={{ __html: decodedContent }} />;
+      return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
     }
-    return parseContentWithEmbeds(decodedContent);
-  }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
+    return parseContentWithEmbeds(sanitizedContent);
+  }, [enableEmbeds, isMarkdown, mounted, sanitizedContent]);
 
   if (!content) return null;
 
