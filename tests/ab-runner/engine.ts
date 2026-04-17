@@ -275,6 +275,52 @@ export class ABRunnerEngine {
       JSON.stringify(treeB, null, 2)
     );
 
+    const captureTooltipLayer = async () => {
+      if (!meta?.type) return;
+
+      const triggerSelector = '[data-testid="results-tooltip-trigger"]';
+      const tooltipSelector = '[role="tooltip"]';
+
+      const captureForPage = async (page: Page, label: string) => {
+        try {
+          const trigger = page.locator(triggerSelector).first();
+          if ((await trigger.count()) > 0) {
+            await trigger.scrollIntoViewIfNeeded().catch(() => {});
+            await trigger.hover().catch(() => {});
+            await page.waitForTimeout(500);
+
+            await page
+              .screenshot({
+                path: path.join(artifactsDir, `00_${label}_FullPage_Tooltip.png`),
+              })
+              .catch(() => {});
+
+            const tooltipsDir = path.join(artifactsDir, "focused-crops", "tooltips");
+            if (!fs.existsSync(tooltipsDir)) {
+              fs.mkdirSync(tooltipsDir, { recursive: true });
+            }
+
+            const popover = page.locator(tooltipSelector).first();
+            if ((await popover.count()) > 0) {
+              await popover
+                .screenshot({
+                  path: path.join(tooltipsDir, `00_${label}_Crop.png`),
+                })
+                .catch(() => {});
+            }
+
+            // Defuse tooltip to keep viewport clean
+            await page.keyboard.press("Escape").catch(() => {});
+          }
+        } catch (e) {}
+      };
+
+      await Promise.all([
+        captureForPage(pageA, "UrlA"),
+        captureForPage(pageB, "UrlB"),
+      ]);
+    };
+
     if (override.expectDiff ? !isDiff : isDiff) {
       const cropsDir = path.join(artifactsDir, "focused-crops");
 
@@ -350,6 +396,8 @@ export class ABRunnerEngine {
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
       });
 
+      await captureTooltipLayer();
+
       // 6. Focused crops — UrlA and UrlB captured in parallel per drift
       const cropDrifts = drifts.slice(0, 10);
       for (let i = 0; i < cropDrifts.length; i++) {
@@ -416,6 +464,7 @@ export class ABRunnerEngine {
       await pageB.screenshot({
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
       });
+      await captureTooltipLayer();
     }
 
     const reportWithMeta = [
