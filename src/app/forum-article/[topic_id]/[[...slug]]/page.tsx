@@ -14,6 +14,8 @@ import {
 import { stripHtmlToText } from "@/app/forums/stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import FinancialStatementLayout from "@/app/forums/[topic_id]/components/FinancialStatementLayout";
+import MarkdownToc from "@/app/forums/[topic_id]/components/MarkdownToc";
+import { hasMarkdownHeadings } from "@/app/forums/[topic_id]/components/markdownHeadings";
 
 export const dynamic = "force-dynamic";
 
@@ -196,6 +198,7 @@ export default async function ForumArticlePage({ params }: PageProps) {
   }
 
   const topicBody = transformed.content || "";
+  const showTocSidebar = hasMarkdownHeadings(topicBody);
   const rootPost = topicData.posts?.[0];
   const rootAttachments = (rootPost?.attachments as any[]) || [];
   const pdfAttachment = rootAttachments.find(
@@ -231,13 +234,28 @@ export default async function ForumArticlePage({ params }: PageProps) {
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-8">
-        <FinancialStatementLayout
-          topicId={topicId}
-          title={transformed.title}
-          content={topicBody}
-          pdfUrl={pdfUrl}
-          isOnArticlePage={true}
-        />
+        <div
+          className={`flex flex-col ${showTocSidebar ? "lg:flex-row" : ""} gap-6 lg:gap-8`}
+        >
+          {showTocSidebar && (
+            <aside className="hidden lg:block lg:w-80 flex-shrink-0 lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+              <MarkdownToc
+                content={topicBody}
+                className="rounded-lg bg-cardBackground p-4 shadow-sm"
+              />
+            </aside>
+          )}
+          <div className="flex-1 min-w-0">
+            <FinancialStatementLayout
+              topicId={topicId}
+              title={transformed.title}
+              content={topicBody}
+              pdfUrl={pdfUrl}
+              isOnArticlePage={true}
+              hideInlineToc={showTocSidebar}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

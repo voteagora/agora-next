@@ -486,7 +486,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
 
           {/* Sidebar */}
           {showTocSidebar ? (
-            <aside className="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-10 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scroll-auto bg-cardBackground">
+            <aside className="hidden lg:block lg:w-80 flex-shrink-0 lg:sticky lg:top-10 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scroll-auto bg-cardBackground">
               <MarkdownToc
                 content={topicBody}
                 className="rounded-lg p-4 shadow-sm"

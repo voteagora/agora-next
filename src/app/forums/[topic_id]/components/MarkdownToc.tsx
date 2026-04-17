@@ -23,7 +23,7 @@ function TocList({ nodes }: { nodes: TocNode[] }) {
 
 export default function MarkdownToc({
   content,
-  className = "p-4 border-b border-line",
+  className = "hidden lg:block p-4 border-b border-line",
 }: {
   content: string;
   className?: string;
