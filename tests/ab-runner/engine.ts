@@ -101,12 +101,28 @@ export class ABRunnerEngine {
     const drifts: any[] = [];
     const reportList: any[] = [];
 
-    const safeRouteName = route === "/" ? "index-page" : route.replace(/^\//, "").replace(/\//g, "-");
+    const safeRouteName =
+      route === "/"
+        ? "index-page"
+        : route.replace(/^\//, "").replace(/\//g, "-");
     let artifactsDir = "";
     if (meta && meta.tenant && meta.type) {
-      artifactsDir = path.join(process.cwd(), "test-results", "ab-diffs", meta.tenant, "proposals", meta.type, safeRouteName);
+      artifactsDir = path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        meta.tenant,
+        "proposals",
+        meta.type,
+        safeRouteName
+      );
     } else {
-      artifactsDir = path.join(process.cwd(), "test-results", "ab-diffs", safeRouteName);
+      artifactsDir = path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        safeRouteName
+      );
     }
     if (!fs.existsSync(artifactsDir)) {
       fs.mkdirSync(artifactsDir, { recursive: true });
@@ -189,7 +205,8 @@ export class ABRunnerEngine {
       for (const drift of rawDrifts) {
         const hasParentDrift = rawDrifts.some(
           (other: any) =>
-            other.path !== drift.path && drift.path.startsWith(other.path + " > ")
+            other.path !== drift.path &&
+            drift.path.startsWith(other.path + " > ")
         );
 
         if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
@@ -215,7 +232,8 @@ export class ABRunnerEngine {
     // 0. Auto-Modal Interception Phase
     const captureAutoModal = async () => {
       // General overlay identifiers across Tailwind, Radix, DialogProvider, and legacy absolute popovers
-      const modalSelector = 'dialog[open], [role="dialog"]:not([aria-hidden="true"]), [aria-modal="true"], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0';
+      const modalSelector =
+        'dialog[open], [role="dialog"]:not([aria-hidden="true"]), [aria-modal="true"], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0';
 
       const checkModal = async (p: Page) => {
         try {
@@ -242,7 +260,10 @@ export class ABRunnerEngine {
           ? await this.extractDOMTree(pageB, route, modalSelector)
           : [];
 
-        const { drifts: mDrifts, reportList: mReportList } = compareTrees(modalTreeA, modalTreeB);
+        const { drifts: mDrifts, reportList: mReportList } = compareTrees(
+          modalTreeA,
+          modalTreeB
+        );
 
         if (mDrifts.length > 0) {
           // Add global modal prefixed drifts
@@ -253,8 +274,26 @@ export class ABRunnerEngine {
           mDrifts.forEach((d) => drifts.push(d));
 
           await Promise.all([
-            hasModalA ? pageA.screenshot({ path: path.join(artifactsDir, "00_UrlA_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
-            hasModalB ? pageB.screenshot({ path: path.join(artifactsDir, "00_UrlB_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
+            hasModalA
+              ? pageA
+                  .screenshot({
+                    path: path.join(
+                      artifactsDir,
+                      "00_UrlA_AutoModal_Drift.png"
+                    ),
+                  })
+                  .catch(() => {})
+              : Promise.resolve(),
+            hasModalB
+              ? pageB
+                  .screenshot({
+                    path: path.join(
+                      artifactsDir,
+                      "00_UrlB_AutoModal_Drift.png"
+                    ),
+                  })
+                  .catch(() => {})
+              : Promise.resolve(),
           ]);
         }
       }
@@ -282,10 +321,7 @@ export class ABRunnerEngine {
         .catch(() => {});
     };
 
-    await Promise.all([
-      injectModalBarrier(pageA),
-      injectModalBarrier(pageB),
-    ]);
+    await Promise.all([injectModalBarrier(pageA), injectModalBarrier(pageB)]);
 
     // 1. Scroll to trigger infinite loaders and stabilize the DOM
     await Promise.all([
@@ -304,12 +340,15 @@ export class ABRunnerEngine {
 
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
     // Compare main trees
-    const { drifts: mainDrifts, reportList: mainReportList } = compareTrees(treeA, treeB);
-    mainDrifts.forEach(d => drifts.push(d));
-    mainReportList.forEach(r => reportList.push(r));
+    const { drifts: mainDrifts, reportList: mainReportList } = compareTrees(
+      treeA,
+      treeB
+    );
+    mainDrifts.forEach((d) => drifts.push(d));
+    mainReportList.forEach((r) => reportList.push(r));
 
     const isDiff = drifts.length > 0;
-    
+
     fs.writeFileSync(
       path.join(artifactsDir, "treeA.json"),
       JSON.stringify(treeA, null, 2)
@@ -323,7 +362,8 @@ export class ABRunnerEngine {
       if (!meta?.type) return;
 
       // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
-      const triggerSelector = '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
+      const triggerSelector =
+        '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
       const tooltipSelector = '[role="tooltip"]';
 
       const captureForPage = async (page: Page, label: string) => {
@@ -336,11 +376,18 @@ export class ABRunnerEngine {
 
             await page
               .screenshot({
-                path: path.join(artifactsDir, `00_${label}_FullPage_Tooltip.png`),
+                path: path.join(
+                  artifactsDir,
+                  `00_${label}_FullPage_Tooltip.png`
+                ),
               })
               .catch(() => {});
 
-            const tooltipsDir = path.join(artifactsDir, "focused-crops", "tooltips");
+            const tooltipsDir = path.join(
+              artifactsDir,
+              "focused-crops",
+              "tooltips"
+            );
             if (!fs.existsSync(tooltipsDir)) {
               fs.mkdirSync(tooltipsDir, { recursive: true });
             }
@@ -639,119 +686,130 @@ export class ABRunnerEngine {
     await page.waitForTimeout(3000);
   }
 
-  private async extractDOMTree(page: Page, route: string, customScope?: string) {
-    return await page.evaluate(({ rt, cs }) => {
-      let scope = cs || "*";
-      if (!cs) {
-        if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
-        if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
-      }
+  private async extractDOMTree(
+    page: Page,
+    route: string,
+    customScope?: string
+  ) {
+    return await page.evaluate(
+      ({ rt, cs }) => {
+        let scope = cs || "*";
+        if (!cs) {
+          if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
+          if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
+        }
 
-      const MAX_ELEMENTS = 2000;
-      const allElements = document.querySelectorAll(scope);
-      const elements = Array.from(allElements)
-        .filter((el) => {
-          if (
-            el.closest("vercel-live-feedback") ||
-            el.closest("[data-vercel-toolbar]") ||
-            el.closest("footer") ||
-            el.closest(".bg-footerBackground")
-          )
-            return false;
+        const MAX_ELEMENTS = 2000;
+        const allElements = document.querySelectorAll(scope);
+        const elements = Array.from(allElements)
+          .filter((el) => {
+            if (
+              el.closest("vercel-live-feedback") ||
+              el.closest("[data-vercel-toolbar]") ||
+              el.closest("footer") ||
+              el.closest(".bg-footerBackground")
+            )
+              return false;
 
-          const text = el.textContent?.trim();
-          if (text === "Loading" || text === "Loading...") return false;
+            const text = el.textContent?.trim();
+            if (text === "Loading" || text === "Loading...") return false;
 
-          const isVisualBlock =
-            el.tagName === "IMG" ||
-            el.tagName === "SVG" ||
-            el.hasAttribute("data-testid");
-          const hasDirectText = Array.from(el.childNodes).some(
-            (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
-          );
-          return isVisualBlock || hasDirectText;
-        })
-        .slice(0, MAX_ELEMENTS);
+            const isVisualBlock =
+              el.tagName === "IMG" ||
+              el.tagName === "SVG" ||
+              el.hasAttribute("data-testid");
+            const hasDirectText = Array.from(el.childNodes).some(
+              (n) =>
+                n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
+            );
+            return isVisualBlock || hasDirectText;
+          })
+          .slice(0, MAX_ELEMENTS);
 
-      return elements
-        .map((el) => {
-          const rect = el.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return null;
-          const cs = window.getComputedStyle(el);
+        return elements
+          .map((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return null;
+            const cs = window.getComputedStyle(el);
 
-          return {
-            tag: el.tagName.toLowerCase(),
-            text:
-              ((el as HTMLElement).innerText || "")
+            return {
+              tag: el.tagName.toLowerCase(),
+              text: ((el as HTMLElement).innerText || "")
                 .replace(/\s+/g, " ")
                 .trim(),
-            rect: {
-              x: rect.x + window.scrollY,
-              y: rect.y + window.scrollY,
-              width: rect.width,
-              height: rect.height,
-            },
-            style: {
-              backgroundColor: cs.backgroundColor,
-              color: cs.color,
-              borderColor: cs.borderColor,
-              borderWidth: cs.borderWidth,
-              opacity: cs.opacity,
-              display: cs.display,
-              visibility: cs.visibility,
-            },
-            path: getValidCSSPath(el),
-            isFooter: !!el.closest("footer"),
-          };
-        })
-        .filter(Boolean);
+              rect: {
+                x: rect.x + window.scrollY,
+                y: rect.y + window.scrollY,
+                width: rect.width,
+                height: rect.height,
+              },
+              style: {
+                backgroundColor: cs.backgroundColor,
+                color: cs.color,
+                borderColor: cs.borderColor,
+                borderWidth: cs.borderWidth,
+                opacity: cs.opacity,
+                display: cs.display,
+                visibility: cs.visibility,
+              },
+              path: getValidCSSPath(el),
+              isFooter: !!el.closest("footer"),
+            };
+          })
+          .filter(Boolean);
 
-      function getValidCSSPath(el: Element) {
-        const path: string[] = [];
-        let curr: Element | null = el;
-        while (
-          curr &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          curr.tagName.toLowerCase() !== "body" &&
-          curr.tagName.toLowerCase() !== "html"
-        ) {
-          let index = 1;
-          for (
-            let sibling = curr.previousElementSibling;
-            sibling;
-            sibling = sibling.previousElementSibling
+        function getValidCSSPath(el: Element) {
+          const path: string[] = [];
+          let curr: Element | null = el;
+          while (
+            curr &&
+            curr.nodeType === Node.ELEMENT_NODE &&
+            curr.tagName.toLowerCase() !== "body" &&
+            curr.tagName.toLowerCase() !== "html"
           ) {
-            if (sibling.tagName === curr.tagName) index++;
-          }
-          let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
-          const testid = curr.getAttribute("data-testid");
-          const href = curr.getAttribute("href");
+            let index = 1;
+            for (
+              let sibling = curr.previousElementSibling;
+              sibling;
+              sibling = sibling.previousElementSibling
+            ) {
+              if (sibling.tagName === curr.tagName) index++;
+            }
+            let selector =
+              curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
+            const testid = curr.getAttribute("data-testid");
+            const href = curr.getAttribute("href");
 
-          if (testid) {
-            selector =
-              curr.tagName.toLowerCase() +
-              `[data-testid="${testid}"]:nth-of-type(${index})`;
+            if (testid) {
+              selector =
+                curr.tagName.toLowerCase() +
+                `[data-testid="${testid}"]:nth-of-type(${index})`;
+              path.unshift(selector);
+              break; // Anchor to data-testid — stable across layout refactors
+            }
+
+            if (href && href.length > 2) {
+              selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
+              path.unshift(selector);
+              break; // Anchor to href for dynamic cards without data-testid
+            }
+
             path.unshift(selector);
-            break; // Anchor to data-testid — stable across layout refactors
+            curr = curr.parentElement;
           }
 
-          if (href && href.length > 2) {
-            selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
-            path.unshift(selector);
-            break; // Anchor to href for dynamic cards without data-testid
+          const finalPath = path.join(" > ");
+          if (
+            finalPath.includes("data-testid") ||
+            finalPath.includes("href=")
+          ) {
+            return finalPath;
           }
-
-          path.unshift(selector);
-          curr = curr.parentElement;
+          return "body > " + finalPath;
         }
-
-        const finalPath = path.join(" > ");
-        if (finalPath.includes("data-testid") || finalPath.includes("href=")) {
-          return finalPath;
-        }
-        return "body > " + finalPath;
-      }
-    }, { rt: route, cs: customScope });
+      },
+      { rt: route, cs: customScope }
+    );
   }
 
   private getOverride(route: string): OverrideConfig {
