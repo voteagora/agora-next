@@ -159,7 +159,7 @@ export async function appendServerTraceEvent({
   safeMessageHints,
   safeTxHints,
   txInputData,
-}: AppendServerTraceEventArgs): void {
+}: AppendServerTraceEventArgs): Promise<void> {
   const traceId = traceContext?.traceId;
 
   try {
