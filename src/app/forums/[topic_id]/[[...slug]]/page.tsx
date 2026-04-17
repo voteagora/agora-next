@@ -31,6 +31,8 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 import FinancialStatementLayout from "../components/FinancialStatementLayout";
+import MarkdownToc from "../components/MarkdownToc";
+import { hasMarkdownHeadings } from "../components/markdownHeadings";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -313,6 +315,8 @@ export default async function ForumTopicPage({ params }: PageProps) {
   );
   const pdfUrl = pdfAttachment?.url ?? null;
 
+  const showTocSidebar = isFinancialStatement && hasMarkdownHeadings(topicBody);
+
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
   const labelName = categoryName ?? undefined;
@@ -390,7 +394,11 @@ export default async function ForumTopicPage({ params }: PageProps) {
         }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div
+          className={`flex flex-col ${
+            showTocSidebar ? "lg:flex-row-reverse" : "lg:flex-row"
+          } gap-6 lg:gap-8`}
+        >
           {/* Main Content */}
           <div
             className={`flex-1 min-w-0 max-w-full ${
@@ -407,6 +415,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                   content={topicBody}
                   pdfUrl={pdfUrl}
                   isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
+                  hideInlineToc={showTocSidebar}
                 />
                 <div className="mt-8">
                   <ForumThread
@@ -476,15 +485,24 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
-            <ForumsSidebar
-              categories={categories}
-              latestPost={topicData}
-              selectedCategoryId={categoryId}
-              totalTopicsCount={totalTopicsCount}
-              uncategorizedCount={uncategorizedCount}
-            />
-          </div>
+          {showTocSidebar ? (
+            <aside className="w-full lg:w-80 flex-shrink-0 lg:sticky lg:top-10 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scroll-auto bg-cardBackground">
+              <MarkdownToc
+                content={topicBody}
+                className="rounded-lg p-4 shadow-sm"
+              />
+            </aside>
+          ) : (
+            <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
+              <ForumsSidebar
+                categories={categories}
+                latestPost={topicData}
+                selectedCategoryId={categoryId}
+                totalTopicsCount={totalTopicsCount}
+                uncategorizedCount={uncategorizedCount}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

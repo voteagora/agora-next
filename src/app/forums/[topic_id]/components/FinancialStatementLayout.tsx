@@ -14,6 +14,7 @@ import Markdown from "@/components/shared/Markdown/Markdown";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
+import MarkdownToc from "./MarkdownToc";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -21,6 +22,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  hideInlineToc?: boolean;
 }
 
 function looksLikeHtml(text: string): boolean {
@@ -66,6 +68,7 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  hideInlineToc = false,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const tenant = Tenant.current();
@@ -329,16 +332,19 @@ export default function FinancialStatementLayout({
               style={{ display: "block" }}
             />
           ) : (
-            <div
-              className={cn(
-                "p-4 prose prose-sm max-w-none text-primary",
-                PROSE_PRIMARY_BODY,
-                PROSE_LINKS,
-                PROSE_MEDIA
-              )}
-            >
-              <Markdown content={content} originalHierarchy />
-            </div>
+            <>
+              {!hideInlineToc && <MarkdownToc content={content} />}
+              <div
+                className={cn(
+                  "p-4 prose prose-sm max-w-none text-primary",
+                  PROSE_PRIMARY_BODY,
+                  PROSE_LINKS,
+                  PROSE_MEDIA
+                )}
+              >
+                <Markdown content={content} originalHierarchy />
+              </div>
+            </>
           )}
         </div>
       </div>
