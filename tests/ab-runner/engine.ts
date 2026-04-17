@@ -602,8 +602,9 @@ export class ABRunnerEngine {
 
   private async extractDOMTree(page: Page, route: string) {
     return await page.evaluate((rt) => {
-      // Scope to delegate cards on /delegates to avoid O(N²) CSS path traversal
-      const scope = rt === "/delegates" ? "a[href*='/delegates/'] *" : "*";
+      let scope = "*";
+      if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
+      if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
 
       const MAX_ELEMENTS = 2000;
       const allElements = document.querySelectorAll(scope);
