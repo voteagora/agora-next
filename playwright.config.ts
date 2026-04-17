@@ -53,7 +53,7 @@ export default defineConfig({
             command:
               "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3000 npm run dev",
             url: "http://127.0.0.1:3000",
-            reuseExistingServer: !process.env.CI,
+            reuseExistingServer: true,
             timeout: 120 * 1000,
           },
           {
