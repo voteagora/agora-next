@@ -95,7 +95,7 @@ Rules:
 
   try {
     let response;
-
+    
     // Attempt fetch with basic retry logic for 503 Service Unavailable or network errors
     for (let attempt = 1; attempt <= 3; attempt++) {
       response = await fetch(geminiEndpoint, {
@@ -109,19 +109,15 @@ Rules:
       });
 
       if (response.ok) break;
-      console.log(
-        `Attempt ${attempt} failed with HTTP ${response.status}: ${response.statusText}`
-      );
-
+      console.log(`Attempt ${attempt} failed with HTTP ${response.status}: ${response.statusText}`);
+      
       if (attempt === 3) {
-        core.setFailed(
-          `API request failed after 3 attempts: ${response.statusText}`
-        );
+        core.setFailed(`API request failed after 3 attempts: ${response.statusText}`);
         return;
       }
-
+      
       // Wait 2 seconds before retrying
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, 2000));
     }
 
     const data = await response.json();
