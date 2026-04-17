@@ -64,7 +64,8 @@ export default async function Page() {
 
   const treasuryData = await apiFetchTreasuryBalanceTS(FREQUENCY_FILTERS.YEAR);
 
-  const areFinancialsComingSoon = ui.toggle("financials-coming-soon");
+  const areFinancialsComingSoon =
+    ui.toggle("financials-coming-soon")?.enabled === true;
 
   if (areFinancialsComingSoon) {
     return <FinancialsComingSoon />;
