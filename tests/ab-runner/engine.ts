@@ -101,6 +101,17 @@ export class ABRunnerEngine {
     const drifts: any[] = [];
     const reportList: any[] = [];
 
+    const safeRouteName = route === "/" ? "index-page" : route.replace(/^\//, "").replace(/\//g, "-");
+    let artifactsDir = "";
+    if (meta && meta.tenant && meta.type) {
+      artifactsDir = path.join(process.cwd(), "test-results", "ab-diffs", meta.tenant, "proposals", meta.type, safeRouteName);
+    } else {
+      artifactsDir = path.join(process.cwd(), "test-results", "ab-diffs", safeRouteName);
+    }
+    if (!fs.existsSync(artifactsDir)) {
+      fs.mkdirSync(artifactsDir, { recursive: true });
+    }
+
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
       const mapB = new Map<string, any[]>();
@@ -298,35 +309,7 @@ export class ABRunnerEngine {
     mainReportList.forEach(r => reportList.push(r));
 
     const isDiff = drifts.length > 0;
-
-    const safeRouteName =
-      route === "/"
-        ? "index-page"
-        : route.replace(/^\//, "").replace(/\//g, "-");
-    let artifactsDir = "";
-    if (meta && meta.tenant && meta.type) {
-      artifactsDir = path.join(
-        process.cwd(),
-        "test-results",
-        "ab-diffs",
-        meta.tenant,
-        "proposals",
-        meta.type,
-        safeRouteName
-      );
-    } else {
-      artifactsDir = path.join(
-        process.cwd(),
-        "test-results",
-        "ab-diffs",
-        safeRouteName
-      );
-    }
-
-    if (!fs.existsSync(artifactsDir)) {
-      fs.mkdirSync(artifactsDir, { recursive: true });
-    }
-
+    
     fs.writeFileSync(
       path.join(artifactsDir, "treeA.json"),
       JSON.stringify(treeA, null, 2)
