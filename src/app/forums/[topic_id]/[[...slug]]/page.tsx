@@ -327,7 +327,6 @@ export default async function ForumTopicPage({ params }: PageProps) {
   );
   const pdfUrl = pdfAttachment?.url ?? null;
 
-
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
   const labelName = categoryName ?? undefined;
