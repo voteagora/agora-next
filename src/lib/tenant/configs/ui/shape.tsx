@@ -313,6 +313,13 @@ export const shapeTenantUIConfig = new TenantUI({
         ),
       },
     },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "Financial Statements",
+      },
+    },
     { name: "ui/use-dark-theme-styling", enabled: false },
     {
       name: "info/governance-sections",
