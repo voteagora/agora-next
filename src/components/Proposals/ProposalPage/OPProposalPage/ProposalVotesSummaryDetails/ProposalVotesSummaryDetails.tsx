@@ -27,7 +27,7 @@ export const QuorumTooltip = () => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
-        <TooltipTrigger className="ml-1">
+        <TooltipTrigger className="ml-1" data-testid="results-tooltip-trigger">
           <AlertTriangle className="h-4 w-4 text-negative" />
         </TooltipTrigger>
         <TooltipContent className="text-primary text-xs max-w-xs font-semibold">
