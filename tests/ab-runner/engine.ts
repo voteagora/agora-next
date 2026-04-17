@@ -105,7 +105,7 @@ export class ABRunnerEngine {
         .evaluate(() => {
           const s = document.createElement("style");
           s.innerHTML = `
-            dialog, [role="dialog"], [aria-modal="true"], [data-radix-portal], 
+            dialog, [role="dialog"], [aria-modal="true"], 
             #connectkit-modal, [data-vercel-toolbar], [data-state="open"][class*="inset-0"] {
               display: none !important;
               opacity: 0 !important;
@@ -284,7 +284,8 @@ export class ABRunnerEngine {
     const captureTooltipLayer = async () => {
       if (!meta?.type) return;
 
-      const triggerSelector = '[data-testid="results-tooltip-trigger"]';
+      // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
+      const triggerSelector = '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
       const tooltipSelector = '[role="tooltip"]';
 
       const captureForPage = async (page: Page, label: string) => {
