@@ -8,6 +8,7 @@ import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import MarkdownToc from "./MarkdownToc";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -15,6 +16,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  children?: React.ReactNode;
 }
 
 function looksLikeHtml(text: string): boolean {
@@ -28,6 +30,7 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -62,6 +65,12 @@ export default function FinancialStatementLayout({
               overflow-x: hidden !important;
               overflow-y: visible !important;
             }
+            html {
+              padding: 0;
+            }
+            body {
+              padding: 0;
+            }
             img, svg, canvas {
               max-width: 100% !important;
               height: auto !important;
@@ -74,6 +83,16 @@ export default function FinancialStatementLayout({
           iframeDocument.head.appendChild(style);
         }
 
+        const iframeWidth = iframe.getBoundingClientRect().width;
+        // Equal inset on all sides inside the iframe (margin around the white page).
+        const inset = Math.min(
+          48,
+          Math.max(16, Math.round(iframeWidth * 0.045))
+        );
+        html.style.boxSizing = "border-box";
+        html.style.padding = `${inset}px`;
+        html.style.margin = "0";
+
         // Get the actual content width - use the maximum of all measurements
         const contentWidth = Math.max(
           body.scrollWidth,
@@ -82,14 +101,7 @@ export default function FinancialStatementLayout({
           html.offsetWidth
         );
 
-        // Measure the actual iframe container width
-        const iframeContainer = iframe.parentElement;
-        const containerWidth = iframeContainer
-          ? iframeContainer.getBoundingClientRect().width
-          : window.innerWidth;
-
-        // Calculate available width (account for any potential rounding issues)
-        const availableWidth = Math.max(containerWidth - 2, 320);
+        const availableWidth = Math.max(iframeWidth - 2 * inset - 2, 280);
 
         // Calculate scale for mobile (only scale if content is wider than container)
         const needsScaling = contentWidth > availableWidth;
@@ -109,30 +121,29 @@ export default function FinancialStatementLayout({
           body.style.padding = "0";
         }
 
-        // Get the original content height before applying any height constraints
-        const originalHeight = Math.max(body.scrollHeight, html.scrollHeight);
+        // Body-only: html.scrollHeight includes our html padding and would double-count inset
+        const originalHeight = Math.max(body.scrollHeight, body.offsetHeight);
 
         // Calculate scaled height
         const scaledHeight = originalHeight * scale;
+        const paddedScaledHeight = scaledHeight + 2 * inset;
 
         // Ensure html doesn't overflow and has exact height (prevents extra white space)
         html.style.overflowX = "hidden";
         html.style.overflowY = "hidden";
         html.style.width = "100%";
         html.style.maxWidth = "100%";
-        html.style.margin = "0";
-        html.style.padding = "0";
-        html.style.height = `${scaledHeight}px`;
-        html.style.minHeight = `${scaledHeight}px`;
-        html.style.maxHeight = `${scaledHeight}px`;
+        html.style.height = `${paddedScaledHeight}px`;
+        html.style.minHeight = `${paddedScaledHeight}px`;
+        html.style.maxHeight = `${paddedScaledHeight}px`;
 
         // Constrain body height to prevent extra space
         body.style.height = `${originalHeight}px`;
         body.style.minHeight = `${originalHeight}px`;
         body.style.maxHeight = `${originalHeight}px`;
 
-        // Set iframe height to exactly match scaled content (no extra space)
-        iframe.style.height = `${Math.ceil(scaledHeight)}px`;
+        // Match iframe to scaled content plus html inset on top and bottom
+        iframe.style.height = `${Math.ceil(paddedScaledHeight)}px`;
         iframe.style.width = "100%";
         iframe.style.maxWidth = "100%";
         iframe.style.overflow = "hidden";
@@ -207,7 +218,7 @@ export default function FinancialStatementLayout({
         </div>
       )}
       <div
-        className={`${isOnArticlePage ? "max-w-5xl" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
+        className={`${isOnArticlePage ? "" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
       >
         <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-6">
           {title}
@@ -237,22 +248,38 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
-          {looksLikeHtml(content) ? (
-            <iframe
-              ref={iframeRef}
-              srcDoc={content}
-              className="w-full border-0"
-              title="Financial Statement"
-              sandbox="allow-same-origin allow-scripts"
-              style={{ display: "block" }}
-            />
-          ) : (
-            <div className="p-4 prose prose-sm max-w-none">
-              <Markdown content={content} originalHierarchy />
+        {looksLikeHtml(content) ? (
+          <>
+            <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
+              <iframe
+                ref={iframeRef}
+                srcDoc={content}
+                className="w-full border-0"
+                title="Financial Statement"
+                sandbox="allow-same-origin allow-scripts"
+                style={{ display: "block" }}
+              />
             </div>
-          )}
-        </div>
+            {children}
+          </>
+        ) : (
+          <div className="flex gap-6 items-start">
+            <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
+              <MarkdownToc
+                content={content}
+                className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
+              />
+            </aside>
+            <div className="flex-1 min-w-0 flex flex-col gap-8">
+              <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                <div className="p-6 sm:p-8 prose prose-sm max-w-none text-primary">
+                  <Markdown content={content} originalHierarchy />
+                </div>
+              </div>
+              {children}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
