@@ -22,6 +22,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  children?: React.ReactNode;
 }
 
 function looksLikeHtml(text: string): boolean {
@@ -67,6 +68,7 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const tenant = Tenant.current();
@@ -332,16 +334,19 @@ export default function FinancialStatementLayout({
         </div>
 
         {looksLikeHtml(content) ? (
-          <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
-            <iframe
-              ref={iframeRef}
-              srcDoc={content}
-              className="w-full border-0"
-              title="Financial Statement"
-              sandbox="allow-same-origin allow-scripts"
-              style={{ display: "block" }}
-            />
-          </div>
+          <>
+            <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
+              <iframe
+                ref={iframeRef}
+                srcDoc={content}
+                className="w-full border-0"
+                title="Financial Statement"
+                sandbox="allow-same-origin allow-scripts"
+                style={{ display: "block" }}
+              />
+            </div>
+            {children}
+          </>
         ) : (
           <div className="flex gap-6 items-start">
             <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
@@ -350,17 +355,20 @@ export default function FinancialStatementLayout({
                 className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
               />
             </aside>
-            <div className="flex-1 min-w-0 bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
-              <div
-                className={cn(
-                  "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
-                  PROSE_PRIMARY_BODY,
-                  PROSE_LINKS,
-                  PROSE_MEDIA
-                )}
-              >
-                <Markdown content={content} originalHierarchy />
+            <div className="flex-1 min-w-0 flex flex-col gap-8">
+              <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                <div
+                  className={cn(
+                    "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
+                    PROSE_PRIMARY_BODY,
+                    PROSE_LINKS,
+                    PROSE_MEDIA
+                  )}
+                >
+                  <Markdown content={content} originalHierarchy />
+                </div>
               </div>
+              {children}
             </div>
           </div>
         )}

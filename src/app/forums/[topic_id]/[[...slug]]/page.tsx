@@ -410,15 +410,14 @@ export default async function ForumTopicPage({ params }: PageProps) {
                   content={topicBody}
                   pdfUrl={pdfUrl}
                   isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
-                />
-                <div className="mt-8">
+                >
                   <ForumThread
                     topicId={topicId}
                     initialComments={comments}
                     categoryId={categoryId}
                     adminDirectory={adminDirectory}
                   />
-                </div>
+                </FinancialStatementLayout>
               </>
             ) : (
               <>
