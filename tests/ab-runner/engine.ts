@@ -98,6 +98,159 @@ export class ABRunnerEngine {
       ]);
     }
 
+    const drifts: any[] = [];
+    const reportList: any[] = [];
+
+    const compareTrees = (tA: any[], tB: any[]) => {
+      const rawDrifts: any[] = [];
+      const mapB = new Map<string, any[]>();
+      for (const n of tB) {
+        if (!mapB.has(n.path)) mapB.set(n.path, []);
+        mapB.get(n.path)!.push(n);
+      }
+
+      for (const nodeA of tA) {
+        if (!nodeA) continue;
+
+        const nodesListB = mapB.get(nodeA.path) || [];
+        let nodeB = nodesListB.length > 0 ? nodesListB.shift() : undefined;
+
+        if (!nodeB && nodeA.text && nodeA.text.length > 2) {
+          nodeB = tB.find(
+            (n: any) => n.text === nodeA.text && n.tag === nodeA.tag
+          );
+        }
+
+        let isDrifted = false;
+        let driftReason = "";
+
+        if (!nodeB) {
+          isDrifted = true;
+          driftReason = "Missing or Moved Component";
+        } else {
+          if (nodeA.text !== nodeB.text) {
+            isDrifted = true;
+            driftReason = "Data Drift";
+          } else {
+            const stylesToCompare = [
+              "backgroundColor",
+              "color",
+              "borderColor",
+              "borderWidth",
+              "opacity",
+              "display",
+              "visibility",
+            ];
+            const hasStyleDrift = stylesToCompare.some(
+              (k) => nodeA.style?.[k] !== nodeB.style?.[k]
+            );
+
+            if (hasStyleDrift) {
+              isDrifted = true;
+              driftReason = "Style Drift";
+            } else if (!nodeA.isFooter) {
+              const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
+              const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
+
+              if (dw > 10 || dh > 10) {
+                isDrifted = true;
+                driftReason = "Layout Drift";
+              }
+            }
+          }
+        }
+
+        if (isDrifted) {
+          rawDrifts.push({
+            path: nodeA.path,
+            reason: driftReason,
+            urlA_text: nodeA.text,
+            urlB_text: nodeB
+              ? nodeB.text
+              : "(Element Missing or Structurally Shifted)",
+          });
+        }
+      }
+
+      const mDrifts: any[] = [];
+      const mReportList: any[] = [];
+
+      for (const drift of rawDrifts) {
+        const hasParentDrift = rawDrifts.some(
+          (other: any) =>
+            other.path !== drift.path && drift.path.startsWith(other.path + " > ")
+        );
+
+        if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
+          mDrifts.push({ path: drift.path, reason: drift.reason });
+          mReportList.push({
+            component: drift.path,
+            reason: drift.reason,
+            colorCode:
+              drift.reason === "Data Drift"
+                ? "Yellow (Data)"
+                : drift.reason === "Style Drift"
+                  ? "Cyan (Style)"
+                  : "Purple (Layout/UI)",
+            urlA_text: drift.urlA_text,
+            urlB_text: drift.urlB_text,
+          });
+        }
+      }
+
+      return { drifts: mDrifts, reportList: mReportList };
+    };
+
+    // 0. Auto-Modal Interception Phase
+    const captureAutoModal = async () => {
+      // General overlay identifiers across Tailwind, Radix, DialogProvider, and legacy absolute popovers
+      const modalSelector = 'dialog[open], [role="dialog"]:not([aria-hidden="true"]), [aria-modal="true"], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0';
+
+      const checkModal = async (p: Page) => {
+        try {
+          await p.waitForTimeout(1000); // Allow hydration
+          const locator = p.locator(modalSelector).first();
+          if ((await locator.count()) > 0) {
+            return true;
+          }
+        } catch (e) {}
+        return false;
+      };
+
+      const [hasModalA, hasModalB] = await Promise.all([
+        checkModal(pageA),
+        checkModal(pageB),
+      ]);
+
+      if (hasModalA || hasModalB) {
+        // We have an active auto-modal blocking the view, extract it exclusively!
+        const modalTreeA = hasModalA
+          ? await this.extractDOMTree(pageA, route, modalSelector)
+          : [];
+        const modalTreeB = hasModalB
+          ? await this.extractDOMTree(pageB, route, modalSelector)
+          : [];
+
+        const { drifts: mDrifts, reportList: mReportList } = compareTrees(modalTreeA, modalTreeB);
+
+        if (mDrifts.length > 0) {
+          // Add global modal prefixed drifts
+          mReportList.forEach((r) => {
+            r.component = `[MODAL] ${r.component}`;
+            reportList.push(r);
+          });
+          mDrifts.forEach((d) => drifts.push(d));
+
+          await Promise.all([
+            hasModalA ? pageA.screenshot({ path: path.join(artifactsDir, "00_UrlA_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
+            hasModalB ? pageB.screenshot({ path: path.join(artifactsDir, "00_UrlB_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
+          ]);
+        }
+      }
+    };
+
+    await captureAutoModal();
+
     // Inject a permanent, indestructible CSS barrier against Modals and Overlays
     // This protects both the DOM text extraction and the screenshot pixels from late-hydrating portals.
     const injectModalBarrier = async (p: Page) => {
@@ -106,7 +259,7 @@ export class ABRunnerEngine {
           const s = document.createElement("style");
           s.innerHTML = `
             dialog, [role="dialog"], [aria-modal="true"], 
-            #connectkit-modal, [data-vercel-toolbar], [data-state="open"][class*="inset-0"] {
+            #connectkit-modal, [data-vercel-toolbar], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0 {
               display: none !important;
               opacity: 0 !important;
               pointer-events: none !important;
@@ -139,108 +292,10 @@ export class ABRunnerEngine {
     const treeB = await this.extractDOMTree(pageB, route);
 
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
-    const rawDrifts: any[] = [];
-
-    // Map B groups by path to handle duplicated identical paths (like multiple identical <a href>) natively without cross-wiring
-    const mapB = new Map<string, any[]>();
-    for (const n of treeB) {
-      if (!mapB.has(n.path)) mapB.set(n.path, []);
-      mapB.get(n.path)!.push(n);
-    }
-
-    for (const nodeA of treeA) {
-      if (!nodeA) continue;
-
-      const nodesListB = mapB.get(nodeA.path) || [];
-      let nodeB = nodesListB.length > 0 ? nodesListB.shift() : undefined;
-
-      // Relaxed Heuristic: If path broke (e.g. a dev inserted a <div wrapper>), try to find the identical element visually by Text and Tag!
-      if (!nodeB && nodeA.text && nodeA.text.length > 2) {
-        nodeB = treeB.find(
-          (n: any) => n.text === nodeA.text && n.tag === nodeA.tag
-        );
-      }
-
-      let isDrifted = false;
-      let driftReason = "";
-
-      if (!nodeB) {
-        isDrifted = true;
-        driftReason = "Missing or Moved Component";
-      } else {
-        if (nodeA.text !== nodeB.text) {
-          isDrifted = true;
-          driftReason = "Data Drift";
-        } else {
-          // Check core computed CSS styles for Tailwind class mutations
-          const stylesToCompare = [
-            "backgroundColor",
-            "color",
-            "borderColor",
-            "borderWidth",
-            "opacity",
-            "display",
-            "visibility",
-          ];
-          const hasStyleDrift = stylesToCompare.some(
-            (k) => nodeA.style?.[k] !== nodeB.style?.[k]
-          );
-
-          if (hasStyleDrift) {
-            isDrifted = true;
-            driftReason = "Style Drift";
-          } else if (!nodeA.isFooter) {
-            // Relax layout threshold from 3px to 10px to allow minor padding/margin optimizations to fly under the radar
-            const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
-            const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
-
-            if (dw > 10 || dh > 10) {
-              isDrifted = true;
-              driftReason = "Layout Drift";
-            }
-          }
-        }
-      }
-
-      if (isDrifted) {
-        rawDrifts.push({
-          path: nodeA.path,
-          reason: driftReason,
-          urlA_text: nodeA.text,
-          urlB_text: nodeB
-            ? nodeB.text
-            : "(Element Missing or Structurally Shifted)",
-        });
-      }
-    }
-
-    // De-duplicate: Keep top-level drifted containers, suppress internal noisy children
-    const drifts: any[] = [];
-    const reportList: any[] = [];
-
-    for (const drift of rawDrifts) {
-      // Is this drift structurally inside another drift?
-      const hasParentDrift = rawDrifts.some(
-        (other: any) =>
-          other.path !== drift.path && drift.path.startsWith(other.path + " > ")
-      );
-
-      if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
-        drifts.push({ path: drift.path, reason: drift.reason });
-        reportList.push({
-          component: drift.path,
-          reason: drift.reason,
-          colorCode:
-            drift.reason === "Data Drift"
-              ? "Yellow (Data)"
-              : drift.reason === "Style Drift"
-                ? "Cyan (Style)"
-                : "Purple (Layout/UI)",
-          urlA_text: drift.urlA_text,
-          urlB_text: drift.urlB_text,
-        });
-      }
-    }
+    // Compare main trees
+    const { drifts: mainDrifts, reportList: mainReportList } = compareTrees(treeA, treeB);
+    mainDrifts.forEach(d => drifts.push(d));
+    mainReportList.forEach(r => reportList.push(r));
 
     const isDiff = drifts.length > 0;
 
@@ -601,11 +656,13 @@ export class ABRunnerEngine {
     await page.waitForTimeout(3000);
   }
 
-  private async extractDOMTree(page: Page, route: string) {
-    return await page.evaluate((rt) => {
-      let scope = "*";
-      if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
-      if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
+  private async extractDOMTree(page: Page, route: string, customScope?: string) {
+    return await page.evaluate(({ rt, cs }) => {
+      let scope = cs || "*";
+      if (!cs) {
+        if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
+        if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
+      }
 
       const MAX_ELEMENTS = 2000;
       const allElements = document.querySelectorAll(scope);
@@ -711,7 +768,7 @@ export class ABRunnerEngine {
         }
         return "body > " + finalPath;
       }
-    }, route);
+    }, { rt: route, cs: customScope });
   }
 
   private getOverride(route: string): OverrideConfig {
