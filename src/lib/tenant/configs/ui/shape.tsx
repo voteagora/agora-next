@@ -210,18 +210,6 @@ export const shapeTenantUIConfig = new TenantUI({
         imageDescription: "Structura governance coming soon",
       },
     },
-    {
-      route: "financials-coming-soon",
-      title: "Structura financials are\ncoming soon",
-      description: "",
-      hero: shapeHero,
-      meta: {
-        title: "Structura Financials",
-        description: "Structura financials coming soon",
-        imageTitle: "Structura Financials",
-        imageDescription: "Structura financials coming soon",
-      },
-    },
   ],
 
   toggles: [
@@ -256,7 +244,6 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "footer/hide-votable-supply", enabled: true },
     { name: "footer/hide-total-supply", enabled: true },
     { name: "coming-soon/show-static-proposals", enabled: true },
-    { name: "financials-coming-soon", enabled: false },
     {
       name: "shape-hero-content",
       enabled: true,
