@@ -72,7 +72,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
 
   for (const route of staticRoutes) {
     test(`Diff pass/fail -> expected/diff for static route "${route}"`, async () => {
-      test.setTimeout(300000);
+      test.setTimeout(900000); // 15.0m to compensate for GitHub CI CPU limits on infinite scrolls
       await engine.diffRoute(route, pageA, pageB);
     });
   }
