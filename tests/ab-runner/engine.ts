@@ -480,6 +480,10 @@ export class ABRunnerEngine {
           urlB: this.urlB,
           route,
           driftsFound: drifts.length,
+          status:
+            drifts.length === 0
+              ? "PASSED - NO DRIFTS DETECTED"
+              : "FAILED - DRIFTS DETECTED",
           generatedAt: new Date().toISOString(),
           colorLegend: {
             "Data Drift": "Yellow (#FFD700)",
