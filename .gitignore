@@ -56,3 +56,5 @@ dist
 output/
 test-results/
 playwright-report/
+
+/.claude/worktrees/*

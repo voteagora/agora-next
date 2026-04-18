@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\"); [[ \"$f\" =~ \\.(ts|tsx|js|jsx|json|css|scss)$ ]] && npx prettier --write \"$f\" 2>/dev/null; exit 0'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'f=$(jq -r \".tool_input.file_path // empty\"); if [[ \"$f\" =~ (\\.env($|\\.|local|\\.local)|package-lock\\.json$|prisma/schema\\.prisma$) ]]; then echo \"Blocked: edits to $f require manual review (sensitive file)\"; exit 2; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}
