@@ -203,15 +203,12 @@ type TenantUIParams = {
     footerBackground?: string;
     innerFooterBackground?: string;
     customHeroImageSize?: string;
-    customInfoTabs?: Array<{ title: string; description: string }>;
     customIconBackground?: string;
     customInfoLayout?: string;
-    customTextContainer?: string;
     customAboutSubtitle?: string;
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
-    noReportsFound?: string;
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
@@ -272,15 +269,12 @@ export class TenantUI {
     footerBackground?: string;
     innerFooterBackground?: string;
     customHeroImageSize?: string;
-    customInfoTabs?: Array<{ title: string; description: string }>;
     customIconBackground?: string;
     customInfoLayout?: string;
-    customTextContainer?: string;
     customAboutSubtitle?: string;
     customTitleSize?: string;
     customCardSize?: string;
     customIconColor?: string;
-    noReportsFound?: string;
     customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
@@ -426,17 +420,16 @@ export class TenantUI {
         footerBackground?: string;
         innerFooterBackground?: string;
         customHeroImageSize?: string;
-        customInfoTabs?: Array<{ title: string; description: string }>;
         customIconBackground?: string;
         customInfoLayout?: string;
-        customTextContainer?: string;
         customAboutSubtitle?: string;
         customTitleSize?: string;
         customCardSize?: string;
         customIconColor?: string;
-        noReportsFound?: string;
+        customHeroTitleWidth?: string;
         tagBackground?: string;
         infoBannerBackground?: string;
+        heroCardGradient?: { from: string; to: string };
       }
     | undefined {
     return this._customization;

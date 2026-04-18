@@ -72,7 +72,6 @@ export const syndicateTenantUIConfig = new TenantUI({
     customAboutSubtitle: "About Syndicate Network Collective",
     customIconColor: "#87819F",
     customInfoLayout: "flex-col sm:flex-row gap-2",
-    noReportsFound: "Quarterly Reports will be posted on October 15th, 2025.",
     customHeroImageSize: "sm:h-[160px]",
   },
 
