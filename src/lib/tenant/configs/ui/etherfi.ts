@@ -150,10 +150,6 @@ export const etherfiTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "use-daonode-for-proposals", // Etherfi has no DAO Node instance, yet.
-      enabled: false, // TODO - Migrate Etherfi to DAO Node
-    },
-    {
       name: "use-daonode-for-votable-supply",
       enabled: false,
     },

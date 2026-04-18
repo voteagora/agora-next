@@ -424,12 +424,6 @@ export const demo3TenantUIConfig = new TenantUI({
     },
 
     {
-      name: "use-daonode-for-proposals",
-
-      enabled: false,
-    },
-
-    {
       name: "use-daonode-for-votable-supply",
 
       enabled: false,

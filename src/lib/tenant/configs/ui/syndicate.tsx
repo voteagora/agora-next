@@ -322,10 +322,6 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "use-daonode-for-proposals",
-      enabled: false,
-    },
-    {
       name: "use-daonode-for-votable-supply",
       enabled: true,
     },

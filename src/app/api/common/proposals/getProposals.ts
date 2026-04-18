@@ -33,61 +33,8 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
-import {
-  adaptDAONodeResponse,
-  getCachedAllProposalsFromDaoNode,
-  getProposalTypesFromDaoNode,
-} from "@/app/lib/dao-node/client";
+import { getProposalTypesFromDaoNode } from "@/app/lib/dao-node/client";
 import { fetchProposalTaxFormMetadata } from "./getProposalTaxFormMetadata";
-
-// Helper function to fetch proposals from DAO Node
-async function fetchProposalsFromDaoNode(
-  skip: number,
-  take: number,
-  filter: string,
-  useSnapshot: boolean,
-  namespace: any,
-  contracts: any
-): Promise<ProposalPayload[]> {
-  try {
-    const [data, typesFromApi] = await Promise.all([
-      getCachedAllProposalsFromDaoNode(),
-      getProposalTypesFromDaoNode(),
-    ]);
-
-    let proposals = data;
-
-    // Apply relevant filter
-    if (filter === "relevant") {
-      proposals = proposals.filter((proposal) => !proposal.cancel_event);
-    }
-
-    // Adapt DAO Node response format
-    proposals = proposals.map((proposal) =>
-      adaptDAONodeResponse(proposal, typesFromApi.proposal_types)
-    );
-
-    // Include snapshot proposals if enabled
-    if (useSnapshot) {
-      const snapshotData = await fetchSnapshotProposalsFromDB();
-      proposals = [...proposals, ...snapshotData];
-
-      // Sort by start block descending
-      proposals.sort((a, b) => b.start_block - a.start_block);
-    }
-
-    return proposals.slice(skip, skip + take) as unknown as ProposalPayload[];
-  } catch (error) {
-    console.warn("REST API failed, falling back to DB:", error);
-    return (await findProposalsQueryFromDB({
-      namespace,
-      skip,
-      take,
-      filter,
-      contract: contracts.governor.address,
-    })) as ProposalPayload[];
-  }
-}
 
 // Helper function to extract onchain IDs from offchain proposals
 function extractOnchainIdsFromOffchainProposals(
@@ -190,7 +137,6 @@ async function fetchInitialProposals(
   pagination: PaginationParams,
   filter: string,
   type: string | undefined,
-  useDaoNode: boolean,
   useSnapshot: boolean,
   namespace: any,
   contracts: any
@@ -198,16 +144,6 @@ async function fetchInitialProposals(
   return doInSpan({ name: "getProposals" }, async () => {
     const proposalsResult = await paginateResult(
       async (skip: number, take: number) => {
-        if (useDaoNode) {
-          return await fetchProposalsFromDaoNode(
-            skip,
-            take,
-            filter,
-            useSnapshot,
-            namespace,
-            contracts
-          );
-        }
         return (await findProposalsQueryFromDB({
           namespace,
           skip,
@@ -306,8 +242,6 @@ export async function getProposals({
     async () => {
       try {
         const { namespace, contracts, ui } = Tenant.current();
-        const useDaoNode =
-          ui.toggle("use-daonode-for-proposals")?.enabled ?? false;
         const useSnapshot = ui.toggle("snapshotVotes")?.enabled ?? false;
 
         // Fetch initial proposals and supporting data in parallel
@@ -316,7 +250,6 @@ export async function getProposals({
             pagination,
             filter,
             type,
-            useDaoNode,
             useSnapshot,
             namespace,
             contracts

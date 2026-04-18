@@ -223,10 +223,6 @@ export const xaiTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "info/treasury",
-      enabled: false,
-    },
-    {
       name: "use-l1-block-number",
       enabled: true,
     },
