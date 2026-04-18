@@ -9,19 +9,12 @@ import {
   TENANT_NAMESPACES,
 } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
+import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { Chain } from "viem/chains";
 export type MetricTimeSeriesValue = {
   day: string;
   date: string;
   value: any;
-};
-
-export type StakedDeposit = {
-  amount: string;
-  delegatee: string;
-  depositor: string;
-  id: number;
 };
 
 export type ChartVote = {
@@ -72,45 +65,6 @@ export type TenantToken = {
   decimals: number;
   address: string;
   chainId?: number;
-};
-
-export type RetroPGFProject = {
-  id: string;
-  bio: string;
-  impactCategory: string[];
-  displayName: string;
-  websiteUrl: string;
-  applicant: {
-    address: {
-      address: string;
-    };
-    id: string;
-  };
-  applicantType: string;
-  profile: {
-    profileImageUrl: string;
-    bannerImageUrl: string;
-    id: string;
-  };
-  includedInBallots: number;
-  impactDescription: string;
-  contributionDescription: string;
-  contributionLinks: {
-    type: string;
-    url: string;
-    description: string;
-  }[];
-  impactMetrics: {
-    description: string;
-    number: number;
-    url: string;
-  }[];
-  fundingSources: {
-    type: string;
-    currency: string;
-    amount: number;
-    description: string;
-  }[];
 };
 
 // Analytics events

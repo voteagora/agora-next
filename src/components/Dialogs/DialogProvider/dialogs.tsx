@@ -10,7 +10,6 @@ import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelega
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { EasApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
@@ -26,7 +25,7 @@ import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
-import { ProposalType, StakedDeposit } from "@/lib/types";
+import { ProposalType } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
@@ -62,7 +61,6 @@ export type DialogType =
   | DeleteAllDraftProposalsDialog
   | OpenGithubPRDialog
   | PartialDelegateDialogType
-  | RetroPGFShareCardDialog
   | SponsorOnchainDraftProposalDialog
   | SponsorSnapshotDraftProposalDialog
   | SwithcNetworkDialogType
@@ -137,35 +135,10 @@ export type CastProposalDialogType = {
   };
 };
 
-export type RetroPGFShareCardDialog = {
-  transparent: boolean;
-  type: "RETROPGF_SHARE_CARD";
-  params: {
-    awarded: string;
-    displayName: string;
-    id: string;
-    profileImageUrl: string | null;
-  };
-};
-
 export type SwithcNetworkDialogType = {
   type: "SWITCH_NETWORK";
   params: {
     chain: Chain;
-  };
-};
-
-export type StaleDepositAddDialogType = {
-  type: "STAKE_DEPOSIT_ADD";
-  params: {
-    deposit: StakedDeposit;
-  };
-};
-
-export type StakeDepositWithdrawDialogType = {
-  type: "STAKE_DEPOSIT_WITHDRAW";
-  params: {
-    deposit: StakedDeposit;
   };
 };
 
@@ -540,30 +513,6 @@ export const dialogs: DialogDefinitions<DialogType> = {
         totalOptions={totalOptions}
         options={options}
         votes={votes}
-      />
-    );
-  },
-  RETROPGF_SHARE_CARD: (
-    {
-      awarded,
-      displayName,
-      id,
-      profileImageUrl,
-    }: {
-      awarded: string;
-      displayName: string;
-      id: string;
-      profileImageUrl: string | null;
-    },
-    closeDialog
-  ) => {
-    return (
-      <RetroPGFShareCardDialog
-        awarded={awarded}
-        displayName={displayName}
-        id={id}
-        profileImageUrl={profileImageUrl}
-        closeDialog={closeDialog}
       />
     );
   },

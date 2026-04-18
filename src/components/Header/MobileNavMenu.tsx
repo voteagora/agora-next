@@ -43,12 +43,6 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const delegatesToggle = ui.toggle("delegates");
   const hasDelegates = delegatesToggle !== undefined && delegatesToggle.enabled;
 
-  const stakingToggle = ui.toggle("staking");
-  const hasStaking = stakingToggle !== undefined && stakingToggle.enabled;
-
-  const retropgfToggle = ui.toggle("retropgf");
-  const hasRetropgf = retropgfToggle !== undefined && retropgfToggle.enabled;
-
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
 
@@ -88,26 +82,6 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
             href: "/delegates",
             target: "_self",
             isActive: pathname.includes("delegates"),
-          },
-        ]
-      : []),
-    ...(hasStaking
-      ? [
-          {
-            name: "Staking",
-            href: isConnected && address ? `/staking/${address}` : "/staking",
-            target: "_self",
-            isActive: pathname.includes("staking"),
-          },
-        ]
-      : []),
-    ...(hasRetropgf
-      ? [
-          {
-            name: "RetroPGF",
-            href: "/retropgf/3/summary",
-            target: "_self",
-            isActive: pathname.includes("retropgf/3/summary"),
           },
         ]
       : []),

@@ -40,9 +40,6 @@ export default function Navbar() {
     } else if (pathname === "/" && linkRefs.current["proposals"]) {
       // Special case for homepage
       setActiveNavItem("proposals");
-    } else if (path === "retropgf" && linkRefs.current["retropgf"]) {
-      // Special case for retropgf which has a more complex path
-      setActiveNavItem("retropgf");
     } else if (
       pathname.includes("coming-soon") &&
       linkRefs.current["coming-soon"]
@@ -136,32 +133,6 @@ export default function Navbar() {
           onClick={() => handleNavClick("delegates")}
         >
           Voters
-        </HeaderLink>
-      )}
-
-      {ui.toggle("staking") && ui.toggle("staking").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.staking = el;
-          }}
-          href={isConnected && address ? `/staking/${address}` : "/staking"}
-          isActive={activeNavItem === "staking"}
-          onClick={() => handleNavClick("staking")}
-        >
-          Staking
-        </HeaderLink>
-      )}
-
-      {ui.toggle("retropgf") && ui.toggle("retropgf").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.retropgf = el;
-          }}
-          href="/retropgf/3/summary"
-          isActive={activeNavItem === "retropgf"}
-          onClick={() => handleNavClick("retropgf")}
-        >
-          RetroPGF
         </HeaderLink>
       )}
 
