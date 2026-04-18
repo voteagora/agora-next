@@ -1,16 +1,23 @@
 "use client";
 
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
-import styles from "./proposalDescription.module.scss";
+
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import ENSName from "@/components/shared/ENSName";
+import {
+  isGovlessOffchainProposal,
+  isHybridProposal,
+  isSnapshotProposal,
+} from "@/features/proposals/domain";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
 import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
-import { Proposal } from "@/app/api/common/proposals/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
-import Tenant from "@/lib/tenant/tenant";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
-import ENSName from "@/components/shared/ENSName";
+import Tenant from "@/lib/tenant/tenant";
+
+import styles from "./proposalDescription.module.scss";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -56,6 +63,9 @@ export default function ProposalDescription({
   // @ts-ignore
   const options = proposal.proposalData?.options;
   const option = options?.[0];
+  const isSnapshot = isSnapshotProposal(proposal);
+  const isHybrid = isHybridProposal(proposal);
+  const isGovlessOffchain = isGovlessOffchainProposal(proposal);
   const { ui } = Tenant.current();
   const tagBackground = ui.customization?.tagBackground;
   const tagBgStyle = tagBackground
@@ -115,7 +125,7 @@ export default function ProposalDescription({
         </div>
       )}
       <ProposalTitle title={shortTitle} proposal={proposal} />
-      {proposal.proposalType?.includes("HYBRID") && (
+      {isHybrid && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p>
             <strong>New:</strong> This proposal implements the Joint House
@@ -132,10 +142,7 @@ export default function ProposalDescription({
           </p>
         </div>
       )}
-      {!proposal.proposalType?.includes("OFFCHAIN") &&
-        !proposal.proposalType?.includes("HYBRID") && (
-          <ProposalChart proposal={proposal} />
-        )}
+      {!isGovlessOffchain && !isHybrid && <ProposalChart proposal={proposal} />}
 
       {/* Execution Transactions - shown right below chart for succeeded proposals */}
       {useArchiveForProposals && (
@@ -146,10 +153,8 @@ export default function ProposalDescription({
         {/* Right now I'm only sure this better decoded component works for standard proposals */}
         {/* This is a feature for ENS, they use standard only, so we should be good for now */}
         {/* TODO: abstract this into better decoding for all proposal types */}
-        {proposal.proposalType === "SNAPSHOT" ||
-        proposal.proposalType?.startsWith(
-          "OFFCHAIN"
-        ) ? null : proposal.proposalType === "STANDARD" && !!option ? (
+        {isSnapshot || isGovlessOffchain ? null : proposal.proposalType ===
+            "STANDARD" && !!option ? (
           <ProposalTransactionDisplay
             targets={option.targets}
             calldatas={option.calldatas}

@@ -5,6 +5,10 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
+import {
+  isApprovalProposal,
+  isGovlessOffchainProposal,
+} from "@/features/proposals/domain";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
@@ -48,11 +52,11 @@ export default function ArchiveApprovalProposalVotesList({
   }, [votes.length]);
 
   const approvalOptionLabels = useMemo(() => {
-    if (!proposalType?.includes("APPROVAL") || !proposal.proposalData) {
+    if (!isApprovalProposal(proposal) || !proposal.proposalData) {
       return [] as string[];
     }
 
-    if (proposalType === "OFFCHAIN_APPROVAL") {
+    if (isGovlessOffchainProposal(proposal)) {
       const data =
         proposal.proposalData as ParsedProposalData["OFFCHAIN_APPROVAL"]["kind"];
       return data?.choices ?? [];

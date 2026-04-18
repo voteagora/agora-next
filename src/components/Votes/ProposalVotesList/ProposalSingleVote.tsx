@@ -26,23 +26,26 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
+import { fromLegacyProposalType } from "@/features/proposals/domain";
 
 const { token, ui } = Tenant.current();
 
 function isOffchain(vote: Vote) {
-  const proposalType = vote.proposalType || "";
+  const proposalType = vote.proposalType;
   // Consider offchain if proposal type denotes offchain or if citizenType is present (Optimism citizens)
   return (
     !!vote.citizenType ||
-    proposalType.includes("OFFCHAIN") ||
-    proposalType === "SNAPSHOT"
+    (proposalType
+      ? fromLegacyProposalType(proposalType).scope === "offchain"
+      : false)
   );
 }
 
 function getVoteTooltipText(vote: Vote) {
-  const proposalType = vote.proposalType || "";
   const isOffchainVote = isOffchain(vote);
-  const isOptimistic = proposalType.includes("OPTIMISTIC");
+  const isOptimistic = vote.proposalType
+    ? fromLegacyProposalType(vote.proposalType).votingKind === "optimistic"
+    : false;
 
   // Amount string depends on offchain vs onchain
   const amountStr = formatNumber(

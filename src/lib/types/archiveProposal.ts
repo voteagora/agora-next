@@ -15,7 +15,11 @@
  * - OFFCHAIN_*: Purely offchain EAS-based proposals
  */
 
-import type { ProposalType } from "@/lib/types";
+import {
+  normalizeProposalSource,
+  toLegacyProposalType,
+} from "@/features/proposals/domain";
+import type { ProposalKind, ProposalType } from "@/lib/types";
 
 export type DecodedStandardProposalData = {
   functionArgsName?: {
@@ -358,19 +362,23 @@ export type ArchiveProposalBySource =
  * - If source is dao_node → base type (STANDARD, APPROVAL, OPTIMISTIC)
  * - OPTIMISTIC with tiers → OPTIMISTIC_TIERED variant
  */
-export function deriveProposalType(
+export function deriveProposalKind(
   proposal: ArchiveProposalBySource | ArchiveListProposal
-): ProposalType {
-  const source = proposal.data_eng_properties.source;
+): ProposalKind {
+  const source = normalizeProposalSource(proposal.data_eng_properties.source);
   const hybrid = "hybrid" in proposal && proposal.hybrid === true;
 
   // Handle snapshot proposals
   if (source === "snapshot") {
-    return "SNAPSHOT";
+    return {
+      votingKind: "snapshot",
+      scope: "offchain",
+      source,
+    };
   }
 
   // Determine base class
-  let baseClass: ProposalClass;
+  let votingKind: ProposalKind["votingKind"];
   let isTiered = false;
 
   if (source === "dao_node") {
@@ -378,45 +386,52 @@ export function deriveProposalType(
     const votingModule = daoProposal.voting_module_name;
 
     if (votingModule === "approval") {
-      baseClass = "APPROVAL";
+      votingKind = "approval";
     } else if (votingModule === "optimistic") {
-      baseClass = "OPTIMISTIC";
+      votingKind = "optimistic";
       // Check govless_proposal for tiered info
       if (daoProposal.govless_proposal?.tiers?.length) {
         isTiered = true;
       }
     } else {
-      baseClass = "STANDARD";
+      votingKind = "standard";
     }
   } else if (source === "eas-atlas") {
     const atlasProposal = proposal as EasAtlasProposal;
     const propType = atlasProposal.proposal_type;
 
     if (propType === "APPROVAL") {
-      baseClass = "APPROVAL";
+      votingKind = "approval";
     } else if (propType === "OPTIMISTIC" || propType === "OPTIMISTIC_TIERED") {
-      baseClass = "OPTIMISTIC";
+      votingKind = "optimistic";
       isTiered =
         propType === "OPTIMISTIC_TIERED" || !!atlasProposal.tiers?.length;
     } else {
-      baseClass = "STANDARD";
+      votingKind = "standard";
     }
   } else if (source === "eas-oodao") {
     const oodaoProposal = proposal as EasOodaoProposal;
-    baseClass =
+    votingKind =
       oodaoProposal.voting_module === 1
-        ? "STANDARD"
-        : (oodaoProposal.voting_module.toUpperCase() as ProposalClass);
+        ? "standard"
+        : (oodaoProposal.voting_module.toLowerCase() as ProposalKind["votingKind"]);
   } else {
-    baseClass = "STANDARD";
+    votingKind = "standard";
   }
 
-  // Determine final type based on hybrid/offchain status
   if (hybrid) {
-    if (baseClass === "OPTIMISTIC") {
-      return "HYBRID_OPTIMISTIC_TIERED";
-    }
-    return `HYBRID_${baseClass}` as ProposalType;
+    return {
+      votingKind,
+      scope: "hybrid",
+      source,
+      ...(votingKind === "optimistic"
+        ? {
+            // Preserve current archive behavior where hybrid optimistic proposals
+            // are treated as the tiered legacy variant.
+            mode: "tiered" as const,
+          }
+        : {}),
+    };
   }
 
   // Offchain-only proposals (eas-atlas without onchain link)
@@ -427,15 +442,35 @@ export function deriveProposalType(
       proposal.onchain_proposalid !== 0;
 
     if (!hasOnchainId) {
-      if (baseClass === "OPTIMISTIC" && isTiered) {
-        return "OFFCHAIN_OPTIMISTIC_TIERED";
-      }
-      return `OFFCHAIN_${baseClass}` as ProposalType;
+      return {
+        votingKind,
+        scope: "offchain",
+        source,
+        ...(votingKind === "optimistic"
+          ? {
+              mode: isTiered ? "tiered" : "basic",
+            }
+          : {}),
+      };
     }
   }
 
-  // Onchain dao_node proposals
-  return baseClass as ProposalType;
+  return {
+    votingKind,
+    scope: "onchain",
+    source,
+    ...(votingKind === "optimistic"
+      ? {
+          mode: isTiered ? "tiered" : "basic",
+        }
+      : {}),
+  };
+}
+
+export function deriveProposalType(
+  proposal: ArchiveProposalBySource | ArchiveListProposal
+): ProposalType {
+  return toLegacyProposalType(deriveProposalKind(proposal));
 }
 
 export type ProposalTypeInfo = {

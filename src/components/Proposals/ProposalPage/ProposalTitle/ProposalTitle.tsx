@@ -1,10 +1,12 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import ENSName from "@/components/shared/ENSName";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalTitle({
   title,
@@ -13,7 +15,11 @@ export default function ProposalTitle({
   title: string;
   proposal: Proposal;
 }) {
-  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const isOffchain =
+    proposal.kind?.scope === "offchain" ||
+    (proposal.proposalType
+      ? isOffchainLegacyProposalType(proposal.proposalType)
+      : false);
   const proposalData =
     proposal.proposalType === "SNAPSHOT"
       ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])

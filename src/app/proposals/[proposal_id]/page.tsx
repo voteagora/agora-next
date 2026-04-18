@@ -12,13 +12,13 @@ import {
   getProposalPageComponent,
   requiresSpecialHandling,
 } from "@/components/Proposals/ProposalPage/registry";
+import { normalizeArchiveProposal } from "@/features/proposals/data/adapters/fromArchive";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import { archiveToProposal } from "@/lib/proposals";
 import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
 
 export const maxDuration = 60;
@@ -37,10 +37,13 @@ async function loadProposal(
     ]);
 
     if (archiveProposal) {
-      const normalizedProposal = await archiveToProposal(archiveProposal, {
-        namespace,
-        tokenDecimals: token.decimals ?? 18,
-      });
+      const normalizedProposal = await normalizeArchiveProposal(
+        archiveProposal,
+        {
+          namespace,
+          tokenDecimals: token.decimals ?? 18,
+        }
+      );
 
       return {
         ...normalizedProposal,

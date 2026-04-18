@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
+
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import { icons } from "@/assets/icons/icons";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
@@ -9,15 +12,18 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { icons } from "@/assets/icons/icons";
-import { Proposal } from "@/app/api/common/proposals/proposal";
 import ProposalVotesFilter from "./ProposalVotesFilter";
+import ProposalVotesSummary from "../ProposalVotesSummary/ProposalVotesSummary";
 import Tenant from "@/lib/tenant/tenant";
 
 const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
   const [isClicked, setIsClicked] = useState(false);
   const [showVoters, setShowVoters] = useState(true);
-  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const isOffchain =
+    proposal.kind?.scope === "offchain" ||
+    (proposal.proposalType
+      ? isOffchainLegacyProposalType(proposal.proposalType)
+      : false);
   const { ui } = Tenant.current();
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"

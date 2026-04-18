@@ -1,4 +1,23 @@
+import { Block } from "ethers";
+
 import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
+import {
+  getApprovalProposalStatus,
+  getHybridApprovalProposalStatus,
+  getOffchainApprovalProposalStatus,
+} from "@/features/proposals/variants/approval/status";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
+import {
+  getOptimisticProposalStatus,
+  getTieredOptimisticProposalStatus,
+} from "@/features/proposals/variants/optimistic/status";
+import { getSnapshotProposalStatus } from "@/features/proposals/variants/snapshot/status";
+import {
+  getHybridStandardProposalStatus,
+  getStandardProposalStatus,
+} from "@/features/proposals/variants/standard/status";
+
+import Tenant from "../tenant/tenant";
 import {
   calculateHybridApprovalProposalMetrics,
   calculateHybridOptimisticProposalMetrics,
@@ -6,7 +25,6 @@ import {
   getEndBlock,
   getEndTimestamp,
   getProposalCreatedTime,
-  getProposalCurrentQuorum,
   getStartBlock,
   getStartTimestamp,
   isBlockBasedProposal,
@@ -16,8 +34,6 @@ import {
   parseProposalData,
 } from "../proposalUtils";
 import { ProposalType } from "../types";
-import { Block } from "ethers";
-import Tenant from "../tenant/tenant";
 import { mapArbitrumBlockToMainnetBlock } from "../utils";
 import { getHumanBlockTime } from "../blockTimes";
 
@@ -48,7 +64,7 @@ export async function getProposalStatus(
     if (
       proposal.proposal_type === "SNAPSHOT" ||
       proposal.proposal_type === "OPTIMISTIC" ||
-      proposal.proposal_type.startsWith("OFFCHAIN")
+      isOffchainLegacyProposalType(proposal.proposal_type as ProposalType)
     ) {
       return true;
     }
@@ -128,7 +144,7 @@ export async function getProposalStatus(
   };
 
   if (proposalResults.key === "SNAPSHOT") {
-    return proposalResults.kind.status.toUpperCase() as ProposalStatus;
+    return getSnapshotProposalStatus(proposalResults.kind.status);
   }
   if (
     proposal.cancelled_block ||
@@ -217,45 +233,15 @@ export async function getProposalStatus(
   // Ensure we have a return value for all code paths
   switch (proposalResults.key) {
     case "STANDARD":
-    case "OFFCHAIN_STANDARD": {
-      const {
-        for: forVotes,
-        against: againstVotes,
-        abstain: abstainVotes,
-      } = proposalResults.kind;
-      const calculationOptions = (
-        proposalData as ParsedProposalData["STANDARD" | "HYBRID_STANDARD"]
-      ).kind.calculationOptions;
-      let thresholdVotes = BigInt(forVotes) + BigInt(againstVotes);
-      const voteThresholdPercent =
-        Number(thresholdVotes) > 0
-          ? (Number(forVotes) / Number(thresholdVotes)) * 100
-          : 0;
-      const apprThresholdPercent = Number(approvalThreshold) / 100;
-
-      const hasMetThresholdOrNoThreshold =
-        Boolean(voteThresholdPercent >= apprThresholdPercent) ||
-        approvalThreshold === undefined;
-
-      const quorumForGovernor = getProposalCurrentQuorum(
-        proposalResults.kind,
-        calculationOptions
-      );
-
-      if (
-        (quorum && quorumForGovernor < quorum) ||
-        forVotes < againstVotes ||
-        !hasMetThresholdOrNoThreshold
-      ) {
-        return "DEFEATED";
-      }
-
-      if (forVotes > againstVotes) {
-        return "SUCCEEDED";
-      }
-
-      return "FAILED";
-    }
+    case "OFFCHAIN_STANDARD":
+      return getStandardProposalStatus({
+        proposalResults,
+        proposalData: proposalData as
+          | ParsedProposalData["STANDARD"]
+          | ParsedProposalData["OFFCHAIN_STANDARD"],
+        quorum,
+        approvalThreshold,
+      });
     case "HYBRID_STANDARD": {
       const tallies = calculateHybridStandardTallies(
         proposalResults.kind,
@@ -266,65 +252,27 @@ export async function getProposalStatus(
           .calculationOptions
       );
 
-      if (tallies.quorumMet) {
-        return "SUCCEEDED";
-      }
-      return "DEFEATED";
+      return getHybridStandardProposalStatus({ tallies });
     }
     case "OPTIMISTIC": {
-      const {
-        for: forVotes,
-        against: againstVotes,
-        abstain: abstainVotes,
-      } = proposalResults.kind;
-
-      // Check against 50% of votable supply
-      if (BigInt(againstVotes) > BigInt(votableSupply!) / 2n) {
-        return "DEFEATED";
-      } else return "SUCCEEDED";
+      return getOptimisticProposalStatus({
+        againstVotes: proposalResults.kind.against,
+        votableSupply,
+      });
     }
-    case "APPROVAL": {
-      const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
-      const proposalQuorumVotes = forVotes + abstainVotes;
-
-      if (quorum && proposalQuorumVotes < quorum) {
-        return "DEFEATED";
-      }
-
-      if (proposalResults.kind.criteria === "THRESHOLD") {
-        for (const option of proposalResults.kind.options) {
-          if (option.votes > proposalResults.kind.criteriaValue) {
-            return "SUCCEEDED";
-          }
-        }
-
-        return "DEFEATED";
-      } else {
-        return "SUCCEEDED";
-      }
-    }
-    case "OFFCHAIN_APPROVAL": {
-      // Need to update to take weights
-      const { for: forVotes, abstain: abstainVotes } = proposalResults.kind;
-      const proposalQuorumVotes = forVotes + abstainVotes;
-
-      if (quorum && proposalQuorumVotes < quorum) {
-        return "DEFEATED";
-      }
-
-      return "SUCCEEDED";
-    }
+    case "APPROVAL":
+      return getApprovalProposalStatus({
+        proposalResults,
+        quorum,
+      });
+    case "OFFCHAIN_APPROVAL":
+      return getOffchainApprovalProposalStatus({
+        proposalResults,
+        quorum,
+      });
     case "HYBRID_APPROVAL": {
-      const kind = proposalResults.kind;
-
-      const proposalForMetrics = {
-        proposalResults: kind,
-        quorum: quorum!,
-        approvalThreshold: 0,
-      };
-
       const metrics = calculateHybridApprovalProposalMetrics({
-        proposalResults: kind,
+        proposalResults: proposalResults.kind,
         proposalData:
           proposalData.kind as ParsedProposalData["HYBRID_APPROVAL"]["kind"],
         quorum: Number(quorum!),
@@ -335,16 +283,10 @@ export async function getProposalStatus(
         }),
       });
 
-      // Check if weighted quorum is met
-      if (!metrics.quorumMet) {
-        return "DEFEATED";
-      }
-
-      if (kind.criteria === "THRESHOLD") {
-        return metrics.thresholdMet ? "SUCCEEDED" : "DEFEATED";
-      } else {
-        return "SUCCEEDED";
-      }
+      return getHybridApprovalProposalStatus({
+        proposalResults,
+        metrics,
+      });
     }
     case "OFFCHAIN_OPTIMISTIC":
     case "OFFCHAIN_OPTIMISTIC_TIERED":
@@ -358,7 +300,9 @@ export async function getProposalStatus(
       } as Proposal;
 
       const metrics = calculateHybridOptimisticProposalMetrics(tempProposal);
-      return metrics.vetoThresholdMet ? "DEFEATED" : "SUCCEEDED";
+      return getTieredOptimisticProposalStatus({
+        vetoThresholdMet: metrics.vetoThresholdMet,
+      });
     }
     default: {
       // Default case to handle any unmatched proposalResults.key values

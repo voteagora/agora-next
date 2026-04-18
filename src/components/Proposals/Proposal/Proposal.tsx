@@ -1,21 +1,16 @@
 import Link from "next/link";
-import ProposalStatus from "../ProposalStatus/ProposalStatus";
-import OPStandardProposalStatus from "./OPStandardProposalStatus";
-import OPApprovalProposalStatus, {
-  OffchainApprovalProposalStatus,
-} from "./OPApprovalProposalStatus";
-import ProposalTimeStatus from "./ProposalTimeStatus";
-import { cn, getProposalTypeText } from "@/lib/utils";
-import OPOptimisticProposalStatus from "./OPOptimisticProposalStatus";
-import SnapshotProposalStatus from "./SnapshotProposalStatus";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+
 import { type Proposal } from "@/app/api/common/proposals/proposal";
-import { ParsedProposalData } from "@/lib/proposalUtils";
 import ENSName from "@/components/shared/ENSName";
-import HybridStandardProposalStatus from "./HybridStandardProposalStatus";
-import { HybridOptimisticProposalStatus } from "./HybridOptimisticProposalStatus";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { cn, getProposalTypeText } from "@/lib/utils";
+
+import ProposalStatus from "../ProposalStatus/ProposalStatus";
+import { getProposalListStatusComponent } from "./registry";
+import ProposalTimeStatus from "./ProposalTimeStatus";
 
 export default function Proposal({
   proposal,
@@ -25,6 +20,7 @@ export default function Proposal({
   votableSupply: string;
 }) {
   const { ui } = Tenant.current();
+  const ProposalListStatus = getProposalListStatusComponent(proposal);
   const proposalText = getProposalTypeText(
     proposal.proposalType ?? "",
     proposal.proposalType === "SNAPSHOT"
@@ -101,39 +97,12 @@ export default function Proposal({
         </div>
         <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden lg:block">
           <div className="overflow-hidden overflow-ellipsis">
-            {proposal.proposalType === "SNAPSHOT" && (
-              <SnapshotProposalStatus proposal={proposal} />
-            )}
-            {proposal.proposalType === "STANDARD" &&
-              proposal.proposalResults && (
-                <OPStandardProposalStatus proposal={proposal} />
-              )}
-            {proposal.proposalType === "OPTIMISTIC" &&
-              proposal.proposalResults && (
-                <OPOptimisticProposalStatus
-                  proposal={proposal}
-                  votableSupply={votableSupply}
-                />
-              )}
-            {(proposal.proposalType === "APPROVAL" ||
-              proposal.proposalType === "HYBRID_APPROVAL") &&
-              proposal.proposalData && (
-                <OPApprovalProposalStatus proposal={proposal} />
-              )}
-            {proposal.proposalType === "OFFCHAIN_APPROVAL" &&
-              proposal.proposalData && (
-                <OffchainApprovalProposalStatus proposal={proposal} />
-              )}
-            {(proposal.proposalType === "HYBRID_STANDARD" ||
-              proposal.proposalType === "OFFCHAIN_STANDARD") &&
-              proposal.proposalData && (
-                <HybridStandardProposalStatus proposal={proposal} />
-              )}
-            {(proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ||
-              proposal.proposalType === "OFFCHAIN_OPTIMISTIC" ||
-              proposal.proposalType === "OFFCHAIN_OPTIMISTIC_TIERED") && (
-              <HybridOptimisticProposalStatus proposal={proposal} />
-            )}
+            {ProposalListStatus ? (
+              <ProposalListStatus
+                proposal={proposal}
+                votableSupply={votableSupply}
+              />
+            ) : null}
           </div>
         </div>
       </div>

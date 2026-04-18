@@ -6,7 +6,11 @@ import {
   ProposalPayload,
   ProposalTypeData,
 } from "@/app/api/common/proposals/proposal";
-import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
+import { keccak256, parseUnits } from "viem";
+import {
+  parseApprovalProposalData,
+  parseOffchainApprovalProposalData,
+} from "@/features/proposals/variants/approval/parse";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
@@ -19,12 +23,30 @@ import {
   OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
   OFFCHAIN_OPTIMISTIC_THRESHOLD,
 } from "./constants";
+import {
+  fromLegacyProposalType,
+  isOffchainLegacyProposalType,
+} from "@/features/proposals/domain";
+import {
+  parseHybridOptimisticProposalData,
+  parseOptimisticProposalData,
+  parseTieredOptimisticProposalData,
+} from "@/features/proposals/variants/optimistic/parse";
+import { parseSnapshotProposalData } from "@/features/proposals/variants/snapshot/parse";
+import {
+  parseOffchainStandardProposalData,
+  parseStandardProposalData,
+} from "@/features/proposals/variants/standard/parse";
 import { ProposalType } from "./types";
 import {
   parseOffChainProposalResults,
   parseProposalResults,
 } from "./proposalUtils/parseProposalResults";
 import { getProposalStatus } from "./proposalUtils/proposalStatus";
+export {
+  decodeCalldata,
+  parseIfNecessary,
+} from "./proposalUtils/parsers/shared";
 import { tokenForContractAddress } from "./tokenUtils";
 
 // Type guards
@@ -71,130 +93,6 @@ export function getEndBlock(proposal: ProposalPayload): string | undefined {
   }
   return undefined;
 }
-
-const knownAbis: Record<string, Abi> = {
-  "0x5ef2c7f0": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_node", type: "bytes32" },
-        { name: "_label", type: "bytes32" },
-        { name: "_owner", type: "address" },
-        { name: "_resolver", type: "address" },
-        { name: "_ttl", type: "uint64" },
-      ],
-      name: "setSubnodeRecord",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0x10f13a8c": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_node", type: "bytes32" },
-        { name: "_key", type: "string" },
-        { name: "_value", type: "string" },
-      ],
-      name: "setText",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0xb4720477": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_child", type: "address" },
-        { name: "_message", type: "bytes" },
-      ],
-      name: "sendMessageToChild",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0xa9059cbb": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_to", type: "address" },
-        { name: "_value", type: "uint256" },
-      ],
-      name: "transfer",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0x095ea7b3": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_spender", type: "address" },
-        { name: "_value", type: "uint256" },
-      ],
-      name: "approve",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0x7b1837de": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_to", type: "address" },
-        { name: "_amount", type: "uint256" },
-      ],
-      name: "fund",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-  "0x23b872dd": [
-    {
-      constant: false,
-      inputs: [
-        { name: "_from", type: "address" },
-        { name: "_to", type: "address" },
-        { name: "_value", type: "uint256" },
-      ],
-      name: "transferFrom",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ],
-};
-
-export const decodeCalldata = (calldatas: `0x${string}`[]) => {
-  return calldatas.map((calldata) => {
-    const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
-      ? calldata
-      : (("0x" + calldata) as `0x${string}`);
-    const abi = knownAbis[parsedCalldata.slice(0, 10)];
-    let functionName = "unknown";
-    let functionArgs = [] as string[];
-
-    if (abi) {
-      const decodedData = decodeFunctionData({
-        abi: abi,
-        data: parsedCalldata,
-      });
-      functionName = decodedData.functionName;
-      functionArgs = decodedData.args as string[];
-    }
-
-    return {
-      functionArgs,
-      functionName,
-    };
-  });
-};
 
 /**
  * Proposal title extraction
@@ -366,7 +264,7 @@ export async function parseProposal(
       ? BigInt(5100)
       : null;
 
-  const offchainProposalId = proposalType.startsWith("OFFCHAIN")
+  const offchainProposalId = isOffchainLegacyProposalType(proposalType)
     ? proposal.proposal_id
     : offchainProposal?.proposal_id;
 
@@ -425,6 +323,7 @@ export async function parseProposal(
     unformattedProposalData: proposal.proposal_data_raw,
     proposalResults: proposalResults.kind,
     proposalType,
+    kind: fromLegacyProposalType(proposalType),
     proposalTypeData,
     status,
     createdTransactionHash: proposal.created_transaction_hash,
@@ -622,282 +521,43 @@ export type ParsedProposalData = {
   };
 };
 
-export function parseIfNecessary(obj: string | object) {
-  return typeof obj === "string" ? JSON.parse(obj) : obj;
-}
-
-function parseMultipleStringsSeparatedByComma(obj: string | object) {
-  // Helper function to split string without catastrophic backtracking
-  // This replaces the dangerous regex: /(?![^(]*\)),\s*/
-  const safeSplit = (str: string): string[] => {
-    // For very large strings (>100KB), skip complex parsing to avoid hanging
-    // if (str.length > 100000 && process.env.NODE_ENV === "development") {
-    //   console.log("Skipping complex parsing for large string when in development mode.");
-    //   return [str];
-    // }
-
-    const result: string[] = [];
-    let current = "";
-    let parenDepth = 0;
-
-    for (let i = 0; i < str.length; i++) {
-      const char = str[i];
-
-      if (char === "(") {
-        parenDepth++;
-        current += char;
-      } else if (char === ")") {
-        parenDepth--;
-        current += char;
-      } else if (char === "," && parenDepth === 0) {
-        // Only split on commas outside of parentheses
-        if (current.trim()) {
-          result.push(current.trim().replace(/^['"]|['"]$/g, ""));
-        }
-        current = "";
-      } else {
-        current += char;
-      }
-    }
-
-    // Add the last item
-    if (current.trim()) {
-      result.push(current.trim().replace(/^['"]|['"]$/g, ""));
-    }
-
-    return result;
-  };
-
-  return typeof obj === "string"
-    ? safeSplit(obj)
-    : Array.isArray(obj)
-      ? obj
-          .map((item) => (typeof item === "string" ? safeSplit(item) : item))
-          .flat()
-      : obj;
-}
-
 export function parseProposalData(
   proposalData: string,
   proposalType: ProposalType,
   offChainProposalData?: any
 ): ParsedProposalData[ProposalType] {
   switch (proposalType) {
-    case "SNAPSHOT": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          title: parsedProposalData.title ?? "",
-          start_ts: parsedProposalData.start_ts ?? 0,
-          end_ts: parsedProposalData.end_ts ?? 0,
-          created_ts: parsedProposalData.created_ts ?? 0,
-          link: parsedProposalData.link ?? "",
-          scores: parsedProposalData.scores ?? [],
-          type: parsedProposalData.type ?? "",
-          votes: parsedProposalData.votes ?? "",
-          state: parsedProposalData.state ?? "",
-          body: parsedProposalData.body ?? "",
-          choices: parsedProposalData.choices ?? [],
-        },
-      };
-    }
+    case "SNAPSHOT":
+      return parseSnapshotProposalData(proposalData);
     case "STANDARD":
-    case "HYBRID_STANDARD": {
-      const parsedProposalData = JSON.parse(proposalData);
-      try {
-        const calldatas: any = parseMultipleStringsSeparatedByComma(
-          parseIfNecessary(parsedProposalData.calldatas)
-        );
-        const targets: any = parseMultipleStringsSeparatedByComma(
-          parseIfNecessary(parsedProposalData.targets)
-        );
-        const values = parseIfNecessary(parsedProposalData.values);
-        const signatures: any = parseMultipleStringsSeparatedByComma(
-          parseIfNecessary(parsedProposalData.signatures)
-        );
-        const functionArgsName = decodeCalldata(calldatas);
-
-        return {
-          key: proposalType,
-          kind: {
-            options: [
-              {
-                targets,
-                values,
-                signatures,
-                calldatas,
-                functionArgsName,
-              },
-            ],
-            calculationOptions: offChainProposalData?.calculation_options,
-          },
-        };
-      } catch (error) {
-        console.log(
-          `Error parsing proposal calldatas: '${proposalData}'`,
-          error
-        );
-      }
-    }
-    case "OPTIMISTIC": {
-      const parsedProposalData = JSON.parse(proposalData);
-      const disapprovalThreshold =
-        Number(parsedProposalData?.[0]?.[0] || 2000) / 100;
-      return {
-        key: proposalType,
-        kind: { options: [], disapprovalThreshold },
-      } as ParsedProposalData["OPTIMISTIC"];
-    }
-    case "HYBRID_OPTIMISTIC_TIERED": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          options: [],
-          tiers: offChainProposalData?.tiers
-            .map((tier: number) => tier / 100)
-            .sort((a: number, b: number) => b - a),
-          created_attestation_hash: parsedProposalData.created_attestation_hash,
-          cancelled_attestation_hash:
-            parsedProposalData.cancelled_attestation_hash,
-        },
-      };
-    }
+    case "HYBRID_STANDARD":
+      return parseStandardProposalData(
+        proposalData,
+        proposalType,
+        offChainProposalData
+      );
     case "APPROVAL":
-    case "HYBRID_APPROVAL": {
-      const parsedProposalData = JSON.parse(proposalData);
-      const [maxApprovals, criteria, budgetToken, criteriaValue, budgetAmount] =
-        parsedProposalData[1] as [string, string, string, string, string];
-      return {
-        key: proposalType,
-        kind: {
-          options: parsedProposalData[0].map(
-            (option: Array<string | string[]>) => {
-              const [
-                budgetTokensSpent,
-                targets,
-                values,
-                calldatas,
-                description,
-              ] = (() => {
-                if (option.length === 4) {
-                  return [
-                    null,
-                    option[0],
-                    option[1],
-                    option[2],
-                    option[3],
-                  ] as const;
-                } else if (option.length === 5) {
-                  return [
-                    option[0],
-                    option[1],
-                    option[2],
-                    option[3],
-                    option[4],
-                  ] as const;
-                } else {
-                  throw new Error("unknown option length");
-                }
-              })();
-
-              const functionArgsName = decodeCalldata(
-                calldatas as `0x${string}`[]
-              );
-
-              return {
-                targets,
-                values,
-                calldatas,
-                description,
-                functionArgsName,
-                budgetTokensSpent,
-              };
-            }
-          ),
-          proposalSettings: {
-            maxApprovals: Number(maxApprovals),
-            criteria: toApprovalVotingCriteria(Number(criteria)),
-            budgetToken,
-            criteriaValue: BigInt(criteriaValue),
-            budgetAmount: BigInt(budgetAmount),
-          },
-        },
-      };
-    }
-
-    case "OFFCHAIN_OPTIMISTIC_TIERED": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          options: [],
-          tiers: parsedProposalData.tiers
-            ?.map((tier: number) => tier / 100)
-            .sort((a: number, b: number) => b - a),
-          onchainProposalId: parsedProposalData.onchain_proposalid,
-          created_attestation_hash: parsedProposalData.created_attestation_hash,
-          cancelled_attestation_hash:
-            parsedProposalData.cancelled_attestation_hash,
-        },
-      };
-    }
-    case "OFFCHAIN_OPTIMISTIC": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          options: [],
-          onchainProposalId: parsedProposalData.onchain_proposalid,
-          created_attestation_hash: parsedProposalData.created_attestation_hash,
-          cancelled_attestation_hash:
-            parsedProposalData.cancelled_attestation_hash,
-        },
-      };
-    }
-    case "OFFCHAIN_STANDARD": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          options: [],
-          onchainProposalId: parsedProposalData.onchain_proposalid,
-          created_attestation_hash: parsedProposalData.created_attestation_hash,
-          cancelled_attestation_hash:
-            parsedProposalData.cancelled_attestation_hash,
-          calculationOptions: parsedProposalData.calculation_options,
-        },
-      };
-    }
-    case "OFFCHAIN_APPROVAL": {
-      const parsedProposalData = JSON.parse(proposalData);
-      return {
-        key: proposalType,
-        kind: {
-          onchainProposalId: parsedProposalData.onchain_proposalid,
-          choices: parsedProposalData.choices,
-          options: [],
-          created_attestation_hash: parsedProposalData.created_attestation_hash,
-          cancelled_attestation_hash:
-            parsedProposalData.cancelled_attestation_hash,
-        },
-      };
-    }
+    case "HYBRID_APPROVAL":
+      return parseApprovalProposalData(proposalData, proposalType);
+    case "OPTIMISTIC":
+      return parseOptimisticProposalData(proposalData);
+    case "HYBRID_OPTIMISTIC":
+      return parseHybridOptimisticProposalData();
+    case "HYBRID_OPTIMISTIC_TIERED":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+    case "OFFCHAIN_OPTIMISTIC":
+      return parseTieredOptimisticProposalData(
+        proposalData,
+        proposalType,
+        offChainProposalData
+      );
+    case "OFFCHAIN_STANDARD":
+      return parseOffchainStandardProposalData(proposalData);
+    case "OFFCHAIN_APPROVAL":
+      return parseOffchainApprovalProposalData(proposalData);
     default: {
       throw new Error(`unknown type ${proposalType}`);
     }
-  }
-}
-
-function toApprovalVotingCriteria(value: number): "THRESHOLD" | "TOP_CHOICES" {
-  switch (value) {
-    case 0:
-      return "THRESHOLD";
-    case 1:
-      return "TOP_CHOICES";
-    default:
-      throw new Error(`unknown type ${value}`);
   }
 }
 
@@ -1263,21 +923,21 @@ export function calculateHybridApprovalWeightedPercentage(
 
   weightedOptionPercentage +=
     (eligibleVoters.delegates > 0
-      ? (delegatesVotes / eligibleVoters.delegates)
+      ? delegatesVotes / eligibleVoters.delegates
       : 0) *
     weights.delegates *
     100;
 
   weightedOptionPercentage +=
-    (eligibleVoters.apps > 0 ? (appsVotes / eligibleVoters.apps) : 0) *
+    (eligibleVoters.apps > 0 ? appsVotes / eligibleVoters.apps : 0) *
     weights.apps *
     100;
   weightedOptionPercentage +=
-    (eligibleVoters.users > 0 ? (usersVotes / eligibleVoters.users) : 0) *
+    (eligibleVoters.users > 0 ? usersVotes / eligibleVoters.users : 0) *
     weights.users *
     100;
   weightedOptionPercentage +=
-    (eligibleVoters.chains > 0 ? (chainsVotes / eligibleVoters.chains) : 0) *
+    (eligibleVoters.chains > 0 ? chainsVotes / eligibleVoters.chains : 0) *
     weights.chains *
     100;
 
@@ -1304,28 +964,28 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
 
   uniqueParticipationPercentage +=
     (eligibleVoters.delegates > 0
-      ? (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates)
+      ? Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates
       : 0) *
     100 *
     weights.delegates;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.apps > 0
-      ? (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps)
+      ? Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps
       : 0) *
     100 *
     weights.apps;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.users > 0
-      ? (Number(totalUniqueVoters.users || 0) / eligibleVoters.users)
+      ? Number(totalUniqueVoters.users || 0) / eligibleVoters.users
       : 0) *
     100 *
     weights.users;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.chains > 0
-      ? (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains)
+      ? Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains
       : 0) *
     100 *
     weights.chains;

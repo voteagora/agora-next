@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchProposal } from "@/app/api/common/proposals/getProposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { normalizeArchiveProposal } from "@/features/proposals/data/adapters/fromArchive";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber } from "@/lib/tokenUtils";
 import { unstable_cache } from "next/cache";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import { archiveToProposal } from "@/lib/proposals";
 
 export const runtime = "nodejs";
 
@@ -44,10 +44,13 @@ async function loadProposal(proposalId: string): Promise<Proposal> {
 
     const archiveProposal = archiveResults ? archiveResults : undefined;
     if (archiveProposal) {
-      const normalizedProposal = await archiveToProposal(archiveProposal, {
-        namespace,
-        tokenDecimals: token.decimals ?? 18,
-      });
+      const normalizedProposal = await normalizeArchiveProposal(
+        archiveProposal,
+        {
+          namespace,
+          tokenDecimals: token.decimals ?? 18,
+        }
+      );
 
       return normalizedProposal;
     }

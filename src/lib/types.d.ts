@@ -4,6 +4,14 @@ import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorCo
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
+import type {
+  LegacyProposalType as DomainProposalType,
+  ProposalKind,
+  ProposalMode,
+  ProposalScope,
+  ProposalSource,
+  ProposalVotingKind,
+} from "@/features/proposals/domain";
 import {
   PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TENANT_NAMESPACES,
@@ -259,19 +267,15 @@ export interface DelegateStats {
   participation: [number, number];
 }
 
-export type ProposalType =
-  | "STANDARD"
-  | "APPROVAL"
-  | "OPTIMISTIC"
-  | "SNAPSHOT"
-  | "OFFCHAIN_OPTIMISTIC_TIERED"
-  | "OFFCHAIN_OPTIMISTIC"
-  | "OFFCHAIN_STANDARD"
-  | "OFFCHAIN_APPROVAL"
-  | "HYBRID_STANDARD"
-  | "HYBRID_APPROVAL"
-  | "HYBRID_OPTIMISTIC"
-  | "HYBRID_OPTIMISTIC_TIERED";
+export type {
+  ProposalKind,
+  ProposalMode,
+  ProposalScope,
+  ProposalSource,
+  ProposalVotingKind,
+};
+
+export type ProposalType = DomainProposalType;
 
 // Execution Transaction Types
 export interface ExecutionTransaction {

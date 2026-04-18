@@ -6,8 +6,12 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
-import { VOTER_TYPES } from "@/lib/constants";
 import { VoterTypes } from "@/app/api/common/votes/vote";
+import {
+  getDefaultProposalVoterType,
+  isProposalOffchainVoterFilter,
+  shouldShowProposalVoterTypeFilter,
+} from "./selectors";
 
 const NON_VOTERS_PAGE_SIZE = 20;
 
@@ -20,10 +24,7 @@ export default function ArchiveProposalNonVoterList({
 }: ArchiveProposalNonVoterListProps) {
   const [visibleCount, setVisibleCount] = useState(NON_VOTERS_PAGE_SIZE);
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    proposal.proposalType?.includes("HYBRID") ||
-      proposal.proposalType?.includes("OFFCHAIN")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
+    getDefaultProposalVoterType(proposal)
   );
 
   const { nonVoters, isLoading, error } = useArchiveNonVoters({
@@ -35,10 +36,8 @@ export default function ArchiveProposalNonVoterList({
   }, [selectedVoterType]);
 
   // Determine if we should show the filter
-  const shouldShowFilter =
-    proposal.proposalType?.includes("HYBRID") ||
-    proposal.proposalType?.includes("OFFCHAIN") ||
-    !!proposal.offchainProposalId;
+  const shouldShowFilter = shouldShowProposalVoterTypeFilter(proposal);
+  const isOffchainFilter = isProposalOffchainVoterFilter(proposal);
 
   // Filter non-voters by citizen type
   const filteredNonVoters = useMemo(() => {
@@ -102,15 +101,13 @@ export default function ArchiveProposalNonVoterList({
     );
   }
 
-  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
-
   return (
     <>
       {shouldShowFilter && (
         <ProposalVoterListFilter
           selectedVoterType={selectedVoterType}
           onVoterTypeChange={setSelectedVoterType}
-          isOffchain={isOffchain}
+          isOffchain={isOffchainFilter}
         />
       )}
       <div

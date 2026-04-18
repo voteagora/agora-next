@@ -7,9 +7,10 @@ import {
   fetchProposalsFromArchive,
   fetchRawProposalVotesFromArchive,
 } from "@/lib/archiveUtils";
-import { archiveToProposal } from "@/lib/proposals";
 import { withMetrics } from "@/lib/metricWrapper";
 import Tenant from "@/lib/tenant/tenant";
+import { normalizeArchiveProposal } from "@/features/proposals/data/adapters/fromArchive";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import {
   ArchiveListProposal,
   deriveProposalType,
@@ -54,7 +55,7 @@ async function getNeedsMyVoteProposalsFromArchive(address: string) {
       return false;
     }
     const proposalType = deriveProposalType(p);
-    if (proposalType.startsWith("OFFCHAIN")) {
+    if (isOffchainLegacyProposalType(proposalType)) {
       return false;
     }
     if (isTimeStampBasedTenant) {
@@ -96,7 +97,7 @@ async function getNeedsMyVoteProposalsFromArchive(address: string) {
 
   const proposals = await Promise.all(
     needsVote.map((archiveProposal) =>
-      archiveToProposal(archiveProposal as ArchiveListProposal, {
+      normalizeArchiveProposal(archiveProposal as ArchiveListProposal, {
         namespace,
         tokenDecimals,
       })

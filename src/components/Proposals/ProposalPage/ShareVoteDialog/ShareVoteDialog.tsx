@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import OptionsResultsPanel from "../OPProposalApprovalPage/OptionResultsPanel/OptionResultsPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import {
+  isApprovalProposal,
+  isOptimisticProposal,
+  isStandardProposal,
+} from "@/features/proposals/domain";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
 import blockIcon from "@/icons/block.svg";
 import { ogLogoForShareVote } from "./TenantLogo";
@@ -21,7 +26,7 @@ import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
 function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
-  proposalType: ProposalType,
+  proposal: Proposal,
   supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const totalBars = 56;
@@ -48,7 +53,7 @@ function generateVoteBars(
       );
     }
   } else {
-    const forBars = proposalType.includes("OPTIMISTIC")
+    const forBars = isOptimisticProposal(proposal)
       ? 0
       : Math.round((totalBars * forPercentage) / 100);
     const againstBars = Math.round((totalBars * againstPercentage) / 100);
@@ -113,6 +118,8 @@ const SuccessMessageCard = ({
   totalOptions: number;
 }) => {
   const { namespace, brandName } = Tenant.current();
+  const isApproval = isApprovalProposal(proposal);
+  const isStandard = isStandardProposal(proposal);
   return (
     <div
       className="h-full w-full flex flex-col p-4 bg-[#F3F3EF] relative rounded-lg"
@@ -153,7 +160,7 @@ const SuccessMessageCard = ({
 
         {/* Vote Stats Section */}
         <div className="flex flex-col bg-white gap-3 sm:gap-0 rounded-lg border border-line mt-4 sm:mt-6">
-          {proposalType === "APPROVAL" ? (
+          {isApproval ? (
             <div className="py-2">
               <OptionsResultsPanel
                 proposal={proposal}
@@ -165,7 +172,7 @@ const SuccessMessageCard = ({
             <div className="flex flex-col gap-2 p-3 sm:p-4 pb-0">
               <div className="flex justify-between w-full">
                 <span className="text-xs font-semibold text-positive">
-                  {proposalType === "STANDARD" ? "FOR" : ""}
+                  {isStandard ? "FOR" : ""}
                 </span>
                 <span className="text-xs font-semibold text-negative">
                   AGAINST
@@ -177,7 +184,7 @@ const SuccessMessageCard = ({
                 {generateVoteBars(
                   forPercentage,
                   againstPercentage,
-                  proposalType,
+                  proposal,
                   supportType
                 )}
               </div>
@@ -276,6 +283,8 @@ export function ShareDialog({
   const proposalLink = `${window.location.origin}/proposals/${proposalId}?support=${newVote.support || supportType}&weight=${newVote.weight}&blockNumber=${blockNumberToUse}&timestamp=${timestampToUse}&params=${encodeURIComponent(
     JSON.stringify(newVote.params)
   )}`;
+  const isApproval = isApprovalProposal(proposal);
+  const isOptimistic = isOptimisticProposal(proposal);
 
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
   useEffect(() => {
@@ -293,12 +302,12 @@ export function ShareDialog({
   let text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
   let textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} ${proposalTitle} \n\n${voteReason}`;
 
-  if (proposalType === "OPTIMISTIC") {
+  if (isOptimistic) {
     text = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} the optimistic proposal ${proposalTitle} ${proposalLink} \n\n${voteReason}`;
     textWithoutLinkForWarpcast = `I voted ${supportType.charAt(0).toUpperCase() + supportType.toLowerCase().slice(1)}${supportType === "ABSTAIN" ? " on" : ""} the optimistic proposal ${proposalTitle} \n\n${voteReason}`;
   }
 
-  if (proposalType === "APPROVAL") {
+  if (isApproval) {
     const params = votes?.[0]?.params;
     const paramsString = params
       ?.map((option: string, index: number) => `${++index}. ${option}`)

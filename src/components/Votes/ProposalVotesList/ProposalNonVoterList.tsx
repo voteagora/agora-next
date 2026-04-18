@@ -6,11 +6,15 @@ import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
 import InfiniteScroll from "react-infinite-scroller";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { ParsedProposalData } from "@/lib/proposalUtils";
 import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
-import { VOTER_TYPES } from "@/lib/constants";
+import {
+  getDefaultProposalVoterType,
+  getProposalNonVoterListBaseHeight,
+  isProposalOffchainVoterFilter,
+  shouldShowProposalVoterTypeFilter,
+} from "./selectors";
 
 const LIMIT = 20;
 
@@ -23,10 +27,6 @@ type ProposalNonVoterListContentProps = {
   proposal: Proposal;
   offchainProposalId?: string;
   selectedVoterType: VoterTypes;
-};
-
-const isApprovalProposal = (proposal: Proposal) => {
-  return proposal.proposalType?.includes("APPROVAL");
 };
 
 // Child component that handles the actual voter list for a specific voter type
@@ -80,24 +80,10 @@ const ProposalNonVoterListContent = ({
   const voters = useMemo(() => {
     return pages.flatMap((page) => page.data);
   }, [pages]);
-
-  const isThresholdCriteria =
-    isApprovalProposal(proposal) &&
-    (proposal.proposalData as ParsedProposalData["APPROVAL"]["kind"])
-      .proposalSettings?.criteria === "THRESHOLD";
-
-  // Calculate max height
-  let baseHeight = 437;
-  if (isThresholdCriteria || proposal.proposalType === "SNAPSHOT") {
-    baseHeight = 560;
-  } else if (isApprovalProposal(proposal)) {
-    baseHeight = 527;
-  }
-
-  // Only add 50px for offchainProposalId to account for filter
-  if (offchainProposalId) {
-    baseHeight += 50;
-  }
+  const baseHeight = getProposalNonVoterListBaseHeight(
+    proposal,
+    Boolean(offchainProposalId)
+  );
 
   return (
     <div
@@ -137,13 +123,9 @@ export const ProposalNonVoterList = ({
   offchainProposalId,
 }: ProposalNonVoterListProps) => {
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    proposal.proposalType?.includes("HYBRID") ||
-      proposal.proposalType?.includes("OFFCHAIN")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
+    getDefaultProposalVoterType(proposal)
   );
-
-  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
+  const isOffchainFilter = isProposalOffchainVoterFilter(proposal);
 
   return (
     <>
@@ -151,7 +133,7 @@ export const ProposalNonVoterList = ({
         <ProposalVoterListFilter
           selectedVoterType={selectedVoterType}
           onVoterTypeChange={setSelectedVoterType}
-          isOffchain={isOffchain}
+          isOffchain={isOffchainFilter}
         />
       )}
       <ProposalNonVoterListContent

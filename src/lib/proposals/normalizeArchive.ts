@@ -19,6 +19,7 @@ import {
   resolveArchiveThresholds,
 } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import {
   decodeCalldata,
   ParsedProposalData,
@@ -29,6 +30,7 @@ import {
   DaoNodeVoteTotals,
   EasOodaoVoteOutcome,
   DecodedStandardProposalData,
+  deriveProposalKind,
   deriveProposalType,
 } from "@/lib/types/archiveProposal";
 import type { ArchiveProposalInput } from "./extractors/types";
@@ -90,7 +92,7 @@ const getOffchainProposalId = (
   proposal: ArchiveListProposal,
   proposalType: ProposalType
 ): string | undefined => {
-  if (proposalType.startsWith("OFFCHAIN")) {
+  if (isOffchainLegacyProposalType(proposalType)) {
     return String(proposal.id);
   }
 
@@ -799,6 +801,7 @@ export async function archiveToProposal(
   const latestBlock = await contracts.token.provider.getBlock("latest");
 
   let archiveProposal = proposal as ArchiveListProposal;
+  const proposalKind = deriveProposalKind(archiveProposal);
   const proposalType = deriveProposalType(archiveProposal);
   const base = await normalizeBase(archiveProposal, options, latestBlock);
   const offchainProposalId = getOffchainProposalId(
@@ -877,6 +880,7 @@ export async function archiveToProposal(
 
   return {
     ...normalizedProposal,
+    kind: proposalKind,
     offchainProposalId,
     archiveMetadata,
   } as Proposal & { archiveMetadata: typeof archiveMetadata };

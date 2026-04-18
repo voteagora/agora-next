@@ -6,6 +6,10 @@ import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { getBlockScanUrl } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
+import {
+  isApprovalProposal,
+  isStandardProposal,
+} from "@/features/proposals/domain";
 import { getActionsLink } from "./ProposalTransactionDisplay";
 
 function getTransactionsLabel(status) {
@@ -43,10 +47,8 @@ export default function ApprovedTransactions({
     return null;
   }
   const isNoProposedTransactions =
-    (proposalType === "STANDARD" &&
-      proposalData.options[0].calldatas[0] === "0x") ||
-    (proposalType === "HYBRID_STANDARD" &&
-      proposalData.options[0].calldatas[0] === "0x");
+    isStandardProposal(proposal) &&
+    proposalData.options[0].calldatas[0] === "0x";
 
   const actionsLabel = getTransactionsLabel(proposal?.status);
   const actionsLink = getActionsLink(proposal, executedTransactionHash);
@@ -73,8 +75,7 @@ export default function ApprovedTransactions({
           {proposalData.options.slice(0, displayedOptions).map((option, i) => {
             return (
               <div key={i}>
-                {(proposalType === "APPROVAL" ||
-                  proposalType === "HYBRID_APPROVAL") && (
+                {isApprovalProposal(proposal) && (
                   <p className="font-mono text-xs font-medium leading-4 text-tertiary">
                     {"//"} {option.description}
                   </p>

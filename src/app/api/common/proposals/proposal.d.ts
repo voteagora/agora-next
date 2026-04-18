@@ -3,6 +3,7 @@ import {
   ProposalStatus,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
+import type { ProposalKind } from "@/features/proposals/domain";
 import { OptimismProposals, lineaProposals } from "@prisma/client";
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
@@ -143,6 +144,7 @@ export type Proposal = {
   unformattedProposalData: `0x${string}` | null | any;
   proposalResults: ParsedProposalResults[ProposalType]["kind"];
   proposalType: ProposalType | null;
+  kind?: ProposalKind;
   proposalTypeData: ProposalTypeData | null;
   status: ProposalStatus | null;
   createdTransactionHash: string | null;

@@ -1,13 +1,6 @@
-import BasicProposalAction from "./BasicProposalAction";
-import SocialProposalAction from "./SocialProposalAction";
-import ApprovalProposalAction from "./ApprovalProposalAction";
-import OptimisticProposalAction from "./OptimisticProposalAction";
-import {
-  DraftProposal,
-  ProposalScope,
-  ProposalType,
-} from "../../../proposals/draft/types";
+import { DraftProposal, ProposalScope } from "../../../proposals/draft/types";
 import OffchainProposalAction from "./OffchainProposalAction";
+import { getSponsorActionComponent } from "./registry";
 
 const SponsorActions = ({
   draftProposal,
@@ -17,23 +10,7 @@ const SponsorActions = ({
   const proposal_scope = draftProposal.proposal_scope;
   const isHybrid = proposal_scope === ProposalScope.HYBRID;
   const isOffchainOnly = proposal_scope === ProposalScope.OFFCHAIN_ONLY;
-
-  const renderOnchainAction = (proposal: DraftProposal) => {
-    switch (proposal.voting_module_type) {
-      case ProposalType.BASIC:
-        return <BasicProposalAction draftProposal={proposal} />;
-      case ProposalType.SOCIAL:
-        return <SocialProposalAction draftProposal={proposal} />;
-      case ProposalType.APPROVAL:
-        return <ApprovalProposalAction draftProposal={proposal} />;
-      case ProposalType.OPTIMISTIC:
-        return <OptimisticProposalAction draftProposal={proposal} />;
-      default:
-        // ensures that we've handled all cases
-        const _exhaustiveCheck: never = proposal;
-        throw new Error(`Unhandled proposal type.`);
-    }
-  };
+  const OnchainSponsorAction = getSponsorActionComponent(draftProposal);
 
   const renderAction = (proposal: DraftProposal) => {
     if (isOffchainOnly) {
@@ -47,7 +24,7 @@ const SponsorActions = ({
             <h4 className="font-semibold text-gray-900 mb-3">
               Step 1: Submit on-chain
             </h4>
-            {renderOnchainAction(proposal)}
+            <OnchainSponsorAction draftProposal={proposal} />
           </div>
           <div>
             <h4 className="font-semibold text-gray-900 mb-3">
@@ -59,7 +36,7 @@ const SponsorActions = ({
       );
     }
 
-    return renderOnchainAction(proposal);
+    return <OnchainSponsorAction draftProposal={proposal} />;
   };
 
   return (

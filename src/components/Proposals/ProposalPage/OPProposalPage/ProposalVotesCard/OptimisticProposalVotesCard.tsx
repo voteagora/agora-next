@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { HStack, VStack } from "@/components/Layout/Stack";
+
 import { Proposal } from "@/app/api/common/proposals/proposal";
+import { icons } from "@/assets/icons/icons";
+import { HStack, VStack } from "@/components/Layout/Stack";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/ArchiveProposalVotesList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
@@ -11,12 +14,11 @@ import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalN
 import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
-import { icons } from "@/assets/icons/icons";
 import ProposalVotesFilter from "./ProposalVotesFilter";
-import Tenant from "@/lib/tenant/tenant";
-import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
-import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
+import Tenant from "@/lib/tenant/tenant";
+import { checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import CastEasOptimisticVoteInput from "@/components/Votes/CastVoteInput/CastEasOptimisticVoteInput";
 
 interface Props {
@@ -37,7 +39,11 @@ const OptimisticProposalVotesCard = ({
   const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [showVoters, setShowVoters] = useState(true);
-  const isOffchain = proposal.proposalType?.startsWith("OFFCHAIN");
+  const isOffchain =
+    proposal.kind?.scope === "offchain" ||
+    (proposal.proposalType
+      ? isOffchainLegacyProposalType(proposal.proposalType)
+      : false);
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
   )?.enabled;

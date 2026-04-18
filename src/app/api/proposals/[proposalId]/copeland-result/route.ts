@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchProposalUnstableCache } from "@/app/api/common/proposals/getProposals";
 import { calculateCopelandVote } from "@/lib/copelandCalculation";
+import { normalizeArchiveProposal } from "@/features/proposals/data/adapters/fromArchive";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import {
   fetchProposalFromArchive,
   fetchRawProposalVotesFromArchive,
 } from "@/lib/archiveUtils";
-import { archiveToProposal } from "@/lib/proposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { SnapshotVote } from "@/app/api/common/votes/vote";
 import { fetchProposalTaxFormMetadata } from "@/app/api/common/proposals/getProposalTaxFormMetadata";
@@ -23,10 +23,13 @@ async function loadProposal(proposalId: string): Promise<Proposal> {
     ]);
 
     if (archiveProposal) {
-      const normalizedProposal = await archiveToProposal(archiveProposal, {
-        namespace,
-        tokenDecimals: token.decimals ?? 18,
-      });
+      const normalizedProposal = await normalizeArchiveProposal(
+        archiveProposal,
+        {
+          namespace,
+          tokenDecimals: token.decimals ?? 18,
+        }
+      );
 
       return {
         ...normalizedProposal,
