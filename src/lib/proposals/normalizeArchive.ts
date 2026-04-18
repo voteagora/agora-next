@@ -39,7 +39,7 @@ import {
   extractOptimisticMetrics,
   extractOptimisticTieredMetrics,
 } from "./extractors";
-import { ProposalType } from "../types";
+import { LegacyProposalType } from "../types";
 import {
   HYBRID_OPTIMISTIC_TIERED_THRESHOLD,
   OFFCHAIN_OPTIMISTIC_TIERED_THRESHOLD,
@@ -90,7 +90,7 @@ const normalizeOption = (proposal: ArchiveListProposal) => {
 
 const getOffchainProposalId = (
   proposal: ArchiveListProposal,
-  proposalType: ProposalType
+  proposalType: LegacyProposalType
 ): string | undefined => {
   if (isOffchainLegacyProposalType(proposalType)) {
     return String(proposal.id);
@@ -240,7 +240,7 @@ async function normalizeBase(
 function normalizeStandardProposal(
   proposal: ArchiveListProposal,
   base: NormalizedBase,
-  proposalType: ProposalType = "STANDARD"
+  proposalType: LegacyProposalType = "STANDARD"
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
   const isHybrid = proposalType === "HYBRID_STANDARD";
@@ -515,7 +515,7 @@ function normalizeApprovalProposal(
 function normalizeOptimisticProposal(
   proposal: ArchiveListProposal,
   base: NormalizedBase,
-  proposalType: ProposalType
+  proposalType: LegacyProposalType
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
   const isHybrid = proposalType === "HYBRID_OPTIMISTIC";
@@ -634,7 +634,7 @@ function normalizeOptimisticProposal(
 function normalizeOptimisticTieredProposal(
   proposal: ArchiveListProposal,
   base: NormalizedBase,
-  proposalType: ProposalType
+  proposalType: LegacyProposalType
 ): Proposal {
   const { decimals, source, ...baseFields } = base;
   const isHybrid = proposalType === "HYBRID_OPTIMISTIC_TIERED";

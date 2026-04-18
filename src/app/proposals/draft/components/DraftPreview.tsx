@@ -10,12 +10,12 @@ import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import {
   DraftProposal,
+  DraftVotingModuleType,
   PLMConfig,
   ProposalGatingType,
   ProposalScope,
 } from "@/app/proposals/draft/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ProposalType } from "@/app/proposals/draft/types";
 import toast from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import Markdown from "@/components/shared/Markdown/Markdown";
@@ -127,7 +127,7 @@ const DraftPreview = ({
     const scopeDescription = getScopeDescription(proposal.proposal_scope);
 
     switch (proposal.voting_module_type) {
-      case ProposalType.BASIC:
+      case DraftVotingModuleType.BASIC:
         return (
           <div>
             <p className="text-secondary mt-2">
@@ -138,7 +138,7 @@ const DraftPreview = ({
             )}
           </div>
         );
-      case ProposalType.APPROVAL:
+      case DraftVotingModuleType.APPROVAL:
         const isOnchainOnly =
           proposal.proposal_scope === ProposalScope.ONCHAIN_ONLY;
         return (
@@ -175,7 +175,7 @@ const DraftPreview = ({
           </div>
         );
 
-      case ProposalType.SOCIAL:
+      case DraftVotingModuleType.SOCIAL:
         return (
           <div>
             <p className="text-secondary mt-2">
@@ -188,7 +188,7 @@ const DraftPreview = ({
           </div>
         );
 
-      case ProposalType.OPTIMISTIC:
+      case DraftVotingModuleType.OPTIMISTIC:
         return (
           <div>
             <p className="text-secondary mt-2">
@@ -211,7 +211,7 @@ const DraftPreview = ({
     const isOffchainOnly =
       proposalDraft.proposal_scope === ProposalScope.OFFCHAIN_ONLY;
 
-    if (votingModuleType === ProposalType.SOCIAL) {
+    if (votingModuleType === DraftVotingModuleType.SOCIAL) {
       return (
         <div className="first-of-type:rounded-t-xl first-of-type:border-t border-x border-b last-of-type:rounded-b-xl p-4 flex flex-row items-center space-x-4">
           <p className="flex-grow text-primary">Voting power</p>
@@ -383,7 +383,7 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {proposalDraft.voting_module_type === ProposalType.BASIC &&
+          {proposalDraft.voting_module_type === DraftVotingModuleType.BASIC &&
             proposalDraft.proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
               <ProposalTransactionDisplay
                 descriptions={description as string[]}

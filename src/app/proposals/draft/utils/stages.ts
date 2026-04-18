@@ -1,7 +1,7 @@
 import {
   PLMConfig,
   ProposalLifecycleStageMetadata,
-  ProposalType,
+  DraftVotingModuleType,
 } from "../types";
 
 import { ProposalStage } from "@prisma/client";
@@ -96,7 +96,7 @@ export const isPostSubmission = (stage: ProposalStage) => {
 };
 
 export const getProposalTypeAddress = (
-  type: ProposalType
+  type: DraftVotingModuleType
 ): `0x${string}` | null | undefined => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
@@ -107,7 +107,7 @@ export const getProposalTypeAddress = (
     );
   }
 
-  if (type === ProposalType.BASIC) {
+  if (type === DraftVotingModuleType.BASIC) {
     return ("0x" + "0".repeat(40)) as `0x${string}`;
   }
 

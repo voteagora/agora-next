@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
   DraftProposal,
-  ProposalType,
+  DraftVotingModuleType,
   ApprovalProposalType,
 } from "@/app/proposals/draft/types";
 import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
@@ -12,13 +12,13 @@ export function formDataToProposal(data: FormData): DraftProposal {
   const proposalType = data.proposalConfigType?.toString() ?? "0";
 
   switch (data.type) {
-    case ProposalType.BASIC:
+    case DraftVotingModuleType.BASIC:
       return {
         id: 0,
         author_address: "" as `0x${string}`,
         title: data.title,
         abstract: data.abstract,
-        voting_module_type: ProposalType.BASIC,
+        voting_module_type: DraftVotingModuleType.BASIC,
         proposal_type: proposalType,
         transactions: (data.transactions ?? []).map((t) => ({
           id: 0,
@@ -35,14 +35,14 @@ export function formDataToProposal(data: FormData): DraftProposal {
         tiers: data.tiers ?? [],
       } as unknown as DraftProposal;
 
-    case ProposalType.APPROVAL: {
+    case DraftVotingModuleType.APPROVAL: {
       const ap = data.approvalProposal;
       return {
         id: 0,
         author_address: "" as `0x${string}`,
         title: data.title,
         abstract: data.abstract,
-        voting_module_type: ProposalType.APPROVAL,
+        voting_module_type: DraftVotingModuleType.APPROVAL,
         proposal_type: proposalType,
         budget: parseInt(ap?.budget ?? "0") || 0,
         criteria: (ap?.criteria ??
@@ -70,13 +70,13 @@ export function formDataToProposal(data: FormData): DraftProposal {
       } as unknown as DraftProposal;
     }
 
-    case ProposalType.OPTIMISTIC:
+    case DraftVotingModuleType.OPTIMISTIC:
       return {
         id: 0,
         author_address: "" as `0x${string}`,
         title: data.title,
         abstract: data.abstract,
-        voting_module_type: ProposalType.OPTIMISTIC,
+        voting_module_type: DraftVotingModuleType.OPTIMISTIC,
         proposal_type: proposalType,
         transactions: [],
         checklist_items: [],
@@ -84,13 +84,13 @@ export function formDataToProposal(data: FormData): DraftProposal {
         tiers: data.tiers ?? [],
       } as unknown as DraftProposal;
 
-    case ProposalType.SOCIAL:
+    case DraftVotingModuleType.SOCIAL:
       return {
         id: 0,
         author_address: "" as `0x${string}`,
         title: data.title,
         abstract: data.abstract,
-        voting_module_type: ProposalType.SOCIAL,
+        voting_module_type: DraftVotingModuleType.SOCIAL,
         proposal_type: proposalType,
         proposal_social_type: data.socialProposal?.type ?? "basic",
         start_date_social: data.socialProposal?.start_date ?? new Date(),

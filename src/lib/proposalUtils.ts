@@ -37,7 +37,7 @@ import {
   parseOffchainStandardProposalData,
   parseStandardProposalData,
 } from "@/features/proposals/variants/standard/parse";
-import { ProposalType } from "./types";
+import { LegacyProposalType } from "./types";
 import {
   parseOffChainProposalResults,
   parseProposalResults,
@@ -136,8 +136,8 @@ export function getTitleFromProposalDescription(description: string = "") {
 }
 
 export const mapOffchainProposalType = (
-  proposalType: ProposalType
-): ProposalType => {
+  proposalType: LegacyProposalType
+): LegacyProposalType => {
   switch (proposalType) {
     case "OFFCHAIN_STANDARD":
       return "HYBRID_STANDARD";
@@ -176,11 +176,11 @@ export async function parseProposal(
   let cancelledBlock: bigint | string | null = proposal.cancelled_block;
   let createdBlock: bigint | string | null = proposal.created_block;
   let offChainProposalData = offchainProposal?.proposal_data;
-  let proposalType = proposal.proposal_type as ProposalType;
+  let proposalType = proposal.proposal_type as LegacyProposalType;
 
   if (offChainProposalData) {
     proposalType = mapOffchainProposalType(
-      offchainProposal?.proposal_type as ProposalType
+      offchainProposal?.proposal_type as LegacyProposalType
     );
   }
 
@@ -338,7 +338,7 @@ export async function parseProposal(
  * Extract proposal total value
  */
 export function getProposalTotalValue(
-  proposalData: ParsedProposalData[ProposalType]
+  proposalData: ParsedProposalData[LegacyProposalType]
 ) {
   switch (proposalData.key) {
     case "STANDARD":
@@ -523,9 +523,9 @@ export type ParsedProposalData = {
 
 export function parseProposalData(
   proposalData: string,
-  proposalType: ProposalType,
+  proposalType: LegacyProposalType,
   offChainProposalData?: any
-): ParsedProposalData[ProposalType] {
+): ParsedProposalData[LegacyProposalType] {
   switch (proposalType) {
     case "SNAPSHOT":
       return parseSnapshotProposalData(proposalData);
@@ -1517,7 +1517,7 @@ export const getProposalCreatedTime = ({
   latestBlock,
   createdBlock,
 }: {
-  proposalData: ParsedProposalData[ProposalType];
+  proposalData: ParsedProposalData[LegacyProposalType];
   latestBlock: Block | null;
   createdBlock: bigint | string | null;
 }) => {

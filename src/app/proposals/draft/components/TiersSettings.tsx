@@ -1,6 +1,9 @@
 "use client";
 
-import { ProposalScope, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalScope,
+} from "@/app/proposals/draft/types";
 import { Button } from "@/components/ui/button";
 import { Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,7 +59,7 @@ function TiersSettings({
   };
 
   const showTiers =
-    proposalType === ProposalType.OPTIMISTIC &&
+    proposalType === DraftVotingModuleType.OPTIMISTIC &&
     proposal_scope !== ProposalScope.ONCHAIN_ONLY;
 
   if (!showTiers) return null;

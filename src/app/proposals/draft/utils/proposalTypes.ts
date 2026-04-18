@@ -1,5 +1,5 @@
 import Tenant from "@/lib/tenant/tenant";
-import { PLMConfig, ProposalType } from "../types";
+import { DraftVotingModuleType, PLMConfig } from "../types";
 import { getProposalTypeAddress } from "./stages";
 
 export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
@@ -21,10 +21,13 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
 
     try {
       optimisticModuleAddress =
-        getProposalTypeAddress(ProposalType.OPTIMISTIC)?.toLowerCase() || null;
+        getProposalTypeAddress(
+          DraftVotingModuleType.OPTIMISTIC
+        )?.toLowerCase() || null;
 
       approvalModuleAddress =
-        getProposalTypeAddress(ProposalType.APPROVAL)?.toLowerCase() || null;
+        getProposalTypeAddress(DraftVotingModuleType.APPROVAL)?.toLowerCase() ||
+        null;
     } catch (error) {
       // ignore
     }

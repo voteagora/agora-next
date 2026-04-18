@@ -4,7 +4,7 @@ import { Octokit } from "@octokit/rest";
 import { ProposalDraft, ProposalDraftTransaction } from "@prisma/client";
 import { markdownTable } from "markdown-table";
 import { formatTransactions } from "./formatTransactions";
-import { DraftProposal, ProposalType } from "../types";
+import { DraftProposal, DraftVotingModuleType } from "../types";
 
 const AGORA_PROXY_ACCOUNT = "agora-gov-bot";
 const AGORA_ENS_FORK = "docs";
@@ -60,7 +60,7 @@ function formatGithubProposal(proposal: DraftProposal) {
       : "N/A"
   }                                                                                              |
   | **Votes**             | ${
-    proposal.voting_module_type === ProposalType.BASIC
+    proposal.voting_module_type === DraftVotingModuleType.BASIC
       ? "[Agora](https://agora.ensdao.org/proposals/" + proposal.id + ")"
       : "[Snapshot](https://snapshot.org/#/ens.eth/proposal/" +
         proposal.id +
@@ -70,28 +70,28 @@ function formatGithubProposal(proposal: DraftProposal) {
 
   const abstract = `# Description \n ${proposal.abstract}`;
   const transactions =
-    proposal.voting_module_type === ProposalType.BASIC
+    proposal.voting_module_type === DraftVotingModuleType.BASIC
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
       : "";
 
   const votingStrategy =
-    proposal.voting_module_type === ProposalType.SOCIAL
+    proposal.voting_module_type === DraftVotingModuleType.SOCIAL
       ? `# Voting Strategy \n ${proposal.proposal_social_type}`
       : ``;
 
   const votingStrategyDates =
-    proposal.voting_module_type === ProposalType.SOCIAL
+    proposal.voting_module_type === DraftVotingModuleType.SOCIAL
       ? `# Voting Dates \n ${proposal.start_date_social} - ${proposal.end_date_social}`
       : ``;
 
   const socialOptionsBasic =
-    proposal.voting_module_type === ProposalType.SOCIAL &&
+    proposal.voting_module_type === DraftVotingModuleType.SOCIAL &&
     proposal.proposal_social_type === "basic"
       ? `# Voting options \n For, Against, Abstain`
       : ``;
 
   const socialOptionsApproval =
-    proposal.voting_module_type === ProposalType.SOCIAL &&
+    proposal.voting_module_type === DraftVotingModuleType.SOCIAL &&
     proposal.proposal_social_type === "approval"
       ? `# Voting options \n ${proposal.social_options
           .map((option) => option.text)

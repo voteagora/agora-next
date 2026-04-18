@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
-import { ProposalType } from "../types";
+import { DraftVotingModuleType } from "../types";
 import type { FormState } from "@/app/types";
 import { DraftProposalSchema } from "../schemas/DraftProposalSchema";
 import { ProposalDraftTransaction } from "@prisma/client";
@@ -20,7 +20,7 @@ const formDataByType = (
 ) => {
   // Remove the unused sanitizedTransactions variable since we're sanitizing inline
   switch (data.type) {
-    case ProposalType.BASIC:
+    case DraftVotingModuleType.BASIC:
       if (!data.transactions) return {};
       return {
         transactions: {
@@ -51,7 +51,7 @@ const formDataByType = (
         },
       };
 
-    case ProposalType.SOCIAL:
+    case DraftVotingModuleType.SOCIAL:
       return {
         proposal_social_type: data.socialProposal?.type,
         start_date_social: data.socialProposal?.start_date
@@ -71,7 +71,7 @@ const formDataByType = (
         },
       };
 
-    case ProposalType.APPROVAL:
+    case DraftVotingModuleType.APPROVAL:
       return {
         criteria: data.approvalProposal.criteria,
         threshold: data.approvalProposal.threshold
@@ -126,7 +126,7 @@ const formDataByType = (
         },
       };
 
-    case ProposalType.OPTIMISTIC:
+    case DraftVotingModuleType.OPTIMISTIC:
       // nothing specific to optimistic
       return;
   }

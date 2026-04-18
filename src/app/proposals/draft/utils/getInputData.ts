@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { DraftProposal, ProposalType } from "../types";
+import { DraftProposal, DraftVotingModuleType } from "../types";
 import { decodeFunctionData, encodeAbiParameters, parseEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
 import {
@@ -84,7 +84,7 @@ export function getInputData(proposal: DraftProposal): {
   // [targets, values, calldatas, description]
   // [string[], bigint[], string[], string]
   switch (proposal.voting_module_type) {
-    case ProposalType.BASIC:
+    case DraftVotingModuleType.BASIC:
       let targets: `0x${string}`[] = [];
       let values: number[] = [];
       let calldatas: `0x${string}`[] = [];
@@ -146,7 +146,7 @@ export function getInputData(proposal: DraftProposal): {
 
     // inputs for approval type
     // ((uint256 budgetTokensSpent,address[] targets,uint256[] values,bytes[] calldatas,string description)[] proposalOptions,(uint8 maxApprovals,uint8 criteria,address budgetToken,uint128 criteriaValue,uint128 budgetAmount) proposalSettings)
-    case ProposalType.APPROVAL: {
+    case DraftVotingModuleType.APPROVAL: {
       let options = [] as {
         budgetTokensSpent: bigint;
         targets: `0x${string}`[];
@@ -233,7 +233,7 @@ export function getInputData(proposal: DraftProposal): {
       );
 
       const approvalModuleAddress = getProposalTypeAddress(
-        ProposalType.APPROVAL
+        DraftVotingModuleType.APPROVAL
       );
 
       if (!approvalModuleAddress) {
@@ -252,7 +252,7 @@ export function getInputData(proposal: DraftProposal): {
       return { inputData: approvalInputData };
     }
 
-    case ProposalType.OPTIMISTIC: {
+    case DraftVotingModuleType.OPTIMISTIC: {
       const calldata = encodeAbiParameters(
         [
           {
@@ -273,7 +273,7 @@ export function getInputData(proposal: DraftProposal): {
       );
 
       const optimisticModuleAddress = getProposalTypeAddress(
-        ProposalType.OPTIMISTIC
+        DraftVotingModuleType.OPTIMISTIC
       );
 
       if (!optimisticModuleAddress) {

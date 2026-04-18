@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { isAddress } from "viem";
 import {
-  ProposalType,
+  DraftVotingModuleType,
   TransactionType,
   SocialProposalType,
   ApprovalProposalType,
@@ -134,7 +134,7 @@ const approvalProposal = z
   );
 
 const BaseProposalSchema = z.object({
-  type: z.nativeEnum(ProposalType),
+  type: z.nativeEnum(DraftVotingModuleType),
   proposalConfigType: z.string().optional(),
   title: z.string().min(1, { message: "Title cannot be empty" }),
   abstract: z.string().min(1, { message: "Description cannot be empty" }),
@@ -147,22 +147,22 @@ const BaseProposalSchema = z.object({
 });
 
 export const BasicProposalSchema = BaseProposalSchema.extend({
-  type: z.literal(ProposalType.BASIC),
+  type: z.literal(DraftVotingModuleType.BASIC),
   transactions: z.array(transaction),
 });
 
 export const SocialProposalSchema = BaseProposalSchema.extend({
-  type: z.literal(ProposalType.SOCIAL),
+  type: z.literal(DraftVotingModuleType.SOCIAL),
   socialProposal,
 });
 
 export const ApprovalProposalSchema = BaseProposalSchema.extend({
-  type: z.literal(ProposalType.APPROVAL),
+  type: z.literal(DraftVotingModuleType.APPROVAL),
   approvalProposal,
 });
 
 export const OptimisticProposalSchema = BaseProposalSchema.extend({
-  type: z.literal(ProposalType.OPTIMISTIC),
+  type: z.literal(DraftVotingModuleType.OPTIMISTIC),
 });
 
 export const DraftProposalSchema = z.discriminatedUnion("type", [

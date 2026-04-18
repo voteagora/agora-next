@@ -14,10 +14,10 @@ import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import {
   DraftProposal,
+  DraftVotingModuleType,
   PLMConfig,
   ProposalGatingType,
   ProposalScope,
-  ProposalType,
 } from "../types";
 import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
@@ -54,7 +54,7 @@ const RequestSponsorshipForm = ({
   });
 
   const canSponsorOnchain = () => {
-    if (votingModuleType === ProposalType.SOCIAL) {
+    if (votingModuleType === DraftVotingModuleType.SOCIAL) {
       const requiredTokensForSnapshot = (plmToggle?.config as PLMConfig)
         ?.snapshotConfig?.requiredTokens;
       return (

@@ -230,12 +230,12 @@ export type BaseProposal = ProposalDraft & {
 };
 
 export type BasicProposal = BaseProposal & {
-  voting_module_type: ProposalType.BASIC;
+  voting_module_type: DraftVotingModuleType.BASIC;
   transactions: ProposalDraftTransaction[];
 };
 
 export type SocialProposal = BaseProposal & {
-  voting_module_type: ProposalType.SOCIAL;
+  voting_module_type: DraftVotingModuleType.SOCIAL;
   end_date_social: Date;
   start_date_social: Date;
   proposal_social_type: SocialProposalType;
@@ -243,7 +243,7 @@ export type SocialProposal = BaseProposal & {
 };
 
 export type ApprovalProposal = BaseProposal & {
-  voting_module_type: ProposalType.APPROVAL;
+  voting_module_type: DraftVotingModuleType.APPROVAL;
   budget: number;
   criteria: ApprovalProposalType;
   max_options: number;
@@ -258,7 +258,7 @@ type ApprovalProposalOption = {
 };
 
 export type OptimisticProposal = BaseProposal & {
-  voting_module_type: ProposalType.OPTIMISTIC;
+  voting_module_type: DraftVotingModuleType.OPTIMISTIC;
 };
 
 export type DraftProposal =
@@ -307,17 +307,17 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
   };
 
   switch (proposal.voting_module_type) {
-    case ProposalType.BASIC:
+    case DraftVotingModuleType.BASIC:
       return {
-        type: ProposalType.BASIC,
+        type: DraftVotingModuleType.BASIC,
         title: proposal.title,
         abstract: proposal.abstract,
         transactions: proposal.transactions.map((t) => parseTransaction(t)),
         ...baseFields,
       };
-    case ProposalType.SOCIAL:
+    case DraftVotingModuleType.SOCIAL:
       return {
-        type: ProposalType.SOCIAL,
+        type: DraftVotingModuleType.SOCIAL,
         title: proposal.title,
         abstract: proposal.abstract,
         socialProposal: {
@@ -328,9 +328,9 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         },
         ...baseFields,
       };
-    case ProposalType.APPROVAL:
+    case DraftVotingModuleType.APPROVAL:
       return {
-        type: ProposalType.APPROVAL,
+        type: DraftVotingModuleType.APPROVAL,
         title: proposal.title,
         abstract: proposal.abstract,
         approvalProposal: {
@@ -348,9 +348,9 @@ export const parseProposalToForm = (proposal: DraftProposal) => {
         },
         ...baseFields,
       };
-    case ProposalType.OPTIMISTIC:
+    case DraftVotingModuleType.OPTIMISTIC:
       return {
-        type: ProposalType.OPTIMISTIC,
+        type: DraftVotingModuleType.OPTIMISTIC,
         title: proposal.title,
         abstract: proposal.abstract,
         ...baseFields,

@@ -59,9 +59,9 @@ canonical taxonomy and feature-oriented structure.
 - [x] `PostType` -> `AuthoringEntryType`
       `src/features/proposals/authoring/shared/` and the create flow now use `AuthoringEntryType` as the primary name. `PostType` remains as a compatibility alias while downstream callers finish migrating.
 - [ ] draft `ProposalType` -> `DraftVotingModuleType`
-      `DraftVotingModuleType` is now introduced as a compatibility alias in `src/app/proposals/draft/types.ts`, and the central draft/create-proposal form surfaces now use it. The rest of the draft domain still references `ProposalType`.
+      `DraftVotingModuleType` is now introduced as a compatibility alias in `src/app/proposals/draft/types.ts`, and the central forms, schema, actions, preview/sponsorship components, and most draft utilities now use it. The remaining old-name usage is concentrated in the enum declaration plus a few draft-core/internal spots.
 - [ ] runtime `ProposalType` -> `LegacyProposalType`
-      `LegacyProposalType` is already the canonical taxonomy name in `src/features/proposals/domain/`, and `src/lib/types.d.ts` now re-exports it explicitly. Central proposal model declarations are starting to consume that name, but most runtime parsing code still references `ProposalType`.
+      `LegacyProposalType` is already the canonical taxonomy name in `src/features/proposals/domain/`, and `src/lib/types.d.ts` now re-exports it explicitly. Central proposal model declarations plus the main parsing/normalization files (`src/lib/proposalUtils.ts`, `src/lib/proposals/normalizeArchive.ts`) now consume that name. Remaining old-name usage is concentrated in other runtime helpers and compatibility surfaces.
 - [x] Centralize proposal-type metadata and filtering
       Entry-type filtering, voting-type-based proposal-type filtering, proposal-type normalization, metadata retrieval, and shared select-option/label formatting now live in `src/features/proposals/authoring/shared/`. Create and draft now both read proposal/voting metadata from that shared layer.
 - [ ] Decide long-term ownership between `src/app/create/` and `src/app/proposals/draft/`
