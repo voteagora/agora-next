@@ -302,6 +302,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     address: authorAddress,
     authorName: truncateAddress(authorAddress) || authorAddress,
     createdAt: createdAtIso,
+    revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,
   };
 
@@ -314,7 +315,6 @@ export default async function ForumTopicPage({ params }: PageProps) {
     (att: any) => att.contentType === "application/pdf"
   );
   const pdfUrl = pdfAttachment?.url ?? null;
-
 
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
