@@ -24,7 +24,7 @@ import { formatUnits, parseUnits } from "viem";
 import { format } from "date-fns";
 import { tokenForContractAddress } from "./tokenUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { ProposalType } from "./types";
+import { LegacyProposalType } from "./types";
 
 /**
  * Vote primitives
@@ -34,7 +34,7 @@ export type Support = "AGAINST" | "ABSTAIN" | "FOR";
 
 export function parseSupport(
   support: string | null,
-  proposalType: ProposalType,
+  proposalType: LegacyProposalType,
   start_block: string | null
 ): Support {
   /**
@@ -68,7 +68,7 @@ export function parseSupport(
 
 export function parseSupportOldModule(
   support: string | null,
-  proposalType: ProposalType
+  proposalType: LegacyProposalType
 ): Support {
   switch (Number(support)) {
     case 0:
@@ -139,8 +139,8 @@ export type ParsedParams = {
 
 export function parseParams(
   params: string | null,
-  proposalData: ParsedProposalData[ProposalType]
-): ParsedParams[ProposalType]["kind"] {
+  proposalData: ParsedProposalData[LegacyProposalType]
+): ParsedParams[LegacyProposalType]["kind"] {
   if (params === null || proposalData.key !== "APPROVAL") {
     return null;
   }
@@ -193,7 +193,7 @@ export function parseSnapshotVote(vote: SnapshotVotePayload): SnapshotVote {
 
 export async function parseVote(
   vote: VotePayload,
-  proposalData?: ParsedProposalData[ProposalType],
+  proposalData?: ParsedProposalData[LegacyProposalType],
   latestBlock?: Block | null
 ): Promise<Vote> {
   const { contracts } = Tenant.current();

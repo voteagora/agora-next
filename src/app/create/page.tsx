@@ -5,10 +5,10 @@ import {
   normalizeAuthoringVotingType,
 } from "@/features/proposals/authoring/shared";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
-import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { getForumTopic } from "@/lib/actions/forum/topics";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
+import { deriveStatus } from "@/lib/proposals";
 import Tenant from "@/lib/tenant/tenant";
 import { AuthoringEntryType, CreatePostFormData, ProposalType } from "./types";
 import { CreatePostClient } from "./components/CreatePostClient";

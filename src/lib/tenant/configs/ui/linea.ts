@@ -1,6 +1,9 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import lineaLogo from "@/assets/tenant/linea_logo.svg";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import infoPageCard01 from "@/assets/tenant/linea_info_1.png";
 import infoPageCard02 from "@/assets/tenant/linea_info_2.png";
@@ -243,12 +246,12 @@ export const lineaTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7",
             testnetAddress: "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7",
           },

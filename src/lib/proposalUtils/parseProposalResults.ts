@@ -4,7 +4,7 @@ import {
   ParsedProposalResults,
   getProposalCreatedTime,
 } from "../proposalUtils";
-import { ProposalType } from "../types";
+import { LegacyProposalType } from "../types";
 import Tenant from "../tenant/tenant";
 import { TENANT_NAMESPACES } from "../constants";
 
@@ -18,12 +18,12 @@ type ProposalResults = {
 
 export function parseProposalResults(
   proposalResults: string,
-  proposalData: ParsedProposalData[ProposalType],
+  proposalData: ParsedProposalData[LegacyProposalType],
   startBlock: string,
   offchainProposalData?: string,
   quorum?: number,
   createdTime?: Date | null
-): ParsedProposalResults[ProposalType] {
+): ParsedProposalResults[LegacyProposalType] {
   const type = proposalData.key;
   switch (type) {
     case "SNAPSHOT": {
@@ -347,7 +347,7 @@ export function parseProposalResults(
 export function parseOffChainProposalResults(
   // proposalResults is expected to be a stringified JSON of the offchain_tally object
   proposalResults: string,
-  proposalType: ProposalType
+  proposalType: LegacyProposalType
 ): any {
   switch (proposalType) {
     case "OFFCHAIN_STANDARD":

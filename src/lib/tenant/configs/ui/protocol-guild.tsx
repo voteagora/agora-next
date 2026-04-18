@@ -7,7 +7,10 @@ import pguildInfo3 from "@/assets/tenant/pguild_info_3.svg";
 import pguildInfo4 from "@/assets/tenant/pguild_info_4.svg";
 import pguildSuccess from "@/assets/tenant/pguild_success.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -273,7 +276,7 @@ export const protocolGuildTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },

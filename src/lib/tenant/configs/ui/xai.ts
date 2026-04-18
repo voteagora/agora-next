@@ -10,7 +10,10 @@ import infoPageCard03 from "@/assets/tenant/xai_info_3.svg";
 import infoPageCard04 from "@/assets/tenant/xai_info_4.svg";
 import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -269,17 +272,17 @@ export const xaiTenantUIConfig = new TenantUI({
 
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0xA8D1D683a43586330b44c073406789e6f6dC04cc",
             testnetAddress: "0x4990cce6e8cd9596305b83c4860d4c0f3bf4e8fa",
           },
           {
-            type: ProposalType?.OPTIMISTIC,
+            type: DraftVotingModuleType?.OPTIMISTIC,
             prodAddress: "0x7a0f7659103cfc42f3Eeb265EDb0205bE9B25490",
             testnetAddress: "0xf8d15c3132efa557989a1c9331b6667ca8caa3a9",
           },

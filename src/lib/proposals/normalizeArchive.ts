@@ -9,22 +9,22 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Block } from "ethers";
 import Tenant from "@/lib/tenant/tenant";
 import {
+  deriveProposalTag,
   deriveStatus,
   deriveTimeStatus,
-  STATUS_LABEL_MAP,
-  toDate,
+  resolveArchiveThresholds,
   safeBigInt,
   safeBigIntOrNull,
-  deriveProposalTag,
-  resolveArchiveThresholds,
-} from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
-import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
-import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
+  STATUS_LABEL_MAP,
+  toDate,
+} from "@/lib/proposals";
 import {
   decodeCalldata,
   ParsedProposalData,
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
+import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
+import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
 import {
   ArchiveListProposal,
   DaoNodeVoteTotals,

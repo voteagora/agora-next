@@ -61,14 +61,15 @@ canonical taxonomy and feature-oriented structure.
 - [ ] draft `ProposalType` -> `DraftVotingModuleType`
       `DraftVotingModuleType` is now introduced as a compatibility alias in `src/app/proposals/draft/types.ts`, and the central forms, schema, actions, preview/sponsorship components, and most draft utilities now use it. The remaining old-name usage is concentrated in the enum declaration plus a few draft-core/internal spots.
 - [ ] runtime `ProposalType` -> `LegacyProposalType`
-      `LegacyProposalType` is already the canonical taxonomy name in `src/features/proposals/domain/`, and `src/lib/types.d.ts` now re-exports it explicitly. Central proposal model declarations plus the main parsing/normalization files (`src/lib/proposalUtils.ts`, `src/lib/proposals/normalizeArchive.ts`) now consume that name. Remaining old-name usage is concentrated in other runtime helpers and compatibility surfaces.
+      `LegacyProposalType` is already the canonical taxonomy name in `src/features/proposals/domain/`, and `src/lib/types.d.ts` now re-exports it explicitly. Central proposal model declarations, parsing/normalization helpers, vote utilities, and runtime status/result helpers now consume that name. Remaining old-name usage is effectively limited to the compatibility alias in `src/lib/types.d.ts`, comments, and ABI JSON metadata.
 - [x] Centralize proposal-type metadata and filtering
       Entry-type filtering, voting-type-based proposal-type filtering, proposal-type normalization, metadata retrieval, and shared select-option/label formatting now live in `src/features/proposals/authoring/shared/`. Create and draft now both read proposal/voting metadata from that shared layer.
 - [ ] Decide long-term ownership between `src/app/create/` and `src/app/proposals/draft/`
 
 ## Phase 6: Cleanup
 
-- [ ] Remove compatibility re-export [src/components/Proposals/Proposal/Archive/archiveProposalUtils.ts](/Users/sudheer.t/Documents/github/agora-next/src/components/Proposals/Proposal/Archive/archiveProposalUtils.ts)
+- [x] Remove compatibility re-export [src/components/Proposals/Proposal/Archive/archiveProposalUtils.ts](/Users/sudheer.t/Documents/github/agora-next/src/components/Proposals/Proposal/Archive/archiveProposalUtils.ts)
+      Remaining imports now point at `@/lib/proposals`, and the compatibility file has been deleted.
 - [ ] Move proposal-specific helpers out of generic utility files
 - [ ] Remove duplicate proposal display label logic
 - [ ] Eliminate `any`-typed proposal-type metadata in draft and create flows

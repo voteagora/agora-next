@@ -33,7 +33,7 @@ import {
   ParsedProposalResults,
   parseProposalData,
 } from "../proposalUtils";
-import { ProposalType } from "../types";
+import { LegacyProposalType } from "../types";
 import { mapArbitrumBlockToMainnetBlock } from "../utils";
 import { getHumanBlockTime } from "../blockTimes";
 
@@ -51,8 +51,8 @@ export type ProposalStatus =
 
 export async function getProposalStatus(
   proposal: ProposalPayload,
-  proposalResults: ParsedProposalResults[ProposalType],
-  proposalData: ParsedProposalData[ProposalType],
+  proposalResults: ParsedProposalResults[LegacyProposalType],
+  proposalData: ParsedProposalData[LegacyProposalType],
   latestBlock: Block | null,
   quorum: bigint | null,
   votableSupply: bigint,
@@ -64,7 +64,7 @@ export async function getProposalStatus(
     if (
       proposal.proposal_type === "SNAPSHOT" ||
       proposal.proposal_type === "OPTIMISTIC" ||
-      isOffchainLegacyProposalType(proposal.proposal_type as ProposalType)
+      isOffchainLegacyProposalType(proposal.proposal_type as LegacyProposalType)
     ) {
       return true;
     }
@@ -85,7 +85,7 @@ export async function getProposalStatus(
     try {
       const parsedProposalData = parseProposalData(
         dataAsString,
-        proposal.proposal_type as ProposalType
+        proposal.proposal_type as LegacyProposalType
       );
 
       if (parsedProposalData.key === "STANDARD") {

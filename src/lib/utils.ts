@@ -7,7 +7,6 @@ import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
-import { ProposalType } from "../app/proposals/draft/types";
 import { AlchemyProvider } from "ethers";
 import {
   Address,

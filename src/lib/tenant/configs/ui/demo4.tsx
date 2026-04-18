@@ -16,7 +16,10 @@ import demoForum from "@/assets/tenant/demo_forum.png";
 
 import demoDiscord from "@/assets/tenant/demo_discord.png";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
@@ -372,7 +375,7 @@ export const demo4TenantUIConfig = new TenantUI({
 
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
 
             prodAddress: null,
 

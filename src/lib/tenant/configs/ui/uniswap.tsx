@@ -10,7 +10,10 @@ import infoPageCard02 from "@/assets/tenant/uniswap_info_2.svg";
 import infoPageCard03 from "@/assets/tenant/uniswap_info_3.png";
 import infoPageCard04 from "@/assets/tenant/uniswap_info_4.png";
 import infoPageHero from "@/assets/tenant/uniswap_info_hero.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -322,7 +325,7 @@ export const uniswapTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },

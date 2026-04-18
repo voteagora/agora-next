@@ -7,7 +7,10 @@ import delegateImage from "@/assets/tenant/boost_logo.svg";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const boostTenantUIConfig = new TenantUI({
@@ -157,17 +160,17 @@ export const boostTenantUIConfig = new TenantUI({
 
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0xEE0178EabB933A5eDA6309AC1D1678A0670103e3",
             testnetAddress: "0x044e697c37B974d3822832934fC88fA07fa18Fb2",
           },
           {
-            type: ProposalType?.OPTIMISTIC,
+            type: DraftVotingModuleType?.OPTIMISTIC,
             prodAddress: "0x38947322EBDb3e892DED2EDca9AA35dD177CCd06",
             testnetAddress: "0x7dB0853038F845c70A278F0dc23d7437404F44fd",
           },

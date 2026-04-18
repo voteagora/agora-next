@@ -8,7 +8,10 @@ import infoPageHero from "@/assets/tenant/ens_info_hero.png";
 import infoPageCard00 from "@/assets/tenant/ens_info_0.png";
 import infoPageCard01 from "@/assets/tenant/ens_info_1.png";
 import infoPageCard02 from "@/assets/tenant/ens_info_2.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -246,12 +249,12 @@ export const ensTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.SOCIAL,
+            type: DraftVotingModuleType?.SOCIAL,
             prodAddress: null,
             testnetAddress: null,
           },

@@ -6,7 +6,10 @@ import demoDocs from "@/assets/tenant/demo_docs.png";
 import demoVision from "@/assets/tenant/demo_vision.png";
 import demoForum from "@/assets/tenant/demo_forum.png";
 import demoDiscord from "@/assets/tenant/demo_discord.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -253,17 +256,17 @@ export const demoTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
             testnetAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
           },
           {
-            type: ProposalType?.OPTIMISTIC,
+            type: DraftVotingModuleType?.OPTIMISTIC,
             prodAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
             testnetAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
           },

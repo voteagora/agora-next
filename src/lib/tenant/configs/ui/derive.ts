@@ -5,7 +5,10 @@ import delegateImage from "@/assets/tenant/derive_delegate.svg";
 import successImage from "@/assets/tenant/derive_success.svg";
 import pendingImage from "@/assets/tenant/derive_pending.svg";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import infoPageCard01 from "@/assets/tenant/derive_info_0.png";
 import infoPageCard02 from "@/assets/tenant/derive_info_1.png";
 import infoPageCard03 from "@/assets/tenant/derive_info_2.png";
@@ -262,17 +265,17 @@ export const deriveTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6",
             testnetAddress: "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3",
           },
           {
-            type: ProposalType?.OPTIMISTIC,
+            type: DraftVotingModuleType?.OPTIMISTIC,
             prodAddress: "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9",
             testnetAddress: "0x785553111A66B88E3D0cef523C3A2c6D821e675B",
           },

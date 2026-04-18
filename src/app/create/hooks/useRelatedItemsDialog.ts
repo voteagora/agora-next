@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { useAccount } from "wagmi";
-import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import {
   extractAuthoringApprovalData,
@@ -13,6 +12,7 @@ import { getArchivedProposals } from "@/lib/actions/archive";
 import { getForumTopics } from "@/lib/actions/forum";
 import { getProposalLinks } from "@/lib/actions/proposalLinks";
 import { buildForumTopicPath, transformForumTopics } from "@/lib/forumUtils";
+import { deriveStatus } from "@/lib/proposals";
 import { RelatedItem } from "../types";
 
 interface UseRelatedItemsDialogProps {

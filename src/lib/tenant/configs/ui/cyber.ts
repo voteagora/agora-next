@@ -9,7 +9,10 @@ import infoPageCard02 from "@/assets/tenant/cyber_info_2.png";
 import infoPageCard03 from "@/assets/tenant/cyber_info_3.png";
 import infoPageCard04 from "@/assets/tenant/cyber_info_4.png";
 import infoPageHero from "@/assets/tenant/cyber_info_hero.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -274,12 +277,12 @@ export const cyberTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
           {
-            type: ProposalType?.APPROVAL,
+            type: DraftVotingModuleType?.APPROVAL,
             prodAddress: "0x751a4989E01776522B6989511D0B969311Dd5f4e",
             testnetAddress: "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49",
           },

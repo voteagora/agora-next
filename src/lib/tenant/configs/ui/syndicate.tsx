@@ -11,7 +11,10 @@ import syndicateInfoCard3 from "@/assets/tenant/syndicate_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import {
+  DraftVotingModuleType,
+  ProposalGatingType,
+} from "@/app/proposals/draft/types";
 import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
 export const syndicateTenantUIConfig = new TenantUI({
@@ -296,7 +299,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         ],
         proposalTypes: [
           {
-            type: ProposalType?.BASIC,
+            type: DraftVotingModuleType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
           },
