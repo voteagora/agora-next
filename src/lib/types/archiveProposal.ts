@@ -353,7 +353,7 @@ export type ArchiveProposalBySource =
 // =============================================================================
 
 /**
- * Derives the ProposalType from archive proposal data.
+ * Derives the LegacyProposalType from archive proposal data.
  * Accepts both ArchiveProposalBySource (discriminated union) and ArchiveListProposal (legacy).
  *
  * Logic:

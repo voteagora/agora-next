@@ -16,6 +16,7 @@ export {
   isOffchainLegacyProposalType,
   isTieredLegacyProposalType,
   normalizeProposalSource,
+  resolveLinkedOffchainProposalKind,
   toLegacyProposalType,
 } from "./taxonomy";
 export {

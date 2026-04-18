@@ -6,7 +6,6 @@ export type {
   AuthoringApprovalOption,
   AuthoringApprovalSettings,
   AuthoringOptimisticSettings,
-  AuthoringPostType,
   AuthoringProposalTypeConfig,
   AuthoringProposalTypeOption,
   AuthoringVotingMetadata,
@@ -16,7 +15,6 @@ export type {
 export {
   APPROVAL_CRITERIA_TO_NUMBER,
   AUTHORING_ENTRY_TYPE_OPTIONS,
-  AUTHORING_POST_TYPE_OPTIONS,
   AUTHORING_VOTING_TYPE_METADATA,
   AUTHORING_VOTING_TYPE_OPTIONS,
   DEFAULT_AUTHORING_APPROVAL_SETTINGS,

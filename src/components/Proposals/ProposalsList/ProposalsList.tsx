@@ -12,7 +12,7 @@ import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import { Proposal as ProposalType } from "@/app/api/common/proposals/proposal";
+import { Proposal as ProposalRecord } from "@/app/api/common/proposals/proposal";
 import Proposal from "../Proposal/Proposal";
 import { DaoSlug } from "@prisma/client";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
@@ -24,12 +24,12 @@ export default function ProposalsList({
   votableSupply,
   governanceCalendar,
 }: {
-  initRelevantProposals: PaginatedResult<ProposalType[]>;
-  initAllProposals: PaginatedResult<ProposalType[]>;
+  initRelevantProposals: PaginatedResult<ProposalRecord[]>;
+  initAllProposals: PaginatedResult<ProposalRecord[]>;
   fetchProposals: (
     pagination: PaginationParams,
     filter: string
-  ) => Promise<PaginatedResult<ProposalType[]>>;
+  ) => Promise<PaginatedResult<ProposalRecord[]>>;
   votableSupply: string;
   governanceCalendar?: {
     title: string;

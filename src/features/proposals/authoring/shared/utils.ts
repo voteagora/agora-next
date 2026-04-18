@@ -3,7 +3,7 @@ import type {
   AuthoringApprovalData,
   AuthoringApprovalOption,
   AuthoringApprovalSettings,
-  AuthoringPostType,
+  AuthoringEntryType,
   AuthoringProposalTypeConfig,
 } from "./types";
 import { normalizeAuthoringVotingType } from "./types";
@@ -53,7 +53,7 @@ type AuthoringProposalTypeConfigSource = {
 
 export function filterAuthoringProposalTypesByEntryType<
   T extends AuthoringProposalTypeRecord,
->(proposalTypes: T[], entryType: AuthoringPostType): T[] {
+>(proposalTypes: T[], entryType: AuthoringEntryType): T[] {
   return proposalTypes.filter(
     (proposalType) =>
       proposalType.module?.toLowerCase() === entryType.toLowerCase()

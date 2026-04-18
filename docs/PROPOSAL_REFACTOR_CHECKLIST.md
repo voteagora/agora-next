@@ -12,7 +12,8 @@ canonical taxonomy and feature-oriented structure.
 - [x] Emit canonical `kind` metadata from archive normalization
 - [x] Emit canonical `kind` metadata from live proposal parsing
 - [x] Replace remaining `startsWith("OFFCHAIN")` checks with taxonomy helpers
-- [ ] Add tests for `fromLegacyProposalType()` and `toLegacyProposalType()`
+- [x] Add tests for `fromLegacyProposalType()` and `toLegacyProposalType()`
+      Added focused taxonomy coverage in `src/features/proposals/domain/taxonomy.test.ts`, including round-trips, overrides, source normalization, and linked offchain kind normalization.
 
 ## Phase 2: Data Adapters And Repositories
 
@@ -54,10 +55,10 @@ canonical taxonomy and feature-oriented structure.
 
 - [x] Create `src/features/proposals/authoring/shared/`
 - [ ] Consolidate shared authoring types from [src/app/create/types.ts](/Users/sudheer.t/Documents/github/agora-next/src/app/create/types.ts) and [src/app/proposals/draft/types.ts](/Users/sudheer.t/Documents/github/agora-next/src/app/proposals/draft/types.ts)
-      Shared authoring voting/post/approval definitions now live under `src/features/proposals/authoring/shared/`, and both `app/create/types.ts` and draft form metadata reuse that layer. Proposal-type filtering plus approval-tempcheck extraction/settings mapping also moved into that shared layer, replacing the old create-only filter util. The create flow no longer uses a local overloaded `ProposalType` alias and now uses `AuthoringProposalType`. Draft database/form types are still local to `src/app/proposals/draft/types.ts`.
+      Shared authoring voting/post/approval definitions now live under `src/features/proposals/authoring/shared/`, and both `app/create/types.ts` and draft form metadata reuse that layer. Proposal-type filtering plus approval-tempcheck extraction/settings mapping also moved into that shared layer, replacing the old create-only filter util. The create flow no longer uses local `ProposalType` or `PostType` compatibility aliases and now uses `AuthoringProposalType` / `AuthoringEntryType`. Draft database/form types are still local to `src/app/proposals/draft/types.ts`.
 - [ ] Rename colliding concepts:
 - [x] `PostType` -> `AuthoringEntryType`
-      `src/features/proposals/authoring/shared/` and the create flow now use `AuthoringEntryType` as the primary name. `PostType` remains as a compatibility alias while downstream callers finish migrating.
+      `src/features/proposals/authoring/shared/` and the create flow now use `AuthoringEntryType` as the primary name, and the old `PostType` compatibility alias has been removed.
 - [ ] draft `ProposalType` -> `DraftVotingModuleType`
       `DraftVotingModuleType` is now introduced as a compatibility alias in `src/app/proposals/draft/types.ts`, and the central forms, schema, actions, preview/sponsorship components, admin proposal-type tooling, tenant lifecycle config, and draft utilities now use it. The old name has also been drained from the create-flow and local snapshot helper naming. Remaining old-name usage is effectively concentrated in the enum declaration/compatibility alias inside `src/app/proposals/draft/types.ts`.
 - [ ] runtime `ProposalType` -> `LegacyProposalType`
@@ -76,4 +77,5 @@ canonical taxonomy and feature-oriented structure.
       Proposal type display text now lives in `src/lib/proposals/formatting.ts`, and callers no longer depend on `src/lib/utils.ts` for proposal-specific labeling.
 - [x] Eliminate `any`-typed proposal-type metadata in draft and create flows
       Draft and create now share explicit proposal-type option types for fetched proposal-type metadata, while `PLMConfig` now uses typed proposal-type config and copy/config fields instead of `any`.
-- [ ] Delete transitional legacy-only helpers once callers move to canonical `kind`
+- [x] Delete transitional legacy-only helpers once callers move to canonical `kind`
+      Removed the hardcoded `mapOffchainProposalType()` legacy remap from `src/lib/proposalUtils.ts` and now derive linked offchain display types through canonical `ProposalKind` logic in `src/features/proposals/domain/taxonomy.ts`.

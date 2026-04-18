@@ -2,15 +2,12 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import type { FormattedProposalType, TenantNamespace } from "@/lib/types";
 
 export type AuthoringEntryType = "tempcheck" | "gov-proposal";
-export type AuthoringPostType = AuthoringEntryType;
 
 export const AUTHORING_ENTRY_TYPE_OPTIONS: Record<AuthoringEntryType, string> =
   {
     tempcheck: "Temp check",
     "gov-proposal": "Governance proposal",
   };
-
-export const AUTHORING_POST_TYPE_OPTIONS = AUTHORING_ENTRY_TYPE_OPTIONS;
 
 export type AuthoringVotingType = "standard" | "approval" | "optimistic";
 

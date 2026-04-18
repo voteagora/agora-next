@@ -158,6 +158,30 @@ export function fromLegacyProposalType(
   };
 }
 
+export function resolveLinkedOffchainProposalKind(
+  kind: ProposalKind
+): ProposalKind {
+  if (kind.scope !== "offchain") {
+    return kind;
+  }
+
+  if (kind.votingKind === "standard" || kind.votingKind === "approval") {
+    return {
+      ...kind,
+      scope: "hybrid",
+    };
+  }
+
+  if (kind.votingKind === "optimistic" && kind.mode === "tiered") {
+    return {
+      ...kind,
+      scope: "hybrid",
+    };
+  }
+
+  return kind;
+}
+
 export function toLegacyProposalType(kind: ProposalKind): LegacyProposalType {
   if (kind.votingKind === "snapshot") {
     return "SNAPSHOT";

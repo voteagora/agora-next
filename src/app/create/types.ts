@@ -1,7 +1,6 @@
 import {
   APPROVAL_CRITERIA_TO_NUMBER,
   AUTHORING_ENTRY_TYPE_OPTIONS,
-  AUTHORING_POST_TYPE_OPTIONS,
   AUTHORING_VOTING_TYPE_OPTIONS,
   DEFAULT_AUTHORING_APPROVAL_SETTINGS,
   DEFAULT_AUTHORING_OPTIMISTIC_SETTINGS,
@@ -12,16 +11,13 @@ import {
   type AuthoringApprovalSettings,
   type AuthoringEntryType as SharedAuthoringEntryType,
   type AuthoringOptimisticSettings,
-  type AuthoringPostType,
   type AuthoringProposalTypeConfig,
   type AuthoringVotingType,
 } from "@/features/proposals/authoring/shared";
 
 export type AuthoringEntryType = SharedAuthoringEntryType;
-export type PostType = AuthoringPostType;
 
 export const authoringEntryTypeOptions = AUTHORING_ENTRY_TYPE_OPTIONS;
-export const postTypeOptions = AUTHORING_POST_TYPE_OPTIONS;
 
 export type EASVotingType = AuthoringVotingType;
 

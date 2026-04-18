@@ -36,10 +36,10 @@ import {
   ApprovalProposalSettings,
   AuthoringEntryType,
   AuthoringProposalType,
+  authoringEntryTypeOptions,
   CreatePostFormData,
   defaultApprovalSettings,
   EASVotingType,
-  postTypeOptions,
   RelatedItem,
 } from "../types";
 
@@ -301,7 +301,7 @@ export function CreatePostClient({
       <div className="mb-6">
         <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-primary">
-            Create {postTypeOptions[selectedPostType].toLowerCase()}
+            Create {authoringEntryTypeOptions[selectedPostType].toLowerCase()}
           </h1>
           <PostTypeSelector
             value={selectedPostType}

@@ -26,6 +26,8 @@ import {
 import {
   fromLegacyProposalType,
   isOffchainLegacyProposalType,
+  resolveLinkedOffchainProposalKind,
+  toLegacyProposalType,
 } from "@/features/proposals/domain";
 import {
   parseHybridOptimisticProposalData,
@@ -135,23 +137,6 @@ export function getTitleFromProposalDescription(description: string = "") {
   );
 }
 
-export const mapOffchainProposalType = (
-  proposalType: LegacyProposalType
-): LegacyProposalType => {
-  switch (proposalType) {
-    case "OFFCHAIN_STANDARD":
-      return "HYBRID_STANDARD";
-    case "OFFCHAIN_APPROVAL":
-      return "HYBRID_APPROVAL";
-    case "OFFCHAIN_OPTIMISTIC":
-      return "OFFCHAIN_OPTIMISTIC";
-    case "OFFCHAIN_OPTIMISTIC_TIERED":
-      return "HYBRID_OPTIMISTIC_TIERED";
-    default:
-      return proposalType;
-  }
-};
-
 /**
  * Parse proposal into proposal response
  */
@@ -179,8 +164,12 @@ export async function parseProposal(
   let proposalType = proposal.proposal_type as LegacyProposalType;
 
   if (offChainProposalData) {
-    proposalType = mapOffchainProposalType(
-      offchainProposal?.proposal_type as LegacyProposalType
+    proposalType = toLegacyProposalType(
+      resolveLinkedOffchainProposalKind(
+        fromLegacyProposalType(
+          offchainProposal?.proposal_type as LegacyProposalType
+        )
+      )
     );
   }
 
