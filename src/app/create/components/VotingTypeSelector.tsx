@@ -1,12 +1,10 @@
 "use client";
 
+import Tenant from "@/lib/tenant/tenant";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/shared/Switch";
-import {
-  EASVotingType,
-  easVotingTypeOptions,
-  EASVotingTypeMetadata,
-} from "../types";
+import { easVotingTypeOptions, EASVotingType } from "../types";
+import { getAuthoringVotingTypeMetadata } from "@/features/proposals/authoring/shared";
 
 interface VotingTypeSelectorProps {
   value: EASVotingType;
@@ -21,6 +19,7 @@ export function VotingTypeSelector({
   disabled = false,
   allowedTypes,
 }: VotingTypeSelectorProps) {
+  const { namespace } = Tenant.current();
   const availableTypes =
     allowedTypes || (Object.keys(easVotingTypeOptions) as EASVotingType[]);
   const options = availableTypes.map((type) => easVotingTypeOptions[type]);
@@ -37,7 +36,9 @@ export function VotingTypeSelector({
   };
 
   const currentLabel = easVotingTypeOptions[value];
-  const metadata = EASVotingTypeMetadata[value];
+  const metadata = getAuthoringVotingTypeMetadata(value, {
+    namespace,
+  });
 
   return (
     <div className="space-y-3">

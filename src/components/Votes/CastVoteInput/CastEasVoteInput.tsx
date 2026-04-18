@@ -12,6 +12,10 @@ import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";
 import { parseVoteError } from "@/lib/voteErrorUtils";
+import {
+  isApprovalProposal,
+  isOptimisticProposal,
+} from "@/features/proposals/domain";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 import { DisabledVoteButton } from "../components/DisabledVoteButton";
 import CastEasApprovalVoteInput from "./CastEasApprovalVoteInput";
@@ -74,7 +78,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   }
 
   // Route to appropriate vote input based on voting type
-  if (proposal.proposalType === "APPROVAL") {
+  if (isApprovalProposal(proposal)) {
     return (
       <CastEasApprovalVoteInput
         proposal={proposal}
@@ -90,7 +94,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
       />
     );
   }
-  if (proposal.proposalType === "OPTIMISTIC") {
+  if (isOptimisticProposal(proposal)) {
     return (
       <CastEasOptimisticVoteInput proposal={proposal} vetoThreshold={20} />
     );

@@ -7,6 +7,10 @@ import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { UpdatedButton } from "@/components/Button";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
+import {
+  isGovlessOffchainProposal,
+  isSnapshotProposal,
+} from "@/features/proposals/domain";
 import { PROPOSAL_STATUS } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import {
@@ -221,11 +225,8 @@ export function TaxFormBanner({ proposal }: Props) {
 
   const hasGovTag =
     normalizedTag === "gov-proposal" || normalizedTag === "govproposal";
-
-  const onchainProposalTypes = ["STANDARD", "APPROVAL", "OPTIMISTIC"];
-  const hasOnchainType = proposal.proposalType
-    ? onchainProposalTypes.includes(proposal.proposalType)
-    : false;
+  const hasOnchainType =
+    !isSnapshotProposal(proposal) && !isGovlessOffchainProposal(proposal);
 
   const isOnchainProposal = hasGovTag || hasOnchainType;
 

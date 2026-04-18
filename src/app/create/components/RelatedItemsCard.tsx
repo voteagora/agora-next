@@ -1,11 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { RelatedItem, PostType } from "../types";
+import { AuthoringEntryType, RelatedItem } from "../types";
 import { RelatedItemsSection } from "./RelatedItemsSection";
 
 interface RelatedItemsCardProps {
-  postType: PostType;
+  postType: AuthoringEntryType;
   relatedDiscussions: RelatedItem[];
   relatedTempChecks: RelatedItem[];
   onAddRelatedDiscussion: (item: RelatedItem) => void;

@@ -1,7 +1,10 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { isOffchainLegacyProposalType } from "@/features/proposals/domain";
+import {
+  isOffchainLegacyProposalType,
+  isSnapshotProposal,
+} from "@/features/proposals/domain";
 import ENSName from "@/components/shared/ENSName";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -15,15 +18,15 @@ export default function ProposalTitle({
   title: string;
   proposal: Proposal;
 }) {
+  const isSnapshot = isSnapshotProposal(proposal);
   const isOffchain =
     proposal.kind?.scope === "offchain" ||
     (proposal.proposalType
       ? isOffchainLegacyProposalType(proposal.proposalType)
       : false);
-  const proposalData =
-    proposal.proposalType === "SNAPSHOT"
-      ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
-      : undefined;
+  const proposalData = isSnapshot
+    ? (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
+    : undefined;
   const proposalText = getProposalTypeText(
     proposal.proposalType ?? "",
     proposalData
@@ -46,7 +49,7 @@ export default function ProposalTitle({
           )}
           <a
             href={
-              proposal.proposalType === "SNAPSHOT"
+              isSnapshot
                 ? proposalData?.link
                 : getBlockScanUrl(
                     proposal.createdTransactionHash ?? "",

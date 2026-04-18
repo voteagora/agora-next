@@ -22,6 +22,7 @@ import ArchiveProposalVotesList from "@/components/Votes/ProposalVotesList/Archi
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalVotesList from "@/components/Votes/ProposalVotesList/ProposalVotesList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
+import { isHybridProposal } from "@/features/proposals/domain";
 
 interface Props {
   proposal: Proposal;
@@ -126,10 +127,9 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
   );
 
   const groups: GroupData[] = useMemo(() => {
-    const order =
-      proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED"
-        ? ["chains", "apps", "users", "delegates"]
-        : ["chains", "apps", "users"];
+    const order = isHybridProposal(proposal)
+      ? ["chains", "apps", "users", "delegates"]
+      : ["chains", "apps", "users"];
 
     return order.map((name) => {
       const tally = groupTallies.find((g) => g.name === name);
@@ -138,7 +138,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         vetoPercentage: tally?.vetoPercentage || 0,
       };
     });
-  }, [proposal.proposalType, groupTallies]);
+  }, [proposal, groupTallies]);
 
   const totalGroups = groups.length;
 

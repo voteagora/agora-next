@@ -7,6 +7,7 @@
 
 import type { ComponentType } from "react";
 import type { Proposal } from "@/app/api/common/proposals/proposal";
+import { isSnapshotProposal } from "@/features/proposals/domain";
 import type { ProposalType } from "@/lib/types";
 
 // Lazy imports to reduce bundle size
@@ -153,7 +154,7 @@ export function requiresSpecialHandling(
   proposal: Proposal
 ): ProposalPageComponent | null {
   // Copeland proposals are a special case of SNAPSHOT
-  if (proposal.proposalType === "SNAPSHOT") {
+  if (isSnapshotProposal(proposal)) {
     const proposalData = proposal.proposalData as { type?: string };
     if (proposalData?.type === "copeland") {
       return CopelandProposalPage;

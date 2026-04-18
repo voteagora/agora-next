@@ -176,6 +176,9 @@ export enum ProposalType {
   OPTIMISTIC = "optimistic",
 }
 
+export const DraftVotingModuleType = ProposalType;
+export type DraftVotingModuleType = ProposalType;
+
 export enum TransactionType {
   TRANSFER = "transfer",
   CUSTOM = "custom",

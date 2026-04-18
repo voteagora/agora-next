@@ -1,46 +1,50 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
-import Tenant from "@/lib/tenant/tenant";
-import { useEASV2 } from "@/hooks/useEASV2";
-import { useDaoSettings } from "@/hooks/useDaoSettings";
 import toast from "react-hot-toast";
-import { PostTypeSelector } from "./PostTypeSelector";
-import { CreatePostForm } from "./CreatePostForm";
-import { ProposalSettingsCard } from "./ProposalSettingsCard";
+import { useForm } from "react-hook-form";
+import { useAccount } from "wagmi";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import {
+  filterAuthoringProposalTypesByEntryType,
+  getApprovalSettingsFromAuthoringData,
+  normalizeAuthoringVotingType,
+} from "@/features/proposals/authoring/shared";
+import { useDaoSettings } from "@/hooks/useDaoSettings";
+import { useEASV2 } from "@/hooks/useEASV2";
 import {
   canCreateTempCheck as canCreateTempCheckUtil,
   canCreateGovernanceProposal as canCreateGovernanceProposalUtil,
 } from "@/lib/forumPermissionUtils";
+import Tenant from "@/lib/tenant/tenant";
 import { useHasTownsNFT } from "@/hooks/useHasTownsNFT";
-import {
-  PostType,
-  postTypeOptions,
-  ProposalType,
-  CreatePostFormData,
-  RelatedItem,
-  EASVotingType,
-  ApprovalProposalSettings,
-  defaultApprovalSettings,
-} from "../types";
-import { filterProposalTypesByType } from "../utils/proposalTypeUtils";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { CreatePostForm } from "./CreatePostForm";
+import { PostTypeSelector } from "./PostTypeSelector";
+import { ProposalSettingsCard } from "./ProposalSettingsCard";
+import {
+  ApprovalProposalSettings,
+  AuthoringEntryType,
+  CreatePostFormData,
+  defaultApprovalSettings,
+  EASVotingType,
+  postTypeOptions,
+  ProposalType,
+  RelatedItem,
+} from "../types";
 
 interface CreatePostClientProps {
-  initialPostType: PostType;
+  initialPostType: AuthoringEntryType;
   initialFormData: Partial<CreatePostFormData>;
   proposalTypes: ProposalType[];
 }
@@ -66,11 +70,13 @@ export function CreatePostClient({
       hasInitialTempCheck &&
       initialFormData.relatedTempChecks?.[0]?.votingModule
     ) {
-      const votingModule =
-        initialFormData.relatedTempChecks[0].votingModule.toUpperCase();
-      if (votingModule === "OPTIMISTIC") return "optimistic";
-      if (votingModule === "APPROVAL") return "approval";
-      if (votingModule === "STANDARD") return "standard";
+      const votingType = normalizeAuthoringVotingType(
+        initialFormData.relatedTempChecks[0].votingModule
+      );
+
+      if (votingType) {
+        return votingType;
+      }
     }
     return "standard";
   };
@@ -80,26 +86,19 @@ export function CreatePostClient({
       hasInitialTempCheck &&
       initialFormData.relatedTempChecks?.[0]?.approvalData
     ) {
-      const approvalData = initialFormData.relatedTempChecks[0].approvalData;
-      return {
-        budget: approvalData.budget,
-        maxApprovals: approvalData.maxApprovals,
-        criteria: approvalData.criteria === 0 ? "threshold" : "top-choices",
-        criteriaValue: approvalData.criteriaValue,
-        choices: approvalData.choices.map((choice, index) => ({
-          id: `choice-${index}`,
-          title: choice,
-        })),
-      };
+      return getApprovalSettingsFromAuthoringData(
+        initialFormData.relatedTempChecks[0].approvalData
+      );
     }
     return defaultApprovalSettings;
   };
 
   const [selectedPostType, setSelectedPostType] =
-    useState<PostType>(initialPostType);
+    useState<AuthoringEntryType>(initialPostType);
 
   const filteredProposalTypes = useMemo(
-    () => filterProposalTypesByType(proposalTypes, selectedPostType),
+    () =>
+      filterAuthoringProposalTypesByEntryType(proposalTypes, selectedPostType),
     [proposalTypes, selectedPostType]
   );
 
@@ -223,7 +222,7 @@ export function CreatePostClient({
 
   const changeSelectedVotingType = (type: EASVotingType) => {
     setSelectedVotingType(type);
-    const filteredByPostType = filterProposalTypesByType(
+    const filteredByPostType = filterAuthoringProposalTypesByEntryType(
       proposalTypes,
       selectedPostType
     );
@@ -270,7 +269,7 @@ export function CreatePostClient({
 
   useEffect(() => {
     setSelectedProposalType(filteredProposalTypes[0]);
-  }, [selectedPostType]);
+  }, [filteredProposalTypes]);
 
   useEffect(() => {
     if (
@@ -279,36 +278,23 @@ export function CreatePostClient({
       !hasInitialTempCheck
     ) {
       const tempCheck = relatedTempChecks[0];
-      if (tempCheck.votingModule) {
-        // Automatically set voting type based on temp check's proposal type class
-        const proposalClass = tempCheck.votingModule.toUpperCase();
-        if (proposalClass === "OPTIMISTIC") {
-          setSelectedVotingType("optimistic");
-        } else if (proposalClass === "APPROVAL") {
-          setSelectedVotingType("approval");
+      const votingType = normalizeAuthoringVotingType(tempCheck.votingModule);
 
+      if (votingType) {
+        // Automatically set voting type based on temp check's proposal type class
+        setSelectedVotingType(votingType);
+
+        if (votingType === "approval") {
           // Auto-fill approval settings from temp check data
           if (tempCheck.approvalData) {
-            setApprovalSettings({
-              budget: tempCheck.approvalData.budget,
-              maxApprovals: tempCheck.approvalData.maxApprovals,
-              criteria:
-                tempCheck.approvalData.criteria === 0
-                  ? "threshold"
-                  : "top-choices",
-              criteriaValue: tempCheck.approvalData.criteriaValue,
-              choices: tempCheck.approvalData.choices.map((choice, index) => ({
-                id: `choice-${index}`,
-                title: choice,
-              })),
-            });
+            setApprovalSettings(
+              getApprovalSettingsFromAuthoringData(tempCheck.approvalData)
+            );
           }
-        } else {
-          setSelectedVotingType("standard");
         }
       }
     }
-  }, [relatedTempChecks, selectedPostType, proposalTypes]);
+  }, [hasInitialTempCheck, relatedTempChecks, selectedPostType]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -358,7 +344,7 @@ export function CreatePostClient({
         <div className="space-y-6">
           <ProposalSettingsCard
             selectedProposalType={selectedProposalType}
-            proposalTypes={filterProposalTypesByType(
+            proposalTypes={filterAuthoringProposalTypesByEntryType(
               proposalTypes,
               selectedPostType
             )}

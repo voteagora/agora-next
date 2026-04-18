@@ -52,13 +52,18 @@ canonical taxonomy and feature-oriented structure.
 
 ## Phase 5: Authoring Unification
 
-- [ ] Create `src/features/proposals/authoring/shared/`
+- [x] Create `src/features/proposals/authoring/shared/`
 - [ ] Consolidate shared authoring types from [src/app/create/types.ts](/Users/sudheer.t/Documents/github/agora-next/src/app/create/types.ts) and [src/app/proposals/draft/types.ts](/Users/sudheer.t/Documents/github/agora-next/src/app/proposals/draft/types.ts)
+      Shared authoring voting/post/approval definitions now live under `src/features/proposals/authoring/shared/`, and both `app/create/types.ts` and draft form metadata reuse that layer. Proposal-type filtering plus approval-tempcheck extraction/settings mapping also moved into that shared layer, replacing the old create-only filter util. Draft database/form types are still local to `src/app/proposals/draft/types.ts`.
 - [ ] Rename colliding concepts:
-- [ ] `PostType` -> `AuthoringEntryType`
+- [x] `PostType` -> `AuthoringEntryType`
+      `src/features/proposals/authoring/shared/` and the create flow now use `AuthoringEntryType` as the primary name. `PostType` remains as a compatibility alias while downstream callers finish migrating.
 - [ ] draft `ProposalType` -> `DraftVotingModuleType`
+      `DraftVotingModuleType` is now introduced as a compatibility alias in `src/app/proposals/draft/types.ts`, and the central draft/create-proposal form surfaces now use it. The rest of the draft domain still references `ProposalType`.
 - [ ] runtime `ProposalType` -> `LegacyProposalType`
-- [ ] Centralize proposal-type metadata and filtering
+      `LegacyProposalType` is already the canonical taxonomy name in `src/features/proposals/domain/`, and `src/lib/types.d.ts` now re-exports it explicitly. Central proposal model declarations are starting to consume that name, but most runtime parsing code still references `ProposalType`.
+- [x] Centralize proposal-type metadata and filtering
+      Entry-type filtering, voting-type-based proposal-type filtering, proposal-type normalization, metadata retrieval, and shared select-option/label formatting now live in `src/features/proposals/authoring/shared/`. Create and draft now both read proposal/voting metadata from that shared layer.
 - [ ] Decide long-term ownership between `src/app/create/` and `src/app/proposals/draft/`
 
 ## Phase 6: Cleanup

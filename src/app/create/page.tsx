@@ -1,20 +1,24 @@
 import { formatDistanceToNow } from "date-fns";
-import { buildForumTopicPath } from "@/lib/forumUtils";
-import { CreatePostClient } from "./components/CreatePostClient";
-import { PostType, CreatePostFormData, ProposalType } from "./types";
+import {
+  extractAuthoringApprovalData,
+  normalizeAuthoringProposalTypeConfig,
+  normalizeAuthoringVotingType,
+} from "@/features/proposals/authoring/shared";
 import { fetchProposalTypes } from "@/app/api/common/proposals/getProposals";
-import { fetchProposalFromArchive } from "@/lib/archiveUtils";
-import { getForumTopic } from "@/lib/actions/forum/topics";
-import Tenant from "@/lib/tenant/tenant";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
-import { filterProposalTypesByType } from "./utils/proposalTypeUtils";
+import { getForumTopic } from "@/lib/actions/forum/topics";
+import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import { buildForumTopicPath } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { AuthoringEntryType, CreatePostFormData, ProposalType } from "./types";
+import { CreatePostClient } from "./components/CreatePostClient";
 
 const { namespace, ui } = Tenant.current();
 
 function getInitialPostType(searchParams: {
   [key: string]: string | string[] | undefined;
-}): PostType {
-  const type = searchParams.type as PostType;
+}): AuthoringEntryType {
+  const type = searchParams.type as AuthoringEntryType;
   return type && ["tempcheck", "gov-proposal"].includes(type)
     ? type
     : "tempcheck";
@@ -60,27 +64,10 @@ async function getInitialFormData(
     data.title = fetchedProposal.title || "";
     data.description = fetchedProposal.description || "";
 
-    // Extract approval-specific data from kwargs or direct fields
-    const kwargs = fetchedProposal.kwargs || {};
     const approvalData =
-      fetchedProposal?.voting_module?.toUpperCase() === "APPROVAL"
-        ? {
-            choices:
-              (kwargs.choices as string[]) || fetchedProposal.choices || [],
-            maxApprovals:
-              typeof kwargs.max_approvals === "number"
-                ? kwargs.max_approvals
-                : fetchedProposal.max_approvals || 1,
-            criteria:
-              typeof kwargs.criteria === "number"
-                ? kwargs.criteria
-                : fetchedProposal.criteria || 0,
-            criteriaValue:
-              typeof kwargs.criteria_value === "number"
-                ? kwargs.criteria_value
-                : fetchedProposal.criteria_value || 0,
-            budget: typeof kwargs.budget === "number" ? kwargs.budget : 0,
-          }
+      normalizeAuthoringVotingType(fetchedProposal?.voting_module) ===
+      "approval"
+        ? extractAuthoringApprovalData(fetchedProposal)
         : undefined;
 
     data.relatedTempChecks = [
@@ -135,14 +122,16 @@ export default async function CreatePostPage({
   if (proposalTypes.length === 0) {
     const proposalTypesData = await fetchProposalTypes();
     proposalTypes = Array.isArray(proposalTypesData)
-      ? proposalTypesData.map((type) => ({
-          id: type.proposal_type_id,
-          name: type.name,
-          description: type.description,
-          quorum: type.quorum / 100,
-          approvalThreshold: type.approval_threshold / 100,
-          module: type.module,
-        }))
+      ? proposalTypesData.map((type) =>
+          normalizeAuthoringProposalTypeConfig({
+            id: type.proposal_type_id,
+            name: type.name,
+            description: type.description,
+            quorum: type.quorum,
+            approvalThreshold: type.approval_threshold,
+            module: type.module,
+          })
+        )
       : [
           {
             id: "none",

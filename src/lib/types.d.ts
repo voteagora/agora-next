@@ -268,6 +268,7 @@ export interface DelegateStats {
 }
 
 export type {
+  LegacyProposalType,
   ProposalKind,
   ProposalMode,
   ProposalScope,

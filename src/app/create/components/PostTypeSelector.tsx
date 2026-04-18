@@ -1,15 +1,17 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { PostType, postTypeOptions } from "../types";
+import { AuthoringEntryType, authoringEntryTypeOptions } from "../types";
 
 interface PostTypeSelectorProps {
-  value: PostType;
-  onChange: (type: PostType) => void;
+  value: AuthoringEntryType;
+  onChange: (type: AuthoringEntryType) => void;
 }
 
 export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
   const selectorRef = useRef<HTMLDivElement>(null);
-  const buttonRefs = useRef<Record<PostType, HTMLButtonElement | null>>({
+  const buttonRefs = useRef<
+    Record<AuthoringEntryType, HTMLButtonElement | null>
+  >({
     tempcheck: null,
     "gov-proposal": null,
   });
@@ -42,13 +44,13 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
           opacity: activeIndicator.width ? 1 : 0,
         }}
       />
-      {Object.entries(postTypeOptions).map(([key, label]) => (
+      {Object.entries(authoringEntryTypeOptions).map(([key, label]) => (
         <button
           key={key}
           ref={(el) => {
-            buttonRefs.current[key as PostType] = el;
+            buttonRefs.current[key as AuthoringEntryType] = el;
           }}
-          onClick={() => onChange(key as PostType)}
+          onClick={() => onChange(key as AuthoringEntryType)}
           className={`relative z-10 px-4 py-2 rounded-full transition-colors duration-150 ${
             value === key
               ? "text-primary"

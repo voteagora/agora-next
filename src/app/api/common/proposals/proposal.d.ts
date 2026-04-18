@@ -7,7 +7,7 @@ import type { ProposalKind } from "@/features/proposals/domain";
 import { OptimismProposals, lineaProposals } from "@prisma/client";
 import { BigNumberish } from "ethers";
 import { Decimal } from "@prisma/client/runtime";
-import { ProposalType } from "@/lib/types";
+import { LegacyProposalType } from "@/lib/types";
 
 export type ProposalPayloadFromDAONode = {
   id: string;
@@ -85,7 +85,7 @@ export type ProposalPayloadFromDB = {
 
   proposal_data: Prisma.JsonValue | null;
   proposal_results: Prisma.JsonValue | null;
-  proposal_type: ProposalType;
+  proposal_type: LegacyProposalType;
   proposal_type_data: Prisma.JsonValue | null;
   proposal_data_raw: string | null;
 
@@ -140,10 +140,10 @@ export type Proposal = {
   quorum: bigint | null;
   votableSupply?: bigint | null; // Added votableSupply property to match Python implementation
   approvalThreshold: bigint | null;
-  proposalData: ParsedProposalData[ProposalType]["kind"];
+  proposalData: ParsedProposalData[LegacyProposalType]["kind"];
   unformattedProposalData: `0x${string}` | null | any;
-  proposalResults: ParsedProposalResults[ProposalType]["kind"];
-  proposalType: ProposalType | null;
+  proposalResults: ParsedProposalResults[LegacyProposalType]["kind"];
+  proposalType: LegacyProposalType | null;
   kind?: ProposalKind;
   proposalTypeData: ProposalTypeData | null;
   status: ProposalStatus | null;

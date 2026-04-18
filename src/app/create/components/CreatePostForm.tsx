@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
+  AuthoringEntryType,
   CreatePostFormData,
-  PostType,
   RelatedItem,
   EASVotingType,
   ApprovalProposalSettings,
@@ -20,7 +20,7 @@ import { useAccount } from "wagmi";
 
 interface CreatePostFormProps {
   form: UseFormReturn<CreatePostFormData>;
-  postType: PostType;
+  postType: AuthoringEntryType;
   onSubmit: () => void;
   isSubmitting: boolean;
   canCreateTempCheck: boolean;

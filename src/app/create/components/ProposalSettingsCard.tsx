@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProposalType, PostType, RelatedItem, EASVotingType } from "../types";
+import { ProposalType } from "../types";
 
 interface ProposalSettingsCardProps {
   selectedProposalType: ProposalType;

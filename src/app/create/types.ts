@@ -1,56 +1,37 @@
-export type PostType = "tempcheck" | "gov-proposal";
+import {
+  APPROVAL_CRITERIA_TO_NUMBER,
+  AUTHORING_ENTRY_TYPE_OPTIONS,
+  AUTHORING_POST_TYPE_OPTIONS,
+  AUTHORING_VOTING_TYPE_OPTIONS,
+  DEFAULT_AUTHORING_APPROVAL_SETTINGS,
+  DEFAULT_AUTHORING_OPTIMISTIC_SETTINGS,
+  VOTING_TYPE_TO_NUMBER,
+  type AuthoringApprovalData,
+  type AuthoringApprovalCriteria,
+  type AuthoringApprovalOption,
+  type AuthoringApprovalSettings,
+  type AuthoringEntryType as SharedAuthoringEntryType,
+  type AuthoringOptimisticSettings,
+  type AuthoringPostType,
+  type AuthoringProposalTypeConfig,
+  type AuthoringVotingType,
+} from "@/features/proposals/authoring/shared";
 
-export const postTypeOptions = {
-  tempcheck: "Temp check",
-  "gov-proposal": "Governance proposal",
-} as const;
+export type AuthoringEntryType = SharedAuthoringEntryType;
+export type PostType = AuthoringPostType;
 
-// EAS Voting Types
-export type EASVotingType = "standard" | "approval" | "optimistic";
+export const authoringEntryTypeOptions = AUTHORING_ENTRY_TYPE_OPTIONS;
+export const postTypeOptions = AUTHORING_POST_TYPE_OPTIONS;
 
-export const easVotingTypeOptions: Record<EASVotingType, string> = {
-  standard: "Standard",
-  approval: "Approval",
-  optimistic: "Optimistic",
-} as const;
+export type EASVotingType = AuthoringVotingType;
 
-// Metadata for each voting type (similar to DraftFormClient pattern)
-export const EASVotingTypeMetadata: Record<
-  EASVotingType,
-  { title: string; description: string }
-> = {
-  standard: {
-    title: "Standard Voting",
-    description:
-      "Voters choose For, Against, or Abstain. The proposal passes if it meets quorum and approval threshold.",
-  },
-  approval: {
-    title: "Approval Voting",
-    description:
-      "Voters select from multiple options. Options are approved based on the criteria (threshold or top choices).",
-  },
-  optimistic: {
-    title: "Optimistic Voting",
-    description:
-      "The proposal passes automatically unless enough voters veto it. Only vote if you want to block this proposal.",
-  },
-};
+export const easVotingTypeOptions = AUTHORING_VOTING_TYPE_OPTIONS;
 
-// Maps UI voting type to EAS schema voting type number
-export const easVotingTypeToNumber: Record<EASVotingType, number> = {
-  standard: 0,
-  approval: 1,
-  optimistic: 2,
-} as const;
+export const easVotingTypeToNumber = VOTING_TYPE_TO_NUMBER;
 
-// Approval voting criteria
-export type ApprovalCriteria = "threshold" | "top-choices";
+export type ApprovalCriteria = AuthoringApprovalCriteria;
 
-// Maps UI criteria to EAS schema criteria number
-export const approvalCriteriaToNumber: Record<ApprovalCriteria, number> = {
-  threshold: 0,
-  "top-choices": 1,
-} as const;
+export const approvalCriteriaToNumber = APPROVAL_CRITERIA_TO_NUMBER;
 
 export interface RelatedItem {
   id: string;
@@ -61,55 +42,24 @@ export interface RelatedItem {
   url?: string;
   status?: string;
   proposer?: string;
-  proposalType?: {
-    id: string;
-    name: string;
-    description: string;
-    quorum: number;
-    approvalThreshold: number;
+  proposalType?: AuthoringProposalTypeConfig & {
     type?: string; // OPTIMISTIC, STANDARD, or APPROVAL
   };
   // Approval-specific data from temp check
-  approvalData?: {
-    choices: string[];
-    maxApprovals: number;
-    criteria: number;
-    criteriaValue: number;
-    budget: number;
-  };
+  approvalData?: AuthoringApprovalData;
   votingModule?: string;
 }
 
-export interface ProposalType {
-  id: string;
-  name: string;
-  description: string;
-  quorum: number;
-  approvalThreshold: number;
-  proposal_type_id?: string;
-  module?: string;
-}
+export type ProposalType = AuthoringProposalTypeConfig;
 
 // Approval voting option
-export interface ApprovalOption {
-  id: string;
-  title: string;
-  description?: string;
-}
+export type ApprovalOption = AuthoringApprovalOption;
 
 // Settings for approval voting proposals
-export interface ApprovalProposalSettings {
-  budget: number; // Maximum tokens that can be transferred
-  maxApprovals: number; // How many options each voter can select
-  criteria: ApprovalCriteria; // Threshold or Top Choices
-  criteriaValue: number; // Threshold value or number of top choices
-  choices: ApprovalOption[]; // The voting options
-}
+export type ApprovalProposalSettings = AuthoringApprovalSettings;
 
 // Settings for optimistic voting proposals
-export interface OptimisticProposalSettings {
-  tiers: number[]; // Array of veto threshold percentages
-}
+export type OptimisticProposalSettings = AuthoringOptimisticSettings;
 
 export interface CreatePostFormData {
   title: string;
@@ -125,15 +75,7 @@ export interface CreatePostFormData {
 }
 
 // Default values for approval settings
-export const defaultApprovalSettings: ApprovalProposalSettings = {
-  budget: 0,
-  maxApprovals: 1,
-  criteria: "threshold",
-  criteriaValue: 0,
-  choices: [],
-};
+export const defaultApprovalSettings = DEFAULT_AUTHORING_APPROVAL_SETTINGS;
 
 // Default values for optimistic settings
-export const defaultOptimisticSettings: OptimisticProposalSettings = {
-  tiers: [20], // Default 20% veto threshold
-};
+export const defaultOptimisticSettings = DEFAULT_AUTHORING_OPTIMISTIC_SETTINGS;

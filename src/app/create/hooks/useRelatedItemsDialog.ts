@@ -1,15 +1,19 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { getForumTopics } from "@/lib/actions/forum";
-import { transformForumTopics } from "@/lib/forumUtils";
-import { RelatedItem } from "../types";
-import { getProposalLinks } from "@/lib/actions/proposalLinks";
-import { buildForumTopicPath } from "@/lib/forumUtils";
-import { getArchivedProposals } from "@/lib/actions/archive";
-import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { useAccount } from "wagmi";
+import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import {
+  extractAuthoringApprovalData,
+  normalizeAuthoringProposalTypeConfig,
+  normalizeAuthoringVotingType,
+} from "@/features/proposals/authoring/shared";
+import { getArchivedProposals } from "@/lib/actions/archive";
+import { getForumTopics } from "@/lib/actions/forum";
+import { getProposalLinks } from "@/lib/actions/proposalLinks";
+import { buildForumTopicPath, transformForumTopics } from "@/lib/forumUtils";
+import { RelatedItem } from "../types";
 
 interface UseRelatedItemsDialogProps {
   searchType: "forum" | "tempcheck";
@@ -165,35 +169,21 @@ export function useRelatedItemsDialog({
           typeof proposalType === "object" &&
           "quorum" in proposalType
             ? {
-                id: (proposalType as any).eas_uid,
-                name: proposalType.name,
-                description: proposalType.description,
-                quorum: proposalType.quorum / 100,
-                approvalThreshold: proposalType.approval_threshold / 100,
+                ...normalizeAuthoringProposalTypeConfig({
+                  id: (proposalType as any).eas_uid,
+                  name: proposalType.name,
+                  description: proposalType.description,
+                  quorum: proposalType.quorum,
+                  approvalThreshold: proposalType.approval_threshold,
+                  module: proposalType.class,
+                }),
                 type: proposalType.class,
               }
             : undefined;
 
-        // Extract approval-specific data from kwargs or direct fields
-        const kwargs = proposal.kwargs || {};
         const approvalData =
-          proposalTypeData?.type?.toUpperCase() === "APPROVAL"
-            ? {
-                choices: (kwargs.choices as string[]) || proposal.choices || [],
-                maxApprovals:
-                  typeof kwargs.max_approvals === "number"
-                    ? kwargs.max_approvals
-                    : proposal.max_approvals || 1,
-                criteria:
-                  typeof kwargs.criteria === "number"
-                    ? kwargs.criteria
-                    : proposal.criteria || 0,
-                criteriaValue:
-                  typeof kwargs.criteria_value === "number"
-                    ? kwargs.criteria_value
-                    : proposal.criteria_value || 0,
-                budget: typeof kwargs.budget === "number" ? kwargs.budget : 0,
-              }
+          normalizeAuthoringVotingType(proposalTypeData?.type) === "approval"
+            ? extractAuthoringApprovalData(proposal)
             : undefined;
 
         return {

@@ -14,7 +14,7 @@ import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
 import { invalidatePath } from "../../../actions/revalidatePath";
 import {
-  ProposalType,
+  DraftVotingModuleType,
   parseProposalToForm,
   DraftProposal,
 } from "../../../types";
@@ -39,6 +39,7 @@ import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { toAuthoringProposalTypeSelectOption } from "@/features/proposals/authoring/shared";
 
 const { ui } = Tenant.current();
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
@@ -53,7 +54,12 @@ const DraftFormClient = ({
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<
     FormattedProposalType[]
-  >(getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC));
+  >(
+    getValidProposalTypesForVotingType(
+      proposalTypes,
+      DraftVotingModuleType.BASIC
+    )
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const shareParam = searchParams?.get("share");
@@ -184,10 +190,9 @@ const DraftFormClient = ({
                   control={control}
                   label="Proposal type"
                   required={true}
-                  options={validProposalTypes.map((typeConfig) => ({
-                    label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
-                    value: typeConfig.proposal_type_id.toString(),
-                  }))}
+                  options={validProposalTypes.map(
+                    toAuthoringProposalTypeSelectOption
+                  )}
                   name="proposalConfigType"
                   emptyCopy="Default"
                 />
@@ -224,13 +229,13 @@ const DraftFormClient = ({
           <FormCard.Section>
             {(() => {
               switch (votingModuleType) {
-                case ProposalType.BASIC:
+                case DraftVotingModuleType.BASIC:
                   return <BasicProposalForm />;
-                case ProposalType.SOCIAL:
+                case DraftVotingModuleType.SOCIAL:
                   return <SocialProposalForm />;
-                case ProposalType.APPROVAL:
+                case DraftVotingModuleType.APPROVAL:
                   return <ApprovalProposalForm />;
-                case ProposalType.OPTIMISTIC:
+                case DraftVotingModuleType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
                   const exhaustiveCheck: never = votingModuleType;

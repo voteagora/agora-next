@@ -27,6 +27,7 @@ import { Block } from "ethers";
 import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useEffect, useState } from "react";
 import { ChartSkeleton } from "@/components/Proposals/ProposalPage/ProposalChart/ProposalChart";
+import { isSnapshotProposal } from "@/features/proposals/domain";
 import { isProposalCreatedBeforeUpgradeCheck } from "@/lib/proposalUtils";
 const { token, ui, contracts } = Tenant.current();
 
@@ -54,6 +55,7 @@ type RangeProposalType = {
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
   const [chartData, setChartData] = useState<ChartData[] | null>(null);
+  const isSnapshot = isSnapshotProposal(proposal);
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 
@@ -107,7 +109,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
       const transformedData = transformVotesToChartData({
         votes: votes,
         block,
-        proposalType: proposal.proposalType ?? undefined,
+        isSnapshot,
         governorType: contracts.governorType,
         startBlock: proposal.startBlock,
         endBlock: proposal.endBlock,
@@ -175,7 +177,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             className="text-xs font-inter font-semibold fill:text-primary/30 fill"
             tick={{ fill: rgbStringToHex(ui.customization?.tertiary) }}
             tickFormatter={(value, index) =>
-              yTickFormatter(value, index, proposal.proposalType === "SNAPSHOT")
+              yTickFormatter(value, index, isSnapshot)
             }
             tickLine={false}
             axisLine={false}
@@ -345,7 +347,7 @@ const interpolateBlockTime = (
 const transformVotesToChartData = ({
   votes,
   block,
-  proposalType,
+  isSnapshot,
   governorType,
   startBlock,
   endBlock,
@@ -354,7 +356,7 @@ const transformVotesToChartData = ({
 }: {
   votes: ChartVote[];
   block: Block;
-  proposalType?: string;
+  isSnapshot: boolean;
   governorType?: GOVERNOR_TYPE;
   startBlock?: bigint | string | null;
   endBlock?: bigint | string | null;
@@ -370,7 +372,7 @@ const transformVotesToChartData = ({
     forCount = vote.support === "1" ? forCount + Number(vote.weight) : forCount;
     abstain = vote.support === "2" ? abstain + Number(vote.weight) : abstain;
     against = vote.support === "0" ? against + Number(vote.weight) : against;
-    if (proposalType === "SNAPSHOT") {
+    if (isSnapshot) {
       timestamp = new Date(Number(vote.created) * 1000);
     } else {
       timestamp =
@@ -398,7 +400,7 @@ const transformVotesToChartData = ({
       timestamp: timestamp,
       total: forCount + abstain + against,
       quorumTotal: quorumTotal,
-      isSnapshot: proposalType === "SNAPSHOT",
+      isSnapshot,
     };
   });
 };

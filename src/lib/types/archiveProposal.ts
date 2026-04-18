@@ -19,7 +19,7 @@ import {
   normalizeProposalSource,
   toLegacyProposalType,
 } from "@/features/proposals/domain";
-import type { ProposalKind, ProposalType } from "@/lib/types";
+import type { LegacyProposalType, ProposalKind } from "@/lib/types";
 
 export type DecodedStandardProposalData = {
   functionArgsName?: {
@@ -469,7 +469,7 @@ export function deriveProposalKind(
 
 export function deriveProposalType(
   proposal: ArchiveProposalBySource | ArchiveListProposal
-): ProposalType {
+): LegacyProposalType {
   return toLegacyProposalType(deriveProposalKind(proposal));
 }
 

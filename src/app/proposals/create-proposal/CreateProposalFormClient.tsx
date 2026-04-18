@@ -14,9 +14,9 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { UpdatedButton } from "@/components/Button";
 import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
 import {
+  DraftVotingModuleType,
   PLMConfig,
   ProposalScope,
-  ProposalType,
 } from "@/app/proposals/draft/types";
 import BasicProposalForm from "@/app/proposals/draft/components/BasicProposalForm";
 import SocialProposalForm from "@/app/proposals/draft/components/SocialProposalForm";
@@ -68,6 +68,7 @@ import { shouldTrackSafeOnchainTransactions } from "@/lib/safeFeatures";
 import { isSafeWallet, resolveSafeTx } from "@/lib/utils";
 import { useSafeWalletStatus } from "@/hooks/useSafeWalletStatus";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { toAuthoringProposalTypeSelectOption } from "@/features/proposals/authoring/shared";
 import { resolveSafePublishSummary } from "./helpers";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 
@@ -84,7 +85,12 @@ export default function CreateProposalFormClient({
   const [isOffchainPending, setIsOffchainPending] = useState(false);
   const [validProposalTypes, setValidProposalTypes] = useState<
     FormattedProposalType[]
-  >(getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC));
+  >(
+    getValidProposalTypesForVotingType(
+      proposalTypes,
+      DraftVotingModuleType.BASIC
+    )
+  );
 
   const router = useRouter();
   const openDialog = useOpenDialog();
@@ -301,7 +307,7 @@ export default function CreateProposalFormClient({
     }
     const fullDescription = "# " + proposal.title + "\n" + proposal.abstract;
     const choices =
-      proposal.voting_module_type === ProposalType.APPROVAL
+      proposal.voting_module_type === DraftVotingModuleType.APPROVAL
         ? proposal.approval_options.map((opt) => opt.title)
         : [];
 
@@ -311,13 +317,13 @@ export default function CreateProposalFormClient({
 
     const tiersEnabled =
       (proposal.tiers?.length ?? 0) > 0 &&
-      proposal.voting_module_type === ProposalType.OPTIMISTIC &&
+      proposal.voting_module_type === DraftVotingModuleType.OPTIMISTIC &&
       proposal.proposal_scope !== ProposalScope.ONCHAIN_ONLY;
 
     const parsedProposalType = (
       tiersEnabled
         ? "OPTIMISTIC_TIERED"
-        : proposal.voting_module_type === ProposalType.BASIC
+        : proposal.voting_module_type === DraftVotingModuleType.BASIC
           ? "STANDARD"
           : proposal.voting_module_type?.toUpperCase()
     ) as LibProposalType;
@@ -428,7 +434,7 @@ export default function CreateProposalFormClient({
       toast.error("Connect your wallet");
       return;
     }
-    if (data.type === ProposalType.SOCIAL) {
+    if (data.type === DraftVotingModuleType.SOCIAL) {
       toast.error(
         "Social proposals use Snapshot. Use the normal proposal flow."
       );
@@ -443,7 +449,9 @@ export default function CreateProposalFormClient({
         return;
       }
       const functionName =
-        data.type === ProposalType.BASIC ? "propose" : "proposeWithModule";
+        data.type === DraftVotingModuleType.BASIC
+          ? "propose"
+          : "proposeWithModule";
       traceProposalEvent("proposal_onchain_submit_requested", {
         functionName,
         proposalScope: data.proposal_scope,
@@ -717,10 +725,9 @@ export default function CreateProposalFormClient({
                   control={control}
                   label="Proposal type"
                   required
-                  options={validProposalTypes.map((typeConfig) => ({
-                    label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
-                    value: typeConfig.proposal_type_id.toString(),
-                  }))}
+                  options={validProposalTypes.map(
+                    toAuthoringProposalTypeSelectOption
+                  )}
                   name="proposalConfigType"
                   emptyCopy="Default"
                 />
@@ -756,13 +763,13 @@ export default function CreateProposalFormClient({
           <FormCard.Section>
             {(() => {
               switch (votingModuleType) {
-                case ProposalType.BASIC:
+                case DraftVotingModuleType.BASIC:
                   return <BasicProposalForm />;
-                case ProposalType.SOCIAL:
+                case DraftVotingModuleType.SOCIAL:
                   return <SocialProposalForm />;
-                case ProposalType.APPROVAL:
+                case DraftVotingModuleType.APPROVAL:
                   return <ApprovalProposalForm />;
-                case ProposalType.OPTIMISTIC:
+                case DraftVotingModuleType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
                 default:
                   return null;
@@ -795,7 +802,7 @@ export default function CreateProposalFormClient({
                     isSubmit={false}
                     className="w-[200px] flex items-center justify-center"
                     isLoading={isOnchainLoading}
-                    disabled={votingModuleType === ProposalType.SOCIAL}
+                    disabled={votingModuleType === DraftVotingModuleType.SOCIAL}
                     onClick={handleSubmit(onSubmitOnchain)}
                   >
                     {isHybrid ? "Submit on-chain" : "Create proposal"}
