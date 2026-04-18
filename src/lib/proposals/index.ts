@@ -65,6 +65,7 @@ export {
 
 // Formatting
 export {
+  getProposalTypeText,
   STATUS_LABEL_MAP,
   formatArchiveTagLabel,
   formatVotingModuleName,

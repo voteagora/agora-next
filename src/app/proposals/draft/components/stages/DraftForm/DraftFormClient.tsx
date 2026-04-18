@@ -14,6 +14,7 @@ import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
 import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
 import { invalidatePath } from "../../../actions/revalidatePath";
 import {
+  DraftProposalTypeOption,
   DraftVotingModuleType,
   parseProposalToForm,
   DraftProposal,
@@ -34,7 +35,6 @@ import {
   getValidProposalTypesForVotingType,
 } from "@/app/proposals/draft/utils/formConstants";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
-import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
@@ -49,11 +49,11 @@ const DraftFormClient = ({
   proposalTypes,
 }: {
   draftProposal: DraftProposal;
-  proposalTypes: FormattedProposalType[];
+  proposalTypes: DraftProposalTypeOption[];
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const [validProposalTypes, setValidProposalTypes] = useState<
-    FormattedProposalType[]
+    DraftProposalTypeOption[]
   >(
     getValidProposalTypesForVotingType(
       proposalTypes,

@@ -48,7 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ProposalType as ProposalTypeEnum } from "@/app/proposals/draft/types";
+import { DraftVotingModuleType } from "@/app/proposals/draft/types";
 
 type Props = {
   proposalType: FormattedProposalType;
@@ -64,7 +64,7 @@ const proposalTypeSchema = z.object({
   description: z.string().optional(),
   approval_threshold: z.coerce.number().lte(100),
   quorum: z.coerce.number().lte(100),
-  voting_module_type: z.nativeEnum(ProposalTypeEnum),
+  voting_module_type: z.nativeEnum(DraftVotingModuleType),
 });
 
 export default function ProposalType({
@@ -222,9 +222,11 @@ export default function ProposalType({
     }
 
     const quorum =
-      votingModuleType === ProposalTypeEnum.OPTIMISTIC ? 0 : formValues.quorum;
+      votingModuleType === DraftVotingModuleType.OPTIMISTIC
+        ? 0
+        : formValues.quorum;
     const approvalThreshold =
-      votingModuleType === ProposalTypeEnum.OPTIMISTIC
+      votingModuleType === DraftVotingModuleType.OPTIMISTIC
         ? 0
         : formValues.approval_threshold;
 
@@ -388,7 +390,7 @@ export default function ProposalType({
 
   const hasOptimisticProposalType = useMemo(() => {
     try {
-      const address = getProposalTypeAddress(ProposalTypeEnum.OPTIMISTIC);
+      const address = getProposalTypeAddress(DraftVotingModuleType.OPTIMISTIC);
       return address !== null;
     } catch (e) {
       return false;
@@ -397,7 +399,7 @@ export default function ProposalType({
 
   const hasApprovalProposalType = useMemo(() => {
     try {
-      const address = getProposalTypeAddress(ProposalTypeEnum.APPROVAL);
+      const address = getProposalTypeAddress(DraftVotingModuleType.APPROVAL);
       return address !== null;
     } catch (e) {
       return false;
@@ -459,16 +461,16 @@ export default function ProposalType({
                         <SelectValue placeholder="Select a voting module type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={ProposalTypeEnum.BASIC}>
+                        <SelectItem value={DraftVotingModuleType.BASIC}>
                           Standard
                         </SelectItem>
                         {hasApprovalProposalType && (
-                          <SelectItem value={ProposalTypeEnum.APPROVAL}>
+                          <SelectItem value={DraftVotingModuleType.APPROVAL}>
                             Approval
                           </SelectItem>
                         )}
                         {hasOptimisticProposalType && (
-                          <SelectItem value={ProposalTypeEnum.OPTIMISTIC}>
+                          <SelectItem value={DraftVotingModuleType.OPTIMISTIC}>
                             Optimistic
                           </SelectItem>
                         )}
@@ -481,7 +483,7 @@ export default function ProposalType({
             )}
           />
         </div>
-        {formValues.voting_module_type === ProposalTypeEnum.OPTIMISTIC ? (
+        {formValues.voting_module_type === DraftVotingModuleType.OPTIMISTIC ? (
           <div>
             <p>
               Optimistic proposals do not require a quorum or approval

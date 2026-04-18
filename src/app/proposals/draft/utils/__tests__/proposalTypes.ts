@@ -1,5 +1,9 @@
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { getProposalTypeMetaDataForTenant } from "../proposalTypes";
+import {
+  DraftVotingModuleType,
+  type TenantProposalTypeConfig,
+} from "../../types";
 import Tenant from "@/lib/tenant/tenant";
 
 // Store the original Tenant.current implementation
@@ -7,7 +11,7 @@ const originalTenantCurrent = Tenant.current;
 
 // Helper function to mock Tenant with specific proposal types
 const mockTenantWithProposalTypes = (
-  proposalTypes: { type: string }[] = []
+  proposalTypes: TenantProposalTypeConfig[] = []
 ) => {
   Tenant.current = vi.fn().mockReturnValue({
     ui: {
@@ -33,9 +37,21 @@ describe("getProposalTypeMetaDataForTenant", () => {
 
   test("should return empty array when no proposal types are provided", () => {
     mockTenantWithProposalTypes([
-      { type: "basic" },
-      { type: "approval" },
-      { type: "optimistic" },
+      {
+        type: DraftVotingModuleType.BASIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.APPROVAL,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.OPTIMISTIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
     ]);
 
     const result = getProposalTypeMetaDataForTenant([]);
@@ -43,7 +59,18 @@ describe("getProposalTypeMetaDataForTenant", () => {
   });
 
   test("should return only proposal types that are enabled in the tenant config", () => {
-    mockTenantWithProposalTypes([{ type: "basic" }, { type: "approval" }]);
+    mockTenantWithProposalTypes([
+      {
+        type: DraftVotingModuleType.BASIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.APPROVAL,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+    ]);
 
     const proposalTypes = [
       {
@@ -73,9 +100,21 @@ describe("getProposalTypeMetaDataForTenant", () => {
 
   test("should correctly categorize proposal types based on their names", () => {
     mockTenantWithProposalTypes([
-      { type: "basic" },
-      { type: "approval" },
-      { type: "optimistic" },
+      {
+        type: DraftVotingModuleType.BASIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.APPROVAL,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.OPTIMISTIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
     ]);
 
     const proposalTypes = [
@@ -145,7 +184,18 @@ describe("getProposalTypeMetaDataForTenant", () => {
   });
 
   test("should be case-insensitive when matching proposal types", () => {
-    mockTenantWithProposalTypes([{ type: "BASIC" }, { type: "approval" }]);
+    mockTenantWithProposalTypes([
+      {
+        type: DraftVotingModuleType.BASIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+      {
+        type: DraftVotingModuleType.APPROVAL,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+    ]);
 
     const proposalTypes = [
       {
@@ -168,7 +218,13 @@ describe("getProposalTypeMetaDataForTenant", () => {
   });
 
   test("should handle if more proposal types are provided than config types", () => {
-    mockTenantWithProposalTypes([{ type: "basic" }]);
+    mockTenantWithProposalTypes([
+      {
+        type: DraftVotingModuleType.BASIC,
+        prodAddress: null,
+        testnetAddress: null,
+      },
+    ]);
 
     const proposalTypes = [
       {

@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { SnapshotVote } from "@/app/api/common/votes/vote";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 import { cn } from "@/lib/utils";
 import { ParsedProposalData } from "@/lib/proposalUtils";
@@ -23,7 +23,7 @@ export default function ArchiveCopelandProposalVotesList({
   const { address: connectedAddress } = useAccount();
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
-  const proposalType: ProposalType = proposal.proposalType ?? "SNAPSHOT";
+  const proposalType: LegacyProposalType = proposal.proposalType ?? "SNAPSHOT";
   const choices =
     (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"])
       ?.choices ?? [];

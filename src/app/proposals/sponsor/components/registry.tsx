@@ -4,8 +4,8 @@ import {
   ApprovalProposal,
   BasicProposal,
   DraftProposal,
+  DraftVotingModuleType,
   OptimisticProposal,
-  ProposalType,
   SocialProposal,
 } from "../../../proposals/draft/types";
 
@@ -39,13 +39,13 @@ const OptimisticSponsorAction: SponsorActionComponent = ({ draftProposal }) => (
 );
 
 export const SPONSOR_ACTION_REGISTRY: Record<
-  ProposalType,
+  DraftVotingModuleType,
   SponsorActionComponent
 > = {
-  [ProposalType.BASIC]: BasicSponsorAction,
-  [ProposalType.SOCIAL]: SocialSponsorAction,
-  [ProposalType.APPROVAL]: ApprovalSponsorAction,
-  [ProposalType.OPTIMISTIC]: OptimisticSponsorAction,
+  [DraftVotingModuleType.BASIC]: BasicSponsorAction,
+  [DraftVotingModuleType.SOCIAL]: SocialSponsorAction,
+  [DraftVotingModuleType.APPROVAL]: ApprovalSponsorAction,
+  [DraftVotingModuleType.OPTIMISTIC]: OptimisticSponsorAction,
 };
 
 export function getSponsorActionComponent(

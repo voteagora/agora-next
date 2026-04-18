@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { Vote } from "@/app/api/common/votes/vote";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 
 const VOTES_PAGE_SIZE = 20;
@@ -21,7 +21,7 @@ export default function ArchiveProposalVotesList({
   const { address: connectedAddress } = useAccount();
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
-  const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
+  const proposalType: LegacyProposalType = proposal.proposalType ?? "STANDARD";
 
   let startBlock: bigint | number | null = null;
   if (proposal.startBlock !== null && proposal.startBlock !== undefined) {

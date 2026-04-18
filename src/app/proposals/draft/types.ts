@@ -6,6 +6,7 @@ import {
   ProposalChecklist,
 } from "@prisma/client";
 import { decodeFunctionData, formatUnits } from "viem";
+import type { AuthoringProposalTypeOption } from "@/features/proposals/authoring/shared";
 import Tenant from "@/lib/tenant/tenant";
 
 // TODO: move this to a shared location
@@ -48,7 +49,7 @@ type TenantProposalLifecycleStage = {
   stage: PrismaProposalStage;
   order: number;
   isPreSubmission: boolean;
-  config?: any;
+  config?: Record<string, unknown>;
 };
 
 export const ProposalLifecycleStageMetadata = {
@@ -178,6 +179,23 @@ export enum ProposalType {
 
 export const DraftVotingModuleType = ProposalType;
 export type DraftVotingModuleType = ProposalType;
+export type DraftVotingModuleTypeName =
+  | "social"
+  | "basic"
+  | "approval"
+  | "optimistic";
+
+export type TenantProposalTypeConfig = {
+  type: DraftVotingModuleTypeName;
+  prodAddress: `0x${string}` | null;
+  testnetAddress: `0x${string}` | null;
+};
+
+export type ProposalLifecycleCopy = {
+  helperText?: string;
+} & Record<string, unknown>;
+
+export type DraftProposalTypeOption = AuthoringProposalTypeOption;
 
 export enum TransactionType {
   TRANSFER = "transfer",
@@ -196,9 +214,9 @@ export type PLMConfig = {
   stages: TenantProposalLifecycleStage[];
   // We can read proposal type from the governor
   // but others might be desired, like snapshot
-  proposalTypes: any[];
+  proposalTypes: TenantProposalTypeConfig[];
   // custom copy for the proposal lifecycle feature
-  copy: any;
+  copy: ProposalLifecycleCopy;
   // optional config for including snapshot as a proposal type
   snapshotConfig?: {
     domain: string;

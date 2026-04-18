@@ -3,7 +3,7 @@ import type { ComponentType } from "react";
 
 import { ProposalStage } from "@prisma/client";
 
-import { DraftProposal } from "../types";
+import { DraftProposal, DraftProposalTypeOption } from "../types";
 import DraftFormClient from "./stages/DraftForm/DraftFormClient";
 import GithubPRForm from "./stages/GithubPRForm";
 import SubmitForm from "./stages/SubmitForm";
@@ -11,7 +11,7 @@ import TempCheckForm from "./stages/TempCheckForm";
 
 export type DraftStageProps = {
   draftProposal: DraftProposal;
-  proposalTypes: any[];
+  proposalTypes: DraftProposalTypeOption[];
 };
 
 export type DraftStageComponent = ComponentType<DraftStageProps>;

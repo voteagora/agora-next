@@ -10,7 +10,7 @@ import {
   isGovlessOffchainProposal,
 } from "@/features/proposals/domain";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 import { cn } from "@/lib/utils";
 import { ParsedProposalData } from "@/lib/proposalUtils";
@@ -29,7 +29,7 @@ export default function ArchiveApprovalProposalVotesList({
   const { address: connectedAddress } = useAccount();
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
-  const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
+  const proposalType: LegacyProposalType = proposal.proposalType ?? "STANDARD";
 
   let startBlock: bigint | number | null = null;
   if (proposal.startBlock !== null && proposal.startBlock !== undefined) {

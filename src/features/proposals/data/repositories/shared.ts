@@ -1,6 +1,6 @@
 import { Block } from "ethers";
 import { ProposalPayload } from "@/app/api/common/proposals/proposal";
-import type { ProposalType, TenantNamespace } from "@/lib/types";
+import type { LegacyProposalType, TenantNamespace } from "@/lib/types";
 
 export type ProposalRepositoryContext = {
   namespace: TenantNamespace;
@@ -16,10 +16,10 @@ export function getLatestBlockPromise(ui: any, contracts: any): Promise<Block> {
 
 export function getProposalTypeValue(
   proposal: ProposalPayload
-): ProposalType | null {
+): LegacyProposalType | null {
   const proposalType = proposal.proposal_type;
   return typeof proposalType === "string"
-    ? (proposalType as ProposalType)
+    ? (proposalType as LegacyProposalType)
     : null;
 }
 

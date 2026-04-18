@@ -1,5 +1,5 @@
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import type { TenantNamespace } from "@/lib/types";
+import type { FormattedProposalType, TenantNamespace } from "@/lib/types";
 
 export type AuthoringEntryType = "tempcheck" | "gov-proposal";
 export type AuthoringPostType = AuthoringEntryType;
@@ -97,6 +97,10 @@ export type AuthoringProposalTypeConfig = {
   approvalThreshold: number;
   module?: string;
   scopes?: unknown[];
+};
+
+export type AuthoringProposalTypeOption = FormattedProposalType & {
+  module?: string | null;
 };
 
 export type AuthoringOptimisticSettings = {

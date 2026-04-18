@@ -12,12 +12,14 @@ import {
   deriveProposalTag,
   deriveStatus,
   deriveTimeStatus,
-  resolveArchiveThresholds,
+  STATUS_LABEL_MAP,
+} from "@/lib/proposals/formatting";
+import { resolveArchiveThresholds } from "@/lib/proposals/thresholds";
+import {
   safeBigInt,
   safeBigIntOrNull,
-  STATUS_LABEL_MAP,
   toDate,
-} from "@/lib/proposals";
+} from "@/lib/proposals/converters";
 import {
   decodeCalldata,
   ParsedProposalData,

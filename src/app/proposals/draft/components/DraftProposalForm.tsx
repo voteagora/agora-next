@@ -1,5 +1,5 @@
 import { ProposalStage } from "@prisma/client";
-import { DraftProposal } from "../types";
+import { DraftProposal, DraftProposalTypeOption } from "../types";
 import { getDraftStageComponent } from "./registry";
 
 export default function DraftProposalForm({
@@ -9,7 +9,7 @@ export default function DraftProposalForm({
 }: {
   stage: ProposalStage;
   draftProposal: DraftProposal;
-  proposalTypes: any[];
+  proposalTypes: DraftProposalTypeOption[];
 }) {
   const DraftStage = getDraftStageComponent(stage);
 

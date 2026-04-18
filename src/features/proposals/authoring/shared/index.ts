@@ -8,6 +8,7 @@ export type {
   AuthoringOptimisticSettings,
   AuthoringPostType,
   AuthoringProposalTypeConfig,
+  AuthoringProposalTypeOption,
   AuthoringVotingMetadata,
   AuthoringVotingType,
 } from "./types";

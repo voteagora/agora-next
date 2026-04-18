@@ -8,7 +8,7 @@
 import type { ComponentType } from "react";
 import type { Proposal } from "@/app/api/common/proposals/proposal";
 import { isSnapshotProposal } from "@/features/proposals/domain";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 
 // Lazy imports to reduce bundle size
 import dynamic from "next/dynamic";
@@ -81,7 +81,7 @@ const OODaoApprovalProposalPage = dynamic(
  * ```
  */
 export const PROPOSAL_PAGE_REGISTRY: Partial<
-  Record<ProposalType, ProposalPageComponent>
+  Record<LegacyProposalType, ProposalPageComponent>
 > = {
   // Standard variants
   STANDARD: StandardProposalPage,
@@ -109,7 +109,7 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
  * Falls back to regular registry if not specified.
  */
 export const OODAO_PROPOSAL_PAGE_REGISTRY: Partial<
-  Record<ProposalType, ProposalPageComponent>
+  Record<LegacyProposalType, ProposalPageComponent>
 > = {
   STANDARD: OODaoStandardProposalPage,
   OPTIMISTIC: OODaoOptimisticProposalPage,

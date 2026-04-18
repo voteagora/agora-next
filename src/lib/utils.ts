@@ -15,7 +15,6 @@ import {
   WaitForTransactionReceiptReturnType,
 } from "viem";
 import { unstable_cache } from "next/cache";
-import { ParsedProposalData } from "./proposalUtils";
 import { getChainById, getPublicClient } from "./viem";
 import {
   arbitrum,
@@ -87,40 +86,6 @@ export function resolveIPFSUrl(url: string | null | undefined): string | null {
 export function bpsToString(bps: number) {
   return `${(Math.round(bps * 100) / 100).toFixed(2)}%`;
 }
-
-export const getProposalTypeText = (
-  proposalType: string,
-  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
-) => {
-  switch (proposalType) {
-    case "OPTIMISTIC":
-      return "Optimistic Proposal";
-    case "STANDARD":
-      return "Standard Proposal";
-    case "APPROVAL":
-      return "Approval Vote Proposal";
-    case "SNAPSHOT":
-      if (proposalData?.type === "copeland") {
-        return "Ranked Choice Proposal";
-      }
-    case "OFFCHAIN_OPTIMISTIC":
-    case "OFFCHAIN_OPTIMISTIC_TIERED":
-      return "Optimistic Proposal (Offchain)";
-    case "OFFCHAIN_STANDARD":
-      return "Standard Proposal (Offchain)";
-    case "OFFCHAIN_APPROVAL":
-      return "Approval Vote Proposal (Offchain)";
-    case "HYBRID_STANDARD":
-      return "Joint House Standard Proposal";
-    case "HYBRID_APPROVAL":
-      return "Joint House Approval Proposal";
-    case "HYBRID_OPTIMISTIC":
-    case "HYBRID_OPTIMISTIC_TIERED":
-      return "Joint House Optimistic Proposal";
-    default:
-      return "Proposal";
-  }
-};
 
 const format = new Intl.NumberFormat("en", {
   style: "decimal",

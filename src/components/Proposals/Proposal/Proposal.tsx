@@ -4,9 +4,10 @@ import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import ENSName from "@/components/shared/ENSName";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getProposalTypeText } from "@/lib/proposals";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { cn, getProposalTypeText } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 import ProposalStatus from "../ProposalStatus/ProposalStatus";
 import { getProposalListStatusComponent } from "./registry";

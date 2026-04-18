@@ -8,7 +8,8 @@ import {
 import ENSName from "@/components/shared/ENSName";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { getBlockScanUrl, getProposalTypeText } from "@/lib/utils";
+import { getProposalTypeText } from "@/lib/proposals";
+import { getBlockScanUrl } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalTitle({

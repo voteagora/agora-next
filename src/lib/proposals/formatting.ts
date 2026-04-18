@@ -1,10 +1,14 @@
-import { capitalizeFirstLetter } from "@/lib/utils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { ParsedProposalData } from "@/lib/proposalUtils";
+import { LegacyProposalType } from "@/lib/types";
 import { isEasOodaoSource } from "./extractors/guards";
 
 /**
  * Formatting utilities for archive proposals
  */
+
+const capitalizeFirstLetter = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1).toLocaleLowerCase();
 
 /**
  * Map of status codes to display labels
@@ -54,6 +58,40 @@ export const formatVotingModuleName = (name?: string | null): string => {
 
   const cleaned = name.replace(/_/g, " ").trim();
   return cleaned ? capitalizeFirstLetter(cleaned) : "Governance";
+};
+
+export const getProposalTypeText = (
+  proposalType: LegacyProposalType | string,
+  proposalData?: ParsedProposalData["SNAPSHOT"]["kind"]
+) => {
+  switch (proposalType) {
+    case "OPTIMISTIC":
+      return "Optimistic Proposal";
+    case "STANDARD":
+      return "Standard Proposal";
+    case "APPROVAL":
+      return "Approval Vote Proposal";
+    case "SNAPSHOT":
+      if (proposalData?.type === "copeland") {
+        return "Ranked Choice Proposal";
+      }
+    case "OFFCHAIN_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+      return "Optimistic Proposal (Offchain)";
+    case "OFFCHAIN_STANDARD":
+      return "Standard Proposal (Offchain)";
+    case "OFFCHAIN_APPROVAL":
+      return "Approval Vote Proposal (Offchain)";
+    case "HYBRID_STANDARD":
+      return "Joint House Standard Proposal";
+    case "HYBRID_APPROVAL":
+      return "Joint House Approval Proposal";
+    case "HYBRID_OPTIMISTIC":
+    case "HYBRID_OPTIMISTIC_TIERED":
+      return "Joint House Optimistic Proposal";
+    default:
+      return "Proposal";
+  }
 };
 
 /**

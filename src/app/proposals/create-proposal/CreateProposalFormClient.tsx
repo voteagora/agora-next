@@ -14,6 +14,7 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { UpdatedButton } from "@/components/Button";
 import { DraftProposalSchema } from "@/app/proposals/draft/schemas/DraftProposalSchema";
 import {
+  DraftProposalTypeOption,
   DraftVotingModuleType,
   PLMConfig,
   ProposalScope,
@@ -32,7 +33,6 @@ import {
   getValidProposalTypesForVotingType,
 } from "@/app/proposals/draft/utils/formConstants";
 import { ScopeDetails } from "@/components/Admin/ScopeDetails";
-import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 import JointHouseSettings from "@/app/proposals/draft/components/JointHouseSettings";
 import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
@@ -79,12 +79,12 @@ const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
 export default function CreateProposalFormClient({
   proposalTypes,
 }: {
-  proposalTypes: FormattedProposalType[];
+  proposalTypes: DraftProposalTypeOption[];
 }) {
   const [isOnchainPending, setIsOnchainPending] = useState(false);
   const [isOffchainPending, setIsOffchainPending] = useState(false);
   const [validProposalTypes, setValidProposalTypes] = useState<
-    FormattedProposalType[]
+    DraftProposalTypeOption[]
   >(
     getValidProposalTypesForVotingType(
       proposalTypes,

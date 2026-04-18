@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 import type { ArchiveVoteRow, ArchiveNonVoterRow } from "@/lib/archiveUtils";
 import { parseSupport } from "@/lib/voteUtils";
 
@@ -15,7 +15,7 @@ export type ArchiveVote = {
     type: string | null;
   } | null;
   proposalId: string;
-  proposalType: ProposalType;
+  proposalType: LegacyProposalType;
   params: number[] | null;
   reason: string | null;
   blockNumber: bigint;
@@ -89,7 +89,7 @@ async function fetchArchiveVotes({
   startBlock,
 }: {
   proposalId: string;
-  proposalType: ProposalType;
+  proposalType: LegacyProposalType;
   startBlock: bigint | number | null;
 }): Promise<ArchiveVote[]> {
   const response = await fetch(`/api/archive/votes/${proposalId}`, {
@@ -163,7 +163,7 @@ export function useArchiveVotes({
   startBlock,
 }: {
   proposalId: string;
-  proposalType: ProposalType;
+  proposalType: LegacyProposalType;
   startBlock: bigint | number | null;
 }) {
   const startBlockString =

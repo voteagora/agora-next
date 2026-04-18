@@ -7,6 +7,7 @@ import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
 import {
   DraftProposal as DraftProposalType,
+  DraftProposalTypeOption,
   PLMConfig,
 } from "@/app/proposals/draft/types";
 import { useSIWE } from "connectkit";
@@ -30,7 +31,7 @@ export default function DraftProposalPageClient({
 }: {
   idParam: string;
   searchParams?: { [key: string]: string | string[] | undefined };
-  proposalTypes: any[];
+  proposalTypes: DraftProposalTypeOption[];
 }) {
   const [draft, setDraft] = useState<DraftResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -400,13 +401,13 @@ export default function DraftProposalPageClient({
             stageIndex={stageIndex}
             stageTitle={stageMetadata?.title}
             totalStages={DRAFT_STAGES_FOR_TENANT.length}
-            draftIdForBack={(draft as any).uuid}
+            draftIdForBack={draft.uuid}
           />
           {!isShareMode && (
             <div className="flex items-center justify-end gap-4 mt-4">
               {plmConfig?.allowDraftSharing && (
                 <ShareDraftLink
-                  draftUuid={(draft as any).uuid}
+                  draftUuid={draft.uuid}
                   authorAddress={draft.author_address}
                 />
               )}

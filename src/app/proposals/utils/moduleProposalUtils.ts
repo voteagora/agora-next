@@ -2,7 +2,7 @@ import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
-import { ProposalType } from "@/app/proposals/draft/types";
+import { DraftVotingModuleType } from "@/app/proposals/draft/types";
 import { proposalToCallArgs } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -22,12 +22,12 @@ export const getModuleAddressForProposal = (proposalType: string): string => {
   switch (proposalType) {
     case "APPROVAL":
     case "HYBRID_APPROVAL":
-      moduleAddress = getProposalTypeAddress(ProposalType.APPROVAL);
+      moduleAddress = getProposalTypeAddress(DraftVotingModuleType.APPROVAL);
       break;
     case "OPTIMISTIC":
     case "HYBRID_OPTIMISTIC":
     case "HYBRID_OPTIMISTIC_TIERED":
-      moduleAddress = getProposalTypeAddress(ProposalType.OPTIMISTIC);
+      moduleAddress = getProposalTypeAddress(DraftVotingModuleType.OPTIMISTIC);
       break;
     default:
       throw new Error(`Unsupported proposal type: ${proposalType}`);

@@ -5,13 +5,13 @@ import {
   deriveTimeStatus,
   deriveStatus,
   deriveProposalTag,
+  getProposalTypeText,
 } from "@/lib/proposals";
 import {
   isDaoNodeSource,
   isHybridProposal,
   getVotingData,
 } from "@/lib/proposals/extractors/guards";
-import { getProposalTypeText } from "@/lib/utils";
 import { ProposalType } from "@/lib/types";
 import { RowDisplayData } from "./types";
 

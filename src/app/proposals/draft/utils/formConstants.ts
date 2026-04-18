@@ -1,4 +1,5 @@
 import {
+  DraftProposalTypeOption,
   DraftVotingModuleType,
   SocialProposalType,
   ProposalScope,
@@ -9,7 +10,6 @@ import {
   getDraftAuthoringVotingType,
 } from "@/features/proposals/authoring/shared";
 import { getProposalTypeAddress } from "./stages";
-import { FormattedProposalType } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
 
 const { namespace } = Tenant.current();
@@ -43,9 +43,9 @@ export const DEFAULT_FORM = {
 };
 
 export const getValidProposalTypesForVotingType = (
-  proposalTypes: FormattedProposalType[],
+  proposalTypes: DraftProposalTypeOption[],
   proposalType: DraftVotingModuleType
-): FormattedProposalType[] => {
+): DraftProposalTypeOption[] => {
   let optimisticModuleAddress: string | null = null;
   let approvalModuleAddress: string | null = null;
   try {
@@ -59,11 +59,7 @@ export const getValidProposalTypesForVotingType = (
     /* ignore */
   }
 
-  const withModule = proposalTypes as (FormattedProposalType & {
-    module?: string;
-  })[];
-
-  return filterAuthoringProposalTypesByVotingType(withModule, proposalType, {
+  return filterAuthoringProposalTypesByVotingType(proposalTypes, proposalType, {
     approvalModuleAddress,
     optimisticModuleAddress,
   });

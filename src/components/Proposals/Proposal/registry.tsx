@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 
 import type { Proposal } from "@/app/api/common/proposals/proposal";
-import type { ProposalType } from "@/lib/types";
+import type { LegacyProposalType } from "@/lib/types";
 
 import HybridStandardProposalStatus from "./HybridStandardProposalStatus";
 import OPApprovalProposalStatus, {
@@ -55,7 +55,7 @@ const HybridOptimisticStatus: ProposalListStatusComponent = ({ proposal }) => (
 );
 
 export const PROPOSAL_LIST_STATUS_REGISTRY: Partial<
-  Record<ProposalType, ProposalListStatusComponent>
+  Record<LegacyProposalType, ProposalListStatusComponent>
 > = {
   SNAPSHOT: SnapshotStatus,
   STANDARD: StandardStatus,

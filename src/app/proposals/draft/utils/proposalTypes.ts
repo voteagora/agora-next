@@ -1,16 +1,22 @@
 import Tenant from "@/lib/tenant/tenant";
-import { DraftVotingModuleType, PLMConfig } from "../types";
+import {
+  DraftProposalTypeOption,
+  DraftVotingModuleType,
+  PLMConfig,
+} from "../types";
 import { getProposalTypeAddress } from "./stages";
 
-export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
+export const getProposalTypeMetaDataForTenant = (
+  proposalTypes: DraftProposalTypeOption[]
+) => {
   const { ui } = Tenant.current();
   const plmToggle = ui.toggle("proposal-lifecycle");
 
   const enabledProposalTypesFromConfig = (
     (plmToggle?.config as PLMConfig)?.proposalTypes || []
-  ).map((pt: any) => pt.type);
+  ).map((proposalType) => proposalType.type);
 
-  const proposalTypeMap = new Map<string, boolean>();
+  const proposalTypeMap = new Map<DraftVotingModuleType, boolean>();
 
   proposalTypes.forEach((proposalType) => {
     const name = proposalType.name.toLowerCase();
@@ -33,19 +39,19 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
     }
 
     if (name.includes("social")) {
-      proposalTypeMap.set("social", true);
+      proposalTypeMap.set(DraftVotingModuleType.SOCIAL, true);
     } else if (
       (moduleAddress && moduleAddress === approvalModuleAddress) ||
       name.includes("approval")
     ) {
-      proposalTypeMap.set("approval", true);
+      proposalTypeMap.set(DraftVotingModuleType.APPROVAL, true);
     } else if (
       (moduleAddress && moduleAddress === optimisticModuleAddress) ||
       name.includes("optimistic")
     ) {
-      proposalTypeMap.set("optimistic", true);
+      proposalTypeMap.set(DraftVotingModuleType.OPTIMISTIC, true);
     } else {
-      proposalTypeMap.set("basic", true);
+      proposalTypeMap.set(DraftVotingModuleType.BASIC, true);
     }
   });
 
@@ -58,12 +64,12 @@ export const getProposalTypeMetaDataForTenant = (proposalTypes: any[]) => {
     )
     .sort((a, b) => {
       const order = {
-        basic: 0,
-        approval: 1,
-        optimistic: 2,
-        social: 3,
+        [DraftVotingModuleType.BASIC]: 0,
+        [DraftVotingModuleType.APPROVAL]: 1,
+        [DraftVotingModuleType.OPTIMISTIC]: 2,
+        [DraftVotingModuleType.SOCIAL]: 3,
       };
-      return order[a as keyof typeof order] - order[b as keyof typeof order];
+      return order[a] - order[b];
     });
 
   return enabledProposalTypesFromAPI;

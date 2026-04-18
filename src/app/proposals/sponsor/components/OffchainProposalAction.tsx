@@ -5,14 +5,14 @@ import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvide
 import Tenant from "@/lib/tenant/tenant";
 import {
   DraftProposal,
+  DraftVotingModuleType,
   PLMConfig,
   ProposalScope,
-  ProposalType,
 } from "../../../proposals/draft/types";
 import { UpdatedButton } from "@/components/Button";
 import { getInputData } from "../../draft/utils/getInputData";
 import { onSubmitAction as sponsorDraftProposal } from "../../draft/actions/sponsorDraftProposal";
-import { ProposalType as LibProposalType } from "@/lib/types.d";
+import { LegacyProposalType as LibProposalType } from "@/lib/types.d";
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { getPublicClient } from "@/lib/viem";
@@ -85,7 +85,7 @@ const OffchainProposalAction = ({
       const fullDescription =
         "# " + draftProposal.title + "\n" + draftProposal.abstract;
       const choices =
-        draftProposal.voting_module_type === ProposalType.APPROVAL
+        draftProposal.voting_module_type === DraftVotingModuleType.APPROVAL
           ? draftProposal.approval_options.map((option) => option.title)
           : [];
 
@@ -96,14 +96,14 @@ const OffchainProposalAction = ({
 
       const tiersEnabled =
         (draftProposal.tiers?.length ?? 0) > 0 &&
-        draftProposal.voting_module_type === ProposalType.OPTIMISTIC &&
+        draftProposal.voting_module_type === DraftVotingModuleType.OPTIMISTIC &&
         draftProposal.proposal_scope !== ProposalScope.ONCHAIN_ONLY;
 
-      const parsedProposalType = tiersEnabled
+      const parsedProposalType: LibProposalType = tiersEnabled
         ? "OPTIMISTIC_TIERED"
-        : draftProposal.voting_module_type === ProposalType.BASIC
-          ? ("STANDARD" as ProposalType)
-          : (draftProposal.voting_module_type?.toUpperCase() as ProposalType);
+        : draftProposal.voting_module_type === DraftVotingModuleType.BASIC
+          ? "STANDARD"
+          : (draftProposal.voting_module_type.toUpperCase() as LibProposalType);
 
       const rawProposalDataForBackend = {
         proposer: address,
