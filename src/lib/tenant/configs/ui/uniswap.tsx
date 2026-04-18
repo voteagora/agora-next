@@ -246,10 +246,6 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "staking",
-      enabled: false,
-    },
-    {
       name: "info",
       enabled: true,
     },
@@ -371,10 +367,6 @@ export const uniswapTenantUIConfig = new TenantUI({
         offchainMessageTracking: true,
         onchainTransactionTracking: true,
       },
-    },
-    {
-      name: "use-daonode-for-proposals",
-      enabled: false,
     },
     {
       name: "use-daonode-for-votable-supply",
