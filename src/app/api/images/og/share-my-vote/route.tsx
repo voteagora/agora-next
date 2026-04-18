@@ -5,7 +5,7 @@ import { BRAND_NAME_MAPPINGS } from "@/lib/tenant/tenant";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
-import { ProposalType, TenantNamespace } from "@/lib/types";
+import { LegacyProposalType, TenantNamespace } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
@@ -272,7 +272,7 @@ function generateVoteBars(
   forPercentage: number,
   againstPercentage: number,
   namespace: TenantNamespace,
-  proposalType: ProposalType,
+  proposalType: LegacyProposalType,
   supportType: "FOR" | "AGAINST" | "ABSTAIN"
 ) {
   const tenantUI: TenantUI = TenantUIFactory.create(
@@ -387,7 +387,7 @@ const SuccessMessageCard = ({
   endsIn: string | null;
   voteDate: string | null;
   supportType: "FOR" | "AGAINST" | "ABSTAIN";
-  proposalType: ProposalType;
+  proposalType: LegacyProposalType;
   options: {
     description: string;
     votes: bigint;
@@ -664,7 +664,7 @@ export async function GET(req: NextRequest) {
   const voteDate = searchParams.get("voteDate");
   const options = JSON.parse(searchParams.get("options") || "[]");
   const totalOptions = Number(searchParams.get("totalOptions"));
-  const proposalType = searchParams.get("proposalType") as ProposalType;
+  const proposalType = searchParams.get("proposalType") as LegacyProposalType;
   const supportType = searchParams.get("supportType") as
     | "FOR"
     | "AGAINST"

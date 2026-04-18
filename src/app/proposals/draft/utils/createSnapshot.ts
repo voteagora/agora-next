@@ -21,7 +21,7 @@ export const proposalTypes = {
   ],
 };
 
-export type ProposalType =
+export type SnapshotProposalType =
   | "single-choice"
   | "approval"
   | "quadratic"

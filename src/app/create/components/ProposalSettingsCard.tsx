@@ -7,11 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ProposalType } from "../types";
+import { AuthoringProposalType } from "../types";
 
 interface ProposalSettingsCardProps {
-  selectedProposalType: ProposalType;
-  proposalTypes: ProposalType[];
+  selectedProposalType: AuthoringProposalType;
+  proposalTypes: AuthoringProposalType[];
   onProposalTypeChange: (typeId: string) => void;
 }
 

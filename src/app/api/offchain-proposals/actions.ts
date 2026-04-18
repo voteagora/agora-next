@@ -7,7 +7,7 @@ import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { MiradorTraceContext } from "@/lib/mirador/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, LegacyProposalType } from "@/lib/types.d";
 import { getPublicClient } from "@/lib/viem";
 
 interface OffchainProposalData {
@@ -17,7 +17,7 @@ interface OffchainProposalData {
   proposal_type_id: number;
   start_block: string;
   end_block: string;
-  proposal_type: ProposalType;
+  proposal_type: LegacyProposalType;
   tiers: number[];
   maxApprovals: number;
   criteria: number;

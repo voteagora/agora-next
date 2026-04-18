@@ -26,7 +26,7 @@ import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/
 import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
-import { ProposalType, StakedDeposit } from "@/lib/types";
+import { LegacyProposalType, StakedDeposit } from "@/lib/types";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
@@ -202,7 +202,7 @@ export type ShareVoteDialogType = {
     voteReason: string;
     proposalId: string;
     proposalTitle: string;
-    proposalType: ProposalType;
+    proposalType: LegacyProposalType;
     proposal: Proposal;
     newVote: {
       support: string;

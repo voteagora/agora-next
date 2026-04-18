@@ -1,6 +1,6 @@
 import { OptimismVotes, LineaVotes } from "@prisma/client";
 import { ParsedParams } from "@/lib/voteUtils";
-import { ProposalType } from "@/lib/types";
+import { LegacyProposalType } from "@/lib/types";
 
 export type VotesSortOrder = "asc" | "desc";
 export type VotesSort = "weight" | "block_number";
@@ -14,10 +14,10 @@ export type Vote = {
   support: Support;
   weight: string;
   reason: string | null;
-  params: ParsedParams[ProposalType]["kind"];
+  params: ParsedParams[LegacyProposalType]["kind"];
   proposalValue: bigint;
   proposalTitle: string;
-  proposalType: ProposalType;
+  proposalType: LegacyProposalType;
   timestamp: Date | null;
   blockNumber?: bigint;
   citizenType: string | null;

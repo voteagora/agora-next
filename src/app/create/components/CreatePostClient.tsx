@@ -35,18 +35,18 @@ import { ProposalSettingsCard } from "./ProposalSettingsCard";
 import {
   ApprovalProposalSettings,
   AuthoringEntryType,
+  AuthoringProposalType,
   CreatePostFormData,
   defaultApprovalSettings,
   EASVotingType,
   postTypeOptions,
-  ProposalType,
   RelatedItem,
 } from "../types";
 
 interface CreatePostClientProps {
   initialPostType: AuthoringEntryType;
   initialFormData: Partial<CreatePostFormData>;
-  proposalTypes: ProposalType[];
+  proposalTypes: AuthoringProposalType[];
 }
 
 export function CreatePostClient({
@@ -103,7 +103,7 @@ export function CreatePostClient({
   );
 
   const [selectedProposalType, setSelectedProposalType] =
-    useState<ProposalType>(filteredProposalTypes[0]);
+    useState<AuthoringProposalType>(filteredProposalTypes[0]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showIndexingModal, setShowIndexingModal] = useState(false);

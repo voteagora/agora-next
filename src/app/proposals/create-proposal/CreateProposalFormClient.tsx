@@ -41,7 +41,7 @@ import { getInputData } from "@/app/proposals/draft/utils/getInputData";
 import { trackEvent } from "@/lib/analytics";
 import {
   ANALYTICS_EVENT_NAMES,
-  ProposalType as LibProposalType,
+  LegacyProposalType as LibProposalType,
 } from "@/lib/types.d";
 import { createProposalAttestation } from "@/lib/eas";
 import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";

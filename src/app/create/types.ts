@@ -50,7 +50,7 @@ export interface RelatedItem {
   votingModule?: string;
 }
 
-export type ProposalType = AuthoringProposalTypeConfig;
+export type AuthoringProposalType = AuthoringProposalTypeConfig;
 
 // Approval voting option
 export type ApprovalOption = AuthoringApprovalOption;

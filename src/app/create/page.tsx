@@ -10,7 +10,11 @@ import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { deriveStatus } from "@/lib/proposals";
 import Tenant from "@/lib/tenant/tenant";
-import { AuthoringEntryType, CreatePostFormData, ProposalType } from "./types";
+import {
+  AuthoringEntryType,
+  AuthoringProposalType,
+  CreatePostFormData,
+} from "./types";
 import { CreatePostClient } from "./components/CreatePostClient";
 
 const { namespace, ui } = Tenant.current();
@@ -117,7 +121,7 @@ export default async function CreatePostPage({
 
   const initialFormData = await getInitialFormData(params, tempCheckProposal);
 
-  let proposalTypes: ProposalType[] = [];
+  let proposalTypes: AuthoringProposalType[] = [];
 
   if (proposalTypes.length === 0) {
     const proposalTypesData = await fetchProposalTypes();

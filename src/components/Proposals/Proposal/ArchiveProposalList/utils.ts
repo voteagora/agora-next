@@ -12,7 +12,7 @@ import {
   isHybridProposal,
   getVotingData,
 } from "@/lib/proposals/extractors/guards";
-import { ProposalType } from "@/lib/types";
+import { LegacyProposalType } from "@/lib/types";
 import { RowDisplayData } from "./types";
 
 /**
@@ -29,7 +29,7 @@ export { isDaoNodeSource, isHybridProposal, getVotingData };
  */
 export function extractDisplayData(
   proposal: ArchiveListProposal,
-  proposalType: ProposalType,
+  proposalType: LegacyProposalType,
   tokenDecimals: number
 ): RowDisplayData {
   const status = deriveStatus(proposal, tokenDecimals);

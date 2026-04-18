@@ -1,5 +1,5 @@
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
-import { ProposalType } from "@/lib/types";
+import { LegacyProposalType } from "@/lib/types";
 
 /**
  * Props for archive proposal row components
@@ -8,7 +8,7 @@ export type ArchiveRowProps = {
   proposal: ArchiveListProposal;
   tokenDecimals?: number;
   /** Derived proposal type (e.g., STANDARD, HYBRID_STANDARD, etc.) */
-  proposalType?: ProposalType;
+  proposalType?: LegacyProposalType;
 };
 
 /**

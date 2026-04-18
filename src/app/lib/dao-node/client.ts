@@ -3,7 +3,7 @@ import {
   ProposalPayloadFromDB,
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
-import { DelegateResponse, ProposalType } from "@/lib/types";
+import { DelegateResponse, LegacyProposalType } from "@/lib/types";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
@@ -89,7 +89,8 @@ export function adaptDAONodeResponse(
       ? BigInt(apiResponse.queue_event.block_number)
       : null,
     proposal_data: proposalData,
-    proposal_type: apiResponse.voting_module_name.toUpperCase() as ProposalType,
+    proposal_type:
+      apiResponse.voting_module_name.toUpperCase() as LegacyProposalType,
     // TODO: Add proposal type data
     // DO NOT ENABLE DAO-NODE PROPOSALS UNTIL THIS IS HANDLED
     proposal_type_data: parsedProposalType,

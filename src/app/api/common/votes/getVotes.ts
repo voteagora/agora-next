@@ -23,7 +23,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
-import { ProposalType } from "@/lib/types";
+import { LegacyProposalType } from "@/lib/types";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 
 const getVotesForDelegate = ({
@@ -155,9 +155,11 @@ async function getVotesForDelegateForAddress({
         // Render past votes anyway with sane defaults.
         const safeProposalType =
           (vote as any).proposal_type ??
-          (archiveMode ? ("STANDARD" as ProposalType) : (undefined as any));
+          (archiveMode
+            ? ("STANDARD" as LegacyProposalType)
+            : (undefined as any));
 
-        let proposalData: ParsedProposalData[ProposalType] | undefined =
+        let proposalData: ParsedProposalData[LegacyProposalType] | undefined =
           undefined;
         try {
           if (vote.proposal_data) {
@@ -266,7 +268,7 @@ async function getVotesForDelegateForAddress({
 
                     proposalData = parseProposalData(
                       JSON.stringify(transformedData),
-                      proposalType as ProposalType
+                      proposalType as LegacyProposalType
                     );
                   }
                 } catch (e) {
@@ -738,7 +740,7 @@ async function getVotesForProposal({
         };
       }
 
-      let proposalData: ParsedProposalData[ProposalType] | undefined =
+      let proposalData: ParsedProposalData[LegacyProposalType] | undefined =
         undefined;
       try {
         proposalData = parseProposalData(
@@ -829,7 +831,7 @@ async function getUserVotesForProposal({
 
     const data = Promise.all(
       votes.map((vote) => {
-        let proposalData: ParsedProposalData[ProposalType] | undefined =
+        let proposalData: ParsedProposalData[LegacyProposalType] | undefined =
           undefined;
         try {
           proposalData = parseProposalData(
