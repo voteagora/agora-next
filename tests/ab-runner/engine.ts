@@ -613,8 +613,8 @@ export class ABRunnerEngine {
     await page.waitForTimeout(5000);
 
     const isDelegatesRoute = route === "/delegates";
-    const maxAttempts = isDelegatesRoute ? 5 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 8000 : 15000;
+    const maxAttempts = isDelegatesRoute ? 2 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 3000 : 15000;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -788,7 +788,7 @@ export class ABRunnerEngine {
               break; // Anchor to data-testid — stable across layout refactors
             }
 
-            if (href && href.length > 2) {
+            if (href && href.length > 2 && curr.tagName.toLowerCase() === "a") {
               selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
               path.unshift(selector);
               break; // Anchor to href for dynamic cards without data-testid
