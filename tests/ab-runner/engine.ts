@@ -598,12 +598,16 @@ export class ABRunnerEngine {
     if (override.expectDiff) {
       expect(
         isDiff,
-        `Expected route ${route} to structurally DIFFER between URLs.`
+        `\n\n🛑 EXPECTED VISUAL DRIFT MISSING 🛑\n\nExpected route "${route}" to structurally DIFFER between URLs, but they were visually identical.\n`
       ).toBe(true);
     } else {
       expect(
         drifts.length,
-        `Expected route ${route} to structurally match URLs. Found ${drifts.length} drifted components.`
+        `\n\n🛑 VISUAL DRIFT THRESHOLD EXCEEDED 🛑\n\n` +
+        `The A/B regression engine detected ${drifts.length} block-level drift(s) on route: "${route}".\n\n` +
+        `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
+        `Don't panic! This is NOT a code crash. Please check the 'report.json' and screenshots in the \n` +
+        `GCP Bucket to verify if these visual UI variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }
   }
