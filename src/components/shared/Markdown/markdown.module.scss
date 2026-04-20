@@ -35,7 +35,6 @@
 
     a {
       color: rgb(var(--secondary));
-      text-decoration: underline;
       font-weight: inherit;
       padding-bottom: 1px;
       border-bottom: 1px solid rgb(var(--line));
@@ -93,6 +92,10 @@
 
     img {
       border-radius: $border-radius-lg;
+    }
+
+    strong {
+      color: rgb(var(--primary));
     }
   }
 }
