@@ -595,6 +595,18 @@ export class ABRunnerEngine {
       );
     }
 
+    const numStyle = reportList.filter(r => r.reason === "Style Drift").length;
+    const numLayout = reportList.filter(r => r.reason === "Layout Drift").length;
+    const numData = reportList.filter(r => r.reason === "Data Drift").length;
+    const numMissing = reportList.filter(r => r.reason === "Missing or Moved Component").length;
+
+    const topDrifts = reportList.slice(0, 3).map(r => `   - ${r.component}`).join("\n");
+
+    const runId = process.env.GITHUB_RUN_ID;
+    const bucketLink = runId 
+      ? `🔗 View Full Report & Images: https://console.cloud.google.com/storage/browser/agora-ab-artifacts/reports/${new Date().toISOString().split('T')[0]}/${process.env.GITHUB_ACTOR || 'cli'}_run-${runId}?project=silent-turbine-390703`
+      : `🔗 View Full Report locally at: ${artifactsDir}/report.json`;
+
     if (override.expectDiff) {
       expect(
         isDiff,
@@ -605,9 +617,15 @@ export class ABRunnerEngine {
         drifts.length,
         `\n\n🛑 VISUAL DRIFT THRESHOLD EXCEEDED 🛑\n\n` +
         `The A/B regression engine detected ${drifts.length} block-level drift(s) on route: "${route}".\n\n` +
+        `📊 DRIFT ANATOMY BREAKDOWN:\n` +
+        `   🎨 Style Differences: ${numStyle}\n` +
+        `   📏 Layout/Size Shifts: ${numLayout}\n` +
+        `   ✍️ Data/Text Changes: ${numData}\n` +
+        `   👻 Missing Components: ${numMissing}\n\n` +
+        `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
+        `${bucketLink}\n\n` +
         `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
-        `Don't panic! This is NOT a code crash. Please check the 'report.json' and screenshots in the \n` +
-        `GCP Bucket to verify if these visual UI variations are intentional redesigns or true bugs.\n`
+        `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }
   }
