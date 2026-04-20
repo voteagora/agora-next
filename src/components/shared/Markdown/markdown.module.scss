@@ -75,18 +75,15 @@
     }
 
     code {
-      color: rgb(var(--tertiary));
-      background: rgb(var(--wash));
-      border-radius: $border-radius-lg;
+      color: rgb(var(--secondary));
     }
 
     pre {
       border-radius: $border-radius-lg;
       white-space: pre-wrap;
 
-      code,
-      tt {
-        color: rgb(var(--tertiary));
+      code {
+        color: rgb(var(--secondary));
       }
     }
 
