@@ -25,6 +25,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  hideInlineDiscussButton?: boolean;
   children?: React.ReactNode;
 }
 
@@ -71,6 +72,7 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  hideInlineDiscussButton = false,
   children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -280,7 +282,8 @@ export default function FinancialStatementLayout({
   const { namespace } = tenant;
   const mode = tenant.ui.theme;
   const hideDiscussButton =
-    namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
+    hideInlineDiscussButton ||
+    (namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage);
 
   const forumPagePath = buildForumTopicPath(topicId, title);
   const discussButtonText = isOnArticlePage ? "Discuss on forums" : "Discuss";
@@ -321,20 +324,16 @@ export default function FinancialStatementLayout({
         <div className="flex flex-wrap gap-4 mb-8">
           {!hideDiscussButton &&
             (isOnArticlePage ? (
-              <Button asChild variant="outline" className="text-primary">
+              <Button asChild size="lg">
                 <Link href={forumPagePath}>{discussButtonText}</Link>
               </Button>
             ) : (
-              <Button
-                onClick={handleScrollToComments}
-                variant="outline"
-                className="text-primary"
-              >
+              <Button onClick={handleScrollToComments} size="lg">
                 {discussButtonText}
               </Button>
             ))}
           {pdfUrl && (
-            <Button asChild variant="outline" className="text-primary">
+            <Button asChild size="lg">
               <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
                 View PDF
               </a>
