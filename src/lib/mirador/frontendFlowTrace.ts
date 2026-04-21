@@ -2,6 +2,7 @@
 
 import { buildFrontendTraceContext } from "./clientTraceContext";
 import { getMiradorChainNameFromChainId } from "./chains";
+import { isMiradorFlowTracingEnabled } from "./config";
 import { getMiradorFlowTags } from "./tags";
 import { MiradorAttributeMap, MiradorFlow, MiradorTraceContext } from "./types";
 import {
@@ -51,6 +52,10 @@ export function startFrontendMiradorFlowTrace({
   startEventName,
   startEventDetails,
 }: StartFrontendMiradorFlowTraceOptions): FrontendMiradorTrace {
+  if (!isMiradorFlowTracingEnabled(flow)) {
+    return null;
+  }
+
   const trace = startMiradorTrace({
     name,
     flow,
