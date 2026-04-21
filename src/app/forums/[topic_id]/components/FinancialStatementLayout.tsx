@@ -378,8 +378,28 @@ export default function FinancialStatementLayout({
             >
               <div
                 onClick={(e) => {
-                  const el = (e.target as HTMLElement).closest("a[href^='#']");
-                  if (el) setIsTocDrawerOpen(false);
+                  const el = (e.target as HTMLElement).closest(
+                    "a[href^='#']"
+                  ) as HTMLAnchorElement | null;
+                  if (!el) return;
+                  e.preventDefault();
+                  const slug = el.getAttribute("href")?.slice(1) ?? "";
+                  if (!slug) return;
+                  const target = document.getElementById(slug);
+                  // Clear the Drawer's pushed history entry before closing so
+                  // its cleanup doesn't call history.back() and undo navigation.
+                  try {
+                    window.history.replaceState(null, "", `#${slug}`);
+                  } catch (_) {}
+                  // Release the Drawer's body scroll lock so scrollIntoView runs.
+                  document.body.style.overflow = "";
+                  if (target) {
+                    target.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                  setIsTocDrawerOpen(false);
                 }}
               >
                 <MarkdownToc
