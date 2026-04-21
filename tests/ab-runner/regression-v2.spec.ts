@@ -1,5 +1,5 @@
 import { test, chromium, BrowserContext, Page } from "@playwright/test";
-import { ABRunnerEngine } from "./engine";
+import { ABRunnerEngine } from "./engine-v2";
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
@@ -75,6 +75,22 @@ test.describe("Visual Regression A/B Diff Runner", () => {
       test.setTimeout(900000); // 15.0m to compensate for GitHub CI CPU limits on infinite scrolls
       await engine.diffRoute(route, pageA, pageB);
     });
+  }
+
+  // === Explicit Targeted/Manual Regression ===
+  // E.g.: `TARGET_PROPOSALS="116,423" TARGET_DELEGATES="0x123...456" npm run test:ab`
+  const explicitProposals = (process.env.TARGET_PROPOSALS || "")
+    .split(",")
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  if (explicitProposals.length > 0) {
+    for (const proposalId of explicitProposals) {
+      test(`Diff pass/fail -> expected/diff for specific explicitly targeted proposal "/proposals/${proposalId}"`, async () => {
+        test.setTimeout(900000);
+        await engine.diffRoute(`/proposals/${proposalId}`, pageA, pageB);
+      });
+    }
   }
 
   test(`Diff pass/fail -> expected/diff for proposals-by-type-tenant`, async () => {

@@ -70,7 +70,7 @@ jobs:
           TENANT_CONTEXT: ${{ matrix.tenant }}
           URL_A: ${{ env.OP_URL_A }}
           # NOTE: Sudheer's backend logic for `feat/a-b-allProposals` will automatically scan through all CPLS proposals based on the domain URL or tenant context.
-        run: npm run test:ab
+        run: npm run test:ab:v2
 
       - name: Google Auth
         if: always()

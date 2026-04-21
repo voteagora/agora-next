@@ -19,7 +19,8 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:ab": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression.spec.ts"
+    "test:ab": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression.spec.ts",
+    "test:ab:v2": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression-v2.spec.ts"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",
