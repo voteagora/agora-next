@@ -127,24 +127,49 @@ function extractChoicesFromDaoNode(
 
   if (Array.isArray(decodedProposalData)) {
     // decoded_proposal_data[0] is array of options
-    // Each option: [targets[], values[], calldatas[], ?, description, budgetTokensSpent?]
+    // Older format (len 4): [targets[], values[], calldatas[], description]
+    // Newer format (len 5): [budgetTokensSpent, targets[], values[], calldatas[], description]
     const optionsArray = decodedProposalData[0];
     if (Array.isArray(optionsArray)) {
       optionsArray.forEach((opt: unknown, idx: number) => {
         const optArr = opt as unknown[];
-        let description;
+        let description: string;
+        let targets: string[];
+        let values: string[];
+        let calldatas: string[];
+        let budgetTokensSpent: bigint | null;
+
         if (optArr.length === 4) {
-          // For older OP proposals
+          // Older format: [targets, values, calldatas, description]
+          targets = Array.isArray(optArr[0]) ? (optArr[0] as string[]) : [];
+          values = Array.isArray(optArr[1])
+            ? (optArr[1] as unknown[]).map((v) => String(v))
+            : [];
+          calldatas = Array.isArray(optArr[2])
+            ? (optArr[2] as unknown[]).map((c) =>
+                String(c).startsWith("0x") ? String(c) : `0x${String(c)}`
+              )
+            : [];
           description =
-            typeof optArr?.[3] === "string" ? optArr[3] : `Option ${idx + 1}`;
+            typeof optArr[3] === "string" ? optArr[3] : `Option ${idx + 1}`;
+          budgetTokensSpent = null;
         } else {
-          // For newer OP proposals
+          // Newer format: [budgetTokensSpent, targets, values, calldatas, description]
+          budgetTokensSpent = optArr[0] != null
+            ? safeBigInt(optArr[0])
+            : null;
+          targets = Array.isArray(optArr[1]) ? (optArr[1] as string[]) : [];
+          values = Array.isArray(optArr[2])
+            ? (optArr[2] as unknown[]).map((v) => String(v))
+            : [];
+          calldatas = Array.isArray(optArr[3])
+            ? (optArr[3] as unknown[]).map((c) =>
+                String(c).startsWith("0x") ? String(c) : `0x${String(c)}`
+              )
+            : [];
           description =
-            typeof optArr?.[4] === "string" ? optArr[4] : `Option ${idx + 1}`;
+            typeof optArr[4] === "string" ? optArr[4] : `Option ${idx + 1}`;
         }
-        const budgetTokensSpent = optArr?.[5]
-          ? BigInt(String(optArr[5]))
-          : null;
 
         choices.push({
           index: idx,
@@ -154,15 +179,9 @@ function extractChoicesFromDaoNode(
         });
 
         options.push({
-          targets: Array.isArray(optArr?.[0]) ? optArr[0] : [],
-          values: Array.isArray(optArr?.[1])
-            ? optArr[1].map((v: unknown) => String(v))
-            : [],
-          calldatas: Array.isArray(optArr?.[2])
-            ? optArr[2].map((c: unknown) =>
-                String(c).startsWith("0x") ? String(c) : `0x${String(c)}`
-              )
-            : [],
+          targets,
+          values,
+          calldatas,
           description,
           budgetTokensSpent,
         });
