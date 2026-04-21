@@ -302,10 +302,16 @@ export default async function Page({
   }
 
   return (
-    <div className="flex justify-between mt-12">
-      <div>
+    <div className="flex justify-between mt-12 relative w-full flex-col">
+      <div className="w-full bg-cyan-400 text-black font-black p-6 rounded-2xl shadow-xl border-4 border-cyan-600 mb-8 max-w-3xl flex justify-center items-center">
+        [QA] INLINE DRIFT TARGET (ABOVE CARD)
+      </div>
+      <div className="w-full">
         {RenderComponent && <RenderComponent proposal={loadedProposal} />}
       </div>
+      <button className="fixed bottom-40 right-10 z-[9999] bg-fuchsia-600 px-8 py-4 rounded-full text-white font-bold animate-pulse shadow-2xl">
+        [QA] FLOATING DRIFT TARGET (PROPOSALS)
+      </button>
     </div>
   );
 }
