@@ -424,7 +424,11 @@ export default function FinancialStatementLayout({
                       PROSE_MEDIA
                     )}
                   >
-                    <Markdown content={content} originalHierarchy />
+                    <Markdown
+                      content={content}
+                      originalHierarchy
+                      className="!py-0"
+                    />
                   </div>
                 </div>
               </div>
@@ -451,7 +455,11 @@ export default function FinancialStatementLayout({
                     PROSE_MEDIA
                   )}
                 >
-                  <Markdown content={content} originalHierarchy />
+                  <Markdown
+                    content={content}
+                    originalHierarchy
+                    className="!py-0"
+                  />
                 </div>
               </div>
               {children}
