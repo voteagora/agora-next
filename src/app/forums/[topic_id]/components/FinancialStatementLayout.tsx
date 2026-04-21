@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Drawer } from "@/components/ui/Drawer";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 import {
@@ -72,6 +74,7 @@ export default function FinancialStatementLayout({
   children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isTocDrawerOpen, setIsTocDrawerOpen] = useState(false);
   const tenant = Tenant.current();
 
   const primaryRgb = tenant.ui?.customization?.primary ?? "23 23 23";
@@ -287,6 +290,7 @@ export default function FinancialStatementLayout({
     () => !looksLikeHtml(content) && hasMarkdownHeadings(content),
     [content]
   );
+  const markdownTocClassName = "px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3";
   const { svg: patternSvg } = generatePatternSvg(
     metadataString,
     600,
@@ -354,11 +358,41 @@ export default function FinancialStatementLayout({
           </>
         ) : showMarkdownToc ? (
           <>
+            <button
+              type="button"
+              className="lg:hidden fixed left-0 top-1/2 z-30 -translate-y-1/2 inline-flex items-center justify-center rounded-r-lg border border-l-0 border-line bg-cardBackground py-3 pl-1 pr-1.5 text-tertiary shadow-newDefault transition-shadow hover:text-primary hover:shadow-newHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line"
+              aria-haspopup="dialog"
+              aria-label="Open table of contents"
+              onClick={() => setIsTocDrawerOpen(true)}
+            >
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </button>
+            <Drawer
+              isOpen={isTocDrawerOpen}
+              onClose={() => setIsTocDrawerOpen(false)}
+              position="left"
+              className={cn(
+                "bg-cardBackground shadow-sm",
+                "inset-y-0 left-0 w-64 max-w-none rounded-r-lg border-r border-line"
+              )}
+            >
+              <div
+                onClick={(e) => {
+                  const el = (e.target as HTMLElement).closest("a[href^='#']");
+                  if (el) setIsTocDrawerOpen(false);
+                }}
+              >
+                <MarkdownToc
+                  content={content}
+                  className={markdownTocClassName}
+                />
+              </div>
+            </Drawer>
             <div className="flex items-start gap-6">
               <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
                 <MarkdownToc
                   content={content}
-                  className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
+                  className={markdownTocClassName}
                 />
               </aside>
               <div className="min-w-0 flex-1 flex flex-col">
