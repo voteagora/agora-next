@@ -1,9 +1,8 @@
 import { test, chromium, BrowserContext, Page } from "@playwright/test";
 import { ABRunnerEngine } from "./engine";
-import fs from "fs";
-import path from "path";
 import dotenv from "dotenv";
 import { TENANT_NAMESPACES } from "../../src/lib/constants";
+import { fetchProposalsFromArchive } from "../../src/lib/archiveUtils";
 
 dotenv.config();
 
@@ -77,68 +76,58 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     });
   }
 
-  // === Explicit Targeted/Manual Regression ===
-  // E.g.: `TARGET_PROPOSALS="116,423" TARGET_DELEGATES="0x123...456" npm run test:ab`
-  const explicitProposals = (process.env.TARGET_PROPOSALS || "")
-    .split(",")
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
+  // === GCS Archive Proposals Regression ===
+  // Fetches all proposals from the archive and runs a diff for each proposal ID.
+  test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {
+    test.setTimeout(0); // No timeout — scales with number of proposals in archive
 
-  if (explicitProposals.length > 0) {
-    for (const proposalId of explicitProposals) {
-      test(`Diff pass/fail -> expected/diff for specific explicitly targeted proposal "/proposals/${proposalId}"`, async () => {
-        test.setTimeout(900000);
-        await engine.diffRoute(`/proposals/${proposalId}`, pageA, pageB);
-      });
-    }
-  }
-
-  test(`Diff pass/fail -> expected/diff for proposals-by-type-tenant`, async () => {
-    test.setTimeout(600000); // 10 minutes to allow multiple deep proposals
     const targetA = process.env.URL_A || "http://127.0.0.1:3000";
-
-    console.log(
-      `[Dynamic] Scraping DOM for available proposal types from ${targetA}/proposals...`
-    );
-
-    // Dynamically detect tenant namespace and extract its configured proposal types
-    let activeTenant =
+    const activeTenant =
       Object.values(TENANT_NAMESPACES).find((ns) =>
         targetA.toLowerCase().includes(ns.toLowerCase())
       ) || TENANT_NAMESPACES.OPTIMISM;
 
-    // Natively read the TS config file to bypass Playwright's Babel/SVG loader limitations
-    let dynamicTypes = ["STANDARD"];
-    try {
-      const configPath = path.join(
-        __dirname,
-        `../../src/lib/tenant/configs/ui/${activeTenant}.ts`
-      );
-      if (fs.existsSync(configPath)) {
-        const content = fs.readFileSync(configPath, "utf-8");
-        const match = content.match(/proposalTypes:\s*\[([\s\S]*?)\]/);
-        if (match) {
-          dynamicTypes = Array.from(
-            match[1].matchAll(/type:\s*["']([^"']+)["']/g)
-          ).map((m) => {
-            let name = m[1].toUpperCase();
-            return name === "BASIC" ? "STANDARD" : name;
-          });
-        }
-      }
-    } catch (e) {
-      console.warn(
-        `[Dynamic] Could not parse TS config for ${activeTenant}, defaulting to [STANDARD]`
-      );
-    }
-
-    // Ensure generic STANDARD fallback if empty
-    const searchTargets = dynamicTypes.length > 0 ? dynamicTypes : ["STANDARD"];
+    const { data: proposals } = await fetchProposalsFromArchive(
+      activeTenant,
+      "relevant"
+    );
     console.log(
-      `[Dynamic] Detected Tenant: [${activeTenant}]. Extracting native UI typologies: [${searchTargets.join(", ")}]`
+      `[Archive] Loaded ${proposals.length} proposals for tenant [${activeTenant}]`
     );
 
-    let proposalsByType: Record<string, string> = {};
+    const failedDrifts: string[] = [];
+
+    for (const proposal of proposals) {
+      const route = `/proposals/${proposal.id}`;
+      console.log(`[Archive] Testing proposal: ${route}`);
+      try {
+        await engine.diffRoute(route, pageA, pageB);
+      } catch (e: any) {
+        failedDrifts.push(`[${proposal.id}] ${e.message}`);
+      }
+    }
+
+    if (failedDrifts.length > 0) {
+      throw new Error(
+        `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
+      );
+    }
+  });
+
+  test(`Diff pass/fail -> expected/diff for all proposal ids from proposals index`, async () => {
+    test.setTimeout(0); // No timeout — scales with number of proposals discovered
+    const targetA = process.env.URL_A || "http://127.0.0.1:3000";
+
+    console.log(
+      `[Dynamic] Scraping DOM for all proposal ids from ${targetA}/proposals...`
+    );
+
+    const activeTenant =
+      Object.values(TENANT_NAMESPACES).find((ns) =>
+        targetA.toLowerCase().includes(ns.toLowerCase())
+      ) || TENANT_NAMESPACES.OPTIMISM;
+
+    let proposalRoutes: string[] = [];
 
     try {
       await pageA.goto(`${targetA}/proposals`, { waitUntil: "commit" });
@@ -146,59 +135,68 @@ test.describe("Visual Regression A/B Diff Runner", () => {
         .waitForSelector('a[href*="/proposals/"]', { timeout: 20000 })
         .catch(() => {});
 
-      const res = await pageA.evaluate(async (expectedTypes) => {
-        const map: Record<string, string> = {};
+      const res = await pageA.evaluate(async () => {
+        const reservedSegments = new Set([
+          "create-proposal",
+          "draft",
+          "sponsor",
+        ]);
+        const routes = new Set<string>();
         let iterations = 0;
+        let stableRounds = 0;
+        let previousCount = 0;
 
-        while (
-          Object.keys(map).length < expectedTypes.length &&
-          iterations < 8
-        ) {
+        while (iterations < 12) {
           const cards = Array.from(
             document.querySelectorAll('a[href*="/proposals/"]')
           ).filter((a) => {
             const h = a.getAttribute("href") || "";
-            return /\/proposals\/([0-9a-zA-Z_-]{2,})/.test(h);
+            return h.includes("/proposals/");
           });
 
           cards.forEach((card) => {
             const href = card.getAttribute("href") as string;
-            const text = ((card as HTMLElement).innerText || "").toUpperCase();
+            const match = href.match(
+              /^\/proposals\/([^/?#]+)(?:[?#].*)?$/
+            );
+            if (!match) return;
 
-            let typeText = "STANDARD";
-            expectedTypes.forEach((targetType: string) => {
-              if (text.includes(targetType)) typeText = targetType;
-            });
-
-            if (!map[typeText]) {
-              map[typeText] = href;
-            }
+            const proposalId = match[1];
+            if (reservedSegments.has(proposalId)) return;
+            routes.add(`/proposals/${proposalId}`);
           });
 
-          if (Object.keys(map).length >= expectedTypes.length) break;
           window.scrollTo(0, document.body.scrollHeight);
           await new Promise((r) => setTimeout(r, 1500));
+
+          if (routes.size === previousCount) {
+            stableRounds++;
+            if (stableRounds >= 2) break;
+          } else {
+            stableRounds = 0;
+          }
+
+          previousCount = routes.size;
           iterations++;
         }
 
         return {
-          map,
+          routes: Array.from(routes),
           totalCards: document.querySelectorAll('a[href*="/proposals/"]')
             .length,
         };
-      }, searchTargets);
+      });
 
-      proposalsByType = res.map;
+      proposalRoutes = res.routes;
       console.log(
         `[Dynamic] Extracted ${res.totalCards} raw proposals from DOM.`
       );
       console.log(
-        `[Dynamic] Mapping matrix generated natively:`,
-        JSON.stringify(proposalsByType, null, 2)
+        `[Dynamic] Discovered ${proposalRoutes.length} unique proposal routes.`
       );
     } catch (e) {
       console.error(
-        "[Dynamic] Error extracting proposals by type. Skipping extraction.",
+        "[Dynamic] Error extracting proposal routes. Skipping extraction.",
         e
       );
     }
@@ -206,36 +204,28 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     // Execute sequentially and Aggregate failures so we never break the loop early
     const failedDrifts: string[] = [];
 
-    for (const ptype of searchTargets) {
-      if (!proposalsByType[ptype]) {
-        console.log(
-          `[Dynamic] Missing native proposal type in production: [${ptype}]`
-        );
-        const artifactsDir = path.join(
-          process.cwd(),
-          "test-results",
-          "ab-diffs",
-          "optimism",
-          "proposals",
-          ptype
-        );
-        fs.mkdirSync(artifactsDir, { recursive: true });
-        fs.writeFileSync(
-          path.join(artifactsDir, "report.json"),
-          JSON.stringify({ error: "No proposals found of this type" }, null, 2)
+    if (proposalRoutes.length === 0) {
+      throw new Error(
+        `[Dynamic] No proposal routes discovered on ${targetA}/proposals`
+      );
+    }
+
+    for (const pRoute of proposalRoutes) {
+      const proposalId = pRoute.split("/").filter(Boolean).pop();
+      if (!proposalId) {
+        failedDrifts.push(
+          `[Dynamic] Unable to derive proposal ID from route: ${pRoute}`
         );
         continue;
       }
-
-      const pRoute = proposalsByType[ptype];
-      console.log(`[Dynamic] Testing Proposal Type [${ptype}]: ${pRoute}`);
+      console.log(`[Dynamic] Testing proposal [${proposalId}]: ${pRoute}`);
       try {
         await engine.diffRoute(pRoute, pageA, pageB, {
           tenant: activeTenant,
-          type: ptype,
+          proposalId,
         });
       } catch (e: any) {
-        failedDrifts.push(`[${ptype}] Proposal Drifts Detected: ${e.message}`);
+        failedDrifts.push(`[${proposalId}] ${e.message}`);
       }
     }
 
