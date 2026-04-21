@@ -302,29 +302,16 @@ export default async function Page({
   }
 
   return (
-    <>
-      <button
-        id="qa-ab-fake-proposal-trigger"
-        style={{
-          position: "fixed",
-          bottom: "150px",
-          right: "50px",
-          padding: "20px",
-          background: "#0055ff",
-          color: "white",
-          fontWeight: "bold",
-          zIndex: 9999,
-          borderRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0,85,255,0.4)",
-        }}
-      >
-        [QA] FAKE DRIFT TARGET (PROPOSAL)
-      </button>
-      <div className="flex justify-between mt-12">
-        <div>
-          {RenderComponent && <RenderComponent proposal={loadedProposal} />}
-        </div>
+    <div className="flex justify-between mt-12 relative w-full flex-col">
+      <div className="w-full bg-cyan-400 text-black font-black p-6 rounded-2xl shadow-xl border-4 border-cyan-600 mb-8 max-w-3xl flex justify-center items-center mx-auto">
+        [QA] INLINE DRIFT TARGET (ABOVE CARD)
       </div>
-    </>
+      <div className="w-full flex justify-center">
+        {RenderComponent && <RenderComponent proposal={loadedProposal} />}
+      </div>
+      <button className="fixed bottom-40 right-10 z-[9999] bg-fuchsia-600 px-8 py-4 rounded-full text-white font-bold animate-pulse shadow-2xl">
+        [QA] FLOATING DRIFT TARGET (PROPOSALS)
+      </button>
+    </div>
   );
 }
