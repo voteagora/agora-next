@@ -54,5 +54,15 @@ export default async function Home() {
     return <ComingSoonPage />;
   }
 
-  return <ProposalsHome />;
+  return (
+    <>
+      <button 
+        id="qa-ab-fake-index-trigger" 
+        style={{ position: 'fixed', top: '150px', left: '50px', padding: '20px', background: '#ff0055', color: 'white', fontWeight: 'bold', zIndex: 9999, borderRadius: '8px', boxShadow: '0 4px 12px rgba(255,0,85,0.4)' }}
+      >
+        [QA] FAKE DRIFT TARGET (INDEX)
+      </button>
+      <ProposalsHome />
+    </>
+  );
 }
