@@ -12,6 +12,10 @@ on:
         description: "Preview URL to Compare (Vercel Branch Deployment)"
         required: true
         type: string
+      target_proposals:
+        description: "Specific Proposals to Target (e.g. 116,adv-55)"
+        required: false
+        type: string
 
 jobs:
   visual-regression:
@@ -42,6 +46,7 @@ jobs:
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b }}
+          TARGET_PROPOSALS: ${{ inputs.target_proposals }}
         run: npm run test:ab
 
       - name: Google Auth

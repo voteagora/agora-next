@@ -303,9 +303,20 @@ export default async function Page({
 
   return (
     <>
-      <button 
-        id="qa-ab-fake-proposal-trigger" 
-        style={{ position: 'fixed', bottom: '150px', right: '50px', padding: '20px', background: '#0055ff', color: 'white', fontWeight: 'bold', zIndex: 9999, borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,85,255,0.4)' }}
+      <button
+        id="qa-ab-fake-proposal-trigger"
+        style={{
+          position: "fixed",
+          bottom: "150px",
+          right: "50px",
+          padding: "20px",
+          background: "#0055ff",
+          color: "white",
+          fontWeight: "bold",
+          zIndex: 9999,
+          borderRadius: "8px",
+          boxShadow: "0 4px 12px rgba(0,85,255,0.4)",
+        }}
       >
         [QA] FAKE DRIFT TARGET (PROPOSAL)
       </button>
