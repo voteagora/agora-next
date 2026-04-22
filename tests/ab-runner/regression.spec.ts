@@ -51,10 +51,10 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     ]);
     await Promise.all([
       pageA
-        .waitForFunction(() => document.title.length > 0, { timeout: 5000 })
+        .waitForFunction(() => document.title.length > 0, { timeout: 15000 })
         .catch(() => {}),
       pageB
-        .waitForFunction(() => document.title.length > 0, { timeout: 5000 })
+        .waitForFunction(() => document.title.length > 0, { timeout: 15000 })
         .catch(() => {}),
     ]);
 
