@@ -68,6 +68,14 @@ export default function ProposalStatusDetail({
             SUCCEEDED
           </p>
         )}
+        {proposalStatus === "PASSED" && (
+          <p
+            data-testid="proposal-status-badge"
+            className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold"
+          >
+            PASSED
+          </p>
+        )}
         {proposalStatus === "DEFEATED" && (
           <p
             data-testid="proposal-status-badge"
