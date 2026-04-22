@@ -76,6 +76,22 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     });
   }
 
+  // === Explicit Targeted/Manual Regression ===
+  // E.g.: `TARGET_PROPOSALS="116,423" TARGET_DELEGATES="0x123...456" npm run test:ab`
+  const explicitProposals = (process.env.TARGET_PROPOSALS || "")
+    .split(",")
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+
+  if (explicitProposals.length > 0) {
+    for (const proposalId of explicitProposals) {
+      test(`Diff pass/fail -> expected/diff for specific explicitly targeted proposal "/proposals/${proposalId}"`, async () => {
+        test.setTimeout(900000);
+        await engine.diffRoute(`/proposals/${proposalId}`, pageA, pageB);
+      });
+    }
+  }
+
   // === GCS Archive Proposals Regression ===
   // Fetches all proposals from the archive and runs a diff for each proposal ID.
   test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {

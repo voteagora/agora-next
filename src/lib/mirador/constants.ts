@@ -3,6 +3,12 @@ export const MIRADOR_FLOW_HEADER = "x-mirador-flow";
 
 export const MIRADOR_FLOW = {
   proposalCreation: "proposal_creation",
+  governanceVote: "governance_vote",
+  governanceDelegation: "governance_delegation",
+  staking: "staking",
+  governanceAdmin: "governance_admin",
+  proposalAttestation: "proposal_attestation",
+  membershipAdmin: "membership_admin",
   notificationPreferences: "notification_preferences",
   delegateStatement: "delegate_statement",
 } as const;

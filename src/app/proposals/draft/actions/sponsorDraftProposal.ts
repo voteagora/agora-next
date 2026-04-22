@@ -46,7 +46,7 @@ export async function onSubmitAction(
     data.creatorAddress as `0x${string}`
   );
   if (!authResult.success) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_auth_failed",
       details: { reason: authResult.error },
@@ -60,7 +60,7 @@ export async function onSubmitAction(
     includeProposalScope: true,
   });
   if (!draftAccess.ok) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_failed",
       details: {
@@ -107,7 +107,7 @@ export async function onSubmitAction(
   }
 
   if (!isAuthorized) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_failed",
       details: { reason: "unauthorized" },
@@ -118,7 +118,7 @@ export async function onSubmitAction(
   const parsed = SponsorProposalSchema.safeParse(data);
 
   if (!parsed.success) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_failed",
       details: { reason: "invalid_form_data" },
@@ -135,7 +135,7 @@ export async function onSubmitAction(
   const currentIndex = getStageIndexForTenant("AWAITING_SUBMISSION") as number;
 
   try {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_requested",
       details: {
@@ -198,7 +198,7 @@ export async function onSubmitAction(
       });
     }
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_persisted",
       details: {
@@ -213,7 +213,7 @@ export async function onSubmitAction(
       safeProposalPublish,
     };
   } catch (error) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "draft_publish_failed",
       details: {

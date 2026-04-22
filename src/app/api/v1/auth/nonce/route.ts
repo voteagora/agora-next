@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const nonce = generateNonce();
     await storeSiweNonce(nonce, requestUrl.host);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? { ...traceContext, step: "siwe_nonce", source: "api" }
         : undefined,
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     });
     return NextResponse.json({ nonce });
   } catch (e: any) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? { ...traceContext, step: "siwe_nonce", source: "api" }
         : undefined,
