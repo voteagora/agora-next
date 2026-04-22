@@ -63,6 +63,7 @@ jobs:
           URL_A=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_a")
           URL_B=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_b")
           TARGET_PROPOSALS=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_proposals")
+          TARGET_TYPES=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_types")
           
           echo "URL_A=$URL_A" >> $GITHUB_ENV
           echo "URL_B=$URL_B" >> $GITHUB_ENV
@@ -70,6 +71,11 @@ jobs:
           if [ "$TARGET_PROPOSALS" != "null" ] && [ "$TARGET_PROPOSALS" != "" ]; then
             echo "TARGET_PROPOSALS=$TARGET_PROPOSALS" >> $GITHUB_ENV
             echo "Target Proposals Override set to: $TARGET_PROPOSALS"
+          fi
+          
+          if [ "$TARGET_TYPES" != "null" ] && [ "$TARGET_TYPES" != "" ]; then
+            echo "TARGET_TYPES=$TARGET_TYPES" >> $GITHUB_ENV
+            echo "Target Types Override set to: $TARGET_TYPES"
           fi
 
       - name: Run Dedicated Tenant Assertion
