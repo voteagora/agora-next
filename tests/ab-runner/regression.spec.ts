@@ -33,9 +33,10 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     await contextB.close();
   });
 
+  const delegatesSortBy = process.env.TARGET_DELEGATES_SORT_BY || "most_voting_power";
   const staticRoutes = [
     "/",
-    "/delegates?orderBy=most_voting_power",
+    `/delegates?orderBy=${delegatesSortBy}`,
     "/proposals",
   ];
 

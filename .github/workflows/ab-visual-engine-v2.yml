@@ -64,6 +64,7 @@ jobs:
           URL_B=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_b")
           TARGET_PROPOSALS=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_proposals")
           TARGET_TYPES=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_types")
+          TARGET_DELEGATES_SORT_BY=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_delegates_sort_by")
           
           echo "URL_A=$URL_A" >> $GITHUB_ENV
           echo "URL_B=$URL_B" >> $GITHUB_ENV
@@ -76,6 +77,11 @@ jobs:
           if [ "$TARGET_TYPES" != "null" ] && [ "$TARGET_TYPES" != "" ]; then
             echo "TARGET_TYPES=$TARGET_TYPES" >> $GITHUB_ENV
             echo "Target Types Override set to: $TARGET_TYPES"
+          fi
+
+          if [ "$TARGET_DELEGATES_SORT_BY" != "null" ] && [ "$TARGET_DELEGATES_SORT_BY" != "" ]; then
+            echo "TARGET_DELEGATES_SORT_BY=$TARGET_DELEGATES_SORT_BY" >> $GITHUB_ENV
+            echo "Target Delegates Sort By set to: $TARGET_DELEGATES_SORT_BY"
           fi
 
       - name: Run Dedicated Tenant Assertion
