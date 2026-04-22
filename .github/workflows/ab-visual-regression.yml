@@ -16,6 +16,26 @@ on:
         description: "Specific Proposals to Target (e.g. 116,adv-55)"
         required: false
         type: string
+      tenant:
+        description: "Target Tenant Context"
+        required: true
+        default: "optimism"
+        type: choice
+        options:
+          - optimism
+          - uniswap
+          - ens
+          - scroll
+          - cyber
+          - linea
+          - b3
+          - xai
+          - derive
+          - etherfi
+          - syndicate
+          - protocol-guild
+          - towns
+          - boost
 
 jobs:
   visual-regression:
@@ -47,6 +67,7 @@ jobs:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b }}
           TARGET_PROPOSALS: ${{ inputs.target_proposals }}
+          TENANT_CONTEXT: ${{ inputs.tenant }}
         run: npm run test:ab
 
       - name: Google Auth
