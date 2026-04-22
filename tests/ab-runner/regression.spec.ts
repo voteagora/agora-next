@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import { TENANT_NAMESPACES } from "../../src/lib/constants";
+import { fetchProposalsFromArchive } from "../../src/lib/archiveUtils";
 
 dotenv.config();
 
