@@ -31,6 +31,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 import FinancialStatementLayout from "../components/FinancialStatementLayout";
+import ForumDiscussAction from "../components/ForumDiscussAction";
 import { hasMarkdownHeadings } from "../components/markdownHeadings";
 
 // Force dynamic rendering - forum topics and posts change frequently
@@ -302,6 +303,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     address: authorAddress,
     authorName: truncateAddress(authorAddress) || authorAddress,
     createdAt: createdAtIso,
+    revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,
   };
 
@@ -314,7 +316,6 @@ export default async function ForumTopicPage({ params }: PageProps) {
     (att: any) => att.contentType === "application/pdf"
   );
   const pdfUrl = pdfAttachment?.url ?? null;
-
 
   const lastActivityAt =
     comments[comments.length - 1]?.createdAt || createdAtIso;
@@ -369,6 +370,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         <ForumsHeader
           breadcrumbs={[{ label: "Discussions", href: "/forums" }]}
           isDuna={false}
+          showSearch={false}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <UnpublishedTopicGate
@@ -379,11 +381,19 @@ export default async function ForumTopicPage({ params }: PageProps) {
     );
   }
 
+  // Mirror FinancialStatementLayout's discuss-button visibility rule: hidden on
+  // the article-style topic view (Uniswap). When the discuss button would be
+  // shown, render it next to the temp-check button instead of inline.
+  const isOnArticlePage = namespace === TENANT_NAMESPACES.UNISWAP;
+  const showDiscussButton = isFinancialStatement && !isOnArticlePage;
+
   return (
     <div className="min-h-screen">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
+        showSearch={false}
+        headerActions={showDiscussButton ? <ForumDiscussAction /> : undefined}
         topicContext={{
           id: headerTopic.id,
           title: headerTopic.title,
@@ -409,7 +419,8 @@ export default async function ForumTopicPage({ params }: PageProps) {
                   title={transformed.title}
                   content={topicBody}
                   pdfUrl={pdfUrl}
-                  isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
+                  isOnArticlePage={isOnArticlePage}
+                  hideInlineDiscussButton={showDiscussButton}
                 >
                   <ForumThread
                     topicId={topicId}

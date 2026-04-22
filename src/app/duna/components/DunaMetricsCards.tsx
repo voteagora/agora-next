@@ -206,7 +206,7 @@ export default function DunaMetricsCards() {
     );
   };
 
-  const metrics: MetricCardProps[] = [
+  const allMetrics: MetricCardProps[] = [
     {
       title: "Total Assets",
       value: String(latestData.TOTAL_ASSETS || 0),
@@ -245,8 +245,23 @@ export default function DunaMetricsCards() {
     },
   ];
 
+  const metrics = allMetrics.filter((m) => parseInt(m.value, 10) !== 0);
+
+  if (metrics.length === 0) {
+    return null;
+  }
+
+  const colClass =
+    metrics.length >= 4
+      ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4"
+      : metrics.length === 3
+        ? "grid-cols-1 sm:grid-cols-3"
+        : metrics.length === 2
+          ? "grid-cols-1 sm:grid-cols-2"
+          : "grid-cols-1";
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <div className={`grid ${colClass} gap-4`}>
       {metrics.map((metric) => (
         <MetricCard key={metric.title} {...metric} />
       ))}

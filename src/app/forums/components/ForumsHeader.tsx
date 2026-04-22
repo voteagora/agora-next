@@ -32,6 +32,8 @@ interface ForumsHeaderProps {
   fallbackTitle?: string;
   isDuna?: boolean;
   topicContext?: TopicContext;
+  showSearch?: boolean;
+  headerActions?: React.ReactNode;
 }
 
 export default function ForumsHeader({
@@ -41,6 +43,8 @@ export default function ForumsHeader({
   fallbackTitle = "Discussions",
   isDuna = false,
   topicContext,
+  showSearch = true,
+  headerActions,
 }: ForumsHeaderProps) {
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;
 
@@ -78,7 +82,14 @@ export default function ForumsHeader({
           {description ? <h3 className="text-primary">{description}</h3> : null}
         </div>
         <div className="flex flex-col gap-3 w-full shrink-0 sm:flex-row sm:items-center sm:justify-end lg:w-auto">
-          <ForumsSearch className="w-full min-w-0 sm:max-w-[400px] lg:w-[400px]" />
+          {showSearch ? (
+            <ForumsSearch className="w-full min-w-0 sm:max-w-[400px] lg:w-[400px]" />
+          ) : null}
+          {headerActions ? (
+            <div className="shrink-0 sm:flex sm:items-center">
+              {headerActions}
+            </div>
+          ) : null}
           <div className="shrink-0 sm:flex sm:items-center">
             <NewTopicButton isDuna={isDuna} topicContext={topicContext} />
           </div>

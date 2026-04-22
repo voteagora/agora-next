@@ -130,6 +130,11 @@ export default function NewTopicButton({
     );
   }
 
+  // Suppress the global "create new topic" CTA when viewing a topic.
+  if (topicContext) {
+    return null;
+  }
+
   return (
     <>
       <Button

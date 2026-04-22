@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Drawer } from "@/components/ui/Drawer";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
 import {
@@ -23,6 +25,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  hideInlineDiscussButton?: boolean;
   children?: React.ReactNode;
 }
 
@@ -69,9 +72,11 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  hideInlineDiscussButton = false,
   children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isTocDrawerOpen, setIsTocDrawerOpen] = useState(false);
   const tenant = Tenant.current();
 
   const primaryRgb = tenant.ui?.customization?.primary ?? "23 23 23";
@@ -277,7 +282,8 @@ export default function FinancialStatementLayout({
   const { namespace } = tenant;
   const mode = tenant.ui.theme;
   const hideDiscussButton =
-    namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
+    hideInlineDiscussButton ||
+    (namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage);
 
   const forumPagePath = buildForumTopicPath(topicId, title);
   const discussButtonText = isOnArticlePage ? "Discuss on forums" : "Discuss";
@@ -287,6 +293,7 @@ export default function FinancialStatementLayout({
     () => !looksLikeHtml(content) && hasMarkdownHeadings(content),
     [content]
   );
+  const markdownTocClassName = "px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3";
   const { svg: patternSvg } = generatePatternSvg(
     metadataString,
     600,
@@ -317,20 +324,16 @@ export default function FinancialStatementLayout({
         <div className="flex flex-wrap gap-4 mb-8">
           {!hideDiscussButton &&
             (isOnArticlePage ? (
-              <Button asChild variant="outline" className="text-primary">
+              <Button asChild size="lg">
                 <Link href={forumPagePath}>{discussButtonText}</Link>
               </Button>
             ) : (
-              <Button
-                onClick={handleScrollToComments}
-                variant="outline"
-                className="text-primary"
-              >
+              <Button onClick={handleScrollToComments} size="lg">
                 {discussButtonText}
               </Button>
             ))}
           {pdfUrl && (
-            <Button asChild variant="outline" className="text-primary">
+            <Button asChild size="lg">
               <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
                 View PDF
               </a>
@@ -352,27 +355,97 @@ export default function FinancialStatementLayout({
             </div>
             {children}
           </>
-        ) : (
-          <div
-            className={cn(
-              "flex items-start",
-              showMarkdownToc ? "gap-6" : "flex-col"
-            )}
-          >
-            {showMarkdownToc && (
+        ) : showMarkdownToc ? (
+          <>
+            <button
+              type="button"
+              className="lg:hidden fixed left-0 top-1/2 z-30 -translate-y-1/2 inline-flex items-center justify-center rounded-r-lg border border-l-0 border-line bg-cardBackground py-3 pl-1 pr-1.5 text-tertiary shadow-newDefault transition-shadow hover:text-primary hover:shadow-newHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line"
+              aria-haspopup="dialog"
+              aria-label="Open table of contents"
+              onClick={() => setIsTocDrawerOpen(true)}
+            >
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </button>
+            <Drawer
+              isOpen={isTocDrawerOpen}
+              onClose={() => setIsTocDrawerOpen(false)}
+              position="left"
+              className={cn(
+                "bg-cardBackground shadow-sm",
+                "inset-y-0 left-0 w-64 max-w-none rounded-r-lg border-r border-line"
+              )}
+            >
+              <div
+                onClick={(e) => {
+                  const el = (e.target as HTMLElement).closest(
+                    "a[href^='#']"
+                  ) as HTMLAnchorElement | null;
+                  if (!el) return;
+                  e.preventDefault();
+                  const slug = el.getAttribute("href")?.slice(1) ?? "";
+                  if (!slug) return;
+                  const target = document.getElementById(slug);
+                  // Clear the Drawer's pushed history entry before closing so
+                  // its cleanup doesn't call history.back() and undo navigation.
+                  try {
+                    window.history.replaceState(null, "", `#${slug}`);
+                  } catch (_) {}
+                  // Release the Drawer's body scroll lock so scrollIntoView runs.
+                  document.body.style.overflow = "";
+                  if (target) {
+                    target.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                  setIsTocDrawerOpen(false);
+                }}
+              >
+                <MarkdownToc
+                  content={content}
+                  className={markdownTocClassName}
+                />
+              </div>
+            </Drawer>
+            <div className="flex items-start gap-6">
               <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
                 <MarkdownToc
                   content={content}
-                  className="px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3"
+                  className={markdownTocClassName}
                 />
               </aside>
-            )}
-            <div
-              className={cn(
-                "min-w-0 flex flex-col gap-8",
-                showMarkdownToc ? "flex-1" : "w-full"
-              )}
-            >
+              <div className="min-w-0 flex-1 flex flex-col">
+                <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                  <div
+                    className={cn(
+                      "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
+                      PROSE_PRIMARY_BODY,
+                      PROSE_LINKS,
+                      PROSE_MEDIA
+                    )}
+                  >
+                    <Markdown
+                      content={content}
+                      originalHierarchy
+                      className="!py-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {children != null ? (
+              <div className="mt-8 flex items-start gap-6">
+                <div
+                  className="hidden lg:block w-64 flex-shrink-0"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 w-full">{children}</div>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="flex flex-col items-start">
+            <div className="min-w-0 flex flex-col gap-8 w-full">
               <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
                 <div
                   className={cn(
@@ -382,7 +455,11 @@ export default function FinancialStatementLayout({
                     PROSE_MEDIA
                   )}
                 >
-                  <Markdown content={content} originalHierarchy />
+                  <Markdown
+                    content={content}
+                    originalHierarchy
+                    className="!py-0"
+                  />
                 </div>
               </div>
               {children}

@@ -14,7 +14,10 @@ import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { buildForumTopicPath } from "@/lib/forumUtils";
+import {
+  buildForumTopicPath,
+  forumTopicDisplayTimestamp,
+} from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
 import { useForum } from "@/hooks/useForum";
@@ -33,6 +36,7 @@ interface Topic {
   title: string;
   address?: string;
   createdAt: string;
+  revealTime?: string | null;
   postsCount?: number;
   upvotes?: number;
 }
@@ -190,7 +194,10 @@ function TopicCard({
     }
   };
 
-  const createdAt = topic.createdAt;
+  const listTimestamp = forumTopicDisplayTimestamp(
+    topic.createdAt,
+    topic.revealTime
+  );
   const replies = Math.max((topic.postsCount || 1) - 1, 0);
   const authorAddress = (topic.address || "").toLowerCase();
   const adminRole = admins[authorAddress] || null;
@@ -202,9 +209,9 @@ function TopicCard({
         href={buildForumTopicPath(topic.id, topic.title)}
         className="group block bg-cardBackground border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
       >
-        <div className="flex items-start gap-3">
+        <div className="flex min-w-0 items-start">
           {/* Avatar */}
-          <div className="flex-shrink-0 relative self-center">
+          <div className="relative mr-3 flex-shrink-0 self-center">
             <ENSAvatar
               ensName={topic.address}
               className="w-[42px] h-[42px]"
@@ -219,29 +226,30 @@ function TopicCard({
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             {/* Title + Meta */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 min-w-0">
-                <h3 className="text-base font-semibold text-primary truncate group-hover:underline">
-                  {topic.title}
-                </h3>
-              </div>
-              <div className="flex items-center gap-4 text-xs font-semibold text-secondary">
-                {/* Replies */}
-                <div className="inline-flex items-center gap-1.5">
-                  <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.7} />
-                  <span>{replies}</span>
+            <div className="flex min-w-0 items-center gap-8">
+              <h3 className="min-w-0 flex-1 truncate text-base font-semibold text-primary group-hover:underline">
+                {topic.title}
+              </h3>
+              <div className="flex shrink-0 items-center gap-2 pl-4 text-xs font-semibold text-secondary lg:w-60 lg:pl-5">
+                <div className="flex w-12 shrink-0 items-center justify-start gap-1 whitespace-nowrap">
+                  <MessageCircle
+                    className="w-3.5 h-3.5 shrink-0"
+                    strokeWidth={1.7}
+                  />
+                  <span className="tabular-nums">{replies}</span>
                 </div>
-                {/* Time */}
-                <div className="hidden lg:inline-flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" strokeWidth={1.7} />
-                  <span>{formatRelative(createdAt)}</span>
+                <div className="hidden min-w-0 flex-1 items-center justify-start gap-1 whitespace-nowrap lg:flex">
+                  <Clock className="w-3.5 h-3.5 shrink-0" strokeWidth={1.7} />
+                  <span className="min-w-0 truncate">
+                    {formatRelative(listTimestamp)}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
+            <p className="mt-1 max-w-full break-words text-sm leading-relaxed text-secondary line-clamp-1 overflow-hidden">
               By:{" "}
               {isAuthorAdmin ? (
                 <span className="text-primary">Cowrie</span>
@@ -252,7 +260,7 @@ function TopicCard({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 lg:-ml-4">
             {/* Watch button */}
             {showWatchButton && (
               <TooltipProvider>
