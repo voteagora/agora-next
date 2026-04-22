@@ -131,35 +131,13 @@ export default function DelegateCardList({
               }
 
               return (
-                <div
+                <DelegateCard
                   key={delegate.address + idx}
-                  className="relative flex flex-col w-full h-full"
-                >
-                  {idx === 0 && (
-                    <svg
-                      className="absolute -top-8 -left-8 w-24 h-24 z-50 text-teal-400 drop-shadow-2xl opacity-90 pointer-events-none rotate-12"
-                      viewBox="0 0 100 100"
-                      fill="currentColor"
-                    >
-                      <polygon points="50,15 100,100 0,100" />
-                    </svg>
-                  )}
-                  {idx === 1 && (
-                    <svg
-                      className="absolute -top-10 -right-10 w-28 h-28 z-50 text-yellow-500 drop-shadow-[0_0_20px_rgba(234,179,8,0.7)] opacity-100 pointer-events-none animate-pulse rotate-[35deg]"
-                      viewBox="0 0 100 100"
-                      fill="currentColor"
-                    >
-                      <polygon points="50,5 61,38 96,38 68,59 79,91 50,70 21,91 32,59 4,38 39,38" />
-                    </svg>
-                  )}
-                  <DelegateCard
-                    delegate={delegate}
-                    truncatedStatement={truncatedStatement}
-                    isDelegatesFiltering={isDelegatesFiltering}
-                    isAdvancedUser={isAdvancedUser}
-                  />
-                </div>
+                  delegate={delegate}
+                  truncatedStatement={truncatedStatement}
+                  isDelegatesFiltering={isDelegatesFiltering}
+                  isAdvancedUser={isAdvancedUser}
+                />
               );
             })}
           </InfiniteScroll>
