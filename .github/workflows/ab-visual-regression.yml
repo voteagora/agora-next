@@ -24,28 +24,28 @@ on:
           - towns
           - boost
       url_a:
-        description: "Production URL (baseline)"
+        description: "URL A — Production baseline"
         required: true
         default: "https://vote.optimism.io"
         type: string
       url_b:
-        description: "Preview URL (Vercel deploy or staging)"
+        description: "URL B — Preview or staging to compare"
         required: true
         type: string
 
       # ── Route Scopes (check the pages you want to scan) ──
       scan_index:
-        description: "🏠 Scan Index / Home page"
+        description: "🏠 Index / Home page"
         required: false
         type: boolean
         default: true
       scan_proposals:
-        description: "📋 Scan Proposals listing"
+        description: "📋 Proposals listing"
         required: false
         type: boolean
         default: true
       scan_delegates:
-        description: "👥 Scan Delegates listing"
+        description: "👥 Delegates listing"
         required: false
         type: boolean
         default: true
