@@ -120,20 +120,11 @@ test.describe("Visual Regression A/B Diff Runner", () => {
 
     if (targetTypes.length > 0) {
       proposals = proposals.filter((p: any) => targetTypes.includes(String(p.proposal_type).toUpperCase()));
-      // Bound execution: take only the 2 most recent proposals of each selected type
-      const grouped: Record<string, any[]> = {};
-      proposals.forEach((p: any) => {
-        const type = String(p.proposal_type).toUpperCase();
-        if (!grouped[type]) grouped[type] = [];
-        if (grouped[type].length < 2) grouped[type].push(p);
-      });
-      proposals = Object.values(grouped).flat();
-      console.log(`[Archive] Filtered to ${proposals.length} proposals (max 2 per type) matching types: [${targetTypes.join(", ")}]`);
+      console.log(`[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`);
     } else {
-      // If no specific types or proposals requested, bound exhaustive run to 5 recent to prevent CI timeouts
-      proposals = proposals.slice(0, 5);
+      // If no specific types or proposals requested, run on all available proposals
       console.log(
-        `[Archive] Bounded fallback: Loaded top ${proposals.length} recent proposals for tenant [${activeTenant}]`
+        `[Archive] Unbounded fallback: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
       );
     }
 
