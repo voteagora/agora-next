@@ -9,11 +9,15 @@ on:
         default: "https://vote.optimism.io"
         type: string
       url_b:
-        description: "Preview URL to Compare (Vercel Branch Deployment)"
+        description: "Preview URL to Compare"
         required: true
         type: string
       target_proposals:
         description: "Specific Proposals to Target (e.g. 116,adv-55)"
+        required: false
+        type: string
+      target_types:
+        description: "Target Scopes (e.g. index,proposals,delegates)"
         required: false
         type: string
       tenant:
@@ -67,6 +71,7 @@ jobs:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b }}
           TARGET_PROPOSALS: ${{ inputs.target_proposals }}
+          TARGET_TYPES: ${{ inputs.target_types }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
         run: npm run test:ab
 
