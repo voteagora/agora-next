@@ -309,7 +309,7 @@ export default async function Page({
       <div className="w-full flex justify-center">
         {RenderComponent && <RenderComponent proposal={loadedProposal} />}
       </div>
-      <button className="fixed bottom-40 right-10 z-[9999] bg-fuchsia-600 px-8 py-4 rounded-full text-white font-bold animate-pulse shadow-2xl">
+      <button className="fixed bottom-40 right-10 z-[9999] bg-fuchsia-600 px-8 py-4 rounded-full text-white font-bold shadow-2xl">
         [QA] FLOATING DRIFT TARGET (PROPOSALS)
       </button>
     </div>
