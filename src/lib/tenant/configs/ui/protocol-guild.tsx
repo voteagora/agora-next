@@ -320,6 +320,12 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       config: {
         proposalCreation: true,
         siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        staking: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+        membershipAdmin: true,
       },
     },
     {

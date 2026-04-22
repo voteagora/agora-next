@@ -29,13 +29,13 @@ export async function POST(request: NextRequest) {
         }
       : undefined;
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "proposal_draft_create_requested",
     });
 
     if (!creatorAddress) {
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
         details: { reason: "missing_creator_address" },
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
               ? "invalid_token"
               : "auth_failed";
 
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
         details: { reason },
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     const plmToggle = tenant.ui.toggle("proposal-lifecycle");
     const plmConfig = plmToggle?.config as PLMConfig | undefined;
     if (!plmConfig?.stages?.length) {
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
         details: { reason: "missing_proposal_lifecycle_config" },
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
     const firstStage = plmConfig.stages[0];
     if (!firstStage?.stage) {
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "proposal_draft_create_failed",
         details: { reason: "invalid_proposal_lifecycle_config" },
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "proposal_draft_created",
       details: { draftId: proposal.uuid },
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(proposal, { status: 201 });
   } catch (e: any) {
     // Avoid leaking internal errors
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: baseTraceContext
         ? { ...baseTraceContext, step: "proposal_draft_create", source: "api" }
         : undefined,
