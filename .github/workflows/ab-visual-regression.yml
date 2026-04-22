@@ -100,6 +100,21 @@ jobs:
           echo "route_scopes=$ROUTES" >> $GITHUB_OUTPUT
           echo "📍 Route scopes: $ROUTES"
 
+      - name: Write Run Metadata
+        run: |
+          mkdir -p test-results
+          cat > test-results/run_metadata.json << 'METAEOF'
+          {
+            "url_a": "${{ inputs.url_a }}",
+            "url_b": "${{ inputs.url_b }}",
+            "tenant": "${{ inputs.tenant }}",
+            "routes": "${{ steps.scopes.outputs.route_scopes }}",
+            "target_types": "${{ inputs.target_types }}",
+            "target_proposals": "${{ inputs.target_proposals }}"
+          }
+          METAEOF
+          echo "📝 Metadata written"
+
       - name: Run A/B Regression Engine
         continue-on-error: true
         env:
