@@ -57,6 +57,7 @@ export const shapeTenantUIConfig = new TenantUI({
     customCardSize: "sm:h-[100px] sm:w-[100px] lg:h-[120px] lg:w-[120px]",
     customIconColor: "#87819F",
     grantsListBackground: "bg-wash",
+    infoBannerBackground: "#000000",
   },
 
   theme: "light",
