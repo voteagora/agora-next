@@ -228,7 +228,16 @@
                 <img src="https://i.ibb.co/xtxxLctG/logo.png" alt="Agora Logo" class="h-8 object-contain">
                 <h2 class="text-xl font-outfit font-bold text-white tracking-widest uppercase">A/B Tests Workflows</h2>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
+                <!-- Mode Toggle -->
+                <div class="flex items-center gap-2 bg-[#1a1d24] border border-gray-700 rounded-lg p-0.5">
+                    <button id="toggleLocal" onclick="switchMode('local')" class="mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 bg-transparent text-gray-500 hover:text-gray-300">
+                        <i data-lucide="hard-drive" class="w-3 h-3"></i> Local
+                    </button>
+                    <button id="toggleCI" onclick="switchMode('ci')" class="mode-toggle-btn active px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 bg-white/10 text-white border border-gray-600 shadow-sm">
+                        <i data-lucide="cloud" class="w-3 h-3"></i> CI / CD
+                    </button>
+                </div>
                 <input type="password" id="githubTokenInput" placeholder="Optional: GitHub PAT" class="bg-[#1a1d24] border border-gray-700 text-gray-400 text-xs px-3 py-1.5 rounded-lg focus:outline-none focus:border-gray-500 font-mono w-48" title="Enter PAT if rate limited">
                 <button onclick="initRunsHistory()" class="bg-gray-800 hover:bg-gray-700 text-white p-1.5 rounded-lg transition-colors" title="Refresh">
                     <i data-lucide="refresh-cw" class="w-4 h-4"></i>
@@ -498,6 +507,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     let currentRunId = urlParams.get('runId');
     let globalTelemetryData = [];
+    let currentMode = urlParams.get('mode') || 'ci'; // 'local' or 'ci'
     
     function escapeHtml(unsafe) {
         if (!unsafe || typeof unsafe !== 'string') return String(unsafe);
@@ -555,11 +565,176 @@
     const savedToken = localStorage.getItem('agora_githubToken');
     if (savedToken) document.getElementById('githubTokenInput').value = savedToken;
 
-    if (currentRunId) {
+    // Apply initial mode from URL
+    if (currentMode === 'local') {
+        switchMode('local', true);
+    } else if (currentRunId) {
         document.getElementById('runsHistoryOverlay').style.display = 'none';
         initTelemetry(currentRunId);
     } else {
         initRunsHistory();
+    }
+
+    function switchMode(mode, skipHistory) {
+        currentMode = mode;
+        const localBtn = document.getElementById('toggleLocal');
+        const ciBtn = document.getElementById('toggleCI');
+        const patInput = document.getElementById('githubTokenInput');
+        const activeClass = 'bg-white/10 text-white border border-gray-600 shadow-sm';
+        const inactiveClass = 'bg-transparent text-gray-500 hover:text-gray-300';
+
+        if (mode === 'local') {
+            localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
+            ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
+            patInput.style.display = 'none';
+            if (!skipHistory) window.history.pushState({}, '', '?mode=local');
+            initLocalMode();
+        } else {
+            ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
+            localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
+            patInput.style.display = '';
+            if (!skipHistory) window.history.pushState({}, '', window.location.pathname);
+            initRunsHistory();
+        }
+        if (window.lucide) lucide.createIcons();
+    }
+
+    async function initLocalMode() {
+        // In Local mode, skip the runs list and go directly to the dashboard
+        // reading from the relative test-results/ab-diffs directory
+        const dashboard = document.getElementById('dashboard');
+        const overlay = document.getElementById('runsHistoryOverlay');
+
+        // Hide the runs table, show a local-mode message instead
+        const tbody = document.getElementById('runsTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="px-4 py-8 text-center">
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-green-500/30 bg-green-900/20 text-green-400">
+                            <i data-lucide="hard-drive" class="w-4 h-4"></i> Local Mode Active
+                        </div>
+                        <p class="text-gray-500 text-sm max-w-md">Reading from <code class="text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded">test-results/ab-diffs/</code>. Run your tests first, then open this file to view results.</p>
+                        <button onclick="loadLocalResults()" class="mt-2 px-5 py-2 bg-white/5 hover:bg-white/10 border border-gray-600 hover:border-white text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2">
+                            <i data-lucide="folder-open" class="w-4 h-4"></i> Load Local Results
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        if (window.lucide) lucide.createIcons();
+    }
+
+    async function loadLocalResults() {
+        // Determine base path: this file is at tests/ab-runner/, results at test-results/ab-diffs/
+        const basePath = '../../test-results/ab-diffs';
+        
+        const overlay = document.getElementById('runsHistoryOverlay');
+        overlay.style.display = 'none';
+        const dashboard = document.getElementById('dashboard');
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('flex');
+        switchTab('results');
+
+        // Reset state
+        document.getElementById('viewerGallery').innerHTML = '';
+        document.getElementById('viewerTitle').textContent = 'Select a scope';
+        document.getElementById('viewerSubtitle').textContent = 'to view visual QA artifacts';
+        document.getElementById('viewerActions').innerHTML = '';
+        document.getElementById('sidebarList').innerHTML = SKELETON_SIDEBAR;
+        ['metricDrifts', 'metricCritical', 'metricScans', 'metricScope'].forEach(id => document.getElementById(id).innerHTML = SKELETON_METRIC);
+
+        // Set header for local mode
+        document.getElementById('headerRunId').textContent = 'Local Run';
+        document.getElementById('statusBadge').className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-green-500 bg-green-900/30 text-green-400";
+        document.getElementById('statusBadge').innerHTML = `<i data-lucide="hard-drive" class="w-3 h-3"></i> LOCAL`;
+        document.getElementById('infoActor').textContent = 'Local Dev';
+        document.getElementById('infoDate').textContent = new Date().toLocaleString();
+        document.getElementById('infoRef').textContent = 'localhost';
+
+        // URL row for local
+        const urlRow = document.getElementById('headerUrls');
+        urlRow.innerHTML = `
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono text-green-400 border border-green-700/50 bg-green-900/20">
+                <i data-lucide="hard-drive" class="w-3 h-3"></i> Reading from test-results/ab-diffs/
+            </span>`;
+
+        try {
+            // Try to discover scopes by fetching known scope directories
+            // In local mode, we expect the user has run tests and the directories exist
+            // Try the report.json approach — scan common scope names
+            const possibleScopes = ['index-page', 'proposals', 'delegates', 'retro-funding'];
+            const scopesMap = {};
+            const fetchPromises = [];
+
+            for (const scope of possibleScopes) {
+                const p = fetch(`${basePath}/${scope}/report.json`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('not found');
+                        return res.json();
+                    })
+                    .then(json => {
+                        scopesMap[scope] = { drifts: 0, regressions: 0, noise: 0, scans: new Set(), images: [], reportObj: json };
+                        const entries = Array.isArray(json) ? json.filter(e => !e.reportDescription) : (json.diffs || []);
+                        entries.forEach(e => {
+                            const r = (e.reason || '').toLowerCase();
+                            if (r.includes('data') || r.includes('style') || r.includes('layout')) {
+                                scopesMap[scope].regressions++;
+                            } else {
+                                scopesMap[scope].noise++;
+                            }
+                        });
+                        scopesMap[scope].drifts = entries.length;
+                        
+                        // Discover images from report metadata
+                        const meta = Array.isArray(json) ? json.find(item => item.reportDescription)?.reportDescription : null;
+                        if (meta) {
+                            // Build image list from known patterns
+                            const imgPatterns = [
+                                `00_UrlA_FullPage_Highlights.png`, `00_UrlB_FullPage_Highlights.png`,
+                                `00_UrlA_FullPage.png`, `00_UrlB_FullPage.png`
+                            ];
+                            imgPatterns.forEach(name => {
+                                scopesMap[scope].images.push({ name, url: `${basePath}/${scope}/${name}` });
+                                scopesMap[scope].scans.add(name.replace('UrlA', '').replace('UrlB', '').replace('.png', ''));
+                            });
+                            // Add drift crops
+                            for (let i = 1; i <= entries.length; i++) {
+                                ['UrlA', 'UrlB'].forEach(side => {
+                                    const name = `drift_${i}_${side}.png`;
+                                    scopesMap[scope].images.push({ name, url: `${basePath}/${scope}/${name}` });
+                                });
+                            }
+                        }
+                    })
+                    .catch(() => { /* scope doesn't exist locally, skip */ });
+                fetchPromises.push(p);
+            }
+
+            await Promise.all(fetchPromises);
+
+            if (Object.keys(scopesMap).length === 0) {
+                document.getElementById('sidebarList').innerHTML = `<div class="px-4 py-4 text-sm text-gray-500 italic">No local results found. Run <code class="text-gray-400 bg-gray-800 px-1 py-0.5 rounded text-[10px]">npm run test:ab</code> first.</div>`;
+                return;
+            }
+
+            globalTelemetryData = Object.keys(scopesMap).map(s => ({
+                scope: s,
+                drifts: scopesMap[s].drifts,
+                regressions: scopesMap[s].regressions,
+                noise: scopesMap[s].noise,
+                scans: scopesMap[s].scans.size > 0 ? Math.ceil(scopesMap[s].scans.size / 2) : 1,
+                images: scopesMap[s].images,
+                reportObj: scopesMap[s].reportObj || null
+            })).sort((a, b) => b.regressions - a.regressions || b.drifts - a.drifts);
+
+            renderTelemetryTab();
+            renderResultsSidebar();
+            if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
+
+        } catch (e) {
+            console.error('Local mode error:', e);
+            document.getElementById('sidebarList').innerHTML = `<div class="px-4 py-4 text-sm text-red-400">Error reading local results: ${e.message}</div>`;
+        }
     }
 
     function resetSearch() {
@@ -567,7 +742,11 @@
         document.getElementById('runsHistoryOverlay').style.display = 'flex';
         document.getElementById('dashboard').classList.add('hidden');
         document.getElementById('dashboard').classList.remove('flex');
-        initRunsHistory();
+        if (currentMode === 'local') {
+            initLocalMode();
+        } else {
+            initRunsHistory();
+        }
     }
 
     function switchTab(tabId) {
@@ -796,12 +975,32 @@
         dashboard.classList.add('flex');
         switchTab('status'); 
 
+        // Reset ALL state from previous run
         document.getElementById('tableBody').innerHTML = SKELETON_TABLE;
         document.getElementById('chartContainer').innerHTML = SKELETON_CHART;
         document.getElementById('sidebarList').innerHTML = SKELETON_SIDEBAR;
         
         ['infoActor', 'infoDate', 'infoRef'].forEach(id => document.getElementById(id).innerHTML = SKELETON_TEXT);
         ['metricDrifts', 'metricCritical', 'metricScans', 'metricScope'].forEach(id => document.getElementById(id).innerHTML = SKELETON_METRIC);
+
+        // Reset visual results panel
+        document.getElementById('viewerGallery').innerHTML = '';
+        document.getElementById('viewerTitle').textContent = 'Select a scope';
+        document.getElementById('viewerSubtitle').textContent = 'to view visual QA artifacts';
+        document.getElementById('viewerActions').innerHTML = '';
+
+        // Reset URL row to loading state
+        const urlRow = document.getElementById('headerUrls');
+        urlRow.innerHTML = `
+            <span id="headerUrlA" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The production baseline being compared against." data-tip-title="URL A · Production" data-tip-color="#22c55e">
+                <span class="text-green-600 font-bold shrink-0">A</span>
+                <span class="truncate" id="headerUrlAText">loading…</span>
+            </span>
+            <span class="text-gray-600 text-[10px] font-bold shrink-0">vs</span>
+            <span id="headerUrlB" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The preview or staging deploy being tested." data-tip-title="URL B · Preview" data-tip-color="#3b82f6">
+                <span class="text-blue-600 font-bold shrink-0">B</span>
+                <span class="truncate" id="headerUrlBText">loading…</span>
+            </span>`;
 
         const badge = document.getElementById('statusBadge');
         badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border border-gray-500 bg-gray-800 text-gray-300";
