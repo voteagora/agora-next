@@ -33,12 +33,25 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     await contextB.close();
   });
 
-  const delegatesSortBy = process.env.TARGET_DELEGATES_SORT_BY || "most_voting_power";
-  const staticRoutes = [
-    "/",
-    `/delegates?orderBy=${delegatesSortBy}`,
-    "/proposals",
-  ];
+  const delegatesSortBy =
+    process.env.TARGET_DELEGATES_SORT_BY || "most_voting_power";
+
+  // Route scope mapping — controlled by TARGET_ROUTES env var (from CI checkboxes)
+  const routeMap: Record<string, string> = {
+    index: "/",
+    delegates: `/delegates?orderBy=${delegatesSortBy}`,
+    proposals: "/proposals",
+  };
+
+  const targetRoutes = (process.env.TARGET_ROUTES || "")
+    .split(",")
+    .map((r) => r.trim().toLowerCase())
+    .filter((r) => r.length > 0);
+
+  const staticRoutes =
+    targetRoutes.length > 0
+      ? targetRoutes.filter((r) => routeMap[r]).map((r) => routeMap[r])
+      : Object.values(routeMap); // default: all routes
 
   test(`Cross-Tenant Guardrail: Verify identical DAO targets`, async () => {
     test.setTimeout(60000);
@@ -119,8 +132,12 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     );
 
     if (targetTypes.length > 0) {
-      proposals = proposals.filter((p: any) => targetTypes.includes(String(p.proposal_type).toUpperCase()));
-      console.log(`[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`);
+      proposals = proposals.filter((p: any) =>
+        targetTypes.includes(String(p.proposal_type).toUpperCase())
+      );
+      console.log(
+        `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`
+      );
     } else {
       // If no specific types or proposals requested, run on all available proposals
       console.log(
@@ -139,7 +156,9 @@ test.describe("Visual Regression A/B Diff Runner", () => {
           type: String(proposal.proposal_type),
         });
       } catch (e: any) {
-        failedDrifts.push(`[${proposal.id}] Proposal Drifts Detected: ${e.message}`);
+        failedDrifts.push(
+          `[${proposal.id}] Proposal Drifts Detected: ${e.message}`
+        );
       }
     }
 
