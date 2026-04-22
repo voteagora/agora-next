@@ -1,0 +1,116 @@
+name: A/B Visual Regression V2 (Matrix Orchestrator)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenants:
+        description: "JSON array of target tenants (e.g. [\"optimism\",\"uniswap\"])"
+        required: true
+        type: string
+        default: '["optimism"]'
+      payloads:
+        description: "JSON array of specific payload configs (URLs, Proposals) per tenant"
+        required: true
+        type: string
+        default: '[]'
+      ref:
+        description: "Target branch reference for execution"
+        required: false
+        type: string
+        default: "main"
+
+jobs:
+  visual-regression-matrix:
+    name: "A/B Platform Check: ${{ matrix.tenant }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+    
+    strategy:
+      fail-fast: false  # Allow other tenants to finish even if one fails
+      matrix:
+        tenant: ${{ fromJSON(inputs.tenants) }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Global Tenant Endpoints
+        continue-on-error: true
+        env:
+          TENANT_CONTEXT: ${{ matrix.tenant }}
+          PAYLOADS_JSON: ${{ inputs.payloads }}
+        run: |
+          echo "Extracting dynamic configurations for: $TENANT_CONTEXT"
+          
+          # Parse the dynamic configuration passed from Agora Health
+          # Use jq to filter the array by _tenant_id, then extract properties
+          URL_A=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_a")
+          URL_B=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_b")
+          TARGET_PROPOSALS=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_proposals")
+          TARGET_TYPES=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_types")
+          TARGET_DELEGATES_SORT_BY=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_delegates_sort_by")
+          
+          echo "URL_A=$URL_A" >> $GITHUB_ENV
+          echo "URL_B=$URL_B" >> $GITHUB_ENV
+          
+          if [ "$TARGET_PROPOSALS" != "null" ] && [ "$TARGET_PROPOSALS" != "" ]; then
+            echo "TARGET_PROPOSALS=$TARGET_PROPOSALS" >> $GITHUB_ENV
+            echo "Target Proposals Override set to: $TARGET_PROPOSALS"
+          fi
+          
+          if [ "$TARGET_TYPES" != "null" ] && [ "$TARGET_TYPES" != "" ]; then
+            echo "TARGET_TYPES=$TARGET_TYPES" >> $GITHUB_ENV
+            echo "Target Types Override set to: $TARGET_TYPES"
+          fi
+
+          if [ "$TARGET_DELEGATES_SORT_BY" != "null" ] && [ "$TARGET_DELEGATES_SORT_BY" != "" ]; then
+            echo "TARGET_DELEGATES_SORT_BY=$TARGET_DELEGATES_SORT_BY" >> $GITHUB_ENV
+            echo "Target Delegates Sort By set to: $TARGET_DELEGATES_SORT_BY"
+          fi
+
+      - name: Run Dedicated Tenant Assertion
+        continue-on-error: true
+        env:
+          TENANT_CONTEXT: ${{ matrix.tenant }}
+        run: npm run test:ab
+
+      - name: Google Auth
+        if: always()
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        if: always()
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: "silent-turbine-390703"
+
+      - name: Upload Parallel Artifacts to GCP Bucket
+        if: always()
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          TENANT_CONTEXT: ${{ matrix.tenant }}
+        run: |
+          chmod +x scripts/upload-ab-artifacts.sh
+          # The script depends on GITHUB_RUN_ID natively. Since Playwright artifacts shouldn't collide inside a tenant sub-run (due to unique URL domains parsing inside), we just invoke the script cleanly.
+          ./scripts/upload-ab-artifacts.sh

@@ -19,8 +19,11 @@ if [ -n "$GITHUB_SHA" ]; then
     DATE_STR=$(date +'%Y-%m-%d')
     ACTOR=${GITHUB_ACTOR:-"cli"}
     
-    # Clean, parametric reporting taxonomy: reports / YYYY-MM-DD / username_run-ID
+    # Clean, parametric reporting taxonomy: reports / YYYY-MM-DD / username_run-ID / tenant
     TARGET_DIR="gs://agora-ab-artifacts/reports/${DATE_STR}/${ACTOR}_run-${GITHUB_RUN_ID}"
+    if [ -n "$TENANT_CONTEXT" ]; then
+        TARGET_DIR="${TARGET_DIR}/${TENANT_CONTEXT}"
+    fi
 fi
 
 echo "Uploading artifacts to $TARGET_DIR..."

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAccount, useWalletClient } from "wagmi";
-import { BrowserProvider, JsonRpcSigner } from "ethers";
-import { createVoteAttestation } from "@/lib/eas";
+import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -16,6 +14,7 @@ import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 import { DisabledVoteButton } from "../components/DisabledVoteButton";
 import CastEasApprovalVoteInput from "./CastEasApprovalVoteInput";
 import CastEasOptimisticVoteInput from "./CastEasOptimisticVoteInput";
+import { useEASV2 } from "@/hooks/useEASV2";
 
 type VoteOption = "for" | "against" | "abstain" | null;
 
@@ -101,11 +100,10 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
 }
 
 function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
-  const { address, chain } = useAccount();
-  const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
+  const { createStandardVote, isCreatingStandardVote } = useEASV2();
   const [selectedVote, setSelectedVote] = useState<VoteOption>(null);
   const [reason, setReason] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -115,31 +113,23 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
   });
 
   const handleSubmitVote = async () => {
-    if (!selectedVote || !address || !walletClient || !chain) {
+    if (!selectedVote || !address) {
       setError("Please connect wallet and select a vote option");
       return;
     }
 
-    setIsSubmitting(true);
     setError(null);
 
     try {
-      // Create signer from wallet client
-      const network = { chainId: chain.id, name: chain.name };
-      const provider = new BrowserProvider(walletClient.transport, network);
-      const signer = new JsonRpcSigner(provider, address);
-
-      // Map vote option to choice number: 0 = against, 1 = for, 2 = abstain
       const choiceMap = {
         against: 0,
         for: 1,
         abstain: 2,
       };
 
-      await createVoteAttestation({
+      await createStandardVote({
         choice: choiceMap[selectedVote],
         reason: reason || "",
-        signer,
         proposalId: proposal.id,
       });
 
@@ -149,8 +139,6 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
     } catch (err) {
       console.error("Error submitting vote:", err);
       setError(parseVoteError(err));
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -166,13 +154,13 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         placeholder="I believe..."
         className="w-full resize-none rounded border-none  bg-neutral px-3 text-sm text-secondary outline-none focus:border-primary focus:ring-0"
         rows={1}
-        disabled={isSubmitting}
+        disabled={isCreatingStandardVote}
       />
 
       <div className="flex gap-2 mb-2">
         <button
           onClick={() => setSelectedVote("for")}
-          disabled={isSubmitting}
+          disabled={isCreatingStandardVote}
           className={`flex-1 rounded border px-3 py-2 text-sm font-semibold transition text-positive ${
             selectedVote === "for"
               ? "border-positive bg-positive/10"
@@ -184,7 +172,7 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
 
         <button
           onClick={() => setSelectedVote("against")}
-          disabled={isSubmitting}
+          disabled={isCreatingStandardVote}
           className={`flex-1 rounded border px-3 py-2 text-sm font-semibold transition text-negative ${
             selectedVote === "against"
               ? "border-negative bg-negative/10"
@@ -196,7 +184,7 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
 
         <button
           onClick={() => setSelectedVote("abstain")}
-          disabled={isSubmitting}
+          disabled={isCreatingStandardVote}
           className={`flex-1 rounded border px-3 py-2 text-sm font-semibold transition text-secondary ${
             selectedVote === "abstain"
               ? "border-secondary bg-secondary/10"
@@ -211,10 +199,10 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
 
       <button
         onClick={handleSubmitVote}
-        disabled={!selectedVote || !address || isSubmitting}
+        disabled={!selectedVote || !address || isCreatingStandardVote}
         className="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {isSubmitting ? (
+        {isCreatingStandardVote ? (
           "Submitting..."
         ) : (
           <>

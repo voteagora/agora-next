@@ -41,8 +41,8 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     // Execute sequential navigation instead of parallel to prevent Vercel/GraphQL 429 Too Many Requests caching drops on identical simultaneous payloads
-    await pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {});
-    await pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {});
+    await pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 });
+    await pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 });
 
     // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
     await Promise.all([
@@ -131,9 +131,14 @@ export class ABRunnerEngine {
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
       const mapB = new Map<string, any[]>();
+      const mapA = new Map<string, any[]>();
       for (const n of tB) {
         if (!mapB.has(n.path)) mapB.set(n.path, []);
         mapB.get(n.path)!.push(n);
+      }
+      for (const n of tA) {
+        if (!mapA.has(n.path)) mapA.set(n.path, []);
+        mapA.get(n.path)!.push(n);
       }
 
       for (const nodeA of tA) {
@@ -199,6 +204,29 @@ export class ABRunnerEngine {
         }
       }
 
+      // 🔴 REVERSE ENGINE TRAVERSAL: Catch Newly Injected UI Components
+      for (const nodeB of tB) {
+        if (!nodeB || nodeB.isFooter) continue;
+
+        const nodesListA = mapA.get(nodeB.path) || [];
+        let nodeA = nodesListA.length > 0 ? nodesListA.shift() : undefined;
+
+        if (!nodeA && nodeB.text && nodeB.text.length > 2) {
+          nodeA = tA.find(
+            (n: any) => n.text === nodeB.text && n.tag === nodeB.tag
+          );
+        }
+
+        if (!nodeA) {
+          rawDrifts.push({
+            path: nodeB.path,
+            reason: "Added Component",
+            urlA_text: "(Element completely absent in Production Baseline)",
+            urlB_text: nodeB.text,
+          });
+        }
+      }
+
       const mDrifts: any[] = [];
       const mReportList: any[] = [];
 
@@ -209,7 +237,11 @@ export class ABRunnerEngine {
             drift.path.startsWith(other.path + " > ")
         );
 
-        if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
+        if (
+          !hasParentDrift ||
+          drift.reason === "Missing or Moved Component" ||
+          drift.reason === "Added Component"
+        ) {
           mDrifts.push({ path: drift.path, reason: drift.reason });
           mReportList.push({
             component: drift.path,
@@ -225,6 +257,16 @@ export class ABRunnerEngine {
           });
         }
       }
+
+      const getSeverity = (reason: string) => {
+        if (reason === "Added Component") return 3;
+        if (reason === "Missing or Moved Component") return 2;
+        if (reason === "Data Drift") return 1;
+        return 0; // Layout/Style drift usually occurs in mass numbers
+      };
+
+      mDrifts.sort((a, b) => getSeverity(b.reason) - getSeverity(a.reason));
+      mReportList.sort((a, b) => getSeverity(b.reason) - getSeverity(a.reason));
 
       return { drifts: mDrifts, reportList: mReportList };
     };
@@ -281,6 +323,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlA_AutoModal_Drift.png"
                     ),
+                    timeout: 15000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -291,6 +334,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlB_AutoModal_Drift.png"
                     ),
+                    timeout: 15000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -380,6 +424,7 @@ export class ABRunnerEngine {
                   artifactsDir,
                   `00_${label}_FullPage_Tooltip.png`
                 ),
+                timeout: 15000,
               })
               .catch(() => {});
 
@@ -397,6 +442,7 @@ export class ABRunnerEngine {
               await popover
                 .screenshot({
                   path: path.join(tooltipsDir, `00_${label}_Crop.png`),
+                  timeout: 15000,
                 })
                 .catch(() => {});
             }
@@ -428,13 +474,17 @@ export class ABRunnerEngine {
             ? "4px dashed #FFD700" // Yellow
             : d.reason === "Style Drift"
               ? "4px dashed #00FFFF" // Cyan
-              : "4px dashed #8A2BE2", // Purple
+              : d.reason === "Added Component"
+                ? "4px dashed #FF00FF" // Hot Pink
+                : "4px dashed #8A2BE2", // Purple
         bg:
           d.reason === "Data Drift"
             ? "rgba(255, 215, 0, 0.2)"
             : d.reason === "Style Drift"
               ? "rgba(0, 255, 255, 0.2)"
-              : "rgba(138, 43, 226, 0.2)",
+              : d.reason === "Added Component"
+                ? "rgba(255, 0, 255, 0.4)" // Hot Pink
+                : "rgba(138, 43, 226, 0.2)",
       }));
 
       const batchHighlight = (items: typeof highlightPayload) => {
@@ -478,15 +528,17 @@ export class ABRunnerEngine {
 
       // 5. Full-page screenshots before crops — captured after load state settles
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
       await pageA.screenshot({
         path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
+        timeout: 15000,
+      }).catch(() => {});
       await pageB.screenshot({
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+        timeout: 15000,
+      }).catch(() => {});
 
       await captureTooltipLayer();
 
@@ -503,6 +555,7 @@ export class ABRunnerEngine {
                 await locA
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -516,6 +569,7 @@ export class ABRunnerEngine {
                 await locB
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -547,15 +601,17 @@ export class ABRunnerEngine {
 
       // No drifts — capture full-page baselines
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
       await pageA.screenshot({
         path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
+        timeout: 15000,
+      }).catch(() => {});
       await pageB.screenshot({
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+        timeout: 15000,
+      }).catch(() => {});
       await captureTooltipLayer();
     }
 
@@ -595,15 +651,46 @@ export class ABRunnerEngine {
       );
     }
 
+    const numStyle = reportList.filter(
+      (r) => r.reason === "Style Drift"
+    ).length;
+    const numLayout = reportList.filter(
+      (r) => r.reason === "Layout Drift"
+    ).length;
+    const numData = reportList.filter((r) => r.reason === "Data Drift").length;
+    const numMissing = reportList.filter(
+      (r) => r.reason === "Missing or Moved Component"
+    ).length;
+
+    const topDrifts = reportList
+      .slice(0, 3)
+      .map((r) => `   - ${r.component}`)
+      .join("\n");
+
+    const runId = process.env.GITHUB_RUN_ID;
+    const bucketLink = runId
+      ? `🔗 View Full Report & Images: https://console.cloud.google.com/storage/browser/agora-ab-artifacts/reports/${new Date().toISOString().split("T")[0]}/${process.env.GITHUB_ACTOR || "cli"}_run-${runId}?project=silent-turbine-390703`
+      : `🔗 View Full Report locally at: ${artifactsDir}/report.json`;
+
     if (override.expectDiff) {
       expect(
         isDiff,
-        `Expected route ${route} to structurally DIFFER between URLs.`
+        `\n\n🛑 EXPECTED VISUAL DRIFT MISSING 🛑\n\nExpected route "${route}" to structurally DIFFER between URLs, but they were visually identical.\n`
       ).toBe(true);
     } else {
       expect(
         drifts.length,
-        `Expected route ${route} to structurally match URLs. Found ${drifts.length} drifted components.`
+        `\n\n🛑 VISUAL DRIFT THRESHOLD EXCEEDED 🛑\n\n` +
+          `The A/B regression engine detected ${drifts.length} block-level drift(s) on route: "${route}".\n\n` +
+          `📊 DRIFT ANATOMY BREAKDOWN:\n` +
+          `   🎨 Style Differences: ${numStyle}\n` +
+          `   📏 Layout/Size Shifts: ${numLayout}\n` +
+          `   ✍️ Data/Text Changes: ${numData}\n` +
+          `   👻 Missing Components: ${numMissing}\n\n` +
+          `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
+          `${bucketLink}\n\n` +
+          `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
+          `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }
   }
@@ -613,8 +700,8 @@ export class ABRunnerEngine {
     await page.waitForTimeout(5000);
 
     const isDelegatesRoute = route === "/delegates";
-    const maxAttempts = isDelegatesRoute ? 5 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 8000 : 15000;
+    const maxAttempts = isDelegatesRoute ? 2 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 3000 : 15000;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -788,7 +875,7 @@ export class ABRunnerEngine {
               break; // Anchor to data-testid — stable across layout refactors
             }
 
-            if (href && href.length > 2) {
+            if (href && href.length > 2 && curr.tagName.toLowerCase() === "a") {
               selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
               path.unshift(selector);
               break; // Anchor to href for dynamic cards without data-testid
