@@ -46,8 +46,8 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     const targetB = process.env.URL_B || "http://127.0.0.1:3000";
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "commit", timeout: 45000 }),
-      pageB.goto(targetB, { waitUntil: "commit", timeout: 45000 }),
+      pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 }),
+      pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 }),
     ]);
     await Promise.all([
       pageA

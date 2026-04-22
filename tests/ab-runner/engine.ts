@@ -41,8 +41,8 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     // Execute sequential navigation instead of parallel to prevent Vercel/GraphQL 429 Too Many Requests caching drops on identical simultaneous payloads
-    await pageA.goto(targetA, { waitUntil: "commit", timeout: 45000 });
-    await pageB.goto(targetB, { waitUntil: "commit", timeout: 45000 });
+    await pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 });
+    await pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 });
 
     // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
     await Promise.all([
