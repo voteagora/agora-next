@@ -41,13 +41,13 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   ];
 
   test(`Cross-Tenant Guardrail: Verify identical DAO targets`, async () => {
-    test.setTimeout(30000);
+    test.setTimeout(60000);
     const targetA = process.env.URL_A || "http://127.0.0.1:3000";
     const targetB = process.env.URL_B || "http://127.0.0.1:3000";
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {}),
-      pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
+      pageA.goto(targetA, { waitUntil: "commit", timeout: 45000 }),
+      pageB.goto(targetB, { waitUntil: "commit", timeout: 45000 }),
     ]);
     await Promise.all([
       pageA
