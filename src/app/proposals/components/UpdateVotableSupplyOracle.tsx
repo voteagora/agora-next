@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useAccount,
   useReadContract,
@@ -19,6 +19,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { UpdatedButton } from "@/components/Button";
 import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 import { TenantContract } from "@/lib/tenant/tenantContract";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
+import { encodeFunctionData } from "viem";
 
 export const UpdateVotableSupplyOracle = ({
   votableSupplyOracle,
@@ -31,6 +39,7 @@ export const UpdateVotableSupplyOracle = ({
   const { data: presentVotableSupply } = useGetVotableSupply();
   const queryClient = useQueryClient();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const traceRef = useRef<FrontendMiradorTrace>(null);
 
   const { writeContractAsync, isPending } = useWriteContract();
   const chainId = votableSupplyOracle.chain.id;
@@ -84,6 +93,22 @@ export const UpdateVotableSupplyOracle = ({
 
   useEffect(() => {
     if (isTxConfirmed) {
+      if (traceRef.current) {
+        attachMiradorTransactionArtifacts(traceRef.current, {
+          chainId,
+          txHash,
+          txDetails: "Update votable supply oracle transaction",
+        });
+        void closeFrontendMiradorFlowTrace(traceRef.current, {
+          reason: "governance_admin_succeeded",
+          eventName: "governance_admin_succeeded",
+          details: {
+            action: "update_votable_supply",
+            transactionHash: txHash,
+          },
+        });
+        traceRef.current = null;
+      }
       // Invalidate the votable supply query when transaction is confirmed
       queryClient.invalidateQueries({ queryKey: [VOTABLE_SUPPLY_QK] });
       refetchVotableSupplyOracle();
@@ -91,10 +116,65 @@ export const UpdateVotableSupplyOracle = ({
     }
   }, [isTxConfirmed, queryClient, refetchVotableSupplyOracle]);
 
-  const handleUpdateSupply = async () => {
-    try {
-      const supplyInWei = BigInt(presentVotableSupply);
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
 
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_unmounted",
+        eventName: "governance_admin_unmounted",
+        details: {
+          action: "update_votable_supply",
+        },
+      });
+      traceRef.current = null;
+    };
+  }, []);
+
+  const handleUpdateSupply = async () => {
+    const supplyInWei = BigInt(presentVotableSupply);
+    const inputData = encodeFunctionData({
+      abi: abi as any,
+      functionName: "_updateVotableSupply",
+      args: [supplyInWei],
+    });
+
+    if (traceRef.current) {
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_admin_restarted",
+        eventName: "governance_admin_restarted",
+        details: {
+          action: "update_votable_supply",
+        },
+      });
+    }
+
+    const trace = startFrontendMiradorFlowTrace({
+      name: "GovernanceAdmin",
+      flow: MIRADOR_FLOW.governanceAdmin,
+      step: "votable_supply_update_submit",
+      context: {
+        walletAddress: address,
+        chainId,
+      },
+      tags: ["governance", "admin", "frontend"],
+      attributes: {
+        action: "update_votable_supply",
+      },
+      startEventName: "governance_admin_started",
+      startEventDetails: {
+        action: "update_votable_supply",
+      },
+    });
+    attachMiradorTransactionArtifacts(trace, {
+      chainId,
+      inputData,
+    });
+    traceRef.current = trace;
+
+    try {
       const hash = await writeContractAsync({
         address: oracleAddress,
         abi,
@@ -105,8 +185,25 @@ export const UpdateVotableSupplyOracle = ({
 
       // Store the transaction hash to track confirmation
       setTxHash(hash);
+      attachMiradorTransactionArtifacts(trace, {
+        chainId,
+        inputData,
+        txHash: hash,
+        txDetails: "Update votable supply oracle transaction",
+      });
     } catch (err) {
       console.error("Error updating votable supply:", err);
+      void closeFrontendMiradorFlowTrace(trace, {
+        reason: "governance_admin_failed",
+        eventName: "governance_admin_failed",
+        details: {
+          action: "update_votable_supply",
+          error: err instanceof Error ? err.message : String(err),
+        },
+      });
+      if (traceRef.current === trace) {
+        traceRef.current = null;
+      }
     }
   };
 

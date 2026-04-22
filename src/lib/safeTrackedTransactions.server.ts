@@ -179,7 +179,7 @@ export async function upsertSafeTrackedTransaction(
 
   const miradorChain = getMiradorChainNameFromChainId(params.chainId);
   if (params.traceContext?.traceId && miradorChain) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: {
         ...params.traceContext,
         step: "safe_tracked_transaction_tracking",

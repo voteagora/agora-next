@@ -1,6 +1,6 @@
-"use client";
-
 import Tenant from "@/lib/tenant/tenant";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { MiradorFlow } from "@/lib/mirador/types";
 import { UIMiradorConfig } from "@/lib/tenant/tenantUI";
 
 function isMiradorGloballyDisabled() {
@@ -24,9 +24,31 @@ export function getMiradorConfig(): UIMiradorConfig | null {
   }
 }
 
+const MIRADOR_CONFIG_KEY_BY_FLOW: Record<MiradorFlow, keyof UIMiradorConfig> = {
+  [MIRADOR_FLOW.proposalCreation]: "proposalCreation",
+  [MIRADOR_FLOW.governanceVote]: "governanceVote",
+  [MIRADOR_FLOW.governanceDelegation]: "governanceDelegation",
+  [MIRADOR_FLOW.staking]: "staking",
+  [MIRADOR_FLOW.governanceAdmin]: "governanceAdmin",
+  [MIRADOR_FLOW.proposalAttestation]: "proposalAttestation",
+  [MIRADOR_FLOW.membershipAdmin]: "membershipAdmin",
+  [MIRADOR_FLOW.notificationPreferences]: "siweLoginTracing",
+  [MIRADOR_FLOW.delegateStatement]: "siweLoginTracing",
+};
+
+const MIRADOR_CONFIG_KEYS = [
+  "proposalCreation",
+  "siweLoginTracing",
+  "governanceVote",
+  "governanceDelegation",
+  "staking",
+  "governanceAdmin",
+  "proposalAttestation",
+  "membershipAdmin",
+] as const satisfies ReadonlyArray<keyof UIMiradorConfig>;
+
 export function isMiradorProposalCreationTracingEnabled(): boolean {
-  const config = getMiradorConfig();
-  return config?.proposalCreation === true;
+  return isMiradorFlowTracingEnabled(MIRADOR_FLOW.proposalCreation);
 }
 
 export function isMiradorSiweLoginTracingEnabled(): boolean {
@@ -34,11 +56,21 @@ export function isMiradorSiweLoginTracingEnabled(): boolean {
   return config?.siweLoginTracing === true;
 }
 
+export function isMiradorFlowTracingEnabled(
+  flow?: MiradorFlow | null
+): boolean {
+  if (!flow) {
+    return false;
+  }
+
+  const config = getMiradorConfig();
+  const configKey = MIRADOR_CONFIG_KEY_BY_FLOW[flow];
+  return config?.[configKey] === true;
+}
+
 export function isMiradorEnabled(): boolean {
-  return (
-    isMiradorProposalCreationTracingEnabled() ||
-    isMiradorSiweLoginTracingEnabled()
-  );
+  const config = getMiradorConfig();
+  return MIRADOR_CONFIG_KEYS.some((configKey) => config?.[configKey] === true);
 }
 
 export function shouldEnableMiradorWebClient(): boolean {

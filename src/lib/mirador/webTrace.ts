@@ -12,6 +12,7 @@ import {
   MiradorFlow,
   MiradorTraceContext,
 } from "./types";
+import { isMiradorFlowTracingEnabled } from "./config";
 import { getMiradorWebClient } from "./webClient";
 
 type MiradorTrace = Trace & Web3Methods;
@@ -38,6 +39,7 @@ function applyContextAttributes(trace: Trace, context?: MiradorTraceContext) {
     "trace.source": context.source,
     "wallet.address": context.walletAddress,
     "wallet.chainId": context.chainId,
+    "proposal.id": context.proposalId,
     "proposal.branch": context.branch,
     "session.id": context.sessionId,
   };
@@ -64,6 +66,10 @@ function applyAttributes(trace: Trace, attributes?: MiradorAttributeMap) {
 export function startMiradorTrace(
   options: StartMiradorTraceOptions
 ): MiradorTrace | null {
+  if (!isMiradorFlowTracingEnabled(options.flow)) {
+    return null;
+  }
+
   const client = getMiradorWebClient();
   if (!client) {
     return null;
