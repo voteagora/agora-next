@@ -49,13 +49,13 @@ export class ABRunnerEngine {
       pageA
         .waitForFunction(
           () => document.body && document.body.innerText.trim().length > 50,
-          { timeout: 15000 }
+          { timeout: 10000 }
         )
         .catch(() => {}),
       pageB
         .waitForFunction(
           () => document.body && document.body.innerText.trim().length > 50,
-          { timeout: 15000 }
+          { timeout: 10000 }
         )
         .catch(() => {}),
     ]);
@@ -65,13 +65,13 @@ export class ABRunnerEngine {
       pageA
         .waitForSelector(".animate-pulse, .skeleton", {
           state: "hidden",
-          timeout: 25000,
+          timeout: 15000,
         })
         .catch(() => {}),
       pageB
         .waitForSelector(".animate-pulse, .skeleton", {
           state: "hidden",
-          timeout: 25000,
+          timeout: 15000,
         })
         .catch(() => {}),
     ]);
@@ -323,7 +323,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlA_AutoModal_Drift.png"
                     ),
-                    timeout: 15000,
+                    timeout: 5000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -334,7 +334,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlB_AutoModal_Drift.png"
                     ),
-                    timeout: 15000,
+                    timeout: 5000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -424,7 +424,7 @@ export class ABRunnerEngine {
                   artifactsDir,
                   `00_${label}_FullPage_Tooltip.png`
                 ),
-                timeout: 15000,
+                timeout: 5000,
               })
               .catch(() => {});
 
@@ -442,7 +442,7 @@ export class ABRunnerEngine {
               await popover
                 .screenshot({
                   path: path.join(tooltipsDir, `00_${label}_Crop.png`),
-                  timeout: 15000,
+                  timeout: 5000,
                 })
                 .catch(() => {});
             }
@@ -528,16 +528,16 @@ export class ABRunnerEngine {
 
       // 5. Full-page screenshots before crops — captured after load state settles
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 5000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 5000 }).catch(() => {}),
       ]);
       await pageA.screenshot({
         path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-        timeout: 15000,
+        timeout: 5000,
       }).catch(() => {});
       await pageB.screenshot({
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-        timeout: 15000,
+        timeout: 5000,
       }).catch(() => {});
 
       await captureTooltipLayer();
@@ -555,7 +555,7 @@ export class ABRunnerEngine {
                 await locA
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
-                    timeout: 15000,
+                    timeout: 5000,
                   })
                   .catch(() => {});
               }
@@ -569,7 +569,7 @@ export class ABRunnerEngine {
                 await locB
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
-                    timeout: 15000,
+                    timeout: 5000,
                   })
                   .catch(() => {});
               }
@@ -601,16 +601,16 @@ export class ABRunnerEngine {
 
       // No drifts — capture full-page baselines
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 5000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 5000 }).catch(() => {}),
       ]);
       await pageA.screenshot({
         path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-        timeout: 15000,
+        timeout: 5000,
       }).catch(() => {});
       await pageB.screenshot({
         path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-        timeout: 15000,
+        timeout: 5000,
       }).catch(() => {});
       await captureTooltipLayer();
     }
