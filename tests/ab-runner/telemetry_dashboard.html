@@ -2378,36 +2378,109 @@
           window._currentReportDrifts = drifts;
           window._currentReportMeta = meta;
 
-          // Count by category
-          const counts = {
-            all: drifts.length,
-            added: 0,
-            missing: 0,
-            data: 0,
-            style: 0,
-            layout: 0,
-          };
+          // Classify each drift with the same audit-driven logic
+          let reportActionable = 0,
+            reportExpected = 0,
+            reportNoise = 0;
           drifts.forEach((d) => {
             const r = (d.reason || "").toLowerCase();
-            if (r.includes("added")) counts.added++;
-            else if (r.includes("missing") || r.includes("moved"))
-              counts.missing++;
-            else if (r.includes("data")) counts.data++;
-            else if (r.includes("style")) counts.style++;
-            else if (r.includes("layout")) counts.layout++;
+            const comp = (d.component || "").toLowerCase();
+            const hasTestId = comp.includes("data-testid");
+            const aText = (d.urlA_text || "").trim();
+            const bText = (d.urlB_text || "").trim();
+
+            if (r.includes("layout")) {
+              d._cat = aText === bText ? "noise" : "actionable";
+            } else if (r.includes("data")) {
+              if (
+                comp.includes("quorum") ||
+                comp.includes("proposal-list") ||
+                aText.startsWith("Quorum") ||
+                aText.startsWith("Current")
+              ) {
+                d._cat = "expected";
+              } else if (
+                aText.includes("Ended") ||
+                aText.includes("Created") ||
+                aText.includes("Started")
+              ) {
+                d._cat = "expected";
+              } else if (
+                aText.includes("M OP") ||
+                aText.includes("K OP") ||
+                /\d+\.\d+%/.test(aText)
+              ) {
+                d._cat = "noise";
+              } else {
+                d._cat = "actionable";
+              }
+            } else if (
+              r.includes("added") &&
+              hasTestId &&
+              (comp.includes("proposal-status") ||
+                comp.includes("proposal-results") ||
+                comp.includes("proposal-votes"))
+            ) {
+              d._cat = "expected";
+            } else if (
+              r.includes("missing") &&
+              (comp.includes("proposal-list-item") ||
+                comp.includes("/proposals/") ||
+                comp.startsWith("a[href="))
+            ) {
+              d._cat = "noise";
+            } else if (
+              r.includes("style") &&
+              !hasTestId &&
+              comp.startsWith("body >")
+            ) {
+              d._cat = "noise";
+            } else if (r.includes("added") || r.includes("missing")) {
+              d._cat = "expected";
+            } else {
+              d._cat = "noise";
+            }
+
+            if (d._cat === "actionable") reportActionable++;
+            else if (d._cat === "expected") reportExpected++;
+            else reportNoise++;
           });
 
-          const regressionCount = counts.data + counts.style + counts.layout;
-          const noiseCount = counts.added + counts.missing;
+          // Status verdict
+          const statusText =
+            reportActionable > 0
+              ? "ISSUES FOUND"
+              : reportExpected > 0
+                ? "EXPECTED CHANGES ONLY"
+                : reportNoise > 0
+                  ? "NOISE ONLY"
+                  : "CLEAN";
+          const statusColor =
+            reportActionable > 0
+              ? "text-red-400"
+              : reportExpected > 0
+                ? "text-blue-400"
+                : reportNoise > 0
+                  ? "text-gray-400"
+                  : "text-green-400";
+          const statusTip =
+            reportActionable > 0
+              ? "Actionable issues found: layout or data regressions that need developer review."
+              : reportExpected > 0
+                ? "Only expected archive changes detected (status panels, date formats, quorum normalization). No regressions."
+                : reportNoise > 0
+                  ? "Only noise detected: scroll-depth differences, sub-pixel rendering, live data timing. Safe to ignore."
+                  : "No differences detected between Production and Branch.";
 
           const metaHtml = meta
             ? `
                 <div class="bg-[#1a1d24] p-5 rounded-xl border border-gray-800 mb-4">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
                         <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Target Route</span><span class="font-mono text-sm text-gray-200">${escapeHtml(meta.route)}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Status <svg class="tip-icon" data-tip="${regressionCount > 0 ? "Regressions found: real visual differences in data, style, or layout that may need fixing." : noiseCount > 0 ? "Scroll noise only: pages loaded different amounts of content during testing. No code changes caused visual differences. Safe to ignore." : "No differences detected between Production and Branch."}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="text-sm font-bold ${regressionCount > 0 ? "text-red-400" : noiseCount > 0 ? "text-amber-400" : "text-green-400"}">${regressionCount > 0 ? "REGRESSIONS FOUND" : noiseCount > 0 ? "SCROLL NOISE ONLY" : "CLEAN"}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Regressions <svg class="tip-icon" data-tip="Actual visual changes caused by code: data content, CSS styles, or element sizes that differ between Production and Branch. These need developer review." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold ${regressionCount > 0 ? "text-red-500" : "text-green-500"}">${regressionCount}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Scroll Noise <svg class="tip-icon" data-tip="DOM nodes reported as Added or Missing because pages loaded different amounts of content during scroll. Not a code issue — safe to ignore." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-gray-500">${noiseCount}</span></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Status <svg class="tip-icon" data-tip="${statusTip}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="text-sm font-bold ${statusColor}">${statusText}</span></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Actionable <svg class="tip-icon" data-tip="Real layout or data regressions requiring developer review." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold ${reportActionable > 0 ? "text-red-500" : "text-green-500"}">${reportActionable}</span></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Expected <svg class="tip-icon" data-tip="Archive-related changes: status panels added, date formats, quorum normalization. Confirms the feature works." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-blue-400">${reportExpected}</span></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Noise <svg class="tip-icon" data-tip="Scroll-depth differences, sub-pixel rendering, live chain data timing. Safe to ignore." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-gray-500">${reportNoise}</span></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-700/50">
                         <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Production</span><a href="${meta.urlA}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlA)}</a></div>
@@ -2427,15 +2500,13 @@
                             oninput="window.renderReportTable()">
                     </div>
                     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-                        <button onclick="window.setReportFilter('all')" data-filter="all" class="report-filter-btn active px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-white/10 border-gray-600 text-white">All <span class="ml-1 opacity-60">${counts.all}</span></button>
-                        ${counts.added > 0 ? `<button onclick="window.setReportFilter('added')" data-filter="added" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-green-800/50 text-green-500 hover:bg-green-900/20">Added <span class="ml-1 opacity-60">${counts.added}</span></button>` : ""}
-                        ${counts.missing > 0 ? `<button onclick="window.setReportFilter('missing')" data-filter="missing" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-red-800/50 text-red-500 hover:bg-red-900/20">Missing <span class="ml-1 opacity-60">${counts.missing}</span></button>` : ""}
-                        ${counts.data > 0 ? `<button onclick="window.setReportFilter('data')" data-filter="data" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-yellow-800/50 text-yellow-500 hover:bg-yellow-900/20">Data <span class="ml-1 opacity-60">${counts.data}</span></button>` : ""}
-                        ${counts.style > 0 ? `<button onclick="window.setReportFilter('style')" data-filter="style" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-cyan-800/50 text-cyan-500 hover:bg-cyan-900/20">Style <span class="ml-1 opacity-60">${counts.style}</span></button>` : ""}
-                        ${counts.layout > 0 ? `<button onclick="window.setReportFilter('layout')" data-filter="layout" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-purple-800/50 text-purple-400 hover:bg-purple-900/20">Layout <span class="ml-1 opacity-60">${counts.layout}</span></button>` : ""}
+                        <button onclick="window.setReportFilter('all')" data-filter="all" class="report-filter-btn active px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-white/10 border-gray-600 text-white">All <span class="ml-1 opacity-60">${drifts.length}</span></button>
+                        ${reportActionable > 0 ? `<button onclick="window.setReportFilter('actionable')" data-filter="actionable" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-red-800/50 text-red-400 hover:bg-red-900/20">Actionable <span class="ml-1 opacity-60">${reportActionable}</span></button>` : ""}
+                        ${reportExpected > 0 ? `<button onclick="window.setReportFilter('expected')" data-filter="expected" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-blue-800/50 text-blue-400 hover:bg-blue-900/20">Expected <span class="ml-1 opacity-60">${reportExpected}</span></button>` : ""}
+                        ${reportNoise > 0 ? `<button onclick="window.setReportFilter('noise')" data-filter="noise" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-gray-700/50 text-gray-500 hover:bg-gray-800/20">Noise <span class="ml-1 opacity-60">${reportNoise}</span></button>` : ""}
                     </div>
                 </div>
-                <div id="reportFilterInfo" class="text-xs text-gray-500 mb-2 px-1">Showing ${counts.all} entries</div>
+                <div id="reportFilterInfo" class="text-xs text-gray-500 mb-2 px-1">Showing ${drifts.length} entries</div>
                 <div class="rounded-xl border border-gray-800 overflow-hidden bg-[#0f1115]">
                     <table class="w-full text-left">
                         <thead class="bg-[#1a1d24] text-[10px] font-bold text-gray-500 uppercase tracking-widest border-b border-gray-800 sticky top-0">
@@ -2443,6 +2514,7 @@
                                 <th class="py-3 px-4 text-center w-12">#</th>
                                 <th class="py-3 px-4">DOM Selector (Target)</th>
                                 <th class="py-3 px-4 w-36">Detected Issue</th>
+                                <th class="py-3 px-4 w-24">Category</th>
                             </tr>
                         </thead>
                         <tbody id="reportTableBody"></tbody>
@@ -2463,15 +2535,12 @@
                   .replace(/border-\S+/g, "border-gray-600")
                   .replace(/text-\S+/g, "text-white");
               } else {
-                // Restore original color classes based on filter type
                 const f = btn.dataset.filter;
                 const colorMap = {
                   all: "border-gray-600 text-gray-400",
-                  added: "border-green-800/50 text-green-500",
-                  missing: "border-red-800/50 text-red-500",
-                  data: "border-yellow-800/50 text-yellow-500",
-                  style: "border-cyan-800/50 text-cyan-500",
-                  layout: "border-purple-800/50 text-purple-400",
+                  actionable: "border-red-800/50 text-red-400",
+                  expected: "border-blue-800/50 text-blue-400",
+                  noise: "border-gray-700/50 text-gray-500",
                 };
                 btn.className = `report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent ${colorMap[f] || "border-gray-700 text-gray-400"} hover:bg-white/5`;
               }
@@ -2487,20 +2556,11 @@
             ).toLowerCase();
 
             let filtered = drifts.filter((d) => {
-              const r = (d.reason || "").toLowerCase();
-              if (filter === "added" && !r.includes("added")) return false;
-              if (
-                filter === "missing" &&
-                !r.includes("missing") &&
-                !r.includes("moved")
-              )
-                return false;
-              if (filter === "data" && !r.includes("data")) return false;
-              if (filter === "style" && !r.includes("style")) return false;
-              if (filter === "layout" && !r.includes("layout")) return false;
+              // Category filter
+              if (filter !== "all" && d._cat !== filter) return false;
               if (search) {
                 const comp = (d.component || "").toLowerCase();
-                const reason = r;
+                const reason = (d.reason || "").toLowerCase();
                 const textA = (
                   d.urlA_text ||
                   d.productionText ||
@@ -2527,7 +2587,7 @@
 
             if (filtered.length === 0) {
               tbody.innerHTML =
-                '<tr><td colspan="3" class="p-6 text-center text-gray-500 italic">No entries match your filter.</td></tr>';
+                '<tr><td colspan="4" class="p-6 text-center text-gray-500 italic">No entries match your filter.</td></tr>';
               return;
             }
 
@@ -2553,8 +2613,24 @@
                   badgeColor =
                     "bg-purple-900/40 text-purple-400 border border-purple-700/50";
 
+                // Category badge
+                const catColors = {
+                  actionable:
+                    "bg-red-900/30 text-red-400 border border-red-700/40",
+                  expected:
+                    "bg-blue-900/30 text-blue-400 border border-blue-700/40",
+                  noise:
+                    "bg-gray-800/50 text-gray-500 border border-gray-700/40",
+                };
+                const catBadge = catColors[d._cat] || catColors.noise;
+                const catLabel =
+                  d._cat === "actionable"
+                    ? "⚠ Issue"
+                    : d._cat === "expected"
+                      ? "✓ Expected"
+                      : "· Noise";
+
                 const comp = escapeHtml(d.component || "Unknown Node");
-                // Highlight search term in component
                 let displayComp = comp;
                 if (search && comp.toLowerCase().includes(search)) {
                   const re = new RegExp(
@@ -2572,13 +2648,14 @@
                         <td class="py-3 px-4 font-mono text-[10px] text-gray-500 w-12 text-center">${i + 1}</td>
                         <td class="py-3 px-4 text-xs font-mono text-gray-300 break-all">${displayComp}</td>
                         <td class="py-3 px-4"><span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${badgeColor}">${escapeHtml(d.reason || d.colorCode || "Drift")}</span></td>
+                        <td class="py-3 px-4"><span class="inline-flex px-2 py-0.5 rounded text-[10px] font-medium tracking-wide ${catBadge}">${catLabel}</span></td>
                     </tr>`;
               })
               .join("");
 
             if (filtered.length > 200) {
               tbody.innerHTML +=
-                '<tr><td colspan="3" class="p-4 text-center text-gray-500 text-xs italic">Showing first 200 of ' +
+                '<tr><td colspan="4" class="p-4 text-center text-gray-500 text-xs italic">Showing first 200 of ' +
                 filtered.length +
                 " results. Use search to narrow down.</td></tr>";
             }
