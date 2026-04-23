@@ -627,21 +627,123 @@
     async function loadLocalResults() {
         // Determine base path: this file is at tests/ab-runner/, results at test-results/ab-diffs/
         const basePath = '../../test-results/ab-diffs';
+        const tbody = document.getElementById('runsTableBody');
         
+        // Show loading state in the table
+        tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500 italic"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto mb-2 inline"></i> Scanning local results...</td></tr>`;
+        if (window.lucide) lucide.createIcons();
+
+        try {
+            const possibleScopes = ['index-page', 'proposals', 'delegates', 'retro-funding'];
+            const localScopes = [];
+
+            const fetchPromises = possibleScopes.map(scope =>
+                fetch(`${basePath}/${scope}/report.json`)
+                    .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
+                    .then(json => {
+                        const entries = Array.isArray(json) ? json.filter(e => !e.reportDescription) : (json.diffs || []);
+                        let regressions = 0, noise = 0;
+                        entries.forEach(e => {
+                            const r = (e.reason || '').toLowerCase();
+                            if (r.includes('data') || r.includes('style') || r.includes('layout')) regressions++;
+                            else noise++;
+                        });
+                        const meta = Array.isArray(json) ? json.find(item => item.reportDescription)?.reportDescription : null;
+                        // Build images list
+                        const images = [];
+                        const scans = new Set();
+                        if (meta) {
+                            ['00_UrlA_FullPage_Highlights.png','00_UrlB_FullPage_Highlights.png','00_UrlA_FullPage.png','00_UrlB_FullPage.png'].forEach(name => {
+                                images.push({ name, url: `${basePath}/${scope}/${name}` });
+                                scans.add(name.replace('UrlA','').replace('UrlB','').replace('.png',''));
+                            });
+                            for (let i = 1; i <= entries.length; i++) {
+                                ['UrlA','UrlB'].forEach(side => images.push({ name: `drift_${i}_${side}.png`, url: `${basePath}/${scope}/drift_${i}_${side}.png` }));
+                            }
+                        }
+                        localScopes.push({ scope, drifts: entries.length, regressions, noise, scans: scans.size > 0 ? Math.ceil(scans.size / 2) : 1, images, reportObj: json });
+                    })
+                    .catch(() => { /* scope doesn't exist locally */ })
+            );
+
+            await Promise.all(fetchPromises);
+
+            if (localScopes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-gray-500 italic">No local results found in <code class="text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">test-results/ab-diffs/</code></span>
+                        <span class="text-gray-600 text-xs">Run <code class="text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded text-[10px]">npm run test:ab</code> first, then click Load again.</span>
+                    </div>
+                </td></tr>`;
+                return;
+            }
+
+            // Populate the table with discovered local scopes
+            localScopes.sort((a, b) => b.regressions - a.regressions || b.drifts - a.drifts);
+            tbody.innerHTML = '';
+
+            localScopes.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-white/5 transition-colors group cursor-pointer";
+                tr.onclick = () => openLocalScope(localScopes, s.scope);
+
+                let badgeColor, badgeIcon, statusText;
+                if (s.regressions > 0) {
+                    badgeColor = "bg-red-500/10 text-red-500 border border-red-500/20";
+                    badgeIcon = "alert-triangle"; statusText = `${s.regressions} REGRESSION${s.regressions > 1 ? 'S' : ''}`;
+                } else if (s.noise > 0) {
+                    badgeColor = "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+                    badgeIcon = "check-circle"; statusText = "CLEAN (noise)";
+                } else {
+                    badgeColor = "bg-green-500/10 text-green-500 border border-green-500/20";
+                    badgeIcon = "check-circle"; statusText = "CLEAN";
+                }
+
+                const cropCount = Math.ceil(s.images.filter(img => img.name.includes('drift_')).length / 2);
+
+                tr.innerHTML = `
+                    <td class="px-4 py-4">
+                        <div class="flex flex-col">
+                            <span class="text-white font-mono text-sm group-hover:text-blue-400 transition-colors">/${s.scope === 'index-page' ? '' : s.scope}</span>
+                            <span class="text-xs text-gray-500 flex items-center gap-1 mt-1"><i data-lucide="hard-drive" class="w-3 h-3"></i> local</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-4">
+                        <div class="flex items-center gap-3 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> ${s.scans} captures</span>
+                            ${cropCount > 0 ? `<span class="flex items-center gap-1"><i data-lucide="crop" class="w-3 h-3"></i> ${cropCount} crops</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${badgeColor}">
+                            <i data-lucide="${badgeIcon}" class="w-3 h-3"></i> ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-4 py-4 text-right text-gray-400 text-xs font-mono">${s.drifts} diffs</td>
+                    <td class="px-4 py-4 text-center">
+                        <button class="px-3 py-1.5 inline-flex items-center justify-center gap-2 rounded-lg bg-transparent border border-gray-500 text-gray-300 hover:border-white hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
+                            View <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+
+            if (window.lucide) lucide.createIcons();
+
+        } catch (e) {
+            console.error('Local scan error:', e);
+            tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-red-400 italic">Error scanning local results: ${e.message}</td></tr>`;
+        }
+    }
+
+    function openLocalScope(allScopes, clickedScope) {
+        // Transition from overlay to dashboard with all local data loaded
         const overlay = document.getElementById('runsHistoryOverlay');
         overlay.style.display = 'none';
         const dashboard = document.getElementById('dashboard');
         dashboard.classList.remove('hidden');
         dashboard.classList.add('flex');
         switchTab('results');
-
-        // Reset state
-        document.getElementById('viewerGallery').innerHTML = '';
-        document.getElementById('viewerTitle').textContent = 'Select a scope';
-        document.getElementById('viewerSubtitle').textContent = 'to view visual QA artifacts';
-        document.getElementById('viewerActions').innerHTML = '';
-        document.getElementById('sidebarList').innerHTML = SKELETON_SIDEBAR;
-        ['metricDrifts', 'metricCritical', 'metricScans', 'metricScope'].forEach(id => document.getElementById(id).innerHTML = SKELETON_METRIC);
 
         // Set header for local mode
         document.getElementById('headerRunId').textContent = 'Local Run';
@@ -651,90 +753,28 @@
         document.getElementById('infoDate').textContent = new Date().toLocaleString();
         document.getElementById('infoRef').textContent = 'localhost';
 
-        // URL row for local
         const urlRow = document.getElementById('headerUrls');
         urlRow.innerHTML = `
             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-mono text-green-400 border border-green-700/50 bg-green-900/20">
                 <i data-lucide="hard-drive" class="w-3 h-3"></i> Reading from test-results/ab-diffs/
             </span>`;
 
-        try {
-            // Try to discover scopes by fetching known scope directories
-            // In local mode, we expect the user has run tests and the directories exist
-            // Try the report.json approach — scan common scope names
-            const possibleScopes = ['index-page', 'proposals', 'delegates', 'retro-funding'];
-            const scopesMap = {};
-            const fetchPromises = [];
+        // Load all scopes into the global telemetry data
+        globalTelemetryData = allScopes.sort((a, b) => b.regressions - a.regressions || b.drifts - a.drifts);
 
-            for (const scope of possibleScopes) {
-                const p = fetch(`${basePath}/${scope}/report.json`)
-                    .then(res => {
-                        if (!res.ok) throw new Error('not found');
-                        return res.json();
-                    })
-                    .then(json => {
-                        scopesMap[scope] = { drifts: 0, regressions: 0, noise: 0, scans: new Set(), images: [], reportObj: json };
-                        const entries = Array.isArray(json) ? json.filter(e => !e.reportDescription) : (json.diffs || []);
-                        entries.forEach(e => {
-                            const r = (e.reason || '').toLowerCase();
-                            if (r.includes('data') || r.includes('style') || r.includes('layout')) {
-                                scopesMap[scope].regressions++;
-                            } else {
-                                scopesMap[scope].noise++;
-                            }
-                        });
-                        scopesMap[scope].drifts = entries.length;
-                        
-                        // Discover images from report metadata
-                        const meta = Array.isArray(json) ? json.find(item => item.reportDescription)?.reportDescription : null;
-                        if (meta) {
-                            // Build image list from known patterns
-                            const imgPatterns = [
-                                `00_UrlA_FullPage_Highlights.png`, `00_UrlB_FullPage_Highlights.png`,
-                                `00_UrlA_FullPage.png`, `00_UrlB_FullPage.png`
-                            ];
-                            imgPatterns.forEach(name => {
-                                scopesMap[scope].images.push({ name, url: `${basePath}/${scope}/${name}` });
-                                scopesMap[scope].scans.add(name.replace('UrlA', '').replace('UrlB', '').replace('.png', ''));
-                            });
-                            // Add drift crops
-                            for (let i = 1; i <= entries.length; i++) {
-                                ['UrlA', 'UrlB'].forEach(side => {
-                                    const name = `drift_${i}_${side}.png`;
-                                    scopesMap[scope].images.push({ name, url: `${basePath}/${scope}/${name}` });
-                                });
-                            }
-                        }
-                    })
-                    .catch(() => { /* scope doesn't exist locally, skip */ });
-                fetchPromises.push(p);
-            }
+        renderTelemetryTab();
+        renderResultsSidebar();
 
-            await Promise.all(fetchPromises);
-
-            if (Object.keys(scopesMap).length === 0) {
-                document.getElementById('sidebarList').innerHTML = `<div class="px-4 py-4 text-sm text-gray-500 italic">No local results found. Run <code class="text-gray-400 bg-gray-800 px-1 py-0.5 rounded text-[10px]">npm run test:ab</code> first.</div>`;
-                return;
-            }
-
-            globalTelemetryData = Object.keys(scopesMap).map(s => ({
-                scope: s,
-                drifts: scopesMap[s].drifts,
-                regressions: scopesMap[s].regressions,
-                noise: scopesMap[s].noise,
-                scans: scopesMap[s].scans.size > 0 ? Math.ceil(scopesMap[s].scans.size / 2) : 1,
-                images: scopesMap[s].images,
-                reportObj: scopesMap[s].reportObj || null
-            })).sort((a, b) => b.regressions - a.regressions || b.drifts - a.drifts);
-
-            renderTelemetryTab();
-            renderResultsSidebar();
-            if (window.lucide) setTimeout(() => lucide.createIcons(), 50);
-
-        } catch (e) {
-            console.error('Local mode error:', e);
-            document.getElementById('sidebarList').innerHTML = `<div class="px-4 py-4 text-sm text-red-400">Error reading local results: ${e.message}</div>`;
-        }
+        // Auto-select the clicked scope in the sidebar
+        setTimeout(() => {
+            const sidebarBtns = document.querySelectorAll('.sidebar-item');
+            sidebarBtns.forEach(btn => {
+                if (btn.textContent.includes(clickedScope)) {
+                    selectScope(clickedScope, btn);
+                }
+            });
+            if (window.lucide) lucide.createIcons();
+        }, 100);
     }
 
     function resetSearch() {
