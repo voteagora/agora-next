@@ -400,7 +400,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "hide-info-tabs",
@@ -446,7 +446,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6">DUNI Disclosures</div>
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+              DUNI Disclosures
+            </div>
 
             <div>
               <p className="mt-2">

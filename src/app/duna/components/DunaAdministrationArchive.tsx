@@ -25,7 +25,6 @@ const DunaAdministrationArchive = async () => {
       categoryId: dunaCategoryId,
       archived: true,
     });
-
     if (documentsResult.success) {
       documents = documentsResult.data;
     }
@@ -37,7 +36,6 @@ const DunaAdministrationArchive = async () => {
     (doc) => doc.isFinancialStatement
   );
   const otherDocuments = documents.filter((doc) => !doc.isFinancialStatement);
-
   return (
     <div className="mt-12">
       <div className="flex items-center justify-between mb-6">
@@ -46,41 +44,42 @@ const DunaAdministrationArchive = async () => {
         </h3>
       </div>
 
-      <div className="mb-4">
-        <h4 className="text-lg font-semibold text-primary">
-          Formation Documents
-        </h4>
-      </div>
-
-      <Card className="border border-line bg-cardBackground shadow-sm">
-        <CardContent className="p-6">
-          <div className="">
-            <DocumentsSection
-              initialDocuments={otherDocuments}
-              hideHeader={true}
-              hideComms={true}
-            />
+      {otherDocuments.length > 0 && (
+        <>
+          <div className="mb-4">
+            <h4 className="text-lg font-semibold text-primary">
+              Formation Documents
+            </h4>
           </div>
-        </CardContent>
-      </Card>
+          <Card className="border border-line bg-cardBackground shadow-sm">
+            <CardContent className="p-6">
+              <DocumentsSection
+                initialDocuments={otherDocuments}
+                hideHeader={true}
+              />
+            </CardContent>
+          </Card>
+        </>
+      )}
 
-      <div className="my-4">
-        <h4 className="text-lg font-semibold text-primary">
-          Financial Statements
-        </h4>
-      </div>
-
-      <Card className="border border-line bg-cardBackground shadow-sm">
-        <CardContent className="p-6">
-          <div className="">
-            <DocumentsSection
-              initialDocuments={financialDocuments}
-              hideHeader={true}
-              hideComms={true}
-            />
+      {financialDocuments.length > 0 && (
+        <>
+          <div className="my-4">
+            <h4 className="text-lg font-semibold text-primary">
+              Financial Statements
+            </h4>
           </div>
-        </CardContent>
-      </Card>
+          <Card className="border border-line bg-cardBackground shadow-sm">
+            <CardContent className="p-6">
+              <DocumentsSection
+                initialDocuments={financialDocuments}
+                hideHeader={true}
+                hideComms={true}
+              />
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 };

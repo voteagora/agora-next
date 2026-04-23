@@ -46,6 +46,10 @@ export const syndicateTenantUIConfig = new TenantUI({
     title: "Syndicate Network",
   },
 
+  grantsFollowXHandle: "syndicateio",
+  grantsEmailOrgName: "Syndicate Network Collective",
+  grantsEmailSenderName: "Syndicate",
+
   dunaDisclaimers:
     "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
 
@@ -398,10 +402,6 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "syndicate-hero-content",
-      enabled: true,
-    },
-    {
       name: "duna/use-community-dialogue-label",
       enabled: true,
     },
@@ -411,7 +411,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
               SYNDICATE NETWORK COLLECTIVE - DUNA DISCLOSURES
             </div>
 

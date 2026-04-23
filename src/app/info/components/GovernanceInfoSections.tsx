@@ -6,31 +6,22 @@ import { UIGovernanceInfoConfig } from "@/lib/tenant/tenantUI";
 export default function GovernanceInfoSections() {
   const { ui } = Tenant.current();
   const config = ui.toggle("info/governance-sections");
-
   if (!config?.enabled || !config?.config) {
     return null;
   }
 
   const governanceConfig = config.config as UIGovernanceInfoConfig;
-  const useNeutral =
-    ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
   if (!governanceConfig.sections || governanceConfig.sections.length === 0) {
     return null;
   }
 
-  const bgClass = useNeutral ? "bg-neutral" : "bg-wash";
-
   return (
-    <div className="flex flex-col">
-      {governanceConfig.title && (
-        <h3 className="text-2xl font-black text-primary mt-12">
-          {governanceConfig.title}
-        </h3>
-      )}
-      <div
-        className={`flex flex-col mb-8 mt-4 ${bgClass} border border-line shadow-newDefault rounded-xl overflow-hidden`}
-      >
+    <div className="flex flex-col gap-4">
+      <h2 className="text-2xl font-bold text-primary">
+        {governanceConfig.title}
+      </h2>
+      <div className="flex flex-col border border-line rounded-xl overflow-hidden bg-wash">
         {governanceConfig.sections.map((section, index) => {
           const isLast = index === governanceConfig.sections.length - 1;
           return (
