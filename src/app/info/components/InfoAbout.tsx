@@ -62,14 +62,7 @@ const InfoAbout = () => {
     return <div>Page metadata not defined</div>;
   }
 
-  const tabs = ui.customization?.customInfoTabs
-    ? ui.customization.customInfoTabs.map((tab, index) => ({
-        ...tab,
-        icon: defaultTabs[index]?.icon,
-      }))
-    : defaultTabs;
-
-  const activeTabs = page.tabs || tabs;
+  const activeTabs = page.tabs || defaultTabs;
   const sectionTitle = page.sectionTitle || "Getting started";
 
   return (
@@ -94,9 +87,7 @@ const InfoAbout = () => {
           <div
             className={`${ui.customization?.customInfoLayout ? "sm:w-auto sm:ml-2" : ui.toggle("hide-hero-image")?.enabled ? "w-full" : "sm:w-1/2"}`}
           >
-            <div
-              className={`${ui.customization?.customTextContainer ? ui.customization.customTextContainer : ""}`}
-            >
+            <div>
               <h3 className="text-lg font-bold text-primary">
                 {ui.customization?.customAboutSubtitle || "About " + brandName}
               </h3>
