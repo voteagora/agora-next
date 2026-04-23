@@ -379,7 +379,7 @@
               title="Enter PAT if rate limited"
             />
             <button
-              onclick="initRunsHistory()"
+              onclick="currentMode === 'local' ? initLocalMode() : initRunsHistory()"
               class="bg-gray-800 hover:bg-gray-700 text-white p-1.5 rounded-lg transition-colors"
               title="Refresh"
             >
@@ -1237,8 +1237,16 @@
               for (let i = 0; i < reportEntries.length; i += batchSize) {
                 const batch = reportEntries.slice(i, i + batchSize);
                 const batchPromises = batch.map((entry) => {
-                  const reportUrl = `${basePath}/${entry.path}`;
-                  const scopePath = reportUrl.replace("/report.json", "");
+                  // Encode each path segment to handle special chars (e.g. ? in folder names)
+                  const encodedPath = entry.path
+                    .split("/")
+                    .map((seg) => encodeURIComponent(seg))
+                    .join("/");
+                  const reportUrl = `${basePath}/${encodedPath}`;
+                  const scopePath = reportUrl.replace(
+                    "/" + encodeURIComponent("report.json"),
+                    ""
+                  );
                   // Derive a human-readable label from the path
                   const parts = entry.path
                     .replace("/report.json", "")
@@ -1433,7 +1441,12 @@
       }
 
       function resetSearch() {
-        window.history.pushState({}, "", window.location.pathname);
+        // Preserve mode in URL when going back
+        if (currentMode === "local") {
+          window.history.pushState({}, "", "?mode=local");
+        } else {
+          window.history.pushState({}, "", window.location.pathname);
+        }
         document.getElementById("runsHistoryOverlay").style.display = "flex";
         document.getElementById("dashboard").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("flex");
