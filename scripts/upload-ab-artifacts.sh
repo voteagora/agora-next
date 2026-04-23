@@ -30,8 +30,17 @@ echo "Uploading artifacts to $TARGET_DIR..."
 # We use gsutil or gcloud storage depending on environment
 if command -v gsutil &> /dev/null; then
     gsutil -m rsync -r test-results/ab-diffs $TARGET_DIR
+    # Upload run metadata (URL A/B, tenant, routes) for dashboard
+    if [ -f "test-results/run_metadata.json" ]; then
+        gsutil cp test-results/run_metadata.json "${TARGET_DIR}/run_metadata.json"
+        echo "📝 Uploaded run_metadata.json"
+    fi
 else
     gcloud storage cp -r test-results/ab-diffs/* $TARGET_DIR
+    if [ -f "test-results/run_metadata.json" ]; then
+        gcloud storage cp test-results/run_metadata.json "${TARGET_DIR}/run_metadata.json"
+        echo "📝 Uploaded run_metadata.json"
+    fi
 fi
 
 echo "Upload completed successfully! You can view the artifacts in the GCP Console."
