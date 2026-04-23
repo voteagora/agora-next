@@ -345,6 +345,7 @@
               class="h-8 object-contain"
             />
             <h2
+              id="dashboardTitle"
               class="text-xl font-outfit font-bold text-white tracking-widest uppercase"
             >
               A/B Tests Workflows
@@ -1144,6 +1145,7 @@
           localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
           ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
           patInput.style.display = "none";
+          document.getElementById("dashboardTitle").textContent = "Local Explorer";
           // Update table headers for local mode
           document.getElementById("thCol1").textContent = "Route";
           document.getElementById("thCol2").textContent = "Artifacts";
@@ -1156,6 +1158,7 @@
           ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
           localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
           patInput.style.display = "";
+          document.getElementById("dashboardTitle").textContent = "A/B Tests Workflows";
           // Restore table headers for CI mode
           document.getElementById("thCol1").textContent = "Run ID / Branch";
           document.getElementById("thCol2").textContent = "Author";
@@ -1432,75 +1435,110 @@
           );
           tbody.innerHTML = "";
 
+          // ── Group local scopes into sections ──
+          const _static = [], _typed = [], _archive = [];
           localScopes.forEach((s) => {
+            const sc = s.scope;
+            if (sc === "/" || sc === "index-page" || sc === "/proposals" || sc.startsWith("proposals") && !sc.includes("/") || sc.startsWith("/delegates") || sc.startsWith("delegates")) {
+              _static.push(s);
+            } else {
+              const parts = sc.split("/");
+              if (parts.some(p => /^(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)$/i.test(p))) {
+                _typed.push(s);
+              } else {
+                _archive.push(s);
+              }
+            }
+          });
+
+          // ── Helper: render a group header row ──
+          const addGroupHeader = (icon, label, count, tooltip) => {
             const tr = document.createElement("tr");
-            tr.className =
-              "hover:bg-white/5 transition-colors group cursor-pointer";
+            tr.className = "bg-[#13161c] border-b border-gray-700/60";
+            tr.innerHTML = `
+              <td colspan="5" class="px-4 py-2">
+                <div class="flex items-center gap-2" title="${tooltip}">
+                  <i data-lucide="${icon}" class="w-4 h-4 text-gray-500"></i>
+                  <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">${label}</span>
+                  <span class="text-[10px] text-gray-600 font-mono bg-gray-800/60 px-1.5 py-0.5 rounded">${count}</span>
+                </div>
+              </td>`;
+            tbody.appendChild(tr);
+          };
+
+          // ── Helper: render a scope row ──
+          const addScopeRow = (s) => {
+            const tr = document.createElement("tr");
+            tr.className = "hover:bg-white/5 transition-colors group cursor-pointer";
             tr.onclick = () => openLocalScope(localScopes, s.scope);
 
             let badgeColor, badgeIcon, statusText;
             if (s.actionable > 0) {
-              badgeColor =
-                "bg-red-500/10 text-red-400 border border-red-500/20";
+              badgeColor = "bg-red-500/10 text-red-400 border border-red-500/20";
               badgeIcon = "alert-triangle";
               statusText = `${s.actionable} ISSUE${s.actionable > 1 ? "S" : ""}`;
             } else if (s.expected > 0 && s.noise === 0) {
-              badgeColor =
-                "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+              badgeColor = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
               badgeIcon = "check-circle";
               statusText = "EXPECTED";
             } else if (s.expected > 0 || s.noise > 0) {
-              badgeColor =
-                "bg-green-500/10 text-green-400 border border-green-500/20";
+              badgeColor = "bg-green-500/10 text-green-400 border border-green-500/20";
               badgeIcon = "check-circle";
               statusText = "CLEAN";
             } else {
-              badgeColor =
-                "bg-green-500/10 text-green-500 border border-green-500/20";
+              badgeColor = "bg-green-500/10 text-green-500 border border-green-500/20";
               badgeIcon = "check-circle";
               statusText = "CLEAN";
             }
 
-            // Build mini breakdown
             const parts = [];
-            if (s.actionable > 0)
-              parts.push(
-                `<span class="text-red-400">${s.actionable} actionable</span>`
-              );
-            if (s.expected > 0)
-              parts.push(
-                `<span class="text-blue-400">${s.expected} expected</span>`
-              );
-            if (s.noise > 0)
-              parts.push(`<span class="text-gray-500">${s.noise} noise</span>`);
-            const breakdownHtml =
-              parts.length > 0
-                ? parts.join(" · ")
-                : '<span class="text-gray-600">—</span>';
+            if (s.actionable > 0) parts.push(`<span class="text-red-400">${s.actionable} actionable</span>`);
+            if (s.expected > 0) parts.push(`<span class="text-blue-400">${s.expected} expected</span>`);
+            if (s.noise > 0) parts.push(`<span class="text-gray-500">${s.noise} noise</span>`);
+            const breakdownHtml = parts.length > 0 ? parts.join(" · ") : '<span class="text-gray-600">—</span>';
+
+            // Clean label
+            let label = s.scope;
+            const idMatch = label.match(/proposals?-(\d{10,})/);
+            if (idMatch) label = label.replace(idMatch[0], `#${idMatch[1].slice(0,6)}…${idMatch[1].slice(-4)}`);
+            label = label.replace(/^(optimism|scroll|ens|uniswap|cyber|derive|linea|etherfi|b3|xai)\//i, "");
 
             tr.innerHTML = `
-                    <td class="px-4 py-4">
+                    <td class="px-4 py-3 pl-8">
                         <div class="flex flex-col">
-                            <span class="text-white font-mono text-sm group-hover:text-blue-400 transition-colors">${s.scope}</span>
-                            <span class="text-xs text-gray-500 flex items-center gap-1 mt-1"><i data-lucide="hard-drive" class="w-3 h-3"></i> local</span>
+                            <span class="text-white font-mono text-sm group-hover:text-blue-400 transition-colors">${label}</span>
                         </div>
                     </td>
-                    <td class="px-4 py-4">
+                    <td class="px-4 py-3">
                         <div class="text-xs">${breakdownHtml}</div>
                     </td>
-                    <td class="px-4 py-4 text-center">
+                    <td class="px-4 py-3 text-center">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${badgeColor}">
                             <i data-lucide="${badgeIcon}" class="w-3 h-3"></i> ${statusText}
                         </span>
                     </td>
-                    <td class="px-4 py-4 text-right text-gray-400 text-xs font-mono">${s.drifts} diffs</td>
-                    <td class="px-4 py-4 text-center">
+                    <td class="px-4 py-3 text-right text-gray-400 text-xs font-mono">${s.drifts} diffs</td>
+                    <td class="px-4 py-3 text-center">
                         <button class="px-3 py-1.5 inline-flex items-center justify-center gap-2 rounded-lg bg-transparent border border-gray-500 text-gray-300 hover:border-white hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider">
                             View <i data-lucide="arrow-right" class="w-3 h-3"></i>
                         </button>
                     </td>`;
             tbody.appendChild(tr);
-          });
+          };
+
+          // ── Render grouped ──
+          if (_static.length > 0) {
+            addGroupHeader("home", "Static Routes", _static.length, "Core pages: home, proposals listing, delegates listing");
+            _static.forEach(addScopeRow);
+          }
+          if (_typed.length > 0) {
+            addGroupHeader("tag", "Proposals by Type", _typed.length, "One sample proposal per governance type (Standard, Approval, Optimistic)");
+            _typed.forEach(addScopeRow);
+          }
+          if (_archive.length > 0) {
+            addGroupHeader("archive", "Archive Proposals", _archive.length, "All proposals from the archive, bulk-scanned for regressions");
+            _archive.forEach(addScopeRow);
+          }
 
           if (window.lucide) lucide.createIcons();
         } catch (e) {
@@ -2255,37 +2293,42 @@
         chartContainer.innerHTML = "";
 
         const maxTotal = Math.max(
-          ...globalTelemetryData.map((d) => d.regressions + d.noise),
+          ...globalTelemetryData.map((d) => (d.actionable || d.regressions || 0) + (d.expected || 0) + (d.noise || 0)),
           1
         );
 
         globalTelemetryData.forEach((d) => {
-          const total = d.regressions + d.noise;
-          const regPct = total > 0 ? (d.regressions / maxTotal) * 100 : 0;
-          const noisePct = total > 0 ? (d.noise / maxTotal) * 100 : 0;
+          const dAct = d.actionable || d.regressions || 0;
+          const dExp = d.expected || 0;
+          const dNoi = d.noise || 0;
+          const total = dAct + dExp + dNoi;
+          const actPct = total > 0 ? (dAct / maxTotal) * 100 : 0;
+          const expPct = total > 0 ? (dExp / maxTotal) * 100 : 0;
+          const noiPct = total > 0 ? (dNoi / maxTotal) * 100 : 0;
           const isClean = total === 0;
 
           const row = document.createElement("div");
           row.className = "flex items-center gap-4 group";
 
           // Summary text for tooltip
-          const summary =
-            d.regressions > 0
-              ? `${d.regressions} regression(s), ${d.noise} noise`
-              : d.noise > 0
-                ? `Clean — ${d.noise} scroll noise (safe to ignore)`
-                : "Identical — no differences";
+          const tipParts = [];
+          if (dAct > 0) tipParts.push(`⚠ ${dAct} actionable`);
+          if (dExp > 0) tipParts.push(`✓ ${dExp} expected`);
+          if (dNoi > 0) tipParts.push(`· ${dNoi} noise`);
+          const summary = tipParts.length > 0 ? tipParts.join(" · ") : "Identical — no differences";
 
           row.innerHTML = `
                 <div class="w-28 md:w-36 text-right text-xs font-mono text-gray-400 truncate" title="${d.scope}">${d.scope}</div>
                 <div class="flex-1 h-7 bg-gray-800/50 rounded-md relative flex items-center overflow-hidden cursor-pointer" title="${summary}">
                     ${isClean ? `<div class="absolute inset-0 flex items-center justify-center"><span class="text-[10px] text-green-500/60 font-medium">✓ identical</span></div>` : ""}
-                    ${regPct > 0 ? `<div class="h-full bg-red-500/80 rounded-l-md transition-all duration-1000 bar-reg" style="width: 0%" data-target="${regPct}"></div>` : ""}
-                    ${noisePct > 0 ? `<div class="h-full bg-gray-600/60 ${regPct === 0 ? "rounded-l-md" : ""} rounded-r-md transition-all duration-1000 bar-noise" style="width: 0%" data-target="${noisePct}"></div>` : ""}
+                    ${actPct > 0 ? `<div class="h-full bg-red-500/80 rounded-l-md transition-all duration-1000 bar-reg" style="width: 0%" data-target="${actPct}"></div>` : ""}
+                    ${expPct > 0 ? `<div class="h-full bg-blue-500/50 ${actPct === 0 ? "rounded-l-md" : ""} transition-all duration-1000 bar-reg" style="width: 0%" data-target="${expPct}"></div>` : ""}
+                    ${noiPct > 0 ? `<div class="h-full bg-gray-600/60 ${actPct === 0 && expPct === 0 ? "rounded-l-md" : ""} rounded-r-md transition-all duration-1000 bar-noise" style="width: 0%" data-target="${noiPct}"></div>` : ""}
                 </div>
                 <div class="w-16 text-right">
-                    ${d.regressions > 0 ? `<span class="text-xs font-bold text-red-400">${d.regressions}</span>` : ""}
-                    ${d.noise > 0 ? `<span class="text-[10px] text-gray-600 ${d.regressions > 0 ? "ml-1" : ""}">${d.noise > 999 ? (d.noise / 1000).toFixed(0) + "k" : d.noise}</span>` : ""}
+                    ${dAct > 0 ? `<span class="text-xs font-bold text-red-400">${dAct}</span>` : ""}
+                    ${dExp > 0 ? `<span class="text-[10px] text-blue-400 ${dAct > 0 ? "ml-1" : ""}">${dExp}</span>` : ""}
+                    ${dNoi > 0 ? `<span class="text-[10px] text-gray-600 ${dAct > 0 || dExp > 0 ? "ml-1" : ""}">${dNoi > 999 ? (dNoi / 1000).toFixed(0) + "k" : dNoi}</span>` : ""}
                     ${isClean ? '<span class="text-[10px] text-green-500/50">0</span>' : ""}
                 </div>
             `;
@@ -2307,37 +2350,189 @@
         const sidebar = document.getElementById("sidebarList");
         sidebar.innerHTML = "";
 
-        globalTelemetryData.forEach((d, i) => {
+        // ── Classify scopes into groups ──
+        const staticRoutes = []; // /, /proposals, /delegates
+        const typedProposals = {}; // grouped by type (STANDARD, APPROVAL, etc.)
+        const archiveProposals = []; // untyped / flat archive
+
+        globalTelemetryData.forEach((d) => {
+          const s = d.scope;
+          // Static routes: no slash separators or known pages
+          if (s === "/" || s === "index-page" || s === "/proposals" || s.startsWith("proposals") && !s.includes("/") || s.startsWith("/delegates") || s.startsWith("delegates")) {
+            staticRoutes.push(d);
+          } else {
+            // Check for typed proposal: tenant/proposals/TYPE/id or tenant/TYPE/id
+            const parts = s.split("/");
+            const typeIdx = parts.findIndex(p => /^(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)$/i.test(p));
+            if (typeIdx >= 0) {
+              const type = parts[typeIdx].toUpperCase();
+              if (!typedProposals[type]) typedProposals[type] = [];
+              typedProposals[type].push(d);
+            } else {
+              archiveProposals.push(d);
+            }
+          }
+        });
+
+        // ── Helper: build a sidebar item button ──
+        const makeSidebarBtn = (d, isFirst) => {
           const btn = document.createElement("button");
-          btn.className = `sidebar-item w-full text-left px-4 py-3 border-b border-gray-800/50 hover:bg-white/5 group ${i === 0 ? "active" : ""}`;
+          btn.className = `sidebar-item w-full text-left px-4 py-2.5 border-b border-gray-800/30 hover:bg-white/5 group ${isFirst ? "active" : ""}`;
           btn.onclick = () => selectScope(d.scope, btn);
 
-          const cropCount = Math.ceil(
-            d.images.filter((img) => img.name.includes("drift_")).length / 2
-          );
-
-          // Compact status: just a colored dot + short label
+          const cropCount = Math.ceil(d.images.filter((img) => img.name.includes("drift_")).length / 2);
+          const dAct = d.actionable || d.regressions || 0;
+          const dExp = d.expected || 0;
+          const dNoi = d.noise || 0;
           let statusHtml;
-          if (d.regressions > 0) {
-            statusHtml = `<span class="flex items-center gap-1 text-[10px] font-bold text-red-400 shrink-0" data-tip="${d.regressions} real visual change(s) in data, style, or layout between Prod and Branch." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>${d.regressions}</span>`;
+          if (dAct > 0) {
+            const tipParts = [`⚠ ${dAct} actionable`];
+            if (dExp > 0) tipParts.push(`${dExp} expected`);
+            if (dNoi > 0) tipParts.push(`${dNoi} noise`);
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] font-bold text-red-400 shrink-0" data-tip="${tipParts.join(' · ')}" data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>${dAct}</span>`;
+          } else if (dExp > 0) {
+            const tipParts = [`✓ ${dExp} expected changes`];
+            if (dNoi > 0) tipParts.push(`${dNoi} noise`);
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] font-medium text-blue-400 shrink-0" data-tip="${tipParts.join(' · ')}" data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>ok</span>`;
+          } else if (dNoi > 0) {
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0" data-tip="· ${dNoi} noise diffs. Safe to ignore." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>ok</span>`;
           } else {
-            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-green-500/60 shrink-0" data-tip="No regressions.${d.noise > 0 ? " " + d.noise + " scroll-noise nodes (safe to ignore)." : " Identical."}" data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>ok</span>`;
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-green-500/60 shrink-0" data-tip="Identical — no differences." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>ok</span>`;
           }
 
-          btn.innerHTML = `
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-sm font-semibold text-gray-200 truncate">${d.scope}</span>
-                    <div class="flex items-center gap-2.5 shrink-0">
-                        ${cropCount > 0 ? `<span class="flex items-center gap-1 text-[10px] text-gray-500" data-tip="${cropCount} focused diff crops" data-tip-pos="bottom"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>${cropCount}</span>` : ""}
-                        <span class="flex items-center gap-1 text-[10px] text-gray-500" data-tip="${d.scans} screenshots captured" data-tip-pos="bottom"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>${d.scans}</span>
-                        ${statusHtml}
-                    </div>
-                </div>
-            `;
-          sidebar.appendChild(btn);
+          // Friendly label: truncate long proposal IDs
+          let label = d.scope;
+          const idMatch = label.match(/proposals?-(\d{10,})/);
+          if (idMatch) {
+            label = label.replace(idMatch[0], `#${idMatch[1].slice(0,6)}…${idMatch[1].slice(-4)}`);
+          }
+          // Remove tenant prefix for cleaner display
+          label = label.replace(/^(optimism|scroll|ens|uniswap|cyber|derive|linea|etherfi|b3|xai)\//i, "");
 
-          if (i === 0) selectScope(d.scope, btn);
-        });
+          btn.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[13px] font-medium text-gray-300 truncate">${label}</span>
+              <div class="flex items-center gap-2 shrink-0">
+                ${cropCount > 0 ? `<span class="text-[10px] text-gray-600">${cropCount}✂</span>` : ""}
+                ${statusHtml}
+              </div>
+            </div>
+          `;
+          return btn;
+        };
+
+        // ── Helper: section header ──
+        const makeSectionHeader = (iconSvg, title, tooltip, count, items) => {
+          const aggAct = items.reduce((s, d) => s + (d.actionable || d.regressions || 0), 0);
+          const aggExp = items.reduce((s, d) => s + (d.expected || 0), 0);
+
+          let accentClass;
+          if (aggAct > 0) accentClass = "border-l-red-500";
+          else if (aggExp > 0) accentClass = "border-l-blue-500";
+          else accentClass = "border-l-green-500/40";
+
+          let statusDot;
+          if (aggAct > 0) statusDot = `<span class="w-2 h-2 rounded-full bg-red-500" title="${aggAct} actionable"></span>`;
+          else if (aggExp > 0) statusDot = `<span class="w-2 h-2 rounded-full bg-blue-500" title="${aggExp} expected"></span>`;
+          else statusDot = `<span class="w-2 h-2 rounded-full bg-green-500/40" title="Clean"></span>`;
+
+          const header = document.createElement("div");
+          header.className = `flex items-center justify-between px-3 py-2.5 bg-[#13161c] border-b border-gray-700/60 border-l-[3px] ${accentClass} cursor-pointer hover:bg-[#181c24] transition-colors select-none`;
+          header.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-gray-500">${iconSvg}</span>
+              <span class="text-[11px] font-bold text-gray-300 uppercase tracking-wider" data-tip="${tooltip}" data-tip-pos="right">${title}</span>
+              <span class="text-[10px] text-gray-600 font-mono bg-gray-800/60 px-1.5 py-0.5 rounded">${count}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              ${statusDot}
+              ${ICONS.chevron}
+            </div>
+          `;
+          return header;
+        };
+
+        let isFirstItem = true;
+
+        // ═══════════════════════════════════════════
+        // Section 1: Static Routes
+        // ═══════════════════════════════════════════
+        if (staticRoutes.length > 0) {
+          const header = makeSectionHeader(
+            ICONS.home, "Static Routes",
+            "Core pages: home, proposals listing, delegates listing. These should always be clean.",
+            staticRoutes.length, staticRoutes
+          );
+          const container = document.createElement("div");
+          header.onclick = () => {
+            container.classList.toggle("hidden");
+            header.querySelector(".section-chevron").classList.toggle("rotate-180");
+          };
+          sidebar.appendChild(header);
+          staticRoutes.forEach((d) => {
+            const btn = makeSidebarBtn(d, isFirstItem);
+            container.appendChild(btn);
+            if (isFirstItem) { selectScope(d.scope, btn); isFirstItem = false; }
+          });
+          sidebar.appendChild(container);
+        }
+
+        // ═══════════════════════════════════════════
+        // Section 2: Proposals by Type (all under one accordion)
+        // ═══════════════════════════════════════════
+        if (allTypedFlat.length > 0) {
+          const header = makeSectionHeader(
+            ICONS.tag, "Proposals by Type",
+            "One sample proposal per governance type (Standard, Approval, Optimistic, etc). Validates that each proposal layout renders correctly.",
+            allTypedFlat.length, allTypedFlat
+          );
+          const container = document.createElement("div");
+          header.onclick = () => {
+            container.classList.toggle("hidden");
+            header.querySelector(".section-chevron").classList.toggle("rotate-180");
+          };
+          sidebar.appendChild(header);
+
+          // Sort by type then by scope for visual grouping
+          const typeOrder = ["STANDARD", "APPROVAL", "OPTIMISTIC", "BASIC", "ADMIN", "SNAPSHOT"];
+          allTypedFlat.sort((a, b) => {
+            const ai = typeOrder.indexOf(a._proposalType);
+            const bi = typeOrder.indexOf(b._proposalType);
+            return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+          });
+
+          allTypedFlat.forEach((d) => {
+            const btn = makeSidebarBtn(d, isFirstItem, d._proposalType);
+            container.appendChild(btn);
+            if (isFirstItem) { selectScope(d.scope, btn); isFirstItem = false; }
+          });
+          sidebar.appendChild(container);
+        }
+
+        // ═══════════════════════════════════════════
+        // Section 3: Archive Proposals (untyped)
+        // ═══════════════════════════════════════════
+        if (archiveProposals.length > 0) {
+          const header = makeSectionHeader(
+            ICONS.archive, "Archive Proposals",
+            "All proposals fetched from the archive. These lack typed classification and are bulk-scanned for regressions.",
+            archiveProposals.length, archiveProposals
+          );
+          const container = document.createElement("div");
+          container.classList.add("hidden"); // collapsed by default
+          header.querySelector(".section-chevron").classList.add("rotate-180");
+          header.onclick = () => {
+            container.classList.toggle("hidden");
+            header.querySelector(".section-chevron").classList.toggle("rotate-180");
+          };
+          sidebar.appendChild(header);
+          archiveProposals.forEach((d) => {
+            const btn = makeSidebarBtn(d, isFirstItem);
+            container.appendChild(btn);
+            if (isFirstItem) { selectScope(d.scope, btn); isFirstItem = false; }
+          });
+          sidebar.appendChild(container);
+        }
       }
 
       function selectScope(scopeName, btnElement) {
