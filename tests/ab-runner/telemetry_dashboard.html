@@ -402,12 +402,16 @@
               class="bg-black/40 text-xs uppercase text-gray-500 sticky top-0 backdrop-blur-md z-10"
             >
               <tr>
-                <th class="px-4 py-3 font-semibold rounded-tl-lg">
+                <th id="thCol1" class="px-4 py-3 font-semibold rounded-tl-lg">
                   Run ID / Branch
                 </th>
-                <th class="px-4 py-3 font-semibold">Author</th>
-                <th class="px-4 py-3 font-semibold text-center">Status</th>
-                <th class="px-4 py-3 font-semibold text-right">Date</th>
+                <th id="thCol2" class="px-4 py-3 font-semibold">Author</th>
+                <th id="thCol3" class="px-4 py-3 font-semibold text-center">
+                  Status
+                </th>
+                <th id="thCol4" class="px-4 py-3 font-semibold text-right">
+                  Date
+                </th>
                 <th class="px-4 py-3 font-semibold text-center rounded-tr-lg">
                   Action
                 </th>
@@ -1140,6 +1144,11 @@
           localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
           ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
           patInput.style.display = "none";
+          // Update table headers for local mode
+          document.getElementById("thCol1").textContent = "Route";
+          document.getElementById("thCol2").textContent = "Artifacts";
+          document.getElementById("thCol3").textContent = "Status";
+          document.getElementById("thCol4").textContent = "Drifts";
           localStorage.setItem("agora_ab_mode", "local");
           if (!skipHistory) window.history.pushState({}, "", "?mode=local");
           initLocalMode();
@@ -1147,6 +1156,11 @@
           ciBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${activeClass}`;
           localBtn.className = `mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 ${inactiveClass}`;
           patInput.style.display = "";
+          // Restore table headers for CI mode
+          document.getElementById("thCol1").textContent = "Run ID / Branch";
+          document.getElementById("thCol2").textContent = "Author";
+          document.getElementById("thCol3").textContent = "Status";
+          document.getElementById("thCol4").textContent = "Date";
           localStorage.setItem("agora_ab_mode", "ci");
           if (!skipHistory)
             window.history.pushState({}, "", window.location.pathname);
@@ -1265,7 +1279,9 @@
                         : proposalId;
                     const tenant = parts[0];
                     const pType = parts.length > 3 ? parts[2] : "";
-                    label = `/${tenant}/${pType}/${shortId}`;
+                    label = pType
+                      ? `${tenant}/${pType}/${shortId}`
+                      : `${tenant}/${shortId}`;
                   }
                   return fetch(reportUrl)
                     .then((res) => {
@@ -1363,7 +1379,7 @@
             tr.innerHTML = `
                     <td class="px-4 py-4">
                         <div class="flex flex-col">
-                            <span class="text-white font-mono text-sm group-hover:text-blue-400 transition-colors">/${s.scope === "index-page" ? "" : s.scope}</span>
+                            <span class="text-white font-mono text-sm group-hover:text-blue-400 transition-colors">${s.scope}</span>
                             <span class="text-xs text-gray-500 flex items-center gap-1 mt-1"><i data-lucide="hard-drive" class="w-3 h-3"></i> local</span>
                         </div>
                     </td>
