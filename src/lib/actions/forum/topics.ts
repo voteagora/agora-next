@@ -26,8 +26,6 @@ import {
 import { getPublicClient } from "@/lib/viem";
 import {
   addRecipientAttributeValue,
-  buildForumTopicUrl,
-  buildProfileUrl,
   emitBroadcastEvent,
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
@@ -557,12 +555,11 @@ export async function createForumTopic(
         },
         {
           dao_name: slug,
+          topic_id: newTopic.id,
           topic_title: newTopic.title,
-          topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
           category_name: category?.name ?? "General",
           author_address: normalizedAddress,
           author_display_name: authorDisplayName,
-          author_profile_url: buildProfileUrl(normalizedAddress),
         }
       );
     }
