@@ -641,39 +641,75 @@
         if (window.lucide) lucide.createIcons();
 
         try {
-            const possibleScopes = ['index-page', 'proposals', 'delegates', 'retro-funding'];
             const localScopes = [];
 
-            const fetchPromises = possibleScopes.map(scope =>
+            // Helper: process a report.json into a scope entry
+            function processReport(json, scopeLabel, scopePath) {
+                const entries = Array.isArray(json) ? json.filter(e => !e.reportDescription) : (json.diffs || []);
+                let regressions = 0, noise = 0;
+                entries.forEach(e => {
+                    const r = (e.reason || '').toLowerCase();
+                    if (r.includes('data') || r.includes('style') || r.includes('layout') || r.includes('missing')) regressions++;
+                    else noise++;
+                });
+                // Build images from whatever exists in the report
+                const images = [];
+                ['00_UrlA_FullPage_Highlights.png','00_UrlB_FullPage_Highlights.png','00_UrlA_FullPage.png','00_UrlB_FullPage.png',
+                 '00_UrlA_FullPage_Tooltip.png','00_UrlB_FullPage_Tooltip.png'].forEach(name => {
+                    images.push({ name, url: `${scopePath}/${name}` });
+                });
+                // Add focused-crops for each drift
+                for (let i = 1; i <= entries.length; i++) {
+                    ['UrlA','UrlB'].forEach(side => {
+                        images.push({ name: `drift_${i}_${side}.png`, url: `${scopePath}/focused-crops/drift_${i}_${side}.png` });
+                    });
+                }
+                return { scope: scopeLabel, drifts: entries.length, regressions, noise, scans: 1, images, reportObj: json, basePath: scopePath };
+            }
+
+            // 1. Scan flat scopes (legacy structure: ab-diffs/{scope}/report.json)
+            const flatScopes = ['index-page', 'proposals', 'delegates', 'retro-funding', 'delegates?orderBy=most_voting_power'];
+            const flatPromises = flatScopes.map(scope =>
                 fetch(`${basePath}/${scope}/report.json`)
                     .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
-                    .then(json => {
-                        const entries = Array.isArray(json) ? json.filter(e => !e.reportDescription) : (json.diffs || []);
-                        let regressions = 0, noise = 0;
-                        entries.forEach(e => {
-                            const r = (e.reason || '').toLowerCase();
-                            if (r.includes('data') || r.includes('style') || r.includes('layout')) regressions++;
-                            else noise++;
-                        });
-                        const meta = Array.isArray(json) ? json.find(item => item.reportDescription)?.reportDescription : null;
-                        // Build images list
-                        const images = [];
-                        const scans = new Set();
-                        if (meta) {
-                            ['00_UrlA_FullPage_Highlights.png','00_UrlB_FullPage_Highlights.png','00_UrlA_FullPage.png','00_UrlB_FullPage.png'].forEach(name => {
-                                images.push({ name, url: `${basePath}/${scope}/${name}` });
-                                scans.add(name.replace('UrlA','').replace('UrlB','').replace('.png',''));
-                            });
-                            for (let i = 1; i <= entries.length; i++) {
-                                ['UrlA','UrlB'].forEach(side => images.push({ name: `drift_${i}_${side}.png`, url: `${basePath}/${scope}/drift_${i}_${side}.png` }));
-                            }
-                        }
-                        localScopes.push({ scope, drifts: entries.length, regressions, noise, scans: scans.size > 0 ? Math.ceil(scans.size / 2) : 1, images, reportObj: json });
-                    })
-                    .catch(() => { /* scope doesn't exist locally */ })
+                    .then(json => { localScopes.push(processReport(json, `/${scope === 'index-page' ? '' : scope}`, `${basePath}/${scope}`)); })
+                    .catch(() => {})
             );
+            await Promise.all(flatPromises);
 
-            await Promise.all(fetchPromises);
+            // 2. Scan nested per-proposal structure: ab-diffs/{tenant}/proposals/{type}/{proposals-{id}}/report.json
+            // We discover tenants dynamically, then known types, then enumerate proposal dirs via report probing
+            const knownTenants = ['optimism', 'ens', 'uniswap', 'cyber', 'scroll', 'derive', 'pgn'];
+            const knownTypes = ['undefined', 'STANDARD', 'APPROVAL', 'OPTIMISTIC', 'SOCIAL'];
+
+            for (const tenant of knownTenants) {
+                for (const pType of knownTypes) {
+                    const typeBase = `${basePath}/${tenant}/proposals/${pType}`;
+                    // Try to list directories by fetching directory index (works on local dev servers)
+                    try {
+                        const dirRes = await fetch(`${typeBase}/`);
+                        if (!dirRes.ok) continue;
+                        const dirHtml = await dirRes.text();
+                        // Extract proposal dir names from directory listing HTML (covers common dev servers)
+                        const dirMatches = dirHtml.match(/proposals-[a-zA-Z0-9]+/g);
+                        if (!dirMatches || dirMatches.length === 0) continue;
+                        const uniqueDirs = [...new Set(dirMatches)];
+
+                        const proposalPromises = uniqueDirs.map(dirName =>
+                            fetch(`${typeBase}/${dirName}/report.json`)
+                                .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
+                                .then(json => {
+                                    const proposalId = dirName.replace('proposals-', '');
+                                    const shortId = proposalId.length > 12 ? proposalId.slice(0, 6) + '…' + proposalId.slice(-6) : proposalId;
+                                    const label = `/${tenant}/proposals/${shortId}`;
+                                    localScopes.push(processReport(json, label, `${typeBase}/${dirName}`));
+                                })
+                                .catch(() => {})
+                        );
+                        await Promise.all(proposalPromises);
+                    } catch (e) { continue; }
+                }
+            }
 
             if (localScopes.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center">
