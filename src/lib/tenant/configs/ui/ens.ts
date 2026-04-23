@@ -166,8 +166,8 @@ export const ensTenantUIConfig = new TenantUI({
         },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+            ? "0x7D6E5Ceec3542E7A58f066830F0819b28De6eE0D"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
         minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },
@@ -181,8 +181,8 @@ export const ensTenantUIConfig = new TenantUI({
         },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0x7735C385081568e9338aEc70492Debfd2d5c3450"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
+            ? "0x7D6E5Ceec3542E7A58f066830F0819b28De6eE0D"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
         minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },
