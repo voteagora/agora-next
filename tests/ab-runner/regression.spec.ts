@@ -1,7 +1,5 @@
 import { test, chromium, BrowserContext, Page } from "@playwright/test";
 import { ABRunnerEngine } from "./engine";
-import fs from "fs";
-import path from "path";
 import dotenv from "dotenv";
 import { TENANT_NAMESPACES } from "../../src/lib/constants";
 import { fetchProposalsFromArchive } from "../../src/lib/archiveUtils";
@@ -33,34 +31,20 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     await contextB.close();
   });
 
-  const delegatesSortBy =
-    process.env.TARGET_DELEGATES_SORT_BY || "most_voting_power";
-
-  // Route scope mapping — controlled by TARGET_ROUTES env var (from CI checkboxes)
-  const routeMap: Record<string, string> = {
-    index: "/",
-    delegates: `/delegates?orderBy=${delegatesSortBy}`,
-    proposals: "/proposals",
-  };
-
-  const targetRoutes = (process.env.TARGET_ROUTES || "")
-    .split(",")
-    .map((r) => r.trim().toLowerCase())
-    .filter((r) => r.length > 0);
-
-  const staticRoutes =
-    targetRoutes.length > 0
-      ? targetRoutes.filter((r) => routeMap[r]).map((r) => routeMap[r])
-      : Object.values(routeMap); // default: all routes
+  const staticRoutes = [
+    "/",
+    "/delegates?orderBy=most_voting_power",
+    "/proposals",
+  ];
 
   test(`Cross-Tenant Guardrail: Verify identical DAO targets`, async () => {
-    test.setTimeout(60000);
+    test.setTimeout(30000);
     const targetA = process.env.URL_A || "http://127.0.0.1:3000";
     const targetB = process.env.URL_B || "http://127.0.0.1:3000";
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 }),
-      pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 }),
+      pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {}),
+      pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
     ]);
     await Promise.all([
       pageA
@@ -108,13 +92,6 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     }
   }
 
-  // === Targeted Proposal Types Regression ===
-  // E.g.: `TARGET_TYPES="STANDARD,APPROVAL" npm run test:ab`
-  const targetTypes = (process.env.TARGET_TYPES || "")
-    .split(",")
-    .map((t) => t.trim().toUpperCase())
-    .filter((t) => t.length > 0);
-
   // === GCS Archive Proposals Regression ===
   // Fetches all proposals from the archive and runs a diff for each proposal ID.
   test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {
@@ -126,39 +103,145 @@ test.describe("Visual Regression A/B Diff Runner", () => {
         targetA.toLowerCase().includes(ns.toLowerCase())
       ) || TENANT_NAMESPACES.OPTIMISM;
 
-    let { data: proposals } = await fetchProposalsFromArchive(
+    const { data: proposals } = await fetchProposalsFromArchive(
       activeTenant,
       "relevant"
     );
-
-    if (targetTypes.length > 0) {
-      proposals = proposals.filter((p: any) =>
-        targetTypes.includes(String(p.proposal_type).toUpperCase())
-      );
-      console.log(
-        `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`
-      );
-    } else {
-      // If no specific types or proposals requested, run on all available proposals
-      console.log(
-        `[Archive] Unbounded fallback: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
-      );
-    }
+    console.log(
+      `[Archive] Loaded ${proposals.length} proposals for tenant [${activeTenant}]`
+    );
 
     const failedDrifts: string[] = [];
 
     for (const proposal of proposals) {
-      const pRoute = `/proposals/${proposal.id}`;
-      console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
+      const route = `/proposals/${proposal.id}`;
+      console.log(`[Archive] Testing proposal: ${route}`);
+      try {
+        await engine.diffRoute(route, pageA, pageB);
+      } catch (e: any) {
+        failedDrifts.push(`[${proposal.id}] ${e.message}`);
+      }
+    }
+
+    if (failedDrifts.length > 0) {
+      throw new Error(
+        `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
+      );
+    }
+  });
+
+  test(`Diff pass/fail -> expected/diff for all proposal ids from proposals index`, async () => {
+    test.setTimeout(0); // No timeout — scales with number of proposals discovered
+    const targetA = process.env.URL_A || "http://127.0.0.1:3000";
+
+    console.log(
+      `[Dynamic] Scraping DOM for all proposal ids from ${targetA}/proposals...`
+    );
+
+    const activeTenant =
+      Object.values(TENANT_NAMESPACES).find((ns) =>
+        targetA.toLowerCase().includes(ns.toLowerCase())
+      ) || TENANT_NAMESPACES.OPTIMISM;
+
+    let proposalRoutes: string[] = [];
+
+    try {
+      await pageA.goto(`${targetA}/proposals`, { waitUntil: "commit" });
+      await pageA
+        .waitForSelector('a[href*="/proposals/"]', { timeout: 20000 })
+        .catch(() => {});
+
+      const res = await pageA.evaluate(async () => {
+        const reservedSegments = new Set([
+          "create-proposal",
+          "draft",
+          "sponsor",
+        ]);
+        const routes = new Set<string>();
+        let iterations = 0;
+        let stableRounds = 0;
+        let previousCount = 0;
+
+        while (iterations < 12) {
+          const cards = Array.from(
+            document.querySelectorAll('a[href*="/proposals/"]')
+          ).filter((a) => {
+            const h = a.getAttribute("href") || "";
+            return h.includes("/proposals/");
+          });
+
+          cards.forEach((card) => {
+            const href = card.getAttribute("href") as string;
+            const match = href.match(
+              /^\/proposals\/([^/?#]+)(?:[?#].*)?$/
+            );
+            if (!match) return;
+
+            const proposalId = match[1];
+            if (reservedSegments.has(proposalId)) return;
+            routes.add(`/proposals/${proposalId}`);
+          });
+
+          window.scrollTo(0, document.body.scrollHeight);
+          await new Promise((r) => setTimeout(r, 1500));
+
+          if (routes.size === previousCount) {
+            stableRounds++;
+            if (stableRounds >= 2) break;
+          } else {
+            stableRounds = 0;
+          }
+
+          previousCount = routes.size;
+          iterations++;
+        }
+
+        return {
+          routes: Array.from(routes),
+          totalCards: document.querySelectorAll('a[href*="/proposals/"]')
+            .length,
+        };
+      });
+
+      proposalRoutes = res.routes;
+      console.log(
+        `[Dynamic] Extracted ${res.totalCards} raw proposals from DOM.`
+      );
+      console.log(
+        `[Dynamic] Discovered ${proposalRoutes.length} unique proposal routes.`
+      );
+    } catch (e) {
+      console.error(
+        "[Dynamic] Error extracting proposal routes. Skipping extraction.",
+        e
+      );
+    }
+
+    // Execute sequentially and Aggregate failures so we never break the loop early
+    const failedDrifts: string[] = [];
+
+    if (proposalRoutes.length === 0) {
+      throw new Error(
+        `[Dynamic] No proposal routes discovered on ${targetA}/proposals`
+      );
+    }
+
+    for (const pRoute of proposalRoutes) {
+      const proposalId = pRoute.split("/").filter(Boolean).pop();
+      if (!proposalId) {
+        failedDrifts.push(
+          `[Dynamic] Unable to derive proposal ID from route: ${pRoute}`
+        );
+        continue;
+      }
+      console.log(`[Dynamic] Testing proposal [${proposalId}]: ${pRoute}`);
       try {
         await engine.diffRoute(pRoute, pageA, pageB, {
           tenant: activeTenant,
-          type: String(proposal.proposal_type),
+          proposalId,
         });
       } catch (e: any) {
-        failedDrifts.push(
-          `[${proposal.id}] Proposal Drifts Detected: ${e.message}`
-        );
+        failedDrifts.push(`[${proposalId}] ${e.message}`);
       }
     }
 
