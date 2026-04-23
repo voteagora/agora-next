@@ -2,6 +2,7 @@
 
 import {
   fetchUserVotesForProposal as apiFetchUserVotesForProposal,
+  fetchUserVoteStatus as apiFetchUserVoteStatus,
   fetchVotesForProposal as apiFetchVotesForProposal,
   fetchVotersWhoHaveNotVotedForProposal as apiFetchVotersWhoHaveNotVotedForProposal,
   fetchSnapshotVotesForProposal as apiFetchSnapshotVotesForProposal,
@@ -54,11 +55,26 @@ export const fetchSnapshotProposalVotes = (
     pagination,
   });
 
+import { Proposal } from "../api/common/proposals/proposal";
+
 export const fetchUserVotesForProposal = (
   proposalId: string,
-  address: string | `0x${string}`
+  address: string | `0x${string}`,
+  proposal?: Proposal
 ) =>
   apiFetchUserVotesForProposal({
     proposalId,
     address,
+    proposal,
+  });
+
+export const fetchUserVoteStatus = (
+  proposalId: string,
+  address: string | `0x${string}`,
+  proposal?: Proposal
+) =>
+  apiFetchUserVoteStatus({
+    proposalId,
+    address,
+    proposal,
   });
