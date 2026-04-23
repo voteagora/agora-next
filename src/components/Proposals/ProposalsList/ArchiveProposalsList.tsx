@@ -105,7 +105,13 @@ export default function ArchiveProposalsList({
     return [...filteredProposals].sort((a, b) => {
       const aBlock = Number(a.start_blocktime) || 0;
       const bBlock = Number(b.start_blocktime) || 0;
-      return bBlock - aBlock;
+      if (bBlock !== aBlock) {
+        return bBlock - aBlock;
+      }
+
+      const aLogIndex = Number(a.log_index) || 0;
+      const bLogIndex = Number(b.log_index) || 0;
+      return bLogIndex - aLogIndex;
     });
   }, [filteredProposals]);
 

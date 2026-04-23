@@ -286,13 +286,8 @@ export const deriveStandardStatus = (
       const { namespace } = Tenant.current();
       // this is just as backwards compatibility for optimism old governor where we dont
       // have quorum set
-      if (
-        namespace === TENANT_NAMESPACES.OPTIMISM &&
-        thresholds.quorum === 0n
-      ) {
-        if (forVotes < againstVotes) {
-          return "DEFEATED";
-        }
+      if (forVotes < againstVotes) {
+        return "DEFEATED";
       }
       return "SUCCEEDED";
     }
