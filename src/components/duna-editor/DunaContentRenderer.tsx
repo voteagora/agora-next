@@ -163,7 +163,6 @@ export default function DunaContentRenderer({
     [content]
   );
   const isMarkdown = !looksLikeHtml(sanitizedContent);
-
   const renderedContent = useMemo(() => {
     if (isMarkdown) {
       return (

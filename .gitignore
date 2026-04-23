@@ -54,3 +54,5 @@ dist
 # version manager
 .tool-versions
 output/
+test-results/
+playwright-report/

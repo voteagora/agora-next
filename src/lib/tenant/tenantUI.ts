@@ -29,6 +29,12 @@ export type UIGasRelayConfig = {
 export type UIMiradorConfig = {
   proposalCreation?: boolean;
   siweLoginTracing?: boolean;
+  governanceVote?: boolean;
+  governanceDelegation?: boolean;
+  staking?: boolean;
+  governanceAdmin?: boolean;
+  proposalAttestation?: boolean;
+  membershipAdmin?: boolean;
 };
 
 export type UISafeTrackingConfig = {

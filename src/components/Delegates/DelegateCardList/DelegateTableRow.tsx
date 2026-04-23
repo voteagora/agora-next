@@ -33,6 +33,7 @@ export default function DelegateTableRow({
 
   return (
     <TableRow
+      data-testid="delegate-row"
       className="font-semibold cursor-pointer bg-neutral text-secondary"
       onClick={() => {
         router.push(`/delegates/${delegate.address}`);

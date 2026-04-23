@@ -13,11 +13,15 @@ import {
   PROSE_PRIMARY_BODY,
 } from "@/components/duna-editor/proseThemeClasses";
 import Markdown from "@/components/shared/Markdown/Markdown";
+<<<<<<< HEAD
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import MarkdownToc from "./MarkdownToc";
 import { hasMarkdownHeadings } from "./markdownHeadings";
+=======
+import MarkdownToc from "./MarkdownToc";
+>>>>>>> main
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -25,7 +29,10 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+<<<<<<< HEAD
   hideInlineDiscussButton?: boolean;
+=======
+>>>>>>> main
   children?: React.ReactNode;
 }
 
@@ -72,7 +79,10 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+<<<<<<< HEAD
   hideInlineDiscussButton = false,
+=======
+>>>>>>> main
   children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -123,6 +133,12 @@ export default function FinancialStatementLayout({
               margin: 0;
               overflow-x: hidden;
               overflow-y: visible;
+            }
+            html {
+              padding: 0;
+            }
+            body {
+              padding: 0;
             }
             html {
               padding: 0;

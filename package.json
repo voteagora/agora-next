@@ -8,7 +8,6 @@
     "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
-    "cypress": "cypress open",
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
     "generate-typechain:pretty": "yarn generate-typechain && prettier -w src/lib/contracts/generated",
     "typecheck": "tsc --pretty --noEmit",
@@ -17,7 +16,10 @@
     "init-forum-index": "tsx src/scripts/initializeForumIndex.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:ab": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression.spec.ts"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",
@@ -155,17 +157,20 @@
     "viem": "^2.37.0",
     "@wagmi/core": "^2.22.1",
     "@noble/hashes": "^1.5.0",
-    "@noble/curves": "^1.6.0"
+    "@noble/curves": "^1.6.0",
+    "@reown/walletkit": "1.2.2"
   },
   "overrides": {
     "viem": "^2.37.0",
     "@wagmi/core": "^2.22.1",
     "@noble/hashes": "^1.5.0",
-    "@noble/curves": "^1.6.0"
+    "@noble/curves": "^1.6.0",
+    "@reown/walletkit": "1.2.2"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.454.0",
     "@next/bundle-analyzer": "^16.0.3",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/dom": "^10.4.0",
@@ -174,6 +179,8 @@
     "@typechain/ethers-v6": "^0.5.1",
     "@types/d3": "^7.4.3",
     "@types/node": "^22.7.5",
+    "@types/pixelmatch": "^5.2.6",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.25",
     "@types/react-infinite-scroller": "^1.2.5",
@@ -183,10 +190,14 @@
     "@types/uuid": "^9.0.8",
     "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
     "csv-parser": "^3.0.0",
-    "cypress": "^12.11.0",
     "dotenv": "^17.2.2",
+    "fawkes-wallet": "github:voteagora/fawkes-wallet",
     "jsdom": "^26.0.0",
+    "msw": "^2.12.14",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "prettier": "^3.2.5",
     "sass": "^1.62.1",
     "ts-node": "^10.9.2",

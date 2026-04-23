@@ -1,0 +1,150 @@
+name: A/B Visual Regression Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant:
+        description: "Governance tenant to test"
+        required: true
+        default: "optimism"
+        type: choice
+        options:
+          - optimism
+          - uniswap
+          - ens
+          - scroll
+          - cyber
+          - linea
+          - b3
+          - xai
+          - derive
+          - etherfi
+          - syndicate
+          - protocol-guild
+          - towns
+          - boost
+      url_a:
+        description: "URL A — Production baseline"
+        required: true
+        default: "https://vote.optimism.io"
+        type: string
+      url_b:
+        description: "URL B — Preview or staging to compare"
+        required: true
+        type: string
+
+      # ── Route Scopes (checked = included in scan) ──
+      scan_index:
+        description: "🏠 Index / Home page"
+        required: false
+        type: boolean
+        default: true
+      scan_proposals:
+        description: "📋 Proposals listing"
+        required: false
+        type: boolean
+        default: true
+      scan_delegates:
+        description: "👥 Delegates listing"
+        required: false
+        type: boolean
+        default: true
+
+      # ── Optional Filters ──
+      target_proposals:
+        description: "Specific proposal IDs (e.g. 116,adv-55). Leave empty for listing page."
+        required: false
+        type: string
+      target_types:
+        description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for all."
+        required: false
+        type: string
+
+jobs:
+  visual-regression:
+    name: "Visual A/B: ${{ inputs.tenant }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Route Scopes
+        id: scopes
+        run: |
+          ROUTES=""
+          if [ "${{ inputs.scan_index }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}index"; fi
+          if [ "${{ inputs.scan_proposals }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}proposals"; fi
+          if [ "${{ inputs.scan_delegates }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}delegates"; fi
+
+          if [ -z "$ROUTES" ]; then
+            echo "⚠️ No routes selected — defaulting to all routes"
+            ROUTES="index,proposals,delegates"
+          fi
+
+          echo "route_scopes=$ROUTES" >> $GITHUB_OUTPUT
+          echo "📍 Route scopes: $ROUTES"
+
+      - name: Write Run Metadata
+        run: |
+          mkdir -p test-results
+          cat > test-results/run_metadata.json << 'METAEOF'
+          {
+            "url_a": "${{ inputs.url_a }}",
+            "url_b": "${{ inputs.url_b }}",
+            "tenant": "${{ inputs.tenant }}",
+            "routes": "${{ steps.scopes.outputs.route_scopes }}",
+            "target_types": "${{ inputs.target_types }}",
+            "target_proposals": "${{ inputs.target_proposals }}"
+          }
+          METAEOF
+          echo "📝 Metadata written"
+
+      - name: Run A/B Regression Engine
+        continue-on-error: true
+        env:
+          URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
+          URL_B: ${{ inputs.url_b }}
+          TARGET_PROPOSALS: ${{ inputs.target_proposals }}
+          TARGET_TYPES: ${{ inputs.target_types }}
+          TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
+          TENANT_CONTEXT: ${{ inputs.tenant }}
+        run: npm run test:ab
+
+      - name: Google Auth
+        if: always()
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        if: always()
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: "silent-turbine-390703"
+
+      - name: Upload Artifacts to GCP Bucket
+        if: always()
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          chmod +x scripts/upload-ab-artifacts.sh
+          ./scripts/upload-ab-artifacts.sh

@@ -37,7 +37,7 @@ describe("useSafeMultisigTransactionStatus", () => {
       })
     );
 
-    const queryOptions = result.current as {
+    const queryOptions = result.current as unknown as {
       enabled: boolean;
       refetchInterval: (query: {
         state: {

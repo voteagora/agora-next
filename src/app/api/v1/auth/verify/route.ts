@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         }
       : undefined;
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "siwe_verify_started",
     });
@@ -38,14 +38,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (verification.ok) {
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "siwe_verify_succeeded",
       });
     }
 
     if (!verification.ok) {
-      await appendServerTraceEvent({
+      appendServerTraceEvent({
         traceContext,
         eventName: "siwe_verify_failed",
         details: { reason: verification.reason },
@@ -74,13 +74,13 @@ export async function POST(request: NextRequest) {
       token_type: "JWT",
       expires_in: ttl,
     };
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext,
       eventName: "siwe_jwt_issued",
     });
     return NextResponse.json(responseBody);
   } catch (e) {
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: baseTraceContext
         ? { ...baseTraceContext, step: "siwe_verify", source: "api" }
         : undefined,
