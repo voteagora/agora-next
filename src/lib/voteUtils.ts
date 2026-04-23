@@ -127,6 +127,10 @@ export type ParsedParams = {
     key: "HYBRID_APPROVAL";
     kind: string[];
   };
+  OPTIMISTIC_EXECUTABLE: {
+    key: "OPTIMISTIC_EXECUTABLE";
+    kind: null;
+  };
   HYBRID_OPTIMISTIC: {
     key: "HYBRID_OPTIMISTIC";
     kind: string[];

@@ -292,6 +292,62 @@ export function getInputData(proposal: DraftProposal): {
       return { inputData: optimisticInputData };
     }
 
+    case ProposalType.OPTMISTIC_EXECUTABLE: {
+      const targets = proposal.transactions.map((t) =>
+        ethers.getAddress(t.target)
+      ) as `0x${string}`[];
+      const values = proposal.transactions.map((t) =>
+        BigInt(parseInt(t.value) || 0)
+      );
+      const calldatas = proposal.transactions.map(
+        (t) => t.calldata as `0x${string}`
+      );
+
+      const calldata = encodeAbiParameters(
+        [
+          { name: "targets", type: "address[]" },
+          { name: "values", type: "uint256[]" },
+          { name: "calldatas", type: "bytes[]" },
+          {
+            name: "proposalSettings",
+            type: "tuple",
+            components: [
+              { name: "againstThreshold", type: "uint248" },
+              { name: "isRelativeToVotableSupply", type: "bool" },
+            ],
+          },
+        ],
+        [
+          targets,
+          values,
+          calldatas,
+          {
+            againstThreshold: BigInt(disapprovalThreshold * 100),
+            isRelativeToVotableSupply: true,
+          },
+        ]
+      );
+
+      const optimisticExecutableModuleAddress = getProposalTypeAddress(
+        ProposalType.OPTMISTIC_EXECUTABLE
+      );
+
+      if (!optimisticExecutableModuleAddress) {
+        throw new Error(
+          `Optimistic executable module address not found for tenant ${namespace}`
+        );
+      }
+
+      const optimisticExecutableInputData: ApprovalInputData = [
+        optimisticExecutableModuleAddress,
+        calldata,
+        description,
+        parseInt(proposal.proposal_type || "0"),
+      ];
+
+      return { inputData: optimisticExecutableInputData };
+    }
+
     default:
       return {
         inputData: null,

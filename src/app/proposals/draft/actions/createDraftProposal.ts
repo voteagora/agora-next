@@ -127,8 +127,34 @@ const formDataByType = (
       };
 
     case ProposalType.OPTIMISTIC:
-      // nothing specific to optimistic
       return;
+
+    case ProposalType.OPTMISTIC_EXECUTABLE:
+      if (!data.transactions) return {};
+      return {
+        transactions: {
+          deleteMany: {},
+          create: data.transactions.map(
+            (
+              transaction: {
+                target: string;
+                value: string;
+                calldata: string;
+                signature?: string;
+                description: string;
+              },
+              idx: number
+            ) => ({
+              order: idx,
+              target: transaction.target as string,
+              value: transaction.value,
+              calldata: transaction.calldata,
+              signature: transaction.signature,
+              description: sanitizeContent(transaction.description),
+            })
+          ),
+        },
+      };
   }
 };
 
