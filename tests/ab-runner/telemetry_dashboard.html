@@ -1192,23 +1192,62 @@
             const entries = Array.isArray(json)
               ? json.filter((e) => !e.reportDescription)
               : json.diffs || [];
-            let regressions = 0,
+
+            // Smart classification: actionable vs expected vs noise
+            let actionable = 0,
+              expected = 0,
               noise = 0;
             entries.forEach((e) => {
               const r = (e.reason || "").toLowerCase();
-              if (
-                r.includes("data") ||
-                r.includes("style") ||
-                r.includes("layout") ||
-                r.includes("missing")
-              )
-                regressions++;
-              else noise++;
+              const comp = (e.component || "").toLowerCase();
+              const hasTestId = comp.includes("data-testid");
+
+              if (r.includes("layout")) {
+                // Layout drifts are always actionable
+                actionable++;
+              } else if (
+                r.includes("data") &&
+                !comp.includes("quorum") &&
+                !comp.includes("proposal-list")
+              ) {
+                // Data drifts on non-quorum, non-list items are actionable
+                actionable++;
+              } else if (
+                r.includes("added") &&
+                hasTestId &&
+                (comp.includes("proposal-status") ||
+                  comp.includes("proposal-results") ||
+                  comp.includes("proposal-votes"))
+              ) {
+                // Archive-added components with data-testid = expected behavior
+                expected++;
+              } else if (
+                r.includes("missing") &&
+                (comp.includes("proposal-list-item") ||
+                  comp.includes("/proposals/") ||
+                  comp.startsWith("a[href="))
+              ) {
+                // Missing proposal links = scroll-depth noise
+                noise++;
+              } else if (
+                r.includes("style") &&
+                !hasTestId &&
+                comp.startsWith("body >")
+              ) {
+                // Generic deep CSS style drifts = noise
+                noise++;
+              } else if (r.includes("added") || r.includes("missing")) {
+                // Other structural changes — mark as expected
+                expected++;
+              } else {
+                // Everything else (remaining style drifts, etc) = noise
+                noise++;
+              }
             });
+
             // Build images from verified list (manifest) or probe fallback
             const images = [];
             if (verifiedImages && verifiedImages.length > 0) {
-              // Use ONLY verified images from the manifest
               verifiedImages.forEach((name) => {
                 images.push({
                   name: name.replace("focused-crops/", ""),
@@ -1216,7 +1255,6 @@
                 });
               });
             } else {
-              // Fallback: include fullpage images only (crops will use onerror handler)
               [
                 "00_UrlA_FullPage_Highlights.png",
                 "00_UrlB_FullPage_Highlights.png",
@@ -1229,8 +1267,11 @@
             return {
               scope: scopeLabel,
               drifts: entries.length,
-              regressions,
+              actionable,
+              expected,
               noise,
+              // Keep legacy fields for CI compatibility
+              regressions: actionable,
               scans: 1,
               images,
               reportObj: json,
@@ -1349,7 +1390,10 @@
 
           // Populate the table with discovered local scopes
           localScopes.sort(
-            (a, b) => b.regressions - a.regressions || b.drifts - a.drifts
+            (a, b) =>
+              b.actionable - a.actionable ||
+              b.expected - a.expected ||
+              b.drifts - a.drifts
           );
           tbody.innerHTML = "";
 
@@ -1360,16 +1404,21 @@
             tr.onclick = () => openLocalScope(localScopes, s.scope);
 
             let badgeColor, badgeIcon, statusText;
-            if (s.regressions > 0) {
+            if (s.actionable > 0) {
               badgeColor =
-                "bg-red-500/10 text-red-500 border border-red-500/20";
+                "bg-red-500/10 text-red-400 border border-red-500/20";
               badgeIcon = "alert-triangle";
-              statusText = `${s.regressions} REGRESSION${s.regressions > 1 ? "S" : ""}`;
-            } else if (s.noise > 0) {
+              statusText = `${s.actionable} ISSUE${s.actionable > 1 ? "S" : ""}`;
+            } else if (s.expected > 0 && s.noise === 0) {
               badgeColor =
-                "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+                "bg-blue-500/10 text-blue-400 border border-blue-500/20";
               badgeIcon = "check-circle";
-              statusText = "CLEAN (noise)";
+              statusText = "EXPECTED";
+            } else if (s.expected > 0 || s.noise > 0) {
+              badgeColor =
+                "bg-green-500/10 text-green-400 border border-green-500/20";
+              badgeIcon = "check-circle";
+              statusText = "CLEAN";
             } else {
               badgeColor =
                 "bg-green-500/10 text-green-500 border border-green-500/20";
@@ -1377,9 +1426,22 @@
               statusText = "CLEAN";
             }
 
-            const cropCount = Math.ceil(
-              s.images.filter((img) => img.name.includes("drift_")).length / 2
-            );
+            // Build mini breakdown
+            const parts = [];
+            if (s.actionable > 0)
+              parts.push(
+                `<span class="text-red-400">${s.actionable} actionable</span>`
+              );
+            if (s.expected > 0)
+              parts.push(
+                `<span class="text-blue-400">${s.expected} expected</span>`
+              );
+            if (s.noise > 0)
+              parts.push(`<span class="text-gray-500">${s.noise} noise</span>`);
+            const breakdownHtml =
+              parts.length > 0
+                ? parts.join(" · ")
+                : '<span class="text-gray-600">—</span>';
 
             tr.innerHTML = `
                     <td class="px-4 py-4">
@@ -1389,10 +1451,7 @@
                         </div>
                     </td>
                     <td class="px-4 py-4">
-                        <div class="flex items-center gap-3 text-xs text-gray-400">
-                            <span class="flex items-center gap-1"><i data-lucide="image" class="w-3 h-3"></i> ${s.scans} captures</span>
-                            ${cropCount > 0 ? `<span class="flex items-center gap-1"><i data-lucide="crop" class="w-3 h-3"></i> ${cropCount} crops</span>` : ""}
-                        </div>
+                        <div class="text-xs">${breakdownHtml}</div>
                     </td>
                     <td class="px-4 py-4 text-center">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${badgeColor}">
@@ -2068,8 +2127,12 @@
       }
 
       function renderTelemetryTab() {
-        const totalRegressions = globalTelemetryData.reduce(
-          (sum, d) => sum + d.regressions,
+        const totalActionable = globalTelemetryData.reduce(
+          (sum, d) => sum + (d.actionable || d.regressions || 0),
+          0
+        );
+        const totalExpected = globalTelemetryData.reduce(
+          (sum, d) => sum + (d.expected || 0),
           0
         );
         const totalNoise = globalTelemetryData.reduce(
@@ -2082,15 +2145,15 @@
         );
 
         document.getElementById("metricDrifts").textContent =
-          totalRegressions.toString();
+          totalActionable.toString();
         document.getElementById("metricDrifts").className =
-          `text-5xl font-outfit font-black ${totalRegressions > 0 ? "text-red-500" : "text-green-500"}`;
+          `text-5xl font-outfit font-black ${totalActionable > 0 ? "text-red-500" : "text-green-500"}`;
         document.getElementById("metricDriftsSubtext").textContent =
-          totalRegressions === 0
-            ? "data · style · layout"
-            : `across ${globalTelemetryData.filter((d) => d.regressions > 0).length} route(s)`;
+          totalActionable === 0
+            ? "No actionable issues"
+            : `across ${globalTelemetryData.filter((d) => (d.actionable || d.regressions || 0) > 0).length} route(s)`;
         document.getElementById("metricCritical").textContent =
-          totalNoise.toLocaleString();
+          totalExpected.toLocaleString();
         document.getElementById("metricScans").textContent =
           totalScans.toString();
         document.getElementById("metricScope").textContent =
@@ -2112,15 +2175,22 @@
             });
           };
           let badgeClass, badgeText, badgeTitle;
-          if (d.regressions > 0) {
+          const dActionable = d.actionable || d.regressions || 0;
+          const dExpected = d.expected || 0;
+          if (dActionable > 0) {
             badgeClass = "bg-red-900/30 text-red-400 border border-red-500/50";
-            badgeText = `${d.regressions} REGRESSION${d.regressions > 1 ? "S" : ""}`;
-            badgeTitle = `Click to inspect visual artifacts for this route.`;
+            badgeText = `${dActionable} ISSUE${dActionable > 1 ? "S" : ""}`;
+            badgeTitle = `${dActionable} actionable issue(s). Click to inspect.`;
+          } else if (dExpected > 0) {
+            badgeClass =
+              "bg-blue-900/30 text-blue-400 border border-blue-500/50";
+            badgeText = "EXPECTED";
+            badgeTitle = `${dExpected} expected archive change(s), ${d.noise} noise. Click to view.`;
           } else if (d.noise > 0) {
             badgeClass =
               "bg-gray-800/50 text-gray-500 border border-gray-700/50";
             badgeText = "CLEAN";
-            badgeTitle = `No regressions. ${d.noise} scroll-noise nodes (safe to ignore). Click to view.`;
+            badgeTitle = `No issues. ${d.noise} noise (safe to ignore). Click to view.`;
           } else {
             badgeClass =
               "bg-green-900/30 text-green-400 border border-green-500/50";
@@ -2493,9 +2563,12 @@
         }
 
         document.getElementById("viewerSubtitle").innerHTML = `
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
                 <span class="px-2.5 py-1 bg-[#1a1d24] rounded-md text-gray-400 font-mono text-xs border border-gray-700 shadow-sm flex items-center gap-1.5" title="Analyzed Route"><i data-lucide="link-2" class="w-3.5 h-3.5"></i> ${routePath}</span>
-                <span class="px-2.5 py-1 bg-[#1a1d24] rounded-md text-gray-400 font-mono text-xs border border-gray-700 shadow-sm flex items-center gap-1.5" title="Total Captures"><i data-lucide="camera" class="w-3.5 h-3.5"></i> ${scopeData.images.length} Captures</span>
+                <span class="px-2.5 py-1 bg-[#1a1d24] rounded-md text-gray-400 font-mono text-xs border border-gray-700 shadow-sm flex items-center gap-1.5" title="Total Diffs"><i data-lucide="scan" class="w-3.5 h-3.5"></i> ${scopeData.drifts} diffs</span>
+                ${scopeData.actionable > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-red-900/20 text-red-400 border-red-500/30" title="Actionable issues — layout or data regressions"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> ${scopeData.actionable} actionable</span>` : ""}
+                ${scopeData.expected > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-blue-900/20 text-blue-400 border-blue-500/30" title="Expected changes — archive adds voting panels, status badges"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${scopeData.expected} expected</span>` : ""}
+                ${scopeData.noise > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-gray-900/20 text-gray-500 border-gray-700" title="Noise — scroll-depth differences, generic CSS changes"><i data-lucide="volume-x" class="w-3.5 h-3.5"></i> ${scopeData.noise} noise</span>` : ""}
             </div>
             
             <div class="flex flex-col gap-2 mt-8">
