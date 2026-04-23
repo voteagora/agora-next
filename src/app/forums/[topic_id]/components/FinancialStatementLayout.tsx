@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,15 +19,11 @@ import {
   PROSE_PRIMARY_BODY,
 } from "@/components/duna-editor/proseThemeClasses";
 import Markdown from "@/components/shared/Markdown/Markdown";
-<<<<<<< HEAD
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import MarkdownToc from "./MarkdownToc";
 import { hasMarkdownHeadings } from "./markdownHeadings";
-=======
-import MarkdownToc from "./MarkdownToc";
->>>>>>> main
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -29,10 +31,7 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
-<<<<<<< HEAD
   hideInlineDiscussButton?: boolean;
-=======
->>>>>>> main
   children?: React.ReactNode;
 }
 
@@ -79,14 +78,15 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
-<<<<<<< HEAD
   hideInlineDiscussButton = false,
-=======
->>>>>>> main
   children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [isTocDrawerOpen, setIsTocDrawerOpen] = useState(false);
+  const [pendingTocTarget, setPendingTocTarget] = useState<{
+    slug: string;
+    tick: number;
+  } | null>(null);
   const tenant = Tenant.current();
 
   const primaryRgb = tenant.ui?.customization?.primary ?? "23 23 23";
@@ -295,6 +295,39 @@ export default function FinancialStatementLayout({
     }
   };
 
+  const handleTocHeadingClick = useCallback(
+    (slug: string, event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      if (!slug) return;
+      // Replace the current history entry with the hash URL. This overwrites
+      // the Drawer's pushed entry so its cleanup sees a non-drawer state and
+      // won't call history.back() and undo the navigation. Using the native
+      // history API (not router.replace) avoids triggering an app-router
+      // navigation/refetch on hash-only changes.
+      try {
+        window.history.replaceState(null, "", `#${slug}`);
+      } catch (_) {}
+      // Using a tick ensures the effect re-fires even when the same slug is
+      // clicked repeatedly.
+      setPendingTocTarget((prev) => ({
+        slug,
+        tick: (prev?.tick ?? 0) + 1,
+      }));
+      setIsTocDrawerOpen(false);
+    },
+    []
+  );
+
+  // Scroll to the selected heading once the drawer has closed (which releases
+  // the body scroll lock). Runs for both the drawer and sticky-sidebar TOCs.
+  useEffect(() => {
+    if (!pendingTocTarget || isTocDrawerOpen) return;
+    const target = document.getElementById(pendingTocTarget.slug);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [pendingTocTarget, isTocDrawerOpen]);
+
   const { namespace } = tenant;
   const mode = tenant.ui.theme;
   const hideDiscussButton =
@@ -391,43 +424,18 @@ export default function FinancialStatementLayout({
                 "inset-y-0 left-0 w-64 max-w-none rounded-r-lg border-r border-line"
               )}
             >
-              <div
-                onClick={(e) => {
-                  const el = (e.target as HTMLElement).closest(
-                    "a[href^='#']"
-                  ) as HTMLAnchorElement | null;
-                  if (!el) return;
-                  e.preventDefault();
-                  const slug = el.getAttribute("href")?.slice(1) ?? "";
-                  if (!slug) return;
-                  const target = document.getElementById(slug);
-                  // Clear the Drawer's pushed history entry before closing so
-                  // its cleanup doesn't call history.back() and undo navigation.
-                  try {
-                    window.history.replaceState(null, "", `#${slug}`);
-                  } catch (_) {}
-                  // Release the Drawer's body scroll lock so scrollIntoView runs.
-                  document.body.style.overflow = "";
-                  if (target) {
-                    target.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                  }
-                  setIsTocDrawerOpen(false);
-                }}
-              >
-                <MarkdownToc
-                  content={content}
-                  className={markdownTocClassName}
-                />
-              </div>
+              <MarkdownToc
+                content={content}
+                className={markdownTocClassName}
+                onHeadingClick={handleTocHeadingClick}
+              />
             </Drawer>
             <div className="flex items-start gap-6">
               <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
                 <MarkdownToc
                   content={content}
                   className={markdownTocClassName}
+                  onHeadingClick={handleTocHeadingClick}
                 />
               </aside>
               <div className="min-w-0 flex-1 flex flex-col">
