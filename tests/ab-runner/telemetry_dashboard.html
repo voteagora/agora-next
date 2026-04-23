@@ -229,8 +229,8 @@
                 <h2 class="text-xl font-outfit font-bold text-white tracking-widest uppercase">A/B Tests Workflows</h2>
             </div>
             <div class="flex items-center gap-4">
-                <!-- Mode Toggle -->
-                <div class="flex items-center gap-2 bg-[#1a1d24] border border-gray-700 rounded-lg p-0.5">
+                <!-- Mode Toggle (hidden on remote/gist domains where local file access is impossible) -->
+                <div id="modeToggleContainer" class="flex items-center gap-2 bg-[#1a1d24] border border-gray-700 rounded-lg p-0.5">
                     <button id="toggleLocal" onclick="switchMode('local')" class="mode-toggle-btn px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 flex items-center gap-1.5 bg-transparent text-gray-500 hover:text-gray-300">
                         <i data-lucide="hard-drive" class="w-3 h-3"></i> Local
                     </button>
@@ -508,6 +508,13 @@
     let currentRunId = urlParams.get('runId');
     let globalTelemetryData = [];
     let currentMode = urlParams.get('mode') || 'ci'; // 'local' or 'ci'
+
+    // Auto-detect environment: hide Local toggle on remote domains (gist, githack, CDN, etc.)
+    const isLocalHost = ['localhost', '127.0.0.1', '0.0.0.0', ''].includes(location.hostname) || location.protocol === 'file:';
+    if (!isLocalHost) {
+        document.getElementById('modeToggleContainer').style.display = 'none';
+        currentMode = 'ci'; // Force CI mode on remote
+    }
     
     function escapeHtml(unsafe) {
         if (!unsafe || typeof unsafe !== 'string') return String(unsafe);
