@@ -1613,8 +1613,9 @@
           const headers = { Accept: "application/vnd.github+json" };
           if (finalToken) headers["Authorization"] = `Bearer ${finalToken}`;
 
+          // Use workflow-specific endpoint to avoid missing AB runs in a busy repo
           const res = await fetch(
-            `https://api.github.com/repos/voteagora/agora-next/actions/runs?per_page=30`,
+            `https://api.github.com/repos/voteagora/agora-next/actions/workflows/ab-visual-regression.yml/runs?per_page=30`,
             { headers }
           );
 
@@ -1628,12 +1629,7 @@
           }
 
           const data = await res.json();
-          const runs = data.workflow_runs.filter(
-            (r) =>
-              r.name.toLowerCase().includes("regression") ||
-              r.name.toLowerCase().includes("telemetry") ||
-              r.name.toLowerCase().includes("ab-visual")
-          );
+          const runs = data.workflow_runs || [];
 
           if (runs.length === 0) {
             tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500 italic">No visual regression runs found.</td></tr>`;
