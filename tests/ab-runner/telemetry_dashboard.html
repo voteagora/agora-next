@@ -855,22 +855,30 @@
         
         if (isZoomed) {
             img.classList.replace('cursor-zoom-in', 'cursor-zoom-out');
-            img.classList.remove('max-w-full', 'max-h-full', 'object-contain');
-            // Remove padding so scroll reaches top/bottom edges
-            container.classList.remove('pt-24', 'pb-20', 'px-12', 'items-center', 'justify-center');
-            container.classList.add('p-2');
-            // Small images: scale up so zoom is meaningful
+            // Remove max constraints so image can exceed viewport
+            img.classList.remove('max-w-full', 'max-h-full');
+            // Show at natural size (or 2x for small crops)
             const naturalW = img.naturalWidth || 800;
+            const naturalH = img.naturalHeight || 600;
             if (naturalW < 600) {
-                img.style.width = (naturalW * 3) + 'px';
+                img.style.width = (naturalW * 2.5) + 'px';
+                img.style.height = 'auto';
+            } else {
+                img.style.width = naturalW + 'px';
+                img.style.height = 'auto';
             }
+            // Scroll to center of the now-oversized image
+            requestAnimationFrame(() => {
+                const scrollX = (container.scrollWidth - container.clientWidth) / 2;
+                const scrollY = (container.scrollHeight - container.clientHeight) / 2;
+                container.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' });
+            });
         } else {
             img.classList.replace('cursor-zoom-out', 'cursor-zoom-in');
-            img.classList.add('max-w-full', 'max-h-full', 'object-contain');
+            img.classList.add('max-w-full', 'max-h-full');
             img.style.width = '';
-            // Restore padding and centering
-            container.classList.add('pt-24', 'pb-20', 'px-12', 'items-center', 'justify-center');
-            container.classList.remove('p-2');
+            img.style.height = '';
+            container.scrollTo({ left: 0, top: 0, behavior: 'instant' });
         }
     }
 
@@ -893,12 +901,11 @@
         const domImg = document.getElementById('lightboxImg');
         const container = document.getElementById('lightboxScrollContainer');
         
-        domImg.classList.add('max-w-full', 'max-h-full', 'object-contain');
+        domImg.classList.add('max-w-full', 'max-h-full');
         domImg.classList.replace('cursor-zoom-out', 'cursor-zoom-in');
         domImg.style.width = '';
-        container.classList.add('pt-24', 'pb-20', 'px-12', 'items-center', 'justify-center');
-        container.classList.remove('p-2');
-        container.scrollTo(0, 0);
+        domImg.style.height = '';
+        container.scrollTo({ left: 0, top: 0, behavior: 'instant' });
 
         const cleanName = img.name.split('/').pop().replace(/^\d+_/, '').replace(/_/g, ' ').replace('.png', '');
         
