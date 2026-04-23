@@ -1225,7 +1225,8 @@
                 } else if (
                   aText.includes("Ended") ||
                   aText.includes("Created") ||
-                  aText.includes("Started")
+                  aText.includes("Started") ||
+                  aText.includes("Executed")
                 ) {
                   // Timestamp differences = archive stores different dates
                   expected++;
@@ -1235,6 +1236,13 @@
                   aText.match(/\d+\.\d+%/)
                 ) {
                   // Live delegation amounts or vote percentages = chain state noise
+                  noise++;
+                } else if (
+                  comp.startsWith("a[href=") &&
+                  aText.length < 20 &&
+                  bText.length < 20
+                ) {
+                  // Nav link label changes (e.g. About→Info) = branch intentional change
                   noise++;
                 } else {
                   actionable++;
@@ -2402,13 +2410,20 @@
               } else if (
                 aText.includes("Ended") ||
                 aText.includes("Created") ||
-                aText.includes("Started")
+                aText.includes("Started") ||
+                aText.includes("Executed")
               ) {
                 d._cat = "expected";
               } else if (
                 aText.includes("M OP") ||
                 aText.includes("K OP") ||
                 /\d+\.\d+%/.test(aText)
+              ) {
+                d._cat = "noise";
+              } else if (
+                comp.startsWith("a[href=") &&
+                aText.length < 20 &&
+                bText.length < 20
               ) {
                 d._cat = "noise";
               } else {

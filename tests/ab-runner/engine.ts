@@ -106,16 +106,19 @@ export class ABRunnerEngine {
         ? "index-page"
         : route.replace(/^\//, "").replace(/\//g, "-");
     let artifactsDir = "";
-    if (meta && meta.tenant && meta.type) {
-      artifactsDir = path.join(
+    const hasValidType =
+      meta?.type && meta.type !== "undefined" && meta.type !== "null";
+    if (meta && meta.tenant) {
+      const segments = [
         process.cwd(),
         "test-results",
         "ab-diffs",
         meta.tenant,
         "proposals",
-        meta.type,
-        safeRouteName
-      );
+      ];
+      if (hasValidType) segments.push(meta.type!);
+      segments.push(safeRouteName);
+      artifactsDir = path.join(...segments);
     } else {
       artifactsDir = path.join(
         process.cwd(),
@@ -531,14 +534,18 @@ export class ABRunnerEngine {
         pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
         pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-        timeout: 15000,
-      }).catch(() => {});
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-        timeout: 15000,
-      }).catch(() => {});
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
 
       await captureTooltipLayer();
 
@@ -604,14 +611,18 @@ export class ABRunnerEngine {
         pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
         pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-        timeout: 15000,
-      }).catch(() => {});
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-        timeout: 15000,
-      }).catch(() => {});
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
       await captureTooltipLayer();
     }
 
