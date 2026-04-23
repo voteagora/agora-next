@@ -1735,7 +1735,12 @@
             tr.className =
               "hover:bg-white/5 transition-colors group cursor-pointer";
             tr.onclick = (e) => {
-              if (e.target.closest("a") || e.target.closest("input")) return;
+              if (
+                !e.target?.closest ||
+                e.target.closest("a") ||
+                e.target.closest("input")
+              )
+                return;
               window.history.pushState({}, "", "?runId=" + run.id);
               document.getElementById("runsHistoryOverlay").style.display =
                 "none";
@@ -2746,6 +2751,7 @@
         document.addEventListener(
           "mouseenter",
           function (e) {
+            if (!e.target?.closest) return;
             const target = e.target.closest("[data-tip]");
             if (!target) return;
 
@@ -2806,6 +2812,7 @@
         document.addEventListener(
           "mouseleave",
           function (e) {
+            if (!e.target?.closest) return;
             const target = e.target.closest("[data-tip]");
             if (!target) return;
             hideTimeout = setTimeout(() => {
