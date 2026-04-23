@@ -1187,7 +1187,8 @@
           const localScopes = [];
 
           // Helper: process a report.json into a scope entry
-          function processReport(json, scopeLabel, scopePath) {
+          // verifiedImages: optional array of filenames that actually exist on disk (from manifest)
+          function processReport(json, scopeLabel, scopePath, verifiedImages) {
             const entries = Array.isArray(json)
               ? json.filter((e) => !e.reportDescription)
               : json.diffs || [];
@@ -1204,25 +1205,25 @@
                 regressions++;
               else noise++;
             });
-            // Build images from whatever exists in the report
+            // Build images from verified list (manifest) or probe fallback
             const images = [];
-            [
-              "00_UrlA_FullPage_Highlights.png",
-              "00_UrlB_FullPage_Highlights.png",
-              "00_UrlA_FullPage.png",
-              "00_UrlB_FullPage.png",
-              "00_UrlA_FullPage_Tooltip.png",
-              "00_UrlB_FullPage_Tooltip.png",
-            ].forEach((name) => {
-              images.push({ name, url: `${scopePath}/${name}` });
-            });
-            // Add focused-crops for each drift
-            for (let i = 1; i <= entries.length; i++) {
-              ["UrlA", "UrlB"].forEach((side) => {
+            if (verifiedImages && verifiedImages.length > 0) {
+              // Use ONLY verified images from the manifest
+              verifiedImages.forEach((name) => {
                 images.push({
-                  name: `drift_${i}_${side}.png`,
-                  url: `${scopePath}/focused-crops/drift_${i}_${side}.png`,
+                  name: name.replace("focused-crops/", ""),
+                  url: `${scopePath}/${name}`,
                 });
+              });
+            } else {
+              // Fallback: include fullpage images only (crops will use onerror handler)
+              [
+                "00_UrlA_FullPage_Highlights.png",
+                "00_UrlB_FullPage_Highlights.png",
+                "00_UrlA_FullPage_Tooltip.png",
+                "00_UrlB_FullPage_Tooltip.png",
+              ].forEach((name) => {
+                images.push({ name, url: `${scopePath}/${name}` });
               });
             }
             return {
@@ -1291,7 +1292,9 @@
                       return res.json();
                     })
                     .then((json) => {
-                      localScopes.push(processReport(json, label, scopePath));
+                      localScopes.push(
+                        processReport(json, label, scopePath, entry.images)
+                      );
                     })
                     .catch(() => {});
                 });
