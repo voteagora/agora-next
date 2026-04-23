@@ -2359,23 +2359,23 @@
         };
 
         // ── Classify scopes into groups ──
-        const staticRoutes = []; // /, /proposals, /delegates
-        const typedProposals = {}; // grouped by type (STANDARD, APPROVAL, etc.)
-        const archiveProposals = []; // untyped / flat archive
+        const staticRoutes = [];
+        const typedProposals = {};
+        const allTypedFlat = [];
+        const archiveProposals = [];
 
         globalTelemetryData.forEach((d) => {
           const s = d.scope;
-          // Static routes: no slash separators or known pages
           if (s === "/" || s === "index-page" || s === "/proposals" || s.startsWith("proposals") && !s.includes("/") || s.startsWith("/delegates") || s.startsWith("delegates")) {
             staticRoutes.push(d);
           } else {
-            // Check for typed proposal: tenant/proposals/TYPE/id or tenant/TYPE/id
             const parts = s.split("/");
             const typeIdx = parts.findIndex(p => /^(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)$/i.test(p));
             if (typeIdx >= 0) {
               const type = parts[typeIdx].toUpperCase();
               if (!typedProposals[type]) typedProposals[type] = [];
               typedProposals[type].push(d);
+              allTypedFlat.push({ ...d, _proposalType: type });
             } else {
               archiveProposals.push(d);
             }
@@ -2383,9 +2383,9 @@
         });
 
         // ── Helper: build a sidebar item button ──
-        const makeSidebarBtn = (d, isFirst) => {
+        const makeSidebarBtn = (d, isFirst, proposalType) => {
           const btn = document.createElement("button");
-          btn.className = `sidebar-item w-full text-left px-4 py-2.5 border-b border-gray-800/30 hover:bg-white/5 group ${isFirst ? "active" : ""}`;
+          btn.className = `sidebar-item w-full text-left pl-7 pr-3 py-2 border-b border-gray-800/20 hover:bg-white/[0.04] group ${isFirst ? "active" : ""}`;
           btn.onclick = () => selectScope(d.scope, btn);
 
           const cropCount = Math.ceil(d.images.filter((img) => img.name.includes("drift_")).length / 2);
@@ -2399,27 +2399,30 @@
             if (dNoi > 0) tipParts.push(`${dNoi} noise`);
             statusHtml = `<span class="flex items-center gap-1 text-[10px] font-bold text-red-400 shrink-0" data-tip="${tipParts.join(' · ')}" data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>${dAct}</span>`;
           } else if (dExp > 0) {
-            const tipParts = [`✓ ${dExp} expected changes`];
+            const tipParts = [`✓ ${dExp} expected`];
             if (dNoi > 0) tipParts.push(`${dNoi} noise`);
             statusHtml = `<span class="flex items-center gap-1 text-[10px] font-medium text-blue-400 shrink-0" data-tip="${tipParts.join(' · ')}" data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>ok</span>`;
           } else if (dNoi > 0) {
-            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0" data-tip="· ${dNoi} noise diffs. Safe to ignore." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>ok</span>`;
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-gray-500 shrink-0" data-tip="· ${dNoi} noise. Safe to ignore." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>ok</span>`;
           } else {
-            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-green-500/60 shrink-0" data-tip="Identical — no differences." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>ok</span>`;
+            statusHtml = `<span class="flex items-center gap-1 text-[10px] text-green-500/60 shrink-0" data-tip="Identical." data-tip-pos="bottom"><span class="w-1.5 h-1.5 rounded-full bg-green-500/50"></span>ok</span>`;
           }
 
-          // Friendly label: truncate long proposal IDs
+          // Clean label
           let label = d.scope;
           const idMatch = label.match(/proposals?-(\d{10,})/);
-          if (idMatch) {
-            label = label.replace(idMatch[0], `#${idMatch[1].slice(0,6)}…${idMatch[1].slice(-4)}`);
-          }
-          // Remove tenant prefix for cleaner display
+          if (idMatch) label = label.replace(idMatch[0], `#${idMatch[1].slice(0,6)}…${idMatch[1].slice(-4)}`);
           label = label.replace(/^(optimism|scroll|ens|uniswap|cyber|derive|linea|etherfi|b3|xai)\//i, "");
+          if (proposalType) label = label.replace(new RegExp(`proposals/${proposalType}/`, "i"), "");
+
+          const typeBadge = proposalType ? `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-800 text-gray-500 border border-gray-700/50 shrink-0">${proposalType.slice(0,4)}</span>` : "";
 
           btn.innerHTML = `
             <div class="flex items-center justify-between gap-2">
-              <span class="text-[13px] font-medium text-gray-300 truncate">${label}</span>
+              <div class="flex items-center gap-1.5 min-w-0">
+                ${typeBadge}
+                <span class="text-[12px] text-gray-400 truncate">${label}</span>
+              </div>
               <div class="flex items-center gap-2 shrink-0">
                 ${cropCount > 0 ? `<span class="text-[10px] text-gray-600">${cropCount}✂</span>` : ""}
                 ${statusHtml}
