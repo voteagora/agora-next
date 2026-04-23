@@ -1279,9 +1279,11 @@
                         : proposalId;
                     const tenant = parts[0];
                     const pType = parts.length > 3 ? parts[2] : "";
-                    label = pType
-                      ? `${tenant}/${pType}/${shortId}`
-                      : `${tenant}/${shortId}`;
+                    // Hide "undefined" type - just show tenant/shortId
+                    label =
+                      pType && pType !== "undefined"
+                        ? `${tenant}/${pType}/${shortId}`
+                        : `${tenant}/${shortId}`;
                   }
                   return fetch(reportUrl)
                     .then((res) => {
@@ -2237,8 +2239,12 @@
         if (!scopeData) return;
 
         const routePath =
-          scopeData.scope === "index-page" ? "/" : `/${scopeData.scope}`;
-        document.getElementById("viewerTitle").textContent = scopeData.scope;
+          scopeData.scope === "index-page"
+            ? "/"
+            : scopeData.scope.startsWith("/")
+              ? scopeData.scope
+              : `/${scopeData.scope}`;
+        document.getElementById("viewerTitle").textContent = routePath;
 
         // Place diagnostics button in the header actions area
         const actionsEl = document.getElementById("viewerActions");
@@ -2646,7 +2652,7 @@
                 <svg class="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
             </div>
             <div class="relative bg-gray-900 flex-1 flex items-center justify-center p-2 min-h-[200px]">
-                <img src="${img.url}" class="max-w-full max-h-[500px] object-contain shadow-md" loading="lazy">
+                <img src="${img.url}" class="max-w-full max-h-[500px] object-contain shadow-md" loading="lazy" onerror="this.closest('.glass-panel').style.display='none'">
                 <div class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors pointer-events-none"></div>
             </div>
         `;
