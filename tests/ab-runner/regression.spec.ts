@@ -210,11 +210,30 @@ test.describe("Visual Regression A/B Diff Runner", () => {
 
       for (const proposal of proposals) {
         const pRoute = `/proposals/${proposal.id}`;
-        console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
+
+        let rawType = String(
+          proposal.proposal_type ||
+            proposal.proposal_type_info?.name ||
+            "UNDEFINED"
+        ).toUpperCase();
+        let resolvedType = "UNDEFINED";
+        if (rawType.includes("OPTIMISTIC")) resolvedType = "OPTIMISTIC";
+        else if (rawType.includes("APPROVAL")) resolvedType = "APPROVAL";
+        else if (
+          rawType.includes("STANDARD") ||
+          rawType.includes("DEFAULT") ||
+          rawType.includes("SUPERMAJORITY")
+        ) {
+          resolvedType = "STANDARD";
+        }
+
+        console.log(
+          `[Archive] Testing Proposal [${proposal.id}]: ${pRoute} (Type: ${resolvedType})`
+        );
         try {
           await engine.diffRoute(pRoute, pageA, pageB, {
             tenant: activeTenant,
-            type: String(proposal.proposal_type),
+            type: resolvedType,
           });
         } catch (e: any) {
           failedDrifts.push(
