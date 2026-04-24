@@ -1678,16 +1678,32 @@
           container.classList.remove("items-center", "justify-center");
           container.classList.add("items-start", "justify-start");
 
-          // Show at natural size (or 2x for small crops)
+          // Show at natural size (or 2.5x for small crops)
           const naturalW = img.naturalWidth || 800;
           const naturalH = img.naturalHeight || 600;
+          let zoomedW, zoomedH;
           if (naturalW < 600) {
-            img.style.width = naturalW * 2.5 + "px";
+            zoomedW = naturalW * 2.5;
+            zoomedH = naturalH * 2.5;
+            img.style.width = zoomedW + "px";
             img.style.height = "auto";
           } else {
+            zoomedW = naturalW;
+            zoomedH = naturalH;
             img.style.width = naturalW + "px";
             img.style.height = "auto";
           }
+
+          // Center the image via margin if it is smaller than the available viewport,
+          // otherwise it will snap to the left due to items-start.
+          // Container paddings: px-12 (96px), pt-24 (96px), pb-20 (80px) = 176px Y.
+          const padX = Math.max(0, (container.clientWidth - 96 - zoomedW) / 2);
+          const padY = Math.max(
+            0,
+            (container.clientHeight - 176 - zoomedH) / 2
+          );
+          img.style.margin = `${padY}px ${padX}px`;
+
           // Scroll to center of the now-oversized image
           requestAnimationFrame(() => {
             const scrollX = (container.scrollWidth - container.clientWidth) / 2;
@@ -1704,6 +1720,7 @@
           img.classList.add("max-w-full", "max-h-full");
           img.style.width = "";
           img.style.height = "";
+          img.style.margin = "";
           container.classList.add("items-center", "justify-center");
           container.classList.remove("items-start", "justify-start");
           container.scrollTo({ left: 0, top: 0, behavior: "instant" });
@@ -1736,6 +1753,10 @@
         domImg.classList.replace("cursor-zoom-out", "cursor-zoom-in");
         domImg.style.width = "";
         domImg.style.height = "";
+        domImg.style.margin = "";
+
+        container.classList.add("items-center", "justify-center");
+        container.classList.remove("items-start", "justify-start");
         container.scrollTo({ left: 0, top: 0, behavior: "instant" });
 
         const cleanName = img.name
