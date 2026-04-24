@@ -133,11 +133,24 @@ test.describe("Visual Regression A/B Diff Runner", () => {
       );
 
       if (targetTypes.length > 0) {
-        proposals = proposals.filter((p: any) =>
-          targetTypes.includes(String(p.proposal_type).toUpperCase())
-        );
+        const limitedProposals: any[] = [];
+        const typesCount: Record<string, number> = {};
+
+        for (const p of proposals) {
+          const t = String(p.proposal_type).toUpperCase();
+          if (targetTypes.includes(t)) {
+            typesCount[t] = (typesCount[t] || 0) + 1;
+            // Only keep up to 1 of each type to prevent massive loops, unless overridden
+            const limit = Number(process.env.TARGET_TYPES_LIMIT || "1");
+            if (typesCount[t] <= limit) {
+              limitedProposals.push(p);
+            }
+          }
+        }
+        proposals = limitedProposals;
+
         console.log(
-          `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`
+          `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}] (Limit per type: ${process.env.TARGET_TYPES_LIMIT || "1"})`
         );
       } else {
         // If no specific types or proposals requested, run on all available proposals
