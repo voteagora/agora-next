@@ -14,7 +14,7 @@ import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/Ar
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { PaginationParams } from "@/app/lib/pagination";
-import {
+import type {
   Vote,
   VoterTypes,
   VotesSort,

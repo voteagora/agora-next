@@ -7,11 +7,11 @@ import InfiniteScroll from "react-infinite-scroller";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
+import type { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
-import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
+import type { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 const LIMIT = 20;
 

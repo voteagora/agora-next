@@ -11,7 +11,7 @@ import ProposalVotesFilter from "./ProposalVotesFilter";
 import ProposalVotesSort, {
   SortParams,
 } from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/app/api/common/votes/vote";
 import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 import { ProposalVotesTab } from "@/components/common/ProposalVotesTab";
 import { VoteOnAtlas } from "@/components/common/VoteOnAtlas";

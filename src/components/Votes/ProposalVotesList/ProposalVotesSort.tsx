@@ -11,7 +11,7 @@ import { ChevronDown } from "lucide-react";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { ArrowDownAZ } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
+import type { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 export type SortParams = {
   sortKey: VotesSort;

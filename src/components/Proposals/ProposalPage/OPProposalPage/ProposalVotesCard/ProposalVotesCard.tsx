@@ -15,7 +15,7 @@ import ProposalVotesFilter from "./ProposalVotesFilter";
 import ProposalVotesSort, {
   SortParams,
 } from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/app/api/common/votes/vote";
 import { VOTER_TYPES } from "@/lib/constants";
 import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
 import Tenant from "@/lib/tenant/tenant";

@@ -8,7 +8,7 @@ import {
 } from "@/app/api/common/votes/getVotes";
 import { PaginationParams } from "@/app/lib/pagination";
 import { TaxFormBanner } from "../TaxFormBanner";
-import { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
+import type { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 async function fetchProposalVotes(
   proposalId: string,

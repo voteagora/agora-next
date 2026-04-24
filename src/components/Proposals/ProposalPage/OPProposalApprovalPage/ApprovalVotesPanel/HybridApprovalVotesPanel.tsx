@@ -25,7 +25,7 @@ import ProposalVotesSort, {
   SortParams,
 } from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
 import ProposalVoterListFilter from "@/components/Votes/ProposalVotesList/ProsalVoterListFilter";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/app/api/common/votes/vote";
 
 type Props = {
   proposal: Proposal;

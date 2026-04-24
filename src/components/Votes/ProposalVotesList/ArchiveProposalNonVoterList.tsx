@@ -7,7 +7,7 @@ import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/app/api/common/votes/vote";
 
 const NON_VOTERS_PAGE_SIZE = 20;
 
