@@ -170,7 +170,21 @@ test.describe("Visual Regression A/B Diff Runner", () => {
         const typesCount: Record<string, number> = {};
 
         for (const p of proposals) {
-          const t = String(p.proposal_type).toUpperCase();
+          let rawType = String(
+            p.proposal_type || p.proposal_type_info?.name || "UNDEFINED"
+          ).toUpperCase();
+
+          let t = "UNDEFINED";
+          if (rawType.includes("OPTIMISTIC")) t = "OPTIMISTIC";
+          else if (rawType.includes("APPROVAL")) t = "APPROVAL";
+          else if (
+            rawType.includes("STANDARD") ||
+            rawType.includes("DEFAULT") ||
+            rawType.includes("SUPERMAJORITY")
+          ) {
+            t = "STANDARD";
+          }
+
           if (targetTypes.includes(t)) {
             typesCount[t] = (typesCount[t] || 0) + 1;
             // Only keep up to 1 of each type to prevent massive loops, unless overridden
