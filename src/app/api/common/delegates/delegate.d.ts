@@ -1,4 +1,3 @@
-import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
 
 export type Delegate = {
