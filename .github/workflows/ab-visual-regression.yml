@@ -56,9 +56,14 @@ on:
         required: false
         type: string
       target_types:
-        description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for all."
+        description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for none."
         required: false
         type: string
+      scan_all_archive:
+        description: "Deep scan all individual archived proposals (can be slow)"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   visual-regression:
@@ -122,6 +127,7 @@ jobs:
           URL_B: ${{ inputs.url_b }}
           TARGET_PROPOSALS: ${{ inputs.target_proposals }}
           TARGET_TYPES: ${{ inputs.target_types }}
+          SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
         run: npm run test:ab

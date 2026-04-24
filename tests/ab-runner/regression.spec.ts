@@ -200,11 +200,16 @@ test.describe("Visual Regression A/B Diff Runner", () => {
           `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}] (Limit per type: ${process.env.TARGET_TYPES_LIMIT || "1"})`
         );
       } else {
-        // If no specific types or proposals requested, run on a capped sample of 5 recent proposals
-        proposals = proposals.slice(0, 5);
-        console.log(
-          `[Archive] Unbounded fallback: Capped to ${proposals.length} recent proposals for tenant [${activeTenant}] to prevent CI timeout.`
-        );
+        if (process.env.SCAN_ALL_ARCHIVE === "true") {
+          console.log(
+            `[Archive] Unbounded scan enabled: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
+          );
+        } else {
+          console.log(
+            `[Archive] Skipping archive crawler because no TARGET_TYPES were provided and SCAN_ALL_ARCHIVE is false.`
+          );
+          proposals = [];
+        }
       }
 
       const failedDrifts: string[] = [];
