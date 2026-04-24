@@ -117,55 +117,57 @@ test.describe("Visual Regression A/B Diff Runner", () => {
 
   // === GCS Archive Proposals Regression ===
   // Fetches all proposals from the archive and runs a diff for each proposal ID.
-  test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {
-    test.setTimeout(0); // No timeout — scales with number of proposals in archive
+  if (explicitProposals.length === 0) {
+    test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {
+      test.setTimeout(0); // No timeout — scales with number of proposals in archive
 
-    const targetA = process.env.URL_A || "http://127.0.0.1:3000";
-    const activeTenant =
-      Object.values(TENANT_NAMESPACES).find((ns) =>
-        targetA.toLowerCase().includes(ns.toLowerCase())
-      ) || TENANT_NAMESPACES.OPTIMISM;
+      const targetA = process.env.URL_A || "http://127.0.0.1:3000";
+      const activeTenant =
+        Object.values(TENANT_NAMESPACES).find((ns) =>
+          targetA.toLowerCase().includes(ns.toLowerCase())
+        ) || TENANT_NAMESPACES.OPTIMISM;
 
-    let { data: proposals } = await fetchProposalsFromArchive(
-      activeTenant,
-      "relevant"
-    );
-
-    if (targetTypes.length > 0) {
-      proposals = proposals.filter((p: any) =>
-        targetTypes.includes(String(p.proposal_type).toUpperCase())
+      let { data: proposals } = await fetchProposalsFromArchive(
+        activeTenant,
+        "relevant"
       );
-      console.log(
-        `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`
-      );
-    } else {
-      // If no specific types or proposals requested, run on all available proposals
-      console.log(
-        `[Archive] Unbounded fallback: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
-      );
-    }
 
-    const failedDrifts: string[] = [];
-
-    for (const proposal of proposals) {
-      const pRoute = `/proposals/${proposal.id}`;
-      console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
-      try {
-        await engine.diffRoute(pRoute, pageA, pageB, {
-          tenant: activeTenant,
-          type: String(proposal.proposal_type),
-        });
-      } catch (e: any) {
-        failedDrifts.push(
-          `[${proposal.id}] Proposal Drifts Detected: ${e.message}`
+      if (targetTypes.length > 0) {
+        proposals = proposals.filter((p: any) =>
+          targetTypes.includes(String(p.proposal_type).toUpperCase())
+        );
+        console.log(
+          `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}]`
+        );
+      } else {
+        // If no specific types or proposals requested, run on all available proposals
+        console.log(
+          `[Archive] Unbounded fallback: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
         );
       }
-    }
 
-    if (failedDrifts.length > 0) {
-      throw new Error(
-        `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
-      );
-    }
-  });
+      const failedDrifts: string[] = [];
+
+      for (const proposal of proposals) {
+        const pRoute = `/proposals/${proposal.id}`;
+        console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
+        try {
+          await engine.diffRoute(pRoute, pageA, pageB, {
+            tenant: activeTenant,
+            type: String(proposal.proposal_type),
+          });
+        } catch (e: any) {
+          failedDrifts.push(
+            `[${proposal.id}] Proposal Drifts Detected: ${e.message}`
+          );
+        }
+      }
+
+      if (failedDrifts.length > 0) {
+        throw new Error(
+          `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
+        );
+      }
+    });
+  }
 });
