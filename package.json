@@ -14,7 +14,7 @@
     "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "init-forum-index": "tsx src/scripts/initializeForumIndex.ts",
-    "check-prettier": "prettier --check src/",
+    "check-prettier": "prettier --check src/ --write",
     "prettier-src": "prettier -w src/",
     "test": "vitest",
     "test:e2e": "playwright test",
