@@ -1674,6 +1674,10 @@
           img.classList.replace("cursor-zoom-in", "cursor-zoom-out");
           // Remove max constraints so image can exceed viewport
           img.classList.remove("max-w-full", "max-h-full");
+          // Disable centering to allow scroll to top/left correctly
+          container.classList.remove("items-center", "justify-center");
+          container.classList.add("items-start", "justify-start");
+
           // Show at natural size (or 2x for small crops)
           const naturalW = img.naturalWidth || 800;
           const naturalH = img.naturalHeight || 600;
@@ -1700,6 +1704,8 @@
           img.classList.add("max-w-full", "max-h-full");
           img.style.width = "";
           img.style.height = "";
+          container.classList.add("items-center", "justify-center");
+          container.classList.remove("items-start", "justify-start");
           container.scrollTo({ left: 0, top: 0, behavior: "instant" });
         }
       }
