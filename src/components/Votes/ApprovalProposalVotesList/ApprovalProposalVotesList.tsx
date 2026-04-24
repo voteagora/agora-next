@@ -3,11 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
-import {
-  type Vote,
-  VotesSort,
-  VotesSortOrder,
-} from "@/app/api/common/votes/vote";
+import type { Vote, VotesSort, VotesSortOrder,  } from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";

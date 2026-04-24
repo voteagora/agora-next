@@ -6,7 +6,7 @@ import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import {

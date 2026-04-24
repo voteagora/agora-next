@@ -11,7 +11,7 @@ import ApprovalVoteReason from "./ApprovalVoteReason";
 import { pluralizeVote } from "@/lib/tokenUtils";
 import DelegateVoteIcon from "./DelegateVoteIcon";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import LazyVotingPower from "./LazyVotingPower";
 
 function shortPropTitle(title: string, proosalId: string) {

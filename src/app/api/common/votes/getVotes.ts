@@ -6,15 +6,7 @@ import {
 import { ParsedProposalData, parseProposalData } from "@/lib/proposalUtils";
 import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import {
-  SnapshotVote,
-  SnapshotVotePayload,
-  Vote,
-  VotePayload,
-  VoterTypes,
-  VotesSort,
-  VotesSortOrder,
-} from "./vote";
+import type { SnapshotVote, SnapshotVotePayload, Vote, VotePayload, VoterTypes, VotesSort, VotesSortOrder,  } from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";

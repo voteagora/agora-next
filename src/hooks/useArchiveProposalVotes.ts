@@ -3,11 +3,7 @@ import { useMemo } from "react";
 import type { ProposalType } from "@/lib/types";
 import type { ArchiveVoteRow, ArchiveNonVoterRow } from "@/lib/archiveUtils";
 import { parseSupport } from "@/lib/voteUtils";
-import {
-  VotesSort,
-  VotesSortOrder,
-  VoterTypes,
-} from "@/app/api/common/votes/vote";
+import type { VotesSort, VotesSortOrder, VoterTypes,  } from "@/app/api/common/votes/vote";
 
 export type ArchiveVote = {
   transactionHash: string | null;

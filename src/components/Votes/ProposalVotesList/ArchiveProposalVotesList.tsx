@@ -4,12 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import {
-  VotesSort,
-  VotesSortOrder,
-  VoterTypes,
-  Vote,
-} from "@/app/api/common/votes/vote";
+import type { VotesSort, VotesSortOrder, VoterTypes, Vote,  } from "@/app/api/common/votes/vote";
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";

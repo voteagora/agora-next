@@ -7,7 +7,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useSnapshotProposalVotes } from "@/hooks/useProposalVotes";
 import { cn } from "@/lib/utils";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type { SnapshotVote } from "@/app/api/common/votes/vote";
 
 type Props = {
   fetchVotesForProposal: (

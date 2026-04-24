@@ -6,12 +6,7 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { PaginatedResult } from "@/app/lib/pagination";
-import {
-  SnapshotVote,
-  Vote,
-  VotesSort,
-  VotesSortOrder,
-} from "@/app/api/common/votes/vote";
+import type { SnapshotVote, Vote, VotesSort, VotesSortOrder,  } from "@/app/api/common/votes/vote";
 
 interface Props {
   enabled: boolean;

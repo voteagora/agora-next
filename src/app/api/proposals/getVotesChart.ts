@@ -1,6 +1,6 @@
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
+import type { SnapshotVotePayload, VotePayload } from "@/app/api/common/votes/vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { fetchRawProposalVotesFromArchive } from "@/lib/archiveUtils";
 
