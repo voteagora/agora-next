@@ -107,10 +107,7 @@ export function ExecutionCopyableValue({
   }
   return (
     <div
-      className={cn(
-        "flex min-w-0 items-start gap-0.5 text-primary",
-        className
-      )}
+      className={cn("flex min-w-0 items-start gap-0.5 text-primary", className)}
     >
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>

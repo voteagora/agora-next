@@ -37,22 +37,29 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72": "ENS (token)",
   "0x323a76393544d5ecca80cd6ef2a560c6a395b7e3": "ENS Governor",
-  "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7": "ENS Timelock (wallet.ensdao.eth)",
+  "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7":
+    "ENS Timelock (wallet.ensdao.eth)",
 
   "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e": "ENS Registry",
   "0x57f1887a8bf19b14fc0df6fd9b2ac6fea176e835": "BaseRegistrar (ERC721 .eth)",
   "0xdaaf96c0f0d2cb03c01295172da9066cb7716f3c": "ENS NameWrapper",
-  "0x253553366da8546fc250f225fe3d25d0c782303b": "ETHRegistrarController (controller.ens.eth)",
-  "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5": "ETHRegistrarController (legacy controller.ens.eth)",
+  "0x253553366da8546fc250f225fe3d25d0c782303b":
+    "ETHRegistrarController (controller.ens.eth)",
+  "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5":
+    "ETHRegistrarController (legacy controller.ens.eth)",
 
   "0x4f2083f5fbede34c2714affb3105539775f7fe64": "ENS Endowment (Safe)",
-  "0xf20325cf84b72e8bbf8d8984b8f0059b984b390b": "Zodiac Roles modifier (v1, ENS)",
-  "0x703806e61847984346d2d7ddd853049627e50a40": "Zodiac Roles modifier (v2, ENS)",
-  "0x11c76ad590abdffcd980afec9ad951b160f02797": "Milkman (CoW / ENS DAO trades)",
+  "0xf20325cf84b72e8bbf8d8984b8f0059b984b390b":
+    "Zodiac Roles modifier (v1, ENS)",
+  "0x703806e61847984346d2d7ddd853049627e50a40":
+    "Zodiac Roles modifier (v2, ENS)",
+  "0x11c76ad590abdffcd980afec9ad951b160f02797":
+    "Milkman (CoW / ENS DAO trades)",
   "0x000000000000cd17345801aa8147b8d3950260ff":
     "Karpatkey on-chain post (governance / kit, ERC-2980 style)",
 
-  "0x8fb66f38cf86a3d5e8768f8f1754a24a6c661fb8": "Splits Warehouse (ERC-6909, Splits v2)",
+  "0x8fb66f38cf86a3d5e8768f8f1754a24a6c661fb8":
+    "Splits Warehouse (ERC-6909, Splits v2)",
 
   // ─── Bridge Contracts (L1) ───
 

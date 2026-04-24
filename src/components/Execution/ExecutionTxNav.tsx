@@ -38,7 +38,8 @@ export function ExecutionTxNav({
         {ids.map((id) => {
           const view = getExecutionView(id);
           const href = executionTxViewPath(txHash, id);
-          const active = pendingHref != null ? pendingHref === href : pathname === href;
+          const active =
+            pendingHref != null ? pendingHref === href : pathname === href;
           const Icon = TAB_ICON[id];
 
           return (
