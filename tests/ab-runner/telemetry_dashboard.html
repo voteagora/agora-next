@@ -846,10 +846,10 @@
                 <div
                   class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"
                 >
-                  Regressions
+                  Changed
                   <svg
                     class="tip-icon"
-                    data-tip="Real visual changes caused by code: data, style, or layout differences between Production and Branch. These need developer review."
+                    data-tip="True changes: data, structure, or visual shifts with different text."
                     data-tip-pos="bottom"
                     fill="none"
                     stroke="currentColor"
@@ -876,10 +876,10 @@
                 <div
                   class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"
                 >
-                  Scroll Noise
+                  Noise
                   <svg
                     class="tip-icon"
-                    data-tip="DOM nodes that appear as Added or Missing because the pages loaded different amounts of content during scroll. Not a code issue — safe to ignore."
+                    data-tip="CSS or layout shifts with identical text content. Safe to ignore."
                     data-tip-pos="bottom"
                     fill="none"
                     stroke="currentColor"
@@ -896,7 +896,7 @@
                   -
                 </div>
                 <div class="text-[10px] text-gray-600 mt-1">
-                  added / missing nodes
+                  style & layout shifts
                 </div>
               </div>
               <div
@@ -950,7 +950,44 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="flex flex-col gap-8">
+              <div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+                <div
+                  class="px-6 py-4 border-b border-gray-800 bg-white/5 flex items-center justify-between"
+                >
+                  <h2 class="text-lg font-outfit font-bold text-gray-100">
+                    Route Breakdown
+                  </h2>
+                  <div class="flex items-center gap-3">
+                    <span
+                      class="flex items-center gap-1.5 text-[10px] text-orange-400"
+                      ><span class="w-2 h-2 rounded-sm bg-orange-500"></span
+                      >Changed</span
+                    >
+                    <span
+                      class="flex items-center gap-1.5 text-[10px] text-gray-500"
+                      ><span class="w-2 h-2 rounded-sm bg-gray-600"></span
+                      >Noise</span
+                    >
+                    <span
+                      class="flex items-center gap-1.5 text-[10px] text-green-500"
+                      ><span class="w-2 h-2 rounded-sm bg-green-600"></span
+                      >Clean</span
+                    >
+                  </div>
+                </div>
+                <div
+                  id="chartContainer"
+                  class="p-8 flex-1 flex flex-col justify-center gap-4 min-h-[300px]"
+                >
+                  <div
+                    class="flex items-center justify-center h-full text-gray-500 italic"
+                  >
+                    Processing distributions...
+                  </div>
+                </div>
+              </div>
+
               <div class="glass-panel rounded-xl overflow-hidden flex flex-col">
                 <div
                   class="px-6 py-4 border-b border-gray-800 bg-white/5 flex items-center justify-between"
@@ -990,42 +1027,6 @@
                       </tr>
                     </tbody>
                   </table>
-                </div>
-              </div>
-              <div class="glass-panel rounded-xl overflow-hidden flex flex-col">
-                <div
-                  class="px-6 py-4 border-b border-gray-800 bg-white/5 flex items-center justify-between"
-                >
-                  <h2 class="text-lg font-outfit font-bold text-gray-100">
-                    Route Breakdown
-                  </h2>
-                  <div class="flex items-center gap-3">
-                    <span
-                      class="flex items-center gap-1.5 text-[10px] text-red-400"
-                      ><span class="w-2 h-2 rounded-sm bg-red-500"></span
-                      >Regressions</span
-                    >
-                    <span
-                      class="flex items-center gap-1.5 text-[10px] text-gray-500"
-                      ><span class="w-2 h-2 rounded-sm bg-gray-600"></span
-                      >Noise</span
-                    >
-                    <span
-                      class="flex items-center gap-1.5 text-[10px] text-green-500"
-                      ><span class="w-2 h-2 rounded-sm bg-green-600"></span
-                      >Clean</span
-                    >
-                  </div>
-                </div>
-                <div
-                  id="chartContainer"
-                  class="p-8 flex-1 flex flex-col justify-center gap-4 min-h-[300px]"
-                >
-                  <div
-                    class="flex items-center justify-center h-full text-gray-500 italic"
-                  >
-                    Processing distributions...
-                  </div>
                 </div>
               </div>
             </div>
@@ -2223,7 +2224,7 @@
             ? "No changes detected"
             : `across ${globalTelemetryData.filter((d) => (d.actionable || d.regressions || 0) > 0).length} route(s)`;
         document.getElementById("metricCritical").textContent =
-          totalExpected.toLocaleString();
+          totalNoise.toLocaleString();
         document.getElementById("metricScans").textContent =
           totalScans.toString();
         document.getElementById("metricScope").textContent =
