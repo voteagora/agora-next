@@ -160,6 +160,12 @@ test.describe("Visual Regression A/B Diff Runner", () => {
         "relevant"
       );
 
+      // Filter out snapshot proposals because they don't have a detail page on Agora
+      // and redirect to snapshot.org, which would break the visual regression scanner.
+      proposals = proposals.filter(
+        (p: any) => String(p.proposal_type).toUpperCase() !== "SNAPSHOT"
+      );
+
       if (targetTypes.length > 0) {
         const limitedProposals: any[] = [];
         const typesCount: Record<string, number> = {};
