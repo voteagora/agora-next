@@ -2247,8 +2247,22 @@
             const sidebarBtns = document.querySelectorAll(".sidebar-item");
             sidebarBtns.forEach((btn) => {
               if (btn.dataset.scope === d.scope) {
+                // Ensure the accordion container is visible
+                const container = btn.parentElement;
+                if (container && container.classList.contains("hidden")) {
+                  container.classList.remove("hidden");
+                  // Rotate the chevron back down
+                  const header = container.previousElementSibling;
+                  if (header) {
+                    const chevron = header.querySelector(".section-chevron");
+                    if (chevron) chevron.classList.remove("rotate-180");
+                  }
+                }
                 selectScope(d.scope, btn);
-                btn.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Small delay to ensure layout is updated before scrolling
+                setTimeout(() => {
+                  btn.scrollIntoView({ behavior: "smooth", block: "center" });
+                }, 10);
               }
             });
           };
