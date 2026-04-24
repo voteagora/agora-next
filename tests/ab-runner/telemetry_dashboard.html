@@ -1578,8 +1578,20 @@
         setTimeout(() => {
           const sidebarBtns = document.querySelectorAll(".sidebar-item");
           sidebarBtns.forEach((btn) => {
-            if (btn.textContent.includes(clickedScope)) {
+            if (btn.dataset.scope === clickedScope) {
+              const container = btn.parentElement;
+              if (container && container.classList.contains("hidden")) {
+                container.classList.remove("hidden");
+                const header = container.previousElementSibling;
+                if (header) {
+                  const chevron = header.querySelector(".section-chevron");
+                  if (chevron) chevron.classList.remove("rotate-180");
+                }
+              }
               selectScope(clickedScope, btn);
+              setTimeout(() => {
+                btn.scrollIntoView({ behavior: "smooth", block: "center" });
+              }, 10);
             }
           });
           if (window.lucide) lucide.createIcons();
