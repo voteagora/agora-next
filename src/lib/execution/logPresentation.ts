@@ -1059,7 +1059,7 @@ function numberField(label: string, value: unknown): ExecutionLogField | null {
   return {
     label: humanizeLabel(label),
     type: "number",
-    value: bigintValue.toLocaleString(),
+    value: bigintValue.toString(),
   };
 }
 

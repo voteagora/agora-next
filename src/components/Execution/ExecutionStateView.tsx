@@ -262,9 +262,6 @@ export function ExecutionStateView({ txHash }: { txHash: string }) {
                         <div className="text-sm font-semibold text-primary">
                           {presentation.summary ?? presentation.title}
                         </div>
-                        <span className="text-xs font-mono text-tertiary">
-                          #{log.logIndex}
-                        </span>
                       </div>
                       {presentation.fields.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-secondary">

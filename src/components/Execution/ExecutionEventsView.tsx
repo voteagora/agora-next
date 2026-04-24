@@ -144,9 +144,6 @@ export function ExecutionEventsView({ txHash }: { txHash: string }) {
                       <h3 className="text-base font-semibold text-primary sm:text-lg">
                         {presentation.title}
                       </h3>
-                      <span className="text-xs font-medium text-tertiary">
-                        #{log.logIndex}
-                      </span>
                     </div>
                     {presentation.summary && (
                       <p className="text-sm leading-relaxed text-secondary">
