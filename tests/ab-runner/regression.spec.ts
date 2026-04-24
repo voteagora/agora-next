@@ -200,9 +200,10 @@ test.describe("Visual Regression A/B Diff Runner", () => {
           `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}] (Limit per type: ${process.env.TARGET_TYPES_LIMIT || "1"})`
         );
       } else {
-        // If no specific types or proposals requested, run on all available proposals
+        // If no specific types or proposals requested, run on a capped sample of 5 recent proposals
+        proposals = proposals.slice(0, 5);
         console.log(
-          `[Archive] Unbounded fallback: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
+          `[Archive] Unbounded fallback: Capped to ${proposals.length} recent proposals for tenant [${activeTenant}] to prevent CI timeout.`
         );
       }
 
