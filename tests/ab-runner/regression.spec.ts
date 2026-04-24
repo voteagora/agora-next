@@ -31,6 +31,34 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   test.afterAll(async () => {
     await contextA.close();
     await contextB.close();
+
+    // Generate manifest.json for local dashboard viewing
+    const abDiffsDir = path.join(process.cwd(), "test-results", "ab-diffs");
+    if (fs.existsSync(abDiffsDir)) {
+      const reports: { path: string; images: string[] }[] = [];
+      const getDirs = (dir: string) => {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const res = path.resolve(dir, entry.name);
+          if (entry.isDirectory()) {
+            getDirs(res);
+          } else if (entry.name === "report.json") {
+            const relPath = path.relative(abDiffsDir, res);
+            const parentDir = path.dirname(res);
+            const images = fs
+              .readdirSync(parentDir)
+              .filter((f) => f.endsWith(".png"))
+              .map((f) => path.relative(abDiffsDir, path.join(parentDir, f)));
+            reports.push({ path: relPath, images });
+          }
+        }
+      };
+      getDirs(abDiffsDir);
+      fs.writeFileSync(
+        path.join(abDiffsDir, "manifest.json"),
+        JSON.stringify({ reports }, null, 2)
+      );
+    }
   });
 
   const delegatesSortBy =
