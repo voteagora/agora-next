@@ -1,15 +1,16 @@
 "use client";
 
-import ProposalTitle from "../ProposalTitle/ProposalTitle";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import Markdown from "@/components/shared/Markdown/Markdown";
+import ENSName from "@/components/shared/ENSName";
+import Tenant from "@/lib/tenant/tenant";
+import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
-import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import Markdown from "@/components/shared/Markdown/Markdown";
-import Tenant from "@/lib/tenant/tenant";
+import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
-import ENSName from "@/components/shared/ENSName";
+import { ExecutionInspectorSection } from "./ExecutionInspectorSection";
 
 const { contracts, namespace } = Tenant.current();
 
@@ -184,6 +185,9 @@ export default function ProposalDescription({
             proposal={proposal}
           />
         )}
+        <ExecutionInspectorSection
+          executedTransactionHash={proposal.executedTransactionHash}
+        />
         <RelatedProposalLinks proposalId={proposal.id} />
         <Markdown
           content={stripTitleFromDescription(

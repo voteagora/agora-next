@@ -11,6 +11,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f": "Uniswap V2 Factory",
   "0x18e433c7bf8a2e1d0197ce5d8f9afada1a771360": "Uniswap V2 FeeToSetter",
   "0x1a9c8182c09f50c8318d769245bea52c32be35bc": "Governance Timelock",
+  "0x408ed6354d4973f66138c91495f2f2fcbd8724c3": "Uniswap Governor",
   "0x000000000000000000000000000000000000dead": "Burn address",
 
   // ─── Protocol Fees (Ethereum Mainnet) ───
@@ -31,6 +32,27 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41": "ENS Public Resolver",
   "0x3b59c6d0034490093460787566dc5d6ce17f2f9c": "uac.eth",
   "0x8f72fcf695523a6fc7dd97eafdd7a083c386b7b6": "SEAL Safe Harbor Registry",
+
+  // ─── ENS (mainnet) — token, governance, and contracts governance executions usually hit ───
+
+  "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72": "ENS (token)",
+  "0x323a76393544d5ecca80cd6ef2a560c6a395b7e3": "ENS Governor",
+  "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7": "ENS Timelock (wallet.ensdao.eth)",
+
+  "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e": "ENS Registry",
+  "0x57f1887a8bf19b14fc0df6fd9b2ac6fea176e835": "BaseRegistrar (ERC721 .eth)",
+  "0xdaaf96c0f0d2cb03c01295172da9066cb7716f3c": "ENS NameWrapper",
+  "0x253553366da8546fc250f225fe3d25d0c782303b": "ETHRegistrarController (controller.ens.eth)",
+  "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5": "ETHRegistrarController (legacy controller.ens.eth)",
+
+  "0x4f2083f5fbede34c2714affb3105539775f7fe64": "ENS Endowment (Safe)",
+  "0xf20325cf84b72e8bbf8d8984b8f0059b984b390b": "Zodiac Roles modifier (v1, ENS)",
+  "0x703806e61847984346d2d7ddd853049627e50a40": "Zodiac Roles modifier (v2, ENS)",
+  "0x11c76ad590abdffcd980afec9ad951b160f02797": "Milkman (CoW / ENS DAO trades)",
+  "0x000000000000cd17345801aa8147b8d3950260ff":
+    "Karpatkey on-chain post (governance / kit, ERC-2980 style)",
+
+  "0x8fb66f38cf86a3d5e8768f8f1754a24a6c661fb8": "Splits Warehouse (ERC-6909, Splits v2)",
 
   // ─── Bridge Contracts (L1) ───
 
@@ -88,6 +110,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0x1ac1181fc4e4f877963680587aeaa2c90d7ebb95":
     "Celo L1 Cross Domain Messenger",
+  "0xc5c5d157928bdbd2acf6d0777626b6c75a9eaedc": "Celo Optimism Portal",
   "0xafe208a311b21f13ef87e33a90049fc17a7acdec": "Celo V3 Factory",
   "0x79a530c8e2fa8748b7b40dd3629c0520c2ccf03f": "Celo V2 Factory",
   "0x288dc841a52fca2707c6947b3a777c5e56cd87bc": "Celo V4 Pool Manager",
@@ -99,6 +122,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0xf931a81d18b1766d15695ffc7c1920a62b7e710a":
     "Worldchain L1 Cross Domain Messenger",
+  "0xd5ec14a83b7d95be1e2ac12523e2dee12cbeea6c": "Worldchain Optimism Portal",
   "0xcb2436774c3e191c85056d248ef4260ce5f27a9d":
     "Worldchain Cross Chain Account",
   "0x7a5028bda40e7b173c278c5342087826455ea25a": "Worldchain V3 Factory",
@@ -110,6 +134,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0xdc40a14d9abd6f410226f1e6de71ae03441ca506":
     "Zora L1 Cross Domain Messenger",
+  "0x1a0ad011913a150f69f6a19df447a0cfd9551054": "Zora Bridge",
   "0x36eec182d0b24df3dc23115d64db521a93d5154f": "Zora Cross Chain Account",
   "0x7145f8aeef1f6510e92164038e1b6f8cb2c42cbb": "Zora V3 Factory",
   "0xbfc49b47637a4dc9b7b8de8e71bf41e519103b95": "Zora V3 Open Fee Adapter",
