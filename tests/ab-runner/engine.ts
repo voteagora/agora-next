@@ -470,7 +470,7 @@ export class ABRunnerEngine {
       }
 
       // 4. Batch-inject highlights in a single evaluate() per page
-      const highlightPayload = drifts.slice(0, 50).map((d) => ({
+      const highlightPayload = drifts.map((d) => ({
         path: d.path,
         css:
           d.reason === "Data Drift"
@@ -712,7 +712,7 @@ export class ABRunnerEngine {
 
     const isDelegatesRoute = route === "/delegates";
     const maxAttempts = isDelegatesRoute ? 2 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 3000 : 15000;
+    const maxViewportHeight = isDelegatesRoute ? 3000 : 35000;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -797,7 +797,7 @@ export class ABRunnerEngine {
           if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
         }
 
-        const MAX_ELEMENTS = 2000;
+        const MAX_ELEMENTS = 10000;
         const allElements = document.querySelectorAll(scope);
         const elements = Array.from(allElements)
           .filter((el) => {

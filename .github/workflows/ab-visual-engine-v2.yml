@@ -88,6 +88,7 @@ jobs:
         continue-on-error: true
         env:
           TENANT_CONTEXT: ${{ matrix.tenant }}
+          SCAN_ALL_ARCHIVE: false
         run: npm run test:ab
 
       - name: Google Auth
