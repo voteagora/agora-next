@@ -2246,8 +2246,9 @@
             // Find and click the correct sidebar item
             const sidebarBtns = document.querySelectorAll(".sidebar-item");
             sidebarBtns.forEach((btn) => {
-              if (btn.textContent.includes(d.scope)) {
+              if (btn.dataset.scope === d.scope) {
                 selectScope(d.scope, btn);
+                btn.scrollIntoView({ behavior: "smooth", block: "center" });
               }
             });
           };
@@ -2403,6 +2404,7 @@
         const makeSidebarBtn = (d, isFirst, proposalType) => {
           const btn = document.createElement("button");
           btn.className = `sidebar-item w-full text-left pl-7 pr-3 py-2 border-b border-gray-800/20 hover:bg-white/[0.04] group ${isFirst ? "active" : ""}`;
+          btn.dataset.scope = d.scope;
           btn.onclick = () => selectScope(d.scope, btn);
 
           const cropCount = Math.ceil(
