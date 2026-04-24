@@ -2217,10 +2217,10 @@
         document.getElementById("metricDrifts").textContent =
           totalActionable.toString();
         document.getElementById("metricDrifts").className =
-          `text-5xl font-outfit font-black ${totalActionable > 0 ? "text-red-500" : "text-green-500"}`;
+          `text-5xl font-outfit font-black ${totalActionable > 0 ? "text-orange-500" : "text-green-500"}`;
         document.getElementById("metricDriftsSubtext").textContent =
           totalActionable === 0
-            ? "No actionable issues"
+            ? "No changes detected"
             : `across ${globalTelemetryData.filter((d) => (d.actionable || d.regressions || 0) > 0).length} route(s)`;
         document.getElementById("metricCritical").textContent =
           totalExpected.toLocaleString();
@@ -2310,7 +2310,7 @@
 
           // Summary text for tooltip
           const tipParts = [];
-          if (dAct > 0) tipParts.push(`⚠ ${dAct} actionable`);
+          if (dAct > 0) tipParts.push(`⚠ ${dAct} changed`);
           if (dExp > 0) tipParts.push(`✓ ${dExp} expected`);
           if (dNoi > 0) tipParts.push(`· ${dNoi} noise`);
           const summary =
@@ -2466,13 +2466,13 @@
           const aggExp = items.reduce((s, d) => s + (d.expected || 0), 0);
 
           let accentClass;
-          if (aggAct > 0) accentClass = "border-l-red-500";
+          if (aggAct > 0) accentClass = "border-l-orange-500";
           else if (aggExp > 0) accentClass = "border-l-blue-500";
           else accentClass = "border-l-green-500/40";
 
           let statusDot;
           if (aggAct > 0)
-            statusDot = `<span class="w-2 h-2 rounded-full bg-red-500" title="${aggAct} actionable"></span>`;
+            statusDot = `<span class="w-2 h-2 rounded-full bg-orange-500" title="${aggAct} changed"></span>`;
           else if (aggExp > 0)
             statusDot = `<span class="w-2 h-2 rounded-full bg-blue-500" title="${aggExp} expected"></span>`;
           else
@@ -2696,22 +2696,22 @@
                   : "text-green-400";
           const statusTip =
             reportActionable > 0
-              ? "Actionable issues found: layout or data regressions that need developer review."
+              ? "True changes found: data, structure, or visual shifts with different text."
               : reportExpected > 0
-                ? "Only expected archive changes detected (status panels, date formats, quorum normalization). No regressions."
+                ? "Only expected archive changes detected. No regressions."
                 : reportNoise > 0
-                  ? "Only noise detected: scroll-depth differences, sub-pixel rendering, live data timing. Safe to ignore."
+                  ? "Only noise detected: CSS shifts with identical text. Safe to ignore."
                   : "No differences detected between Production and Branch.";
 
           const metaHtml = meta
             ? `
                 <div class="bg-[#1a1d24] p-5 rounded-xl border border-gray-800 mb-4">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Target Route</span><span class="font-mono text-sm text-gray-200">${escapeHtml(meta.route)}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Status <svg class="tip-icon" data-tip="${statusTip}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="text-sm font-bold ${statusColor}">${statusText}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Actionable <svg class="tip-icon" data-tip="Real layout or data regressions requiring developer review." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold ${reportActionable > 0 ? "text-red-500" : "text-green-500"}">${reportActionable}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Expected <svg class="tip-icon" data-tip="Archive-related changes: status panels added, date formats, quorum normalization. Confirms the feature works." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-blue-400">${reportExpected}</span></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Noise <svg class="tip-icon" data-tip="Scroll-depth differences, sub-pixel rendering, live chain data timing. Safe to ignore." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-gray-500">${reportNoise}</span></div>
+                    <div class="flex flex-wrap gap-6 mb-4">
+                        <div class="flex-1 min-w-[200px]"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Target Route</span><span class="font-mono text-sm text-gray-200">${escapeHtml(meta.route)}</span></div>
+                        <div class="w-32"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Status <svg class="tip-icon" data-tip="${statusTip}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="text-sm font-bold ${statusColor}">${statusText}</span></div>
+                        <div class="w-28"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Changed <svg class="tip-icon" data-tip="Real structural or data changes." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold ${reportActionable > 0 ? "text-orange-400" : "text-green-500"}">${reportActionable}</span></div>
+                        ${reportExpected > 0 ? `<div class="w-28"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Expected <svg class="tip-icon" data-tip="Legacy classification." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-blue-400">${reportExpected}</span></div>` : ""}
+                        <div class="w-28"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Noise <svg class="tip-icon" data-tip="CSS/Layout shifts with identical text. Safe to ignore." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-gray-500">${reportNoise}</span></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-700/50">
                         <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Production</span><a href="${meta.urlA}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlA)}</a></div>
@@ -2732,7 +2732,7 @@
                     </div>
                     <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
                         <button onclick="window.setReportFilter('all')" data-filter="all" class="report-filter-btn active px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-white/10 border-gray-600 text-white">All <span class="ml-1 opacity-60">${drifts.length}</span></button>
-                        ${reportActionable > 0 ? `<button onclick="window.setReportFilter('actionable')" data-filter="actionable" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-red-800/50 text-red-400 hover:bg-red-900/20">Actionable <span class="ml-1 opacity-60">${reportActionable}</span></button>` : ""}
+                        ${reportActionable > 0 ? `<button onclick="window.setReportFilter('actionable')" data-filter="actionable" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-orange-800/50 text-orange-400 hover:bg-orange-900/20">Changed <span class="ml-1 opacity-60">${reportActionable}</span></button>` : ""}
                         ${reportExpected > 0 ? `<button onclick="window.setReportFilter('expected')" data-filter="expected" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-blue-800/50 text-blue-400 hover:bg-blue-900/20">Expected <span class="ml-1 opacity-60">${reportExpected}</span></button>` : ""}
                         ${reportNoise > 0 ? `<button onclick="window.setReportFilter('noise')" data-filter="noise" class="report-filter-btn px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-colors whitespace-nowrap bg-transparent border-gray-700/50 text-gray-500 hover:bg-gray-800/20">Noise <span class="ml-1 opacity-60">${reportNoise}</span></button>` : ""}
                     </div>
@@ -2769,7 +2769,7 @@
                 const f = btn.dataset.filter;
                 const colorMap = {
                   all: "border-gray-600 text-gray-400",
-                  actionable: "border-red-800/50 text-red-400",
+                  actionable: "border-orange-800/50 text-orange-400",
                   expected: "border-blue-800/50 text-blue-400",
                   noise: "border-gray-700/50 text-gray-500",
                 };
@@ -2847,7 +2847,7 @@
                 // Category badge
                 const catColors = {
                   actionable:
-                    "bg-red-900/30 text-red-400 border border-red-700/40",
+                    "bg-orange-900/30 text-orange-400 border border-orange-700/40",
                   expected:
                     "bg-blue-900/30 text-blue-400 border border-blue-700/40",
                   noise:
@@ -2856,7 +2856,7 @@
                 const catBadge = catColors[d._cat] || catColors.noise;
                 const catLabel =
                   d._cat === "actionable"
-                    ? "⚠ Issue"
+                    ? "⚠ Changed"
                     : d._cat === "expected"
                       ? "✓ Expected"
                       : "· Noise";
@@ -2906,9 +2906,9 @@
             <div class="flex items-center gap-3 flex-wrap">
                 <span class="px-2.5 py-1 bg-[#1a1d24] rounded-md text-gray-400 font-mono text-xs border border-gray-700 shadow-sm flex items-center gap-1.5" title="Analyzed Route"><i data-lucide="link-2" class="w-3.5 h-3.5"></i> ${routePath}</span>
                 <span class="px-2.5 py-1 bg-[#1a1d24] rounded-md text-gray-400 font-mono text-xs border border-gray-700 shadow-sm flex items-center gap-1.5" title="Total Diffs"><i data-lucide="scan" class="w-3.5 h-3.5"></i> ${scopeData.drifts} diffs</span>
-                ${scopeData.actionable > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-red-900/20 text-red-400 border-red-500/30" title="Actionable issues — layout or data regressions"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> ${scopeData.actionable} actionable</span>` : ""}
-                ${scopeData.expected > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-blue-900/20 text-blue-400 border-blue-500/30" title="Expected changes — archive adds voting panels, status badges"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${scopeData.expected} expected</span>` : ""}
-                ${scopeData.noise > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-gray-900/20 text-gray-500 border-gray-700" title="Noise — scroll-depth differences, generic CSS changes"><i data-lucide="volume-x" class="w-3.5 h-3.5"></i> ${scopeData.noise} noise</span>` : ""}
+                ${scopeData.actionable > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-orange-900/20 text-orange-400 border-orange-500/30" title="True changes — data, structure, or visual shifts"><i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> ${scopeData.actionable} changed</span>` : ""}
+                ${scopeData.expected > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-blue-900/20 text-blue-400 border-blue-500/30" title="Expected legacy changes"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> ${scopeData.expected} expected</span>` : ""}
+                ${scopeData.noise > 0 ? `<span class="px-2.5 py-1 rounded-md font-mono text-xs border shadow-sm flex items-center gap-1.5 bg-gray-900/20 text-gray-500 border-gray-700" title="Noise — CSS shifts with identical text"><i data-lucide="volume-x" class="w-3.5 h-3.5"></i> ${scopeData.noise} noise</span>` : ""}
             </div>
             
             <div class="flex flex-col gap-2 mt-8">
