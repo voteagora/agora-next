@@ -47,8 +47,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
             const parentDir = path.dirname(res);
             const images = fs
               .readdirSync(parentDir)
-              .filter((f) => f.endsWith(".png"))
-              .map((f) => path.relative(abDiffsDir, path.join(parentDir, f)));
+              .filter((f) => f.endsWith(".png"));
             reports.push({ path: relPath, images });
           }
         }
