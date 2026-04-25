@@ -285,6 +285,18 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },
