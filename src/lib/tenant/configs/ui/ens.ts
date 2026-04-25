@@ -285,6 +285,17 @@ For a full walkthrough of the proposal process, check out the [ENS DAO docs](htt
       },
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        governanceAdmin: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },

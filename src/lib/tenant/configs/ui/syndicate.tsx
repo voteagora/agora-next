@@ -350,6 +350,16 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        proposalAttestation: true,
+      },
+    },
+    {
       name: "tax-form",
       enabled: true,
       config: {
