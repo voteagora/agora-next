@@ -122,12 +122,72 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0xaac9059248a06233db16fc9c25426365b7afb481": "Protocol Guild Timelock",
   "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Membership",
   "0xd982477216dadd4c258094b071b49d17b6271d66": "Protocol Guild Vesting Split",
+
+  // ─── Protocol Guild Distributed Tokens (Ethereum Mainnet) ───
+  // Verified via Etherscan: symbol(), name(), decimals()
+
+  "0x10dea67478c5f8c5e2d90e5e9b26dbe60c54d800": "TAIKO", // Taiko Token, 18 decimals
+  "0x4d1c297d39c5c1277964d0e3f8aa901493664530": "PUFFER", // PUFFER governance token, 18 decimals
+  "0xca14007eff0db1f8135f4c25b34de49ab0d42766": "STRK", // Starknet Token, 18 decimals
+  "0x5afe3855358e112b5647b952709e6165e1c1eeee": "SAFE", // Safe Token, 18 decimals
+  "0xe485e2f1bab389c08721b291f6b59780fec83fd7": "SHU", // Shutter Token, 18 decimals
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT", // Tether USD, 6 decimals
+  "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb": "ETHFI", // ether.fi governance token, 18 decimals
+  "0xec53bf9167f50cdeb3ae105f56099aaab9061f83": "EIGEN", // EigenLayer Token, 18 decimals
+  "0x14778860e937f509e651192a90589de711fb88a9": "CYBER", // CyberConnect Token, 18 decimals
+  "0xe29797910d413281d2821d5d9a989262c8121cc2": "ELIMU", // elimu.ai Token, 18 decimals
+  "0xd33526068d116ce69f19a9ee46f0bd304f21a51f": "RPL", // Rocket Pool Token, 18 decimals
+  "0x31c8eacbffdd875c74b94b077895bd78cf1e64a3": "RAD", // Radicle Token, 18 decimals
+  "0x1bab804803159ad84b8854581aa53ac72455614e": "SYND", // Syndicate Token, 18 decimals
+  "0xb45ad160634c528cc3d2926d9807104fa3157305": "sDOLA", // Inverse Finance Staked DOLA, 18 decimals
+  "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": "OBOL", // Obol Network Token, 18 decimals
+  "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": "CC", // Wrapped CurrencyCoin, 0 decimals
+
+  // ─── Common ERC-20 Tokens (Ethereum Mainnet) ───
+
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": "WETH", // Wrapped Ether, 18 decimals
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "USDC", // USD Coin, 6 decimals
+  "0x6b175474e89094c44da98b954eedeac495271d0f": "DAI", // Dai Stablecoin, 18 decimals
+  "0x514910771af9ca656af840dff83e8264ecf986ca": "LINK", // Chainlink Token, 18 decimals
+  "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "AAVE", // Aave Token, 18 decimals
+  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": "WBTC", // Wrapped BTC, 8 decimals
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": "stETH", // Lido Staked Ether, 18 decimals
 };
 
 /** Schema UIDs stored without 0x prefix, lowercase. */
 export const KNOWN_SCHEMAS: Record<string, string> = {
   "504f10498bcdb19d4960412dbade6fa1530b8eed65c319f15cbe20fadafe56bd":
     "DUNI Agreement EAS Schema",
+};
+
+/** Token decimals for accurate amount formatting. */
+export const KNOWN_TOKEN_DECIMALS: Record<string, number> = {
+  // Protocol Guild Distributed Tokens
+  "0x10dea67478c5f8c5e2d90e5e9b26dbe60c54d800": 18, // TAIKO
+  "0x4d1c297d39c5c1277964d0e3f8aa901493664530": 18, // PUFFER
+  "0xca14007eff0db1f8135f4c25b34de49ab0d42766": 18, // STRK
+  "0x5afe3855358e112b5647b952709e6165e1c1eeee": 18, // SAFE
+  "0xe485e2f1bab389c08721b291f6b59780fec83fd7": 18, // SHU
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": 6, // USDT
+  "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb": 18, // ETHFI
+  "0xec53bf9167f50cdeb3ae105f56099aaab9061f83": 18, // EIGEN
+  "0x14778860e937f509e651192a90589de711fb88a9": 18, // CYBER
+  "0xe29797910d413281d2821d5d9a989262c8121cc2": 18, // ELIMU
+  "0xd33526068d116ce69f19a9ee46f0bd304f21a51f": 18, // RPL
+  "0x31c8eacbffdd875c74b94b077895bd78cf1e64a3": 18, // RAD
+  "0x1bab804803159ad84b8854581aa53ac72455614e": 18, // SYND
+  "0xb45ad160634c528cc3d2926d9807104fa3157305": 18, // sDOLA
+  "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": 18, // OBOL
+  "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": 0, // CC — non-standard, 0 decimals
+
+  // Common ERC-20 Tokens
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 18, // WETH
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 6, // USDC
+  "0x6b175474e89094c44da98b954eedeac495271d0f": 18, // DAI
+  "0x514910771af9ca656af840dff83e8264ecf986ca": 18, // LINK
+  "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": 18, // AAVE
+  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 8, // WBTC
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": 18, // stETH
 };
 
 export function getFriendlyName(address: string): string | null {
@@ -144,4 +204,8 @@ export function getSchemaName(schemaUid: string): string | null {
 
 export function hasSchemaName(schemaUid: string): boolean {
   return schemaUid.toLowerCase().replace(/^0x/, "") in KNOWN_SCHEMAS;
+}
+
+export function getTokenDecimals(address: string): number | null {
+  return KNOWN_TOKEN_DECIMALS[address.toLowerCase()] ?? null;
 }

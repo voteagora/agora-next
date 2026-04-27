@@ -948,7 +948,12 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             parameter:
           </div>
           <div className="pl-4">
-            Token: {isEth ? "ETH" : maybeFriendlyAddress(tokenAddress)}
+            Token:{" "}
+            {isEth ? (
+              <span className="font-semibold">ETH</span>
+            ) : (
+              maybeFriendlyAddress(tokenAddress)
+            )}
           </div>
         </div>
       );
