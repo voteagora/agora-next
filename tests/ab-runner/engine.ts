@@ -1031,7 +1031,10 @@ export class ABRunnerEngine {
           const statuses = document.querySelectorAll(
             '[data-testid="proposal-status"]'
           );
-          if (statuses.length === 0) return true; // Wait for them to exist
+          const proposals = document.querySelectorAll('a[href*="/proposals/"]');
+          // Wait for at least some statuses to render if there are proposals
+          if (proposals.length > 0 && statuses.length === 0) return false;
+          if (statuses.length === 0) return true; 
           return Array.from(statuses).every(
             (el) => el.textContent && el.textContent.trim().length > 0
           );
