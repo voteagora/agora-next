@@ -28,7 +28,8 @@ export async function classifyDriftsWithGemini(
         try {
           if (!drift.imgUrlA || !drift.imgUrlB) {
             drift.aiVerdict = "Skipped - Missing Image";
-            drift.aiReason = "Drift exceeded crop limits or image URLs missing.";
+            drift.aiReason =
+              "Drift exceeded crop limits or image URLs missing.";
             return;
           }
 
@@ -70,35 +71,63 @@ Reply strictly in JSON format:
   "reason": "Short explanation of your reasoning (max 2 sentences)."
 }`;
 
-          const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [
-              {
-                role: "user",
-                parts: [
-                  { text: prompt },
-                  { inlineData: { mimeType: "image/png", data: imgABase64 } },
-                  { inlineData: { mimeType: "image/png", data: imgBBase64 } },
+          let attempt = 0;
+          let success = false;
+          while (attempt < 3 && !success) {
+            try {
+              const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: [
+                  {
+                    role: "user",
+                    parts: [
+                      { text: prompt },
+                      {
+                        inlineData: { mimeType: "image/png", data: imgABase64 },
+                      },
+                      {
+                        inlineData: { mimeType: "image/png", data: imgBBase64 },
+                      },
+                    ],
+                  },
                 ],
-              },
-            ],
-            config: {
-              responseMimeType: "application/json",
-            },
-          });
+                config: {
+                  responseMimeType: "application/json",
+                },
+              });
 
-          if (response.text) {
-            const result = JSON.parse(response.text);
-            drift.aiVerdict = result.verdict;
-            drift.aiReason = result.reason;
+              if (response.text) {
+                const result = JSON.parse(response.text);
+                drift.aiVerdict = result.verdict;
+                drift.aiReason = result.reason;
+              }
+              success = true;
+            } catch (retryErr: any) {
+              attempt++;
+              // Don't retry on 400 (Bad Request), but retry on 429/500/503
+              if (attempt >= 3 || retryErr?.status === 400) {
+                throw retryErr;
+              }
+              console.warn(
+                `[AI] Rate limit or transient error. Retrying drift ${drift.component || "unknown"} in ${attempt * 2}s...`
+              );
+              await new Promise((res) => setTimeout(res, attempt * 2000));
+            }
           }
         } catch (err) {
-          console.error(`AI Classification failed for drift ${drift.id}:`, err);
+          console.error(
+            `AI Classification failed for drift ${drift.component || index}:`,
+            err
+          );
           drift.aiVerdict = "AI Error";
           drift.aiReason = String(err);
         }
       })
     );
+    // Add a small delay between batches to respect rate limits
+    if (i + batchSize < drifts.length) {
+      await new Promise((res) => setTimeout(res, 1500));
+    }
   }
 
   return drifts;
