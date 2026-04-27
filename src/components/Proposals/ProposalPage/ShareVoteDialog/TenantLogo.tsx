@@ -353,9 +353,9 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
       return (
         <div tw="flex items-center">
           <svg
-            width="244"
+            width="168"
             height="56"
-            viewBox="0 0 61 14"
+            viewBox="0 0 42 14"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
