@@ -1643,10 +1643,12 @@
         const scope = globalTelemetryData.find((d) => d.scope === scopeName);
         if (!scope) return;
 
-        const fullPages = scope.images
+        // Exclude clean/ crops (reserved for AI analysis) from human viewer
+        const viewerImages = scope.images.filter((img) => !img.name.includes("clean/"));
+        const fullPages = viewerImages
           .filter((img) => img.name.toLowerCase().includes("fullpage"))
           .sort((a, b) => a.name.localeCompare(b.name));
-        const crops = scope.images
+        const crops = viewerImages
           .filter((img) => !img.name.toLowerCase().includes("fullpage"))
           .sort((a, b) => a.name.localeCompare(b.name));
         currentLightboxImages = [...fullPages, ...crops];
@@ -2156,6 +2158,8 @@
             const fileName = parts.slice(1).join("/");
 
             if (fileName.endsWith(".png")) {
+              // Skip clean/ crops — they are reserved for AI analysis, not human viewing
+              if (fileName.includes("clean/")) return;
               const baseName = fileName
                 .replace("UrlA", "")
                 .replace("UrlB", "")
@@ -2720,7 +2724,16 @@
 
             if (r.includes("style") || r.includes("layout")) {
               if (isTextIdentical || (aText === "" && bText === "")) {
-                d._cat = "noise";
+                // Enhanced heuristic: check for contrast-loss or visibility regressions
+                // If backgroundColor or color changed on an element with real text,
+                // promote to actionable (potential invisible-text regression)
+                const comp = d.component || d.path || "";
+                const isCriticalElement = /button|badge|status|alert|tag|chip/i.test(comp);
+                if (isCriticalElement && isTextIdentical && r.includes("style")) {
+                  d._cat = "actionable";
+                } else {
+                  d._cat = "noise";
+                }
               } else {
                 d._cat = "actionable";
               }
@@ -3086,10 +3099,12 @@
           return section;
         };
 
-        const fullPages = scopeData.images.filter((img) =>
+        // Exclude clean/ crops (reserved for AI analysis) from gallery
+        const viewerImages = scopeData.images.filter((img) => !img.name.includes("clean/"));
+        const fullPages = viewerImages.filter((img) =>
           img.name.toLowerCase().includes("fullpage")
         );
-        const crops = scopeData.images.filter(
+        const crops = viewerImages.filter(
           (img) => !img.name.toLowerCase().includes("fullpage")
         );
 

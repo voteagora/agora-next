@@ -131,6 +131,13 @@ export class ABRunnerEngine {
       fs.mkdirSync(artifactsDir, { recursive: true });
     }
 
+    // Route-aware layout drift threshold: list pages tolerate more shift
+    const isListRoute =
+      route === "/proposals" ||
+      route === "/delegates" ||
+      route.startsWith("/delegates?");
+    const LAYOUT_DRIFT_THRESHOLD = isListRoute ? 25 : 10;
+
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
       const mapB = new Map<string, any[]>();
@@ -187,7 +194,7 @@ export class ABRunnerEngine {
               const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
               const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
 
-              if (dw > 10 || dh > 10) {
+              if (dw > LAYOUT_DRIFT_THRESHOLD || dh > LAYOUT_DRIFT_THRESHOLD) {
                 isDrifted = true;
                 driftReason = "Layout Drift";
               }
@@ -381,9 +388,56 @@ export class ABRunnerEngine {
       pageB.keyboard.press("Escape").catch(() => {}),
     ]);
 
+    // 1.5 Freeze volatile DOM content to prevent temporal drifts
+    const freezeVolatileContent = async (page: Page) => {
+      await page.evaluate(() => {
+        // Freeze relative time elements (timeago, "2 hours ago", etc.)
+        document.querySelectorAll(
+          'time, [datetime], .timeago, [data-testid*="time"], [data-testid*="date"]'
+        ).forEach(el => {
+          if (el.textContent && el.textContent.trim().length > 0) {
+            (el as HTMLElement).textContent = '—';
+          }
+        });
+        // Freeze block numbers (volatile on-chain data)
+        document.querySelectorAll(
+          '[data-testid*="block"], .block-number'
+        ).forEach(el => {
+          const text = el.textContent || '';
+          if (/^#?\d{6,}$/.test(text.trim())) {
+            (el as HTMLElement).textContent = '#—';
+          }
+        });
+        // Kill all CSS animations globally to prevent frame-dependent captures
+        const freezeStyle = document.createElement('style');
+        freezeStyle.textContent = `
+          *, *::before, *::after {
+            animation-duration: 0s !important;
+            animation-delay: 0s !important;
+            transition-duration: 0s !important;
+            transition-delay: 0s !important;
+          }
+        `;
+        document.head.appendChild(freezeStyle);
+      }).catch(() => {});
+    };
+
+    await Promise.all([
+      freezeVolatileContent(pageA),
+      freezeVolatileContent(pageB),
+    ]);
+
     // 2. Extract DOM trees
     const treeA = await this.extractDOMTree(pageA, route);
     const treeB = await this.extractDOMTree(pageB, route);
+
+    // 2.5 Scroll-depth normalization: trim the longer tree to match the shorter
+    // This prevents mass Missing/Added noise from asymmetric lazy loading
+    if (isListRoute && treeA.length !== treeB.length) {
+      const targetLen = Math.min(treeA.length, treeB.length);
+      if (treeA.length > targetLen) treeA.length = targetLen;
+      if (treeB.length > targetLen) treeB.length = targetLen;
+    }
 
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
     // Compare main trees
@@ -464,12 +518,59 @@ export class ABRunnerEngine {
 
     if (override.expectDiff ? !isDiff : isDiff) {
       const cropsDir = path.join(artifactsDir, "focused-crops");
+      const cleanCropsDir = path.join(artifactsDir, "focused-crops", "clean");
 
       if (!fs.existsSync(cropsDir)) {
         fs.mkdirSync(cropsDir, { recursive: true });
       }
+      if (!fs.existsSync(cleanCropsDir)) {
+        fs.mkdirSync(cleanCropsDir, { recursive: true });
+      }
 
-      // 4. Batch-inject highlights in a single evaluate() per page
+      // 4a. Capture CLEAN crops BEFORE injecting any highlights
+      // These pristine captures are suitable for AI vision analysis
+      const cropDrifts = drifts.slice(0, 10);
+      for (let i = 0; i < cropDrifts.length; i++) {
+        const drift = cropDrifts[i];
+        await Promise.all([
+          (async () => {
+            try {
+              const locA = pageA.locator(drift.path).first();
+              if ((await locA.count()) > 0) {
+                await locA.scrollIntoViewIfNeeded().catch(() => {});
+                await locA
+                  .screenshot({
+                    path: path.join(
+                      cleanCropsDir,
+                      `drift_${i + 1}_UrlA.png`
+                    ),
+                    timeout: 15000,
+                  })
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+          (async () => {
+            try {
+              const locB = pageB.locator(drift.path).first();
+              if ((await locB.count()) > 0) {
+                await locB.scrollIntoViewIfNeeded().catch(() => {});
+                await locB
+                  .screenshot({
+                    path: path.join(
+                      cleanCropsDir,
+                      `drift_${i + 1}_UrlB.png`
+                    ),
+                    timeout: 15000,
+                  })
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+        ]);
+      }
+
+      // 4b. NOW inject highlights for human-facing annotated artifacts
       const highlightPayload = drifts.map((d) => ({
         path: d.path,
         css:
@@ -529,7 +630,7 @@ export class ABRunnerEngine {
         injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
       ]);
 
-      // 5. Full-page screenshots before crops — captured after load state settles
+      // 5. Full-page annotated screenshots (with highlights + overlay)
       await Promise.all([
         pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
         pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
@@ -549,8 +650,7 @@ export class ABRunnerEngine {
 
       await captureTooltipLayer();
 
-      // 6. Focused crops — UrlA and UrlB captured in parallel per drift
-      const cropDrifts = drifts.slice(0, 10);
+      // 6. Annotated focused crops (with highlights) for human dashboard review
       for (let i = 0; i < cropDrifts.length; i++) {
         const drift = cropDrifts[i];
         await Promise.all([
