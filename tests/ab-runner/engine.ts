@@ -1024,17 +1024,17 @@ export class ABRunnerEngine {
       }
     }
 
-    if (route === "/proposals") {
+    if (route.startsWith("/proposals")) {
       // Wait up to 15s for proposal statuses (e.g. SUCCEEDED, QUEUED) to fetch and render
       for (let i = 0; i < 6; i++) {
         const statusesFilled = await page.evaluate(() => {
           const statuses = document.querySelectorAll(
             '[data-testid="proposal-status"]'
           );
-          const proposals = document.querySelectorAll('a[href*="/proposals/"]');
-          // Wait for at least some statuses to render if there are proposals
-          if (proposals.length > 0 && statuses.length === 0) return false;
-          if (statuses.length === 0) return true; 
+          // On detail page there's 1 status badge, on list there are many
+          // If we haven't rendered any status badges yet, wait
+          if (statuses.length === 0) return false; 
+          
           return Array.from(statuses).every(
             (el) => el.textContent && el.textContent.trim().length > 0
           );
