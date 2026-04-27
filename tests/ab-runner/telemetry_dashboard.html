@@ -539,12 +539,22 @@
           </div>
         </div>
 
-        <button
-          onclick="closeLightbox()"
-          class="text-gray-400 hover:text-white p-2 bg-gray-800/80 hover:bg-gray-700 rounded-full transition-colors backdrop-blur-sm border border-gray-700"
-        >
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            id="splitViewToggle"
+            onclick="toggleSplitView()"
+            class="text-gray-400 hover:text-white p-2 bg-gray-800/80 hover:bg-gray-700 rounded-full transition-colors backdrop-blur-sm border border-gray-700"
+            title="Toggle Split View (S)"
+          >
+            <i data-lucide="columns-2" class="w-5 h-5"></i>
+          </button>
+          <button
+            onclick="closeLightbox()"
+            class="text-gray-400 hover:text-white p-2 bg-gray-800/80 hover:bg-gray-700 rounded-full transition-colors backdrop-blur-sm border border-gray-700"
+          >
+            <i data-lucide="x" class="w-6 h-6"></i>
+          </button>
+        </div>
       </div>
 
       <div class="absolute left-4 top-1/2 -translate-y-1/2 z-50">
@@ -565,6 +575,7 @@
         </button>
       </div>
 
+      <!-- Single View -->
       <div
         id="lightboxScrollContainer"
         class="flex-1 w-full h-full overflow-auto flex items-center justify-center pt-24 pb-20 px-12"
@@ -578,6 +589,64 @@
         />
       </div>
 
+      <!-- Split / Dual View -->
+      <div
+        id="splitViewContainer"
+        class="flex-1 w-full h-full overflow-hidden hidden pt-24 pb-20 px-4"
+      >
+        <div class="flex h-full gap-1 relative">
+          <div class="flex-1 flex flex-col min-w-0">
+            <div class="text-center py-1">
+              <span class="text-xs font-mono px-3 py-1 rounded-full bg-blue-900/60 text-blue-300 border border-blue-700/50">A — Production</span>
+            </div>
+            <div
+              id="splitScrollA"
+              class="flex-1 overflow-auto"
+              onscroll="syncSplitScroll('A')"
+            >
+              <img
+                id="splitImgA"
+                class="w-full object-contain"
+                src=""
+                alt="Production"
+              />
+            </div>
+          </div>
+          <div class="w-px bg-gradient-to-b from-transparent via-gray-500 to-transparent flex-shrink-0"></div>
+          <div class="flex-1 flex flex-col min-w-0">
+            <div class="text-center py-1">
+              <span class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">B — Branch</span>
+            </div>
+            <div
+              id="splitScrollB"
+              class="flex-1 overflow-auto"
+              onscroll="syncSplitScroll('B')"
+            >
+              <img
+                id="splitImgB"
+                class="w-full object-contain"
+                src=""
+                alt="Branch"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Context Info Panel -->
+      <div
+        id="contextInfoPanel"
+        class="absolute bottom-16 right-4 z-50 w-72 bg-[#0a0a0c]/95 border border-gray-700 rounded-xl p-3 backdrop-blur-sm shadow-2xl transition-all duration-200"
+      >
+        <div class="flex items-center gap-2 mb-2 border-b border-gray-800 pb-2">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">What Am I Looking At?</span>
+        </div>
+        <div id="contextInfoContent" class="text-xs text-gray-300 leading-relaxed">
+          Click an image to see context.
+        </div>
+      </div>
+
       <div
         class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-between items-center z-50"
       >
@@ -585,7 +654,7 @@
           >Image 1 / 12</span
         >
         <span class="text-gray-500 text-xs"
-          >Use Left/Right arrows to navigate. Esc to close.</span
+          >← → Navigate · S Split View · Click Zoom · Esc Close</span
         >
       </div>
     </div>
@@ -1679,20 +1748,143 @@
         modal.classList.add("flex");
       };
 
+      let isSplitView = false;
+      let splitSyncLock = false;
+
+      // Context descriptions for each artifact type
+      const ARTIFACT_CONTEXT = {
+        'UrlA_FullPage_Highlights': {
+          title: '🅰️ Production Full Page',
+          desc: 'Complete full-page screenshot of <strong>Production</strong> with drift highlights overlaid. Colored borders mark detected regressions (see Legend). Compare with UrlB to spot visual differences.',
+          tip: 'Use Split View (S) to compare side-by-side with Branch.'
+        },
+        'UrlB_FullPage_Highlights': {
+          title: '🅱️ Branch Full Page',
+          desc: 'Complete full-page screenshot of the <strong>Branch</strong> deployment with drift highlights. This is the "after" state you are validating against Production.',
+          tip: 'Use Split View (S) to compare side-by-side with Production.'
+        },
+        'UrlA_FullPage_Tooltip': {
+          title: '🅰️ Production — Tooltip Capture',
+          desc: 'Screenshot taken after hovering a tooltip trigger on Production. Shows tooltip overlay content for comparison.',
+          tip: 'Check if tooltip content or positioning differs from Branch.'
+        },
+        'UrlB_FullPage_Tooltip': {
+          title: '🅱️ Branch — Tooltip Capture',
+          desc: 'Screenshot taken after hovering a tooltip trigger on Branch. Compare tooltip content and positioning with Production.',
+          tip: 'Verify tooltip data matches Production.'
+        },
+        'drift_UrlA': {
+          title: '🔍 Drift Crop — Production',
+          desc: 'Focused crop of a <strong>specific drifted element</strong> on Production. This zooms into the exact DOM node where a visual regression was detected.',
+          tip: 'Compare with the matching UrlB crop to see exactly what changed.'
+        },
+        'drift_UrlB': {
+          title: '🔍 Drift Crop — Branch',
+          desc: 'Focused crop of a <strong>specific drifted element</strong> on Branch. This is the "after" state of the detected regression.',
+          tip: 'Compare with the matching UrlA crop to spot the difference.'
+        }
+      };
+
+      function getArtifactContext(imgName) {
+        const name = imgName || '';
+        if (name.includes('UrlA_FullPage_Tooltip')) return ARTIFACT_CONTEXT['UrlA_FullPage_Tooltip'];
+        if (name.includes('UrlB_FullPage_Tooltip')) return ARTIFACT_CONTEXT['UrlB_FullPage_Tooltip'];
+        if (name.includes('UrlA_FullPage')) return ARTIFACT_CONTEXT['UrlA_FullPage_Highlights'];
+        if (name.includes('UrlB_FullPage')) return ARTIFACT_CONTEXT['UrlB_FullPage_Highlights'];
+        if (name.includes('UrlA')) return ARTIFACT_CONTEXT['drift_UrlA'];
+        if (name.includes('UrlB')) return ARTIFACT_CONTEXT['drift_UrlB'];
+        return { title: '📷 Screenshot', desc: 'Visual artifact from the A/B regression run.', tip: '' };
+      }
+
+      function updateContextPanel(imgName) {
+        const ctx = getArtifactContext(imgName);
+        const panel = document.getElementById('contextInfoContent');
+        panel.innerHTML = `<div class="font-semibold text-white mb-1">${ctx.title}</div><p class="mb-1.5">${ctx.desc}</p>${ctx.tip ? `<p class="text-indigo-400/80 text-[10px] italic">💡 ${ctx.tip}</p>` : ''}`;
+      }
+
+      function toggleSplitView() {
+        isSplitView = !isSplitView;
+        const single = document.getElementById('lightboxScrollContainer');
+        const split = document.getElementById('splitViewContainer');
+        const btn = document.getElementById('splitViewToggle');
+
+        if (isSplitView) {
+          single.classList.add('hidden');
+          split.classList.remove('hidden');
+          split.classList.add('flex');
+          btn.classList.add('text-indigo-400', 'border-indigo-500');
+          btn.classList.remove('text-gray-400');
+          loadSplitImages();
+        } else {
+          split.classList.add('hidden');
+          split.classList.remove('flex');
+          single.classList.remove('hidden');
+          btn.classList.remove('text-indigo-400', 'border-indigo-500');
+          btn.classList.add('text-gray-400');
+        }
+      }
+
+      function loadSplitImages() {
+        if (currentLightboxImages.length === 0) return;
+        const current = currentLightboxImages[currentLightboxIndex];
+        const name = current.name || '';
+
+        // Find the matching counterpart (UrlA ↔ UrlB)
+        let pairName;
+        if (name.includes('UrlA')) {
+          pairName = name.replace('UrlA', 'UrlB');
+        } else if (name.includes('UrlB')) {
+          pairName = name.replace('UrlB', 'UrlA');
+        }
+
+        const pair = pairName ? currentLightboxImages.find(i => i.name === pairName) : null;
+
+        const imgA = document.getElementById('splitImgA');
+        const imgB = document.getElementById('splitImgB');
+
+        if (name.includes('UrlA')) {
+          imgA.src = current.url;
+          imgB.src = pair ? pair.url : '';
+        } else {
+          imgB.src = current.url;
+          imgA.src = pair ? pair.url : '';
+        }
+
+        // Reset scroll positions
+        document.getElementById('splitScrollA').scrollTop = 0;
+        document.getElementById('splitScrollB').scrollTop = 0;
+      }
+
+      function syncSplitScroll(source) {
+        if (splitSyncLock) return;
+        splitSyncLock = true;
+
+        const scrollA = document.getElementById('splitScrollA');
+        const scrollB = document.getElementById('splitScrollB');
+        const src = source === 'A' ? scrollA : scrollB;
+        const dst = source === 'A' ? scrollB : scrollA;
+
+        // Sync by percentage for proportional scrolling
+        const maxScroll = src.scrollHeight - src.clientHeight;
+        const pct = maxScroll > 0 ? src.scrollTop / maxScroll : 0;
+        const dstMax = dst.scrollHeight - dst.clientHeight;
+        dst.scrollTop = pct * dstMax;
+
+        requestAnimationFrame(() => { splitSyncLock = false; });
+      }
+
       function toggleZoom() {
+        if (isSplitView) return; // No zoom in split view
         const img = document.getElementById("lightboxImg");
         const container = document.getElementById("lightboxScrollContainer");
         isZoomed = !isZoomed;
 
         if (isZoomed) {
           img.classList.replace("cursor-zoom-in", "cursor-zoom-out");
-          // Remove max constraints so image can exceed viewport
           img.classList.remove("max-w-full", "max-h-full");
-          // Disable centering to allow scroll to top/left correctly
           container.classList.remove("items-center", "justify-center");
           container.classList.add("items-start", "justify-start");
 
-          // Show at natural size (or 2.5x for small crops)
           const naturalW = img.naturalWidth || 800;
           const naturalH = img.naturalHeight || 600;
           let zoomedW, zoomedH;
@@ -1708,9 +1900,6 @@
             img.style.height = "auto";
           }
 
-          // Center the image via margin if it is smaller than the available viewport,
-          // otherwise it will snap to the left due to items-start.
-          // Container paddings: px-12 (96px), pt-24 (96px), pb-20 (80px) = 176px Y.
           const padX = Math.max(0, (container.clientWidth - 96 - zoomedW) / 2);
           const padY = Math.max(
             0,
@@ -1718,7 +1907,6 @@
           );
           img.style.margin = `${padY}px ${padX}px`;
 
-          // Scroll to center of the now-oversized image
           requestAnimationFrame(() => {
             const scrollX = (container.scrollWidth - container.clientWidth) / 2;
             const scrollY =
@@ -1785,6 +1973,19 @@
         document.getElementById("lightboxDownload").href = img.url;
         document.getElementById("lightboxCounter").textContent =
           `Image ${currentLightboxIndex + 1} / ${currentLightboxImages.length}`;
+
+        // Update context info panel
+        updateContextPanel(img.name);
+
+        // Auto-activate split view for FullPage images
+        const isFullPage = img.name.toLowerCase().includes('fullpage');
+        if (isFullPage && !isSplitView) {
+          toggleSplitView();
+        } else if (!isFullPage && isSplitView) {
+          toggleSplitView();
+        } else if (isSplitView) {
+          loadSplitImages();
+        }
       }
 
       // Keyboard navigation
@@ -1794,6 +1995,7 @@
           if (e.key === "ArrowRight") navigateLightbox(1);
           else if (e.key === "ArrowLeft") navigateLightbox(-1);
           else if (e.key === "Escape") closeLightbox();
+          else if (e.key === "s" || e.key === "S") toggleSplitView();
         }
       });
       async function initRunsHistory() {
