@@ -467,9 +467,40 @@ export class ABRunnerEngine {
         .catch(() => {});
     };
 
+    const stripLoadingText = async (p: Page) => {
+      await p.evaluate(() => {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.nodeValue && node.nodeValue.includes("Loading")) {
+            if (node.parentElement) {
+              const testid = node.parentElement.getAttribute("data-testid");
+              if (testid !== "proposal-status") {
+                node.parentElement.style.opacity = "0";
+                node.parentElement.style.visibility = "hidden";
+              }
+            }
+          }
+        }
+      }).catch(() => {});
+    };
+
+    await Promise.all([
+      stripLoadingText(pageA),
+      stripLoadingText(pageB),
+    ]);
+
     await Promise.all([
       freezeVolatileContent(pageA),
       freezeVolatileContent(pageB),
+    ]);
+
+    // Failsafe: Ensure proposal statuses are fully visible, bypassing any stuck React animations
+    // or IntersectionObserver fade-outs before capturing DOM and screenshots.
+    const forceStatusVisibility = `[data-testid="proposal-status"] { opacity: 1 !important; visibility: visible !important; }`;
+    await Promise.all([
+      pageA.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
+      pageB.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
     ]);
 
     // 2. Extract DOM trees
@@ -958,11 +989,21 @@ export class ABRunnerEngine {
         while ((node = walker.nextNode())) {
           if (node.nodeValue && node.nodeValue.includes("Loading")) {
             if (node.parentElement) {
-              node.parentElement.style.opacity = "0";
-              node.parentElement.style.visibility = "hidden";
+              const testid = node.parentElement.getAttribute("data-testid");
+              if (testid !== "proposal-status") {
+                node.parentElement.style.opacity = "0";
+                node.parentElement.style.visibility = "hidden";
+              }
             }
           }
         }
+        
+        // Failsafe: explicitly restore visibility to all proposal-status elements 
+        // in case they were hidden by any other class/rule
+        document.querySelectorAll('[data-testid="proposal-status"]').forEach(el => {
+          (el as HTMLElement).style.opacity = "1";
+          (el as HTMLElement).style.visibility = "visible";
+        });
       })
       .catch(() => {});
 
