@@ -29,6 +29,12 @@ export type UIGasRelayConfig = {
 export type UIMiradorConfig = {
   proposalCreation?: boolean;
   siweLoginTracing?: boolean;
+  governanceVote?: boolean;
+  governanceDelegation?: boolean;
+  staking?: boolean;
+  governanceAdmin?: boolean;
+  proposalAttestation?: boolean;
+  membershipAdmin?: boolean;
 };
 
 export type UISafeTrackingConfig = {
@@ -164,6 +170,9 @@ type UIOrganization = {
 type TenantUIParams = {
   assets: UIAssets;
   delegates?: UIDelegates;
+  grantsFollowXHandle?: string;
+  grantsEmailOrgName?: string;
+  grantsEmailSenderName?: string;
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
@@ -212,10 +221,10 @@ type TenantUIParams = {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -234,6 +243,9 @@ type TenantUIParams = {
 export class TenantUI {
   private _assets: UIAssets;
   private _delegates?: UIDelegates;
+  private _grantsFollowXHandle?: string;
+  private _grantsEmailOrgName?: string;
+  private _grantsEmailSenderName?: string;
   private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
@@ -281,10 +293,10 @@ export class TenantUI {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -309,6 +321,9 @@ export class TenantUI {
     customization,
     delegates,
     documentColors,
+    grantsFollowXHandle,
+    grantsEmailOrgName,
+    grantsEmailSenderName,
     dunaDisclaimers,
     favicon,
     googleAnalytics,
@@ -331,6 +346,9 @@ export class TenantUI {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._grantsFollowXHandle = grantsFollowXHandle;
+    this._grantsEmailOrgName = grantsEmailOrgName;
+    this._grantsEmailSenderName = grantsEmailSenderName;
     this._documentColors = documentColors;
     this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
@@ -358,6 +376,18 @@ export class TenantUI {
 
   public get delegates(): UIDelegates | undefined {
     return this._delegates;
+  }
+
+  public get grantsFollowXHandle(): string | undefined {
+    return this._grantsFollowXHandle;
+  }
+
+  public get grantsEmailOrgName(): string | undefined {
+    return this._grantsEmailOrgName;
+  }
+
+  public get grantsEmailSenderName(): string | undefined {
+    return this._grantsEmailSenderName;
   }
 
   public get governanceIssues(): UIGovernanceIssue[] | undefined {
@@ -437,6 +467,8 @@ export class TenantUI {
         noReportsFound?: string;
         tagBackground?: string;
         infoBannerBackground?: string;
+        heroCardGradient?: { from: string; to: string };
+        grantsListBackground?: string;
       }
     | undefined {
     return this._customization;
@@ -462,7 +494,11 @@ export class TenantUI {
       return this._linksCache[name];
     }
 
-    const result = this._links?.find((t) => t.name === name);
+    let result = this._links?.find((t) => t.name === name);
+    // Canonical "twitter" resolves to any link with title "Twitter" (e.g. shape-twitter, townstwitter)
+    if (result === undefined && name === "twitter") {
+      result = this._links?.find((t) => t.title === "Twitter");
+    }
     this._linksCache[name] = result;
     return result;
   }

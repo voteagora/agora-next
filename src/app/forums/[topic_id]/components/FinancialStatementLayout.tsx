@@ -1,13 +1,29 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Drawer } from "@/components/ui/Drawer";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import { generatePatternSvg } from "@/lib/utils/generatePatternSvg";
-import Tenant from "@/lib/tenant/tenant";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  PROSE_LINKS,
+  PROSE_MEDIA,
+  PROSE_PRIMARY_BODY,
+} from "@/components/duna-editor/proseThemeClasses";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
+import MarkdownToc from "./MarkdownToc";
+import { hasMarkdownHeadings } from "./markdownHeadings";
 
 interface FinancialStatementLayoutProps {
   topicId: number;
@@ -15,11 +31,45 @@ interface FinancialStatementLayoutProps {
   content: string;
   pdfUrl?: string | null;
   isOnArticlePage?: boolean;
+  hideInlineDiscussButton?: boolean;
+  children?: React.ReactNode;
 }
 
 function looksLikeHtml(text: string): boolean {
   const t = text.trim();
   return t.startsWith("<") || t.includes("</");
+}
+
+/**
+ * Detects if HTML content was generated from a PDF conversion.
+ * PDF converters produce HTML with distinctive patterns:
+ * - CIDFont font-face declarations (e.g., CIDFont-F1_8, CIDFont-F2_g)
+ * - Text container divs with id="text-container"
+ * - Specific class patterns like .t, .s0, .s1 for text positioning
+ * - transform-origin inline styles for precise text placement
+ */
+function isPdfGeneratedHtml(content: string): boolean {
+  // Check for CIDFont font-face declarations (most reliable indicator)
+  const hasCidFont = /CIDFont-F\d+/i.test(content);
+
+  // Check for text-container div (common in pdf2htmlEX output)
+  const hasTextContainer = /id\s*=\s*["']text-container["']/i.test(content);
+
+  // Check for PDF-specific class patterns (.t class with .s0, .s1, etc.)
+  const hasPdfTextClasses =
+    /class\s*=\s*["']t\s+s\d+["']/i.test(content) ||
+    /\.t\s*\{[^}]*position\s*:/i.test(content);
+
+  // Check for transform-origin positioning (used for precise PDF text placement)
+  const hasTransformOrigin = /transform-origin\s*:\s*\d+px\s+\d+px/i.test(
+    content
+  );
+
+  // Content is PDF-generated if it has CIDFont OR multiple other PDF indicators
+  return (
+    hasCidFont ||
+    (hasTextContainer && (hasPdfTextClasses || hasTransformOrigin))
+  );
 }
 
 export default function FinancialStatementLayout({
@@ -28,12 +78,32 @@ export default function FinancialStatementLayout({
   content,
   pdfUrl,
   isOnArticlePage = false,
+  hideInlineDiscussButton = false,
+  children,
 }: FinancialStatementLayoutProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isTocDrawerOpen, setIsTocDrawerOpen] = useState(false);
+  const [pendingTocTarget, setPendingTocTarget] = useState<{
+    slug: string;
+    tick: number;
+  } | null>(null);
+  const tenant = Tenant.current();
+
+  const primaryRgb = tenant.ui?.customization?.primary ?? "23 23 23";
+  const secondaryRgb = tenant.ui?.customization?.secondary ?? "64 64 64";
+
+  const rgbCss = (triplet: string) =>
+    `rgb(${triplet.trim().split(/\s+/).join(", ")})`;
+
+  // Detect if content is PDF-generated HTML (has its own styling) vs regular HTML
+  const isPdfContent = isPdfGeneratedHtml(content);
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
+
+    const bodyColor = rgbCss(primaryRgb);
+    const linkColor = rgbCss(secondaryRgb);
 
     const resizeIframe = () => {
       try {
@@ -52,27 +122,84 @@ export default function FinancialStatementLayout({
         if (!existingStyle) {
           const style = iframeDocument.createElement("style");
           style.id = "responsive-pdf-style";
-          style.textContent = `
+          // For PDF-generated content: only layout styles (PDF has its own text colors)
+          // For regular HTML content: also apply tenant text colors for visibility on dark themes
+          style.textContent = isPdfContent
+            ? `
             * {
               box-sizing: border-box;
             }
             html, body {
               margin: 0;
+              overflow-x: hidden;
+              overflow-y: visible;
+            }
+            html {
               padding: 0;
-              overflow-x: hidden !important;
-              overflow-y: visible !important;
+            }
+            body {
+              padding: 0;
+            }
+            html {
+              padding: 0;
+            }
+            body {
+              padding: 0;
             }
             img, svg, canvas {
-              max-width: 100% !important;
-              height: auto !important;
+              max-width: 100%;
+              height: auto;
             }
             table {
-              max-width: 100% !important;
-              table-layout: auto !important;
+              max-width: 100%;
+              table-layout: auto;
+            }
+          `
+            : `
+            * {
+              box-sizing: border-box;
+            }
+            html, body {
+              margin: 0;
+              overflow-x: hidden;
+              overflow-y: visible;
+              color: ${bodyColor};
+            }
+            html {
+              padding: 0;
+            }
+            body {
+              padding: 0;
+            }
+            p, li, td, th, label,
+            h1, h2, h3, h4, h5, h6,
+            div, span {
+              color: ${bodyColor};
+            }
+            a {
+              color: ${linkColor};
+            }
+            img, svg, canvas {
+              max-width: 100%;
+              height: auto;
+            }
+            table {
+              max-width: 100%;
+              table-layout: auto;
             }
           `;
           iframeDocument.head.appendChild(style);
         }
+
+        const iframeWidth = iframe.getBoundingClientRect().width;
+        // Equal inset on all sides inside the iframe (margin around the white page).
+        const inset = Math.min(
+          48,
+          Math.max(16, Math.round(iframeWidth * 0.045))
+        );
+        html.style.boxSizing = "border-box";
+        html.style.padding = `${inset}px`;
+        html.style.margin = "0";
 
         // Get the actual content width - use the maximum of all measurements
         const contentWidth = Math.max(
@@ -82,14 +209,7 @@ export default function FinancialStatementLayout({
           html.offsetWidth
         );
 
-        // Measure the actual iframe container width
-        const iframeContainer = iframe.parentElement;
-        const containerWidth = iframeContainer
-          ? iframeContainer.getBoundingClientRect().width
-          : window.innerWidth;
-
-        // Calculate available width (account for any potential rounding issues)
-        const availableWidth = Math.max(containerWidth - 2, 320);
+        const availableWidth = Math.max(iframeWidth - 2 * inset - 2, 280);
 
         // Calculate scale for mobile (only scale if content is wider than container)
         const needsScaling = contentWidth > availableWidth;
@@ -109,30 +229,29 @@ export default function FinancialStatementLayout({
           body.style.padding = "0";
         }
 
-        // Get the original content height before applying any height constraints
-        const originalHeight = Math.max(body.scrollHeight, html.scrollHeight);
+        // Body-only: html.scrollHeight includes our html padding and would double-count inset
+        const originalHeight = Math.max(body.scrollHeight, body.offsetHeight);
 
         // Calculate scaled height
         const scaledHeight = originalHeight * scale;
+        const paddedScaledHeight = scaledHeight + 2 * inset;
 
         // Ensure html doesn't overflow and has exact height (prevents extra white space)
         html.style.overflowX = "hidden";
         html.style.overflowY = "hidden";
         html.style.width = "100%";
         html.style.maxWidth = "100%";
-        html.style.margin = "0";
-        html.style.padding = "0";
-        html.style.height = `${scaledHeight}px`;
-        html.style.minHeight = `${scaledHeight}px`;
-        html.style.maxHeight = `${scaledHeight}px`;
+        html.style.height = `${paddedScaledHeight}px`;
+        html.style.minHeight = `${paddedScaledHeight}px`;
+        html.style.maxHeight = `${paddedScaledHeight}px`;
 
         // Constrain body height to prevent extra space
         body.style.height = `${originalHeight}px`;
         body.style.minHeight = `${originalHeight}px`;
         body.style.maxHeight = `${originalHeight}px`;
 
-        // Set iframe height to exactly match scaled content (no extra space)
-        iframe.style.height = `${Math.ceil(scaledHeight)}px`;
+        // Match iframe to scaled content plus html inset on top and bottom
+        iframe.style.height = `${Math.ceil(paddedScaledHeight)}px`;
         iframe.style.width = "100%";
         iframe.style.maxWidth = "100%";
         iframe.style.overflow = "hidden";
@@ -167,7 +286,7 @@ export default function FinancialStatementLayout({
       window.removeEventListener("resize", handleResize);
       clearTimeout((handleResize as any).timeout);
     };
-  }, [content]);
+  }, [content, isPdfContent, primaryRgb, secondaryRgb]);
 
   const handleScrollToComments = () => {
     const commentsSection = document.getElementById("forum-thread-section");
@@ -176,16 +295,54 @@ export default function FinancialStatementLayout({
     }
   };
 
-  const tenant = Tenant.current();
+  const handleTocHeadingClick = useCallback(
+    (slug: string, event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      if (!slug) return;
+      // Replace the current history entry with the hash URL. This overwrites
+      // the Drawer's pushed entry so its cleanup sees a non-drawer state and
+      // won't call history.back() and undo the navigation. Using the native
+      // history API (not router.replace) avoids triggering an app-router
+      // navigation/refetch on hash-only changes.
+      try {
+        window.history.replaceState(null, "", `#${slug}`);
+      } catch (_) {}
+      // Using a tick ensures the effect re-fires even when the same slug is
+      // clicked repeatedly.
+      setPendingTocTarget((prev) => ({
+        slug,
+        tick: (prev?.tick ?? 0) + 1,
+      }));
+      setIsTocDrawerOpen(false);
+    },
+    []
+  );
+
+  // Scroll to the selected heading once the drawer has closed (which releases
+  // the body scroll lock). Runs for both the drawer and sticky-sidebar TOCs.
+  useEffect(() => {
+    if (!pendingTocTarget || isTocDrawerOpen) return;
+    const target = document.getElementById(pendingTocTarget.slug);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [pendingTocTarget, isTocDrawerOpen]);
+
   const { namespace } = tenant;
   const mode = tenant.ui.theme;
   const hideDiscussButton =
-    namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage;
+    hideInlineDiscussButton ||
+    (namespace === TENANT_NAMESPACES.UNISWAP && isOnArticlePage);
 
   const forumPagePath = buildForumTopicPath(topicId, title);
   const discussButtonText = isOnArticlePage ? "Discuss on forums" : "Discuss";
 
   const metadataString = `${topicId}-${title}`;
+  const showMarkdownToc = useMemo(
+    () => !looksLikeHtml(content) && hasMarkdownHeadings(content),
+    [content]
+  );
+  const markdownTocClassName = "px-5 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3";
   const { svg: patternSvg } = generatePatternSvg(
     metadataString,
     600,
@@ -207,7 +364,7 @@ export default function FinancialStatementLayout({
         </div>
       )}
       <div
-        className={`${isOnArticlePage ? "max-w-5xl" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
+        className={`${isOnArticlePage ? "" : "max-w-6xl"} mx-auto relative w-full min-w-0`}
       >
         <h1 className="text-2xl sm:text-4xl font-bold text-primary mb-6">
           {title}
@@ -216,20 +373,16 @@ export default function FinancialStatementLayout({
         <div className="flex flex-wrap gap-4 mb-8">
           {!hideDiscussButton &&
             (isOnArticlePage ? (
-              <Button asChild variant="outline" className="text-primary">
+              <Button asChild size="lg">
                 <Link href={forumPagePath}>{discussButtonText}</Link>
               </Button>
             ) : (
-              <Button
-                onClick={handleScrollToComments}
-                variant="outline"
-                className="text-primary"
-              >
+              <Button onClick={handleScrollToComments} size="lg">
                 {discussButtonText}
               </Button>
             ))}
           {pdfUrl && (
-            <Button asChild variant="outline" className="text-primary">
+            <Button asChild size="lg">
               <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
                 View PDF
               </a>
@@ -237,22 +390,106 @@ export default function FinancialStatementLayout({
           )}
         </div>
 
-        <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
-          {looksLikeHtml(content) ? (
-            <iframe
-              ref={iframeRef}
-              srcDoc={content}
-              className="w-full border-0"
-              title="Financial Statement"
-              sandbox="allow-same-origin allow-scripts"
-              style={{ display: "block" }}
-            />
-          ) : (
-            <div className="p-4 prose prose-sm max-w-none">
-              <Markdown content={content} originalHierarchy />
+        {looksLikeHtml(content) ? (
+          <>
+            <div className="bg-cardBackground rounded-lg p-0 shadow-sm relative z-10 overflow-hidden">
+              <iframe
+                ref={iframeRef}
+                srcDoc={content}
+                className="w-full border-0"
+                title="Financial Statement"
+                sandbox="allow-same-origin allow-scripts"
+                style={{ display: "block" }}
+              />
             </div>
-          )}
-        </div>
+            {children}
+          </>
+        ) : showMarkdownToc ? (
+          <>
+            <button
+              type="button"
+              className="lg:hidden fixed left-0 top-1/2 z-30 -translate-y-1/2 inline-flex items-center justify-center rounded-r-lg border border-l-0 border-line bg-cardBackground py-3 pl-1 pr-1.5 text-tertiary shadow-newDefault transition-shadow hover:text-primary hover:shadow-newHover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line"
+              aria-haspopup="dialog"
+              aria-label="Open table of contents"
+              onClick={() => setIsTocDrawerOpen(true)}
+            >
+              <ChevronRight className="h-5 w-5 shrink-0" aria-hidden />
+            </button>
+            <Drawer
+              isOpen={isTocDrawerOpen}
+              onClose={() => setIsTocDrawerOpen(false)}
+              position="left"
+              className={cn(
+                "bg-cardBackground shadow-sm",
+                "inset-y-0 left-0 w-64 max-w-none rounded-r-lg border-r border-line"
+              )}
+            >
+              <MarkdownToc
+                content={content}
+                className={markdownTocClassName}
+                onHeadingClick={handleTocHeadingClick}
+              />
+            </Drawer>
+            <div className="flex items-start gap-6">
+              <aside className="hidden lg:block h-fit w-64 flex-shrink-0 self-start sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-lg bg-cardBackground shadow-sm">
+                <MarkdownToc
+                  content={content}
+                  className={markdownTocClassName}
+                  onHeadingClick={handleTocHeadingClick}
+                />
+              </aside>
+              <div className="min-w-0 flex-1 flex flex-col">
+                <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                  <div
+                    className={cn(
+                      "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
+                      PROSE_PRIMARY_BODY,
+                      PROSE_LINKS,
+                      PROSE_MEDIA
+                    )}
+                  >
+                    <Markdown
+                      content={content}
+                      originalHierarchy
+                      className="!py-0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {children != null ? (
+              <div className="mt-8 flex items-start gap-6">
+                <div
+                  className="hidden lg:block w-64 flex-shrink-0"
+                  aria-hidden
+                />
+                <div className="min-w-0 flex-1 w-full">{children}</div>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="flex flex-col items-start">
+            <div className="min-w-0 flex flex-col gap-8 w-full">
+              <div className="bg-cardBackground rounded-lg shadow-sm overflow-hidden relative z-10">
+                <div
+                  className={cn(
+                    "p-6 sm:p-8 prose prose-sm max-w-none text-primary",
+                    PROSE_PRIMARY_BODY,
+                    PROSE_LINKS,
+                    PROSE_MEDIA
+                  )}
+                >
+                  <Markdown
+                    content={content}
+                    originalHierarchy
+                    className="!py-0"
+                  />
+                </div>
+              </div>
+              {children}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

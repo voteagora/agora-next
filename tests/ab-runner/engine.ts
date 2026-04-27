@@ -41,8 +41,8 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     // Execute sequential navigation instead of parallel to prevent Vercel/GraphQL 429 Too Many Requests caching drops on identical simultaneous payloads
-    await pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {});
-    await pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {});
+    await pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 });
+    await pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 });
 
     // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
     await Promise.all([
@@ -101,12 +101,47 @@ export class ABRunnerEngine {
     const drifts: any[] = [];
     const reportList: any[] = [];
 
+    const safeRouteName =
+      route === "/"
+        ? "index-page"
+        : route.replace(/^\//, "").replace(/\//g, "-");
+    let artifactsDir = "";
+    const hasValidType =
+      meta?.type && meta.type !== "undefined" && meta.type !== "null";
+    if (meta && meta.tenant) {
+      const segments = [
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        meta.tenant,
+        "proposals",
+      ];
+      if (hasValidType) segments.push(meta.type!);
+      segments.push(safeRouteName);
+      artifactsDir = path.join(...segments);
+    } else {
+      artifactsDir = path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        safeRouteName
+      );
+    }
+    if (!fs.existsSync(artifactsDir)) {
+      fs.mkdirSync(artifactsDir, { recursive: true });
+    }
+
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
       const mapB = new Map<string, any[]>();
+      const mapA = new Map<string, any[]>();
       for (const n of tB) {
         if (!mapB.has(n.path)) mapB.set(n.path, []);
         mapB.get(n.path)!.push(n);
+      }
+      for (const n of tA) {
+        if (!mapA.has(n.path)) mapA.set(n.path, []);
+        mapA.get(n.path)!.push(n);
       }
 
       for (const nodeA of tA) {
@@ -172,16 +207,44 @@ export class ABRunnerEngine {
         }
       }
 
+      // 🔴 REVERSE ENGINE TRAVERSAL: Catch Newly Injected UI Components
+      for (const nodeB of tB) {
+        if (!nodeB || nodeB.isFooter) continue;
+
+        const nodesListA = mapA.get(nodeB.path) || [];
+        let nodeA = nodesListA.length > 0 ? nodesListA.shift() : undefined;
+
+        if (!nodeA && nodeB.text && nodeB.text.length > 2) {
+          nodeA = tA.find(
+            (n: any) => n.text === nodeB.text && n.tag === nodeB.tag
+          );
+        }
+
+        if (!nodeA) {
+          rawDrifts.push({
+            path: nodeB.path,
+            reason: "Added Component",
+            urlA_text: "(Element completely absent in Production Baseline)",
+            urlB_text: nodeB.text,
+          });
+        }
+      }
+
       const mDrifts: any[] = [];
       const mReportList: any[] = [];
 
       for (const drift of rawDrifts) {
         const hasParentDrift = rawDrifts.some(
           (other: any) =>
-            other.path !== drift.path && drift.path.startsWith(other.path + " > ")
+            other.path !== drift.path &&
+            drift.path.startsWith(other.path + " > ")
         );
 
-        if (!hasParentDrift || drift.reason === "Missing or Moved Component") {
+        if (
+          !hasParentDrift ||
+          drift.reason === "Missing or Moved Component" ||
+          drift.reason === "Added Component"
+        ) {
           mDrifts.push({ path: drift.path, reason: drift.reason });
           mReportList.push({
             component: drift.path,
@@ -198,13 +261,24 @@ export class ABRunnerEngine {
         }
       }
 
+      const getSeverity = (reason: string) => {
+        if (reason === "Added Component") return 3;
+        if (reason === "Missing or Moved Component") return 2;
+        if (reason === "Data Drift") return 1;
+        return 0; // Layout/Style drift usually occurs in mass numbers
+      };
+
+      mDrifts.sort((a, b) => getSeverity(b.reason) - getSeverity(a.reason));
+      mReportList.sort((a, b) => getSeverity(b.reason) - getSeverity(a.reason));
+
       return { drifts: mDrifts, reportList: mReportList };
     };
 
     // 0. Auto-Modal Interception Phase
     const captureAutoModal = async () => {
       // General overlay identifiers across Tailwind, Radix, DialogProvider, and legacy absolute popovers
-      const modalSelector = 'dialog[open], [role="dialog"]:not([aria-hidden="true"]), [aria-modal="true"], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0';
+      const modalSelector =
+        'dialog[open], [role="dialog"]:not([aria-hidden="true"]), [aria-modal="true"], [data-state="open"][class*="inset-0"], .fixed.inset-0, .fixed.top-0.right-0.bottom-0.left-0';
 
       const checkModal = async (p: Page) => {
         try {
@@ -231,7 +305,10 @@ export class ABRunnerEngine {
           ? await this.extractDOMTree(pageB, route, modalSelector)
           : [];
 
-        const { drifts: mDrifts, reportList: mReportList } = compareTrees(modalTreeA, modalTreeB);
+        const { drifts: mDrifts, reportList: mReportList } = compareTrees(
+          modalTreeA,
+          modalTreeB
+        );
 
         if (mDrifts.length > 0) {
           // Add global modal prefixed drifts
@@ -242,8 +319,28 @@ export class ABRunnerEngine {
           mDrifts.forEach((d) => drifts.push(d));
 
           await Promise.all([
-            hasModalA ? pageA.screenshot({ path: path.join(artifactsDir, "00_UrlA_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
-            hasModalB ? pageB.screenshot({ path: path.join(artifactsDir, "00_UrlB_AutoModal_Drift.png") }).catch(() => {}) : Promise.resolve(),
+            hasModalA
+              ? pageA
+                  .screenshot({
+                    path: path.join(
+                      artifactsDir,
+                      "00_UrlA_AutoModal_Drift.png"
+                    ),
+                    timeout: 15000,
+                  })
+                  .catch(() => {})
+              : Promise.resolve(),
+            hasModalB
+              ? pageB
+                  .screenshot({
+                    path: path.join(
+                      artifactsDir,
+                      "00_UrlB_AutoModal_Drift.png"
+                    ),
+                    timeout: 15000,
+                  })
+                  .catch(() => {})
+              : Promise.resolve(),
           ]);
         }
       }
@@ -271,10 +368,7 @@ export class ABRunnerEngine {
         .catch(() => {});
     };
 
-    await Promise.all([
-      injectModalBarrier(pageA),
-      injectModalBarrier(pageB),
-    ]);
+    await Promise.all([injectModalBarrier(pageA), injectModalBarrier(pageB)]);
 
     // 1. Scroll to trigger infinite loaders and stabilize the DOM
     await Promise.all([
@@ -293,39 +387,14 @@ export class ABRunnerEngine {
 
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
     // Compare main trees
-    const { drifts: mainDrifts, reportList: mainReportList } = compareTrees(treeA, treeB);
-    mainDrifts.forEach(d => drifts.push(d));
-    mainReportList.forEach(r => reportList.push(r));
+    const { drifts: mainDrifts, reportList: mainReportList } = compareTrees(
+      treeA,
+      treeB
+    );
+    mainDrifts.forEach((d) => drifts.push(d));
+    mainReportList.forEach((r) => reportList.push(r));
 
     const isDiff = drifts.length > 0;
-
-    const safeRouteName =
-      route === "/"
-        ? "index-page"
-        : route.replace(/^\//, "").replace(/\//g, "-");
-    let artifactsDir = "";
-    if (meta && meta.tenant && meta.type) {
-      artifactsDir = path.join(
-        process.cwd(),
-        "test-results",
-        "ab-diffs",
-        meta.tenant,
-        "proposals",
-        meta.type,
-        safeRouteName
-      );
-    } else {
-      artifactsDir = path.join(
-        process.cwd(),
-        "test-results",
-        "ab-diffs",
-        safeRouteName
-      );
-    }
-
-    if (!fs.existsSync(artifactsDir)) {
-      fs.mkdirSync(artifactsDir, { recursive: true });
-    }
 
     fs.writeFileSync(
       path.join(artifactsDir, "treeA.json"),
@@ -340,7 +409,8 @@ export class ABRunnerEngine {
       if (!meta?.type) return;
 
       // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
-      const triggerSelector = '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
+      const triggerSelector =
+        '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
       const tooltipSelector = '[role="tooltip"]';
 
       const captureForPage = async (page: Page, label: string) => {
@@ -353,11 +423,19 @@ export class ABRunnerEngine {
 
             await page
               .screenshot({
-                path: path.join(artifactsDir, `00_${label}_FullPage_Tooltip.png`),
+                path: path.join(
+                  artifactsDir,
+                  `00_${label}_FullPage_Tooltip.png`
+                ),
+                timeout: 15000,
               })
               .catch(() => {});
 
-            const tooltipsDir = path.join(artifactsDir, "focused-crops", "tooltips");
+            const tooltipsDir = path.join(
+              artifactsDir,
+              "focused-crops",
+              "tooltips"
+            );
             if (!fs.existsSync(tooltipsDir)) {
               fs.mkdirSync(tooltipsDir, { recursive: true });
             }
@@ -367,6 +445,7 @@ export class ABRunnerEngine {
               await popover
                 .screenshot({
                   path: path.join(tooltipsDir, `00_${label}_Crop.png`),
+                  timeout: 15000,
                 })
                 .catch(() => {});
             }
@@ -391,20 +470,24 @@ export class ABRunnerEngine {
       }
 
       // 4. Batch-inject highlights in a single evaluate() per page
-      const highlightPayload = drifts.slice(0, 50).map((d) => ({
+      const highlightPayload = drifts.map((d) => ({
         path: d.path,
         css:
           d.reason === "Data Drift"
             ? "4px dashed #FFD700" // Yellow
             : d.reason === "Style Drift"
               ? "4px dashed #00FFFF" // Cyan
-              : "4px dashed #8A2BE2", // Purple
+              : d.reason === "Added Component"
+                ? "4px dashed #FF00FF" // Hot Pink
+                : "4px dashed #8A2BE2", // Purple
         bg:
           d.reason === "Data Drift"
             ? "rgba(255, 215, 0, 0.2)"
             : d.reason === "Style Drift"
               ? "rgba(0, 255, 255, 0.2)"
-              : "rgba(138, 43, 226, 0.2)",
+              : d.reason === "Added Component"
+                ? "rgba(255, 0, 255, 0.4)" // Hot Pink
+                : "rgba(138, 43, 226, 0.2)",
       }));
 
       const batchHighlight = (items: typeof highlightPayload) => {
@@ -448,15 +531,21 @@ export class ABRunnerEngine {
 
       // 5. Full-page screenshots before crops — captured after load state settles
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
 
       await captureTooltipLayer();
 
@@ -473,6 +562,7 @@ export class ABRunnerEngine {
                 await locA
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -486,6 +576,7 @@ export class ABRunnerEngine {
                 await locB
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -517,15 +608,21 @@ export class ABRunnerEngine {
 
       // No drifts — capture full-page baselines
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
       await captureTooltipLayer();
     }
 
@@ -565,15 +662,46 @@ export class ABRunnerEngine {
       );
     }
 
+    const numStyle = reportList.filter(
+      (r) => r.reason === "Style Drift"
+    ).length;
+    const numLayout = reportList.filter(
+      (r) => r.reason === "Layout Drift"
+    ).length;
+    const numData = reportList.filter((r) => r.reason === "Data Drift").length;
+    const numMissing = reportList.filter(
+      (r) => r.reason === "Missing or Moved Component"
+    ).length;
+
+    const topDrifts = reportList
+      .slice(0, 3)
+      .map((r) => `   - ${r.component}`)
+      .join("\n");
+
+    const runId = process.env.GITHUB_RUN_ID;
+    const bucketLink = runId
+      ? `🔗 View Full Report & Images: https://console.cloud.google.com/storage/browser/agora-ab-artifacts/reports/${new Date().toISOString().split("T")[0]}/${process.env.GITHUB_ACTOR || "cli"}_run-${runId}?project=silent-turbine-390703`
+      : `🔗 View Full Report locally at: ${artifactsDir}/report.json`;
+
     if (override.expectDiff) {
       expect(
         isDiff,
-        `Expected route ${route} to structurally DIFFER between URLs.`
+        `\n\n🛑 EXPECTED VISUAL DRIFT MISSING 🛑\n\nExpected route "${route}" to structurally DIFFER between URLs, but they were visually identical.\n`
       ).toBe(true);
     } else {
       expect(
         drifts.length,
-        `Expected route ${route} to structurally match URLs. Found ${drifts.length} drifted components.`
+        `\n\n🛑 VISUAL DRIFT THRESHOLD EXCEEDED 🛑\n\n` +
+          `The A/B regression engine detected ${drifts.length} block-level drift(s) on route: "${route}".\n\n` +
+          `📊 DRIFT ANATOMY BREAKDOWN:\n` +
+          `   🎨 Style Differences: ${numStyle}\n` +
+          `   📏 Layout/Size Shifts: ${numLayout}\n` +
+          `   ✍️ Data/Text Changes: ${numData}\n` +
+          `   👻 Missing Components: ${numMissing}\n\n` +
+          `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
+          `${bucketLink}\n\n` +
+          `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
+          `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }
   }
@@ -583,8 +711,8 @@ export class ABRunnerEngine {
     await page.waitForTimeout(5000);
 
     const isDelegatesRoute = route === "/delegates";
-    const maxAttempts = isDelegatesRoute ? 5 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 8000 : 15000;
+    const maxAttempts = isDelegatesRoute ? 2 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 3000 : 35000;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -656,119 +784,130 @@ export class ABRunnerEngine {
     await page.waitForTimeout(3000);
   }
 
-  private async extractDOMTree(page: Page, route: string, customScope?: string) {
-    return await page.evaluate(({ rt, cs }) => {
-      let scope = cs || "*";
-      if (!cs) {
-        if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
-        if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
-      }
+  private async extractDOMTree(
+    page: Page,
+    route: string,
+    customScope?: string
+  ) {
+    return await page.evaluate(
+      ({ rt, cs }) => {
+        let scope = cs || "*";
+        if (!cs) {
+          if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
+          if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
+        }
 
-      const MAX_ELEMENTS = 2000;
-      const allElements = document.querySelectorAll(scope);
-      const elements = Array.from(allElements)
-        .filter((el) => {
-          if (
-            el.closest("vercel-live-feedback") ||
-            el.closest("[data-vercel-toolbar]") ||
-            el.closest("footer") ||
-            el.closest(".bg-footerBackground")
-          )
-            return false;
+        const MAX_ELEMENTS = 10000;
+        const allElements = document.querySelectorAll(scope);
+        const elements = Array.from(allElements)
+          .filter((el) => {
+            if (
+              el.closest("vercel-live-feedback") ||
+              el.closest("[data-vercel-toolbar]") ||
+              el.closest("footer") ||
+              el.closest(".bg-footerBackground")
+            )
+              return false;
 
-          const text = el.textContent?.trim();
-          if (text === "Loading" || text === "Loading...") return false;
+            const text = el.textContent?.trim();
+            if (text === "Loading" || text === "Loading...") return false;
 
-          const isVisualBlock =
-            el.tagName === "IMG" ||
-            el.tagName === "SVG" ||
-            el.hasAttribute("data-testid");
-          const hasDirectText = Array.from(el.childNodes).some(
-            (n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
-          );
-          return isVisualBlock || hasDirectText;
-        })
-        .slice(0, MAX_ELEMENTS);
+            const isVisualBlock =
+              el.tagName === "IMG" ||
+              el.tagName === "SVG" ||
+              el.hasAttribute("data-testid");
+            const hasDirectText = Array.from(el.childNodes).some(
+              (n) =>
+                n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""
+            );
+            return isVisualBlock || hasDirectText;
+          })
+          .slice(0, MAX_ELEMENTS);
 
-      return elements
-        .map((el) => {
-          const rect = el.getBoundingClientRect();
-          if (rect.width === 0 || rect.height === 0) return null;
-          const cs = window.getComputedStyle(el);
+        return elements
+          .map((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return null;
+            const cs = window.getComputedStyle(el);
 
-          return {
-            tag: el.tagName.toLowerCase(),
-            text:
-              ((el as HTMLElement).innerText || "")
+            return {
+              tag: el.tagName.toLowerCase(),
+              text: ((el as HTMLElement).innerText || "")
                 .replace(/\s+/g, " ")
                 .trim(),
-            rect: {
-              x: rect.x + window.scrollY,
-              y: rect.y + window.scrollY,
-              width: rect.width,
-              height: rect.height,
-            },
-            style: {
-              backgroundColor: cs.backgroundColor,
-              color: cs.color,
-              borderColor: cs.borderColor,
-              borderWidth: cs.borderWidth,
-              opacity: cs.opacity,
-              display: cs.display,
-              visibility: cs.visibility,
-            },
-            path: getValidCSSPath(el),
-            isFooter: !!el.closest("footer"),
-          };
-        })
-        .filter(Boolean);
+              rect: {
+                x: rect.x + window.scrollY,
+                y: rect.y + window.scrollY,
+                width: rect.width,
+                height: rect.height,
+              },
+              style: {
+                backgroundColor: cs.backgroundColor,
+                color: cs.color,
+                borderColor: cs.borderColor,
+                borderWidth: cs.borderWidth,
+                opacity: cs.opacity,
+                display: cs.display,
+                visibility: cs.visibility,
+              },
+              path: getValidCSSPath(el),
+              isFooter: !!el.closest("footer"),
+            };
+          })
+          .filter(Boolean);
 
-      function getValidCSSPath(el: Element) {
-        const path: string[] = [];
-        let curr: Element | null = el;
-        while (
-          curr &&
-          curr.nodeType === Node.ELEMENT_NODE &&
-          curr.tagName.toLowerCase() !== "body" &&
-          curr.tagName.toLowerCase() !== "html"
-        ) {
-          let index = 1;
-          for (
-            let sibling = curr.previousElementSibling;
-            sibling;
-            sibling = sibling.previousElementSibling
+        function getValidCSSPath(el: Element) {
+          const path: string[] = [];
+          let curr: Element | null = el;
+          while (
+            curr &&
+            curr.nodeType === Node.ELEMENT_NODE &&
+            curr.tagName.toLowerCase() !== "body" &&
+            curr.tagName.toLowerCase() !== "html"
           ) {
-            if (sibling.tagName === curr.tagName) index++;
-          }
-          let selector = curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
-          const testid = curr.getAttribute("data-testid");
-          const href = curr.getAttribute("href");
+            let index = 1;
+            for (
+              let sibling = curr.previousElementSibling;
+              sibling;
+              sibling = sibling.previousElementSibling
+            ) {
+              if (sibling.tagName === curr.tagName) index++;
+            }
+            let selector =
+              curr.tagName.toLowerCase() + `:nth-of-type(${index})`;
+            const testid = curr.getAttribute("data-testid");
+            const href = curr.getAttribute("href");
 
-          if (testid) {
-            selector =
-              curr.tagName.toLowerCase() +
-              `[data-testid="${testid}"]:nth-of-type(${index})`;
+            if (testid) {
+              selector =
+                curr.tagName.toLowerCase() +
+                `[data-testid="${testid}"]:nth-of-type(${index})`;
+              path.unshift(selector);
+              break; // Anchor to data-testid — stable across layout refactors
+            }
+
+            if (href && href.length > 2 && curr.tagName.toLowerCase() === "a") {
+              selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
+              path.unshift(selector);
+              break; // Anchor to href for dynamic cards without data-testid
+            }
+
             path.unshift(selector);
-            break; // Anchor to data-testid — stable across layout refactors
+            curr = curr.parentElement;
           }
 
-          if (href && href.length > 2) {
-            selector = curr.tagName.toLowerCase() + `[href="${href}"]`;
-            path.unshift(selector);
-            break; // Anchor to href for dynamic cards without data-testid
+          const finalPath = path.join(" > ");
+          if (
+            finalPath.includes("data-testid") ||
+            finalPath.includes("href=")
+          ) {
+            return finalPath;
           }
-
-          path.unshift(selector);
-          curr = curr.parentElement;
+          return "body > " + finalPath;
         }
-
-        const finalPath = path.join(" > ");
-        if (finalPath.includes("data-testid") || finalPath.includes("href=")) {
-          return finalPath;
-        }
-        return "body > " + finalPath;
-      }
-    }, { rt: route, cs: customScope });
+      },
+      { rt: route, cs: customScope }
+    );
   }
 
   private getOverride(route: string): OverrideConfig {

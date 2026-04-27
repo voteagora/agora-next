@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useMemo, useState, useLayoutEffect } from "react";
-import { cn } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
+import {
+  PROSE_LINKS,
+  PROSE_MEDIA,
+  PROSE_PRIMARY_BODY,
+} from "@/components/duna-editor/proseThemeClasses";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { sanitizeForumContent } from "@/lib/sanitizationUtils";
+import Tenant from "@/lib/tenant/tenant";
+import { cn } from "@/lib/utils";
 
 interface DunaContentRendererProps {
   content: string;
@@ -161,7 +166,14 @@ export default function DunaContentRenderer({
   const renderedContent = useMemo(() => {
     if (isMarkdown) {
       return (
-        <div className="p-4 prose prose-sm max-w-none">
+        <div
+          className={cn(
+            "p-4 prose prose-sm max-w-none",
+            PROSE_PRIMARY_BODY,
+            PROSE_LINKS,
+            PROSE_MEDIA
+          )}
+        >
           <Markdown content={sanitizedContent} originalHierarchy />
         </div>
       );
@@ -179,15 +191,12 @@ export default function DunaContentRenderer({
       data-testid="duna-content"
       className={cn(
         "text-sm prose prose-sm max-w-none",
-        ui.customization?.cardBackground
-          ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white prose-img:rounded-lg"
-          : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-img:rounded-lg",
-        "prose-a:font-medium prose-img:max-w-full prose-img:h-auto prose-img:my-2",
+        PROSE_PRIMARY_BODY,
+        PROSE_LINKS,
+        PROSE_MEDIA,
         className
       )}
       style={{
-        // Force some basic styling to ensure content is visible
-        color: ui.customization?.cardBackground ? "white" : "inherit",
         fontSize: "inherit",
         lineHeight: "inherit",
       }}

@@ -75,8 +75,9 @@ export function getInputData(proposal: DraftProposal): {
     proposal.title +
     "\n\n" +
     `${
-      proposal.temp_check_link &&
-      "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n\n"
+      proposal.temp_check_link
+        ? "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n\n"
+        : ""
     }` +
     proposal.abstract;
 

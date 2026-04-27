@@ -293,7 +293,7 @@ const CommentItem = ({
               </button>
             )}
           </div>
-          <div className="text-secondary text-xs sm:text-sm mb-2">
+          <div className="text-primary text-xs sm:text-sm mb-2">
             <DunaContentRenderer content={comment.content} />
           </div>
 

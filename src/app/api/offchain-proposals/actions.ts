@@ -38,6 +38,7 @@ interface CancelOffchainProposalParams {
   auth: AuthParams;
   proposalId: string;
   attestationUid: string;
+  traceContext?: MiradorTraceContext;
 }
 
 function getOffchainProposalCreators() {
@@ -108,7 +109,7 @@ export async function createOffchainProposal({
       },
     });
 
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,
@@ -130,7 +131,7 @@ export async function createOffchainProposal({
     };
   } catch (error: any) {
     console.error("Error creating off-chain proposal:", error);
-    await appendServerTraceEvent({
+    appendServerTraceEvent({
       traceContext: traceContext
         ? {
             ...traceContext,
@@ -149,6 +150,7 @@ export async function cancelOffchainProposal({
   auth,
   proposalId,
   attestationUid,
+  traceContext,
 }: CancelOffchainProposalParams) {
   try {
     const { slug } = Tenant.current();
@@ -178,6 +180,21 @@ export async function cancelOffchainProposal({
       },
     });
 
+    appendServerTraceEvent({
+      traceContext: traceContext
+        ? {
+            ...traceContext,
+            step: "offchain_proposal_cancel_record",
+            source: "backend",
+          }
+        : undefined,
+      eventName: "offchain_proposal_cancel_recorded",
+      details: {
+        proposalId: updatedProposal.id,
+        attestationUid,
+      },
+    });
+
     return {
       success: true,
       proposalId: updatedProposal.id,
@@ -185,6 +202,17 @@ export async function cancelOffchainProposal({
     };
   } catch (error: any) {
     console.error("Error cancelling off-chain proposal:", error);
+    appendServerTraceEvent({
+      traceContext: traceContext
+        ? {
+            ...traceContext,
+            step: "offchain_proposal_cancel_record",
+            source: "backend",
+          }
+        : undefined,
+      eventName: "offchain_proposal_cancel_record_failed",
+      details: { proposalId, message: error.message },
+    });
     if (error.code === "P2025") {
       throw new Error(`Off-chain proposal with ID ${proposalId} not found`);
     }

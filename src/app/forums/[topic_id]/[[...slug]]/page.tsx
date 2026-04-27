@@ -26,12 +26,13 @@ import {
 } from "@/lib/forumUtils";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { stripHtmlToText } from "../../stripHtml";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 import FinancialStatementLayout from "../components/FinancialStatementLayout";
+import ForumDiscussAction from "../components/ForumDiscussAction";
+import { hasMarkdownHeadings } from "../components/markdownHeadings";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -111,14 +112,6 @@ async function loadTopic(topicIdParam: string): Promise<TopicBundle | null> {
   };
 }
 
-function buildDescription(content: string, title: string): string {
-  const plain = stripHtmlToText(content);
-  if (plain) {
-    return truncateForMeta(plain);
-  }
-  return truncateForMeta(`Discussion: ${title}`);
-}
-
 function extractPostId(postParam: string | undefined): number | null {
   if (!postParam) return null;
   const postId = Number(postParam);
@@ -166,7 +159,6 @@ export async function generateMetadata({
     : null;
 
   let canonicalUrl = `${baseUrl}${canonicalPath}`;
-  let description: string;
   let metaTitle: string;
   let ogImageUrl: string;
   let authorAddress: string;
@@ -175,7 +167,6 @@ export async function generateMetadata({
 
   if (specificPost) {
     canonicalUrl = `${baseUrl}${canonicalPath}?post=${postId}`;
-    description = buildDescription(specificPost.content, transformed.title);
     const suffix = ` | ${brandName} Forum`;
     metaTitle = truncateTitleForMeta(
       `Comment on: ${transformed.title}`,
@@ -188,16 +179,10 @@ export async function generateMetadata({
 
     ogImageUrl = `${baseUrl}/api/images/og/generic?title=${encodeURIComponent(
       transformed.title
-    )}&description=${encodeURIComponent(
-      description
-    )}&author=${encodeURIComponent(
+    )}&description=&author=${encodeURIComponent(
       truncateAddress(authorAddress) || authorAddress
     )}&isPost=true`;
   } else {
-    description = buildDescription(
-      transformed.content || "",
-      transformed.title
-    );
     const suffix = ` | ${brandName} Forum`;
     metaTitle = truncateTitleForMeta(transformed.title, suffix, 60);
     authorAddress = transformed.author;
@@ -208,12 +193,11 @@ export async function generateMetadata({
 
     ogImageUrl = `${baseUrl}/api/images/og/generic?title=${encodeURIComponent(
       transformed.title
-    )}&description=${encodeURIComponent(description)}`;
+    )}&description=`;
   }
 
   return {
     title: metaTitle,
-    description,
     alternates: {
       canonical: canonicalUrl,
     },
@@ -221,7 +205,6 @@ export async function generateMetadata({
       type: "article",
       url: canonicalUrl,
       title: metaTitle,
-      description,
       siteName: `${brandName} Forum`,
       publishedTime: createdAt,
       modifiedTime: updatedAt,
@@ -238,13 +221,20 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: metaTitle,
-      description,
       images: [ogImageUrl],
     },
   };
 }
 
 export default async function ForumTopicPage({ params }: PageProps) {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("forums")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
   const [
     topicBundle,
     adminsResult,
@@ -313,6 +303,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
     address: authorAddress,
     authorName: truncateAddress(authorAddress) || authorAddress,
     createdAt: createdAtIso,
+    revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,
   };
 
@@ -320,6 +311,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
   const rootAttachments = rootPost?.attachments || [];
 
   const isFinancialStatement = topicData.isFinancialStatement ?? false;
+  const showTocSidebar = isFinancialStatement && hasMarkdownHeadings(topicBody);
   const pdfAttachment = rootAttachments.find(
     (att: any) => att.contentType === "application/pdf"
   );
@@ -378,6 +370,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
         <ForumsHeader
           breadcrumbs={[{ label: "Discussions", href: "/forums" }]}
           isDuna={false}
+          showSearch={false}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <UnpublishedTopicGate
@@ -388,11 +381,19 @@ export default async function ForumTopicPage({ params }: PageProps) {
     );
   }
 
+  // Mirror FinancialStatementLayout's discuss-button visibility rule: hidden on
+  // the article-style topic view (Uniswap). When the discuss button would be
+  // shown, render it next to the temp-check button instead of inline.
+  const isOnArticlePage = namespace === TENANT_NAMESPACES.UNISWAP;
+  const showDiscussButton = isFinancialStatement && !isOnArticlePage;
+
   return (
     <div className="min-h-screen">
       <ForumsHeader
         breadcrumbs={breadcrumbs}
         isDuna={categoryName === "DUNA"}
+        showSearch={false}
+        headerActions={showDiscussButton ? <ForumDiscussAction /> : undefined}
         topicContext={{
           id: headerTopic.id,
           title: headerTopic.title,
@@ -418,16 +419,16 @@ export default async function ForumTopicPage({ params }: PageProps) {
                   title={transformed.title}
                   content={topicBody}
                   pdfUrl={pdfUrl}
-                  isOnArticlePage={namespace === TENANT_NAMESPACES.UNISWAP}
-                />
-                <div className="mt-8">
+                  isOnArticlePage={isOnArticlePage}
+                  hideInlineDiscussButton={showDiscussButton}
+                >
                   <ForumThread
                     topicId={topicId}
                     initialComments={comments}
                     categoryId={categoryId}
                     adminDirectory={adminDirectory}
                   />
-                </div>
+                </FinancialStatementLayout>
               </>
             ) : (
               <>
@@ -436,7 +437,7 @@ export default async function ForumTopicPage({ params }: PageProps) {
                 <div className="mt-2 mb-4 break-words">
                   <DunaContentRenderer
                     content={topicBody}
-                    className="text-secondary text-sm leading-relaxed break-words"
+                    className="text-sm leading-relaxed break-words"
                   />
                 </div>
 
@@ -488,15 +489,17 @@ export default async function ForumTopicPage({ params }: PageProps) {
           </div>
 
           {/* Sidebar */}
-          <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
-            <ForumsSidebar
-              categories={categories}
-              latestPost={topicData}
-              selectedCategoryId={categoryId}
-              totalTopicsCount={totalTopicsCount}
-              uncategorizedCount={uncategorizedCount}
-            />
-          </div>
+          {!showTocSidebar && (
+            <div className="w-full lg:w-72 xl:w-64 lg:ml-auto flex-shrink-0">
+              <ForumsSidebar
+                categories={categories}
+                latestPost={topicData}
+                selectedCategoryId={categoryId}
+                totalTopicsCount={totalTopicsCount}
+                uncategorizedCount={uncategorizedCount}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

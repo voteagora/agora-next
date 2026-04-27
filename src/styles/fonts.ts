@@ -89,9 +89,37 @@ export const instrumentSerif = localFont({
   display: "swap",
 });
 
+export const regola = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Regola-Book.woff2",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Regola-Regular.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Regola-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Regola-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-regola",
+  display: "swap",
+});
+
 export const fontMapper = {
   "font-inter": inter,
   "font-rajdhani": rajdhani,
   "font-chivoMono": chivoMono,
   "font-instrument-serif": instrumentSerif,
+  "font-regola": regola,
 } as Record<string, NextFontWithVariable>;

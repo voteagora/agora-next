@@ -3,19 +3,71 @@ name: A/B Visual Regression Tests
 on:
   workflow_dispatch:
     inputs:
+      tenant:
+        description: "Governance tenant to test"
+        required: true
+        default: "optimism"
+        type: choice
+        options:
+          - optimism
+          - uniswap
+          - ens
+          - scroll
+          - cyber
+          - linea
+          - b3
+          - xai
+          - derive
+          - etherfi
+          - syndicate
+          - protocol-guild
+          - towns
+          - boost
       url_a:
-        description: "Base Production URL (e.g. https://vote.optimism.io)"
+        description: "URL A — Production baseline"
         required: true
         default: "https://vote.optimism.io"
         type: string
       url_b:
-        description: "Preview URL to Compare (Vercel Branch Deployment)"
+        description: "URL B — Preview or staging to compare"
         required: true
         type: string
 
+      # ── Route Scopes (checked = included in scan) ──
+      scan_index:
+        description: "🏠 Index / Home page"
+        required: false
+        type: boolean
+        default: true
+      scan_proposals:
+        description: "📋 Proposals listing"
+        required: false
+        type: boolean
+        default: true
+      scan_delegates:
+        description: "👥 Delegates listing"
+        required: false
+        type: boolean
+        default: true
+
+      # ── Optional Filters ──
+      target_proposals:
+        description: "Specific proposal IDs (e.g. 116,adv-55). Leave empty for listing page."
+        required: false
+        type: string
+      target_types:
+        description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for none."
+        required: false
+        type: string
+      scan_all_archive:
+        description: "Deep scan all individual archived proposals (can be slow)"
+        required: false
+        type: boolean
+        default: false
+
 jobs:
   visual-regression:
-    name: Run Visual A/B Engine
+    name: "Visual A/B: ${{ inputs.tenant }}"
     runs-on: ubuntu-latest
     permissions:
       contents: "read"
@@ -37,11 +89,47 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Build Route Scopes
+        id: scopes
+        run: |
+          ROUTES=""
+          if [ "${{ inputs.scan_index }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}index"; fi
+          if [ "${{ inputs.scan_proposals }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}proposals"; fi
+          if [ "${{ inputs.scan_delegates }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}delegates"; fi
+
+          if [ -z "$ROUTES" ]; then
+            echo "⚠️ No routes selected — defaulting to all routes"
+            ROUTES="index,proposals,delegates"
+          fi
+
+          echo "route_scopes=$ROUTES" >> $GITHUB_OUTPUT
+          echo "📍 Route scopes: $ROUTES"
+
+      - name: Write Run Metadata
+        run: |
+          mkdir -p test-results
+          cat > test-results/run_metadata.json << 'METAEOF'
+          {
+            "url_a": "${{ inputs.url_a }}",
+            "url_b": "${{ inputs.url_b }}",
+            "tenant": "${{ inputs.tenant }}",
+            "routes": "${{ steps.scopes.outputs.route_scopes }}",
+            "target_types": "${{ inputs.target_types }}",
+            "target_proposals": "${{ inputs.target_proposals }}"
+          }
+          METAEOF
+          echo "📝 Metadata written"
+
       - name: Run A/B Regression Engine
         continue-on-error: true
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
-          URL_B: ${{ inputs.url_b || 'https://agora-next-optimism-git-sudheer-archivedata-voteagora.vercel.app/' }}
+          URL_B: ${{ inputs.url_b }}
+          TARGET_PROPOSALS: ${{ inputs.target_proposals }}
+          TARGET_TYPES: ${{ inputs.target_types }}
+          SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
+          TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
+          TENANT_CONTEXT: ${{ inputs.tenant }}
         run: npm run test:ab
 
       - name: Google Auth

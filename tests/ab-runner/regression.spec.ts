@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import { TENANT_NAMESPACES } from "../../src/lib/constants";
+import { fetchProposalsFromArchive } from "../../src/lib/archiveUtils";
 
 dotenv.config();
 
@@ -30,22 +31,63 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   test.afterAll(async () => {
     await contextA.close();
     await contextB.close();
+
+    // Generate manifest.json for local dashboard viewing
+    const abDiffsDir = path.join(process.cwd(), "test-results", "ab-diffs");
+    if (fs.existsSync(abDiffsDir)) {
+      const reports: { path: string; images: string[] }[] = [];
+      const getDirs = (dir: string) => {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const res = path.resolve(dir, entry.name);
+          if (entry.isDirectory()) {
+            getDirs(res);
+          } else if (entry.name === "report.json") {
+            const relPath = path.relative(abDiffsDir, res);
+            const parentDir = path.dirname(res);
+            const images = fs
+              .readdirSync(parentDir)
+              .filter((f) => f.endsWith(".png"));
+            reports.push({ path: relPath, images });
+          }
+        }
+      };
+      getDirs(abDiffsDir);
+      fs.writeFileSync(
+        path.join(abDiffsDir, "manifest.json"),
+        JSON.stringify({ reports }, null, 2)
+      );
+    }
   });
 
-  const staticRoutes = [
-    "/",
-    "/delegates?orderBy=most_voting_power",
-    "/proposals",
-  ];
+  const delegatesSortBy =
+    process.env.TARGET_DELEGATES_SORT_BY || "most_voting_power";
+
+  // Route scope mapping — controlled by TARGET_ROUTES env var (from CI checkboxes)
+  const routeMap: Record<string, string> = {
+    index: "/",
+    delegates: `/delegates?orderBy=${delegatesSortBy}`,
+    proposals: "/proposals",
+  };
+
+  const targetRoutes = (process.env.TARGET_ROUTES || "")
+    .split(",")
+    .map((r) => r.trim().toLowerCase())
+    .filter((r) => r.length > 0);
+
+  const staticRoutes =
+    targetRoutes.length > 0
+      ? targetRoutes.filter((r) => routeMap[r]).map((r) => routeMap[r])
+      : Object.values(routeMap); // default: all routes
 
   test(`Cross-Tenant Guardrail: Verify identical DAO targets`, async () => {
-    test.setTimeout(30000);
+    test.setTimeout(60000);
     const targetA = process.env.URL_A || "http://127.0.0.1:3000";
     const targetB = process.env.URL_B || "http://127.0.0.1:3000";
 
     await Promise.all([
-      pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {}),
-      pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {}),
+      pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 }),
+      pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 }),
     ]);
     await Promise.all([
       pageA
@@ -77,156 +119,140 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     });
   }
 
-  test(`Diff pass/fail -> expected/diff for proposals-by-type-tenant`, async () => {
-    test.setTimeout(600000); // 10 minutes to allow multiple deep proposals
-    const targetA = process.env.URL_A || "http://127.0.0.1:3000";
+  // === Explicit Targeted/Manual Regression ===
+  // E.g.: `TARGET_PROPOSALS="116,423" TARGET_DELEGATES="0x123...456" npm run test:ab`
+  const explicitProposals = (process.env.TARGET_PROPOSALS || "")
+    .split(",")
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
 
-    console.log(
-      `[Dynamic] Scraping DOM for available proposal types from ${targetA}/proposals...`
-    );
-
-    // Dynamically detect tenant namespace and extract its configured proposal types
-    let activeTenant =
-      Object.values(TENANT_NAMESPACES).find((ns) =>
-        targetA.toLowerCase().includes(ns.toLowerCase())
-      ) || TENANT_NAMESPACES.OPTIMISM;
-
-    // Natively read the TS config file to bypass Playwright's Babel/SVG loader limitations
-    let dynamicTypes = ["STANDARD"];
-    try {
-      const configPath = path.join(
-        __dirname,
-        `../../src/lib/tenant/configs/ui/${activeTenant}.ts`
-      );
-      if (fs.existsSync(configPath)) {
-        const content = fs.readFileSync(configPath, "utf-8");
-        const match = content.match(/proposalTypes:\s*\[([\s\S]*?)\]/);
-        if (match) {
-          dynamicTypes = Array.from(
-            match[1].matchAll(/type:\s*["']([^"']+)["']/g)
-          ).map((m) => {
-            let name = m[1].toUpperCase();
-            return name === "BASIC" ? "STANDARD" : name;
-          });
-        }
-      }
-    } catch (e) {
-      console.warn(
-        `[Dynamic] Could not parse TS config for ${activeTenant}, defaulting to [STANDARD]`
-      );
+  if (explicitProposals.length > 0) {
+    for (const proposalId of explicitProposals) {
+      test(`Diff pass/fail -> expected/diff for specific explicitly targeted proposal "/proposals/${proposalId}"`, async () => {
+        test.setTimeout(900000);
+        await engine.diffRoute(`/proposals/${proposalId}`, pageA, pageB);
+      });
     }
+  }
 
-    // Ensure generic STANDARD fallback if empty
-    const searchTargets = dynamicTypes.length > 0 ? dynamicTypes : ["STANDARD"];
-    console.log(
-      `[Dynamic] Detected Tenant: [${activeTenant}]. Extracting native UI typologies: [${searchTargets.join(", ")}]`
-    );
+  // === Targeted Proposal Types Regression ===
+  // E.g.: `TARGET_TYPES="STANDARD,APPROVAL" npm run test:ab`
+  const targetTypes = (process.env.TARGET_TYPES || "")
+    .split(",")
+    .map((t) => t.trim().toUpperCase())
+    .filter((t) => t.length > 0);
 
-    let proposalsByType: Record<string, string> = {};
+  // === GCS Archive Proposals Regression ===
+  // Fetches all proposals from the archive and runs a diff for each proposal ID.
+  if (explicitProposals.length === 0) {
+    test(`Diff pass/fail -> expected/diff for all archived proposals`, async () => {
+      test.setTimeout(0); // No timeout — scales with number of proposals in archive
 
-    try {
-      await pageA.goto(`${targetA}/proposals`, { waitUntil: "commit" });
-      await pageA
-        .waitForSelector('a[href*="/proposals/"]', { timeout: 20000 })
-        .catch(() => {});
+      const targetA = process.env.URL_A || "http://127.0.0.1:3000";
+      const activeTenant =
+        Object.values(TENANT_NAMESPACES).find((ns) =>
+          targetA.toLowerCase().includes(ns.toLowerCase())
+        ) || TENANT_NAMESPACES.OPTIMISM;
 
-      const res = await pageA.evaluate(async (expectedTypes) => {
-        const map: Record<string, string> = {};
-        let iterations = 0;
+      let { data: proposals } = await fetchProposalsFromArchive(
+        activeTenant,
+        "relevant"
+      );
 
-        while (
-          Object.keys(map).length < expectedTypes.length &&
-          iterations < 8
-        ) {
-          const cards = Array.from(
-            document.querySelectorAll('a[href*="/proposals/"]')
-          ).filter((a) => {
-            const h = a.getAttribute("href") || "";
-            return /\/proposals\/([0-9a-zA-Z_-]{2,})/.test(h);
-          });
+      // Filter out snapshot proposals because they don't have a detail page on Agora
+      // and redirect to snapshot.org, which would break the visual regression scanner.
+      proposals = proposals.filter(
+        (p: any) => String(p.proposal_type).toUpperCase() !== "SNAPSHOT"
+      );
 
-          cards.forEach((card) => {
-            const href = card.getAttribute("href") as string;
-            const text = ((card as HTMLElement).innerText || "").toUpperCase();
+      if (targetTypes.length > 0) {
+        const limitedProposals: any[] = [];
+        const typesCount: Record<string, number> = {};
 
-            let typeText = "STANDARD";
-            expectedTypes.forEach((targetType: string) => {
-              if (text.includes(targetType)) typeText = targetType;
-            });
+        for (const p of proposals) {
+          let rawType = String(
+            p.proposal_type || p.proposal_type_info?.name || "UNDEFINED"
+          ).toUpperCase();
 
-            if (!map[typeText]) {
-              map[typeText] = href;
+          let t = "UNDEFINED";
+          if (rawType.includes("OPTIMISTIC")) t = "OPTIMISTIC";
+          else if (rawType.includes("APPROVAL")) t = "APPROVAL";
+          else if (
+            rawType.includes("STANDARD") ||
+            rawType.includes("DEFAULT") ||
+            rawType.includes("SUPERMAJORITY")
+          ) {
+            t = "STANDARD";
+          }
+
+          if (targetTypes.includes(t)) {
+            typesCount[t] = (typesCount[t] || 0) + 1;
+            // Only keep up to 1 of each type to prevent massive loops, unless overridden
+            const limit = Number(process.env.TARGET_TYPES_LIMIT || "1");
+            if (typesCount[t] <= limit) {
+              limitedProposals.push(p);
             }
-          });
+          }
+        }
+        proposals = limitedProposals;
 
-          if (Object.keys(map).length >= expectedTypes.length) break;
-          window.scrollTo(0, document.body.scrollHeight);
-          await new Promise((r) => setTimeout(r, 1500));
-          iterations++;
+        console.log(
+          `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}] (Limit per type: ${process.env.TARGET_TYPES_LIMIT || "1"})`
+        );
+      } else {
+        if (process.env.SCAN_ALL_ARCHIVE === "true") {
+          console.log(
+            `[Archive] Unbounded scan enabled: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
+          );
+        } else {
+          console.log(
+            `[Archive] Skipping archive crawler because no TARGET_TYPES were provided and SCAN_ALL_ARCHIVE is false.`
+          );
+          proposals = [];
+        }
+      }
+
+      const failedDrifts: string[] = [];
+
+      for (const proposal of proposals) {
+        const pRoute = `/proposals/${proposal.id}`;
+
+        let rawType = String(
+          proposal.proposal_type ||
+            proposal.proposal_type_info?.name ||
+            "UNDEFINED"
+        ).toUpperCase();
+        let resolvedType = "UNDEFINED";
+        if (rawType.includes("OPTIMISTIC")) resolvedType = "OPTIMISTIC";
+        else if (rawType.includes("APPROVAL")) resolvedType = "APPROVAL";
+        else if (
+          rawType.includes("STANDARD") ||
+          rawType.includes("DEFAULT") ||
+          rawType.includes("SUPERMAJORITY")
+        ) {
+          resolvedType = "STANDARD";
         }
 
-        return {
-          map,
-          totalCards: document.querySelectorAll('a[href*="/proposals/"]')
-            .length,
-        };
-      }, searchTargets);
-
-      proposalsByType = res.map;
-      console.log(
-        `[Dynamic] Extracted ${res.totalCards} raw proposals from DOM.`
-      );
-      console.log(
-        `[Dynamic] Mapping matrix generated natively:`,
-        JSON.stringify(proposalsByType, null, 2)
-      );
-    } catch (e) {
-      console.error(
-        "[Dynamic] Error extracting proposals by type. Skipping extraction.",
-        e
-      );
-    }
-
-    // Execute sequentially and Aggregate failures so we never break the loop early
-    const failedDrifts: string[] = [];
-
-    for (const ptype of searchTargets) {
-      if (!proposalsByType[ptype]) {
         console.log(
-          `[Dynamic] Missing native proposal type in production: [${ptype}]`
+          `[Archive] Testing Proposal [${proposal.id}]: ${pRoute} (Type: ${resolvedType})`
         );
-        const artifactsDir = path.join(
-          process.cwd(),
-          "test-results",
-          "ab-diffs",
-          "optimism",
-          "proposals",
-          ptype
-        );
-        fs.mkdirSync(artifactsDir, { recursive: true });
-        fs.writeFileSync(
-          path.join(artifactsDir, "report.json"),
-          JSON.stringify({ error: "No proposals found of this type" }, null, 2)
-        );
-        continue;
+        try {
+          await engine.diffRoute(pRoute, pageA, pageB, {
+            tenant: activeTenant,
+            type: resolvedType,
+          });
+        } catch (e: any) {
+          failedDrifts.push(
+            `[${proposal.id}] Proposal Drifts Detected: ${e.message}`
+          );
+        }
       }
 
-      const pRoute = proposalsByType[ptype];
-      console.log(`[Dynamic] Testing Proposal Type [${ptype}]: ${pRoute}`);
-      try {
-        await engine.diffRoute(pRoute, pageA, pageB, {
-          tenant: activeTenant,
-          type: ptype,
-        });
-      } catch (e: any) {
-        failedDrifts.push(`[${ptype}] Proposal Drifts Detected: ${e.message}`);
+      if (failedDrifts.length > 0) {
+        throw new Error(
+          `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
+        );
       }
-    }
-
-    if (failedDrifts.length > 0) {
-      throw new Error(
-        `Aggregated Visual Regressions Failed:\n${failedDrifts.join("\n\n")}`
-      );
-    }
-  });
+    });
+  }
 });

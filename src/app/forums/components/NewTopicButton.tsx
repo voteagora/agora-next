@@ -93,12 +93,16 @@ export default function NewTopicButton({
 
   //Todo: the colors for syndicate and towns need to be chagned in theme. cant make it conhesive with other tenants atm
   const bgStyle =
-    namespace === TENANT_NAMESPACES.SYNDICATE
+    namespace === TENANT_NAMESPACES.SYNDICATE ||
+    namespace === TENANT_NAMESPACES.OG ||
+    namespace === TENANT_NAMESPACES.SHAPE
       ? "bg-white"
       : "bg-buttonBackground";
   const textStyle =
     namespace === TENANT_NAMESPACES.SYNDICATE ||
-    namespace === TENANT_NAMESPACES.TOWNS
+    namespace === TENANT_NAMESPACES.TOWNS ||
+    namespace === TENANT_NAMESPACES.OG ||
+    namespace === TENANT_NAMESPACES.SHAPE
       ? "text-primary"
       : "text-neutral";
 
@@ -124,6 +128,11 @@ export default function NewTopicButton({
         )}
       </>
     );
+  }
+
+  // Suppress the global "create new topic" CTA when viewing a topic.
+  if (topicContext) {
+    return null;
   }
 
   return (
