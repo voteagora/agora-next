@@ -468,27 +468,29 @@ export class ABRunnerEngine {
     };
 
     const stripLoadingText = async (p: Page) => {
-      await p.evaluate(() => {
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-        let node;
-        while ((node = walker.nextNode())) {
-          if (node.nodeValue && node.nodeValue.includes("Loading")) {
-            if (node.parentElement) {
-              const testid = node.parentElement.getAttribute("data-testid");
-              if (testid !== "proposal-status") {
-                node.parentElement.style.opacity = "0";
-                node.parentElement.style.visibility = "hidden";
+      await p
+        .evaluate(() => {
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT
+          );
+          let node;
+          while ((node = walker.nextNode())) {
+            if (node.nodeValue && node.nodeValue.includes("Loading")) {
+              if (node.parentElement) {
+                const testid = node.parentElement.getAttribute("data-testid");
+                if (testid !== "proposal-status") {
+                  node.parentElement.style.opacity = "0";
+                  node.parentElement.style.visibility = "hidden";
+                }
               }
             }
           }
-        }
-      }).catch(() => {});
+        })
+        .catch(() => {});
     };
 
-    await Promise.all([
-      stripLoadingText(pageA),
-      stripLoadingText(pageB),
-    ]);
+    await Promise.all([stripLoadingText(pageA), stripLoadingText(pageB)]);
 
     await Promise.all([
       freezeVolatileContent(pageA),
@@ -997,13 +999,15 @@ export class ABRunnerEngine {
             }
           }
         }
-        
-        // Failsafe: explicitly restore visibility to all proposal-status elements 
+
+        // Failsafe: explicitly restore visibility to all proposal-status elements
         // in case they were hidden by any other class/rule
-        document.querySelectorAll('[data-testid="proposal-status"]').forEach(el => {
-          (el as HTMLElement).style.opacity = "1";
-          (el as HTMLElement).style.visibility = "visible";
-        });
+        document
+          .querySelectorAll('[data-testid="proposal-status"]')
+          .forEach((el) => {
+            (el as HTMLElement).style.opacity = "1";
+            (el as HTMLElement).style.visibility = "visible";
+          });
       })
       .catch(() => {});
 
@@ -1074,8 +1078,8 @@ export class ABRunnerEngine {
           );
           // On detail page there's 1 status badge, on list there are many
           // If we haven't rendered any status badges yet, wait
-          if (statuses.length === 0) return false; 
-          
+          if (statuses.length === 0) return false;
+
           return Array.from(statuses).every(
             (el) => el.textContent && el.textContent.trim().length > 0
           );
