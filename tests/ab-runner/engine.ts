@@ -231,7 +231,7 @@ export class ABRunnerEngine {
           rawDrifts.push({
             path: nodeB.path,
             reason: "Added Component",
-            urlA_text: "(Element completely absent in Production Baseline)",
+            urlA_text: "(Element completely absent in URL A)",
             urlB_text: nodeB.text,
           });
         }
@@ -674,8 +674,8 @@ export class ABRunnerEngine {
       };
 
       await Promise.all([
-        injectOverlay(pageA, "A (Production)", this.urlA),
-        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+        injectOverlay(pageA, "A", this.urlA),
+        injectOverlay(pageB, "B", this.urlB),
       ]);
 
       // 5. Full-page annotated screenshots (with highlights + overlay)
@@ -752,8 +752,8 @@ export class ABRunnerEngine {
       };
 
       await Promise.all([
-        injectOverlay(pageA, "A (Production)", this.urlA),
-        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+        injectOverlay(pageA, "A", this.urlA),
+        injectOverlay(pageB, "B", this.urlB),
       ]);
 
       // No drifts — capture full-page baselines
@@ -852,7 +852,7 @@ export class ABRunnerEngine {
           `   👻 Missing Components: ${numMissing}\n\n` +
           `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
           `${bucketLink}\n\n` +
-          `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
+          `Context: This means some React elements changed color, spacing, or text compared to URL A.\n` +
           `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }

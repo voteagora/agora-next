@@ -517,7 +517,7 @@
           </div>
           <div
             class="flex items-center gap-1.5"
-            data-tip="A DOM element in Production was not found in Branch. In list containers, this is usually scroll-depth noise. For standalone elements, it may indicate a removed component."
+            data-tip="A DOM element in URL A was not found in URL B. In list containers, this is usually scroll-depth noise. For standalone elements, it may indicate a removed component."
             data-tip-title="Missing Node"
             data-tip-color="#ff0000"
           >
@@ -528,7 +528,7 @@
           </div>
           <div
             class="flex items-center gap-1.5"
-            data-tip="A DOM element in Branch was not found in Production. In list containers, this is scroll noise. For standalone elements, it may indicate a newly added component or feature."
+            data-tip="A DOM element in URL B was not found in URL A. In list containers, this is scroll noise. For standalone elements, it may indicate a newly added component or feature."
             data-tip-title="New Node"
             data-tip-color="#00ff00"
           >
@@ -597,7 +597,11 @@
         <div class="flex h-full gap-1 relative">
           <div class="flex-1 flex flex-col min-w-0">
             <div class="text-center py-1">
-              <span class="text-xs font-mono px-3 py-1 rounded-full bg-blue-900/60 text-blue-300 border border-blue-700/50">A — Production</span>
+              <span
+                id="splitLabelA"
+                class="text-xs font-mono px-3 py-1 rounded-full bg-blue-900/60 text-blue-300 border border-blue-700/50"
+                >A — URL A</span
+              >
             </div>
             <div
               id="splitScrollA"
@@ -608,14 +612,20 @@
                 id="splitImgA"
                 class="w-full object-contain"
                 src=""
-                alt="Production"
+                alt="URL A"
               />
             </div>
           </div>
-          <div class="w-px bg-gradient-to-b from-transparent via-gray-500 to-transparent flex-shrink-0"></div>
+          <div
+            class="w-px bg-gradient-to-b from-transparent via-gray-500 to-transparent flex-shrink-0"
+          ></div>
           <div class="flex-1 flex flex-col min-w-0">
             <div class="text-center py-1">
-              <span class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">B — Branch</span>
+              <span
+                id="splitLabelB"
+                class="text-xs font-mono px-3 py-1 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50"
+                >B — URL B</span
+              >
             </div>
             <div
               id="splitScrollB"
@@ -626,7 +636,7 @@
                 id="splitImgB"
                 class="w-full object-contain"
                 src=""
-                alt="Branch"
+                alt="URL B"
               />
             </div>
           </div>
@@ -640,9 +650,15 @@
       >
         <div class="flex items-center gap-2 mb-2 border-b border-gray-800 pb-2">
           <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
-          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">What Am I Looking At?</span>
+          <span
+            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+            >What Am I Looking At?</span
+          >
         </div>
-        <div id="contextInfoContent" class="text-xs text-gray-300 leading-relaxed">
+        <div
+          id="contextInfoContent"
+          class="text-xs text-gray-300 leading-relaxed"
+        >
           Click an image to see context.
         </div>
       </div>
@@ -760,8 +776,8 @@
           <span
             id="headerUrlA"
             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40"
-            data-tip="The production baseline being compared against. This is the stable, live version of the governance site."
-            data-tip-title="URL A · Production"
+            data-tip="The baseline URL being compared against."
+            data-tip-title="URL A"
             data-tip-color="#22c55e"
           >
             <span class="text-green-600 font-bold shrink-0">A</span>
@@ -771,8 +787,8 @@
           <span
             id="headerUrlB"
             class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40"
-            data-tip="The preview or staging deploy being tested. This is the version with your changes."
-            data-tip-title="URL B · Preview"
+            data-tip="The target URL being tested against URL A."
+            data-tip-title="URL B"
             data-tip-color="#3b82f6"
           >
             <span class="text-blue-600 font-bold shrink-0">B</span>
@@ -977,7 +993,7 @@
                   Captures
                   <svg
                     class="tip-icon"
-                    data-tip="Total page screenshots captured across all routes — includes Production and Branch full-page and focused crop images."
+                    data-tip="Total page screenshots captured across all routes — includes URL A and URL B full-page and focused crop images."
                     data-tip-pos="bottom"
                     fill="none"
                     stroke="currentColor"
@@ -1713,7 +1729,9 @@
         if (!scope) return;
 
         // Exclude clean/ crops (reserved for AI analysis) from human viewer
-        const viewerImages = scope.images.filter((img) => !img.name.includes("clean/"));
+        const viewerImages = scope.images.filter(
+          (img) => !img.name.includes("clean/")
+        );
         const fullPages = viewerImages
           .filter((img) => img.name.toLowerCase().includes("fullpage"))
           .sort((a, b) => a.name.localeCompare(b.name));
@@ -1753,116 +1771,144 @@
 
       // Context descriptions for each artifact type
       const ARTIFACT_CONTEXT = {
-        'UrlA_FullPage_Highlights': {
-          title: '🅰️ Production Full Page',
-          desc: 'Complete full-page screenshot of <strong>Production</strong> with drift highlights overlaid. Colored borders mark detected regressions (see Legend). Compare with UrlB to spot visual differences.',
-          tip: 'Use Split View (S) to compare side-by-side with Branch.'
+        UrlA_FullPage_Highlights: {
+          title: "🅰️ URL A — Full Page",
+          desc: "Complete full-page screenshot of <strong>URL A</strong> with drift highlights overlaid. Colored borders mark detected regressions (see Legend). Compare with URL B to spot visual differences.",
+          tip: "Use Split View (S) to compare side-by-side with URL B.",
         },
-        'UrlB_FullPage_Highlights': {
-          title: '🅱️ Branch Full Page',
-          desc: 'Complete full-page screenshot of the <strong>Branch</strong> deployment with drift highlights. This is the "after" state you are validating against Production.',
-          tip: 'Use Split View (S) to compare side-by-side with Production.'
+        UrlB_FullPage_Highlights: {
+          title: "🅱️ URL B — Full Page",
+          desc: 'Complete full-page screenshot of <strong>URL B</strong> with drift highlights. This is the "after" state you are validating against URL A.',
+          tip: "Use Split View (S) to compare side-by-side with URL A.",
         },
-        'UrlA_FullPage_Tooltip': {
-          title: '🅰️ Production — Tooltip Capture',
-          desc: 'Screenshot taken after hovering a tooltip trigger on Production. Shows tooltip overlay content for comparison.',
-          tip: 'Check if tooltip content or positioning differs from Branch.'
+        UrlA_FullPage_Tooltip: {
+          title: "🅰️ URL A — Tooltip Capture",
+          desc: "Screenshot taken after hovering a tooltip trigger on URL A. Shows tooltip overlay content for comparison.",
+          tip: "Check if tooltip content or positioning differs from URL B.",
         },
-        'UrlB_FullPage_Tooltip': {
-          title: '🅱️ Branch — Tooltip Capture',
-          desc: 'Screenshot taken after hovering a tooltip trigger on Branch. Compare tooltip content and positioning with Production.',
-          tip: 'Verify tooltip data matches Production.'
+        UrlB_FullPage_Tooltip: {
+          title: "🅱️ URL B — Tooltip Capture",
+          desc: "Screenshot taken after hovering a tooltip trigger on URL B. Compare tooltip content and positioning with URL A.",
+          tip: "Verify tooltip data matches URL A.",
         },
-        'drift_UrlA': {
-          title: '🔍 Drift Crop — Production',
-          desc: 'Focused crop of a <strong>specific drifted element</strong> on Production. This zooms into the exact DOM node where a visual regression was detected.',
-          tip: 'Compare with the matching UrlB crop to see exactly what changed.'
+        drift_UrlA: {
+          title: "🔍 Drift Crop — URL A",
+          desc: "Focused crop of a <strong>specific drifted element</strong> on URL A. This zooms into the exact DOM node where a visual regression was detected.",
+          tip: "Compare with the matching UrlB crop to see exactly what changed.",
         },
-        'drift_UrlB': {
-          title: '🔍 Drift Crop — Branch',
-          desc: 'Focused crop of a <strong>specific drifted element</strong> on Branch. This is the "after" state of the detected regression.',
-          tip: 'Compare with the matching UrlA crop to spot the difference.'
-        }
+        drift_UrlB: {
+          title: "🔍 Drift Crop — URL B",
+          desc: 'Focused crop of a <strong>specific drifted element</strong> on URL B. This is the "after" state of the detected regression.',
+          tip: "Compare with the matching UrlA crop to spot the difference.",
+        },
       };
 
       function getArtifactContext(imgName) {
-        const name = imgName || '';
-        if (name.includes('UrlA_FullPage_Tooltip')) return ARTIFACT_CONTEXT['UrlA_FullPage_Tooltip'];
-        if (name.includes('UrlB_FullPage_Tooltip')) return ARTIFACT_CONTEXT['UrlB_FullPage_Tooltip'];
-        if (name.includes('UrlA_FullPage')) return ARTIFACT_CONTEXT['UrlA_FullPage_Highlights'];
-        if (name.includes('UrlB_FullPage')) return ARTIFACT_CONTEXT['UrlB_FullPage_Highlights'];
-        if (name.includes('UrlA')) return ARTIFACT_CONTEXT['drift_UrlA'];
-        if (name.includes('UrlB')) return ARTIFACT_CONTEXT['drift_UrlB'];
-        return { title: '📷 Screenshot', desc: 'Visual artifact from the A/B regression run.', tip: '' };
+        const name = imgName || "";
+        if (name.includes("UrlA_FullPage_Tooltip"))
+          return ARTIFACT_CONTEXT["UrlA_FullPage_Tooltip"];
+        if (name.includes("UrlB_FullPage_Tooltip"))
+          return ARTIFACT_CONTEXT["UrlB_FullPage_Tooltip"];
+        if (name.includes("UrlA_FullPage"))
+          return ARTIFACT_CONTEXT["UrlA_FullPage_Highlights"];
+        if (name.includes("UrlB_FullPage"))
+          return ARTIFACT_CONTEXT["UrlB_FullPage_Highlights"];
+        if (name.includes("UrlA")) return ARTIFACT_CONTEXT["drift_UrlA"];
+        if (name.includes("UrlB")) return ARTIFACT_CONTEXT["drift_UrlB"];
+        return {
+          title: "📷 Screenshot",
+          desc: "Visual artifact from the A/B regression run.",
+          tip: "",
+        };
       }
 
       function updateContextPanel(imgName) {
         const ctx = getArtifactContext(imgName);
-        const panel = document.getElementById('contextInfoContent');
-        panel.innerHTML = `<div class="font-semibold text-white mb-1">${ctx.title}</div><p class="mb-1.5">${ctx.desc}</p>${ctx.tip ? `<p class="text-indigo-400/80 text-[10px] italic">💡 ${ctx.tip}</p>` : ''}`;
+        const panel = document.getElementById("contextInfoContent");
+        panel.innerHTML = `<div class="font-semibold text-white mb-1">${ctx.title}</div><p class="mb-1.5">${ctx.desc}</p>${ctx.tip ? `<p class="text-indigo-400/80 text-[10px] italic">💡 ${ctx.tip}</p>` : ""}`;
       }
 
       function toggleSplitView() {
         isSplitView = !isSplitView;
-        const single = document.getElementById('lightboxScrollContainer');
-        const split = document.getElementById('splitViewContainer');
-        const btn = document.getElementById('splitViewToggle');
+        const single = document.getElementById("lightboxScrollContainer");
+        const split = document.getElementById("splitViewContainer");
+        const btn = document.getElementById("splitViewToggle");
 
         if (isSplitView) {
-          single.classList.add('hidden');
-          split.classList.remove('hidden');
-          split.classList.add('flex');
-          btn.classList.add('text-indigo-400', 'border-indigo-500');
-          btn.classList.remove('text-gray-400');
+          single.classList.add("hidden");
+          split.classList.remove("hidden");
+          split.classList.add("flex");
+          btn.classList.add("text-indigo-400", "border-indigo-500");
+          btn.classList.remove("text-gray-400");
           loadSplitImages();
         } else {
-          split.classList.add('hidden');
-          split.classList.remove('flex');
-          single.classList.remove('hidden');
-          btn.classList.remove('text-indigo-400', 'border-indigo-500');
-          btn.classList.add('text-gray-400');
+          split.classList.add("hidden");
+          split.classList.remove("flex");
+          single.classList.remove("hidden");
+          btn.classList.remove("text-indigo-400", "border-indigo-500");
+          btn.classList.add("text-gray-400");
         }
       }
 
       function loadSplitImages() {
         if (currentLightboxImages.length === 0) return;
         const current = currentLightboxImages[currentLightboxIndex];
-        const name = current.name || '';
+        const name = current.name || "";
 
         // Find the matching counterpart (UrlA ↔ UrlB)
         let pairName;
-        if (name.includes('UrlA')) {
-          pairName = name.replace('UrlA', 'UrlB');
-        } else if (name.includes('UrlB')) {
-          pairName = name.replace('UrlB', 'UrlA');
+        if (name.includes("UrlA")) {
+          pairName = name.replace("UrlA", "UrlB");
+        } else if (name.includes("UrlB")) {
+          pairName = name.replace("UrlB", "UrlA");
         }
 
-        const pair = pairName ? currentLightboxImages.find(i => i.name === pairName) : null;
+        const pair = pairName
+          ? currentLightboxImages.find((i) => i.name === pairName)
+          : null;
 
-        const imgA = document.getElementById('splitImgA');
-        const imgB = document.getElementById('splitImgB');
+        const imgA = document.getElementById("splitImgA");
+        const imgB = document.getElementById("splitImgB");
 
-        if (name.includes('UrlA')) {
+        if (name.includes("UrlA")) {
           imgA.src = current.url;
-          imgB.src = pair ? pair.url : '';
+          imgB.src = pair ? pair.url : "";
         } else {
           imgB.src = current.url;
-          imgA.src = pair ? pair.url : '';
+          imgA.src = pair ? pair.url : "";
         }
 
         // Reset scroll positions
-        document.getElementById('splitScrollA').scrollTop = 0;
-        document.getElementById('splitScrollB').scrollTop = 0;
+        document.getElementById("splitScrollA").scrollTop = 0;
+        document.getElementById("splitScrollB").scrollTop = 0;
+
+        // Update split labels with actual hostnames from report metadata
+        const labelA = document.getElementById("splitLabelA");
+        const labelB = document.getElementById("splitLabelB");
+        try {
+          const urlAText = document
+            .getElementById("headerUrlAText")
+            ?.textContent?.trim();
+          const urlBText = document
+            .getElementById("headerUrlBText")
+            ?.textContent?.trim();
+          if (urlAText && urlAText !== "loading…") {
+            labelA.textContent = `A — ${urlAText}`;
+          }
+          if (urlBText && urlBText !== "loading…") {
+            labelB.textContent = `B — ${urlBText}`;
+          }
+        } catch {}
       }
 
       function syncSplitScroll(source) {
         if (splitSyncLock) return;
         splitSyncLock = true;
 
-        const scrollA = document.getElementById('splitScrollA');
-        const scrollB = document.getElementById('splitScrollB');
-        const src = source === 'A' ? scrollA : scrollB;
-        const dst = source === 'A' ? scrollB : scrollA;
+        const scrollA = document.getElementById("splitScrollA");
+        const scrollB = document.getElementById("splitScrollB");
+        const src = source === "A" ? scrollA : scrollB;
+        const dst = source === "A" ? scrollB : scrollA;
 
         // Sync by percentage for proportional scrolling
         const maxScroll = src.scrollHeight - src.clientHeight;
@@ -1870,7 +1916,9 @@
         const dstMax = dst.scrollHeight - dst.clientHeight;
         dst.scrollTop = pct * dstMax;
 
-        requestAnimationFrame(() => { splitSyncLock = false; });
+        requestAnimationFrame(() => {
+          splitSyncLock = false;
+        });
       }
 
       function toggleZoom() {
@@ -1978,7 +2026,7 @@
         updateContextPanel(img.name);
 
         // Auto-activate split view for FullPage images
-        const isFullPage = img.name.toLowerCase().includes('fullpage');
+        const isFullPage = img.name.toLowerCase().includes("fullpage");
         if (isFullPage && !isSplitView) {
           toggleSplitView();
         } else if (!isFullPage && isSplitView) {
@@ -2159,12 +2207,12 @@
         // Reset URL row to loading state
         const urlRow = document.getElementById("headerUrls");
         urlRow.innerHTML = `
-            <span id="headerUrlA" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The production baseline being compared against." data-tip-title="URL A · Production" data-tip-color="#22c55e">
+            <span id="headerUrlA" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The baseline URL being compared against." data-tip-title="URL A" data-tip-color="#22c55e">
                 <span class="text-green-600 font-bold shrink-0">A</span>
                 <span class="truncate" id="headerUrlAText">loading…</span>
             </span>
             <span class="text-gray-600 text-[10px] font-bold shrink-0">vs</span>
-            <span id="headerUrlB" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The preview or staging deploy being tested." data-tip-title="URL B · Preview" data-tip-color="#3b82f6">
+            <span id="headerUrlB" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 max-w-full md:max-w-xs truncate pointer-events-none opacity-40" data-tip="The target URL being tested against URL A." data-tip-title="URL B" data-tip-color="#3b82f6">
                 <span class="text-blue-600 font-bold shrink-0">B</span>
                 <span class="truncate" id="headerUrlBText">loading…</span>
             </span>`;
@@ -2320,9 +2368,9 @@
               const mUrlB = meta.url_b;
               if (mUrlA || mUrlB) {
                 urlRow.innerHTML = `
-                            ${mUrlA ? `<a href="${mUrlA}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 hover:brightness-125 cursor-pointer transition-all max-w-full md:max-w-xs truncate" data-tip="The production baseline being compared against." data-tip-title="URL A · Production" data-tip-color="#22c55e"><span class="text-green-600 font-bold shrink-0">A</span><span class="truncate">${mUrlA.replace(/^https?:\/\//, "")}</span></a>` : ""}
+                            ${mUrlA ? `<a href="${mUrlA}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-green-900/20 text-green-400 border border-green-800/40 hover:brightness-125 cursor-pointer transition-all max-w-full md:max-w-xs truncate" data-tip="The baseline URL being compared against." data-tip-title="URL A" data-tip-color="#22c55e"><span class="text-green-600 font-bold shrink-0">A</span><span class="truncate">${mUrlA.replace(/^https?:\/\//, "")}</span></a>` : ""}
                             <span class="text-gray-600 text-[10px] font-bold shrink-0">vs</span>
-                            ${mUrlB ? `<a href="${mUrlB}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 hover:brightness-125 cursor-pointer transition-all max-w-full md:max-w-xs truncate" data-tip="The preview or staging deploy being tested." data-tip-title="URL B · Preview" data-tip-color="#3b82f6"><span class="text-blue-600 font-bold shrink-0">B</span><span class="truncate">${mUrlB.replace(/^https?:\/\//, "")}</span></a>` : ""}
+                            ${mUrlB ? `<a href="${mUrlB}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-blue-900/20 text-blue-400 border border-blue-800/40 hover:brightness-125 cursor-pointer transition-all max-w-full md:max-w-xs truncate" data-tip="The target URL being tested against URL A." data-tip-title="URL B" data-tip-color="#3b82f6"><span class="text-blue-600 font-bold shrink-0">B</span><span class="truncate">${mUrlB.replace(/^https?:\/\//, "")}</span></a>` : ""}
                         `;
               }
             } catch (e) {
@@ -2930,8 +2978,13 @@
                 // If backgroundColor or color changed on an element with real text,
                 // promote to actionable (potential invisible-text regression)
                 const comp = d.component || d.path || "";
-                const isCriticalElement = /button|badge|status|alert|tag|chip/i.test(comp);
-                if (isCriticalElement && isTextIdentical && r.includes("style")) {
+                const isCriticalElement =
+                  /button|badge|status|alert|tag|chip/i.test(comp);
+                if (
+                  isCriticalElement &&
+                  isTextIdentical &&
+                  r.includes("style")
+                ) {
                   d._cat = "actionable";
                 } else {
                   d._cat = "noise";
@@ -2972,7 +3025,7 @@
                 ? "Only expected archive changes detected. No regressions."
                 : reportNoise > 0
                   ? "Only noise detected: CSS shifts with identical text. Safe to ignore."
-                  : "No differences detected between Production and Branch.";
+                  : "No differences detected between URL A and URL B.";
 
           const metaHtml = meta
             ? `
@@ -2985,8 +3038,8 @@
                         <div class="w-28"><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1 flex items-center gap-1.5">Noise <svg class="tip-icon" data-tip="CSS/Layout shifts with identical text. Safe to ignore." fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path stroke-width="2" d="M12 16v-4m0-4h.01"/></svg></span><span class="font-mono text-xl font-bold text-gray-500">${reportNoise}</span></div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-700/50">
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Production</span><a href="${meta.urlA}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlA)}</a></div>
-                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Branch</span><a href="${meta.urlB}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlB)}</a></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">URL A</span><a href="${meta.urlA}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlA)}</a></div>
+                        <div><span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">URL B</span><a href="${meta.urlB}" target="_blank" class="font-mono text-[11px] text-blue-400 hover:underline break-all">${escapeHtml(meta.urlB)}</a></div>
                     </div>
                 </div>
             `
@@ -3189,12 +3242,12 @@
                 </div>
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[#1a1d24] p-4 rounded-xl border border-gray-800 shadow-sm">
                     <div class="flex flex-wrap items-center gap-5">
-                        <div class="flex items-center gap-2" data-tip="The text content or value inside a DOM element changed between Production and Branch. Example: a proposal title, vote count, or timestamp showing different data. This is a true regression — likely a backend or state change." data-tip-title="Data Drift" data-tip-color="#FFD700"><span class="w-3 h-3 rounded-full bg-[#FFD700] shadow-[0_0_8px_rgba(255,215,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Data</span></div>
-                        <div class="flex items-center gap-2" data-tip="A CSS property changed between Production and Branch. Example: a button color shifted, font-size changed, or opacity differs. May be intentional (new feature) or accidental (CSS regression)." data-tip-title="Style Drift" data-tip-color="#00FFFF"><span class="w-3 h-3 rounded-full bg-[#00FFFF] shadow-[0_0_8px_rgba(0,255,255,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Style</span></div>
+                        <div class="flex items-center gap-2" data-tip="The text content or value inside a DOM element changed between URL A and URL B. Example: a proposal title, vote count, or timestamp showing different data. This is a true regression — likely a backend or state change." data-tip-title="Data Drift" data-tip-color="#FFD700"><span class="w-3 h-3 rounded-full bg-[#FFD700] shadow-[0_0_8px_rgba(255,215,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Data</span></div>
+                        <div class="flex items-center gap-2" data-tip="A CSS property changed between URL A and URL B. Example: a button color shifted, font-size changed, or opacity differs. May be intentional (new feature) or accidental (CSS regression)." data-tip-title="Style Drift" data-tip-color="#00FFFF"><span class="w-3 h-3 rounded-full bg-[#00FFFF] shadow-[0_0_8px_rgba(0,255,255,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Style</span></div>
                         <div class="flex items-center gap-2" data-tip="An element's position, size, or bounding box changed. Example: a card grew taller, a sidebar shifted, or spacing changed. May indicate a structural CSS or grid change." data-tip-title="Layout Drift" data-tip-color="#8A2BE2"><span class="w-3 h-3 rounded-full bg-[#8A2BE2] shadow-[0_0_8px_rgba(138,43,226,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Layout</span></div>
                         <div class="flex items-center gap-2" data-tip="A raw pixel-level difference in rendered screenshots that doesn't map to a specific DOM property. Often caused by anti-aliasing, font rendering, or sub-pixel shifts. Usually low-severity." data-tip-title="Pixel Drift" data-tip-color="#ff00ff"><span class="w-3 h-3 rounded-full bg-[#ff00ff] shadow-[0_0_8px_rgba(255,0,255,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Pixel</span></div>
-                        <div class="flex items-center gap-2" data-tip="A DOM element in Production was not found in Branch. In list containers (e.g. proposals), this is usually scroll-depth noise. For standalone elements (buttons, nav items), it may indicate a removed component." data-tip-title="Missing Node" data-tip-color="#ff0000"><span class="w-3 h-3 rounded-full bg-[#ff0000] shadow-[0_0_8px_rgba(255,0,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Missing</span></div>
-                        <div class="flex items-center gap-2" data-tip="A DOM element in Branch was not found in Production. In list containers, this is scroll noise. For standalone elements, it may indicate a newly added component or feature." data-tip-title="New Node" data-tip-color="#00ff00"><span class="w-3 h-3 rounded-full bg-[#00ff00] shadow-[0_0_8px_rgba(0,255,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">New</span></div>
+                        <div class="flex items-center gap-2" data-tip="A DOM element in URL A was not found in URL B. In list containers (e.g. proposals), this is usually scroll-depth noise. For standalone elements (buttons, nav items), it may indicate a removed component." data-tip-title="Missing Node" data-tip-color="#ff0000"><span class="w-3 h-3 rounded-full bg-[#ff0000] shadow-[0_0_8px_rgba(255,0,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">Missing</span></div>
+                        <div class="flex items-center gap-2" data-tip="A DOM element in URL B was not found in URL A. In list containers, this is scroll noise. For standalone elements, it may indicate a newly added component or feature." data-tip-title="New Node" data-tip-color="#00ff00"><span class="w-3 h-3 rounded-full bg-[#00ff00] shadow-[0_0_8px_rgba(0,255,0,0.4)]"></span><span class="text-xs text-gray-300 font-mono">New</span></div>
                     </div>
                     </div>
             </div>
@@ -3246,17 +3299,17 @@
 
             if (pair.a)
               grid.appendChild(
-                createImageCard(pair.a, scopeData.scope, "UrlA (Production)")
+                createImageCard(pair.a, scopeData.scope, "URL A")
               );
             else
-              grid.innerHTML += `<div class="flex items-center justify-center border border-dashed border-gray-800 rounded-xl text-gray-600 font-mono text-xs">Missing Production Capture</div>`;
+              grid.innerHTML += `<div class="flex items-center justify-center border border-dashed border-gray-800 rounded-xl text-gray-600 font-mono text-xs">Missing URL A Capture</div>`;
 
             if (pair.b)
               grid.appendChild(
-                createImageCard(pair.b, scopeData.scope, "UrlB (Branch)")
+                createImageCard(pair.b, scopeData.scope, "URL B")
               );
             else
-              grid.innerHTML += `<div class="flex items-center justify-center border border-dashed border-gray-800 rounded-xl text-gray-600 font-mono text-xs">Missing Branch Capture</div>`;
+              grid.innerHTML += `<div class="flex items-center justify-center border border-dashed border-gray-800 rounded-xl text-gray-600 font-mono text-xs">Missing URL B Capture</div>`;
 
             rowWrapper.appendChild(grid);
             container.appendChild(rowWrapper);
@@ -3302,7 +3355,9 @@
         };
 
         // Exclude clean/ crops (reserved for AI analysis) from gallery
-        const viewerImages = scopeData.images.filter((img) => !img.name.includes("clean/"));
+        const viewerImages = scopeData.images.filter(
+          (img) => !img.name.includes("clean/")
+        );
         const fullPages = viewerImages.filter((img) =>
           img.name.toLowerCase().includes("fullpage")
         );
