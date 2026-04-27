@@ -383,6 +383,38 @@ export class ABRunnerEngine {
       this.progressiveScroll(pageB, route),
     ]);
 
+    // 1.1 Sync viewport heights — each page scrolls independently and may
+    // stabilize at different content heights. Force both to the taller one
+    // so screenshots capture the full page on both sides.
+    const [heightA, heightB] = await Promise.all([
+      pageA.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      ),
+      pageB.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      ),
+    ]);
+    const syncHeight = Math.max(heightA, heightB, 1080) + 200;
+    await Promise.all([
+      pageA.setViewportSize({ width: 1280, height: syncHeight }),
+      pageB.setViewportSize({ width: 1280, height: syncHeight }),
+    ]);
+    // Scroll back to top and wait for lazy images / network requests to settle
+    await Promise.all([
+      pageA.evaluate(() => window.scrollTo(0, 0)),
+      pageB.evaluate(() => window.scrollTo(0, 0)),
+    ]);
+    await Promise.all([
+      pageA.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {}),
+      pageB.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {}),
+    ]);
+
     await Promise.all([
       pageA.keyboard.press("Escape").catch(() => {}),
       pageB.keyboard.press("Escape").catch(() => {}),
@@ -390,27 +422,38 @@ export class ABRunnerEngine {
 
     // 1.5 Freeze volatile DOM content to prevent temporal drifts
     const freezeVolatileContent = async (page: Page) => {
-      await page.evaluate(() => {
-        // Freeze relative time elements (timeago, "2 hours ago", etc.)
-        document.querySelectorAll(
-          'time, [datetime], .timeago, [data-testid*="time"], [data-testid*="date"]'
-        ).forEach(el => {
-          if (el.textContent && el.textContent.trim().length > 0) {
-            (el as HTMLElement).textContent = '—';
-          }
-        });
-        // Freeze block numbers (volatile on-chain data)
-        document.querySelectorAll(
-          '[data-testid*="block"], .block-number'
-        ).forEach(el => {
-          const text = el.textContent || '';
-          if (/^#?\d{6,}$/.test(text.trim())) {
-            (el as HTMLElement).textContent = '#—';
-          }
-        });
-        // Kill all CSS animations globally to prevent frame-dependent captures
-        const freezeStyle = document.createElement('style');
-        freezeStyle.textContent = `
+      await page
+        .evaluate(() => {
+          // SAFETY: Only modify LEAF elements (no child elements) to prevent
+          // destroying container subtrees. textContent= on a parent wipes its children.
+          const isLeaf = (el: Element) => el.childElementCount === 0;
+
+          // Freeze relative time elements — narrow selectors only
+          document
+            .querySelectorAll("time, [datetime], .timeago")
+            .forEach((el) => {
+              if (
+                isLeaf(el) &&
+                el.textContent &&
+                el.textContent.trim().length > 0
+              ) {
+                (el as HTMLElement).textContent = "—";
+              }
+            });
+
+          // Freeze block numbers (volatile on-chain data)
+          // Only target leaf elements whose text matches a block number pattern
+          document.querySelectorAll(".block-number").forEach((el) => {
+            if (!isLeaf(el)) return;
+            const text = el.textContent || "";
+            if (/^#?\d{6,}$/.test(text.trim())) {
+              (el as HTMLElement).textContent = "#—";
+            }
+          });
+
+          // Kill all CSS animations globally to prevent frame-dependent captures
+          const freezeStyle = document.createElement("style");
+          freezeStyle.textContent = `
           *, *::before, *::after {
             animation-duration: 0s !important;
             animation-delay: 0s !important;
@@ -418,8 +461,9 @@ export class ABRunnerEngine {
             transition-delay: 0s !important;
           }
         `;
-        document.head.appendChild(freezeStyle);
-      }).catch(() => {});
+          document.head.appendChild(freezeStyle);
+        })
+        .catch(() => {});
     };
 
     await Promise.all([
@@ -462,10 +506,19 @@ export class ABRunnerEngine {
     const captureTooltipLayer = async () => {
       if (!meta?.type) return;
 
-      // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
-      const triggerSelector =
-        '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
-      const tooltipSelector = '[role="tooltip"]';
+      // Native Radix UI tooltips, UI tooltip triggers, threshold buttons, and icon triggers
+      const triggerSelector = [
+        '[data-testid="results-tooltip-trigger"]',
+        'button[aria-label*="threshold"]',
+        "svg.lucide-alert-triangle",
+        "svg.lucide-info",
+        '[data-state="closed"][data-radix-collection-item]',
+        "[data-tooltip-trigger]",
+        'button[data-state="closed"]',
+        '[role="button"][aria-describedby]',
+      ].join(", ");
+      const tooltipSelector =
+        '[role="tooltip"], [data-radix-popper-content-wrapper], [data-side][data-align]';
 
       const captureForPage = async (page: Page, label: string) => {
         try {
@@ -481,6 +534,7 @@ export class ABRunnerEngine {
                   artifactsDir,
                   `00_${label}_FullPage_Tooltip.png`
                 ),
+                fullPage: true,
                 timeout: 15000,
               })
               .catch(() => {});
@@ -540,10 +594,7 @@ export class ABRunnerEngine {
                 await locA.scrollIntoViewIfNeeded().catch(() => {});
                 await locA
                   .screenshot({
-                    path: path.join(
-                      cleanCropsDir,
-                      `drift_${i + 1}_UrlA.png`
-                    ),
+                    path: path.join(cleanCropsDir, `drift_${i + 1}_UrlA.png`),
                     timeout: 15000,
                   })
                   .catch(() => {});
@@ -557,10 +608,7 @@ export class ABRunnerEngine {
                 await locB.scrollIntoViewIfNeeded().catch(() => {});
                 await locB
                   .screenshot({
-                    path: path.join(
-                      cleanCropsDir,
-                      `drift_${i + 1}_UrlB.png`
-                    ),
+                    path: path.join(cleanCropsDir, `drift_${i + 1}_UrlB.png`),
                     timeout: 15000,
                   })
                   .catch(() => {});
@@ -638,12 +686,14 @@ export class ABRunnerEngine {
       await pageA
         .screenshot({
           path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
       await pageB
         .screenshot({
           path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
@@ -714,12 +764,14 @@ export class ABRunnerEngine {
       await pageA
         .screenshot({
           path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
       await pageB
         .screenshot({
           path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
@@ -810,9 +862,12 @@ export class ABRunnerEngine {
     // Wait for initial Next.js hydration and Web3 data fetching
     await page.waitForTimeout(5000);
 
-    const isDelegatesRoute = route === "/delegates";
-    const maxAttempts = isDelegatesRoute ? 2 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 3000 : 35000;
+    const isDelegatesRoute =
+      route === "/delegates" || route.startsWith("/delegates?");
+    const maxAttempts = isDelegatesRoute ? 3 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 5000 : 35000;
+    // Minimum height below which we don't trust stability (prevents empty-page false stability)
+    const MIN_CONTENT_HEIGHT = 1200;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -846,7 +901,7 @@ export class ABRunnerEngine {
           )
         )
       );
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(2500);
 
       currentHeight = await page.evaluate(getScrollHeight);
       currentCount = await page.evaluate(getListCount);
@@ -857,7 +912,10 @@ export class ABRunnerEngine {
         document.body.innerText.includes("Loading")
       );
 
-      if (heightStable && countStable && !isLoading) {
+      // Don't trust stability if page is too short (likely still rendering)
+      const contentSufficient = currentHeight >= MIN_CONTENT_HEIGHT;
+
+      if (heightStable && countStable && !isLoading && contentSufficient) {
         stableRounds++;
         if (stableRounds >= 2) {
           break;
@@ -871,6 +929,18 @@ export class ABRunnerEngine {
       attempts++;
     }
 
+    // Post-scroll: wait for any lingering "Loading" indicators to clear
+    for (let i = 0; i < 5; i++) {
+      const stillLoading = await page.evaluate(() =>
+        document.body.innerText.includes("Loading")
+      );
+      if (!stillLoading) break;
+      await page.waitForTimeout(2000);
+    }
+
+    // Re-measure after Loading cleared — content may have grown
+    currentHeight = await page.evaluate(getScrollHeight);
+
     // Expand viewport to fit all loaded content
     const artificialHeight = Math.min(
       maxViewportHeight,
@@ -881,7 +951,72 @@ export class ABRunnerEngine {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.mouse.wheel(0, -100000);
 
-    await page.waitForTimeout(3000);
+    // Wait for images/lazy content to load after viewport expansion
+    await page
+      .waitForLoadState("networkidle", { timeout: 10000 })
+      .catch(() => {});
+
+    // Explicitly wait for ALL <img> elements to finish loading.
+    // Avatar icons and delegate images load asynchronously from external CDNs
+    // and may arrive well after networkidle fires.
+    await page
+      .evaluate(() => {
+        const images = Array.from(document.querySelectorAll("img"));
+        return Promise.all(
+          images.map((img) => {
+            if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+            return new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve());
+              img.addEventListener("error", () => resolve());
+              setTimeout(() => resolve(), 8000); // 8s max per image
+            });
+          })
+        );
+      })
+      .catch(() => {});
+
+    // For routes with async card content (delegates, proposals lists),
+    // wait for descriptions/bios to populate. These fetch independently
+    // after the card skeleton renders and don't trigger scroll height changes.
+    if (isDelegatesRoute) {
+      // Wait up to 15s for delegate descriptions to appear
+      for (let i = 0; i < 6; i++) {
+        const descCount = await page.evaluate(
+          () =>
+            document.querySelectorAll(
+              'a[href*="/delegates/"] p, a[href*="/delegates/"] span'
+            ).length
+        );
+        // Expect at least some text content per visible card
+        const cardCount = await page.evaluate(
+          () => document.querySelectorAll('a[href*="/delegates/"]').length
+        );
+        if (descCount >= cardCount * 2) break; // At least 2 text elements per card
+        await page.waitForTimeout(2500);
+      }
+    }
+
+    // Final networkidle after all async content settles
+    await page
+      .waitForLoadState("networkidle", { timeout: 8000 })
+      .catch(() => {});
+
+    // Re-measure — async content may have changed page height
+    const finalHeight = await page.evaluate(() =>
+      Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      )
+    );
+    if (finalHeight > artificialHeight) {
+      await page.setViewportSize({
+        width: 1280,
+        height: Math.min(maxViewportHeight, finalHeight + 200),
+      });
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+
+    await page.waitForTimeout(1500);
   }
 
   private async extractDOMTree(
