@@ -115,6 +115,13 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0xbfc49b47637a4dc9b7b8de8e71bf41e519103b95": "Zora V3 Open Fee Adapter",
   "0x0f797dc7efaea995bb916f268d919d0a1950ee3c": "Zora V2 Factory",
   "0x4753c137002d802f45302b118e265c41140e73c2": "Zora Token Jar",
+
+  // ─── Protocol Guild (Ethereum Mainnet) ───
+
+  "0x85d6bcc74877a1c6fc66a8cd14369f939663f68f": "Protocol Guild Governor",
+  "0xaac9059248a06233db16fc9c25426365b7afb481": "Protocol Guild Timelock",
+  "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Membership",
+  "0xd982477216dadd4c258094b071b49d17b6271d66": "Protocol Guild Vesting Split",
 };
 
 /** Schema UIDs stored without 0x prefix, lowercase. */

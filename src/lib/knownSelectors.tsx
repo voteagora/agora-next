@@ -858,6 +858,185 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       );
     },
   },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Protocol Guild
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // mint(address[]) — Membership NFT
+  "0xbd075b84": {
+    name: "mint",
+    prettyName: "Mint Membership",
+    prettyRender: (decodedData, target) => {
+      const members = collectArrayByType(decodedData.parameters, "address[]");
+      const count = members.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Mint {count} membership NFT{count !== 1 ? "s" : ""} on{" "}
+            {maybeFriendlyAddress(target)}.
+          </div>
+          {count > 0 && count <= 10 && (
+            <div className="space-y-1 pl-4">
+              {members.map((addr, i) => (
+                <div key={i}>{maybeFriendlyAddress(addr)}</div>
+              ))}
+            </div>
+          )}
+          {count > 10 && (
+            <div className="pl-4 text-secondary">
+              ({count} addresses — too many to display)
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // burn(uint256[]) — Membership NFT
+  "0xb80f55c9": {
+    name: "burn",
+    prettyName: "Burn Membership",
+    prettyRender: (decodedData, target) => {
+      const tokenIds = collectArrayByType(decodedData.parameters, "uint256[]");
+      const count = tokenIds.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Burn {count} membership NFT{count !== 1 ? "s" : ""} from{" "}
+            {maybeFriendlyAddress(target)}.
+          </div>
+          {count > 0 && count <= 10 && (
+            <div className="space-y-1 pl-4">
+              {tokenIds.map((id, i) => (
+                <div key={i}>Token ID: {id}</div>
+              ))}
+            </div>
+          )}
+          {count > 10 && (
+            <div className="pl-4 text-secondary">
+              ({count} token IDs — too many to display)
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // distribute((address[],uint256[],uint256,uint16),address,address) — 0xSplits
+  "0x2d3f5537": {
+    name: "distribute",
+    prettyName: "Distribute Split",
+    prettyRender: (decodedData, target) => {
+      const addresses = collectByType(decodedData.parameters, "address");
+      const tokenAddress = addresses.length > 0 ? addresses[0] : undefined;
+
+      const isEth =
+        tokenAddress?.toLowerCase() ===
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Call{" "}
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
+              distribute
+            </code>{" "}
+            on the {maybeFriendlyAddress(target)} contract with the following
+            parameter:
+          </div>
+          <div className="pl-4">
+            Token: {isEth ? "ETH" : maybeFriendlyAddress(tokenAddress)}
+          </div>
+        </div>
+      );
+    },
+  },
+
+  // updateSplit((address[],uint256[],uint256,uint16)) — 0xSplits
+  "0x286617de": {
+    name: "updateSplit",
+    prettyName: "Update Split",
+    prettyRender: (decodedData, target) => {
+      const addresses = collectArrayByType(decodedData.parameters, "address[]");
+      const count = addresses.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Update {maybeFriendlyAddress(target)} split configuration
+            {count > 0
+              ? ` with ${count} recipient${count !== 1 ? "s" : ""}`
+              : ""}
+            .
+          </div>
+        </div>
+      );
+    },
+  },
+
+  // setPaused(bool)
+  "0x16c38b3c": {
+    name: "setPaused",
+    prettyName: "Set Paused",
+    prettyRender: (decodedData, target) => {
+      const boolParams = collectByType(decodedData.parameters, "bool");
+      const paused = boolParams[0] === "true";
+
+      return (
+        <span className="text-sm text-primary">
+          {paused ? "Pause" : "Unpause"} {maybeFriendlyAddress(target)}.
+        </span>
+      );
+    },
+  },
+
+  // updateDelay(uint256) — TimelockController
+  "0x64d62353": {
+    name: "updateDelay",
+    prettyName: "Update Timelock Delay",
+    prettyRender: (decodedData, target) => {
+      const newDelay = collectByType(decodedData.parameters, "uint256")[0];
+      let delayDisplay = newDelay;
+
+      if (newDelay) {
+        const seconds = BigInt(newDelay);
+        if (seconds >= 86400n) {
+          const days = Number(seconds / 86400n);
+          delayDisplay = `${days} day${days !== 1 ? "s" : ""}`;
+        } else if (seconds >= 3600n) {
+          const hours = Number(seconds / 3600n);
+          delayDisplay = `${hours} hour${hours !== 1 ? "s" : ""}`;
+        } else {
+          delayDisplay = `${seconds} seconds`;
+        }
+      }
+
+      return (
+        <span className="text-sm text-primary">
+          Update the timelock delay on {maybeFriendlyAddress(target)} to{" "}
+          <span className="font-semibold">{delayDisplay}</span>.
+        </span>
+      );
+    },
+  },
+
+  // transferOwnership(address) — Ownable
+  "0xf2fde38b": {
+    name: "transferOwnership",
+    prettyName: "Transfer Ownership",
+    prettyRender: (decodedData, target) => {
+      const newOwner = collectByType(decodedData.parameters, "address")[0];
+      return (
+        <span className="text-sm text-primary">
+          Transfer ownership of {maybeFriendlyAddress(target)} to{" "}
+          {maybeFriendlyAddress(newOwner)}.
+        </span>
+      );
+    },
+  },
 };
 
 // ────────────────────────────────────────────────────────────────────────────
