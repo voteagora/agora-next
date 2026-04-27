@@ -19,6 +19,7 @@ export default function Navbar() {
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
   const hasComingSoon =
     ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
+  const hasDuna = ui.toggle("duna") && ui.toggle("duna").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -187,11 +188,11 @@ export default function Navbar() {
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
         >
-          About
+          {hasDuna ? "Info" : "About"}
         </HeaderLink>
       )}
 
-      {ui.toggle("duna") && ui.toggle("duna").enabled && (
+      {hasDuna && (
         <HeaderLink
           ref={(el) => {
             linkRefs.current.financials = el;
