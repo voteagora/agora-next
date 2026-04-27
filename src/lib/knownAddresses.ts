@@ -121,7 +121,8 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x85d6bcc74877a1c6fc66a8cd14369f939663f68f": "Protocol Guild Governor",
   "0xaac9059248a06233db16fc9c25426365b7afb481": "Protocol Guild Timelock",
   "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Membership",
-  "0xd982477216dadd4c258094b071b49d17b6271d66": "Protocol Guild Vesting Split",
+  "0xd982477216dadd4c258094b071b49d17b6271d66":
+    "Protocol Guild Split Wallet V2",
 
   // ─── Protocol Guild Distributed Tokens (Ethereum Mainnet) ───
   // Verified via Etherscan: symbol(), name(), decimals()

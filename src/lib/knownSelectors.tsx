@@ -877,16 +877,22 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             Mint {count} membership NFT{count !== 1 ? "s" : ""} on{" "}
             {maybeFriendlyAddress(target)}.
           </div>
-          {count > 0 && count <= 10 && (
-            <div className="space-y-1 pl-4">
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
               {members.map((addr, i) => (
-                <div key={i}>{maybeFriendlyAddress(addr)}</div>
+                <div key={i}>
+                  <a
+                    href={`https://etherscan.io/address/${addr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs hover:underline"
+                  >
+                    {addr}
+                  </a>
+                </div>
               ))}
-            </div>
-          )}
-          {count > 10 && (
-            <div className="pl-4 text-secondary">
-              ({count} addresses — too many to display)
             </div>
           )}
         </div>
@@ -908,16 +914,15 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             Burn {count} membership NFT{count !== 1 ? "s" : ""} from{" "}
             {maybeFriendlyAddress(target)}.
           </div>
-          {count > 0 && count <= 10 && (
-            <div className="space-y-1 pl-4">
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
               {tokenIds.map((id, i) => (
-                <div key={i}>Token ID: {id}</div>
+                <div key={i} className="font-mono text-xs">
+                  Token ID: {id}
+                </div>
               ))}
-            </div>
-          )}
-          {count > 10 && (
-            <div className="pl-4 text-secondary">
-              ({count} token IDs — too many to display)
             </div>
           )}
         </div>
