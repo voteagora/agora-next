@@ -131,6 +131,7 @@ jobs:
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NEXT_PUBLIC_AGORA_ENV: prod
         run: npm run test:ab
 
       - name: Google Auth
