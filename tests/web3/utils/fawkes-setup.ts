@@ -1,7 +1,11 @@
 import { Page, BrowserContext, expect } from "@playwright/test";
 import { FawkesClient } from "./fawkesClient";
 
-export async function setupFawkes(page: Page, context: BrowserContext, options?: { address?: string; mnemonic?: string }) {
+export async function setupFawkes(
+  page: Page,
+  context: BrowserContext,
+  options?: { address?: string; mnemonic?: string }
+) {
   // 1. Initialize headless wallet (using default single-wallet seed from ENV or FawkesClient default, or impersonated address)
   await FawkesClient.createWallet(options);
 

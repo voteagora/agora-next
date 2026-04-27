@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       agoraNextVersion:
-        description: 'Agora-Next Branch/Tag to run against (defaults to current)'
+        description: "Agora-Next Branch/Tag to run against (defaults to current)"
         required: false
-        default: ''
+        default: ""
 
 jobs:
   create-proposal:
@@ -19,7 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -33,7 +33,7 @@ jobs:
         run: |
           # Use PAT to clone the private dao-node repo
           git clone https://${PAT_TOKEN}@github.com/voteagora/dao-node.git dao-node
-          
+
       - name: Build and Start DAO-Node
         env:
           MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
@@ -44,15 +44,15 @@ jobs:
           # Run the anvil node exposing port 8545
           # It needs MAINNET_RPC_URL (or ALCHEMY_API_KEY) to fork mainnet state
           docker run -d -p 8545:8545 -e MAINNET_RPC_URL=$MAINNET_RPC_URL --name anvil-node dao-node:local
-          
+
           # Wait for Anvil to start up
           sleep 10
-          
+
       - name: Impersonate Whale for Proposal Creation
         run: |
           # We use a known Uniswap whale (a16z) that has enough voting power to create a proposal
           WHALE_ADDRESS="0x2b591e99af9bd2ad008d0e17fc3be708e9ccab0f"
-          
+
           echo "Telling local Anvil node to impersonate the whale account..."
           curl -X POST -H "Content-Type: application/json" \
             --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_impersonateAccount\",\"params\":[\"${WHALE_ADDRESS}\"],\"id\":1}" \
@@ -75,7 +75,7 @@ jobs:
           npm run start &
           # Wait for Next.js to start serving
           sleep 15
-          
+
       - name: Run Fawkes Proposal E2E Test
         env:
           BASE_URL: http://localhost:3000
