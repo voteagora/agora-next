@@ -14,18 +14,30 @@ export async function classifyDriftsWithGemini(
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  console.log(`🧠 Initializing Gemini AI analysis for ${drifts.length} drifts...`);
+  console.log(
+    `🧠 Initializing Gemini AI analysis for ${drifts.length} drifts...`
+  );
 
   // We should process drifts in batches to avoid rate limits, or concurrently if few
   const batchSize = 3;
   for (let i = 0; i < drifts.length; i += batchSize) {
     const batch = drifts.slice(i, i + batchSize);
-    
+
     await Promise.all(
       batch.map(async (drift, index) => {
         try {
-          const imgAPath = path.join(artifactsDir, "focused-crops", "clean", drift.imgUrlA);
-          const imgBPath = path.join(artifactsDir, "focused-crops", "clean", drift.imgUrlB);
+          const imgAPath = path.join(
+            artifactsDir,
+            "focused-crops",
+            "clean",
+            drift.imgUrlA
+          );
+          const imgBPath = path.join(
+            artifactsDir,
+            "focused-crops",
+            "clean",
+            drift.imgUrlB
+          );
 
           // Some components might be missing on one side, so check if files exist
           if (!fs.existsSync(imgAPath) || !fs.existsSync(imgBPath)) {
@@ -56,23 +68,23 @@ Reply strictly in JSON format:
             model: "gemini-2.5-flash",
             contents: [
               {
-                role: 'user',
+                role: "user",
                 parts: [
                   { text: prompt },
                   { inlineData: { mimeType: "image/png", data: imgABase64 } },
-                  { inlineData: { mimeType: "image/png", data: imgBBase64 } }
-                ]
-              }
+                  { inlineData: { mimeType: "image/png", data: imgBBase64 } },
+                ],
+              },
             ],
             config: {
               responseMimeType: "application/json",
-            }
+            },
           });
 
           if (response.text) {
-             const result = JSON.parse(response.text);
-             drift.aiVerdict = result.verdict;
-             drift.aiReason = result.reason;
+            const result = JSON.parse(response.text);
+            drift.aiVerdict = result.verdict;
+            drift.aiReason = result.reason;
           }
         } catch (err) {
           console.error(`AI Classification failed for drift ${drift.id}:`, err);
