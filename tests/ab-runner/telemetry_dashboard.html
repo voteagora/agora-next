@@ -3069,6 +3069,7 @@
                                 <th class="py-3 px-4 text-center w-12">#</th>
                                 <th class="py-3 px-4">DOM Selector (Target)</th>
                                 <th class="py-3 px-4 w-36">Detected Issue</th>
+                                <th class="py-3 px-4 w-36">AI Verdict</th>
                                 <th class="py-3 px-4 w-24">Category</th>
                             </tr>
                         </thead>
@@ -3197,12 +3198,18 @@
                     '<mark class="bg-yellow-500/30 text-yellow-300 rounded px-0.5">$1</mark>'
                   );
                 }
+                let aiBadgeColor = "bg-gray-800/50 text-gray-500 border border-gray-700/40";
+                if (d.aiVerdict === "Real Bug") aiBadgeColor = "bg-red-900/40 text-red-500 border border-red-700/50";
+                if (d.aiVerdict === "Acceptable Change") aiBadgeColor = "bg-blue-900/40 text-blue-500 border border-blue-700/50";
+                if (d.aiVerdict === "Noise") aiBadgeColor = "bg-gray-800/50 text-gray-500 border border-gray-700/40";
+                const aiLabel = d.aiVerdict ? `<span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${aiBadgeColor}" title="${escapeHtml(d.aiReason || '')}">${escapeHtml(d.aiVerdict)}</span>` : '<span class="text-gray-600">—</span>';
 
                 return `
                     <tr class="border-b border-gray-800/50 hover:bg-white/5 transition-colors">
                         <td class="py-3 px-4 font-mono text-[10px] text-gray-500 w-12 text-center">${i + 1}</td>
                         <td class="py-3 px-4 text-xs font-mono text-gray-300 break-all">${displayComp}</td>
                         <td class="py-3 px-4"><span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ${badgeColor}">${escapeHtml(d.reason || d.colorCode || "Drift")}</span></td>
+                        <td class="py-3 px-4">${aiLabel}</td>
                         <td class="py-3 px-4"><span class="inline-flex px-2 py-0.5 rounded text-[10px] font-medium tracking-wide ${catBadge}">${catLabel}</span></td>
                     </tr>`;
               })

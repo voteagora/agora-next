@@ -1,6 +1,7 @@
 import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
+import { classifyDriftsWithGemini } from "./gemini-classifier";
 
 export interface OverrideConfig {
   ignoreSelectors?: string[];
@@ -776,6 +777,10 @@ export class ABRunnerEngine {
         })
         .catch(() => {});
       await captureTooltipLayer();
+    }
+
+    if (reportList.length > 0) {
+      await classifyDriftsWithGemini(reportList, artifactsDir);
     }
 
     const reportWithMeta = [
