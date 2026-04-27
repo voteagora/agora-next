@@ -26,6 +26,12 @@ export async function classifyDriftsWithGemini(
     await Promise.all(
       batch.map(async (drift, index) => {
         try {
+          if (!drift.imgUrlA || !drift.imgUrlB) {
+            drift.aiVerdict = "Skipped - Missing Image";
+            drift.aiReason = "Drift exceeded crop limits or image URLs missing.";
+            return;
+          }
+
           const imgAPath = path.join(
             artifactsDir,
             "focused-crops",

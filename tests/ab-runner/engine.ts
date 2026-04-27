@@ -617,6 +617,9 @@ export class ABRunnerEngine {
             } catch {}
           })(),
         ]);
+
+        reportList[i].imgUrlA = `drift_${i + 1}_UrlA.png`;
+        reportList[i].imgUrlB = `drift_${i + 1}_UrlB.png`;
       }
 
       // 4b. NOW inject highlights for human-facing annotated artifacts
