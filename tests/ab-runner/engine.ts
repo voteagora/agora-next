@@ -872,8 +872,9 @@ export class ABRunnerEngine {
 
     const isDelegatesRoute =
       route === "/delegates" || route.startsWith("/delegates?");
-    const maxAttempts = isDelegatesRoute ? 3 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 5000 : 35000;
+    // Delegates infinite scroll can be extremely long, limit to 8 to avoid timeout, 12 for others
+    const maxAttempts = isDelegatesRoute ? 8 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 8000 : 35000;
     // Minimum height below which we don't trust stability (prevents empty-page false stability)
     const MIN_CONTENT_HEIGHT = 1200;
 
@@ -938,13 +939,32 @@ export class ABRunnerEngine {
     }
 
     // Post-scroll: wait for any lingering "Loading" indicators to clear
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 15; i++) {
       const stillLoading = await page.evaluate(() =>
         document.body.innerText.includes("Loading")
       );
       if (!stillLoading) break;
       await page.waitForTimeout(2000);
     }
+
+    // Force hide any persistent Loading text after waiting, to prevent screenshot artifacts
+    await page
+      .evaluate(() => {
+        const walker = document.createTreeWalker(
+          document.body,
+          NodeFilter.SHOW_TEXT
+        );
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.nodeValue && node.nodeValue.includes("Loading")) {
+            if (node.parentElement) {
+              node.parentElement.style.opacity = "0";
+              node.parentElement.style.visibility = "hidden";
+            }
+          }
+        }
+      })
+      .catch(() => {});
 
     // Re-measure after Loading cleared — content may have grown
     currentHeight = await page.evaluate(getScrollHeight);
@@ -1000,6 +1020,23 @@ export class ABRunnerEngine {
           () => document.querySelectorAll('a[href*="/delegates/"]').length
         );
         if (descCount >= cardCount * 2) break; // At least 2 text elements per card
+        await page.waitForTimeout(2500);
+      }
+    }
+
+    if (route === "/proposals") {
+      // Wait up to 15s for proposal statuses (e.g. SUCCEEDED, QUEUED) to fetch and render
+      for (let i = 0; i < 6; i++) {
+        const statusesFilled = await page.evaluate(() => {
+          const statuses = document.querySelectorAll(
+            '[data-testid="proposal-status"]'
+          );
+          if (statuses.length === 0) return true; // Wait for them to exist
+          return Array.from(statuses).every(
+            (el) => el.textContent && el.textContent.trim().length > 0
+          );
+        });
+        if (statusesFilled) break;
         await page.waitForTimeout(2500);
       }
     }
