@@ -20,30 +20,14 @@ export default async function ComingSoonPage() {
     : syndicateStaticProposals;
   const overlayText = isTowns ? "Coming soon in January 2026" : "Coming Soon";
 
-  // Get page data for mobile hero
-  const pageData = ui.page("coming-soon");
-  const mobileTitle = pageData?.title || "Proposals";
-  const mobileDescription =
-    pageData?.description || "Governance proposals are coming soon.";
-
   return (
     <div className="flex flex-col">
       {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="coming-soon" />
 
-      {/* Mobile Hero - shown only on mobile since Hero component is hidden */}
-      <div className="flex flex-col mt-6 mb-8 sm:hidden">
-        <h1 className="font-extrabold text-xl mb-2 text-primary">
-          {mobileTitle}
-        </h1>
-        {mobileDescription && (
-          <p className="text-secondary text-sm">{mobileDescription}</p>
-        )}
-      </div>
-
       {/* Proposals Section */}
       <div className="flex flex-col max-w-[76rem]">
-        {/* Desktop section header - hidden on mobile where the mobile hero shows instead */}
+        {/* Desktop section header */}
         <div className="hidden sm:flex flex-row justify-between items-baseline gap-2 mb-4">
           <h1 className="text-primary text-2xl font-extrabold mb-0">
             Proposals

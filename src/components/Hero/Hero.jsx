@@ -23,14 +23,16 @@ export default function Hero({ page }) {
   const shouldHideHero = ui.toggle("hide-hero")?.enabled;
 
   return (
-    <div className="flex-col hidden sm:flex sm:flex-row justify-between mt-12 mb-0 sm:my-12 max-w-full">
+    <div className="flex flex-col sm:flex-row justify-between mt-6 sm:mt-12 mb-0 sm:my-12 max-w-full">
       <div className={`flex flex-col mt-0 mb-8 sm:mb-0`}>
-        <h1 className="font-extrabold text-2xl mb-2 text-primary">{title}</h1>
-        <p className="text-secondary text-base">{description}</p>
+        <h1 className="font-extrabold text-xl sm:text-2xl mb-2 text-primary">
+          {title}
+        </h1>
+        <p className="text-secondary text-sm sm:text-base">{description}</p>
       </div>
       {hero && !shouldHideHero && (
         <Image
-          className={`h-auto ${ui.customization?.customHeroImageSize || "sm:h-[110px]"} w-auto`}
+          className={`hidden sm:block h-auto ${ui.customization?.customHeroImageSize || "sm:h-[110px]"} w-auto`}
           alt={`${namespace} cover`}
           src={hero}
         />
