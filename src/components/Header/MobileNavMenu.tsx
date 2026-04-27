@@ -139,7 +139,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasInfo
       ? [
           {
-            name: hasDuna ? "Info" : "About",
+            name: hasDuna ? "About" : "Info",
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),

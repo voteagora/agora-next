@@ -188,7 +188,7 @@ export default function Navbar() {
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
         >
-          {hasDuna ? "Info" : "About"}
+          {hasDuna ? "About" : "Info"}
         </HeaderLink>
       )}
 
