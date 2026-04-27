@@ -188,8 +188,8 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
         <div tw="flex items-center">
           <svg
             width="168"
-            height="44"
-            viewBox="0 0 42 11"
+            height="56"
+            viewBox="0 -1.2 42 14"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -897,8 +897,8 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
         <div tw="flex items-center">
           <svg
             width="168"
-            height="44"
-            viewBox="0 0 42 11"
+            height="56"
+            viewBox="0 -1.2 42 14"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
