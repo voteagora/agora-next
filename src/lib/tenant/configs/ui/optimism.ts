@@ -321,6 +321,18 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "delegation-encouragement",
       enabled: true,
     },

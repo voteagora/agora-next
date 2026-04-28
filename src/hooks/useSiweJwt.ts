@@ -11,6 +11,7 @@ interface UseSiweJwtOptions {
   expectedAddress?: string;
   autoAuthenticate?: boolean;
   purpose?: SafeOffchainSigningPurpose;
+  chainId?: number;
 }
 
 const siweSessionRequests = new Map<string, Promise<string | null>>();
@@ -33,7 +34,7 @@ export function useSiweJwt(options: UseSiweJwtOptions = {}) {
   const { clearSiweSession, ensureSiweSession, loadSiweJwt, walletType } =
     useEnsureSiweSession({
       address: expectedAddress ?? undefined,
-      chainId: chain?.id,
+      chainId: options.chainId ?? chain?.id,
       purpose,
     });
 

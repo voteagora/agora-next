@@ -27,7 +27,8 @@ export default async function ComingSoonPage() {
 
       {/* Proposals Section */}
       <div className="flex flex-col max-w-[76rem]">
-        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
+        {/* Desktop section header */}
+        <div className="hidden sm:flex flex-row justify-between items-baseline gap-2 mb-4">
           <h1 className="text-primary text-2xl font-extrabold mb-0">
             Proposals
           </h1>
