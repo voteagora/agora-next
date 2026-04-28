@@ -1,4 +1,5 @@
 // export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+// Dummy comment for triggering Vercel preview deployment
 
 import Tenant from "@/lib/tenant/tenant";
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
