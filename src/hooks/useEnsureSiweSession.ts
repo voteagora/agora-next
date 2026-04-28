@@ -235,6 +235,7 @@ export function useEnsureSiweSession(params: {
     },
     [
       address,
+      chainId,
       isSigningIn,
       loadSiweJwt,
       openSafeSiweDialog,
