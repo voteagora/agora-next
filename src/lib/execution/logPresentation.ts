@@ -212,6 +212,31 @@ export function buildExecutionLogPresentation(
         ].filter(Boolean) as ExecutionLogField[],
       };
     }
+    if (
+      "caller" in args &&
+      "sender" in args &&
+      "receiver" in args &&
+      "id" in args &&
+      "amount" in args
+    ) {
+      const caller = asAddress(args.caller);
+      const sender = asAddress(args.sender);
+      const receiver = asAddress(args.receiver);
+      return {
+        title: "Splits Warehouse transfer",
+        summary:
+          sender && receiver
+            ? `${formatExecutionAddressLabel(sender)} → ${formatExecutionAddressLabel(receiver)} (ERC-6909 id).`
+            : "ERC-6909 / warehouse balance transfer.",
+        fields: [
+          addressField("Caller", caller),
+          addressField("Sender", sender),
+          addressField("Receiver", receiver),
+          numberField("Token id", args.id),
+          numberField("Amount", args.amount),
+        ].filter(Boolean) as ExecutionLogField[],
+      };
+    }
     const from = asAddress(args.from);
     const to = asAddress(args.to);
     return {
@@ -229,6 +254,27 @@ export function buildExecutionLogPresentation(
   }
 
   if (log.eventName === "Approval" && args) {
+    if (
+      "id" in args &&
+      "amount" in args &&
+      !("value" in args)
+    ) {
+      const owner = asAddress(args.owner);
+      const spender = asAddress(args.spender);
+      return {
+        title: "Splits Warehouse approval",
+        summary:
+          owner && spender
+            ? `${formatExecutionAddressLabel(owner)} approved ${formatExecutionAddressLabel(spender)} for one token id.`
+            : "ERC-6909-style approval (id + amount).",
+        fields: [
+          addressField("Owner", owner),
+          addressField("Spender", spender),
+          numberField("Token id", args.id),
+          numberField("Amount", args.amount),
+        ].filter(Boolean) as ExecutionLogField[],
+      };
+    }
     const owner = asAddress(args.owner);
     const spender = asAddress(args.spender);
     return {
