@@ -47,7 +47,10 @@ export default function Proposal({
       }
       target={shouldNavigateToSnapshot ? "_blank" : ""}
     >
-      <div className="border-b border-line items-center flex flex-row bg-neutral">
+      <div
+        className="border-b border-line items-center flex flex-row bg-neutral"
+        data-testid={`proposal-list-item-${proposal.id}`}
+      >
         <div
           className={cn(
             "flex flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
