@@ -4,7 +4,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getBlockScanAddress } from "@/lib/utils";
 import {
   getFriendlyName,
   getSchemaName,
@@ -120,7 +120,7 @@ function SplitRecipientRow({
   return (
     <div className="flex items-center gap-2 text-xs">
       <a
-        href={`https://etherscan.io/address/${address}`}
+        href={getBlockScanAddress(address)}
         target="_blank"
         rel="noopener noreferrer"
         className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
