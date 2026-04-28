@@ -132,12 +132,7 @@ export class ABRunnerEngine {
       fs.mkdirSync(artifactsDir, { recursive: true });
     }
 
-    // Route-aware layout drift threshold: list pages tolerate more shift
-    const isListRoute =
-      route === "/proposals" ||
-      route === "/delegates" ||
-      route.startsWith("/delegates?");
-    const LAYOUT_DRIFT_THRESHOLD = isListRoute ? 25 : 10;
+
 
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
@@ -195,7 +190,7 @@ export class ABRunnerEngine {
               const dw = Math.abs(nodeA.rect.width - nodeB.rect.width);
               const dh = Math.abs(nodeA.rect.height - nodeB.rect.height);
 
-              if (dw > LAYOUT_DRIFT_THRESHOLD || dh > LAYOUT_DRIFT_THRESHOLD) {
+              if (dw > 10 || dh > 10) {
                 isDrifted = true;
                 driftReason = "Layout Drift";
               }
