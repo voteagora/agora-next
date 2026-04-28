@@ -492,10 +492,17 @@ export class ABRunnerEngine {
 
     await Promise.all([stripLoadingText(pageA), stripLoadingText(pageB)]);
 
-    await Promise.all([
-      freezeVolatileContent(pageA),
-      freezeVolatileContent(pageB),
-    ]);
+    const enableAI = process.env.ENABLE_AI_MASKING !== "false";
+    if (enableAI) {
+      await Promise.all([
+        freezeVolatileContent(pageA),
+        freezeVolatileContent(pageB),
+      ]);
+    } else {
+      console.log(
+        `[Engine] Volatile Content Freeze disabled for route: ${route}`
+      );
+    }
 
     // Failsafe: Ensure proposal statuses are fully visible, bypassing any stuck React animations
     // or IntersectionObserver fade-outs before capturing DOM and screenshots.

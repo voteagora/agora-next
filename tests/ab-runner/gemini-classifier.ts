@@ -8,8 +8,12 @@ export async function classifyDriftsWithGemini(
   artifactsDir: string
 ) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.log("No GEMINI_API_KEY found, skipping AI classification.");
+  const enableAI = process.env.ENABLE_AI_MASKING !== "false";
+
+  if (!apiKey || !enableAI) {
+    console.log(
+      "AI classification is disabled or no GEMINI_API_KEY found, skipping."
+    );
     return drifts;
   }
 
