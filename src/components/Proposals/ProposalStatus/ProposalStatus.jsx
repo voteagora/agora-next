@@ -29,6 +29,7 @@ export default function ProposalStatus({ proposal }) {
 
   return (
     <div
+      data-testid="proposal-status"
       className={cn(
         approved.includes(proposal.status.toLowerCase()) && "text-positive",
         rejected.includes(proposal.status.toLowerCase()) && "text-negative",
