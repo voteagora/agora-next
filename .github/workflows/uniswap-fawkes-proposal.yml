@@ -1,0 +1,83 @@
+name: Uniswap Proposal Automation (Fawkes + Anvil)
+
+on:
+  workflow_dispatch:
+    inputs:
+      agoraNextVersion:
+        description: "Agora-Next Branch/Tag to run against (defaults to current)"
+        required: false
+        default: ""
+
+jobs:
+  create-proposal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Agora-Next
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Clone DAO-Node (Anvil Fork)
+        env:
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          # Use PAT to clone the private dao-node repo
+          git clone https://${PAT_TOKEN}@github.com/voteagora/dao-node.git dao-node
+
+      - name: Build and Start DAO-Node
+        env:
+          MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+        run: |
+          cd dao-node
+          # Build the dao-node docker image
+          docker build -t dao-node:local .
+          # Run the anvil node exposing port 8545
+          # It needs MAINNET_RPC_URL (or ALCHEMY_API_KEY) to fork mainnet state
+          docker run -d -p 8545:8545 -e MAINNET_RPC_URL=$MAINNET_RPC_URL --name anvil-node dao-node:local
+
+          # Wait for Anvil to start up
+          sleep 10
+
+      - name: Impersonate Whale for Proposal Creation
+        run: |
+          # We use a known Uniswap whale (a16z) that has enough voting power to create a proposal
+          WHALE_ADDRESS="0x2b591e99af9bd2ad008d0e17fc3be708e9ccab0f"
+
+          echo "Telling local Anvil node to impersonate the whale account..."
+          curl -X POST -H "Content-Type: application/json" \
+            --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_impersonateAccount\",\"params\":[\"${WHALE_ADDRESS}\"],\"id\":1}" \
+            http://127.0.0.1:8545
+
+          echo "Funding the whale account with ETH to pay for gas fees..."
+          curl -X POST -H "Content-Type: application/json" \
+            --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_setBalance\",\"params\":[\"${WHALE_ADDRESS}\", \"0xDE0B6B3A7640000\"],\"id\":2}" \
+            http://127.0.0.1:8545
+      - name: Start Agora-Next Local Server
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXT_PUBLIC_AGORA_API_KEY: ${{ secrets.NEXT_PUBLIC_AGORA_API_KEY }}
+          NEXT_PUBLIC_AGORA_ENV: prod
+          NEXT_PUBLIC_AGORA_INSTANCE_NAME: uniswap
+          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
+        run: |
+          npm run build
+          npm run start &
+          # Wait for Next.js to start serving
+          sleep 15
+
+      - name: Run Fawkes Proposal E2E Test
+        env:
+          BASE_URL: http://localhost:3000
+        run: |
+          npx playwright test tests/web3/proposal-create.spec.ts --project=chromium

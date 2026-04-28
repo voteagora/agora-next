@@ -20,30 +20,42 @@ export class MockWallet {
    */
   async inject(page: Page, chainId: number = 10) {
     // Expose Node.js signing so the browser mock can use it
-    await page.exposeFunction("mockWalletSignMessage", async (messageHex: string) => {
-      console.log(`Node.js signing message...`);
-      try {
-        const messageStr = ethers.toUtf8String(messageHex);
-        console.log(`Node.js decoded message: ${messageStr}`);
-        const sig = await this.wallet.signMessage(messageStr);
-        console.log(`Node.js signature generated: ${sig}`);
-        return sig;
-      } catch (err) {
-        console.error("Node.js signMessage error:", err);
-        throw err;
+    await page.exposeFunction(
+      "mockWalletSignMessage",
+      async (messageHex: string) => {
+        console.log(`Node.js signing message...`);
+        try {
+          const messageStr = ethers.toUtf8String(messageHex);
+          console.log(`Node.js decoded message: ${messageStr}`);
+          const sig = await this.wallet.signMessage(messageStr);
+          console.log(`Node.js signature generated: ${sig}`);
+          return sig;
+        } catch (err) {
+          console.error("Node.js signMessage error:", err);
+          throw err;
+        }
       }
-    });
+    );
 
-    await page.exposeFunction("mockWalletSignTypedData", async (domain: any, types: any, value: any) => {
-      return await this.wallet.signTypedData(domain, types, value);
-    });
+    await page.exposeFunction(
+      "mockWalletSignTypedData",
+      async (domain: any, types: any, value: any) => {
+        return await this.wallet.signTypedData(domain, types, value);
+      }
+    );
 
     // We pass dynamic values as args to the init script
     await page.addInitScript(
       ({ address, chainIdHex }) => {
-        window.ethereum = ({
+        window.ethereum = {
           isMetaMask: true,
-          request: async ({ method, params }: { method: string; params?: any }) => {
+          request: async ({
+            method,
+            params,
+          }: {
+            method: string;
+            params?: any;
+          }) => {
             console.log("Mock Wallet Request:", method, params);
             switch (method) {
               case "eth_requestAccounts":
@@ -78,7 +90,7 @@ export class MockWallet {
           },
           removeListener: () => {},
           autoRefreshOnNetworkChange: false,
-        } as any);
+        } as any;
       },
       { address: this.address, chainIdHex: "0x" + chainId.toString(16) }
     );
