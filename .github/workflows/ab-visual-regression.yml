@@ -59,11 +59,6 @@ on:
         description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for none."
         required: false
         type: string
-      enable_ai_masking:
-        description: "Enable AI Masking Layer (Volatile Content Freeze)"
-        required: false
-        type: boolean
-        default: true
       scan_all_archive:
         description: "Deep scan all individual archived proposals (can be slow)"
         required: false
@@ -142,7 +137,6 @@ jobs:
           TENANT_CONTEXT: ${{ inputs.tenant }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_data == true && 'prod' || '' }}
-          ENABLE_AI_MASKING: ${{ inputs.enable_ai_masking }}
         run: npm run test:ab
 
       - name: Google Auth

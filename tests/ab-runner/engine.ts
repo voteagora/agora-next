@@ -1,7 +1,7 @@
 import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
-import { classifyDriftsWithGemini } from "./gemini-classifier";
+
 
 export interface OverrideConfig {
   ignoreSelectors?: string[];
@@ -421,51 +421,7 @@ export class ABRunnerEngine {
       pageB.keyboard.press("Escape").catch(() => {}),
     ]);
 
-    // 1.5 Freeze volatile DOM content to prevent temporal drifts
-    const freezeVolatileContent = async (page: Page) => {
-      await page
-        .evaluate(() => {
-          // SAFETY: Only modify LEAF elements (no child elements) to prevent
-          // destroying container subtrees. textContent= on a parent wipes its children.
-          const isLeaf = (el: Element) => el.childElementCount === 0;
 
-          // Freeze relative time elements — narrow selectors only
-          document
-            .querySelectorAll("time, [datetime], .timeago")
-            .forEach((el) => {
-              if (
-                isLeaf(el) &&
-                el.textContent &&
-                el.textContent.trim().length > 0
-              ) {
-                (el as HTMLElement).textContent = "—";
-              }
-            });
-
-          // Freeze block numbers (volatile on-chain data)
-          // Only target leaf elements whose text matches a block number pattern
-          document.querySelectorAll(".block-number").forEach((el) => {
-            if (!isLeaf(el)) return;
-            const text = el.textContent || "";
-            if (/^#?\d{6,}$/.test(text.trim())) {
-              (el as HTMLElement).textContent = "#—";
-            }
-          });
-
-          // Kill all CSS animations globally to prevent frame-dependent captures
-          const freezeStyle = document.createElement("style");
-          freezeStyle.textContent = `
-          *, *::before, *::after {
-            animation-duration: 0s !important;
-            animation-delay: 0s !important;
-            transition-duration: 0s !important;
-            transition-delay: 0s !important;
-          }
-        `;
-          document.head.appendChild(freezeStyle);
-        })
-        .catch(() => {});
-    };
 
     const stripLoadingText = async (p: Page) => {
       await p
@@ -492,17 +448,6 @@ export class ABRunnerEngine {
 
     await Promise.all([stripLoadingText(pageA), stripLoadingText(pageB)]);
 
-    const enableAI = process.env.ENABLE_AI_MASKING !== "false";
-    if (enableAI) {
-      await Promise.all([
-        freezeVolatileContent(pageA),
-        freezeVolatileContent(pageB),
-      ]);
-    } else {
-      console.log(
-        `[Engine] Volatile Content Freeze disabled for route: ${route}`
-      );
-    }
 
     // Failsafe: Ensure proposal statuses are fully visible, bypassing any stuck React animations
     // or IntersectionObserver fade-outs before capturing DOM and screenshots.
@@ -822,9 +767,6 @@ export class ABRunnerEngine {
       await captureTooltipLayer();
     }
 
-    if (reportList.length > 0) {
-      await classifyDriftsWithGemini(reportList, artifactsDir);
-    }
 
     const reportWithMeta = [
       {
