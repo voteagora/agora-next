@@ -120,7 +120,10 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0x85d6bcc74877a1c6fc66a8cd14369f939663f68f": "Protocol Guild Governor",
   "0xaac9059248a06233db16fc9c25426365b7afb481": "Protocol Guild Timelock",
-  "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Membership",
+  "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Gov Token",
+  "0xbfc07a8c9615fe62979f02cd0d975caf61ed0d63":
+    "Protocol Guild Proposal Types Configurator",
+  "0x42436bb7bea1e1e2de03f1223e2a3e0557f606e3": "Protocol Guild Proxy Admin",
   "0xd982477216dadd4c258094b071b49d17b6271d66":
     "Protocol Guild Split Wallet V2",
 
