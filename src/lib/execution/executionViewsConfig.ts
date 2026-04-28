@@ -7,7 +7,6 @@ const VIEWS = {
     tabLabel: "Event logs",
     pageEyebrow: "Receipt",
     pageTitle: "Event logs",
-    lead: "What contracts emitted: named events and fields (explorer ABI, plus a few built-in layouts for timelock/bridge). Raw hex lives under each log.",
     cardTitle: "Event logs",
     cardDescription:
       "Decoded fields, friendly addresses, and raw hex when needed",
@@ -17,7 +16,6 @@ const VIEWS = {
     tabLabel: "State & trace",
     pageEyebrow: "Trace",
     pageTitle: "State & trace",
-    lead: "High-signal log summaries, token moves, and internal ETH transfers and the call tree.",
     cardTitle: "State & trace",
     cardDescription:
       "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",
@@ -29,7 +27,6 @@ const VIEWS = {
     tabLabel: string;
     pageEyebrow: string;
     pageTitle: string;
-    lead: string;
     cardTitle: string;
     cardDescription: string;
   }

@@ -200,11 +200,7 @@ export function ExecutionStateView({ txHash }: { txHash: string }) {
   if (introOnlyLoading) {
     return (
       <div>
-        <ExecutionPageIntro
-          eyebrow={PAGE.pageEyebrow}
-          title={PAGE.pageTitle}
-          lead={PAGE.lead}
-        />
+        <ExecutionPageIntro eyebrow={PAGE.pageEyebrow} title={PAGE.pageTitle} />
         <div className="overflow-hidden rounded-2xl border border-line bg-cardBackground shadow-sm">
           <ExecutionInlineSpinner message="Loading receipt…" />
         </div>
@@ -214,11 +210,7 @@ export function ExecutionStateView({ txHash }: { txHash: string }) {
 
   return (
     <div className="space-y-6">
-      <ExecutionPageIntro
-        eyebrow={PAGE.pageEyebrow}
-        title={PAGE.pageTitle}
-        lead={PAGE.lead}
-      />
+      <ExecutionPageIntro eyebrow={PAGE.pageEyebrow} title={PAGE.pageTitle} />
       {logsQ.isFetching && !logsQ.error && (
         <p className="text-center text-xs text-tertiary">Refreshing receipt…</p>
       )}
