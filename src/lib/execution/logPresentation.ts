@@ -254,11 +254,7 @@ export function buildExecutionLogPresentation(
   }
 
   if (log.eventName === "Approval" && args) {
-    if (
-      "id" in args &&
-      "amount" in args &&
-      !("value" in args)
-    ) {
+    if ("id" in args && "amount" in args && !("value" in args)) {
       const owner = asAddress(args.owner);
       const spender = asAddress(args.spender);
       return {
