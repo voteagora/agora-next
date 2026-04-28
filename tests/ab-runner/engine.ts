@@ -2,6 +2,7 @@ import { test, expect, Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 
+
 export interface OverrideConfig {
   ignoreSelectors?: string[];
   expectDiff?: boolean;
@@ -131,6 +132,8 @@ export class ABRunnerEngine {
       fs.mkdirSync(artifactsDir, { recursive: true });
     }
 
+
+
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
       const mapB = new Map<string, any[]>();
@@ -224,7 +227,7 @@ export class ABRunnerEngine {
           rawDrifts.push({
             path: nodeB.path,
             reason: "Added Component",
-            urlA_text: "(Element completely absent in Production Baseline)",
+            urlA_text: "(Element completely absent in URL A)",
             urlB_text: nodeB.text,
           });
         }
@@ -376,14 +379,90 @@ export class ABRunnerEngine {
       this.progressiveScroll(pageB, route),
     ]);
 
+    // 1.1 Sync viewport heights — each page scrolls independently and may
+    // stabilize at different content heights. Force both to the taller one
+    // so screenshots capture the full page on both sides.
+    const [heightA, heightB] = await Promise.all([
+      pageA.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      ),
+      pageB.evaluate(() =>
+        Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        )
+      ),
+    ]);
+    const syncHeight = Math.max(heightA, heightB, 1080) + 200;
+    await Promise.all([
+      pageA.setViewportSize({ width: 1280, height: syncHeight }),
+      pageB.setViewportSize({ width: 1280, height: syncHeight }),
+    ]);
+    // Scroll back to top and wait for lazy images / network requests to settle
+    await Promise.all([
+      pageA.evaluate(() => window.scrollTo(0, 0)),
+      pageB.evaluate(() => window.scrollTo(0, 0)),
+    ]);
+    await Promise.all([
+      pageA.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {}),
+      pageB.waitForLoadState("networkidle", { timeout: 10000 }).catch(() => {}),
+    ]);
+
     await Promise.all([
       pageA.keyboard.press("Escape").catch(() => {}),
       pageB.keyboard.press("Escape").catch(() => {}),
     ]);
 
+
+
+    const stripLoadingText = async (p: Page) => {
+      await p
+        .evaluate(() => {
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT
+          );
+          let node;
+          while ((node = walker.nextNode())) {
+            if (node.nodeValue && node.nodeValue.includes("Loading")) {
+              if (node.parentElement) {
+                const testid = node.parentElement.getAttribute("data-testid");
+                if (testid !== "proposal-status") {
+                  node.parentElement.style.opacity = "0";
+                  node.parentElement.style.visibility = "hidden";
+                }
+              }
+            }
+          }
+        })
+        .catch(() => {});
+    };
+
+    await Promise.all([stripLoadingText(pageA), stripLoadingText(pageB)]);
+
+
+    // Failsafe: Ensure proposal statuses are fully visible, bypassing any stuck React animations
+    // or IntersectionObserver fade-outs before capturing DOM and screenshots.
+    const forceStatusVisibility = `[data-testid="proposal-status"] { opacity: 1 !important; visibility: visible !important; }`;
+    await Promise.all([
+      pageA.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
+      pageB.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
+    ]);
+
     // 2. Extract DOM trees
     const treeA = await this.extractDOMTree(pageA, route);
     const treeB = await this.extractDOMTree(pageB, route);
+
+    // 2.5 Scroll-depth normalization: trim the longer tree to match the shorter
+    // This prevents mass Missing/Added noise from asymmetric lazy loading
+    if (isListRoute && treeA.length !== treeB.length) {
+      const targetLen = Math.min(treeA.length, treeB.length);
+      if (treeA.length > targetLen) treeA.length = targetLen;
+      if (treeB.length > targetLen) treeB.length = targetLen;
+    }
 
     // 3. Compare trees — only flag deepest-leaf drifts to suppress cascading noise
     // Compare main trees
@@ -408,10 +487,19 @@ export class ABRunnerEngine {
     const captureTooltipLayer = async () => {
       if (!meta?.type) return;
 
-      // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
-      const triggerSelector =
-        '[data-testid="results-tooltip-trigger"], button[aria-label*="threshold"], svg.lucide-alert-triangle, svg.lucide-info, [data-state="closed"]';
-      const tooltipSelector = '[role="tooltip"]';
+      // Native Radix UI tooltips, UI tooltip triggers, threshold buttons, and icon triggers
+      const triggerSelector = [
+        '[data-testid="results-tooltip-trigger"]',
+        'button[aria-label*="threshold"]',
+        "svg.lucide-alert-triangle",
+        "svg.lucide-info",
+        '[data-state="closed"][data-radix-collection-item]',
+        "[data-tooltip-trigger]",
+        'button[data-state="closed"]',
+        '[role="button"][aria-describedby]',
+      ].join(", ");
+      const tooltipSelector =
+        '[role="tooltip"], [data-radix-popper-content-wrapper], [data-side][data-align]';
 
       const captureForPage = async (page: Page, label: string) => {
         try {
@@ -427,6 +515,7 @@ export class ABRunnerEngine {
                   artifactsDir,
                   `00_${label}_FullPage_Tooltip.png`
                 ),
+                fullPage: true,
                 timeout: 15000,
               })
               .catch(() => {});
@@ -464,12 +553,56 @@ export class ABRunnerEngine {
 
     if (override.expectDiff ? !isDiff : isDiff) {
       const cropsDir = path.join(artifactsDir, "focused-crops");
+      const cleanCropsDir = path.join(artifactsDir, "focused-crops", "clean");
 
       if (!fs.existsSync(cropsDir)) {
         fs.mkdirSync(cropsDir, { recursive: true });
       }
+      if (!fs.existsSync(cleanCropsDir)) {
+        fs.mkdirSync(cleanCropsDir, { recursive: true });
+      }
 
-      // 4. Batch-inject highlights in a single evaluate() per page
+      // 4a. Capture CLEAN crops BEFORE injecting any highlights
+      // These pristine captures are suitable for AI vision analysis
+      const cropDrifts = drifts.slice(0, 10);
+      for (let i = 0; i < cropDrifts.length; i++) {
+        const drift = cropDrifts[i];
+        await Promise.all([
+          (async () => {
+            try {
+              const locA = pageA.locator(drift.path).first();
+              if ((await locA.count()) > 0) {
+                await locA.scrollIntoViewIfNeeded().catch(() => {});
+                await locA
+                  .screenshot({
+                    path: path.join(cleanCropsDir, `drift_${i + 1}_UrlA.png`),
+                    timeout: 15000,
+                  })
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+          (async () => {
+            try {
+              const locB = pageB.locator(drift.path).first();
+              if ((await locB.count()) > 0) {
+                await locB.scrollIntoViewIfNeeded().catch(() => {});
+                await locB
+                  .screenshot({
+                    path: path.join(cleanCropsDir, `drift_${i + 1}_UrlB.png`),
+                    timeout: 15000,
+                  })
+                  .catch(() => {});
+              }
+            } catch {}
+          })(),
+        ]);
+
+        reportList[i].imgUrlA = `drift_${i + 1}_UrlA.png`;
+        reportList[i].imgUrlB = `drift_${i + 1}_UrlB.png`;
+      }
+
+      // 4b. NOW inject highlights for human-facing annotated artifacts
       const highlightPayload = drifts.map((d) => ({
         path: d.path,
         css:
@@ -525,11 +658,11 @@ export class ABRunnerEngine {
       };
 
       await Promise.all([
-        injectOverlay(pageA, "A (Production)", this.urlA),
-        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+        injectOverlay(pageA, "A", this.urlA),
+        injectOverlay(pageB, "B", this.urlB),
       ]);
 
-      // 5. Full-page screenshots before crops — captured after load state settles
+      // 5. Full-page annotated screenshots (with highlights + overlay)
       await Promise.all([
         pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
         pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
@@ -537,20 +670,21 @@ export class ABRunnerEngine {
       await pageA
         .screenshot({
           path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
       await pageB
         .screenshot({
           path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
 
       await captureTooltipLayer();
 
-      // 6. Focused crops — UrlA and UrlB captured in parallel per drift
-      const cropDrifts = drifts.slice(0, 10);
+      // 6. Annotated focused crops (with highlights) for human dashboard review
       for (let i = 0; i < cropDrifts.length; i++) {
         const drift = cropDrifts[i];
         await Promise.all([
@@ -602,8 +736,8 @@ export class ABRunnerEngine {
       };
 
       await Promise.all([
-        injectOverlay(pageA, "A (Production)", this.urlA),
-        injectOverlay(pageB, "B (Branch/CPLS)", this.urlB),
+        injectOverlay(pageA, "A", this.urlA),
+        injectOverlay(pageB, "B", this.urlB),
       ]);
 
       // No drifts — capture full-page baselines
@@ -614,17 +748,20 @@ export class ABRunnerEngine {
       await pageA
         .screenshot({
           path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
       await pageB
         .screenshot({
           path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          fullPage: true,
           timeout: 15000,
         })
         .catch(() => {});
       await captureTooltipLayer();
     }
+
 
     const reportWithMeta = [
       {
@@ -700,7 +837,7 @@ export class ABRunnerEngine {
           `   👻 Missing Components: ${numMissing}\n\n` +
           `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
           `${bucketLink}\n\n` +
-          `Context: This means some React elements changed color, spacing, or text compared to Production.\n` +
+          `Context: This means some React elements changed color, spacing, or text compared to URL A.\n` +
           `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
       ).toBe(0);
     }
@@ -710,9 +847,13 @@ export class ABRunnerEngine {
     // Wait for initial Next.js hydration and Web3 data fetching
     await page.waitForTimeout(5000);
 
-    const isDelegatesRoute = route === "/delegates";
-    const maxAttempts = isDelegatesRoute ? 2 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 3000 : 35000;
+    const isDelegatesRoute =
+      route === "/delegates" || route.startsWith("/delegates?");
+    // Delegates infinite scroll can be extremely long, limit to 8 to avoid timeout, 12 for others
+    const maxAttempts = isDelegatesRoute ? 8 : 12;
+    const maxViewportHeight = isDelegatesRoute ? 8000 : 35000;
+    // Minimum height below which we don't trust stability (prevents empty-page false stability)
+    const MIN_CONTENT_HEIGHT = 1200;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -746,7 +887,7 @@ export class ABRunnerEngine {
           )
         )
       );
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(2500);
 
       currentHeight = await page.evaluate(getScrollHeight);
       currentCount = await page.evaluate(getListCount);
@@ -757,7 +898,10 @@ export class ABRunnerEngine {
         document.body.innerText.includes("Loading")
       );
 
-      if (heightStable && countStable && !isLoading) {
+      // Don't trust stability if page is too short (likely still rendering)
+      const contentSufficient = currentHeight >= MIN_CONTENT_HEIGHT;
+
+      if (heightStable && countStable && !isLoading && contentSufficient) {
         stableRounds++;
         if (stableRounds >= 2) {
           break;
@@ -771,6 +915,49 @@ export class ABRunnerEngine {
       attempts++;
     }
 
+    // Post-scroll: wait for any lingering "Loading" indicators to clear
+    for (let i = 0; i < 15; i++) {
+      const stillLoading = await page.evaluate(() =>
+        document.body.innerText.includes("Loading")
+      );
+      if (!stillLoading) break;
+      await page.waitForTimeout(2000);
+    }
+
+    // Force hide any persistent Loading text after waiting, to prevent screenshot artifacts
+    await page
+      .evaluate(() => {
+        const walker = document.createTreeWalker(
+          document.body,
+          NodeFilter.SHOW_TEXT
+        );
+        let node;
+        while ((node = walker.nextNode())) {
+          if (node.nodeValue && node.nodeValue.includes("Loading")) {
+            if (node.parentElement) {
+              const testid = node.parentElement.getAttribute("data-testid");
+              if (testid !== "proposal-status") {
+                node.parentElement.style.opacity = "0";
+                node.parentElement.style.visibility = "hidden";
+              }
+            }
+          }
+        }
+
+        // Failsafe: explicitly restore visibility to all proposal-status elements
+        // in case they were hidden by any other class/rule
+        document
+          .querySelectorAll('[data-testid="proposal-status"]')
+          .forEach((el) => {
+            (el as HTMLElement).style.opacity = "1";
+            (el as HTMLElement).style.visibility = "visible";
+          });
+      })
+      .catch(() => {});
+
+    // Re-measure after Loading cleared — content may have grown
+    currentHeight = await page.evaluate(getScrollHeight);
+
     // Expand viewport to fit all loaded content
     const artificialHeight = Math.min(
       maxViewportHeight,
@@ -781,7 +968,92 @@ export class ABRunnerEngine {
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.mouse.wheel(0, -100000);
 
-    await page.waitForTimeout(3000);
+    // Wait for images/lazy content to load after viewport expansion
+    await page
+      .waitForLoadState("networkidle", { timeout: 10000 })
+      .catch(() => {});
+
+    // Explicitly wait for ALL <img> elements to finish loading.
+    // Avatar icons and delegate images load asynchronously from external CDNs
+    // and may arrive well after networkidle fires.
+    await page
+      .evaluate(() => {
+        const images = Array.from(document.querySelectorAll("img"));
+        return Promise.all(
+          images.map((img) => {
+            if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+            return new Promise<void>((resolve) => {
+              img.addEventListener("load", () => resolve());
+              img.addEventListener("error", () => resolve());
+              setTimeout(() => resolve(), 8000); // 8s max per image
+            });
+          })
+        );
+      })
+      .catch(() => {});
+
+    // For routes with async card content (delegates, proposals lists),
+    // wait for descriptions/bios to populate. These fetch independently
+    // after the card skeleton renders and don't trigger scroll height changes.
+    if (isDelegatesRoute) {
+      // Wait up to 15s for delegate descriptions to appear
+      for (let i = 0; i < 6; i++) {
+        const descCount = await page.evaluate(
+          () =>
+            document.querySelectorAll(
+              'a[href*="/delegates/"] p, a[href*="/delegates/"] span'
+            ).length
+        );
+        // Expect at least some text content per visible card
+        const cardCount = await page.evaluate(
+          () => document.querySelectorAll('a[href*="/delegates/"]').length
+        );
+        if (descCount >= cardCount * 2) break; // At least 2 text elements per card
+        await page.waitForTimeout(2500);
+      }
+    }
+
+    if (route.startsWith("/proposals")) {
+      // Wait up to 15s for proposal statuses (e.g. SUCCEEDED, QUEUED) to fetch and render
+      for (let i = 0; i < 6; i++) {
+        const statusesFilled = await page.evaluate(() => {
+          const statuses = document.querySelectorAll(
+            '[data-testid="proposal-status"]'
+          );
+          // On detail page there's 1 status badge, on list there are many
+          // If we haven't rendered any status badges yet, wait
+          if (statuses.length === 0) return false;
+
+          return Array.from(statuses).every(
+            (el) => el.textContent && el.textContent.trim().length > 0
+          );
+        });
+        if (statusesFilled) break;
+        await page.waitForTimeout(2500);
+      }
+    }
+
+    // Final networkidle after all async content settles
+    await page
+      .waitForLoadState("networkidle", { timeout: 8000 })
+      .catch(() => {});
+
+    // Re-measure — async content may have changed page height
+    const finalHeight = await page.evaluate(() =>
+      Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      )
+    );
+    if (finalHeight > artificialHeight) {
+      await page.setViewportSize({
+        width: 1280,
+        height: Math.min(maxViewportHeight, finalHeight + 200),
+      });
+      await page.evaluate(() => window.scrollTo(0, 0));
+    }
+
+    await page.waitForTimeout(1500);
   }
 
   private async extractDOMTree(
