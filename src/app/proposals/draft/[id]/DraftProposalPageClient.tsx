@@ -9,7 +9,6 @@ import {
   DraftProposal as DraftProposalType,
   PLMConfig,
 } from "@/app/proposals/draft/types";
-import { useSIWE } from "connectkit";
 import { useAccount, useChainId, useSwitchChain } from "wagmi";
 import { useDraftStage } from "./hooks/useDraftStage";
 import { DraftPageHeader } from "./components/DraftPageHeader";
@@ -20,6 +19,7 @@ import Loading from "./loading";
 import Tenant from "@/lib/tenant/tenant";
 import ShareDraftLink from "./components/ShareDraftLink";
 import { getStoredSiweJwt } from "@/lib/siweSession";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 type DraftResponse = DraftProposalType;
 
@@ -61,6 +61,11 @@ export default function DraftProposalPageClient({
   const { address } = useAccount();
   const currentChainId = useChainId();
   const { switchChainAsync, isPending: isSwitching } = useSwitchChain();
+  const { ensureSession: ensureDraftSiweSession } = useSiweJwt({
+    expectedAddress: address?.toLowerCase(),
+    purpose: "proposal_draft",
+    chainId: targetChainId,
+  });
 
   useEffect(() => {
     // Do not clear SIWE session on disconnect/refresh; only reset local UI state
@@ -163,8 +168,6 @@ export default function DraftProposalPageClient({
     }
   }, [data, isLoading, queryError]);
 
-  const { signIn } = useSIWE();
-
   // On mount: if user refreshed/closed while awaiting signature and no JWT exists, reset UI state
   useEffect(() => {
     try {
@@ -193,6 +196,8 @@ export default function DraftProposalPageClient({
       } catch {}
       if (!address) {
         setError("Please connect your wallet before signing");
+        setIsSigning(false);
+        setPostSignGrace(false);
         return;
       }
       if (currentChainId !== targetChainId && switchChainAsync) {
@@ -200,14 +205,45 @@ export default function DraftProposalPageClient({
           await switchChainAsync({ chainId: targetChainId });
         } catch (e) {
           setError("Failed to switch network for this tenant");
+          setIsSigning(false);
+          setPostSignGrace(false);
           return;
         }
       }
       setSignLabel("Awaiting Confirmation");
-      await signIn();
-    } catch {
+      const jwt = await ensureDraftSiweSession();
+      if (!jwt) {
+        setSignLabel("Cancelled");
+        setError("Signature cancelled by user");
+        setIsSigning(false);
+        setPostSignGrace(false);
+        completedSignRef.current = false;
+        return;
+      }
+
+      completedSignRef.current = true;
+      setSignLabel("Signed");
+      setAdvancing(true);
+      setError(null);
+      await refetch();
+      setSignLabel(null);
+      setIsSigning(false);
+      setPostSignGrace(false);
+      setAdvancing(false);
+      try {
+        localStorage.removeItem(LOCAL_STORAGE_SIWE_STAGE_KEY);
+      } catch {}
+      if (pollIdRef.current) {
+        clearInterval(pollIdRef.current);
+        pollIdRef.current = null;
+      }
+    } catch (sessionError) {
       setSignLabel("Cancelled");
-      setError("Signature cancelled by user");
+      setError(
+        sessionError instanceof Error
+          ? sessionError.message
+          : "Signature cancelled by user"
+      );
       try {
         localStorage.setItem(LOCAL_STORAGE_SIWE_STAGE_KEY, "error");
       } catch {}
@@ -226,7 +262,8 @@ export default function DraftProposalPageClient({
     currentChainId,
     targetChainId,
     switchChainAsync,
-    signIn,
+    ensureDraftSiweSession,
+    refetch,
   ]);
 
   const onDeleteSuccess = useCallback(() => {
