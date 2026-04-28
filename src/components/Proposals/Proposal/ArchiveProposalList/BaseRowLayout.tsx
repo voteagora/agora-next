@@ -33,7 +33,10 @@ export function BaseRowLayout({
   } as const;
   return (
     <Link href={data.href}>
-      <div className="border-b border-line items-center flex flex-row bg-neutral">
+      <div
+        className="border-b border-line items-center flex flex-row bg-neutral"
+        data-testid={`proposal-list-item-${data.id}`}
+      >
         {/* Left column: Title and metadata */}
         <div
           className={cn(
