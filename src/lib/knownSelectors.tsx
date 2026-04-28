@@ -4,13 +4,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getBlockScanAddress } from "@/lib/utils";
 import {
   getFriendlyName,
   getSchemaName,
   hasFriendlyName,
   hasSchemaName,
 } from "./knownAddresses";
+import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
@@ -90,6 +91,48 @@ function maybeFriendlyAddress(address?: string) {
   return <span className="font-mono text-xs">{address}</span>;
 }
 
+/**
+ * Recipient row for Split distributions — shows address (or ENS if resolved), ppm, and %.
+ */
+function SplitRecipientRow({
+  address,
+  allocation,
+  totalAllocation,
+}: {
+  address: string;
+  allocation: bigint;
+  totalAllocation: bigint;
+}) {
+  const { data: ensData } = useBlockCacheWrappedEns({
+    address: address as `0x${string}`,
+    enabled: !!address,
+  });
+
+  const ppm = allocation.toLocaleString();
+  const pct =
+    totalAllocation > 0n
+      ? ((Number(allocation) / Number(totalAllocation)) * 100).toFixed(4)
+      : "0.0000";
+
+  const displayName =
+    ensData?.name || `${address.slice(0, 4)}...${address.slice(-4)}`;
+
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <a
+        href={getBlockScanAddress(address)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+      >
+        {displayName}
+      </a>
+      <span className="text-tertiary">{ppm} ppm</span>
+      <span className="text-tertiary">({pct}%)</span>
+    </div>
+  );
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Parameter extraction helpers
 // ────────────────────────────────────────────────────────────────────────────
@@ -125,6 +168,7 @@ function collectByType(
 
 /**
  * Collect values from array-typed parameters (e.g. "address[]", "bytes[]").
+ * Recursively searches into tuple components.
  */
 function collectArrayByType(
   parameters: Record<string, DecodedDataParam>,
@@ -136,6 +180,11 @@ function collectArrayByType(
     }
     if (param.type === type && param.value !== undefined) {
       return [String(param.value)];
+    }
+    // Recurse into tuple components
+    if (param.components) {
+      const nested = collectArrayByType(param.components, type);
+      if (nested.length > 0) return nested;
     }
   }
   return [];
@@ -855,6 +904,286 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             </div>
           )}
         </div>
+      );
+    },
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Protocol Guild
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // mint(address[]) — Membership NFT
+  "0xbd075b84": {
+    name: "mint",
+    prettyName: "Mint Membership",
+    prettyRender: (decodedData, target) => {
+      const members = collectArrayByType(decodedData.parameters, "address[]");
+      const count = members.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Mint {count} membership NFT{count !== 1 ? "s" : ""} on{" "}
+            {maybeFriendlyAddress(target)}.
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {members.map((addr, i) => (
+                <div key={i}>
+                  <a
+                    href={`https://etherscan.io/address/${addr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs hover:underline"
+                  >
+                    {addr}
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // burn(uint256[]) — Membership NFT
+  "0xb80f55c9": {
+    name: "burn",
+    prettyName: "Burn Membership",
+    prettyRender: (decodedData, target) => {
+      const tokenIds = collectArrayByType(decodedData.parameters, "uint256[]");
+      const count = tokenIds.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Burn {count} membership NFT{count !== 1 ? "s" : ""} from{" "}
+            {maybeFriendlyAddress(target)}.
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {tokenIds.map((id, i) => (
+                <div key={i} className="font-mono text-xs">
+                  Token ID: {id}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // distribute((address[],uint256[],uint256,uint16),address,address) — 0xSplits V2.1
+  "0x2d3f5537": {
+    name: "distribute",
+    prettyName: "Distribute Split",
+    prettyRender: (decodedData, target) => {
+      const recipients = collectArrayByType(
+        decodedData.parameters,
+        "address[]"
+      );
+      const allocations = collectArrayByType(
+        decodedData.parameters,
+        "uint256[]"
+      );
+      const scalarAddresses = collectByType(decodedData.parameters, "address");
+      const uint256Scalars = collectByType(decodedData.parameters, "uint256");
+      const uint16Scalars = collectByType(decodedData.parameters, "uint16");
+
+      // _token is first scalar address, _distributor is second
+      const tokenAddress = scalarAddresses[0];
+      const distributorAddress = scalarAddresses[1];
+      // totalAllocation is the first scalar uint256 (not in the array)
+      const totalAllocation = uint256Scalars[0]
+        ? BigInt(uint256Scalars[0])
+        : 1_000_000n;
+      // distributionIncentive is uint16 in ppm scale
+      const incentivePpm = uint16Scalars[0] ? Number(uint16Scalars[0]) : 0;
+      const incentivePct = ((incentivePpm / 1_000_000) * 100).toFixed(4);
+
+      const isEth =
+        tokenAddress?.toLowerCase() ===
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+
+      // Build recipient list sorted by allocation descending
+      const recipientData = recipients.map((addr, i) => ({
+        address: addr,
+        allocation: allocations[i] ? BigInt(allocations[i]) : 0n,
+      }));
+      recipientData.sort((a, b) =>
+        a.allocation > b.allocation ? -1 : a.allocation < b.allocation ? 1 : 0
+      );
+
+      const count = recipientData.length;
+
+      // Token display: ETH sentinel, KNOWN_ADDRESSES, or raw 0x
+      const tokenDisplay = isEth ? (
+        <span className="font-semibold">ETH</span>
+      ) : (
+        maybeFriendlyAddress(tokenAddress)
+      );
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Distribute {tokenDisplay} through {maybeFriendlyAddress(target)} to{" "}
+            <span className="font-semibold">{count}</span> members
+          </div>
+          <div className="text-secondary">
+            Distribution incentive: {incentivePct}% paid to{" "}
+            {maybeFriendlyAddress(distributorAddress)}
+          </div>
+          <div className="text-secondary">
+            Total allocation: {totalAllocation.toLocaleString()} ppm
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {recipientData.map((r, i) => (
+                <SplitRecipientRow
+                  key={i}
+                  address={r.address}
+                  allocation={r.allocation}
+                  totalAllocation={totalAllocation}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // updateSplit((address[],uint256[],uint256,uint16)) — 0xSplits V2.1
+  "0x286617de": {
+    name: "updateSplit",
+    prettyName: "Update Split",
+    prettyRender: (decodedData, target) => {
+      const recipients = collectArrayByType(
+        decodedData.parameters,
+        "address[]"
+      );
+      const allocations = collectArrayByType(
+        decodedData.parameters,
+        "uint256[]"
+      );
+      const uint256Scalars = collectByType(decodedData.parameters, "uint256");
+      const uint16Scalars = collectByType(decodedData.parameters, "uint16");
+
+      // totalAllocation is the scalar uint256
+      const totalAllocation = uint256Scalars[0]
+        ? BigInt(uint256Scalars[0])
+        : 1_000_000n;
+      // distributionIncentive is uint16 in ppm scale
+      const incentivePpm = uint16Scalars[0] ? Number(uint16Scalars[0]) : 0;
+      const incentivePct = ((incentivePpm / 1_000_000) * 100).toFixed(4);
+
+      // Build recipient list sorted by allocation descending
+      const recipientData = recipients.map((addr, i) => ({
+        address: addr,
+        allocation: allocations[i] ? BigInt(allocations[i]) : 0n,
+      }));
+      recipientData.sort((a, b) =>
+        a.allocation > b.allocation ? -1 : a.allocation < b.allocation ? 1 : 0
+      );
+
+      const count = recipientData.length;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Update {maybeFriendlyAddress(target)} membership configuration
+          </div>
+          <div className="text-secondary">
+            {count} recipients, total allocation{" "}
+            {totalAllocation.toLocaleString()} ppm
+          </div>
+          <div className="text-secondary">
+            Distribution incentive: {incentivePct}%
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {recipientData.map((r, i) => (
+                <SplitRecipientRow
+                  key={i}
+                  address={r.address}
+                  allocation={r.allocation}
+                  totalAllocation={totalAllocation}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+
+  // setPaused(bool)
+  "0x16c38b3c": {
+    name: "setPaused",
+    prettyName: "Set Paused",
+    prettyRender: (decodedData, target) => {
+      const boolParams = collectByType(decodedData.parameters, "bool");
+      const paused = boolParams[0] === "true";
+
+      return (
+        <span className="text-sm text-primary">
+          {paused ? "Pause" : "Unpause"} {maybeFriendlyAddress(target)}.
+        </span>
+      );
+    },
+  },
+
+  // updateDelay(uint256) — TimelockController
+  "0x64d62353": {
+    name: "updateDelay",
+    prettyName: "Update Timelock Delay",
+    prettyRender: (decodedData, target) => {
+      const newDelay = collectByType(decodedData.parameters, "uint256")[0];
+      let delayDisplay = newDelay;
+
+      if (newDelay) {
+        const seconds = BigInt(newDelay);
+        if (seconds >= 86400n) {
+          const days = Number(seconds / 86400n);
+          delayDisplay = `${days} day${days !== 1 ? "s" : ""}`;
+        } else if (seconds >= 3600n) {
+          const hours = Number(seconds / 3600n);
+          delayDisplay = `${hours} hour${hours !== 1 ? "s" : ""}`;
+        } else {
+          delayDisplay = `${seconds} seconds`;
+        }
+      }
+
+      return (
+        <span className="text-sm text-primary">
+          Update the timelock delay on {maybeFriendlyAddress(target)} to{" "}
+          <span className="font-semibold">{delayDisplay}</span>.
+        </span>
+      );
+    },
+  },
+
+  // transferOwnership(address) — Ownable
+  "0xf2fde38b": {
+    name: "transferOwnership",
+    prettyName: "Transfer Ownership",
+    prettyRender: (decodedData, target) => {
+      const newOwner = collectByType(decodedData.parameters, "address")[0];
+      return (
+        <span className="text-sm text-primary">
+          Transfer ownership of {maybeFriendlyAddress(target)} to{" "}
+          {maybeFriendlyAddress(newOwner)}.
+        </span>
       );
     },
   },
