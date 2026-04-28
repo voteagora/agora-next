@@ -1,10 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import {
-  ClipboardDocumentCheckIcon,
-  ClipboardIcon,
-} from "@heroicons/react/20/solid";
+import { CheckCircleIcon } from "@heroicons/react/20/solid";
+import { Copy } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -73,9 +71,9 @@ export function ExecutionCopyButton({
       aria-label={ariaLabel}
     >
       {done ? (
-        <ClipboardDocumentCheckIcon className="h-3.5 w-3.5 text-positive" />
+        <CheckCircleIcon className="h-3.5 w-3.5 text-positive" />
       ) : (
-        <ClipboardIcon className="h-3.5 w-3.5" />
+        <Copy className="h-3.5 w-3.5" />
       )}
     </button>
   );
@@ -248,9 +246,9 @@ export function ExecutionHashCopy({
           aria-label={showLabel ? `Copy ${label.toLowerCase()}` : "Copy hash"}
         >
           {done ? (
-            <ClipboardDocumentCheckIcon className="h-4 w-4 text-positive" />
+            <CheckCircleIcon className="h-4 w-4 text-positive" />
           ) : (
-            <ClipboardIcon className="h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" />
           )}
         </button>
       </div>
