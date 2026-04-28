@@ -648,16 +648,26 @@
         id="contextInfoPanel"
         class="absolute bottom-16 right-4 z-50 w-72 bg-[#0a0a0c]/95 border border-gray-700 rounded-xl p-3 backdrop-blur-sm shadow-2xl transition-all duration-200"
       >
-        <div class="flex items-center gap-2 mb-2 border-b border-gray-800 pb-2">
-          <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
-          <span
-            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
-            >What Am I Looking At?</span
-          >
+        <div
+          class="flex items-center justify-between gap-2 border-b border-gray-800 pb-2 cursor-pointer group"
+          onclick="document.getElementById('contextInfoContent').classList.toggle('hidden'); document.getElementById('contextChevron').classList.toggle('rotate-180');"
+        >
+          <div class="flex items-center gap-2">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i>
+            <span
+              class="text-[10px] font-bold text-gray-400 uppercase tracking-widest group-hover:text-gray-300 transition-colors"
+              >What Am I Looking At?</span
+            >
+          </div>
+          <i
+            data-lucide="chevron-down"
+            id="contextChevron"
+            class="w-4 h-4 text-gray-500 transition-transform duration-200"
+          ></i>
         </div>
         <div
           id="contextInfoContent"
-          class="text-xs text-gray-300 leading-relaxed"
+          class="text-xs text-gray-300 leading-relaxed pt-2"
         >
           Click an image to see context.
         </div>
@@ -1772,34 +1782,34 @@
       // Context descriptions for each artifact type
       const ARTIFACT_CONTEXT = {
         UrlA_FullPage_Highlights: {
-          title: "🅰️ URL A — Full Page",
-          desc: "Complete full-page screenshot of <strong>URL A</strong> with drift highlights overlaid. Colored borders mark detected regressions (see Legend). Compare with URL B to spot visual differences.",
-          tip: "Use Split View (S) to compare side-by-side with URL B.",
+          title: "🅰️ Baseline (URL A)",
+          desc: "Full-page snapshot of the production baseline. Highlights indicate detected changes.",
+          tip: "Use Split View (S) to identify exactly what shifted or changed.",
         },
         UrlB_FullPage_Highlights: {
-          title: "🅱️ URL B — Full Page",
-          desc: 'Complete full-page screenshot of <strong>URL B</strong> with drift highlights. This is the "after" state you are validating against URL A.',
-          tip: "Use Split View (S) to compare side-by-side with URL A.",
+          title: "🅱️ Target (URL B)",
+          desc: "Full-page snapshot of the PR/test environment. This is the new proposed state.",
+          tip: "Use Split View (S) to compare against the baseline.",
         },
         UrlA_FullPage_Tooltip: {
-          title: "🅰️ URL A — Tooltip Capture",
-          desc: "Screenshot taken after hovering a tooltip trigger on URL A. Shows tooltip overlay content for comparison.",
-          tip: "Check if tooltip content or positioning differs from URL B.",
+          title: "🅰️ Baseline Tooltip",
+          desc: "Snapshot of the production baseline with a hovered tooltip active.",
+          tip: "Check tooltip content and positioning.",
         },
         UrlB_FullPage_Tooltip: {
-          title: "🅱️ URL B — Tooltip Capture",
-          desc: "Screenshot taken after hovering a tooltip trigger on URL B. Compare tooltip content and positioning with URL A.",
-          tip: "Verify tooltip data matches URL A.",
+          title: "🅱️ Target Tooltip",
+          desc: "Snapshot of the test environment with the same tooltip active.",
+          tip: "Verify tooltip data matches the baseline.",
         },
         drift_UrlA: {
-          title: "🔍 Drift Crop — URL A",
-          desc: "Focused crop of a <strong>specific drifted element</strong> on URL A. This zooms into the exact DOM node where a visual regression was detected.",
-          tip: "Compare with the matching UrlB crop to see exactly what changed.",
+          title: "🔍 Baseline Crop",
+          desc: "Isolated view of a specific element that changed in the baseline.",
+          tip: "Compare with the Target Crop to see the exact regression.",
         },
         drift_UrlB: {
-          title: "🔍 Drift Crop — URL B",
-          desc: 'Focused crop of a <strong>specific drifted element</strong> on URL B. This is the "after" state of the detected regression.',
-          tip: "Compare with the matching UrlA crop to spot the difference.",
+          title: "🔍 Target Crop",
+          desc: "Isolated view of the same element in the new test environment.",
+          tip: "Analyze the structural or data change causing the drift.",
         },
       };
 
