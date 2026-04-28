@@ -355,7 +355,7 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
           <svg
             width="168"
             height="56"
-            viewBox="0 -1.2 42 14"
+            viewBox="0 -1.9 42 14"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
