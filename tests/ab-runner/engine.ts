@@ -41,8 +41,8 @@ export class ABRunnerEngine {
       (route.startsWith("/") ? route : `/${route}`);
 
     // Execute sequential navigation instead of parallel to prevent Vercel/GraphQL 429 Too Many Requests caching drops on identical simultaneous payloads
-    await pageA.goto(targetA, { waitUntil: "commit" }).catch(() => {});
-    await pageB.goto(targetB, { waitUntil: "commit" }).catch(() => {});
+    await pageA.goto(targetA, { waitUntil: "commit", timeout: 20000 });
+    await pageB.goto(targetB, { waitUntil: "commit", timeout: 20000 });
 
     // Force wait until React hydrates and renders text content (prevents intermittent blank captures)
     await Promise.all([
@@ -106,16 +106,19 @@ export class ABRunnerEngine {
         ? "index-page"
         : route.replace(/^\//, "").replace(/\//g, "-");
     let artifactsDir = "";
-    if (meta && meta.tenant && meta.type) {
-      artifactsDir = path.join(
+    const hasValidType =
+      meta?.type && meta.type !== "undefined" && meta.type !== "null";
+    if (meta && meta.tenant) {
+      const segments = [
         process.cwd(),
         "test-results",
         "ab-diffs",
         meta.tenant,
         "proposals",
-        meta.type,
-        safeRouteName
-      );
+      ];
+      if (hasValidType) segments.push(meta.type!);
+      segments.push(safeRouteName);
+      artifactsDir = path.join(...segments);
     } else {
       artifactsDir = path.join(
         process.cwd(),
@@ -323,6 +326,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlA_AutoModal_Drift.png"
                     ),
+                    timeout: 15000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -333,6 +337,7 @@ export class ABRunnerEngine {
                       artifactsDir,
                       "00_UrlB_AutoModal_Drift.png"
                     ),
+                    timeout: 15000,
                   })
                   .catch(() => {})
               : Promise.resolve(),
@@ -422,6 +427,7 @@ export class ABRunnerEngine {
                   artifactsDir,
                   `00_${label}_FullPage_Tooltip.png`
                 ),
+                timeout: 15000,
               })
               .catch(() => {});
 
@@ -439,6 +445,7 @@ export class ABRunnerEngine {
               await popover
                 .screenshot({
                   path: path.join(tooltipsDir, `00_${label}_Crop.png`),
+                  timeout: 15000,
                 })
                 .catch(() => {});
             }
@@ -463,7 +470,7 @@ export class ABRunnerEngine {
       }
 
       // 4. Batch-inject highlights in a single evaluate() per page
-      const highlightPayload = drifts.slice(0, 50).map((d) => ({
+      const highlightPayload = drifts.map((d) => ({
         path: d.path,
         css:
           d.reason === "Data Drift"
@@ -524,15 +531,21 @@ export class ABRunnerEngine {
 
       // 5. Full-page screenshots before crops — captured after load state settles
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
 
       await captureTooltipLayer();
 
@@ -549,6 +562,7 @@ export class ABRunnerEngine {
                 await locA
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlA.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -562,6 +576,7 @@ export class ABRunnerEngine {
                 await locB
                   .screenshot({
                     path: path.join(cropsDir, `drift_${i + 1}_UrlB.png`),
+                    timeout: 15000,
                   })
                   .catch(() => {});
               }
@@ -593,15 +608,21 @@ export class ABRunnerEngine {
 
       // No drifts — capture full-page baselines
       await Promise.all([
-        pageA.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
-        pageB.waitForLoadState("load", { timeout: 10000 }).catch(() => {}),
+        pageA.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
+        pageB.waitForLoadState("load", { timeout: 15000 }).catch(() => {}),
       ]);
-      await pageA.screenshot({
-        path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
-      });
-      await pageB.screenshot({
-        path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
-      });
+      await pageA
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlA_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
+      await pageB
+        .screenshot({
+          path: path.join(artifactsDir, `00_UrlB_FullPage_Highlights.png`),
+          timeout: 15000,
+        })
+        .catch(() => {});
       await captureTooltipLayer();
     }
 
@@ -691,7 +712,7 @@ export class ABRunnerEngine {
 
     const isDelegatesRoute = route === "/delegates";
     const maxAttempts = isDelegatesRoute ? 2 : 12;
-    const maxViewportHeight = isDelegatesRoute ? 3000 : 15000;
+    const maxViewportHeight = isDelegatesRoute ? 3000 : 35000;
 
     let lastHeight = 0;
     let lastCount = 0;
@@ -776,7 +797,7 @@ export class ABRunnerEngine {
           if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
         }
 
-        const MAX_ELEMENTS = 2000;
+        const MAX_ELEMENTS = 10000;
         const allElements = document.querySelectorAll(scope);
         const elements = Array.from(allElements)
           .filter((el) => {

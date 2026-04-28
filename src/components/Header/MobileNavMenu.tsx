@@ -32,8 +32,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const changeLogLink = ui.link("changelog");
   const faqLink = ui.link("faq");
   const discordLink = ui.link("discord");
-  const twitterLink = ui.link("townstwitter");
-  const farcasterLink = ui.link("townsfarcaster");
+  const twitterLink = ui.link("twitter");
+  const farcasterLink = ui.link("farcaster");
   const agoraLink = ui.link("agora");
 
   const proposalsToggle = ui.toggle("proposals");
@@ -52,6 +52,9 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
 
+  const dunaToggle = ui.toggle("duna");
+  const hasDuna = dunaToggle !== undefined && dunaToggle.enabled;
+
   const comingSoonToggle = ui.toggle("coming-soon");
   const hasComingSoon =
     comingSoonToggle !== undefined && comingSoonToggle.enabled;
@@ -67,6 +70,18 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     totalSupply: formatNumber(totalSupply),
   };
   const hideVotableSupply = ui.toggle("footer/hide-votable-supply")?.enabled;
+
+  // Light footer (e.g. Shape) = dark icon; dark footer (e.g. Towns) = white icon
+  const footerBg = ui.customization?.footerBackground;
+  const isLightFooter =
+    footerBg &&
+    (() => {
+      const parts = footerBg.split(/\s+/).map(Number);
+      if (parts.length !== 3) return false;
+      const [r, g, b] = parts;
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+      return luminance > 200;
+    })();
 
   const navItems = [
     ...(hasProposals
@@ -124,10 +139,20 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasInfo
       ? [
           {
-            name: "Info",
+            name: hasDuna ? "About" : "Info",
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),
+          },
+        ]
+      : []),
+    ...(hasDuna
+      ? [
+          {
+            name: "Financials",
+            href: "/financials",
+            target: "_self",
+            isActive: pathname.includes("financials"),
           },
         ]
       : []),
@@ -267,7 +292,17 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     rel="noreferrer"
                     className="w-6 h-6"
                   >
-                    <Image src={XIcon} alt="Twitter" width={24} height={24} />
+                    <Image
+                      src={XIcon}
+                      alt="Twitter"
+                      width={24}
+                      height={24}
+                      style={
+                        isLightFooter
+                          ? undefined
+                          : { filter: "brightness(0) invert(1)" }
+                      }
+                    />
                   </a>
                 )}
                 {farcasterLink && (
@@ -282,6 +317,11 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                       alt="Farcaster"
                       width={24}
                       height={24}
+                      style={
+                        isLightFooter
+                          ? undefined
+                          : { filter: "brightness(0) invert(1)" }
+                      }
                     />
                   </a>
                 )}

@@ -1,7 +1,6 @@
 "use client";
 
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
-import styles from "./proposalDescription.module.scss";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
@@ -168,14 +167,12 @@ export default function ProposalDescription({
           />
         )}
         <RelatedProposalLinks proposalId={proposal.id} />
-        <div className={styles.proposal_description_md}>
-          <Markdown
-            content={stripTitleFromDescription(
-              shortTitle,
-              patchedDescription ?? ""
-            )}
-          />
-        </div>
+        <Markdown
+          content={stripTitleFromDescription(
+            shortTitle,
+            patchedDescription ?? ""
+          )}
+        />
       </div>
     </div>
   );

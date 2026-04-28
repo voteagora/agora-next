@@ -8,6 +8,11 @@ on:
         required: true
         type: string
         default: '["optimism"]'
+      payloads:
+        description: "JSON array of specific payload configs (URLs, Proposals) per tenant"
+        required: true
+        type: string
+        default: '[]'
       ref:
         description: "Target branch reference for execution"
         required: false
@@ -49,27 +54,41 @@ jobs:
         continue-on-error: true
         env:
           TENANT_CONTEXT: ${{ matrix.tenant }}
+          PAYLOADS_JSON: ${{ inputs.payloads }}
         run: |
-          # V2 Matrix Override: Configure the native URLs mapped to this specific tenant context
-          echo "We will execute logic specifically for: $TENANT_CONTEXT"
+          echo "Extracting dynamic configurations for: $TENANT_CONTEXT"
           
-          # Pass the variables dynamically for the Sudheer Playwright loop
-          if [ "$TENANT_CONTEXT" = "optimism" ]; then
-             echo "OP_URL_A=https://vote.optimism.io" >> $GITHUB_ENV
-          elif [ "$TENANT_CONTEXT" = "uniswap" ]; then
-             echo "OP_URL_A=https://vote.uniswapfoundation.org" >> $GITHUB_ENV
-          elif [ "$TENANT_CONTEXT" = "ens" ]; then
-             echo "OP_URL_A=https://agora.ens.domains" >> $GITHUB_ENV
-          else
-             echo "OP_URL_A=https://agora.xyz" >> $GITHUB_ENV
+          # Parse the dynamic configuration passed from Agora Health
+          # Use jq to filter the array by _tenant_id, then extract properties
+          URL_A=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_a")
+          URL_B=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .url_b")
+          TARGET_PROPOSALS=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_proposals")
+          TARGET_TYPES=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_types")
+          TARGET_DELEGATES_SORT_BY=$(echo "$PAYLOADS_JSON" | jq -r ".[] | select(._tenant_id == \"$TENANT_CONTEXT\") | .target_delegates_sort_by")
+          
+          echo "URL_A=$URL_A" >> $GITHUB_ENV
+          echo "URL_B=$URL_B" >> $GITHUB_ENV
+          
+          if [ "$TARGET_PROPOSALS" != "null" ] && [ "$TARGET_PROPOSALS" != "" ]; then
+            echo "TARGET_PROPOSALS=$TARGET_PROPOSALS" >> $GITHUB_ENV
+            echo "Target Proposals Override set to: $TARGET_PROPOSALS"
           fi
           
+          if [ "$TARGET_TYPES" != "null" ] && [ "$TARGET_TYPES" != "" ]; then
+            echo "TARGET_TYPES=$TARGET_TYPES" >> $GITHUB_ENV
+            echo "Target Types Override set to: $TARGET_TYPES"
+          fi
+
+          if [ "$TARGET_DELEGATES_SORT_BY" != "null" ] && [ "$TARGET_DELEGATES_SORT_BY" != "" ]; then
+            echo "TARGET_DELEGATES_SORT_BY=$TARGET_DELEGATES_SORT_BY" >> $GITHUB_ENV
+            echo "Target Delegates Sort By set to: $TARGET_DELEGATES_SORT_BY"
+          fi
+
       - name: Run Dedicated Tenant Assertion
         continue-on-error: true
         env:
           TENANT_CONTEXT: ${{ matrix.tenant }}
-          URL_A: ${{ env.OP_URL_A }}
-          # NOTE: Sudheer's backend logic for `feat/a-b-allProposals` will automatically scan through all CPLS proposals based on the domain URL or tenant context.
+          SCAN_ALL_ARCHIVE: false
         run: npm run test:ab
 
       - name: Google Auth

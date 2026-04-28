@@ -26,8 +26,6 @@ import {
 import { getPublicClient } from "@/lib/viem";
 import {
   addRecipientAttributeValue,
-  buildForumTopicUrl,
-  buildProfileUrl,
   emitBroadcastEvent,
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
@@ -557,12 +555,11 @@ export async function createForumTopic(
         },
         {
           dao_name: slug,
+          topic_id: newTopic.id,
           topic_title: newTopic.title,
-          topic_url: buildForumTopicUrl(newTopic.id, newTopic.title),
           category_name: category?.name ?? "General",
           author_address: normalizedAddress,
           author_display_name: authorDisplayName,
-          author_profile_url: buildProfileUrl(normalizedAddress),
         }
       );
     }
@@ -1161,6 +1158,12 @@ export const getForumData = async ({
     const processedTopics = topics.map((topic) => ({
       ...topic,
       createdAt: topic.createdAt.toISOString(),
+      revealTime: topic.revealTime
+        ? (topic.revealTime instanceof Date
+            ? topic.revealTime
+            : new Date(topic.revealTime)
+          ).toISOString()
+        : null,
       upvotes: (topic as any).posts[0]?._count?.votes || 0,
       firstPost: (topic as any).posts[0],
       postsCount: (topic as any)._count.posts,

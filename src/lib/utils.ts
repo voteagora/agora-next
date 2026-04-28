@@ -273,7 +273,7 @@ export function formatNumber(
     Number(wholePart) + Number(fractionalPart) / Number(divisor);
 
   if (useSpecialFormatting) {
-    if (standardUnitAmount === 0) return "";
+    if (standardUnitAmount === 0) return "0";
     if (standardUnitAmount >= 1.5) {
       const rounded = Math.round(standardUnitAmount);
       return new Intl.NumberFormat("en", {
@@ -571,6 +571,18 @@ export const getTransportForChain = (chainId: number) => {
     case 56:
       return http(
         FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
+
+    // shape mainnet
+    case 360:
+      return http(
+        FORK_NODE_URL || `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
+
+    // shape sepolia
+    case 11011:
+      return http(
+        FORK_NODE_URL || `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
       );
 
     // for each new dao with a new chainId add them here

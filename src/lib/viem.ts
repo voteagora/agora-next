@@ -16,6 +16,8 @@ import {
   optimismSepolia,
   scroll,
   sepolia,
+  shape,
+  shapeSepolia,
   linea,
   lineaSepolia,
 } from "viem/chains";
@@ -96,6 +98,18 @@ export const getWalletClient = (chainId: number) => {
         transport,
       });
 
+    case shape.id:
+      return createWalletClient({
+        chain: shape,
+        transport,
+      });
+
+    case shapeSepolia.id:
+      return createWalletClient({
+        chain: shapeSepolia,
+        transport,
+      });
+
     default:
       throw new Error("Invalid chainId");
   }
@@ -123,6 +137,10 @@ export const getChainById = (chainId: number): Chain | null => {
       return linea;
     case lineaSepolia.id:
       return lineaSepolia;
+    case shape.id:
+      return shape;
+    case shapeSepolia.id:
+      return shapeSepolia;
     case arbitrum.id:
       return arbitrum;
     case arbitrumSepolia.id:

@@ -35,7 +35,6 @@ interface DocumentsSectionProps {
 const DocumentsSection = ({
   initialDocuments,
   hideHeader = false,
-  hideComms = false,
 }: DocumentsSectionProps) => {
   const [documents, setDocuments] = useState<ForumDocument[]>(
     initialDocuments || []
