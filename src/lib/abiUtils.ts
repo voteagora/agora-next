@@ -74,12 +74,16 @@ const { contracts } = Tenant.current();
 const fallbackGetContractAbi = async (
   contractAddress: string
 ): Promise<AbiItem[] | null> => {
-  const fallbackUrl = `${process.env.STORAGE_BUCKET_URL}${contracts.governor.chain.id}/${contractAddress.toLowerCase()}.json`;
-  const fallbackResponse = await axios.get(fallbackUrl);
-  const fallbackData = fallbackResponse.data;
-  if (fallbackResponse.status === 200) {
-    return fallbackData;
-  } else {
+  try {
+    const fallbackUrl = `${process.env.STORAGE_BUCKET_URL}${contracts.governor.chain.id}/${contractAddress.toLowerCase()}.json`;
+    const fallbackResponse = await axios.get(fallbackUrl);
+    const fallbackData = fallbackResponse.data;
+    if (fallbackResponse.status === 200) {
+      return fallbackData;
+    } else {
+      return null;
+    }
+  } catch {
     return null;
   }
 };
