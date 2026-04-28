@@ -100,11 +100,20 @@ const InfoAbout = () => {
               <h3 className="text-lg font-bold text-primary">
                 {ui.customization?.customAboutSubtitle || "About " + brandName}
               </h3>
-              <p
-                className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
-              >
-                {page.description}
-              </p>
+
+              {Array.isArray(page.description) ? (
+                <ul className="text-secondary mt-3 list-disc pl-5">
+                  {page.description.map((descriptionItem, index) => (
+                    <li key={index}>{descriptionItem}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p
+                  className={`text-secondary mt-3 ${ui.toggle("hide-hero-image")?.enabled ? "whitespace-pre-line" : ""}`}
+                >
+                  {page.description}
+                </p>
+              )}
             </div>
             {/* So the image doesn't look smooshed for scroll :eye-roll: */}
             {namespace === TENANT_NAMESPACES.SCROLL && (
