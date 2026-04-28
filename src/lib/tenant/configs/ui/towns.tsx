@@ -337,6 +337,16 @@ export const townsTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        proposalAttestation: true,
+      },
+    },
+    {
       name: "tax-form",
       enabled: false,
       config: {

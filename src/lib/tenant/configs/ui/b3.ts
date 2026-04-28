@@ -267,6 +267,17 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       },
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        governanceAdmin: true,
+      },
+    },
+    {
       name: "safe-proposal-choice",
       enabled: true,
     },
