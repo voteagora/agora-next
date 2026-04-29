@@ -6554,12 +6554,17 @@ model ForumRoleChangeAudit {
 model DaoFinancialMetrics {
     id        Int      @id @default(autoincrement())
     dao_slug  DaoSlug
+    topic_id  Int?
+    year      Int?
+    month     String?
     data      Json
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
     @@index([dao_slug], name: "idx_dao_financial_metrics_dao_slug")
+    @@index([topic_id], name: "idx_dao_financial_metrics_topic_id")
     @@index([createdAt(sort: Desc)], name: "idx_dao_financial_metrics_created_at")
+    @@index([dao_slug, year, month], name: "idx_dao_financial_metrics_reporting_period")
     @@map("dao_financial_metrics")
     @@schema("alltenant")
 }
