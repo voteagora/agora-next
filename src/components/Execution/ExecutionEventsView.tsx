@@ -7,7 +7,7 @@ import { useExecutionTxLogs } from "@/hooks/useExecutionTxLogs";
 import { getExecutionView } from "@/lib/execution/executionViewsConfig";
 import {
   buildExecutionLogPresentation,
-  formatExecutionAddressLabel,
+  formatExecutionAddressDisplay,
   pairExecutionLogsForDisplay,
   type ExecutionLogField,
 } from "@/lib/execution/logPresentation";
@@ -32,9 +32,9 @@ function AddressValue({ address }: { address: `0x${string}` }) {
           href={getBlockScanAddress(address)}
           target="_blank"
           rel="noreferrer noopener"
-          className="inline-flex min-w-0 items-center gap-1 text-sm font-medium text-primary hover:underline"
+          className="inline-flex min-w-0 items-center gap-1 text-xs font-medium text-primary hover:underline"
         >
-          {formatExecutionAddressLabel(address)}
+          {formatExecutionAddressDisplay(address)}
           <ArrowTopRightOnSquareIcon className="h-3 w-3 shrink-0" />
         </a>
       </ExecutionAddressTooltip>
@@ -157,9 +157,9 @@ export function ExecutionEventsView({ txHash }: { txHash: string }) {
                         href={getBlockScanAddress(log.address)}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="inline-flex items-center gap-1 text-xs font-medium text-tertiary transition-colors hover:text-primary"
+                        className="inline-flex items-center gap-1 text-[11px] font-medium text-tertiary transition-colors hover:text-primary"
                       >
-                        {formatExecutionAddressLabel(log.address)}
+                        {formatExecutionAddressDisplay(log.address)}
                         <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5" />
                       </a>
                     </ExecutionAddressTooltip>

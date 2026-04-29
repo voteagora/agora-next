@@ -322,6 +322,9 @@ export default function ProposalVotesSummaryDetails({
                 ? getBlockScanUrl(proposal.executedTransactionHash)
                 : undefined
             }
+            executionInspectorTxHash={
+              proposal.executedTransactionHash ?? undefined
+            }
           />
         ) : null}
       </ol>

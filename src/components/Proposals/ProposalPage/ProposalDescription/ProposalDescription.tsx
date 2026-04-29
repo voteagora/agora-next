@@ -10,8 +10,6 @@ import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransact
 import ProposalChart from "../ProposalChart/ProposalChart";
 import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
-import { ExecutionInspectorSection } from "./ExecutionInspectorSection";
-
 const { contracts, namespace } = Tenant.current();
 
 export default function ProposalDescription({
@@ -185,9 +183,6 @@ export default function ProposalDescription({
             proposal={proposal}
           />
         )}
-        <ExecutionInspectorSection
-          executedTransactionHash={proposal.executedTransactionHash}
-        />
         <RelatedProposalLinks proposalId={proposal.id} />
         <Markdown
           content={stripTitleFromDescription(

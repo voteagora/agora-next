@@ -33,6 +33,8 @@ import {
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
+
 import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
@@ -152,14 +154,20 @@ const ProposalTransactionDisplay = ({
           <div className="w-full flex items-center justify-between">
             <span className="text-xs text-tertiary">{actionsLabel}</span>
             {actionsLink && (
-              <a
-                href={getBlockScanUrl(actionsLink)}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-tertiary hover:text-primary transition-colors"
-              >
-                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-              </a>
+              <span className="inline-flex items-center gap-1">
+                <a
+                  href={getBlockScanUrl(actionsLink)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-tertiary hover:text-primary transition-colors"
+                >
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                </a>
+                <ExecutionTxInspectorIconLink
+                  txHash={actionsLink}
+                  iconClassName="h-3 w-3"
+                />
+              </span>
             )}
           </div>
           <div className="text-xs text-tertiary mt-1">
@@ -264,14 +272,17 @@ const ProposalTransactionDisplay = ({
                     {actionsLabel}
                   </span>
                   {actionsLink && (
-                    <a
-                      href={getBlockScanUrl(actionsLink)}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                    </a>
+                    <span className="inline-flex items-center gap-1">
+                      <a
+                        href={getBlockScanUrl(actionsLink)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                      </a>
+                      <ExecutionTxInspectorIconLink txHash={actionsLink} />
+                    </span>
                   )}
                   {TENDERLY_VALID_CHAINS.includes(
                     contracts.governor.chain.id

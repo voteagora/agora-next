@@ -6,7 +6,7 @@ import {
   ChevronDownIcon,
 } from "@heroicons/react/20/solid";
 import { useExecutionTxOverview } from "@/hooks/useExecutionTxOverview";
-import { formatExecutionAddressLabel } from "@/lib/execution/logPresentation";
+import { formatExecutionAddressDisplay } from "@/lib/execution/logPresentation";
 import { getBlockScanAddress, getBlockScanUrl, cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { ExecutionAddressTooltip, ExecutionHashCopy } from "./ExecutionUi";
@@ -30,17 +30,17 @@ function AddressRow({
   }
 
   const addr = address ?? "";
-  const display = formatExecutionAddressLabel(addr);
+  const display = formatExecutionAddressDisplay(addr);
   return (
-    <div className="min-w-0 text-sm sm:text-base">
+    <div className="min-w-0 text-xs sm:text-sm">
       <span className="text-tertiary">{label} </span>
       <ExecutionAddressTooltip address={addr}>
         <a
           className={cn(
             "text-primary hover:underline",
             display.startsWith("0x")
-              ? "font-mono text-sm"
-              : "text-sm font-medium"
+              ? "font-mono text-xs"
+              : "text-xs font-medium"
           )}
           href={getBlockScanAddress(addr)}
           target="_blank"

@@ -1,4 +1,5 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
 
 interface StepperRowProps {
   label: string;
@@ -6,6 +7,7 @@ interface StepperRowProps {
   isCompleted?: boolean;
   isLastStep?: boolean;
   href?: string;
+  executionInspectorTxHash?: string;
 }
 
 export const StepperRow = ({
@@ -14,6 +16,7 @@ export const StepperRow = ({
   isCompleted,
   isLastStep,
   href,
+  executionInspectorTxHash,
 }: StepperRowProps) => {
   const colorClass = isCompleted ? "text-primary" : "text-secondary";
 
@@ -29,15 +32,23 @@ export const StepperRow = ({
         <div className="w-full flex items-center justify-between text-xs font-semibold">
           <div className={`${colorClass} flex items-center gap-x-1`}>
             {href ? (
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="hover:underline flex items-center gap-x-1"
-              >
-                {label}
-                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-              </a>
+              <span className="inline-flex items-center gap-x-1">
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="flex items-center gap-x-1 hover:underline"
+                >
+                  {label}
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                </a>
+                {executionInspectorTxHash ? (
+                  <ExecutionTxInspectorIconLink
+                    txHash={executionInspectorTxHash}
+                    iconClassName="h-3 w-3"
+                  />
+                ) : null}
+              </span>
             ) : (
               label
             )}

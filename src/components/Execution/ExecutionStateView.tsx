@@ -18,7 +18,7 @@ import {
 } from "@/lib/execution/executionViewsConfig";
 import {
   buildExecutionLogPresentation,
-  formatExecutionAddressLabel,
+  formatExecutionAddressDisplay,
   pairExecutionLogsForDisplay,
   type ExecutionLogField,
 } from "@/lib/execution/logPresentation";
@@ -44,7 +44,7 @@ function CompactLogFieldValue({ field }: { field: ExecutionLogField }) {
     const full = (field.fullValue ?? field.address) as `0x${string}`;
     return (
       <ExecutionAddressTooltip address={full}>
-        <span className="cursor-default text-sm font-medium text-primary">
+        <span className="cursor-default text-xs font-medium text-primary">
           {field.value}
         </span>
       </ExecutionAddressTooltip>
@@ -89,12 +89,12 @@ function AddressLink({ address }: { address: string }) {
   return (
     <ExecutionAddressTooltip address={address}>
       <a
-        className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+        className="text-xs font-medium text-primary underline-offset-2 hover:underline"
         href={getBlockScanAddress(address)}
         target="_blank"
         rel="noreferrer noopener"
       >
-        {formatExecutionAddressLabel(address)}
+        {formatExecutionAddressDisplay(address)}
       </a>
     </ExecutionAddressTooltip>
   );
@@ -345,9 +345,9 @@ export function ExecutionStateView({ txHash }: { txHash: string }) {
                         href={getBlockScanAddress(row.token)}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="inline-flex min-w-0 items-center gap-1 text-sm font-medium text-primary hover:underline"
+                        className="inline-flex min-w-0 items-center gap-1 text-xs font-medium text-primary hover:underline"
                       >
-                        {formatExecutionAddressLabel(row.token)}
+                        {formatExecutionAddressDisplay(row.token)}
                         <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 shrink-0" />
                       </a>
                     </ExecutionAddressTooltip>

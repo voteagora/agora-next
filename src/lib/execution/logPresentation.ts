@@ -77,6 +77,10 @@ type ParsedOpaqueData = {
   data: `0x${string}`;
 };
 
+export function formatExecutionAddressDisplay(address: string): string {
+  return getFriendlyName(address) ?? address;
+}
+
 export function formatExecutionAddressLabel(address: string): string {
   return getFriendlyName(address) ?? shortAddress(address);
 }
@@ -1065,7 +1069,7 @@ function addressField(
   return {
     label: humanizeLabel(label),
     type: "address",
-    value: formatExecutionAddressLabel(address),
+    value: formatExecutionAddressDisplay(address),
     fullValue: address,
     address,
   };
