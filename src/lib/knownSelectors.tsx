@@ -117,21 +117,24 @@ function SplitRecipientRow({
       ? ((Number(allocation) / Number(totalAllocation)) * 100).toFixed(4)
       : "0.0000";
 
-  const displayName =
-    ensData?.name || `${address.slice(0, 4)}...${address.slice(-4)}`;
+  const displayName = ensData?.name || address;
 
   return (
-    <div ref={ref} className="flex items-center gap-2 text-xs">
+    <div ref={ref} className="flex items-center text-xs">
       <a
         href={getBlockScanAddress(address)}
         target="_blank"
         rel="noopener noreferrer"
-        className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+        className={`hover:underline w-80 truncate ${ensData?.name ? "" : "font-mono"}`}
       >
         {displayName}
       </a>
-      <span className="text-tertiary">{ppm} ppm</span>
-      <span className="text-tertiary">({pct}%)</span>
+      <span className="text-tertiary tabular-nums w-20 text-right">
+        {ppm} ppm
+      </span>
+      <span className="text-tertiary tabular-nums w-20 text-right ml-2">
+        ({pct}%)
+      </span>
     </div>
   );
 }
