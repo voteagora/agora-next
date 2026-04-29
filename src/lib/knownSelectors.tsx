@@ -12,6 +12,7 @@ import {
   hasSchemaName,
 } from "./knownAddresses";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
+import { useInView } from "react-intersection-observer";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
@@ -93,6 +94,7 @@ function maybeFriendlyAddress(address?: string) {
 
 /**
  * Recipient row for Split distributions — shows address (or ENS if resolved), ppm, and %.
+ * ENS is lazy-loaded only when the row scrolls into view.
  */
 function SplitRecipientRow({
   address,
@@ -103,9 +105,10 @@ function SplitRecipientRow({
   allocation: bigint;
   totalAllocation: bigint;
 }) {
+  const { ref, inView } = useInView({ triggerOnce: true });
   const { data: ensData } = useBlockCacheWrappedEns({
     address: address as `0x${string}`,
-    enabled: !!address,
+    enabled: inView && !!address,
   });
 
   const ppm = allocation.toLocaleString();
@@ -118,7 +121,7 @@ function SplitRecipientRow({
     ensData?.name || `${address.slice(0, 4)}...${address.slice(-4)}`;
 
   return (
-    <div className="flex items-center gap-2 text-xs">
+    <div ref={ref} className="flex items-center gap-2 text-xs">
       <a
         href={getBlockScanAddress(address)}
         target="_blank"
