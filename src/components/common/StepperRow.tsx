@@ -54,7 +54,7 @@ export const StepperRow = ({
             )}
           </div>
 
-          <p className="text-xs font-medium text-secondary">{value}</p>
+          <p className="text-[11px] font-medium text-secondary">{value}</p>
         </div>
       </div>
     </li>

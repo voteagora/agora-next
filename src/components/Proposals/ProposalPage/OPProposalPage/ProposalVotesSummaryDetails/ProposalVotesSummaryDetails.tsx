@@ -1,6 +1,5 @@
 import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
-import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -9,7 +8,6 @@ import {
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
-import Link from "next/link";
 import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
