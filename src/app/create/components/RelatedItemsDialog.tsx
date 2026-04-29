@@ -17,7 +17,6 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
-import { stripHtmlToText } from "@/app/forums/stripHtml";
 import { useRelatedItemsDialog } from "../hooks/useRelatedItemsDialog";
 import Tenant from "@/lib/tenant/tenant";
 import { useEffect } from "react";
@@ -50,9 +49,6 @@ export function RelatedItemsDialog({
     ].join(" ");
   const titleClass =
     "font-medium text-sm leading-tight mb-1 pr-20 break-words text-primary";
-  const descriptionClass = isDarkTenant
-    ? "text-xs text-secondary line-clamp-2 mb-2 break-words"
-    : "text-xs text-gray-500 line-clamp-2 mb-2 break-words";
   const metaClass = isDarkTenant
     ? "flex items-center gap-3 text-xs text-secondary flex-wrap"
     : "flex items-center gap-3 text-xs text-gray-500 flex-wrap";
@@ -155,11 +151,6 @@ export function RelatedItemsDialog({
                       </div>
                     )}
                     <p className={titleClass}>{item.title}</p>
-                    {item.description && (
-                      <p className={descriptionClass}>
-                        {stripHtmlToText(item.description)}
-                      </p>
-                    )}
                     <div className={metaClass}>
                       <span className="flex items-center gap-1">
                         <MessageSquare className="h-3 w-3" />
