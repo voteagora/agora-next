@@ -63,10 +63,12 @@ export default function ApprovedTransactions({
             >
               <ArrowTopRightOnSquareIcon className="w-3 h-3" />
             </a>
-            <ExecutionTxInspectorIconLink
-              txHash={actionsLink}
-              iconClassName="h-3 w-3"
-            />
+            {proposal?.status === "EXECUTED" && (
+              <ExecutionTxInspectorIconLink
+                txHash={actionsLink}
+                iconClassName="h-3 w-3"
+              />
+            )}
           </span>
         )}
       </div>

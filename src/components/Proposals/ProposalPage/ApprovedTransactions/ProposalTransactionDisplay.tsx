@@ -108,7 +108,6 @@ const ProposalTransactionDisplay = ({
   values,
   descriptions,
   executedTransactionHash,
-  simulationDetails,
   network = "mainnet",
   signatures,
   proposal,
@@ -163,10 +162,12 @@ const ProposalTransactionDisplay = ({
                 >
                   <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                 </a>
-                <ExecutionTxInspectorIconLink
-                  txHash={actionsLink}
-                  iconClassName="h-3 w-3"
-                />
+                {proposal?.status === "EXECUTED" && (
+                  <ExecutionTxInspectorIconLink
+                    txHash={actionsLink}
+                    iconClassName="h-3 w-3"
+                  />
+                )}
               </span>
             )}
           </div>
@@ -281,7 +282,9 @@ const ProposalTransactionDisplay = ({
                       >
                         <ArrowTopRightOnSquareIcon className="w-4 h-4" />
                       </a>
-                      <ExecutionTxInspectorIconLink txHash={actionsLink} />
+                      {proposal?.status === "EXECUTED" && (
+                        <ExecutionTxInspectorIconLink txHash={actionsLink} />
+                      )}
                     </span>
                   )}
                   {TENDERLY_VALID_CHAINS.includes(
