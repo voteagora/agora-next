@@ -41,10 +41,6 @@ function propHeader(vote: Vote) {
     } else {
       headerString = `Voted on ${vote.params?.length} options in this proposal `;
     }
-
-  if (vote.proposalValue != 0n)
-    headerString += ` asking ${formatNumber(vote.proposalValue)} ETH `;
-
   headerString += `${formatDistanceToNow(new Date(vote.timestamp ?? 0))} ago`;
   return headerString;
 }
