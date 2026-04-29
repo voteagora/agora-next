@@ -29,7 +29,7 @@ export default function ProposalStatus({ proposal }) {
 
   return (
     <div
-      data-testid="proposal-status"
+      data-testid={`proposal-status-${proposal.id}`}
       className={cn(
         approved.includes(proposal.status.toLowerCase()) && "text-positive",
         rejected.includes(proposal.status.toLowerCase()) && "text-negative",
