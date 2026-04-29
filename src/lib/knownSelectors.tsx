@@ -1039,18 +1039,27 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
         <div className="text-sm text-primary space-y-2">
           <div>
             Distribute {tokenDisplay} through {maybeFriendlyAddress(target)} to{" "}
-            <span className="font-semibold">{count}</span> members
+            <span className="font-semibold">{count}</span> members.
           </div>
           <div className="text-secondary">
-            Distribution incentive: {incentivePct}% paid to{" "}
-            {maybeFriendlyAddress(distributorAddress)}
+            {incentivePpm === 0 ? (
+              <>
+                No distribution incentive paid to{" "}
+                {maybeFriendlyAddress(distributorAddress)}.
+              </>
+            ) : (
+              <>
+                Distribution incentive: {incentivePct}% paid to{" "}
+                {maybeFriendlyAddress(distributorAddress)}.
+              </>
+            )}
           </div>
           <div className="text-secondary">
-            Total allocation: {totalAllocation.toLocaleString()} ppm
+            Total allocation: {totalAllocation.toLocaleString()} ppm.
           </div>
           {count > 0 && (
             <div
-              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+              className={`space-y-1 pl-4 pt-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
             >
               {recipientData.map((r, i) => (
                 <SplitRecipientRow
@@ -1105,18 +1114,20 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Update {maybeFriendlyAddress(target)} membership configuration
+            Update {maybeFriendlyAddress(target)} membership configuration.
           </div>
           <div className="text-secondary">
             {count} recipients, total allocation{" "}
-            {totalAllocation.toLocaleString()} ppm
+            {totalAllocation.toLocaleString()} ppm.
           </div>
           <div className="text-secondary">
-            Distribution incentive: {incentivePct}%
+            {incentivePpm === 0
+              ? "No distribution incentive."
+              : `Distribution incentive: ${incentivePct}%.`}
           </div>
           {count > 0 && (
             <div
-              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+              className={`space-y-1 pl-4 pt-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
             >
               {recipientData.map((r, i) => (
                 <SplitRecipientRow
