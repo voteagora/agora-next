@@ -51,20 +51,17 @@ const DocumentsSection = ({
   const { hasPermission: canCreateFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "create",
-    { autoAuthenticate: true }
+    "create"
   );
   const { hasPermission: canArchiveFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "archive",
-    { autoAuthenticate: true }
+    "archive"
   );
   const { hasPermission: canDeleteFilings } = useHasPermission(
     "duna_filings",
     "filings",
-    "delete",
-    { autoAuthenticate: true }
+    "delete"
   );
 
   const { ui } = Tenant.current();
