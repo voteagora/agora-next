@@ -6,7 +6,7 @@
  * tests/__mocks__/dao_node/ and tests/__mocks__/eas-atlas/.
  *
  * List-page assertions use `data-testid="proposal-list-item-{id}"` on the row
- * and `data-testid="proposal-status"` for the status pill.
+ * and `data-testid="proposal-status-{id}"` for the status pill.
  *
  * Detail-page assertions use:
  *   - `data-testid="proposal-title"` for the proposal title
@@ -168,7 +168,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
 
       // All status pills within the row should agree on the expected status.
       // BaseRowLayout renders the status pill once (mobile) or twice (desktop).
-      const statusPills = row.getByTestId("proposal-status");
+      const statusPills = row.getByTestId(`proposal-status-${id}`);
       const count = await statusPills.count();
       expect(count).toBeGreaterThan(0);
 
@@ -184,7 +184,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
     const row = page.getByTestId(`proposal-list-item-${id}`);
     await expect(row).toBeVisible({ timeout: 15000 });
 
-    const statusPills = row.getByTestId("proposal-status");
+    const statusPills = row.getByTestId(`proposal-status-${id}`);
     const count = await statusPills.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
@@ -200,7 +200,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
     const row = page.getByTestId(`proposal-list-item-${id}`);
     await expect(row).toBeVisible({ timeout: 15000 });
 
-    const statusPills = row.getByTestId("proposal-status");
+    const statusPills = row.getByTestId(`proposal-status-${id}`);
     const count = await statusPills.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
@@ -332,7 +332,9 @@ test.describe("Proposals archive detail – Hybrid Standard", () => {
 });
 
 test.describe("Proposals archive detail – Approval", () => {
-  test("APPROVAL defeated: results panel visible + badge + specific values", async ({ page }) => {
+  test("APPROVAL defeated: results panel visible + badge + specific values", async ({
+    page,
+  }) => {
     await gotoDetail(page, syntheticId(7));
 
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
