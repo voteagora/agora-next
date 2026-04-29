@@ -1175,16 +1175,13 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       return (
         <div className="text-sm text-primary space-y-2">
           <div>
-            Update {maybeFriendlyAddress(target)} membership configuration.
+            Update {maybeFriendlyAddress(target)} membership configuration for{" "}
+            <span className="font-semibold">{count}</span> members.
           </div>
           <div className="text-secondary">
-            {count} recipients, total allocation{" "}
-            {totalAllocation.toLocaleString()} ppm.
-          </div>
-          <div className="text-secondary">
-            {incentivePpm === 0
-              ? "No distribution incentive."
-              : `Distribution incentive: ${incentivePct}%.`}
+            Total allocation: {totalAllocation.toLocaleString()} ppm.
+            {incentivePpm > 0 &&
+              ` Distribution incentive set to ${incentivePct}%.`}
           </div>
           {count > 0 && (
             <div

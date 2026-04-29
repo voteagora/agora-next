@@ -416,21 +416,23 @@ const ProposalTransactionDisplay = ({
             </div>
           </div>
 
-          <div
-            className={cn(
-              "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
-              hasRealActions
-                ? "border border-t-0 border-line rounded-b-lg"
-                : "border-x border-b border-t border-line rounded-b-lg"
-            )}
-            onClick={() => {
-              setCollapsed(!collapsed);
-            }}
-          >
-            {collapsed
-              ? `Expand all actions (${normalizedLength})`
-              : "Collapse actions"}
-          </div>
+          {normalizedLength > 1 && (
+            <div
+              className={cn(
+                "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
+                hasRealActions
+                  ? "border border-t-0 border-line rounded-b-lg"
+                  : "border-x border-b border-t border-line rounded-b-lg"
+              )}
+              onClick={() => {
+                setCollapsed(!collapsed);
+              }}
+            >
+              {collapsed
+                ? `Expand all actions (${normalizedLength})`
+                : "Collapse actions"}
+            </div>
+          )}
         </>
       )}
     </div>
