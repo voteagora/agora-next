@@ -13,15 +13,24 @@ import {
 } from "./knownAddresses";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { useInView } from "react-intersection-observer";
+import { useOwnerOfAtBlock } from "@/hooks/useOwnerOfAtBlock";
 
 // ────────────────────────────────────────────────────────────────────────────
 // Types
 // ────────────────────────────────────────────────────────────────────────────
 
+export interface ProposalContext {
+  snapshotBlockNumber?: number;
+}
+
 export interface SelectorAdapter {
   name: string;
   prettyName: string;
-  prettyRender: (decodedData: DecodedData, target?: string) => React.ReactNode;
+  prettyRender: (
+    decodedData: DecodedData,
+    target?: string,
+    proposalContext?: ProposalContext
+  ) => React.ReactNode;
 }
 
 interface DecodedDataParam {
@@ -135,6 +144,55 @@ function SplitRecipientRow({
       <span className="text-tertiary tabular-nums w-20 text-right ml-2">
         ({pct}%)
       </span>
+    </div>
+  );
+}
+
+/**
+ * Row for burn membership display — shows token ID and owner (at snapshot block).
+ * Owner lookup is lazy-loaded when row scrolls into view.
+ */
+function BurnTokenRow({
+  tokenId,
+  tokenAddress,
+  snapshotBlockNumber,
+}: {
+  tokenId: string;
+  tokenAddress: `0x${string}`;
+  snapshotBlockNumber?: number;
+}) {
+  const { ref, inView } = useInView({ triggerOnce: true });
+  const { data: owner } = useOwnerOfAtBlock({
+    tokenAddress,
+    tokenId: BigInt(tokenId),
+    blockNumber: snapshotBlockNumber,
+    enabled: inView && !!snapshotBlockNumber,
+  });
+
+  const { data: ensData } = useBlockCacheWrappedEns({
+    address: (owner || "0x") as `0x${string}`,
+    enabled: inView && !!owner,
+  });
+
+  const ownerDisplay = owner ? ensData?.name || owner : null;
+
+  return (
+    <div ref={ref} className="text-xs flex items-center">
+      <span className="font-mono w-28">Token ID: {tokenId}</span>
+      {ownerDisplay && (
+        <span className="text-secondary">
+          (Owned by:{" "}
+          <a
+            href={getBlockScanAddress(owner!)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+          >
+            {ownerDisplay}
+          </a>
+          )
+        </span>
+      )}
     </div>
   );
 }
@@ -959,7 +1017,7 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
   "0xb80f55c9": {
     name: "burn",
     prettyName: "Burn Membership",
-    prettyRender: (decodedData, target) => {
+    prettyRender: (decodedData, target, proposalContext) => {
       const tokenIds = collectArrayByType(decodedData.parameters, "uint256[]");
       const count = tokenIds.length;
 
@@ -974,9 +1032,12 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
               className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
             >
               {tokenIds.map((id, i) => (
-                <div key={i} className="font-mono text-xs">
-                  Token ID: {id}
-                </div>
+                <BurnTokenRow
+                  key={i}
+                  tokenId={id}
+                  tokenAddress={target as `0x${string}`}
+                  snapshotBlockNumber={proposalContext?.snapshotBlockNumber}
+                />
               ))}
             </div>
           )}
