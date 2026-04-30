@@ -72,11 +72,14 @@ jobs:
           NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
           NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
         run: |
+          # Start the Fawkes wallet server in the background
+          node node_modules/fawkes-wallet/src/server.js &
+
           # Start the production server in the background (within the same step so it survives)
           npm run start &
-
-          # Wait for Next.js to start serving
-          echo "Waiting for Next.js to boot on port 3000..."
-          npx wait-on http://127.0.0.1:3000 -t 30000
+          
+          # Wait for both servers to boot
+          echo "Waiting for Next.js and Fawkes Wallet to boot..."
+          npx wait-on http://127.0.0.1:3000 http://127.0.0.1:4000/wallet/status -t 60000
 
           npx playwright test tests/web3/proposal-create.spec.ts --project=chromium
