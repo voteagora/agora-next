@@ -56,6 +56,8 @@ jobs:
           NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
           NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
         run: |
+          npm run generate-typechain
+          npx prisma generate
           npm run build
           npm run start &
           sleep 15
