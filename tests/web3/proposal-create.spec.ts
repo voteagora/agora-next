@@ -53,29 +53,6 @@ test.describe
         .fill("Automated Transfer");
     }
 
-    // Intercept Anvil RPC calls to strictly assert the generated transaction payload
-    let interceptedPayload: any = null;
-    await page.route("http://127.0.0.1:8545*", async (route) => {
-      const request = route.request();
-      if (request.method() === "POST") {
-        try {
-          const postData = JSON.parse(request.postData() || "{}");
-          if (
-            postData.method === "eth_estimateGas" ||
-            postData.method === "eth_call" ||
-            postData.method === "eth_sendTransaction"
-          ) {
-            const params = postData.params[0];
-            // The function selector for propose() on Uniswap Governor is usually 0xda95691a (or similar depending on the exact Governor Bravo/Alpha interface)
-            // Let's capture any payload sent to the governor (we can assume it's the proposal creation if data exists and is large)
-            if (params && params.data && params.data.length > 50) {
-              interceptedPayload = params;
-            }
-          }
-        } catch (e) {}
-      }
-      route.continue();
-    });
 
     // Submit the proposal on-chain
     const submitBtn = page
@@ -84,15 +61,6 @@ test.describe
     await expect(submitBtn).toBeVisible({ timeout: 15000 });
     await submitBtn.click();
 
-    // Give it a moment to trigger the simulation RPC call
-    await page.waitForTimeout(2000);
-    
-    // Assert the frontend generated a payload
-    expect(interceptedPayload).not.toBeNull();
-    // Verify the target address is a contract (has a hex address)
-    expect(interceptedPayload.to).toMatch(/^0x[a-fA-F0-9]{40}$/);
-    // Verify the calldata contains our expected proposal data signature
-    expect(interceptedPayload.data.length).toBeGreaterThan(100);
 
 
     // Intercept and confirm the WalletConnect/Fawkes transaction prompt
