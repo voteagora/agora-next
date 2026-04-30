@@ -53,11 +53,56 @@ export interface SimulationConfigNewApproval {
   totalNumOfOptions?: number;
 }
 
+export enum BridgeKind {
+  ARBITRUM_RETRYABLE = "arbitrum_retryable",
+  OPTIMISM_SEND_MESSAGE = "optimism_send_message",
+  WORMHOLE = "wormhole",
+}
+
+export type CrossChainExecutionStepResult = {
+  label: string;
+  ok: boolean;
+  skipped?: boolean;
+  skipReason?: string;
+  error?: string;
+  tenderlySimulationId?: string;
+  nestedSimulation?: TenderlySimulation;
+};
+
+export type CrossChainExecutionJobResult = {
+  bridge: BridgeKind;
+  destinationChainId: number;
+  sourceActionIndex: number;
+  steps: CrossChainExecutionStepResult[];
+};
+
+export interface CrossChainReportSummary {
+  crossChainFailure: boolean;
+  jobs: Array<{
+    bridge: BridgeKind;
+    destinationChainId: number;
+    sourceActionIndex: number;
+    steps: Array<{
+      label: string;
+      ok: boolean;
+      skipped?: boolean;
+      skipReason?: string;
+      error?: string;
+      tenderlySimulationId?: string;
+      tenderlyHref?: string;
+    }>;
+  }>;
+}
+
 export interface SimulationResult {
   sim: TenderlySimulation;
   proposal?: ProposalEvent;
   deps: ProposalData;
   latestBlock: Block;
+  simulationTimestamp?: bigint;
+  destinationJobResults?: CrossChainExecutionJobResult[];
+  destinationStateByChain?: Record<string, Record<string, unknown>>;
+  crossChainFailure?: boolean;
 }
 
 export interface SimulationData extends SimulationResult {
@@ -778,6 +823,7 @@ export interface StructuredSimulationReport {
   stateChanges: SimulationStateChange[];
   events: SimulationEvent[];
   calldata?: SimulationCalldata;
+  crossChain?: CrossChainReportSummary;
   metadata: {
     blockNumber: string;
     timestamp: string;

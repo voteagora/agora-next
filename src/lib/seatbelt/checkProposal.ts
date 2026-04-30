@@ -1,21 +1,24 @@
 "use server";
 
 import { unstable_cache } from "next/cache";
-import { ParsedProposalData } from "../proposalUtils";
-import Tenant from "../tenant/tenant";
-import ALL_CHECKS from "./checks";
-import { generateAndSaveReports } from "./report";
-import { simulateNew, simulateProposed, simulateNewApproval } from "./simulate";
-import {
-  AllCheckResults,
-  SimulationConfigNew,
-  SimulationConfigProposed,
-  SimulationConfigNewApproval,
-  ApprovalProposalSettings,
-  ApprovalProposalOption,
-} from "./types";
+
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+
+import Tenant from "../tenant/tenant";
+import ALL_CHECKS from "./checks";
+import { handleCrossChainSimulations } from "./cross-chain/tenderly-execution-engine";
+import { generateReport } from "./report";
+import { simulateNew, simulateNewApproval, simulateProposed } from "./simulate";
+import {
+  AllCheckResults,
+  ApprovalProposalOption,
+  ApprovalProposalSettings,
+  SimulationConfigNew,
+  SimulationConfigNewApproval,
+  SimulationConfigProposed,
+  SimulationResult,
+} from "./types";
 
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 
@@ -28,6 +31,13 @@ const getBlockCached = unstable_cache(
   ["getBlock-checkProposal"],
   { revalidate: ONE_HOUR_IN_SECONDS }
 );
+
+async function runCrossChainIfL1Ok(
+  simulationResult: SimulationResult
+): Promise<SimulationResult> {
+  if (!simulationResult.sim.transaction.status) return simulationResult;
+  return handleCrossChainSimulations(simulationResult);
+}
 
 export async function checkNewProposal({
   targets,
@@ -59,15 +69,16 @@ export async function checkNewProposal({
     description: "",
   };
 
-  // Generate the proposal data and dependencies needed by checks
   const proposalData = {
     governor,
     provider,
     timelock: tenant.contracts.timelock!,
   };
 
-  // Run simulation
-  const { sim, proposal, latestBlock } = await simulateNew(config);
+  let simulationResult = await simulateNew(config);
+  simulationResult = await runCrossChainIfL1Ok(simulationResult);
+
+  const { sim, proposal, latestBlock } = simulationResult;
 
   if (!proposal) {
     throw new Error("Proposal not correctly simulated");
@@ -75,7 +86,6 @@ export async function checkNewProposal({
 
   proposal.title = title;
 
-  // Run checks
   const checkResults: AllCheckResults = Object.fromEntries(
     await Promise.all(
       Object.keys(ALL_CHECKS).map(async (checkId) => [
@@ -92,7 +102,6 @@ export async function checkNewProposal({
     )
   );
 
-  // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
       ? getBlockCached(provider, Number(proposal.startBlock))
@@ -102,15 +111,11 @@ export async function checkNewProposal({
       : null,
   ]);
 
-  // Save markdown report to a file
-  // todo: correctly save it
-  const dir = `./reports/${tenant.namespace}/${config.governorAddress}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposal,
     checkResults,
-    dir,
-    sim
+    simulationResult
   );
 
   return report;
@@ -133,37 +138,24 @@ export async function checkExistingProposal({
     proposal: existingProposal,
   };
 
-  // Generate the proposal data and dependencies needed by checks
   const proposalData = {
     governor,
     provider,
     timelock: tenant.contracts.timelock!,
   };
 
-  // Run simulation
-  const { sim, latestBlock } = await simulateProposed(config);
+  let simulationResult = await simulateProposed(config);
+  simulationResult = await runCrossChainIfL1Ok(simulationResult);
 
-  const options = (
-    existingProposal.proposalData as ParsedProposalData["STANDARD"]["kind"]
-  ).options;
-  const option = options?.[0];
+  const { sim, latestBlock } = simulationResult;
 
-  const { targets, signatures: sigs, calldatas, values } = option;
-  const proposalEvent = {
-    targets: targets.map((target) => target as `0x${string}`),
-    values: values.map((value) => BigInt(value)),
-    signatures: sigs,
-    calldatas: calldatas.map((data) => data as `0x${string}`),
-    id: BigInt(existingProposal.id),
-    proposalId: BigInt(existingProposal.id),
-    startBlock: BigInt(existingProposal.startBlock!),
-    endBlock: BigInt(existingProposal.endBlock!),
-    description: existingProposal.description ?? "",
-    proposer: existingProposal.proposer,
-    title: existingProposal.markdowntitle ?? "",
-  };
+  const proposalEvent = simulationResult.proposal;
+  if (!proposalEvent) {
+    throw new Error("Proposal not correctly simulated");
+  }
+  proposalEvent.title =
+    proposalEvent.title || existingProposal.markdowntitle || "";
 
-  // Run checks
   const checkResults: AllCheckResults = Object.fromEntries(
     await Promise.all(
       Object.keys(ALL_CHECKS).map(async (checkId) => {
@@ -183,7 +175,6 @@ export async function checkExistingProposal({
     )
   );
 
-  // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
     existingProposal.startBlock &&
     Number(existingProposal.startBlock) <= latestBlock.number
@@ -195,15 +186,11 @@ export async function checkExistingProposal({
       : null,
   ]);
 
-  // Save markdown report to a file
-  // todo: correctly save it
-  const dir = `./reports/${tenant.namespace}/${config.governorAddress}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposalEvent,
     checkResults,
-    dir,
-    sim
+    simulationResult
   );
 
   return report;
@@ -247,15 +234,16 @@ export async function checkNewApprovalProposal({
     totalNumOfOptions,
   };
 
-  // Generate the proposal data and dependencies needed by checks
   const proposalData = {
     governor,
     provider,
     timelock: tenant.contracts.timelock!,
   };
 
-  // Run simulation
-  const { sim, proposal, latestBlock } = await simulateNewApproval(config);
+  let simulationResult = await simulateNewApproval(config);
+  simulationResult = await runCrossChainIfL1Ok(simulationResult);
+
+  const { sim, proposal, latestBlock } = simulationResult;
 
   if (!proposal) {
     throw new Error("Proposal not correctly simulated");
@@ -263,7 +251,6 @@ export async function checkNewApprovalProposal({
 
   proposal.title = title;
 
-  // Run checks
   const checkResults: AllCheckResults = Object.fromEntries(
     await Promise.all(
       Object.keys(ALL_CHECKS).map(async (checkId) => [
@@ -280,7 +267,6 @@ export async function checkNewApprovalProposal({
     )
   );
 
-  // Generate markdown report
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
       ? getBlockCached(provider, Number(proposal.startBlock))
@@ -290,14 +276,11 @@ export async function checkNewApprovalProposal({
       : null,
   ]);
 
-  // Save markdown report to a file
-  const dir = `./reports/${tenant.namespace}/${governor.address}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposal,
     checkResults,
-    dir,
-    sim
+    simulationResult
   );
 
   return report;

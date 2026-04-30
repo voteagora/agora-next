@@ -5,9 +5,11 @@ import { visit } from "unist-util-visit";
 import type { Visitor } from "unist-util-visit";
 import type {
   AllCheckResults,
+  CrossChainReportSummary,
   ProposalEvent,
   SimulationCheck,
   SimulationEvent,
+  SimulationResult,
   SimulationStateChange,
   StructuredSimulationReport,
   TenderlySimulation,
@@ -48,7 +50,7 @@ export function blockQuote(str: string) {
  * @param code whether to link to the code tab
  */
 export function toAddressLink(address: string, code = false) {
-  return `[\`${address}\`](${getBlockScanAddress(address)}${code ? "#code" : ""})`; // todo correct explorer
+  return `[\`${address}\`](${getBlockScanAddress(address)}${code ? "#code" : ""})`;
 }
 
 // -- Report formatters ---
@@ -117,6 +119,32 @@ function estimateTime(current: Block, block: bigint): number {
   return Number(Number(block) - current.number) * 13 + current.timestamp;
 }
 
+function toCrossChainSummary(
+  simulationResult: SimulationResult
+): CrossChainReportSummary | undefined {
+  const jobs = simulationResult.destinationJobResults;
+  if (!jobs?.length) return undefined;
+  return {
+    crossChainFailure: simulationResult.crossChainFailure ?? false,
+    jobs: jobs.map((j) => ({
+      bridge: j.bridge,
+      destinationChainId: j.destinationChainId,
+      sourceActionIndex: j.sourceActionIndex,
+      steps: j.steps.map((s) => ({
+        label: s.label,
+        ok: s.ok,
+        skipped: s.skipped,
+        skipReason: s.skipReason,
+        error: s.error,
+        tenderlySimulationId: s.tenderlySimulationId,
+        tenderlyHref: s.tenderlySimulationId
+          ? `https://tdly.co/shared/simulation/${s.tenderlySimulationId}`
+          : undefined,
+      })),
+    })),
+  };
+}
+
 /**
  * Generate a structured report from the check results
  */
@@ -124,7 +152,8 @@ async function generateStructuredReport(
   blocks: { current: Block; start: Block | null; end: Block | null },
   proposal: ProposalEvent,
   checks: AllCheckResults,
-  sim: TenderlySimulation
+  sim: TenderlySimulation,
+  crossChain?: CrossChainReportSummary
 ): Promise<StructuredSimulationReport> {
   // Extract title and proposal text
   const title = getProposalTitle(proposal.description.trim(), proposal.title);
@@ -141,6 +170,10 @@ async function generateStructuredReport(
     if (result.warnings.length > 0) {
       status = "warning";
     }
+  }
+
+  if (crossChain?.crossChainFailure && status === "success") {
+    status = "warning";
   }
 
   // Format checks
@@ -287,15 +320,21 @@ async function generateStructuredReport(
     }
   }
 
+  const crossChainFragment =
+    crossChain && crossChain.jobs.length > 0
+      ? ` Cross-chain follow-up: ${crossChain.crossChainFailure ? "failed" : "passed"} (${crossChain.jobs.length} job(s)).`
+      : "";
+
   // Create the structured report
   return {
     title,
     proposalText,
     status,
-    summary: `Simulation ${status === "success" ? "completed successfully" : status === "warning" ? "completed with warnings" : "failed"} for proposal: "${title}".`,
+    summary: `Simulation ${status === "success" ? "completed successfully" : status === "warning" ? "completed with warnings" : "failed"} for proposal: "${title}".${crossChainFragment}`,
     checks: formattedChecks,
     stateChanges,
     events,
+    crossChain,
     metadata: {
       blockNumber: blocks.current.number.toString(),
       timestamp: blocks.current.timestamp.toString(),
@@ -313,19 +352,14 @@ async function generateStructuredReport(
  * @param proposal The proposal details.
  * @param checks The checks results.
  * @param dir The directory where the file should be saved. It will be created if it doesn't exist.
- * @param filename The name of the file. All report formats will have the same filename with different extensions.
+ * @param simulationResult Full L1 (+ optional cross-chain) simulation outcome including `sim`.
  */
-export async function generateAndSaveReports(
+export async function generateReport(
   blocks: { current: Block; start: Block | null; end: Block | null },
   proposal: ProposalEvent,
   checks: AllCheckResults,
-  dir: string,
-  sim: TenderlySimulation
+  simulationResult: SimulationResult
 ) {
-  // todo: correctly save it
-  // Prepare the output folder and filename.
-  // if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
   // Generate the base markdown proposal report. This is the markdown report which is translated into other file types.
   const baseReport = await toMarkdownProposalReport(blocks, proposal, checks);
 
@@ -343,7 +377,8 @@ export async function generateAndSaveReports(
       blocks,
       proposal,
       checks,
-      sim
+      simulationResult.sim,
+      toCrossChainSummary(simulationResult)
     );
 
     // Create a simplified report structure for the frontend

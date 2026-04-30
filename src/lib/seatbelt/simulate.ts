@@ -22,26 +22,20 @@ import {
 } from "./types";
 import { encodeFunctionData, StateOverride } from "viem";
 import { ParsedProposalData } from "../proposalUtils";
-import { delay as delayUtils } from "../utils";
 import { encodeState } from "./encode-state";
 import { IMembershipContract } from "../contracts/common/interfaces/IMembershipContract";
-
-const BLOCK_GAS_LIMIT = 30_000_000;
-const TENDERLY_BASE_URL = "https://api.tenderly.co/api/v1";
-const TENDERLY_USER = process.env.TENDERLY_USER;
-const TENDERLY_PROJECT_SLUG = process.env.TENDERLY_PROJECT;
-const TENDERLY_ENCODE_URL = `${TENDERLY_BASE_URL}/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT_SLUG}/contracts/encode-states`;
-const TENDERLY_SIM_URL = `${TENDERLY_BASE_URL}/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT_SLUG}/simulate`;
-
-const TENDERLY_FETCH_OPTIONS = {
-  type: "json",
-  headers: { "X-Access-Key": process.env.TENDERLY_ACCESS_KEY },
-};
-
-const DEFAULT_FROM = "0xD73a92Be73EfbFcF3854433A5FcbAbF9c1316073"; // arbitrary EOA not used on-chain
+import {
+  BLOCK_GAS_LIMIT,
+  DEFAULT_SIMULATION_FROM,
+  getTenderlyEncodeUrl,
+  sendSimulation,
+  tenderlyFetchHeaders,
+  TENDERLY_API_BASE_URL,
+} from "./tenderly-api";
+const DEFAULT_FROM = DEFAULT_SIMULATION_FROM;
 
 const tenant = Tenant.current();
-const { contracts, ui, namespace } = tenant;
+const { contracts, ui } = tenant;
 const useL1BlockNumber = ui.toggle("use-l1-block-number")?.enabled;
 const provider = contracts.governor.provider;
 const providerForTime = contracts.providerForTime;
@@ -50,14 +44,37 @@ const governor = contracts.governor;
 const timelock = contracts.timelock;
 const governorType = contracts.governorType;
 
-type TenderlyError = {
-  statusCode?: number;
-};
-
 type StateOverridesPayload = {
   networkID: string;
   stateOverrides: Record<string, { value: Record<string, string> }>;
 };
+
+function tenderlyHeaderBlockNumber(
+  governanceSimBlock: bigint,
+  forkBlockNumber: number
+): bigint {
+  const forkBn = BigInt(forkBlockNumber);
+  return governanceSimBlock > forkBn ? governanceSimBlock : forkBn;
+}
+
+function applyTimelockEthFunding(
+  simulationPayload: TenderlyPayload,
+  fromAddress: string,
+  timelockAddress: string,
+  totalValue: bigint
+): void {
+  if (totalValue === 0n) return;
+  simulationPayload.value = totalValue.toString();
+  const objs = simulationPayload.state_objects!;
+  objs[fromAddress] = {
+    ...objs[fromAddress],
+    balance: totalValue.toString(),
+  };
+  objs[timelockAddress] = {
+    ...objs[timelockAddress],
+    balance: totalValue.toString(),
+  };
+}
 
 const ONE_WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 const ONE_MINUTE_IN_SECONDS_BLOCK = 60;
@@ -391,9 +408,15 @@ export async function simulateNew(
       ? [proposalId.toString()]
       : [targets, values, calldatas.map(ensureHexPrefix), descriptionHash];
 
+  const forkBlockNumber = latestBlockL2 ? latestBlockL2 : latestBlock.number;
+  const headerBlockNumber = tenderlyHeaderBlockNumber(
+    simBlock,
+    forkBlockNumber
+  );
+
   const simulationPayload: TenderlyPayload = {
     network_id: chainId.toString(),
-    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
+    block_number: forkBlockNumber,
     from: DEFAULT_FROM,
     to: governor.address,
     input: encodeFunctionData({
@@ -408,7 +431,7 @@ export async function simulateNew(
     save: true,
     generate_access_list: true,
     block_header: {
-      number: `0x${simBlock.toString(16)}`,
+      number: `0x${headerBlockNumber.toString(16)}`,
       timestamp: `0x${simTimestamp.toString(16)}`,
     },
     state_objects: {
@@ -424,19 +447,13 @@ export async function simulateNew(
     },
   };
 
-  // Handle ETH transfers if needed
-  const totalValue = config.values.reduce<bigint>((sum, val) => sum + val, 0n);
-
-  if (totalValue !== 0n) {
-    simulationPayload.value = totalValue.toString();
-    if (!simulationPayload.state_objects) {
-      simulationPayload.state_objects = {};
-    }
-    simulationPayload.state_objects[DEFAULT_FROM] = {
-      ...simulationPayload.state_objects[DEFAULT_FROM],
-      balance: totalValue.toString(),
-    };
-  }
+  const totalValue = sumProposalActionValues(config.values);
+  applyTimelockEthFunding(
+    simulationPayload,
+    DEFAULT_FROM,
+    timelock.address,
+    totalValue
+  );
 
   // Run the simulation
   const sim = await sendSimulation(simulationPayload);
@@ -648,14 +665,18 @@ export async function simulateProposed(
       ? [BigInt(proposalId)]
       : [targets, values, calldatas.map(ensureHexPrefix), descriptionHash];
 
+  const forkBlockNumber = proposal.executedBlock
+    ? Number(BigInt(proposal.executedBlock) - BigInt(10))
+    : (latestBlockL2 ?? latestBlock.number);
+
+  const headerBlockNumber = tenderlyHeaderBlockNumber(
+    simBlock,
+    forkBlockNumber
+  );
+
   const simulationPayload: TenderlyPayload = {
     network_id: chainId.toString(),
-    // this field represents the block state to simulate against, so we use the latest block number
-    block_number: proposal.executedBlock
-      ? Number(BigInt(proposal.executedBlock) - BigInt(10))
-      : latestBlockL2
-        ? latestBlockL2
-        : latestBlock.number,
+    block_number: forkBlockNumber,
     from,
     to: governor.address,
     input: encodeFunctionData({
@@ -671,7 +692,7 @@ export async function simulateProposed(
     generate_access_list: true, // not required, but useful as a sanity check to ensure consistency in the simulation response
     block_header: {
       // this data represents what block.number and block.timestamp should return in the EVM during the simulation
-      number: `0x${simBlock.toString(16)}`,
+      number: `0x${headerBlockNumber.toString(16)}`,
       timestamp: `0x${simTimestamp.toString(16)}`,
     },
     state_objects: {
@@ -691,26 +712,13 @@ export async function simulateProposed(
     },
   };
 
-  // Handle ETH transfers if needed
   try {
-    let totalValue = 0n;
-    for (const val of values) {
-      totalValue += stringToBigInt(val);
-    }
-
-    if (totalValue !== 0n) {
-      // If we need to send ETH, update the value and from address balance
-      simulationPayload.value = totalValue.toString();
-
-      // Make sure the from address has enough balance to cover the transfer
-      if (!simulationPayload.state_objects) {
-        simulationPayload.state_objects = {};
-      }
-      simulationPayload.state_objects[from] = {
-        ...simulationPayload.state_objects[from],
-        balance: totalValue.toString(),
-      };
-    }
+    applyTimelockEthFunding(
+      simulationPayload,
+      from,
+      timelock.address,
+      sumProposalActionValues(values)
+    );
   } catch (error) {
     console.error("Error calculating total value:", error);
     throw error;
@@ -725,7 +733,21 @@ export async function simulateProposed(
     provider,
   };
 
-  return { sim, latestBlock, deps };
+  const proposalForChecks: ProposalEvent = {
+    id: proposalIdBn,
+    proposalId: proposalIdBn,
+    proposer: proposal.proposer,
+    startBlock: BigInt(proposal.startBlock!),
+    endBlock: BigInt(proposal.endBlock!),
+    description: proposal.description ?? "",
+    title: proposal.markdowntitle,
+    targets: targets.map((t) => getAddress(String(t))),
+    values: values.map(stringToBigInt),
+    signatures: sigs,
+    calldatas: calldatas.map((data) => ensureHexPrefix(String(data))),
+  };
+
+  return { sim, proposal: proposalForChecks, latestBlock, deps };
 }
 
 export async function simulateNewApproval(
@@ -798,7 +820,6 @@ export async function simulateNewApproval(
 
   const startBlock = BigInt(latestBlock.number - 100);
 
-  // todo
   const proposal: ProposalEvent = {
     id: proposalId,
     proposalId,
@@ -978,9 +999,15 @@ export async function simulateNewApproval(
   const storageObj = await encodeStateCached(stateOverrides);
 
   // --- Simulate it ---
+  const forkBlockNumber = latestBlockL2 ? latestBlockL2 : latestBlock.number;
+  const headerBlockNumber = tenderlyHeaderBlockNumber(
+    simBlock,
+    forkBlockNumber
+  );
+
   const simulationPayload: TenderlyPayload = {
     network_id: chainId.toString(),
-    block_number: latestBlockL2 ? latestBlockL2 : latestBlock.number,
+    block_number: forkBlockNumber,
     from,
     to: governor.address,
     input: encodeFunctionData({
@@ -995,7 +1022,7 @@ export async function simulateNewApproval(
     save: true,
     generate_access_list: true,
     block_header: {
-      number: `0x${simBlock.toString(16)}`,
+      number: `0x${headerBlockNumber.toString(16)}`,
       timestamp: `0x${simTimestamp.toString(16)}`,
     },
     state_objects: {
@@ -1020,6 +1047,13 @@ export async function simulateNewApproval(
   // Run the simulation
   const sim = await sendSimulation(simulationPayload);
 
+  proposal.targets = [...targets].map((t) => getAddress(String(t)));
+  proposal.values = [...values].map((v) => BigInt(v as bigint));
+  proposal.calldatas = [...calldatas].map((c) =>
+    ensureHexPrefix(typeof c === "string" ? c : String(c))
+  );
+  proposal.signatures = [...targets].map(() => "");
+
   const deps: ProposalData = {
     governor,
     timelock,
@@ -1031,10 +1065,6 @@ export async function simulateNewApproval(
 
 // --- Helper methods ---
 
-// Get a random integer between two values
-const randomInt = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min) + min); // max is exclusive, min is inclusive
-
 /**
  * Gets the latest block number known to Tenderly
  * @param chainId Chain ID to get block number for
@@ -1043,10 +1073,10 @@ const getLatestBlockCached = unstable_cache(
   async (chainId: bigint) => {
     try {
       // Send simulation request
-      const url = `${TENDERLY_BASE_URL}/network/${chainId.toString()}/block-number`;
+      const url = `${TENDERLY_API_BASE_URL}/network/${chainId.toString()}/block-number`;
       const res = await fetch(url, {
         method: "GET",
-        headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
+        headers: tenderlyFetchHeaders(),
       });
       const data = await res.json();
       return data.block_number as number;
@@ -1065,10 +1095,10 @@ const getLatestBlockCached = unstable_cache(
 const sendEncodeRequestCached = unstable_cache(
   async (payload: StateOverridesPayload): Promise<StorageEncodingResponse> => {
     try {
-      const response = await fetch(TENDERLY_ENCODE_URL, {
+      const response = await fetch(getTenderlyEncodeUrl(), {
         method: "POST",
         body: JSON.stringify(payload),
-        headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
+        headers: tenderlyFetchHeaders(),
       });
 
       const sim = await response.json();
@@ -1078,7 +1108,7 @@ const sendEncodeRequestCached = unstable_cache(
       throw err;
     }
   },
-  ["sendEncodeRequest", TENDERLY_ENCODE_URL],
+  ["sendEncodeRequest", getTenderlyEncodeUrl()],
   { revalidate: ONE_WEEK_IN_SECONDS }
 );
 
@@ -1089,63 +1119,6 @@ const encodeStateCached = unstable_cache(
   ["encodeStateFromPayload"],
   { revalidate: ONE_WEEK_IN_SECONDS }
 );
-
-/**
- * @notice Sends a transaction simulation request to the Tenderly API
- * @dev Uses a simple exponential backoff when requests fail, with the following parameters:
- *   - Initial delay is 1 second
- *   - We randomize the delay duration to avoid synchronization issues if client is sending multiple requests simultaneously
- *   - We double delay each time and throw an error if delay is over 8 seconds
- * @param payload Transaction simulation parameters
- * @param delay How long to wait until next simulation request after failure, in milliseconds
- */
-async function sendSimulation(
-  payload: TenderlyPayload,
-  delay = 1000
-): Promise<TenderlySimulation> {
-  try {
-    // Send simulation request
-    const response = await fetch(TENDERLY_SIM_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
-    });
-
-    const sim = await response.json();
-
-    // Enable sharing on the simulation
-    await fetch(
-      `${TENDERLY_BASE_URL}/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT_SLUG}/simulations/${sim.simulation.id}/share`,
-      {
-        method: "POST",
-        headers: TENDERLY_FETCH_OPTIONS.headers as Record<string, string>,
-      }
-    );
-    // Post-processing to ensure addresses we use are checksummed (since ethers returns checksummed addresses)
-    sim.transaction.addresses = sim.transaction.addresses.map(getAddress);
-    for (const contract of sim.contracts) {
-      contract.address = getAddress(contract.address);
-    }
-
-    return sim;
-  } catch (err) {
-    console.log("err in sendSimulation: ", JSON.stringify(err));
-    const is429 = (err as TenderlyError)?.statusCode === 429;
-    if (delay > 8000 || !is429) {
-      console.warn(
-        "Simulation request failed with the below request payload and error"
-      );
-      throw err;
-    }
-    console.warn(err);
-    console.warn(
-      `Simulation request failed with the above error, retrying in ~${delay} milliseconds. See request payload below`
-    );
-    console.log(JSON.stringify(payload));
-    await delayUtils(delay + randomInt(0, 1000));
-    return await sendSimulation(payload, delay * 2);
-  }
-}
 
 /**
  * @notice Given a Tenderly contract object, generates a descriptive human-friendly name for that contract
@@ -1194,6 +1167,16 @@ function stringToBigInt(value: string | number | bigint): bigint {
     }
     throw new Error(`Invalid number format for BigInt conversion: ${str}`);
   }
+}
+
+function sumProposalActionValues(
+  values: readonly (string | number | bigint)[]
+): bigint {
+  let total = 0n;
+  for (const val of values) {
+    total += stringToBigInt(val);
+  }
+  return total;
 }
 
 const ensureHexPrefix = (hex: string): `0x${string}` => {
