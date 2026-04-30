@@ -26,9 +26,9 @@ test.describe
     await page.waitForLoadState("domcontentloaded");
 
     // Fill in basic proposal details
-    await page.getByLabel("Title").fill("Automated Test Proposal via Fawkes");
+    await page.locator('input[name="title"]').fill("Automated Test Proposal via Fawkes");
     await page
-      .getByLabel("Description")
+      .locator('textarea[name="proposalDescription"]')
       .fill(
         "This is an automated E2E proposal created via GitHub Actions and Anvil."
       );
@@ -43,9 +43,9 @@ test.describe
 
       // Fill out the TransferTransactionForm fields
       await page
-        .getByLabel("Recipient")
+        .locator('input[name="transactions.0.recipient"]')
         .fill("0x1a9c8182c09f50c8318d769245bea52c32be35bc");
-      await page.getByLabel(/Amount/i).fill("0");
+      await page.locator('input[name="transactions.0.amount"]').fill("0");
 
       // Target the specific transaction description input
       await page
