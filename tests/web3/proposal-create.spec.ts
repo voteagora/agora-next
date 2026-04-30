@@ -22,7 +22,7 @@ test.describe
     await setupFawkes(page, context, { address: WHALE_ADDRESS });
 
     // Navigate to the proposal creation page
-    await page.goto("/proposals/create");
+    await page.goto("/proposals/create-proposal");
     await page.waitForLoadState("domcontentloaded");
 
     // Fill in basic proposal details
