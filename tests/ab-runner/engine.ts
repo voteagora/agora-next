@@ -239,12 +239,24 @@ export class ABRunnerEngine {
             other.path !== drift.path &&
             drift.path.startsWith(other.path + " > ")
         );
+        const hasChildDataDrift = rawDrifts.some(
+          (other: any) =>
+            other.path !== drift.path &&
+            other.reason === "Data Drift" &&
+            other.path.startsWith(drift.path + " > ")
+        );
 
-        if (
-          !hasParentDrift ||
-          drift.reason === "Missing or Moved Component" ||
-          drift.reason === "Added Component"
-        ) {
+        // Prefer leaf-level text drift highlights instead of parent containers/rows.
+        // For non-data drift types, keep the original parent-pruning behavior.
+        const keepDataDrift =
+          drift.reason === "Data Drift" && !hasChildDataDrift;
+        const keepNonDataDrift =
+          drift.reason !== "Data Drift" &&
+          (!hasParentDrift ||
+            drift.reason === "Missing or Moved Component" ||
+            drift.reason === "Added Component");
+
+        if (keepDataDrift || keepNonDataDrift) {
           mDrifts.push({ path: drift.path, reason: drift.reason });
           mReportList.push({
             component: drift.path,
