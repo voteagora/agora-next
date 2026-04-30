@@ -135,7 +135,6 @@ jobs:
           SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_data == true && 'prod' || '' }}
         run: npm run test:ab
 
