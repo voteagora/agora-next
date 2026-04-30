@@ -34,7 +34,11 @@ export async function GET(request: NextRequest) {
     // Hide tombstoned rows used by admin soft-delete fallback.
     const metrics = rows
       .filter((row) => {
-        if (!row.data || typeof row.data !== "object" || Array.isArray(row.data)) {
+        if (
+          !row.data ||
+          typeof row.data !== "object" ||
+          Array.isArray(row.data)
+        ) {
           return true;
         }
         return !("__deleted" in row.data);
