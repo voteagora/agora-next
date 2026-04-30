@@ -31,29 +31,19 @@ jobs:
         env:
           MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
         run: |
-          # Run the official Anvil node exposing port 8545
-          # We use MAINNET_RPC_URL which requires a proper Alchemy key without strict domain whitelisting for CI
           docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url $MAINNET_RPC_URL
 
-          # Wait for Anvil to start up
-          echo "Waiting 15 seconds for Anvil to boot..."
           sleep 15
-          
-          echo "Checking Anvil container status and logs:"
-          docker ps -a | grep anvil-node
           docker logs anvil-node || true
 
       - name: Impersonate Whale for Proposal Creation
         run: |
-          # We use a known Uniswap whale (a16z) that has enough voting power to create a proposal
           WHALE_ADDRESS="0x2b591e99af9bd2ad008d0e17fc3be708e9ccab0f"
 
-          echo "Telling local Anvil node to impersonate the whale account..."
           curl -X POST -H "Content-Type: application/json" \
             --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_impersonateAccount\",\"params\":[\"${WHALE_ADDRESS}\"],\"id\":1}" \
             http://127.0.0.1:8545
 
-          echo "Funding the whale account with ETH to pay for gas fees..."
           curl -X POST -H "Content-Type: application/json" \
             --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_setBalance\",\"params\":[\"${WHALE_ADDRESS}\", \"0xDE0B6B3A7640000\"],\"id\":2}" \
             http://127.0.0.1:8545
@@ -68,7 +58,6 @@ jobs:
         run: |
           npm run build
           npm run start &
-          # Wait for Next.js to start serving
           sleep 15
 
       - name: Run Fawkes Proposal E2E Test
