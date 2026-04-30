@@ -475,15 +475,6 @@ const fetchStorageLayoutCached: (
       return null;
     }
 
-    const endpoints: { [key: string]: string } = {
-      "1": "https://api.etherscan.io/api",
-      "11155111": "https://api-sepolia.etherscan.io/api",
-      "10": "https://api-optimistic.etherscan.io/api",
-      "534352": "https://api.scrollscan.com/api",
-      "8453": "https://api.basescan.org/api",
-      "42161": "https://api.arbiscan.io/api",
-    };
-
     const baseUrl = "https://api.etherscan.io/api";
 
     const url = `${baseUrl}?chainid=${networkID}&module=contract&action=getsourcecode&address=${contractAddress}&apikey=${etherscanApiKey}`;

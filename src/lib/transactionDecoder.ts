@@ -13,6 +13,7 @@ import { getAddress } from "viem";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "./viem";
 import { cachedGetContractAbi } from "./abiUtils";
+import { normalizeExplorerNetwork } from "./explorerNetwork";
 import { getCanonicalType } from "./utils";
 
 const DEFAULT_ETHERSCAN_API_KEY = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY;
@@ -701,8 +702,9 @@ async function decodeCalldata(
   functionName: string | null,
   calldata: string,
   etherscanApiKey: string,
-  network: string = "mainnet"
+  network: string = "ethereum"
 ): Promise<any> {
+  const explorerNetwork = normalizeExplorerNetwork(network);
   calldata = calldata.startsWith("0x") ? calldata : "0x" + calldata;
 
   if (!functionName) {
@@ -716,7 +718,7 @@ async function decodeCalldata(
   const contractAbi = await cachedGetContractAbi(
     contractAddress,
     etherscanApiKey,
-    network
+    explorerNetwork
   );
   if (!contractAbi) {
     throw new Error(`Could not fetch ABI for contract ${contractAddress}`);
@@ -840,7 +842,7 @@ async function decodeEnhanced(
   target: string,
   calldata: string,
   etherscanApiKey = DEFAULT_ETHERSCAN_API_KEY,
-  network: string = "mainnet"
+  network: string = "ethereum"
 ): Promise<{
   function: string;
   parameters: Record<
@@ -859,6 +861,7 @@ async function decodeEnhanced(
   error?: string;
 }> {
   if (!etherscanApiKey) throw new Error("Missing API key");
+  const explorerNetwork = normalizeExplorerNetwork(network);
   calldata = calldata.startsWith("0x") ? calldata : "0x" + calldata;
   const functionSelector = calldata.slice(0, 10);
   const formattedOutput = {
@@ -889,7 +892,7 @@ async function decodeEnhanced(
         const contractAbi = await cachedGetContractAbi(
           target,
           etherscanApiKey,
-          network
+          explorerNetwork
         );
         if (contractAbi) {
           const matchingFunction = findFunctionBySelector(
@@ -905,7 +908,7 @@ async function decodeEnhanced(
           const implAbi = await cachedGetContractAbi(
             implementationAddress,
             etherscanApiKey,
-            network
+            explorerNetwork
           );
           if (implAbi) {
             const matchingFunction = findFunctionBySelector(
@@ -944,7 +947,7 @@ async function decodeEnhanced(
           functionName,
           calldata,
           etherscanApiKey,
-          network
+          explorerNetwork
         );
         formattedOutput.function = functionName;
         formattedOutput.usedMethod = "signature";
@@ -969,10 +972,14 @@ async function decodeEnhanced(
         });
         return formattedOutput;
       } catch (err) {
-        console.warn(
-          "ABI-based decoding failed, trying fallback methods.",
-          err
-        );
+        console.warn("[decodeEnhanced] ABI path failed, trying fallbacks", {
+          target,
+          explorerNetwork,
+          selector: functionSelector,
+          functionName,
+          functionSignature: functionSignature ?? null,
+          message: err instanceof Error ? err.message : String(err),
+        });
       }
     }
     try {
