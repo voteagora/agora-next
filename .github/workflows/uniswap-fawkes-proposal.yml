@@ -47,7 +47,7 @@ jobs:
           curl -X POST -H "Content-Type: application/json" \
             --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_setBalance\",\"params\":[\"${WHALE_ADDRESS}\", \"0xDE0B6B3A7640000\"],\"id\":2}" \
             http://127.0.0.1:8545
-      - name: Start Agora-Next Local Server
+      - name: Build Agora-Next
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_AGORA_API_KEY: ${{ secrets.NEXT_PUBLIC_AGORA_API_KEY }}
@@ -60,16 +60,23 @@ jobs:
           npm run generate-typechain
           npx prisma generate
           npm run build
-          npm run start &
-          sleep 15
 
       - name: Run Fawkes Proposal E2E Test
         env:
           BASE_URL: http://localhost:3000
-          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
-          NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXT_PUBLIC_AGORA_API_KEY: ${{ secrets.NEXT_PUBLIC_AGORA_API_KEY }}
           NEXT_PUBLIC_AGORA_ENV: prod
           NEXT_PUBLIC_AGORA_INSTANCE_NAME: uniswap
+          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
+          NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
         run: |
+          # Start the production server in the background (within the same step so it survives)
+          npm run start &
+
+          # Wait for Next.js to start serving
+          echo "Waiting for Next.js to boot on port 3000..."
+          npx wait-on http://127.0.0.1:3000 -t 30000
+
           npx playwright test tests/web3/proposal-create.spec.ts --project=chromium
