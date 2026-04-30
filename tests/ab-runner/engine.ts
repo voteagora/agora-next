@@ -418,39 +418,10 @@ export class ABRunnerEngine {
 
 
 
-    const stripLoadingText = async (p: Page) => {
-      await p
-        .evaluate(() => {
-          const walker = document.createTreeWalker(
-            document.body,
-            NodeFilter.SHOW_TEXT
-          );
-          let node;
-          while ((node = walker.nextNode())) {
-            if (node.nodeValue && node.nodeValue.includes("Loading")) {
-              if (node.parentElement) {
-                const testid = node.parentElement.getAttribute("data-testid");
-                if (testid !== "proposal-status") {
-                  node.parentElement.style.opacity = "0";
-                  node.parentElement.style.visibility = "hidden";
-                }
-              }
-            }
-          }
-        })
-        .catch(() => {});
-    };
-
-    await Promise.all([stripLoadingText(pageA), stripLoadingText(pageB)]);
 
 
-    // Failsafe: Ensure proposal statuses are fully visible, bypassing any stuck React animations
-    // or IntersectionObserver fade-outs before capturing DOM and screenshots.
-    const forceStatusVisibility = `[data-testid="proposal-status"] { opacity: 1 !important; visibility: visible !important; }`;
-    await Promise.all([
-      pageA.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
-      pageB.addStyleTag({ content: forceStatusVisibility }).catch(() => {}),
-    ]);
+
+
 
     // 2. Extract DOM trees
     const treeA = await this.extractDOMTree(pageA, route);
@@ -1013,7 +984,7 @@ export class ABRunnerEngine {
       }
     }
 
-    if (route.startsWith("/proposals")) {
+    if (route.startsWith("/proposals") || route === "/") {
       // Wait up to 15s for proposal statuses (e.g. SUCCEEDED, QUEUED) to fetch and render
       for (let i = 0; i < 6; i++) {
         const statusesFilled = await page.evaluate(() => {
@@ -1066,7 +1037,7 @@ export class ABRunnerEngine {
         let scope = cs || "*";
         if (!cs) {
           if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
-          if (rt === "/proposals") scope = "a[href*='/proposals/'] *";
+          if (rt === "/proposals" || rt === "/") scope = "a[href*='/proposals/'] *";
         }
 
         const MAX_ELEMENTS = 10000;
