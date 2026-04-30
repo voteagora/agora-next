@@ -71,6 +71,8 @@ jobs:
           NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
           NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
           NEXT_PUBLIC_RPC_URL: http://127.0.0.1:8545
+          WALLET_CONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+          JSON_RPC_URL: http://127.0.0.1:8545
         run: |
           # Start the Fawkes wallet server in the background
           node node_modules/fawkes-wallet/src/server.js &
