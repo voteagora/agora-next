@@ -8,7 +8,7 @@ import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
 import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";
 import { handleCrossChainSimulations } from "./cross-chain/tenderly-execution-engine";
-import { generateAndSaveReports } from "./report";
+import { generateReport } from "./report";
 import { simulateNew, simulateNewApproval, simulateProposed } from "./simulate";
 import {
   AllCheckResults,
@@ -111,13 +111,10 @@ export async function checkNewProposal({
       : null,
   ]);
 
-  // todo: correctly save it
-  const dir = `./reports/${tenant.namespace}/${config.governorAddress}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposal,
     checkResults,
-    dir,
     simulationResult
   );
 
@@ -189,13 +186,10 @@ export async function checkExistingProposal({
       : null,
   ]);
 
-  // todo: correctly save it
-  const dir = `./reports/${tenant.namespace}/${config.governorAddress}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposalEvent,
     checkResults,
-    dir,
     simulationResult
   );
 
@@ -282,12 +276,10 @@ export async function checkNewApprovalProposal({
       : null,
   ]);
 
-  const dir = `./reports/${tenant.namespace}/${governor.address}`;
-  const report = await generateAndSaveReports(
+  const report = await generateReport(
     { start: startBlock, end: endBlock, current: latestBlock },
     proposal,
     checkResults,
-    dir,
     simulationResult
   );
 

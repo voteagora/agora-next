@@ -820,7 +820,6 @@ export async function simulateNewApproval(
 
   const startBlock = BigInt(latestBlock.number - 100);
 
-  // todo
   const proposal: ProposalEvent = {
     id: proposalId,
     proposalId,

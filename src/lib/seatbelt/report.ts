@@ -50,7 +50,7 @@ export function blockQuote(str: string) {
  * @param code whether to link to the code tab
  */
 export function toAddressLink(address: string, code = false) {
-  return `[\`${address}\`](${getBlockScanAddress(address)}${code ? "#code" : ""})`; // todo correct explorer
+  return `[\`${address}\`](${getBlockScanAddress(address)}${code ? "#code" : ""})`;
 }
 
 // -- Report formatters ---
@@ -354,17 +354,12 @@ async function generateStructuredReport(
  * @param dir The directory where the file should be saved. It will be created if it doesn't exist.
  * @param simulationResult Full L1 (+ optional cross-chain) simulation outcome including `sim`.
  */
-export async function generateAndSaveReports(
+export async function generateReport(
   blocks: { current: Block; start: Block | null; end: Block | null },
   proposal: ProposalEvent,
   checks: AllCheckResults,
-  dir: string,
   simulationResult: SimulationResult
 ) {
-  // todo: correctly save it
-  // Prepare the output folder and filename.
-  // if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
   // Generate the base markdown proposal report. This is the markdown report which is translated into other file types.
   const baseReport = await toMarkdownProposalReport(blocks, proposal, checks);
 
