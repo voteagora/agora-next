@@ -32,8 +32,8 @@ jobs:
           MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
         run: |
           # Run the official Anvil node exposing port 8545
-          # We use Cloudflare's public RPC which is extremely stable and bypasses any Alchemy whitelist issues
-          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url https://cloudflare-eth.com
+          # We use MAINNET_RPC_URL which requires a proper Alchemy key without strict domain whitelisting for CI
+          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url $MAINNET_RPC_URL
 
           # Wait for Anvil to start up
           echo "Waiting 15 seconds for Anvil to boot..."
