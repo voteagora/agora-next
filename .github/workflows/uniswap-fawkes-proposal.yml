@@ -66,5 +66,10 @@ jobs:
       - name: Run Fawkes Proposal E2E Test
         env:
           BASE_URL: http://localhost:3000
+          NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+          NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
+          NEXT_PUBLIC_AGORA_API_KEY: ${{ secrets.NEXT_PUBLIC_AGORA_API_KEY }}
+          NEXT_PUBLIC_AGORA_ENV: prod
+          NEXT_PUBLIC_AGORA_INSTANCE_NAME: uniswap
         run: |
           npx playwright test tests/web3/proposal-create.spec.ts --project=chromium
