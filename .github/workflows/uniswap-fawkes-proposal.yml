@@ -32,8 +32,8 @@ jobs:
           MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
         run: |
           # Run the official Anvil node exposing port 8545
-          # We use a public RPC (LlamaRPC) to bypass Alchemy's "Unspecified origin not on whitelist" 403 errors
-          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url https://eth.llamarpc.com
+          # We use a public RPC (eth.merkle.io) because LlamaRPC was returning 502 errors and Alchemy has whitelist restrictions.
+          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url https://eth.merkle.io
 
           # Wait for Anvil to start up
           echo "Waiting 15 seconds for Anvil to boot..."
