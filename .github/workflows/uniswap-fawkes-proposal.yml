@@ -32,8 +32,8 @@ jobs:
           MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
         run: |
           # Run the official Anvil node exposing port 8545
-          # We use Alchemy but spoof the Origin header to bypass the 403 Whitelist Error in GitHub Actions
-          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url $MAINNET_RPC_URL --fork-header "Origin: https://voteagora.com"
+          # We use Cloudflare's public RPC which is extremely stable and bypasses any Alchemy whitelist issues
+          docker run -d -p 8545:8545 --name anvil-node --entrypoint anvil ghcr.io/foundry-rs/foundry:latest --host 0.0.0.0 --port 8545 --fork-url https://cloudflare-eth.com
 
           # Wait for Anvil to start up
           echo "Waiting 15 seconds for Anvil to boot..."
