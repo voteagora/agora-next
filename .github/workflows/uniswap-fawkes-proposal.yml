@@ -46,7 +46,12 @@ jobs:
           docker run -d -p 8545:8545 -e MAINNET_RPC_URL=$MAINNET_RPC_URL --name anvil-node dao-node:local
 
           # Wait for Anvil to start up
-          sleep 10
+          echo "Waiting 15 seconds for Anvil to boot..."
+          sleep 15
+          
+          echo "Checking Anvil container status and logs:"
+          docker ps -a | grep anvil-node
+          docker logs anvil-node || true
 
       - name: Impersonate Whale for Proposal Creation
         run: |
