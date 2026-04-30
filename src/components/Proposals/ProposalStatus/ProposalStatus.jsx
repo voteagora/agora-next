@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 
-export default function ProposalStatus({ proposal, testIdVariant = "default" }) {
+export default function ProposalStatus({
+  proposal,
+  testIdVariant = "default",
+}) {
   const testProposals = [
     "90839767999322802375479087567202389126141447078032129455920633707568400402209",
     "103606400798595803012644966342403441743733355496979747669804254618774477345292",

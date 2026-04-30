@@ -12,6 +12,9 @@ interface FinancialMetricsData {
 interface FinancialMetric {
   id: number;
   dao_slug: DaoSlug;
+  topic_id: number | null;
+  year: number | null;
+  month: string | null;
   data: FinancialMetricsData;
   createdAt: Date;
   updatedAt: Date;
