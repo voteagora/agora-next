@@ -4,6 +4,7 @@ import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
 import { getBlockScanUrl } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { getActionsLink } from "./ProposalTransactionDisplay";
@@ -59,13 +60,21 @@ export default function ApprovedTransactions({
           {actionsLabel}{" "}
         </p>
         {actionsLink && (
-          <a
-            href={getBlockScanUrl(actionsLink)}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-          </a>
+          <span className="inline-flex items-center gap-1">
+            <a
+              href={getBlockScanUrl(actionsLink)}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+            </a>
+            {proposal?.status === "EXECUTED" && (
+              <ExecutionTxInspectorIconLink
+                txHash={actionsLink}
+                iconClassName="h-3 w-3"
+              />
+            )}
+          </span>
         )}
       </div>
       {!isNoProposedTransactions && (

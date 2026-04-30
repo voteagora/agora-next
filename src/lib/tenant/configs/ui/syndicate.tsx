@@ -318,6 +318,18 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-archive-for-proposals",
       enabled: true,
     },
@@ -348,6 +360,16 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       name: "has-eas-oodao",
       enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        proposalAttestation: true,
+      },
     },
     {
       name: "tax-form",

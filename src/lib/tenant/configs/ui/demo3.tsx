@@ -412,6 +412,23 @@ export const demo3TenantUIConfig = new TenantUI({
     },
 
     {
+      name: "safe-proposal-choice",
+
+      enabled: true,
+    },
+
+    {
+      name: "safe-tracking",
+
+      enabled: true,
+
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+
+    {
       name: "use-archive-for-proposals",
 
       enabled: true,

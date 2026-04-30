@@ -812,10 +812,7 @@ export class ABRunnerEngine {
             const text = el.textContent?.trim();
             if (text === "Loading" || text === "Loading...") return false;
 
-            const isVisualBlock =
-              el.tagName === "IMG" ||
-              el.tagName === "SVG" ||
-              el.hasAttribute("data-testid");
+            const isVisualBlock = el.tagName === "IMG" || el.tagName === "SVG";
             const hasDirectText = Array.from(el.childNodes).some(
               (n) =>
                 n.nodeType === Node.TEXT_NODE && n.textContent?.trim() !== ""

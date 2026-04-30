@@ -11,7 +11,8 @@ export const FawkesClient = {
       body: options ? JSON.stringify(options) : undefined,
     });
     const data = await response.json();
-    if (!response.ok) throw new Error(`Fawkes create failed: ${JSON.stringify(data)}`);
+    if (!response.ok)
+      throw new Error(`Fawkes create failed: ${JSON.stringify(data)}`);
     return data;
   },
 
@@ -26,7 +27,8 @@ export const FawkesClient = {
       body: JSON.stringify({ uri }),
     });
     const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(`Fawkes connect failed: ${JSON.stringify(data)}`);
+    if (!response.ok || !data.success)
+      throw new Error(`Fawkes connect failed: ${JSON.stringify(data)}`);
     return data;
   },
 
@@ -38,7 +40,8 @@ export const FawkesClient = {
       method: "POST",
     });
     const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(`Fawkes approveSession failed: ${JSON.stringify(data)}`);
+    if (!response.ok || !data.success)
+      throw new Error(`Fawkes approveSession failed: ${JSON.stringify(data)}`);
     return data;
   },
 
@@ -50,7 +53,8 @@ export const FawkesClient = {
       method: "POST",
     });
     const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(`Fawkes rejectSession failed: ${JSON.stringify(data)}`);
+    if (!response.ok || !data.success)
+      throw new Error(`Fawkes rejectSession failed: ${JSON.stringify(data)}`);
     return data;
   },
 
@@ -64,7 +68,8 @@ export const FawkesClient = {
       body: requestId ? JSON.stringify({ requestId }) : undefined,
     });
     const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(`Fawkes approveRequest failed: ${JSON.stringify(data)}`);
+    if (!response.ok || !data.success)
+      throw new Error(`Fawkes approveRequest failed: ${JSON.stringify(data)}`);
     return data;
   },
 
@@ -78,7 +83,8 @@ export const FawkesClient = {
       body: requestId ? JSON.stringify({ requestId }) : undefined,
     });
     const data = await response.json();
-    if (!response.ok || !data.success) throw new Error(`Fawkes rejectRequest failed: ${JSON.stringify(data)}`);
+    if (!response.ok || !data.success)
+      throw new Error(`Fawkes rejectRequest failed: ${JSON.stringify(data)}`);
     return data;
   },
 

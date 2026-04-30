@@ -322,8 +322,32 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "delegation-encouragement",
       enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+      },
     },
     {
       name: "use-archive-for-proposals",

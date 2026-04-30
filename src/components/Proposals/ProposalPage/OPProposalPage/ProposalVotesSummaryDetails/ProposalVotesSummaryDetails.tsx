@@ -1,6 +1,5 @@
 import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
-import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -320,6 +319,9 @@ export default function ProposalVotesSummaryDetails({
               proposal.executedTransactionHash
                 ? getBlockScanUrl(proposal.executedTransactionHash)
                 : undefined
+            }
+            executionInspectorTxHash={
+              proposal.executedTransactionHash ?? undefined
             }
           />
         ) : null}
