@@ -9,8 +9,8 @@ export async function setupFawkes(
   // 1. Initialize headless wallet (using default single-wallet seed from ENV or FawkesClient default, or impersonated address)
   await FawkesClient.createWallet(options);
 
-  // 2. Navigate to an initial route to trigger WalletConnect (Delegates is usually a safe default)
-  await page.goto("/delegates");
+  // 2. Navigate to an initial route to trigger WalletConnect
+  await page.goto("/");
   await page.waitForLoadState("domcontentloaded");
 
   // Suppress popups
@@ -20,9 +20,15 @@ export async function setupFawkes(
   await page.reload();
 
   // 3. Open WalletConnect modal
-  const connectButton = page.getByTestId("connect-wallet-button").first();
-  await expect(connectButton).toBeVisible();
-  await connectButton.click();
+  try {
+    const connectButton = page.getByTestId("connect-wallet-button").first();
+    await expect(connectButton).toBeVisible({ timeout: 15000 });
+    await connectButton.click();
+  } catch (err) {
+    console.error("Failed to find connect wallet button!");
+    console.error(await page.content());
+    throw err;
+  }
 
   await page.waitForTimeout(2000);
   const otherWallets = page.getByText("Other Wallets", { exact: false });

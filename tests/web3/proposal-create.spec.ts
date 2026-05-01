@@ -22,13 +22,13 @@ test.describe
     await setupFawkes(page, context, { address: WHALE_ADDRESS });
 
     // Navigate to the proposal creation page
-    await page.goto("/proposals/create");
+    await page.goto("/proposals/create-proposal");
     await page.waitForLoadState("domcontentloaded");
 
     // Fill in basic proposal details
-    await page.getByLabel("Title").fill("Automated Test Proposal via Fawkes");
+    await page.locator('input[name="title"]').fill("Automated Test Proposal via Fawkes");
     await page
-      .getByLabel("Description")
+      .locator('textarea[name="proposalDescription"]')
       .fill(
         "This is an automated E2E proposal created via GitHub Actions and Anvil."
       );
@@ -43,9 +43,9 @@ test.describe
 
       // Fill out the TransferTransactionForm fields
       await page
-        .getByLabel("Recipient")
+        .locator('input[name="transactions.0.recipient"]')
         .fill("0x1a9c8182c09f50c8318d769245bea52c32be35bc");
-      await page.getByLabel(/Amount/i).fill("0");
+      await page.locator('input[name="transactions.0.amount"]').fill("0");
 
       // Target the specific transaction description input
       await page
@@ -53,12 +53,15 @@ test.describe
         .fill("Automated Transfer");
     }
 
+
     // Submit the proposal on-chain
     const submitBtn = page
       .getByRole("button", { name: /Submit on-chain|Create proposal/i })
       .first();
     await expect(submitBtn).toBeVisible({ timeout: 15000 });
     await submitBtn.click();
+
+
 
     // Intercept and confirm the WalletConnect/Fawkes transaction prompt
     await page.waitForTimeout(2000);
