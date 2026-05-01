@@ -654,6 +654,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
     const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
+    const useDaoNodeForVotingPower =
+      ui.toggle("use-daonode-for-voting-power")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
@@ -719,9 +721,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
-    const daoNodeVotingPowerPromise = includeL3Staking
-      ? getDelegateVotingPowerFromDaoNode(address)
-      : Promise.resolve<string | null>(null);
+    const daoNodeVotingPowerPromise =
+      useDaoNodeForVotingPower || includeL3Staking
+        ? getDelegateVotingPowerFromDaoNode(address)
+        : Promise.resolve<string | null>(null);
 
     const [delegate, votableSupply, quorum, daoNodeVotingPower] =
       await Promise.all([
