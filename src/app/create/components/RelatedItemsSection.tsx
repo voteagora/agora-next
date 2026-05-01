@@ -3,7 +3,6 @@ import { Label } from "@/components/ui/label";
 import { X, MessageSquare, Calendar, ExternalLink } from "lucide-react";
 import { RelatedItem } from "../types";
 import { RelatedItemsDialog } from "./RelatedItemsDialog";
-import { stripHtmlToText } from "@/app/forums/stripHtml";
 import Link from "next/link";
 import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
@@ -47,13 +46,13 @@ export function RelatedItemsSection({
 
       <div className="space-y-3">
         {items.map((item) => (
-          <div key={item.id} className="group relative flex items-start gap-3">
+          <div key={item.id} className="group relative flex items-center gap-3">
             <Image
               src={ui.logo}
               alt="logo"
               width={40}
               height={40}
-              className="h-10 w-10 mt-0.5 flex-shrink-0"
+              className="h-10 w-10 flex-shrink-0"
             />
             <div className="flex-1 min-w-0 pr-8">
               <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
@@ -82,11 +81,6 @@ export function RelatedItemsSection({
                   </span>
                 </div>
               </div>
-              {item.description && (
-                <p className="text-xs text-gray-500 line-clamp-2">
-                  {stripHtmlToText(item.description)}
-                </p>
-              )}
             </div>
             <Button
               variant="ghost"
