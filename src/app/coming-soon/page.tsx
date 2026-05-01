@@ -4,6 +4,17 @@ import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogR
 import townsStaticProposals from "@/assets/tenant/towns_static_proposals.svg";
 import syndicateStaticProposals from "@/assets/tenant/syndicate_static_proposals.svg";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `${brandName} Coming Soon`,
+    description: `Stay up to date while ${brandName} governance launches on Agora.`,
+    path: "/coming-soon",
+  });
+}
 
 export default async function ComingSoonPage() {
   const { ui, namespace } = Tenant.current();
