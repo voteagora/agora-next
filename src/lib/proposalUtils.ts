@@ -226,16 +226,6 @@ const removeBold = (text: string | null): string | null =>
 const removeItalics = (text: string | null): string | null =>
   text ? text.replace(/__/g, "") : text;
 
-export function stripLeadingUndefinedFromDescription(
-  description: string | null | undefined
-): string | null {
-  if (description == null) return description ?? null;
-  let d = description.replace(/^undefined[\s\r\n]*/, "");
-  d = d.replace(/^(#\s[^\n]+\n\n)undefined[\s\r\n]*/m, "$1");
-  d = d.replace(/\n\nundefined(?=\n|$|\r)/g, "\n\n");
-  return d;
-}
-
 export function getTitleFromProposalDescription(description: string = "") {
   const normalizedDescription = description
     .replace(/\\n/g, "\n")
@@ -393,13 +383,6 @@ export async function parseProposal(
       )
     : null;
 
-  const rawDescription =
-    (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
-    proposal.description;
-  const description = stripLeadingUndefinedFromDescription(
-    rawDescription != null ? String(rawDescription) : null
-  );
-
   return {
     id: proposal.proposal_id,
     proposer: proposal.proposer,
@@ -430,8 +413,10 @@ export async function parseProposal(
           : null,
     markdowntitle:
       (proposalData.key === "SNAPSHOT" && proposalData.kind.title) ||
-      getTitleFromProposalDescription(description ?? ""),
-    description,
+      getTitleFromProposalDescription(proposal.description || ""),
+    description:
+      (proposalData.key === "SNAPSHOT" && proposalData.kind.body) ||
+      proposal.description,
     quorum,
     approvalThreshold:
       hardcodedThreshold ??
