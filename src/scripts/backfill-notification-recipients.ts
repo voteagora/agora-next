@@ -162,8 +162,18 @@ async function fetchForumEngagement(
 }
 
 type LegacyPreferences = {
-  wants_proposal_created_email?: boolean | "prompt" | "prompted";
-  wants_proposal_ending_soon_email?: boolean | "prompt" | "prompted";
+  wants_proposal_created_email?:
+    | boolean
+    | "true"
+    | "false"
+    | "prompt"
+    | "prompted";
+  wants_proposal_ending_soon_email?:
+    | boolean
+    | "true"
+    | "false"
+    | "prompt"
+    | "prompted";
 };
 
 const PREFERENCE_MAP: Record<keyof LegacyPreferences, string[]> = {
@@ -174,11 +184,20 @@ const PREFERENCE_MAP: Record<keyof LegacyPreferences, string[]> = {
   ],
 };
 
-function mapLegacyPreference(value: unknown): PreferenceState | null {
-  if (value === true) return "on";
-  if (value === false) return "off";
-  // prompt/prompted = never asked or didn't answer → skip (inherit default)
-  return null;
+function mapLegacyPreference(value: unknown): PreferenceState {
+  if (value === true || value === "true") return "on";
+  // V1 only sent proposal emails when the legacy value was exactly true.
+  // Explicitly turn everything else off so migrated users never inherit a
+  // broader V2 default_state by accident.
+  return "off";
+}
+
+function hasLegacyProposalEmailOptIn(preferences: LegacyPreferences): boolean {
+  return Object.keys(PREFERENCE_MAP).some(
+    (legacyKey) =>
+      preferences[legacyKey as keyof LegacyPreferences] === true ||
+      preferences[legacyKey as keyof LegacyPreferences] === "true"
+  );
 }
 
 function parseLegacyPreferences(value: unknown): LegacyPreferences {
@@ -186,6 +205,26 @@ function parseLegacyPreferences(value: unknown): LegacyPreferences {
     return {};
   }
   return value as LegacyPreferences;
+}
+
+function normalizeEmail(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const email = value.trim().toLowerCase();
+  return email.length > 5 ? email : null;
+}
+
+function getPayloadEmail(payload: Prisma.JsonValue): string | null {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return null;
+  }
+  return normalizeEmail((payload as Record<string, unknown>).email);
+}
+
+function getStatementEmail(statement: {
+  email: string | null;
+  payload: Prisma.JsonValue;
+}): string | null {
+  return normalizeEmail(statement.email) ?? getPayloadEmail(statement.payload);
 }
 
 async function main() {
@@ -204,6 +243,7 @@ async function main() {
     select: {
       address: true,
       email: true,
+      payload: true,
       notification_preferences: true,
     },
   });
@@ -214,6 +254,7 @@ async function main() {
     processed: 0,
     createdRecipients: 0,
     updatedEmails: 0,
+    skippedEmailsWithoutLegacyOptIn: 0,
     updatedPreferences: 0,
     updatedAttributes: 0,
     failures: 0,
@@ -239,7 +280,11 @@ async function main() {
   for (const statement of statements) {
     summary.processed += 1;
     const recipientId = statement.address.toLowerCase();
-    const email = statement.email?.trim();
+    const email = getStatementEmail(statement);
+    const preferences = parseLegacyPreferences(
+      statement.notification_preferences
+    );
+    const hasProposalEmailOptIn = hasLegacyProposalEmailOptIn(preferences);
 
     try {
       // Check if recipient already exists
@@ -253,13 +298,15 @@ async function main() {
         summary.createdRecipients += 1;
       }
 
-      if (email) {
+      if (email && hasProposalEmailOptIn) {
         await notificationCenterClient.updateChannel(recipientId, "email", {
           type: "email",
           address: email,
-          verified: false,
+          verified: true,
         });
         summary.updatedEmails += 1;
+      } else if (email) {
+        summary.skippedEmailsWithoutLegacyOptIn += 1;
       }
 
       const engagement = await fetchForumEngagement(recipientId, slug);
@@ -277,10 +324,6 @@ async function main() {
         summary.updatedAttributes += 1;
       }
 
-      const preferences = parseLegacyPreferences(
-        statement.notification_preferences
-      );
-
       for (const [legacyKey, eventTypes] of Object.entries(PREFERENCE_MAP)) {
         const rawValue = preferences[legacyKey as keyof LegacyPreferences];
         const counts =
@@ -288,22 +331,22 @@ async function main() {
 
         if (rawValue === true) counts.true += 1;
         else if (rawValue === false) counts.false += 1;
+        else if (rawValue === "true") counts.true += 1;
+        else if (rawValue === "false") counts.false += 1;
         else if (rawValue === "prompt") counts.prompt += 1;
         else if (rawValue === "prompted") counts.prompted += 1;
         else counts.missing += 1;
 
         const mapped = mapLegacyPreference(rawValue);
 
-        if (mapped) {
-          for (const eventType of eventTypes) {
-            await notificationCenterClient.setPreference(
-              recipientId,
-              eventType,
-              "email",
-              mapped
-            );
-            summary.updatedPreferences += 1;
-          }
+        for (const eventType of eventTypes) {
+          await notificationCenterClient.setPreference(
+            recipientId,
+            eventType,
+            "email",
+            mapped
+          );
+          summary.updatedPreferences += 1;
         }
       }
     } catch (error) {
@@ -319,6 +362,10 @@ async function main() {
   console.log("Processed:", summary.processed);
   console.log("Created recipients:", summary.createdRecipients);
   console.log("Updated emails:", summary.updatedEmails);
+  console.log(
+    "Skipped emails without legacy opt-in:",
+    summary.skippedEmailsWithoutLegacyOptIn
+  );
   console.log(
     "Updated attributes (forum engagement):",
     summary.updatedAttributes
@@ -374,7 +421,10 @@ async function main() {
   console.log("\n=== Mapping Applied ===");
   console.log("true → 'on' (will receive notifications)");
   console.log("false → 'off' (will NOT receive notifications)");
-  console.log("prompt/prompted/missing → skipped (inherit event type default)");
+  console.log("prompt/prompted/missing → 'off' (matches V1 non-send behavior)");
+  console.log(
+    "email channel marked verified only when at least one legacy proposal email preference is true"
+  );
 }
 
 main()
