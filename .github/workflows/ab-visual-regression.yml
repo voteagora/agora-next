@@ -130,11 +130,7 @@ jobs:
           SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
-<<<<<<< fix/abRUnner
-          NEXT_PUBLIC_AGORA_ENV: prod
-=======
           NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_data == true && 'prod' || '' }}
->>>>>>> main
         run: npm run test:ab
 
       - name: Google Auth
