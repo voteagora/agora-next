@@ -23,12 +23,12 @@ async function filterRevealedMetrics(
     ...new Set(
       rows
         .map((row) => row.topic_id)
-        .filter((topicId): topicId is number => topicId !== null)
+        .filter((id): id is number => id !== null)
     ),
   ];
 
   if (topicIds.length === 0) {
-    return [];
+    return rows;
   }
 
   const revealedTopics = await db.forumTopic.findMany({
@@ -45,7 +45,8 @@ async function filterRevealedMetrics(
   const revealedTopicIds = new Set(revealedTopics.map((topic) => topic.id));
 
   return rows.filter(
-    (row) => row.topic_id !== null && revealedTopicIds.has(row.topic_id)
+    (row) =>
+      row.topic_id === null || revealedTopicIds.has(row.topic_id as number)
   );
 }
 
