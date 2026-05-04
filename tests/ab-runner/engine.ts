@@ -29,7 +29,7 @@ export class ABRunnerEngine {
     route: string,
     pageA: Page,
     pageB: Page,
-    meta?: { tenant: string; type?: string }
+    meta?: { tenant: string }
   ) {
     const override = this.getOverride(route);
 
@@ -101,13 +101,14 @@ export class ABRunnerEngine {
     const drifts: any[] = [];
     const reportList: any[] = [];
 
+    const proposalId = route.match(/^\/proposals\/(.+)$/)?.[1];
     const safeRouteName =
       route === "/"
         ? "index-page"
+        : proposalId
+          ? `proposal-${proposalId}`
         : route.replace(/^\//, "").replace(/\//g, "-");
     let artifactsDir = "";
-    const hasValidType =
-      meta?.type && meta.type !== "undefined" && meta.type !== "null";
     if (meta && meta.tenant) {
       const segments = [
         process.cwd(),
@@ -116,7 +117,6 @@ export class ABRunnerEngine {
         meta.tenant,
         "proposals",
       ];
-      if (hasValidType) segments.push(meta.type!);
       segments.push(safeRouteName);
       artifactsDir = path.join(...segments);
     } else {
@@ -418,7 +418,7 @@ export class ABRunnerEngine {
     );
 
     const captureTooltipLayer = async () => {
-      if (!meta?.type) return;
+      if (!meta?.tenant) return;
 
       // Native radix UI components, custom metrics threshold buttons, and fallback data-testids
       const triggerSelector =
