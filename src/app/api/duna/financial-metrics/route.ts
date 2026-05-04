@@ -21,9 +21,7 @@ async function filterRevealedMetrics(
 ) {
   const topicIds = [
     ...new Set(
-      rows
-        .map((row) => row.topic_id)
-        .filter((id): id is number => id !== null)
+      rows.map((row) => row.topic_id).filter((id): id is number => id !== null)
     ),
   ];
 
