@@ -55,10 +55,6 @@ on:
         description: "Specific proposal IDs (e.g. 116,adv-55). Leave empty for listing page."
         required: false
         type: string
-      target_types:
-        description: "Filter proposals by type (e.g. STANDARD,APPROVAL). Leave empty for none."
-        required: false
-        type: string
       scan_all_archive:
         description: "Deep scan all individual archived proposals (can be slow)"
         required: false
@@ -119,8 +115,8 @@ jobs:
             "url_b": "${{ inputs.url_b }}",
             "tenant": "${{ inputs.tenant }}",
             "routes": "${{ steps.scopes.outputs.route_scopes }}",
-            "target_types": "${{ inputs.target_types }}",
-            "target_proposals": "${{ inputs.target_proposals }}"
+            "target_proposals": "${{ inputs.target_proposals }}",
+            "scan_all_archive": "${{ inputs.scan_all_archive }}"
           }
           METAEOF
           echo "📝 Metadata written"
@@ -131,11 +127,14 @@ jobs:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
           URL_B: ${{ inputs.url_b }}
           TARGET_PROPOSALS: ${{ inputs.target_proposals }}
-          TARGET_TYPES: ${{ inputs.target_types }}
           SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
+<<<<<<< fix/abRUnner
+          NEXT_PUBLIC_AGORA_ENV: prod
+=======
           NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_data == true && 'prod' || '' }}
+>>>>>>> main
         run: npm run test:ab
 
       - name: Google Auth

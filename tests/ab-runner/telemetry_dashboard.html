@@ -1473,7 +1473,6 @@
 
           // ── Group local scopes into sections ──
           const _static = [],
-            _typed = [],
             _archive = [];
           localScopes.forEach((s) => {
             const sc = s.scope;
@@ -1487,18 +1486,7 @@
             ) {
               _static.push(s);
             } else {
-              const parts = sc.split("/");
-              if (
-                parts.some((p) =>
-                  /^(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)$/i.test(
-                    p
-                  )
-                )
-              ) {
-                _typed.push(s);
-              } else {
-                _archive.push(s);
-              }
+              _archive.push(s);
             }
           });
 
@@ -1608,15 +1596,6 @@
               "Core pages: home, proposals listing, delegates listing"
             );
             _static.forEach(addScopeRow);
-          }
-          if (_typed.length > 0) {
-            addGroupHeader(
-              "tag",
-              "Proposals by Type",
-              _typed.length,
-              "One sample proposal per governance type (Standard, Approval, Optimistic)"
-            );
-            _typed.forEach(addScopeRow);
           }
           if (_archive.length > 0) {
             addGroupHeader(
@@ -2673,15 +2652,12 @@
         // ── SVG icon library ──
         const ICONS = {
           home: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/></svg>`,
-          tag: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5a2 2 0 011.4.6l6.6 6.6a2 2 0 010 2.8l-5 5a2 2 0 01-2.8 0L5.6 11.4A2 2 0 015 10V5a2 2 0 012-2z"/></svg>`,
           archive: `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>`,
           chevron: `<svg class="w-3 h-3 text-gray-500 transition-transform duration-200 section-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`,
         };
 
         // ── Classify scopes into groups ──
         const staticRoutes = [];
-        const typedProposals = {};
-        const allTypedFlat = [];
         const archiveProposals = [];
 
         globalTelemetryData.forEach((d) => {
@@ -2696,23 +2672,12 @@
           ) {
             staticRoutes.push(d);
           } else {
-            const parts = s.split("/");
-            const typeIdx = parts.findIndex((p) =>
-              /^(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)$/i.test(p)
-            );
-            if (typeIdx >= 0) {
-              const type = parts[typeIdx].toUpperCase();
-              if (!typedProposals[type]) typedProposals[type] = [];
-              typedProposals[type].push(d);
-              allTypedFlat.push({ ...d, _proposalType: type });
-            } else {
-              archiveProposals.push(d);
-            }
+            archiveProposals.push(d);
           }
         });
 
         // ── Helper: build a sidebar item button ──
-        const makeSidebarBtn = (d, isFirst, proposalType) => {
+        const makeSidebarBtn = (d, isFirst) => {
           const btn = document.createElement("button");
           btn.className = `sidebar-item w-full text-left pl-7 pr-3 py-2 border-b border-gray-800/20 hover:bg-white/[0.04] group ${isFirst ? "active" : ""}`;
           btn.dataset.scope = d.scope;
@@ -2752,20 +2717,14 @@
             /^(optimism|scroll|ens|uniswap|cyber|derive|linea|etherfi|b3|xai)\//i,
             ""
           );
-          if (proposalType)
-            label = label.replace(
-              new RegExp(`proposals/${proposalType}/`, "i"),
-              ""
-            );
-
-          const typeBadge = proposalType
-            ? `<span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-gray-800 text-gray-500 border border-gray-700/50 shrink-0">${proposalType.slice(0, 4)}</span>`
-            : "";
+          label = label.replace(
+            /^proposals\/(STANDARD|APPROVAL|OPTIMISTIC|BASIC|ADMIN|SNAPSHOT)\//i,
+            "proposals/"
+          );
 
           btn.innerHTML = `
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-1.5 min-w-0">
-                ${typeBadge}
                 <span class="text-[12px] text-gray-400 truncate">${label}</span>
               </div>
               <div class="flex items-center gap-2 shrink-0">
@@ -2847,53 +2806,7 @@
         }
 
         // ═══════════════════════════════════════════
-        // Section 2: Proposals by Type (all under one accordion)
-        // ═══════════════════════════════════════════
-        if (allTypedFlat.length > 0) {
-          const header = makeSectionHeader(
-            ICONS.tag,
-            "Proposals by Type",
-            "One sample proposal per governance type (Standard, Approval, Optimistic, etc). Validates that each proposal layout renders correctly.",
-            allTypedFlat.length,
-            allTypedFlat
-          );
-          const container = document.createElement("div");
-          header.onclick = () => {
-            container.classList.toggle("hidden");
-            header
-              .querySelector(".section-chevron")
-              .classList.toggle("rotate-180");
-          };
-          sidebar.appendChild(header);
-
-          // Sort by type then by scope for visual grouping
-          const typeOrder = [
-            "STANDARD",
-            "APPROVAL",
-            "OPTIMISTIC",
-            "BASIC",
-            "ADMIN",
-            "SNAPSHOT",
-          ];
-          allTypedFlat.sort((a, b) => {
-            const ai = typeOrder.indexOf(a._proposalType);
-            const bi = typeOrder.indexOf(b._proposalType);
-            return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-          });
-
-          allTypedFlat.forEach((d) => {
-            const btn = makeSidebarBtn(d, isFirstItem, d._proposalType);
-            container.appendChild(btn);
-            if (isFirstItem) {
-              selectScope(d.scope, btn);
-              isFirstItem = false;
-            }
-          });
-          sidebar.appendChild(container);
-        }
-
-        // ═══════════════════════════════════════════
-        // Section 3: Archive Proposals (untyped)
+        // Section 2: Archive Proposals
         // ═══════════════════════════════════════════
         if (archiveProposals.length > 0) {
           const header = makeSectionHeader(
