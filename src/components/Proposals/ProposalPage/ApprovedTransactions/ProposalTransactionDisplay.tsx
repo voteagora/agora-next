@@ -376,6 +376,7 @@ const ProposalTransactionDisplay = ({
                       }
                       index={idx}
                       viewMode={viewMode}
+                      proposal={proposal}
                     />
                   ))}
                 </div>
@@ -421,6 +422,7 @@ const ProposalTransactionDisplay = ({
                       }
                       index={idx}
                       viewMode={viewMode}
+                      proposal={proposal}
                     />
                   ))}
                 </div>
@@ -428,21 +430,23 @@ const ProposalTransactionDisplay = ({
             </div>
           </div>
 
-          <div
-            className={cn(
-              "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
-              hasRealActions
-                ? "border border-t-0 border-line rounded-b-lg"
-                : "border-x border-b border-t border-line rounded-b-lg"
-            )}
-            onClick={() => {
-              setCollapsed(!collapsed);
-            }}
-          >
-            {collapsed
-              ? `Expand all actions (${normalizedLength})`
-              : "Collapse actions"}
-          </div>
+          {normalizedLength > 1 && (
+            <div
+              className={cn(
+                "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
+                hasRealActions
+                  ? "border border-t-0 border-line rounded-b-lg"
+                  : "border-x border-b border-t border-line rounded-b-lg"
+              )}
+              onClick={() => {
+                setCollapsed(!collapsed);
+              }}
+            >
+              {collapsed
+                ? `Expand all actions (${normalizedLength})`
+                : "Collapse actions"}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -459,6 +463,7 @@ const TransactionItem = ({
   index,
   signature,
   viewMode = "decoded",
+  proposal,
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -469,6 +474,7 @@ const TransactionItem = ({
   index: number;
   signature?: string;
   viewMode?: "decoded" | "raw" | "pretty";
+  proposal?: Proposal;
 }) => {
   const {
     data: decodedData,
@@ -519,6 +525,7 @@ const TransactionItem = ({
             target={target}
             calldata={calldata}
             isLoading={isLoading}
+            proposal={proposal}
           />
         ) : (
           <>
@@ -553,11 +560,13 @@ const PrettyView = ({
   target,
   calldata,
   isLoading,
+  proposal,
 }: {
   decodedData: unknown;
   target: string;
   calldata: `0x${string}`;
   isLoading: boolean;
+  proposal?: Proposal;
 }) => {
   if (isLoading) {
     return (
@@ -583,11 +592,16 @@ const PrettyView = ({
   }
 
   try {
+    const proposalContext = proposal?.snapshotBlockNumber
+      ? { snapshotBlockNumber: proposal.snapshotBlockNumber }
+      : undefined;
+
     return (
       <>
         {adapter.prettyRender(
           decodedData as Parameters<typeof adapter.prettyRender>[0],
-          target
+          target,
+          proposalContext
         )}
       </>
     );
