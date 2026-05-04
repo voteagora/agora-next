@@ -102,10 +102,10 @@ function maybeFriendlyAddress(address?: string) {
 }
 
 /**
- * Recipient row for Split distributions — shows address (or ENS if resolved), ppm, and %.
+ * Table row for Split distributions — shows address and split %.
  * ENS is lazy-loaded only when the row scrolls into view.
  */
-function SplitRecipientRow({
+function SplitRecipientTableRow({
   address,
   allocation,
   totalAllocation,
@@ -120,7 +120,6 @@ function SplitRecipientRow({
     enabled: inView && !!address,
   });
 
-  const ppm = allocation.toLocaleString();
   const pct =
     totalAllocation > 0n
       ? ((Number(allocation) / Number(totalAllocation)) * 100).toFixed(4)
@@ -129,22 +128,62 @@ function SplitRecipientRow({
   const displayName = ensData?.name || address;
 
   return (
-    <div ref={ref} className="flex items-center text-xs">
-      <a
-        href={getBlockScanAddress(address)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`hover:underline w-80 truncate ${ensData?.name ? "" : "font-mono"}`}
-      >
-        {displayName}
-      </a>
-      <span className="text-tertiary tabular-nums w-20 text-right">
-        {ppm} ppm
-      </span>
-      <span className="text-tertiary tabular-nums w-20 text-right ml-2">
-        ({pct}%)
-      </span>
-    </div>
+    <tr ref={ref}>
+      <td className="pr-8 py-0.5">
+        <a
+          href={getBlockScanAddress(address)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+        >
+          {displayName}
+        </a>
+      </td>
+      <td className="py-0.5 text-right tabular-nums">{pct}%</td>
+    </tr>
+  );
+}
+
+/**
+ * Table component for Split recipients with header and footer.
+ */
+function SplitRecipientsTable({
+  recipientData,
+  totalAllocation,
+}: {
+  recipientData: { address: string; allocation: bigint }[];
+  totalAllocation: bigint;
+}) {
+  const count = recipientData.length;
+  if (count === 0) return null;
+
+  return (
+    <>
+      <div className={`pt-2 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}>
+        <table>
+          <thead>
+            <tr className="text-secondary font-semibold">
+              <th className="pr-8 py-0.5 text-left font-semibold">Address</th>
+              <th className="py-0.5 text-right font-semibold">Split</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recipientData.map((r, i) => (
+              <SplitRecipientTableRow
+                key={i}
+                address={r.address}
+                allocation={r.allocation}
+                totalAllocation={totalAllocation}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="text-tertiary pt-2">
+        This proposal uses a denominator of {totalAllocation.toLocaleString()}{" "}
+        to calculate the splits.
+      </div>
+    </>
   );
 }
 
@@ -1115,23 +1154,10 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
               </>
             )}
           </div>
-          <div className="text-secondary">
-            Total allocation: {totalAllocation.toLocaleString()} ppm.
-          </div>
-          {count > 0 && (
-            <div
-              className={`space-y-1 pl-4 pt-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
-            >
-              {recipientData.map((r, i) => (
-                <SplitRecipientRow
-                  key={i}
-                  address={r.address}
-                  allocation={r.allocation}
-                  totalAllocation={totalAllocation}
-                />
-              ))}
-            </div>
-          )}
+          <SplitRecipientsTable
+            recipientData={recipientData}
+            totalAllocation={totalAllocation}
+          />
         </div>
       );
     },
@@ -1178,25 +1204,15 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             Update {maybeFriendlyAddress(target)} membership configuration for{" "}
             <span className="font-semibold">{count}</span> members.
           </div>
-          <div className="text-secondary">
-            Total allocation: {totalAllocation.toLocaleString()} ppm.
-            {incentivePpm > 0 &&
-              ` Distribution incentive set to ${incentivePct}%.`}
-          </div>
-          {count > 0 && (
-            <div
-              className={`space-y-1 pl-4 pt-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
-            >
-              {recipientData.map((r, i) => (
-                <SplitRecipientRow
-                  key={i}
-                  address={r.address}
-                  allocation={r.allocation}
-                  totalAllocation={totalAllocation}
-                />
-              ))}
+          {incentivePpm > 0 && (
+            <div className="text-secondary">
+              Distribution incentive set to {incentivePct}%.
             </div>
           )}
+          <SplitRecipientsTable
+            recipientData={recipientData}
+            totalAllocation={totalAllocation}
+          />
         </div>
       );
     },
