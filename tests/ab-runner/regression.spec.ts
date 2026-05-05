@@ -45,11 +45,14 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   ) => {
     const artifactsDir = getArtifactsDir(route, meta);
     fs.mkdirSync(artifactsDir, { recursive: true });
+    const reportPath = path.join(artifactsDir, "report.json");
+    if (fs.existsSync(reportPath)) return;
+
     const message = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;
 
     fs.writeFileSync(
-      path.join(artifactsDir, "report.json"),
+      reportPath,
       JSON.stringify(
         [
           {

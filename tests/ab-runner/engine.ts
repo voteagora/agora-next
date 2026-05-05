@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test";
+import { Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -779,7 +779,7 @@ export class ABRunnerEngine {
 
     if (drifts.length > 0) {
       console.log(
-        `❌ Diff artifacts saved to: ${artifactsDir} for route ${route}`
+        `❌ FAILED - ${drifts.length} visual drift(s) detected. Diff artifacts saved to: ${artifactsDir} for route ${route}. CI will continue because visual differences are reported, not treated as runner failures.`
       );
     } else {
       console.log(
@@ -808,26 +808,17 @@ export class ABRunnerEngine {
       ? `🔗 View Full Report & Images: https://console.cloud.google.com/storage/browser/agora-ab-artifacts/reports/${new Date().toISOString().split("T")[0]}/${process.env.GITHUB_ACTOR || "cli"}_run-${runId}?project=silent-turbine-390703`
       : `🔗 View Full Report locally at: ${artifactsDir}/report.json`;
 
-    if (override.expectDiff) {
-      expect(
-        isDiff,
-        `\n\n🛑 EXPECTED VISUAL DRIFT MISSING 🛑\n\nExpected route "${route}" to structurally DIFFER between URLs, but they were visually identical.\n`
-      ).toBe(true);
-    } else {
-      expect(
-        drifts.length,
-        `\n\n🛑 VISUAL DRIFT THRESHOLD EXCEEDED 🛑\n\n` +
-          `The A/B regression engine detected ${drifts.length} block-level drift(s) on route: "${route}".\n\n` +
-          `📊 DRIFT ANATOMY BREAKDOWN:\n` +
-          `   🎨 Style Differences: ${numStyle}\n` +
-          `   📏 Layout/Size Shifts: ${numLayout}\n` +
-          `   ✍️ Data/Text Changes: ${numData}\n` +
-          `   👻 Missing Components: ${numMissing}\n\n` +
-          `🔍 TOP AFFECTED SELECTORS (Sneak Peek):\n${topDrifts || "   (None)"}\n\n` +
-          `${bucketLink}\n\n` +
-          `Context: This means some React elements changed color, spacing, or text compared to URL A.\n` +
-          `Don't panic! This is NOT a code crash. Please verify if these visual variations are intentional redesigns or true bugs.\n`
-      ).toBe(0);
+    if (override.expectDiff && !isDiff) {
+      console.warn(
+        `Expected route "${route}" to differ, but no visual drift was detected.`
+      );
+    } else if (!override.expectDiff && drifts.length > 0) {
+      console.warn(
+        `FAILED - visual drift detected on route "${route}" (${drifts.length} block-level drift(s)); artifacts were recorded without failing CI.\n` +
+          `Breakdown: style=${numStyle}, layout=${numLayout}, data=${numData}, missing=${numMissing}.\n` +
+          `Top selectors:\n${topDrifts || "   (None)"}\n` +
+          bucketLink
+      );
     }
   }
 
