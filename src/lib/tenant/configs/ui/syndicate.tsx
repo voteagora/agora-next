@@ -539,6 +539,7 @@ export const syndicateTenantUIConfig = new TenantUI({
         storageKey: "syndicate-voting-power-banner-dismissed",
       },
     },
+
     {
       name: "delegates-layout-list",
       enabled: true,
