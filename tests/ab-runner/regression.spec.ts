@@ -15,6 +15,78 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   let pageA: Page;
   let pageB: Page;
 
+  const getArtifactsDir = (route: string, meta?: { tenant: string }) => {
+    const proposalId = route.match(/^\/proposals\/(.+)$/)?.[1];
+    const safeRouteName =
+      route === "/"
+        ? "index-page"
+        : proposalId
+          ? `proposal-${proposalId}`
+          : route.replace(/^\//, "").replace(/\//g, "-");
+
+    if (meta?.tenant) {
+      return path.join(
+        process.cwd(),
+        "test-results",
+        "ab-diffs",
+        meta.tenant,
+        "proposals",
+        safeRouteName
+      );
+    }
+
+    return path.join(process.cwd(), "test-results", "ab-diffs", safeRouteName);
+  };
+
+  const writeFailureReport = (
+    route: string,
+    error: unknown,
+    meta?: { tenant: string }
+  ) => {
+    const artifactsDir = getArtifactsDir(route, meta);
+    fs.mkdirSync(artifactsDir, { recursive: true });
+    const message = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+
+    fs.writeFileSync(
+      path.join(artifactsDir, "report.json"),
+      JSON.stringify(
+        [
+          {
+            reportDescription: {
+              urlA: process.env.URL_A || "http://127.0.0.1:3000",
+              urlB: process.env.URL_B || "http://127.0.0.1:3000",
+              route,
+              driftsFound: 1,
+              status: "ERROR - VISUAL RUNNER FAILED BEFORE DIFF REPORT",
+              generatedAt: new Date().toISOString(),
+            },
+          },
+          {
+            selector: "runner",
+            reason: "Runner Error",
+            urlA_text: message,
+            urlB_text: stack || message,
+          },
+        ],
+        null,
+        2
+      )
+    );
+  };
+
+  const diffRouteWithFailureReport = async (
+    route: string,
+    meta?: { tenant: string }
+  ) => {
+    try {
+      await engine.diffRoute(route, pageA, pageB, meta);
+    } catch (error) {
+      writeFailureReport(route, error, meta);
+      throw error;
+    }
+  };
+
   test.beforeAll(async () => {
     engine = new ABRunnerEngine();
     const browser = await chromium.launch();
@@ -115,7 +187,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
   for (const route of staticRoutes) {
     test(`Diff pass/fail -> expected/diff for static route "${route}"`, async () => {
       test.setTimeout(900000); // 15.0m to compensate for GitHub CI CPU limits on infinite scrolls
-      await engine.diffRoute(route, pageA, pageB);
+      await diffRouteWithFailureReport(route);
     });
   }
 
@@ -130,7 +202,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     for (const proposalId of explicitProposals) {
       test(`Diff pass/fail -> expected/diff for specific explicitly targeted proposal "/proposals/${proposalId}"`, async () => {
         test.setTimeout(900000);
-        await engine.diffRoute(`/proposals/${proposalId}`, pageA, pageB);
+        await diffRouteWithFailureReport(`/proposals/${proposalId}`);
       });
     }
   }
@@ -176,7 +248,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
 
         console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
         try {
-          await engine.diffRoute(pRoute, pageA, pageB, {
+          await diffRouteWithFailureReport(pRoute, {
             tenant: activeTenant,
           });
         } catch (e: any) {

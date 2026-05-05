@@ -60,11 +60,6 @@ on:
         required: false
         type: boolean
         default: false
-      use_prod_data:
-        description: "Force production environment data (Required to fetch real archives)"
-        required: false
-        type: boolean
-        default: true
 
 jobs:
   visual-regression:
@@ -122,6 +117,7 @@ jobs:
           echo "📝 Metadata written"
 
       - name: Run A/B Regression Engine
+        id: regression
         continue-on-error: true
         env:
           URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
@@ -130,7 +126,7 @@ jobs:
           SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
-          NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_data == true && 'prod' || '' }}
+          NEXT_PUBLIC_AGORA_ENV: prod
         run: npm run test:ab
 
       - name: Google Auth
@@ -155,3 +151,19 @@ jobs:
         run: |
           chmod +x scripts/upload-ab-artifacts.sh
           ./scripts/upload-ab-artifacts.sh
+
+      - name: Validate A/B Report Output
+        if: always()
+        run: |
+          REPORT_COUNT=$(find test-results/ab-diffs -name report.json -type f 2>/dev/null | wc -l | tr -d ' ')
+          echo "Visual reports generated: ${REPORT_COUNT}"
+
+          if [ "${REPORT_COUNT}" -eq 0 ]; then
+            echo "::error::No A/B report.json files were generated. Check the 'Run A/B Regression Engine' step logs; the dashboard has no visual results to render."
+            exit 1
+          fi
+
+          if [ "${{ steps.regression.outcome }}" != "success" ]; then
+            echo "::error::The A/B regression step failed. Uploaded artifacts may be partial; check the uploaded dashboard for per-route runner errors."
+            exit 1
+          fi

@@ -2457,7 +2457,9 @@
                     if (
                       r.includes("data") ||
                       r.includes("style") ||
-                      r.includes("layout")
+                      r.includes("layout") ||
+                      r.includes("runner") ||
+                      r.includes("error")
                     ) {
                       scopesMap[scopeName].regressions++;
                     } else {
