@@ -103,6 +103,11 @@ export class ABRunnerEngine {
     const reportList: any[] = [];
 
     const proposalId = route.match(/^\/proposals\/(.+)$/)?.[1];
+    const isListRoute =
+      route === "/" ||
+      route === "/proposals" ||
+      route === "/delegates" ||
+      route.startsWith("/delegates?");
     const safeRouteName =
       route === "/"
         ? "index-page"
