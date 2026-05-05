@@ -19,7 +19,7 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:ab": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression.spec.ts; node tests/ab-runner/generate-manifest.js"
+    "test:ab": "rm -rf test-results/ab-diffs && playwright test tests/ab-runner/regression.spec.ts; TEST_EXIT=$?; node tests/ab-runner/generate-manifest.js; exit $TEST_EXIT"
   },
   "dependencies": {
     "@aa-sdk/core": "^4.0.0-beta.10",
