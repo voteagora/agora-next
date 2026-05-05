@@ -270,13 +270,6 @@ function TopicCard({
                       type="button"
                       onClick={onToggleWatch}
                       disabled={watchLoading}
-                      title={
-                        watchLoading
-                          ? "Loading watch status"
-                          : isWatching
-                            ? "Stop watching"
-                            : "Watch topic"
-                      }
                       className={`flex items-center justify-center text-secondary rounded-md min-w-[40px] h-[42px] hover:bg-neutral transition-colors ${
                         watchLoading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
