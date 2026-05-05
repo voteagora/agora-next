@@ -39,6 +39,7 @@ interface UndelegateActionButtonsProps {
   executeDelegate: () => void;
   isError: boolean;
   didFailDelegation: boolean;
+  didFailSponsoredUnelegation: boolean;
   isProcessingDelegation: boolean;
   isProcessingSponsoredUnelegation: boolean;
   didProcessDelegation: boolean;
@@ -55,6 +56,7 @@ const UndelegateActionButtons = ({
   executeDelegate,
   isError,
   didFailDelegation,
+  didFailSponsoredUnelegation,
   isProcessingDelegation,
   isProcessingSponsoredUnelegation,
   didProcessDelegation,
@@ -71,7 +73,7 @@ const UndelegateActionButtons = ({
     );
   }
 
-  if (isError || didFailDelegation) {
+  if (isError || didFailDelegation || didFailSponsoredUnelegation) {
     return (
       <Button disabled={false} onClick={executeDelegate}>
         Undelegation failed - try again
@@ -158,6 +160,7 @@ export function UndelegateDialog({
     call,
     isFetching: isProcessingSponsoredUnelegation,
     isFetched: didProcessSponsoredUnelegation,
+    isError: didFailSponsoredUnelegation,
     txHash: sponsoredTxnHash,
   } = useSponsoredDelegation({
     address: accountAddress,
@@ -180,7 +183,7 @@ export function UndelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive ? undefined : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -255,7 +258,9 @@ export function UndelegateDialog({
     if (!isReady) {
       fetchData();
     }
+  }, [isReady, fetchData]);
 
+  useEffect(() => {
     if (didProcessDelegation) {
       if (delegationTraceRef.current) {
         attachMiradorTransactionArtifacts(delegationTraceRef.current, {
@@ -274,6 +279,9 @@ export function UndelegateDialog({
         });
         delegationTraceRef.current = null;
       }
+    }
+
+    if (didProcessDelegation || didProcessSponsoredUnelegation) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
@@ -283,7 +291,7 @@ export function UndelegateDialog({
       }
       revalidateData();
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [didProcessDelegation, didProcessSponsoredUnelegation]);
 
   useEffect(() => {
     if (!delegationTraceRef.current || isGasRelayLive) {
@@ -387,6 +395,7 @@ export function UndelegateDialog({
           executeDelegate={executeDelegate}
           isError={isError}
           didFailDelegation={didFailDelegation}
+          didFailSponsoredUnelegation={didFailSponsoredUnelegation}
           isProcessingDelegation={isProcessingDelegation}
           isProcessingSponsoredUnelegation={isProcessingSponsoredUnelegation}
           didProcessDelegation={didProcessDelegation}

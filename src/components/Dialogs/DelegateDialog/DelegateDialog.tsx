@@ -99,6 +99,7 @@ export function DelegateDialog({
     call,
     isFetching: isProcessingSponsoredDelegation,
     isFetched: didProcessSponsoredDelegation,
+    isError: didFailSponsoredDelegation,
     txHash: sponsoredTxnHash,
   } = useSponsoredDelegation({
     address: accountAddress,
@@ -121,9 +122,7 @@ export function DelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayLive
-      ? sponsoredTxnHash
-      : (localDelegateTxHash ?? delegateTxHash),
+    hash: isGasRelayLive ? undefined : (localDelegateTxHash ?? delegateTxHash),
   });
 
   const fetchData = async () => {
@@ -136,7 +135,7 @@ export function DelegateDialog({
   };
 
   useEffect(() => {
-    if (didProcessDelegation) {
+    if (didProcessDelegation || didProcessSponsoredDelegation) {
       trackEvent({
         event_name: ANALYTICS_EVENT_NAMES.DELEGATE,
         event_data: {
@@ -159,7 +158,7 @@ export function DelegateDialog({
         });
       }
     }
-  }, [didProcessDelegation]);
+  }, [didProcessDelegation, didProcessSponsoredDelegation]);
 
   useEffect(() => {
     if (isGasRelayLive || !delegationTraceRef.current) {
@@ -341,7 +340,7 @@ export function DelegateDialog({
       );
     }
 
-    if (isError || didFailDelegation) {
+    if (isError || didFailDelegation || didFailSponsoredDelegation) {
       return (
         <Button disabled={false} onClick={executeDelegate}>
           Delegation failed - try again
@@ -377,7 +376,9 @@ export function DelegateDialog({
     ) {
       fetchData();
     }
+  }, [accountAddress, tokenBalance]);
 
+  useEffect(() => {
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       // Refresh delegation
       if (tokenBalance !== undefined && tokenBalance > 0n) {
@@ -387,7 +388,7 @@ export function DelegateDialog({
         });
       }
     }
-  }, [didProcessDelegation, delegate, tokenBalance, accountAddress]);
+  }, [didProcessDelegation, didProcessSponsoredDelegation]);
 
   if (!isReady) {
     return (
