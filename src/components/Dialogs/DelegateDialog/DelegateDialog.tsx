@@ -34,12 +34,21 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { addMiradorEvent } from "@/lib/mirador/webTrace";
 import {
   attachMiradorTransactionArtifacts,
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+
+function getErrorMessage(error: unknown) {
+  if (!error) {
+    return undefined;
+  }
+
+  return error instanceof Error ? error.message : String(error);
+}
 
 export function DelegateDialog({
   delegate,
@@ -54,6 +63,7 @@ export function DelegateDialog({
 }) {
   const shouldFetchData = useRef(true);
   const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
+  const directDelegationAttemptErrorRef = useRef<string | undefined>(undefined);
   const [isReady, setIsReady] = useState(false);
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
@@ -108,6 +118,7 @@ export function DelegateDialog({
 
   const {
     isError,
+    error: writeError,
     writeContract: write,
     data: delegateTxHash,
   } = useWriteContract();
@@ -121,9 +132,12 @@ export function DelegateDialog({
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
+    error: receiptError,
   } = useWaitForTransactionReceipt({
     hash: isGasRelayLive ? undefined : (localDelegateTxHash ?? delegateTxHash),
   });
+  const writeErrorMessage = getErrorMessage(writeError);
+  const receiptErrorMessage = getErrorMessage(receiptError);
 
   const fetchData = async () => {
     if (shouldFetchData.current && accountAddress) {
@@ -180,19 +194,31 @@ export function DelegateDialog({
         },
       });
       delegationTraceRef.current = null;
+      directDelegationAttemptErrorRef.current = undefined;
       return;
     }
 
     if (didFailDelegation || isError) {
+      const directAttemptError = directDelegationAttemptErrorRef.current;
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
-          error: "Delegation transaction failed",
+          action: "delegate",
+          transactionHash: directDelegationTxHash,
+          error:
+            receiptErrorMessage ||
+            writeErrorMessage ||
+            directAttemptError ||
+            "Delegation transaction failed",
+          directAttemptError,
+          walletError: writeErrorMessage,
+          receiptError: receiptErrorMessage,
         },
       });
       delegationTraceRef.current = null;
+      directDelegationAttemptErrorRef.current = undefined;
     }
   }, [
     contracts.token.chain.id,
@@ -202,6 +228,8 @@ export function DelegateDialog({
     directDelegationTxHash,
     isError,
     isGasRelayLive,
+    receiptErrorMessage,
+    writeErrorMessage,
   ]);
 
   useEffect(() => {
@@ -225,6 +253,7 @@ export function DelegateDialog({
     if (isGasRelayLive) {
       await call();
     } else {
+      directDelegationAttemptErrorRef.current = undefined;
       if (delegationTraceRef.current) {
         void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
           reason: "governance_delegation_restarted",
@@ -293,6 +322,15 @@ export function DelegateDialog({
         setLocalDelegateTxHash(txHash);
       } catch (error) {
         console.error("delegate via viem failed", error);
+        const directAttemptError = getErrorMessage(error);
+        directDelegationAttemptErrorRef.current = directAttemptError;
+        addMiradorEvent(trace, "governance_delegation_direct_attempt_failed", {
+          delegatee: delegate.address,
+          action: "delegate",
+          phase: "viem_simulate_or_write",
+          error: directAttemptError,
+          fallback: "wagmi_write",
+        });
         // Fallback to wagmi write (may still fail under Safe CAIP-2)
         try {
           write({
@@ -304,20 +342,22 @@ export function DelegateDialog({
           });
         } catch (innerError) {
           console.error("delegate via wagmi fallback failed", innerError);
+          const fallbackError = getErrorMessage(innerError);
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_delegation_failed",
             eventName: "governance_delegation_failed",
             details: {
               delegatee: delegate.address,
-              error:
-                innerError instanceof Error
-                  ? innerError.message
-                  : String(innerError),
+              action: "delegate",
+              phase: "wagmi_write",
+              error: fallbackError,
+              directAttemptError,
             },
           });
           if (delegationTraceRef.current === trace) {
             delegationTraceRef.current = null;
           }
+          directDelegationAttemptErrorRef.current = undefined;
         }
       }
     }
