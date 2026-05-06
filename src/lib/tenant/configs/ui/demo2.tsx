@@ -474,7 +474,7 @@ export const demo2TenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Canopy Agora",
+        title: "Canopy Agora Voting",
         sections: [
           {
             id: "voting-process",
