@@ -11,6 +11,13 @@ import { createWalletClient, parseSignature, isHex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 const SPONSOR_PRIVATE_KEY = process.env.GAS_SPONSOR_PK;
+const DELEGATE_BY_SIG_GAS_BUFFER_PERCENT = 30n;
+
+function getBufferedDelegateBySigGasLimit(estimatedGas: bigint) {
+  return (
+    estimatedGas + (estimatedGas * DELEGATE_BY_SIG_GAS_BUFFER_PERCENT) / 100n
+  );
+}
 
 export async function delegateBySignatureApi({
   signature,
@@ -135,14 +142,22 @@ async function prepareDelegateBySignatureApi({
   }
 
   const account = privateKeyToAccount(SPONSOR_PRIVATE_KEY);
-
-  const { request } = await publicClient.simulateContract({
+  const delegateBySigRequest = {
     address: token.address as `0x${string}`,
     abi: token.abi,
     functionName: "delegateBySig",
     args: [delegatee, BigInt(nonce), BigInt(expiry), v, r, s],
     account: account,
-  });
+  } as const;
 
-  return { request };
+  const { request } = await publicClient.simulateContract(delegateBySigRequest);
+  const estimatedGas =
+    await publicClient.estimateContractGas(delegateBySigRequest);
+
+  return {
+    request: {
+      ...request,
+      gas: getBufferedDelegateBySigGasLimit(estimatedGas),
+    },
+  };
 }
