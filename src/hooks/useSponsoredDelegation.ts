@@ -9,6 +9,7 @@ import { config } from "@/app/Web3Provider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useEffect, useRef, useState } from "react";
 import { useTokenName } from "@/hooks/useTokenName";
+import { getPublicClient } from "@/lib/viem";
 import { withMiradorTraceHeaders } from "@/lib/mirador/headers";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import { addMiradorEvent } from "@/lib/mirador/webTrace";
@@ -33,6 +34,14 @@ const types = {
   ],
 };
 const SPONSORED_DELEGATION_RECEIPT_TIMEOUT_MS = 10 * 60 * 1000;
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function addressesMatch(first: string, second: string) {
+  return first.toLowerCase() === second.toLowerCase();
+}
 
 export const useSponsoredDelegation = ({ address, delegate }: Props) => {
   const { ui, contracts } = Tenant.current();
@@ -87,6 +96,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
     const isUndelegation = delegate.address === zeroAddress;
     const action = isUndelegation ? "undelegate" : "delegate";
     let relayTxHash: `0x${string}` | undefined;
+    let didSubmitRelayRequest = false;
     const inputData = encodeFunctionData({
       abi: contracts.token.abi as any,
       functionName: "delegate",
@@ -153,6 +163,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
       });
 
       const agoraAPI = new AgoraAPI();
+      didSubmitRelayRequest = true;
       const response = await agoraAPI.post(
         "/relay/delegate",
         "v1",
@@ -215,6 +226,73 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
     } catch (error) {
       const nextError =
         error instanceof Error ? error : new Error(String(error));
+
+      if (address && (didSubmitRelayRequest || relayTxHash)) {
+        try {
+          const currentDelegatee = (await getPublicClient(
+            contracts.token.chain
+          ).readContract({
+            address: contracts.token.address as Address,
+            abi: contracts.token.abi as any,
+            functionName: "delegates",
+            args: [address],
+          })) as Address;
+
+          const isDelegateStateReconciled = addressesMatch(
+            currentDelegatee,
+            delegate.address
+          );
+
+          addMiradorEvent(
+            trace,
+            "governance_delegation_reconciliation_checked",
+            {
+              delegatee: delegate.address,
+              action,
+              currentDelegatee,
+              transactionHash: relayTxHash,
+              originalError: nextError.message,
+              reconciled: isDelegateStateReconciled,
+            }
+          );
+
+          if (isDelegateStateReconciled) {
+            setError(undefined);
+            setTxHash(undefined);
+            setIsFetched(true);
+
+            void closeFrontendMiradorFlowTrace(trace, {
+              reason: "governance_delegation_succeeded",
+              eventName: "governance_delegation_succeeded",
+              details: {
+                delegatee: delegate.address,
+                action,
+                currentDelegatee,
+                originalTransactionHash: relayTxHash,
+                originalError: nextError.message,
+                reconciled: true,
+              },
+            });
+            if (traceRef.current === trace) {
+              traceRef.current = null;
+            }
+            return;
+          }
+        } catch (reconciliationError) {
+          addMiradorEvent(
+            trace,
+            "governance_delegation_reconciliation_failed",
+            {
+              delegatee: delegate.address,
+              action,
+              transactionHash: relayTxHash,
+              originalError: nextError.message,
+              reconciliationError: getErrorMessage(reconciliationError),
+            }
+          );
+        }
+      }
+
       setError(nextError);
       void closeFrontendMiradorFlowTrace(trace, {
         reason: "governance_delegation_failed",
