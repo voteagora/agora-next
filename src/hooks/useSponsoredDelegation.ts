@@ -258,7 +258,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
           if (isDelegateStateReconciled) {
             setError(undefined);
-            setTxHash(undefined);
+            setTxHash(relayTxHash);
             setIsFetched(true);
 
             void closeFrontendMiradorFlowTrace(trace, {

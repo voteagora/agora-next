@@ -325,7 +325,9 @@ describe("useSponsoredDelegation", () => {
         }),
       })
     );
-    expect(result.current.txHash).toBe(undefined);
+    expect(result.current.txHash).toBe(
+      "0x000000000000000000000000000000000000000000000000000000000000000a"
+    );
     expect(result.current.isFetched).toBe(true);
     expect(result.current.isError).toBe(false);
   });
