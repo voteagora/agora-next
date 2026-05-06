@@ -171,7 +171,7 @@ const knownAbis: Record<string, Abi> = {
   ],
 };
 
-const decodeCalldata = (calldatas: `0x${string}`[]) => {
+export const decodeCalldata = (calldatas: `0x${string}`[]) => {
   return calldatas.map((calldata) => {
     const parsedCalldata: `0x${string}` = calldata.startsWith("0x")
       ? calldata
@@ -1262,14 +1262,24 @@ export function calculateHybridApprovalWeightedPercentage(
     : 0;
 
   weightedOptionPercentage +=
-    (delegatesVotes / eligibleVoters.delegates) * weights.delegates * 100;
+    (eligibleVoters.delegates > 0
+      ? (delegatesVotes / eligibleVoters.delegates)
+      : 0) *
+    weights.delegates *
+    100;
 
   weightedOptionPercentage +=
-    (appsVotes / eligibleVoters.apps) * weights.apps * 100;
+    (eligibleVoters.apps > 0 ? (appsVotes / eligibleVoters.apps) : 0) *
+    weights.apps *
+    100;
   weightedOptionPercentage +=
-    (usersVotes / eligibleVoters.users) * weights.users * 100;
+    (eligibleVoters.users > 0 ? (usersVotes / eligibleVoters.users) : 0) *
+    weights.users *
+    100;
   weightedOptionPercentage +=
-    (chainsVotes / eligibleVoters.chains) * weights.chains * 100;
+    (eligibleVoters.chains > 0 ? (chainsVotes / eligibleVoters.chains) : 0) *
+    weights.chains *
+    100;
 
   return weightedOptionPercentage;
 }
@@ -1284,32 +1294,39 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
   const proposalForVotes = BigInt(proposalResults?.for || 0);
   const proposalAgainstVotes = BigInt(proposalResults?.against || 0);
   const proposalTotalVotes = proposalForVotes + proposalAgainstVotes;
-
   const totalUniqueVoters = {
     ["delegates"]: proposalTotalVotes,
-    ["apps"]: proposalResults.totals.vote_counts.APP,
-    ["users"]: proposalResults.totals.vote_counts.USER,
-    ["chains"]: proposalResults.totals.vote_counts.CHAIN,
+    ["apps"]: proposalResults?.totals?.vote_counts?.APP ?? 0,
+    ["users"]: proposalResults?.totals?.vote_counts?.USER ?? 0,
+    ["chains"]: proposalResults?.totals?.vote_counts?.CHAIN ?? 0,
   };
   let uniqueParticipationPercentage = 0;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates) *
+    (eligibleVoters.delegates > 0
+      ? (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates)
+      : 0) *
     100 *
     weights.delegates;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps) *
+    (eligibleVoters.apps > 0
+      ? (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps)
+      : 0) *
     100 *
     weights.apps;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.users || 0) / eligibleVoters.users) *
+    (eligibleVoters.users > 0
+      ? (Number(totalUniqueVoters.users || 0) / eligibleVoters.users)
+      : 0) *
     100 *
     weights.users;
 
   uniqueParticipationPercentage +=
-    (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains) *
+    (eligibleVoters.chains > 0
+      ? (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains)
+      : 0) *
     100 *
     weights.chains;
 
@@ -1665,10 +1682,7 @@ export function calculateHybridStandardProposalMetrics(proposal: Proposal) {
     finalApproval: talliesData.finalApproval,
     totalForVotesPercentage: Number(calculatedTotalForVotes.toFixed(2)),
     totalAgainstVotesPercentage: Number(calculatedTotalAgainstVotes.toFixed(2)),
-    totalAbstainVotesPercentage:
-      calculationOptions === 0
-        ? Number(calculatedTotalAbstainVotes.toFixed(2))
-        : 0,
+    totalAbstainVotesPercentage: Number(calculatedTotalAbstainVotes.toFixed(2)),
   };
 }
 

@@ -1,0 +1,64 @@
+{
+  "after_end_block": false,
+  "after_start_block": false,
+  "block_number": "139798607",
+  "calldatas": [""],
+  "data_eng_properties": {
+    "hash": "21c85d70f4685b60e4858c22ebee8eeae7a95ecd400ad5ddd75dc354396dc133",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "description": "# Security Council Season 7 Retroactive Funding Request\n\nThe Optimism Security Council (OPSC) is requesting 346,920 OP from the Governance Fund as retroactive compensation for Season 7.\n\nDuring Season 7, the OPSC faced a significantly higher workload than anticipated when the original budget was approved.\n\n* The OPSC is now signing for 5 OP Stack chains, in addition to OP Mainnet.\n* In Season 7, the OPSC completed 19 upgrade ceremonies over a six-month period (vs. 6 in all of 2024).\n\nThe amount requested will be divided equally across all Season 7 signers (13) and the Lead (1), with each recipient receiving 24,780 OP for Season 7.\n\nIf approved, the amount requested will be distributed to Season 7 members of the Security Council, as soon as funds are made available.\n\nThis proposal is eligible for Voting Cycle #40: https://gov.optimism.io/t/voting-cycle-roundup-40\n",
+  "end_block": 140057807,
+  "end_blocktime": 1755714391,
+  "execute_event": {
+    "block_number": "140194574",
+    "id": "95125315478676153337636309965804486010918292377915044655013986825087199254978",
+    "log_index": 1,
+    "timestamp": 1755987925,
+    "transaction_hash": "0xf0e1d6feb494d9c6b0465cf4e12d755a7d74d31f3341c98b807afc79cb721306",
+    "transaction_index": 25
+  },
+  "hybrid": false,
+  "id": "95125315478676153337636309965804486010918292377915044655013986825087199254978",
+  "lifecycle_stage": "EXECUTED",
+  "log_index": 62,
+  "num_of_votes": 6192,
+  "proposal_type_id": 0,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "default",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "queue_event": {
+    "block_number": "140057946",
+    "eta": 1755973869,
+    "id": "95125315478676153337636309965804486010918292377915044655013986825087199254978",
+    "log_index": 31,
+    "timestamp": 1755714669,
+    "transaction_hash": "0xeb4ed4b3778cdd46d1389b52ea34140108a6bef21776d36362d67f207e413a41",
+    "transaction_index": 19
+  },
+  "quorum": "29048439693532197051157636",
+  "signatures": [""],
+  "start_block": 139798607,
+  "start_blocktime": 1755195991,
+  "targets": ["0x0000000000000000000000000000000000000000"],
+  "timestamp": 1755195991,
+  "title": "Security Council Season 7 Retroactive Funding Request",
+  "total_voting_power_at_start": "96828132311773990170525455",
+  "totals": {
+    "no-param": {
+      "0": "48220440983038447128018",
+      "1": "46330174969101274671610001",
+      "2": "4120144602474433253504"
+    }
+  },
+  "transaction_hash": "0x731ae9248f09de0028322602d35a5f52117cde0c8ace92b86eabb6306b8ad42b",
+  "transaction_index": 19,
+  "values": [0],
+  "voting_module_name": "standard"
+}

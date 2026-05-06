@@ -1,0 +1,56 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "139798607",
+  "calldatas": ["0x"],
+  "data_eng_properties": {
+    "hash": "synthetic-standard-passed",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "description": "# [SYNTHETIC] Standard proposal — passed (queued >10d, no onchain actions)\n\nSignal-only proposal; auto-transitions from QUEUED to PASSED after 10 days.",
+  "end_block": 140057807,
+  "end_blocktime": 1755714391,
+  "hybrid": false,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000005",
+  "lifecycle_stage": "QUEUED",
+  "log_index": 1,
+  "num_of_votes": 4800,
+  "proposal_type_id": 0,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "default",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "queue_event": {
+    "block_number": "140057946",
+    "eta": 1775174400,
+    "id": "99000000000000000000000000000000000000000000000000000000000000000000000000005",
+    "log_index": 31,
+    "timestamp": 1775088000,
+    "transaction_hash": "0x00000000000000000000000000000000000000000000000000000000000000c5",
+    "transaction_index": 19
+  },
+  "quorum": "29048439693532197051157636",
+  "signatures": [""],
+  "start_block": 139798607,
+  "start_blocktime": 1755195991,
+  "targets": ["0x0000000000000000000000000000000000000000"],
+  "timestamp": 1755195991,
+  "title": "[SYNTHETIC] Standard — Passed (signal-only)",
+  "total_voting_power_at_start": "96828132311773990170525455",
+  "totals": {
+    "no-param": {
+      "0": "800000000000000000000000",
+      "1": "40000000000000000000000000",
+      "2": "1200000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000005",
+  "transaction_index": 1,
+  "values": [0],
+  "voting_module_name": "standard"
+}

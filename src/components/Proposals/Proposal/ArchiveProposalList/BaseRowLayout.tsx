@@ -26,7 +26,6 @@ export function BaseRowLayout({
 }: BaseRowLayoutProps) {
   const { ui } = Tenant.current();
   const isOODao = data.source === "eas-oodao";
-
   const statusProposal = {
     status: data.statusLabel,
     id: data.id,
@@ -34,8 +33,8 @@ export function BaseRowLayout({
   return (
     <Link href={data.href}>
       <div
-        className="border-b border-line items-center flex flex-row bg-neutral"
         data-testid={`proposal-list-item-${data.id}`}
+        className="border-b border-line items-center flex flex-row bg-neutral"
       >
         {/* Left column: Title and metadata */}
         <div
