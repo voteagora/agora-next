@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import { Delegate } from "@/app/api/common/delegates/delegate";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 
 const useFetchAllForVoting = ({
   proposal,

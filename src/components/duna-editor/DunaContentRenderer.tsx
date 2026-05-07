@@ -9,7 +9,6 @@ import {
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { sanitizeForumContent } from "@/lib/sanitizationUtils";
-import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 
 interface DunaContentRendererProps {
@@ -151,7 +150,6 @@ export default function DunaContentRenderer({
   className,
   enableEmbeds = true,
 }: DunaContentRendererProps) {
-  const { ui } = Tenant.current();
   const [mounted, setMounted] = useState(false);
 
   useLayoutEffect(() => {
@@ -164,6 +162,7 @@ export default function DunaContentRenderer({
   );
   const isMarkdown = !looksLikeHtml(sanitizedContent);
   const renderedContent = useMemo(() => {
+    if (!content) return null;
     if (isMarkdown) {
       return (
         <div

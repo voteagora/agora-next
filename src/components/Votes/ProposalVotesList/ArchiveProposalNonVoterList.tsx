@@ -7,34 +7,41 @@ import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 
 const NON_VOTERS_PAGE_SIZE = 20;
 
 type ArchiveProposalNonVoterListProps = {
   proposal: Proposal;
+  selectedVoterType: VoterTypes;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 };
 
 export default function ArchiveProposalNonVoterList({
   proposal,
+  selectedVoterType,
+  sort,
+  sortOrder,
 }: ArchiveProposalNonVoterListProps) {
   const [visibleCount, setVisibleCount] = useState(NON_VOTERS_PAGE_SIZE);
-  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    proposal.proposalType?.includes("HYBRID") ||
-      proposal.proposalType?.includes("OFFCHAIN")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
-  );
 
   const { nonVoters, isLoading, error } = useArchiveNonVoters({
     proposalId: proposal.id,
+    sort,
+    sortOrder,
+    voterType: selectedVoterType.type,
   });
 
   useEffect(() => {
     setVisibleCount(NON_VOTERS_PAGE_SIZE);
-  }, [selectedVoterType]);
+  }, [selectedVoterType, sort, sortOrder]);
 
-  // Determine if we should show the filter
+  // Determine if we should show the filter (logic kept for filtering data, though UI is lifted)
   const shouldShowFilter =
     proposal.proposalType?.includes("HYBRID") ||
     proposal.proposalType?.includes("OFFCHAIN") ||
@@ -49,6 +56,10 @@ export default function ArchiveProposalNonVoterList({
     return nonVoters.filter((nonVoter) => {
       const citizenType = nonVoter.citizen_type?.toUpperCase();
       const selectedType = selectedVoterType.type.toUpperCase();
+
+      if (selectedType === "ALL") {
+        return true;
+      }
 
       // Token House: show non-voters without citizen type
       if (selectedType === "TH" && !citizenType) {
@@ -106,21 +117,7 @@ export default function ArchiveProposalNonVoterList({
 
   return (
     <>
-      {shouldShowFilter && (
-        <ProposalVoterListFilter
-          selectedVoterType={selectedVoterType}
-          onVoterTypeChange={setSelectedVoterType}
-          isOffchain={isOffchain}
-        />
-      )}
-      <div
-        className="px-4 pb-4 overflow-y-auto min-h-[36px]"
-        style={{
-          maxHeight: shouldShowFilter
-            ? "calc(100vh - 487px)"
-            : "calc(100vh - 437px)",
-        }}
-      >
+      <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
         <InfiniteScroll
           key={selectedVoterType.type}
           hasMore={hasMore}

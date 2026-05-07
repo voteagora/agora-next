@@ -34,6 +34,7 @@ export function ProposalSingleNonVoter({
       image: string;
       type: string;
     } | null;
+    votingPowerSource?: "cpls_snapshot";
   };
 }) {
   const { namespace, ui } = Tenant.current();
@@ -47,11 +48,18 @@ export function ProposalSingleNonVoter({
   });
 
   const { address: connectedAddress } = useAccount();
+  const usesCplsSnapshotVotingPower =
+    voter.votingPowerSource === "cpls_snapshot";
 
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
-    blockNumber: BigInt(proposal.snapshotBlockNumber),
-    enabled: namespace !== TENANT_NAMESPACES.UNISWAP && !useArchiveVoteHistory,
+    blockNumber: proposal.snapshotBlockNumber
+      ? BigInt(proposal.snapshotBlockNumber)
+      : undefined,
+    enabled:
+      namespace !== TENANT_NAMESPACES.UNISWAP &&
+      !useArchiveVoteHistory &&
+      !usesCplsSnapshotVotingPower,
   });
 
   const ensAvatar = () => {
@@ -189,7 +197,9 @@ export function ProposalSingleNonVoter({
               amount={
                 voter.citizen_type
                   ? voter.voting_power
-                  : pastVotes || voter.voting_power
+                  : usesCplsSnapshotVotingPower
+                    ? voter.voting_power
+                    : (pastVotes ?? voter.voting_power)
               }
               hideCurrency
               specialFormatting

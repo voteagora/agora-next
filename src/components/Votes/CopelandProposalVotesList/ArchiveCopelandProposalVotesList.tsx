@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type { SnapshotVote } from "@/app/api/common/votes/vote";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
@@ -119,7 +119,7 @@ export default function ArchiveCopelandProposalVotesList({
   }
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
+    <div className={cn("overflow-y-scroll flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}

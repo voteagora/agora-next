@@ -4,7 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type {
+  Vote,
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
@@ -16,11 +21,17 @@ const VOTES_PAGE_SIZE = 20;
 type ArchiveApprovalProposalVotesListProps = {
   proposal: Proposal;
   isThresholdCriteria: boolean;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 };
 
 export default function ArchiveApprovalProposalVotesList({
   proposal,
   isThresholdCriteria,
+  sort,
+  sortOrder,
+  voterType,
 }: ArchiveApprovalProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
   const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
@@ -41,11 +52,14 @@ export default function ArchiveApprovalProposalVotesList({
     proposalId: proposal.id,
     proposalType,
     startBlock,
+    sort,
+    sortOrder,
+    voterType,
   });
 
   useEffect(() => {
     setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length]);
+  }, [votes.length, sort, sortOrder, voterType]);
 
   const approvalOptionLabels = useMemo(() => {
     if (!proposalType?.includes("APPROVAL") || !proposal.proposalData) {
@@ -163,14 +177,7 @@ export default function ArchiveApprovalProposalVotesList({
   }
 
   return (
-    <div
-      className={cn(
-        "overflow-y-scroll min-h-[36px]",
-        isThresholdCriteria
-          ? "max-h-[calc(100vh-560px)]"
-          : "max-h-[calc(100vh-527px)]"
-      )}
-    >
+    <div className={cn("overflow-y-scroll min-h-[36px]", "flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={hasMore}
         pageStart={0}
