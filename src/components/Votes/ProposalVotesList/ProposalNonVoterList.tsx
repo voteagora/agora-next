@@ -75,23 +75,28 @@ const ProposalNonVoterListContent = ({
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
       const voterTypeAtRequest = selectedVoterType.type;
-      const data = await fetchVotersWhoHaveNotVotedForProposal(
-        proposal.id,
-        {
-          limit: LIMIT,
-          offset: meta.next_offset,
-        },
-        offchainProposalId,
-        voterTypeAtRequest,
-        sort,
-        sortOrder
-      );
+      try {
+        const data = await fetchVotersWhoHaveNotVotedForProposal(
+          proposal.id,
+          {
+            limit: LIMIT,
+            offset: meta.next_offset,
+          },
+          offchainProposalId,
+          voterTypeAtRequest,
+          sort,
+          sortOrder
+        );
 
-      if (selectedVoterType.type === voterTypeAtRequest) {
-        setPages((prev) => [...prev, { ...data, votes: data.data }]);
-        setMeta(data.meta);
+        if (selectedVoterType.type === voterTypeAtRequest) {
+          setPages((prev) => [...prev, { ...data, votes: data.data }]);
+          setMeta(data.meta);
+        }
+      } catch (error) {
+        console.error("Failed to load more proposal non-voters", error);
+      } finally {
+        fetching.current = false;
       }
-      fetching.current = false;
     }
   }, [proposal, meta, selectedVoterType, offchainProposalId, sort, sortOrder]);
 

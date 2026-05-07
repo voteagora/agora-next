@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useMemo } from "react";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
-import ProposalVoterListFilter from "./ProsalVoterListFilter";
-import { VOTER_TYPES } from "@/lib/constants";
+import { useVisibleRows } from "@/hooks/useVisibleRows";
 import type {
   VotesSort,
   VotesSortOrder,
@@ -28,18 +26,12 @@ export default function ArchiveProposalNonVoterList({
   sort,
   sortOrder,
 }: ArchiveProposalNonVoterListProps) {
-  const [visibleCount, setVisibleCount] = useState(NON_VOTERS_PAGE_SIZE);
-
   const { nonVoters, isLoading, error } = useArchiveNonVoters({
     proposalId: proposal.id,
     sort,
     sortOrder,
     voterType: selectedVoterType.type,
   });
-
-  useEffect(() => {
-    setVisibleCount(NON_VOTERS_PAGE_SIZE);
-  }, [selectedVoterType, sort, sortOrder]);
 
   // Determine if we should show the filter (logic kept for filtering data, though UI is lifted)
   const shouldShowFilter =
@@ -81,17 +73,21 @@ export default function ArchiveProposalNonVoterList({
     });
   }, [nonVoters, selectedVoterType, shouldShowFilter]);
 
+  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
+    pageSize: NON_VOTERS_PAGE_SIZE,
+    resetKey: [
+      proposal.id,
+      selectedVoterType.type,
+      sort ?? "weight",
+      sortOrder ?? "desc",
+      filteredNonVoters.length,
+    ].join(":"),
+    totalCount: filteredNonVoters.length,
+  });
+
   const paginatedNonVoters = useMemo(() => {
     return filteredNonVoters.slice(0, visibleCount);
   }, [filteredNonVoters, visibleCount]);
-
-  const hasMore = visibleCount < filteredNonVoters.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + NON_VOTERS_PAGE_SIZE, filteredNonVoters.length)
-    );
-  }, [filteredNonVoters.length]);
 
   if (isLoading) {
     return (
@@ -113,32 +109,20 @@ export default function ArchiveProposalNonVoterList({
     );
   }
 
-  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
-
   return (
     <>
-      <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
-        <InfiniteScroll
-          key={selectedVoterType.type}
-          hasMore={hasMore}
-          pageStart={0}
-          loadMore={loadMore}
-          useWindow={false}
-          loader={
-            <div className="flex text-xs font-medium text-secondary" key={0}>
-              Loading ...
-            </div>
-          }
-          element="main"
-        >
-          <ul className="flex flex-col gap-2">
-            {paginatedNonVoters.map((nonVoter) => (
-              <li key={nonVoter.delegate}>
-                <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
-              </li>
-            ))}
-          </ul>
-        </InfiniteScroll>
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
+      >
+        <ul className="flex flex-col gap-2">
+          {paginatedNonVoters.map((nonVoter) => (
+            <li key={nonVoter.delegate}>
+              <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );

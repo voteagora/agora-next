@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import type {
@@ -13,6 +12,7 @@ import type {
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
+import { useVisibleRows } from "@/hooks/useVisibleRows";
 
 const VOTES_PAGE_SIZE = 20;
 
@@ -30,7 +30,6 @@ export default function ArchiveProposalVotesList({
   voterType,
 }: ArchiveProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
-  const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
   const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
 
@@ -52,10 +51,6 @@ export default function ArchiveProposalVotesList({
     sortOrder,
     voterType,
   });
-
-  useEffect(() => {
-    setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length, sort, sortOrder, voterType]);
 
   const normalizedVotes = useMemo(() => {
     return votes.map(
@@ -103,17 +98,21 @@ export default function ArchiveProposalVotesList({
     );
   }, [normalizedVotes, userVoteAddressSet]);
 
+  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
+    pageSize: VOTES_PAGE_SIZE,
+    resetKey: [
+      proposal.id,
+      sort ?? "weight",
+      sortOrder ?? "desc",
+      voterType ?? "ALL",
+      remainingVotes.length,
+    ].join(":"),
+    totalCount: remainingVotes.length,
+  });
+
   const paginatedVotes = useMemo(() => {
     return remainingVotes.slice(0, visibleCount);
   }, [remainingVotes, visibleCount]);
-
-  const hasMore = visibleCount < remainingVotes.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + VOTES_PAGE_SIZE, remainingVotes.length)
-    );
-  }, [remainingVotes.length]);
 
   if (isLoading) {
     return (
@@ -132,42 +131,33 @@ export default function ArchiveProposalVotesList({
   }
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
-      <InfiniteScroll
-        hasMore={hasMore}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div className="flex text-xs font-medium text-secondary" key={0}>
-            Loading more votes...
-          </div>
-        }
-        element="main"
-      >
-        <ul className="flex flex-col">
-          {userVotes.map((vote) => (
-            <li
-              key={
-                vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
-              }
-            >
-              <ProposalSingleVote vote={vote} />
-            </li>
-          ))}
-          {paginatedVotes.map((vote) => (
-            <li
-              key={
-                vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
-              }
-            >
-              <ProposalSingleVote vote={vote} />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
+    >
+      <ul className="flex flex-col">
+        {userVotes.map((vote) => (
+          <li
+            key={
+              vote.transactionHash ||
+              `${vote.address}-${vote.support}-${vote.weight}`
+            }
+          >
+            <ProposalSingleVote vote={vote} />
+          </li>
+        ))}
+        {paginatedVotes.map((vote) => (
+          <li
+            key={
+              vote.transactionHash ||
+              `${vote.address}-${vote.support}-${vote.weight}`
+            }
+          >
+            <ProposalSingleVote vote={vote} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

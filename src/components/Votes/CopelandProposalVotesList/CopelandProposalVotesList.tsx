@@ -48,15 +48,20 @@ export default function CopelandProposalVotesList({
   const loadMore = async () => {
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(proposalId, {
-        limit: LIMIT,
-        offset: meta.next_offset,
-      });
-      const existingIds = new Set(proposalVotes.map((v) => v.id));
-      const uniqueVotes = data?.data?.filter((v) => !existingIds.has(v.id));
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
-      setMeta(data.meta);
-      fetching.current = false;
+      try {
+        const data = await fetchVotesForProposal(proposalId, {
+          limit: LIMIT,
+          offset: meta.next_offset,
+        });
+        const existingIds = new Set(proposalVotes.map((v) => v.id));
+        const uniqueVotes = data?.data?.filter((v) => !existingIds.has(v.id));
+        setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+        setMeta(data.meta);
+      } catch (error) {
+        console.error("Failed to load more Copeland proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
   };
 

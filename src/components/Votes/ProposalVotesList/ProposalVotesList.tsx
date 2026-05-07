@@ -96,22 +96,27 @@ export default function ProposalVotesList({
   const loadMore = useCallback(async () => {
     if (!fetching.current && voteState.meta?.has_next) {
       fetching.current = true;
-      const data = await fetchProposalVotes(
-        proposalId,
-        {
-          limit: LIMIT,
-          offset: voteState.meta.next_offset,
-        },
-        sort,
-        offchainProposalId,
-        sortOrder,
-        voterType
-      );
-      setVoteState((prev) => ({
-        pages: [...prev.pages, { ...data, votes: data.data }],
-        meta: data.meta,
-      }));
-      fetching.current = false;
+      try {
+        const data = await fetchProposalVotes(
+          proposalId,
+          {
+            limit: LIMIT,
+            offset: voteState.meta.next_offset,
+          },
+          sort,
+          offchainProposalId,
+          sortOrder,
+          voterType
+        );
+        setVoteState((prev) => ({
+          pages: [...prev.pages, { ...data, votes: data.data }],
+          meta: data.meta,
+        }));
+      } catch (error) {
+        console.error("Failed to load more proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
   }, [
     proposalId,

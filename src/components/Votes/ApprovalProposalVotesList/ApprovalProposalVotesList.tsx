@@ -64,24 +64,31 @@ export default function ApprovalProposalVotesList({
   const loadMore = async () => {
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(
-        proposalId,
-        {
-          limit: LIMIT,
-          offset: meta.next_offset,
-        },
-        sort,
-        undefined,
-        sortOrder,
-        voterType
-      );
-      const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
-      const uniqueVotes = data?.data?.filter(
-        (v) => !existingIds.has(v.transactionHash)
-      );
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
-      setMeta(data.meta);
-      fetching.current = false;
+      try {
+        const data = await fetchVotesForProposal(
+          proposalId,
+          {
+            limit: LIMIT,
+            offset: meta.next_offset,
+          },
+          sort,
+          undefined,
+          sortOrder,
+          voterType
+        );
+        const existingIds = new Set(
+          proposalVotes.map((v) => v.transactionHash)
+        );
+        const uniqueVotes = data?.data?.filter(
+          (v) => !existingIds.has(v.transactionHash)
+        );
+        setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+        setMeta(data.meta);
+      } catch (error) {
+        console.error("Failed to load more approval proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
   };
 
