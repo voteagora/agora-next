@@ -7,28 +7,39 @@ import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
-import type { VoterTypes } from "@/app/api/common/votes/vote";
+import type {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 
 const NON_VOTERS_PAGE_SIZE = 20;
 
 type ArchiveProposalNonVoterListProps = {
   proposal: Proposal;
   selectedVoterType: VoterTypes;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 };
 
 export default function ArchiveProposalNonVoterList({
   proposal,
   selectedVoterType,
+  sort,
+  sortOrder,
 }: ArchiveProposalNonVoterListProps) {
   const [visibleCount, setVisibleCount] = useState(NON_VOTERS_PAGE_SIZE);
 
   const { nonVoters, isLoading, error } = useArchiveNonVoters({
     proposalId: proposal.id,
+    sort,
+    sortOrder,
+    voterType: selectedVoterType.type,
   });
 
   useEffect(() => {
     setVisibleCount(NON_VOTERS_PAGE_SIZE);
-  }, [selectedVoterType]);
+  }, [selectedVoterType, sort, sortOrder]);
 
   // Determine if we should show the filter (logic kept for filtering data, though UI is lifted)
   const shouldShowFilter =

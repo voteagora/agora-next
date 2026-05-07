@@ -179,11 +179,16 @@ export default function ApprovalVotesPanel({
                 <ArchiveApprovalProposalVotesList
                   proposal={proposal}
                   isThresholdCriteria={isThresholdCriteria}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  voterType={selectedVoterType.type}
                 />
               ) : (
                 <ArchiveProposalNonVoterList
                   proposal={proposal}
                   selectedVoterType={selectedVoterType}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
                 />
               )
             ) : showVoters ? (

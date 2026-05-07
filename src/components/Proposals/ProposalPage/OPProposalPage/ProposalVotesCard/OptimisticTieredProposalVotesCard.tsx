@@ -487,6 +487,8 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
                   <ArchiveProposalNonVoterList
                     proposal={proposal}
                     selectedVoterType={selectedVoterType}
+                    sort={sortOption.sortKey}
+                    sortOrder={sortOption.sortOrder}
                   />
                 )
               ) : showVoters ? (

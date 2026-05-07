@@ -45,45 +45,155 @@ export type ArchiveNonVoter = {
 const ARCHIVE_VOTES_QK = "archiveVotes";
 const ARCHIVE_NON_VOTERS_QK = "archiveNonVoters";
 
-/**
- * Get citizen type priority for sorting
- */
-function getCitizenTypePriority(
-  citizenType: string | null | undefined
-): number {
-  const citizenTypePriority: Record<string, number> = {
-    CHAIN: 1,
-    APP: 2,
-    USER: 3,
-  };
+type ArchiveVotesProcessingOptions = {
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
+};
 
-  if (!citizenType || typeof citizenType !== "string") {
-    return 999;
+function parseComparableBigInt(value: string | number | bigint | undefined) {
+  if (typeof value === "bigint") {
+    return value;
   }
 
-  return citizenTypePriority[citizenType.toUpperCase()] ?? 999;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? BigInt(Math.trunc(value)) : 0n;
+  }
+
+  if (typeof value === "string") {
+    try {
+      return BigInt(value);
+    } catch {
+      return 0n;
+    }
+  }
+
+  return 0n;
 }
 
-/**
- * Sort by citizen type priority, then by numeric value (descending)
- */
-function sortByCitizenTypeAndValue<T>(
-  items: T[],
-  getValue: (item: T) => number,
-  getCitizenType: (item: T) => string | null | undefined
-): T[] {
-  return items.sort((a, b) => {
-    const aPriority = getCitizenTypePriority(getCitizenType(a));
-    const bPriority = getCitizenTypePriority(getCitizenType(b));
+function compareBigIntLike(
+  a: string | number | bigint | undefined,
+  b: string | number | bigint | undefined
+) {
+  const aValue = parseComparableBigInt(a);
+  const bValue = parseComparableBigInt(b);
 
-    // First sort by citizen type priority
-    if (aPriority !== bPriority) {
-      return aPriority - bPriority;
+  if (aValue === bValue) {
+    return 0;
+  }
+
+  return aValue < bValue ? -1 : 1;
+}
+
+function matchesArchiveVoterType(
+  citizenType: string | null | undefined,
+  voterType: VoterTypes["type"]
+) {
+  const normalizedCitizenType = citizenType?.toUpperCase();
+  const selectedType = voterType.toUpperCase();
+
+  if (selectedType === "ALL") {
+    return true;
+  }
+
+  if (selectedType === "TH") {
+    return !normalizedCitizenType;
+  }
+
+  if (selectedType === "CH") {
+    return !!normalizedCitizenType;
+  }
+
+  return normalizedCitizenType === selectedType;
+}
+
+export function processArchiveVotes(
+  votes: ArchiveVote[],
+  {
+    sort = "weight",
+    sortOrder = "desc",
+    voterType = "ALL",
+  }: ArchiveVotesProcessingOptions
+) {
+  const direction = sortOrder === "asc" ? 1 : -1;
+
+  return votes
+    .filter((vote) => matchesArchiveVoterType(vote.citizenType, voterType))
+    .sort((a, b) => {
+      const comparison =
+        sort === "block_number"
+          ? compareBigIntLike(a.blockNumber, b.blockNumber)
+          : compareBigIntLike(a.weight, b.weight);
+
+      if (comparison !== 0) {
+        return comparison * direction;
+      }
+
+      return a.address.localeCompare(b.address);
+    });
+}
+
+export function processArchiveNonVoters(
+  nonVoters: ArchiveNonVoter[],
+  {
+    sort = "weight",
+    sortOrder = "desc",
+    voterType = "ALL",
+  }: ArchiveVotesProcessingOptions
+) {
+  const direction = sortOrder === "asc" ? 1 : -1;
+
+  return nonVoters
+    .filter((nonVoter) =>
+      matchesArchiveVoterType(nonVoter.citizen_type, voterType)
+    )
+    .sort((a, b) => {
+      const comparison =
+        sort === "block_number"
+          ? a.delegate.localeCompare(b.delegate)
+          : compareBigIntLike(a.voting_power, b.voting_power);
+
+      if (comparison !== 0) {
+        return comparison * direction;
+      }
+
+      return a.delegate.localeCompare(b.delegate);
+    });
+}
+
+function transformArchiveNonVoterRows(rows: ArchiveNonVoterRow[]) {
+  const seen = new Set<string>();
+
+  return rows.reduce<ArchiveNonVoter[]>((acc, row) => {
+    const address = row.addr?.toLowerCase();
+    const citizenType = row.citizen_type ?? "";
+    const dedupeKey = `${citizenType}:${address}`;
+
+    if (!address || seen.has(dedupeKey)) {
+      return acc;
     }
 
-    // Then sort by value (descending) within the same citizen type
-    return getValue(b) - getValue(a);
-  });
+    seen.add(dedupeKey);
+
+    acc.push({
+      delegate: address,
+      voting_power: row.vp !== undefined ? String(row.vp) : "0",
+      twitter: row.x ?? null,
+      warpcast: row.warpcast ?? null,
+      discord: row.discord ?? null,
+      citizen_type: row.citizen_type ?? null,
+      voterMetadata:
+        row.name || row.ens
+          ? {
+              name: row.name || row.ens || "",
+              image: row.image || "",
+              type: row.citizen_type || "",
+            }
+          : null,
+    } satisfies ArchiveNonVoter);
+
+    return acc;
+  }, []);
 }
 
 /**
@@ -187,46 +297,7 @@ export function useArchiveVotes({
   const processedVotes = useMemo(() => {
     if (!data) return [];
 
-    let filtered = [...data];
-
-    // 1. Filter by Voter Type
-    if (voterType !== "ALL") {
-      filtered = filtered.filter((vote) => {
-        if (voterType === "TH") {
-          // Token House: citizenType is null or undefined
-          return !vote.citizenType;
-        } else if (voterType === "CH") {
-          // Citizen House: citizenType is present
-          return !!vote.citizenType;
-        } else if (voterType === "USER") {
-          return vote.citizenType === "USER";
-        } else if (voterType === "APP") {
-          return vote.citizenType === "APP";
-        } else if (voterType === "CHAIN") {
-          return vote.citizenType === "CHAIN";
-        }
-        return true;
-      });
-    }
-
-    // 2. Sort
-    return filtered.sort((a, b) => {
-      let comparison = 0;
-
-      if (sort === "weight") {
-        const weightA = BigInt(a.weight || "0");
-        const weightB = BigInt(b.weight || "0");
-        if (weightA < weightB) comparison = -1;
-        if (weightA > weightB) comparison = 1;
-      } else if (sort === "block_number") {
-        const blockA = a.blockNumber;
-        const blockB = b.blockNumber;
-        if (blockA < blockB) comparison = -1;
-        if (blockA > blockB) comparison = 1;
-      }
-
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
+    return processArchiveVotes(data, { sort, sortOrder, voterType });
   }, [data, sort, sortOrder, voterType]);
 
   return {
@@ -256,53 +327,20 @@ async function fetchArchiveNonVoters({
     data?: ArchiveNonVoterRow[];
   };
 
-  // Transform raw data on client side and deduplicate by citizen_type + address
-  const seen = new Set<string>();
-  const nonVoters =
-    payload.data?.reduce<ArchiveNonVoter[]>((acc, row) => {
-      const address = row.addr?.toLowerCase();
-      const citizenType = row.citizen_type ?? "";
-      const dedupeKey = `${citizenType}:${address}`;
-
-      if (!address || seen.has(dedupeKey)) {
-        return acc;
-      }
-
-      seen.add(dedupeKey);
-
-      acc.push({
-        delegate: address,
-        voting_power: row.vp !== undefined ? String(row.vp) : "0",
-        twitter: row.x ?? null,
-        warpcast: row.warpcast ?? null,
-        discord: row.discord ?? null,
-        citizen_type: row.citizen_type ?? null,
-        voterMetadata:
-          row.name || row.ens
-            ? {
-                name: row.name || row.ens || "",
-                image: row.image || "",
-                type: row.citizen_type || "",
-              }
-            : null,
-      } satisfies ArchiveNonVoter);
-
-      return acc;
-    }, []) ?? [];
-
-  const parseVotingPower = (value: string) => {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  };
-
-  return sortByCitizenTypeAndValue(
-    nonVoters,
-    (nonVoter) => parseVotingPower(nonVoter.voting_power),
-    (nonVoter) => nonVoter.citizen_type
-  );
+  return transformArchiveNonVoterRows(payload.data ?? []);
 }
 
-export function useArchiveNonVoters({ proposalId }: { proposalId: string }) {
+export function useArchiveNonVoters({
+  proposalId,
+  sort = "weight",
+  sortOrder = "desc",
+  voterType = "ALL",
+}: {
+  proposalId: string;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
+}) {
   const { data, isLoading, error } = useQuery({
     queryKey: [ARCHIVE_NON_VOTERS_QK, proposalId],
     queryFn: () => fetchArchiveNonVoters({ proposalId }),
@@ -311,8 +349,14 @@ export function useArchiveNonVoters({ proposalId }: { proposalId: string }) {
     retry: 2,
   });
 
+  const processedNonVoters = useMemo(() => {
+    if (!data) return [];
+
+    return processArchiveNonVoters(data, { sort, sortOrder, voterType });
+  }, [data, sort, sortOrder, voterType]);
+
   return {
-    nonVoters: data ?? [],
+    nonVoters: processedNonVoters,
     isLoading,
     error: error ? (error as Error).message : null,
   };

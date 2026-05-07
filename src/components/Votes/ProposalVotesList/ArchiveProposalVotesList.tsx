@@ -55,7 +55,7 @@ export default function ArchiveProposalVotesList({
 
   useEffect(() => {
     setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length]);
+  }, [votes.length, sort, sortOrder, voterType]);
 
   const normalizedVotes = useMemo(() => {
     return votes.map(

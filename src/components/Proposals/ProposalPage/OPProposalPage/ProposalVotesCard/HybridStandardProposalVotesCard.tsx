@@ -139,6 +139,8 @@ const HybridStandardProposalVotesCard = ({
                   <ArchiveProposalNonVoterList
                     proposal={proposal}
                     selectedVoterType={selectedVoterType}
+                    sort={sortOption.sortKey}
+                    sortOrder={sortOption.sortOrder}
                   />
                 )
               ) : showVoters ? (
