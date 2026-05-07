@@ -8,7 +8,12 @@ import {
   calculateHybridOptimisticProposalMetrics,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import type { SnapshotVote, Vote, VotePayload, SnapshotVotePayload,  } from "@/app/api/common/votes/vote";
+import type {
+  SnapshotVote,
+  Vote,
+  VotePayload,
+  SnapshotVotePayload,
+} from "@/app/api/common/votes/vote";
 import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
