@@ -6,7 +6,15 @@ import {
 import { ParsedProposalData, parseProposalData } from "@/lib/proposalUtils";
 import { parseSnapshotVote, parseVote } from "@/lib/voteUtils";
 import { cache } from "react";
-import type { SnapshotVote, SnapshotVotePayload, Vote, VotePayload, VoterTypes, VotesSort, VotesSortOrder,  } from "./vote";
+import type {
+  SnapshotVote,
+  SnapshotVotePayload,
+  Vote,
+  VotePayload,
+  VoterTypes,
+  VotesSort,
+  VotesSortOrder,
+} from "./vote";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import Tenant from "@/lib/tenant/tenant";
@@ -17,7 +25,11 @@ import { Block } from "ethers";
 import { withMetrics } from "@/lib/metricWrapper";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
-import { fetchProposalFromArchive } from "@/lib/archiveUtils";
+import {
+  fetchProposalFromArchive,
+  fetchRawProposalNonVotersFromArchive,
+} from "@/lib/archiveUtils";
+import { buildCplsSnapshotNonVotersResult } from "./cplsNonVoters";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -459,6 +471,29 @@ async function getVotersWhoHaveNotVotedForProposal({
 }) {
   return withMetrics("getVotersWhoHaveNotVotedForProposal", async () => {
     const { namespace, contracts, slug } = Tenant.current();
+
+    try {
+      const cplsNonVoterRows = await fetchRawProposalNonVotersFromArchive({
+        namespace,
+        proposalId,
+      });
+
+      if (cplsNonVoterRows.length > 0) {
+        return buildCplsSnapshotNonVotersResult({
+          namespace,
+          pagination,
+          rows: cplsNonVoterRows,
+          sort,
+          sortOrder,
+          type,
+        });
+      }
+    } catch (error) {
+      console.warn(
+        "Falling back to indexed non-voter voting power after CPLS fetch failed",
+        error
+      );
+    }
 
     const eventsViewName =
       namespace === TENANT_NAMESPACES.OPTIMISM
