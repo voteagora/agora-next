@@ -1,6 +1,5 @@
 import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
-import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -9,11 +8,11 @@ import {
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
-import Link from "next/link";
 import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { getBlockScanUrl } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -27,7 +26,7 @@ export const QuorumTooltip = () => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
-        <TooltipTrigger className="ml-1">
+        <TooltipTrigger className="ml-1" data-testid="results-tooltip-trigger">
           <AlertTriangle className="h-4 w-4 text-negative" />
         </TooltipTrigger>
         <TooltipContent className="text-primary text-xs max-w-xs font-semibold">
@@ -157,6 +156,8 @@ export default function ProposalVotesSummaryDetails({
 
   const isProposalCancelled = proposal.status === "CANCELLED";
   const isProposalExecuted = proposal.status === "EXECUTED";
+  const isProposalQueued =
+    proposal.status === "QUEUED" || !!proposal.queuedTime;
   const isProposalCancelledBeforeVoteStarts =
     proposal.cancelledTime &&
     proposal.startTime &&
@@ -270,6 +271,11 @@ export default function ProposalVotesSummaryDetails({
         <StepperRow
           label="Proposal created"
           value={formatTime(proposal.createdTime)}
+          href={
+            proposal.createdTransactionHash
+              ? getBlockScanUrl(proposal.createdTransactionHash)
+              : undefined
+          }
         />
         {!isProposalCancelledBeforeVoteStarts && (
           <StepperRow
@@ -281,17 +287,42 @@ export default function ProposalVotesSummaryDetails({
           label="Voting period end"
           value={formatTime(proposal.endTime)}
         />
+        {isProposalQueued && (
+          <StepperRow
+            isLastStep={!isProposalExecuted && !isProposalCancelled}
+            label="Proposal queued"
+            value={formatTime(proposal.queuedTime)}
+            href={
+              proposal.queuedTransactionHash
+                ? getBlockScanUrl(proposal.queuedTransactionHash)
+                : undefined
+            }
+          />
+        )}
         {isProposalCancelled ? (
           <StepperRow
             isLastStep
-            label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
+            label="Proposal cancelled"
             value={formatTime(proposal.cancelledTime)}
+            href={
+              proposal.cancelledTransactionHash
+                ? getBlockScanUrl(proposal.cancelledTransactionHash)
+                : undefined
+            }
           />
         ) : isProposalExecuted ? (
           <StepperRow
             isLastStep
-            label={`Proposal ${proposal.status?.toLocaleLowerCase()}`}
+            label="Proposal executed"
             value={formatTime(proposal.executedTime)}
+            href={
+              proposal.executedTransactionHash
+                ? getBlockScanUrl(proposal.executedTransactionHash)
+                : undefined
+            }
+            executionInspectorTxHash={
+              proposal.executedTransactionHash ?? undefined
+            }
           />
         ) : null}
       </ol>

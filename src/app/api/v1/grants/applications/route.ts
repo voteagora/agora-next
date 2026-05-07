@@ -2,21 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
+import type { DaoSlug } from "@prisma/client";
+import { permissionService } from "@/server/services/permission.service";
+import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
 
 export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   try {
-    // Simple auth check - in production, use proper admin auth
-    const authHeader = req.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
+    const auth = await requireWalletJwtAuth(req);
+    if (!auth.ok) {
+      return auth.response;
     }
 
     const { slug } = Tenant.current();
+    const daoSlug = slug as DaoSlug;
+    const hasReadPermission = await permissionService.checkPermission(
+      { address: auth.address, daoSlug },
+      { module: "grants", resource: "applications", action: "read" }
+    );
+
+    if (!hasReadPermission) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { searchParams } = new URL(req.url);
 
     const status = searchParams.get("status"); // submitted, accepted, rejected

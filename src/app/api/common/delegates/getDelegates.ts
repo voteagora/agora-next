@@ -497,6 +497,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -539,6 +540,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -578,6 +580,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -651,6 +654,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
     const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
+    const useDaoNodeForVotingPower =
+      ui.toggle("use-daonode-for-voting-power")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
@@ -716,9 +721,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
-    const daoNodeVotingPowerPromise = includeL3Staking
-      ? getDelegateVotingPowerFromDaoNode(address)
-      : Promise.resolve<string | null>(null);
+    const daoNodeVotingPowerPromise =
+      useDaoNodeForVotingPower || includeL3Staking
+        ? getDelegateVotingPowerFromDaoNode(address)
+        : Promise.resolve<string | null>(null);
 
     const [delegate, votableSupply, quorum, daoNodeVotingPower] =
       await Promise.all([
@@ -812,7 +818,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     );
 
     // Sanitize statement payload to remove email if it exists
-    let sanitizedStatement = delegate?.statement;
+    let sanitizedStatement =
+      (delegate as any)?.statement ||
+      (daoNodeDelegate as any)?.delegate?.statement;
     if (
       sanitizedStatement &&
       sanitizedStatement.payload &&

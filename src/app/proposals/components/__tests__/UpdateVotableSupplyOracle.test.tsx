@@ -13,6 +13,7 @@ import {
 import { QueryClient } from "@tanstack/react-query";
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
+import { parseAbi } from "viem";
 import { optimism } from "viem/chains";
 
 vi.mock("wagmi");
@@ -36,7 +37,11 @@ vi.mock("@/lib/utils", () => ({
 const mockVotableSupplyOracleData =
   new TenantContract<IVotableSupplyOracleContract>({
     address: "0xvotablesupplyoracle" as `0x${string}`,
-    abi: [],
+    abi: parseAbi([
+      "function votableSupply() view returns (uint256)",
+      "function owner() view returns (address)",
+      "function _updateVotableSupply(uint256 supply)",
+    ]),
     chain: optimism,
     contract: {
       votableSupply: vi
@@ -171,7 +176,7 @@ describe("UpdateVotableSupplyOracle", () => {
     // Check if writeContractAsync was called with correct arguments
     expect(mockWriteContractAsync).toHaveBeenCalledWith({
       address: "0xvotablesupplyoracle",
-      abi: [],
+      abi: mockVotableSupplyOracleData.abi,
       functionName: "_updateVotableSupply",
       args: [BigInt(mockPresentVotableSupply)],
       chainId: optimism.id,

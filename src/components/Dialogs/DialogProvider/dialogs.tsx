@@ -41,8 +41,15 @@ import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActio
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
 import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
-import { ForumPost, ForumTopic } from "@/lib/forumUtils";
-import ReportModal from "@/app/duna/components/ReportModal";
+import { SafeProposalChoiceDialog } from "../SafeProposalChoiceDialog/SafeProposalChoiceDialog";
+import SafeOffchainSigningDialog from "../SafeOffchainSigningDialog/SafeOffchainSigningDialog";
+import SafeOnchainPendingDialog from "../SafeOnchainPendingDialog/SafeOnchainPendingDialog";
+import SafeProposalPublishStatusDialog from "../SafeProposalPublishStatusDialog/SafeProposalPublishStatusDialog";
+import {
+  SafeOffchainSigningKind,
+  SafeOffchainSigningPurpose,
+} from "@/lib/safeOffchainFlow";
+import { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -70,7 +77,11 @@ export type DialogType =
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
-  | ReportModalDialogType;
+  | SafeProposalChoiceDialogType
+  | SafeOffchainSigningDialogType
+  | SafeOnchainPendingDialogType
+  | SafeProposalPublishStatusDialogType
+  | SafeSiweAuthDialogType;
 // | FaqDialogType
 
 export type DelegateDialogType = {
@@ -276,7 +287,7 @@ export type SponsorOnchainDraftProposalDialog = {
 
 export type SponsorOffchainDraftProposalDialog = {
   type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL";
-  params: { redirectUrl: string; txHash: `0x${string}` };
+  params: { redirectUrl: string; attestationUid: `0x${string}` };
 };
 
 export type OpenGithubPRDialog = {
@@ -325,16 +336,73 @@ export type ConfirmDialogType = {
   };
 };
 
-export type ReportModalDialogType = {
-  type: "REPORT_MODAL";
+export type SafeProposalChoiceDialogType = {
+  type: "SAFE_PROPOSAL_CHOICE";
+  className?: string;
+  disableDismiss?: boolean;
+  params: {
+    safeAddress: `0x${string}`;
+    chainId?: number;
+    isSafeWallet: boolean;
+    onCreateDraftProposal?: () => Promise<void>;
+    onAuthenticated?: (jwt: string) => Promise<void> | void;
+  };
+};
+
+export type SafeOffchainSigningDialogType = {
+  type: "SAFE_OFFCHAIN_SIGNING";
+  className?: string;
+  disableDismiss?: boolean;
+  params: {
+    safeAddress: `0x${string}`;
+    chainId?: number;
+    purpose: SafeOffchainSigningPurpose;
+    signingKind?: SafeOffchainSigningKind;
+    message?: string;
+    onAuthenticated?: (jwt: string) => Promise<void> | void;
+    onCompleted?: (signature: `0x${string}`) => Promise<void> | void;
+    onClosed?: (reason: "cancelled" | "failed" | "expired") => void;
+    secondaryAction?: {
+      label: string;
+      onAction: () => Promise<void> | void;
+    };
+    signMessage?: (args: { message: string }) => Promise<`0x${string}`>;
+  };
+};
+
+export type SafeSiweAuthDialogType = {
+  type: "SAFE_SIWE_AUTH";
+  className?: string;
+  disableDismiss?: boolean;
+  params: {
+    safeAddress: `0x${string}`;
+    chainId?: number;
+    purpose: "notification_preferences";
+    onAuthenticated?: (jwt: string) => Promise<void> | void;
+    onClosed?: (reason: "cancelled" | "failed" | "expired") => void;
+  };
+};
+
+export type SafeProposalPublishStatusDialogType = {
+  type: "SAFE_PROPOSAL_PUBLISH_STATUS";
   className?: string;
   params: {
-    report: ForumTopic | null;
-    onDelete?: () => void;
-    onArchive?: () => void;
-    onCommentAdded?: (newComment: ForumPost) => void;
-    onCommentDeleted?: (commentId: number) => void;
-    onCommentUpdated?: (commentId: number, updates: Partial<ForumPost>) => void;
+    publish: SafeTrackedTransactionSummary;
+  };
+};
+
+export type SafeOnchainPendingDialogType = {
+  type: "SAFE_ONCHAIN_PENDING";
+  className?: string;
+  params: {
+    safeAddress: `0x${string}`;
+    chainId: number;
+    expectedTo?: `0x${string}`;
+    expectedData?: `0x${string}`;
+    createdAfter?: number;
+    onTrackedTransactionDiscovered?: (
+      publish: SafeTrackedTransactionSummary
+    ) => void;
   };
 };
 
@@ -537,10 +605,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
       draftProposal={draftProposal}
     />
   ),
-  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: ({ redirectUrl, txHash }, closeDialog) => (
+  SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: (
+    { redirectUrl, attestationUid },
+    closeDialog
+  ) => (
     <SponsorOffchainProposalDialog
       redirectUrl={redirectUrl}
-      txHash={txHash}
+      attestationUid={attestationUid}
       closeDialog={closeDialog}
     />
   ),
@@ -592,26 +663,102 @@ export const dialogs: DialogDefinitions<DialogType> = {
       />
     );
   },
-  REPORT_MODAL: (
+  SAFE_PROPOSAL_CHOICE: (
     {
-      report,
-      onDelete,
-      onArchive,
-      onCommentAdded,
-      onCommentDeleted,
-      onCommentUpdated,
+      safeAddress,
+      chainId,
+      isSafeWallet,
+      onCreateDraftProposal,
+      onAuthenticated,
     },
     closeDialog
   ) => {
     return (
-      <ReportModal
-        report={report}
-        onDelete={onDelete}
-        onArchive={onArchive}
-        onCommentAdded={onCommentAdded}
-        onCommentDeleted={onCommentDeleted}
-        onCommentUpdated={onCommentUpdated}
+      <SafeProposalChoiceDialog
         closeDialog={closeDialog}
+        safeAddress={safeAddress}
+        chainId={chainId}
+        isSafeWallet={isSafeWallet}
+        onCreateDraftProposal={onCreateDraftProposal}
+        onAuthenticated={onAuthenticated}
+      />
+    );
+  },
+  SAFE_OFFCHAIN_SIGNING: (
+    {
+      safeAddress,
+      chainId,
+      purpose,
+      signingKind,
+      message,
+      onAuthenticated,
+      onCompleted,
+      onClosed,
+      secondaryAction,
+      signMessage,
+    },
+    closeDialog
+  ) => {
+    return (
+      <SafeOffchainSigningDialog
+        closeDialog={closeDialog}
+        safeAddress={safeAddress}
+        chainId={chainId}
+        purpose={purpose}
+        signingKind={signingKind}
+        message={message}
+        onAuthenticated={onAuthenticated}
+        onCompleted={onCompleted}
+        onClosed={onClosed}
+        secondaryAction={secondaryAction}
+        signMessage={signMessage}
+      />
+    );
+  },
+  SAFE_SIWE_AUTH: (
+    { safeAddress, chainId, purpose, onAuthenticated, onClosed },
+    closeDialog
+  ) => {
+    return (
+      <SafeOffchainSigningDialog
+        closeDialog={closeDialog}
+        safeAddress={safeAddress}
+        chainId={chainId}
+        purpose={purpose}
+        signingKind="siwe"
+        onAuthenticated={onAuthenticated}
+        onClosed={onClosed}
+      />
+    );
+  },
+  SAFE_PROPOSAL_PUBLISH_STATUS: ({ publish }, closeDialog) => {
+    return (
+      <SafeProposalPublishStatusDialog
+        closeDialog={closeDialog}
+        publish={publish}
+      />
+    );
+  },
+  SAFE_ONCHAIN_PENDING: (
+    {
+      safeAddress,
+      chainId,
+      expectedTo,
+      expectedData,
+      createdAfter,
+      onTrackedTransactionDiscovered,
+    },
+    closeDialog
+  ) => {
+    return (
+      <SafeOnchainPendingDialog
+        closeDialog={closeDialog}
+        safeAddress={safeAddress}
+        chainId={chainId}
+        expectedTo={expectedTo}
+        expectedData={expectedData}
+        createdAfter={createdAfter}
+        onTrackedTransactionDiscovered={onTrackedTransactionDiscovered}
       />
     );
   },

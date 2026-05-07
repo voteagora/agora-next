@@ -1,17 +1,15 @@
 "use client";
 
-import ProposalTitle from "../ProposalTitle/ProposalTitle";
-import styles from "./proposalDescription.module.scss";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import Markdown from "@/components/shared/Markdown/Markdown";
+import ENSName from "@/components/shared/ENSName";
+import Tenant from "@/lib/tenant/tenant";
+import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
 import ApprovedTransactions from "../ApprovedTransactions/ApprovedTransactions";
 import ProposalTransactionDisplay from "../ApprovedTransactions/ProposalTransactionDisplay";
 import ProposalChart from "../ProposalChart/ProposalChart";
-import ExecutionTransactions from "../../ExecutionTransactions/ExecutionTransactions";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import Markdown from "@/components/shared/Markdown/Markdown";
-import Tenant from "@/lib/tenant/tenant";
+import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
-import ENSName from "@/components/shared/ENSName";
-
 const { contracts, namespace } = Tenant.current();
 
 export default function ProposalDescription({
@@ -182,17 +180,16 @@ export default function ProposalDescription({
             proposalData={proposal.proposalData}
             proposalType={proposal.proposalType}
             executedTransactionHash={proposal.executedTransactionHash}
+            proposal={proposal}
           />
         )}
         <RelatedProposalLinks proposalId={proposal.id} />
-        <div className={styles.proposal_description_md}>
-          <Markdown
-            content={stripTitleFromDescription(
-              shortTitle,
-              patchedDescription ?? ""
-            )}
-          />
-        </div>
+        <Markdown
+          content={stripTitleFromDescription(
+            shortTitle,
+            patchedDescription ?? ""
+          )}
+        />
       </div>
     </div>
   );

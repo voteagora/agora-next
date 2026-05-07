@@ -310,5 +310,35 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       name: "forums",
       enabled: false,
     },
+    {
+      name: "notifications",
+      enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        staking: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+        membershipAdmin: true,
+      },
+    },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
   ],
 });

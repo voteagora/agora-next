@@ -17,7 +17,7 @@ import {
 } from "viem";
 import { unstable_cache } from "next/cache";
 import { ParsedProposalData } from "./proposalUtils";
-import { getPublicClient } from "./viem";
+import { getChainById, getPublicClient } from "./viem";
 import {
   arbitrum,
   base,
@@ -29,6 +29,7 @@ import {
   sepolia,
 } from "viem/chains";
 import { getAlchemyId } from "./alchemyConfig";
+import { fetchSafeMultisigTransactionStatus } from "./safeTransactionService";
 
 const { token } = Tenant.current();
 
@@ -271,7 +272,7 @@ export function formatNumber(
     Number(wholePart) + Number(fractionalPart) / Number(divisor);
 
   if (useSpecialFormatting) {
-    if (standardUnitAmount === 0) return "";
+    if (standardUnitAmount === 0) return "0";
     if (standardUnitAmount >= 1.5) {
       const rounded = Math.round(standardUnitAmount);
       return new Intl.NumberFormat("en", {
@@ -571,6 +572,18 @@ export const getTransportForChain = (chainId: number) => {
         FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
       );
 
+    // shape mainnet
+    case 360:
+      return http(
+        FORK_NODE_URL || `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
+
+    // shape sepolia
+    case 11011:
+      return http(
+        FORK_NODE_URL || `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
+
     // for each new dao with a new chainId add them here
     default:
       return null;
@@ -599,11 +612,69 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   }
 );
 
-const isContractWallet = async (address: Address) => {
+export const isContractWallet = async (address: Address) => {
   const publicClient = getPublicClient();
   const bytecode = await publicClient.getCode({ address });
 
   return bytecode && bytecode !== "0x" ? true : false;
+};
+
+const SAFE_THRESHOLD_ABI = [
+  {
+    type: "function",
+    name: "getThreshold",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+] as const;
+
+const SAFE_WALLET_DETECTION_CACHE_TTL_MS = 30_000;
+const safeWalletDetectionCache = new Map<
+  string,
+  {
+    cachedAt: number;
+    value: boolean;
+  }
+>();
+
+export const isSafeWallet = async (address: Address, chainId?: number) => {
+  const cacheKey = `${chainId ?? "default"}:${address.toLowerCase()}`;
+  const cached = safeWalletDetectionCache.get(cacheKey);
+  if (
+    cached &&
+    Date.now() - cached.cachedAt < SAFE_WALLET_DETECTION_CACHE_TTL_MS
+  ) {
+    return cached.value;
+  }
+
+  const chain = typeof chainId === "number" ? getChainById(chainId) : undefined;
+  if (typeof chainId === "number" && !chain) {
+    return false;
+  }
+
+  const publicClient = getPublicClient(chain || undefined);
+
+  try {
+    const threshold = await publicClient.readContract({
+      address,
+      abi: SAFE_THRESHOLD_ABI,
+      functionName: "getThreshold",
+    });
+
+    const value = typeof threshold === "bigint" && threshold > 0n;
+    safeWalletDetectionCache.set(cacheKey, {
+      cachedAt: Date.now(),
+      value,
+    });
+    return value;
+  } catch {
+    safeWalletDetectionCache.set(cacheKey, {
+      cachedAt: Date.now(),
+      value: false,
+    });
+    return false;
+  }
 };
 
 export function delay(milliseconds: number) {
@@ -612,72 +683,44 @@ export function delay(milliseconds: number) {
   });
 }
 
-type TxServiceApiTransactionResponse = {
-  safe: Address;
-  to: Address;
-  data: `0x${string}`;
-  blockNumber: number;
-  transactionHash: `0x${string}`;
-  safeTxHash: `0x${string}`;
-  executor: Address;
-  isExecuted: boolean;
-  isSuccessful: boolean;
-  confirmations: Array<{
-    owner: Address;
-  }>;
-};
-
-const apiNetworkName: Record<number, string> = {
-  [mainnet.id]: "mainnet",
-  [optimism.id]: "optimism",
-  [polygon.id]: "polygon",
-  [base.id]: "base",
-  [arbitrum.id]: "arbitrum",
-  [goerli.id]: "goerli",
-  [sepolia.id]: "sepolia",
-  [scroll.id]: "scroll",
-};
-
 export const resolveSafeTx = async (
   networkId: number,
   safeTxHash: `0x${string}`,
   attempt = 1,
   maxAttempts = 10
 ): Promise<`0x${string}` | undefined> => {
-  const networkName = apiNetworkName[networkId];
   if (attempt >= maxAttempts) {
     throw new Error(
-      `timeout: couldn't find safeTx [${safeTxHash}] on [${networkName}]`
+      `timeout: couldn't find safeTx [${safeTxHash}] on [${networkId}]`
     );
   }
 
-  const endpoint = `https://safe-transaction-${networkName}.safe.global`;
-  const url = `${endpoint}/api/v1/multisig-transactions/${safeTxHash}`;
-
-  const response = await fetch(url);
-
-  const responseJson = <TxServiceApiTransactionResponse>await response.json();
-
-  console.debug(
-    `[${attempt}] looking up [${safeTxHash}] on [${networkName}]`,
-    response
+  const response = await fetchSafeMultisigTransactionStatus(
+    networkId,
+    safeTxHash
   );
-  if (response.status == 404) {
+
+  console.debug(`[${attempt}] looking up [${safeTxHash}] on [${networkId}]`, {
+    found: response.found,
+    isSuccessful: response.isSuccessful,
+    rateLimited: response.rateLimited,
+  });
+  if (!response.found) {
     console.warn(
       `didn't find safe tx [${safeTxHash}], assuming it's already the real one`
     );
     return safeTxHash;
   }
 
-  if (responseJson.isSuccessful === null) {
-    await delay(1000 * attempt ** 1.75);
+  if (response.isSuccessful === null) {
+    await delay(response.nextPollMs || 1000 * attempt ** 1.75);
     return resolveSafeTx(networkId, safeTxHash, attempt + 1, maxAttempts);
   }
 
-  if (!responseJson.isSuccessful) {
+  if (!response.isSuccessful) {
     return undefined;
   }
-  return responseJson.transactionHash;
+  return response.transactionHash;
 };
 
 export const wrappedWaitForTransactionReceipt = async (
@@ -690,7 +733,7 @@ export const wrappedWaitForTransactionReceipt = async (
     throw new Error("no chain on public client");
   }
 
-  const isSafe = await isContractWallet(params.address);
+  const isSafe = await isSafeWallet(params.address, publicClient.chain.id);
 
   if (isSafe) {
     //try to resolve the underlying transaction

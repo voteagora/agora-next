@@ -121,6 +121,7 @@ module.exports = {
         ],
         inter: "var(--font-inter), sans-serif",
         chivoMono: "var(--font-chivo-mono), monospace",
+        instrumentSerif: "var(--font-instrument-serif)",
         code: ["IBM Plex Mono", "monospace"],
         // Add any other custom font families you need
       },

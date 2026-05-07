@@ -1,0 +1,49 @@
+name: AI Security PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  ai_review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Analyze PR Diff
+        id: check_diff
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+
+          has_server="false"
+          for file in $CHANGED_FILES; do
+            if [ -f "$file" ]; then
+              if [[ "$file" == *"app/api/"* && "$file" == *"route."* ]]; then
+                has_server="true"
+                break
+              elif grep -E -q "[\"']use server[\"']" "$file"; then
+                has_server="true"
+                break
+              fi
+            fi
+          done
+
+          echo "has_server=$has_server" >> $GITHUB_OUTPUT
+
+      - name: Execute Security Audit
+        if: steps.check_diff.outputs.has_server == 'true'
+        uses: actions/github-script@v7
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+          script: |
+            const script = require('./.github/scripts/ai-pr-review.js');
+            await script({ github, context, core });

@@ -1,12 +1,20 @@
 "use server";
 
+import type { DaoSlug } from "@prisma/client";
 import { z } from "zod";
 import { handlePrismaError, archiveAttachmentSchema } from "./shared";
-import { uploadFileToPinata, getIPFSUrl } from "@/lib/pinata";
-import verifyMessage from "@/lib/serverVerifyMessage";
+import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
+import { checkAnyPermission, checkPermission } from "@/lib/rbac";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import {
+  ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+  decodeBase64Upload,
+  validateUploadBuffer,
+  validateUploadRateLimit,
+} from "@/lib/uploadValidation";
 
 const { slug } = Tenant.current();
 
@@ -14,9 +22,9 @@ const deleteAttachmentSchema = z.object({
   attachmentId: z.number().min(1, "Attachment ID is required"),
   targetType: z.enum(["post", "category"]),
   address: z.string().min(1, "Address is required"),
-  signature: z.string().min(1, "Signature is required"),
-  message: z.string().min(1, "Signed message is required"),
-  isAuthor: z.boolean().optional(),
+  signature: z.string().optional(),
+  message: z.string().optional(),
+  jwt: z.string().optional(),
 });
 
 export async function getForumAttachments() {
@@ -103,61 +111,74 @@ export async function getForumAttachments() {
   }
 }
 
-export async function uploadFileToIPFS(file: File) {
-  try {
-    const result = await uploadFileToPinata(file, {
-      name: file.name,
-      keyvalues: {
-        type: "forum-document",
-        originalName: file.name,
-        contentType: file.type,
-        uploadedAt: Date.now(),
-      },
-    });
-
-    return {
-      success: true,
-      data: {
-        ipfsCid: result.IpfsHash,
-        fileName: file.name,
-        fileSize: file.size,
-        contentType: file.type,
-      },
-    };
-  } catch (error) {
-    console.error("Error uploading file to IPFS:", error);
-    return {
-      success: false,
-      error: "Failed to upload file to IPFS",
-      details: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
 export async function uploadDocumentFromBase64(
   base64Data: string,
   fileName: string,
   contentType: string,
   address: string,
-  signature: string,
-  message: string,
-  categoryId: number
+  categoryId: number,
+  auth: AuthParams
 ) {
   try {
-    const isValid = await verifyMessage({
-      address: address as `0x${string}`,
-      message: message,
-      signature: signature as `0x${string}`,
-    });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    const authResult = await verifyAuth(auth, address as `0x${string}`);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
-    const base64Content = base64Data.includes(",")
-      ? base64Data.split(",")[1]
-      : base64Data;
-    const buffer = Buffer.from(base64Content, "base64");
+    const normalizedAddress = authResult.address.toLowerCase();
+
+    const category = await prismaWeb2Client.forumCategory.findFirst({
+      where: {
+        id: categoryId,
+        dao_slug: slug,
+        archived: false,
+      },
+      select: {
+        id: true,
+        isDuna: true,
+      },
+    });
+
+    if (!category) {
+      return { success: false, error: "Category not found" };
+    }
+
+    if (!category.isDuna) {
+      return {
+        success: false,
+        error: "This category does not accept document uploads",
+      };
+    }
+
+    const hasCreatePermission = await checkPermission(
+      normalizedAddress,
+      slug as DaoSlug,
+      "duna_filings",
+      "filings",
+      "create"
+    );
+
+    if (!hasCreatePermission) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const rateLimitError = validateUploadRateLimit({
+      address: normalizedAddress,
+      scope: "document",
+    });
+    if (rateLimitError) {
+      return { success: false, error: rateLimitError };
+    }
+
+    const buffer = decodeBase64Upload(base64Data);
+    const validationError = validateUploadBuffer({
+      buffer,
+      contentType,
+      allowedContentTypes: ALLOWED_FORUM_ATTACHMENT_CONTENT_TYPES,
+    });
+    if (validationError) {
+      return { success: false, error: validationError };
+    }
 
     const result = await uploadFileToPinata(buffer, {
       name: fileName,
@@ -171,13 +192,13 @@ export async function uploadDocumentFromBase64(
 
     const document = await prismaWeb2Client.forumCategoryAttachment.create({
       data: {
-        fileName: fileName,
+        fileName,
         fileSize: buffer.length,
-        contentType: contentType,
+        contentType,
         ipfsCid: result.IpfsHash,
-        address: address,
+        address: normalizedAddress,
         dao_slug: slug,
-        categoryId: categoryId,
+        categoryId,
       },
     });
 
@@ -189,7 +210,7 @@ export async function uploadDocumentFromBase64(
         url: getIPFSUrl(document.ipfsCid),
         ipfsCid: document.ipfsCid,
         createdAt: document.createdAt.toISOString(),
-        uploadedBy: address,
+        uploadedBy: normalizedAddress,
       },
     };
   } catch (error) {
@@ -204,34 +225,118 @@ export async function deleteForumAttachment(
   try {
     const validatedData = deleteAttachmentSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
+    const normalizedAddress = authResult.address.toLowerCase();
+
     if (validatedData.targetType === "post") {
+      const attachment = await prismaWeb2Client.forumPostAttachment.findFirst({
+        where: {
+          id: validatedData.attachmentId,
+          dao_slug: slug,
+        },
+        include: {
+          post: {
+            select: {
+              address: true,
+            },
+          },
+        },
+      });
+
+      if (!attachment) {
+        return { success: false, error: "Attachment not found" };
+      }
+
+      const isUploader =
+        attachment.address?.toLowerCase() === normalizedAddress;
+      const isPostAuthor =
+        attachment.post.address.toLowerCase() === normalizedAddress;
+      const hasDeletePermission = await checkPermission(
+        normalizedAddress,
+        slug as DaoSlug,
+        "forums",
+        "posts",
+        "delete"
+      );
+
+      if (!(isUploader || isPostAuthor || hasDeletePermission)) {
+        return { success: false, error: "Unauthorized" };
+      }
+
       await prismaWeb2Client.forumPostAttachment.delete({
         where: { id: validatedData.attachmentId },
       });
+      if (!(isUploader || isPostAuthor)) {
+        await logForumAuditAction(
+          slug,
+          normalizedAddress,
+          "DELETE_ATTACHMENT",
+          "topic",
+          validatedData.attachmentId
+        );
+      }
     } else if (validatedData.targetType === "category") {
+      const attachment =
+        await prismaWeb2Client.forumCategoryAttachment.findFirst({
+          where: {
+            id: validatedData.attachmentId,
+            dao_slug: slug,
+          },
+          include: {
+            category: {
+              select: {
+                isDuna: true,
+              },
+            },
+          },
+        });
+
+      if (!attachment) {
+        return { success: false, error: "Attachment not found" };
+      }
+
+      const isUploader =
+        attachment.address?.toLowerCase() === normalizedAddress;
+      const hasDeletePermission = attachment.category.isDuna
+        ? await checkPermission(
+            normalizedAddress,
+            slug as DaoSlug,
+            "duna_filings",
+            "filings",
+            "delete"
+          )
+        : false;
+
+      if (
+        !(hasDeletePermission || (!attachment.category.isDuna && isUploader))
+      ) {
+        return { success: false, error: "Unauthorized" };
+      }
+
       await prismaWeb2Client.forumCategoryAttachment.delete({
         where: { id: validatedData.attachmentId },
       });
-    }
 
-    if (!validatedData.isAuthor) {
-      await logForumAuditAction(
-        slug,
-        validatedData.address,
-        "DELETE_ATTACHMENT",
-        "topic",
-        validatedData.attachmentId
-      );
+      if (!isUploader) {
+        await logForumAuditAction(
+          slug,
+          normalizedAddress,
+          "DELETE_ATTACHMENT",
+          "topic",
+          validatedData.attachmentId
+        );
+      }
     }
 
     return { success: true };
@@ -247,17 +352,56 @@ export async function archiveForumAttachment(
   try {
     const validatedData = archiveAttachmentSchema.parse(data);
 
-    const isValid = await verifyMessage({
-      address: validatedData.address as `0x${string}`,
-      message: validatedData.message,
-      signature: validatedData.signature as `0x${string}`,
-    });
-
-    if (!isValid) {
-      return { success: false, error: "Invalid signature" };
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
+    const normalizedAddress = authResult.address.toLowerCase();
+
     if (validatedData.targetType === "post") {
+      const attachment = await prismaWeb2Client.forumPostAttachment.findFirst({
+        where: {
+          id: validatedData.attachmentId,
+          dao_slug: slug,
+        },
+        include: {
+          post: {
+            select: {
+              address: true,
+            },
+          },
+        },
+      });
+
+      if (!attachment) {
+        return { success: false, error: "Attachment not found" };
+      }
+
+      const isUploader =
+        attachment.address?.toLowerCase() === normalizedAddress;
+      const isPostAuthor =
+        attachment.post.address.toLowerCase() === normalizedAddress;
+      const hasArchivePermission = await checkAnyPermission(
+        normalizedAddress,
+        slug as DaoSlug,
+        [
+          { module: "forums", resource: "posts", action: "archive" },
+          { module: "forums", resource: "posts", action: "delete" },
+        ]
+      );
+
+      if (!(isUploader || isPostAuthor || hasArchivePermission)) {
+        return { success: false, error: "Unauthorized" };
+      }
+
       await prismaWeb2Client.forumPostAttachment.update({
         where: {
           id: validatedData.attachmentId,
@@ -267,7 +411,57 @@ export async function archiveForumAttachment(
           archived: true,
         },
       });
+
+      if (!(isUploader || isPostAuthor)) {
+        await logForumAuditAction(
+          slug,
+          normalizedAddress,
+          "ARCHIVE_ATTACHMENT",
+          "topic",
+          validatedData.attachmentId
+        );
+      }
     } else if (validatedData.targetType === "category") {
+      const attachment =
+        await prismaWeb2Client.forumCategoryAttachment.findFirst({
+          where: {
+            id: validatedData.attachmentId,
+            dao_slug: slug,
+          },
+          include: {
+            category: {
+              select: {
+                isDuna: true,
+              },
+            },
+          },
+        });
+
+      if (!attachment) {
+        return { success: false, error: "Attachment not found" };
+      }
+
+      const isUploader =
+        attachment.address?.toLowerCase() === normalizedAddress;
+      const hasArchivePermission = attachment.category.isDuna
+        ? await checkAnyPermission(normalizedAddress, slug as DaoSlug, [
+            {
+              module: "duna_filings",
+              resource: "filings",
+              action: "archive",
+            },
+            {
+              module: "duna_filings",
+              resource: "filings",
+              action: "delete",
+            },
+          ])
+        : false;
+
+      if (!(isUploader || hasArchivePermission)) {
+        return { success: false, error: "Unauthorized" };
+      }
+
       await prismaWeb2Client.forumCategoryAttachment.update({
         where: {
           id: validatedData.attachmentId,
@@ -277,16 +471,16 @@ export async function archiveForumAttachment(
           archived: true,
         },
       });
-    }
 
-    if (!validatedData.isAuthor) {
-      await logForumAuditAction(
-        slug,
-        validatedData.address,
-        "ARCHIVE_ATTACHMENT",
-        "topic",
-        validatedData.attachmentId
-      );
+      if (!isUploader) {
+        await logForumAuditAction(
+          slug,
+          normalizedAddress,
+          "ARCHIVE_ATTACHMENT",
+          "topic",
+          validatedData.attachmentId
+        );
+      }
     }
 
     return { success: true };

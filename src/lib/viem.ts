@@ -6,13 +6,18 @@ import {
   http,
 } from "viem";
 import {
+  arbitrum,
+  arbitrumSepolia,
   base,
   bsc,
   cyber,
   mainnet,
   optimism,
+  optimismSepolia,
   scroll,
   sepolia,
+  shape,
+  shapeSepolia,
   linea,
   lineaSepolia,
 } from "viem/chains";
@@ -52,6 +57,11 @@ export const getWalletClient = (chainId: number) => {
         chain: optimism,
         transport,
       });
+    case optimismSepolia.id:
+      return createWalletClient({
+        chain: optimismSepolia,
+        transport,
+      });
     case cyber.id:
       return createWalletClient({
         chain: cyber,
@@ -88,6 +98,18 @@ export const getWalletClient = (chainId: number) => {
         transport,
       });
 
+    case shape.id:
+      return createWalletClient({
+        chain: shape,
+        transport,
+      });
+
+    case shapeSepolia.id:
+      return createWalletClient({
+        chain: shapeSepolia,
+        transport,
+      });
+
     default:
       throw new Error("Invalid chainId");
   }
@@ -101,6 +123,8 @@ export const getChainById = (chainId: number): Chain | null => {
       return sepolia;
     case optimism.id:
       return optimism;
+    case optimismSepolia.id:
+      return optimismSepolia;
     case cyber.id:
       return cyber;
     case deriveTestnet.id:
@@ -113,6 +137,14 @@ export const getChainById = (chainId: number): Chain | null => {
       return linea;
     case lineaSepolia.id:
       return lineaSepolia;
+    case shape.id:
+      return shape;
+    case shapeSepolia.id:
+      return shapeSepolia;
+    case arbitrum.id:
+      return arbitrum;
+    case arbitrumSepolia.id:
+      return arbitrumSepolia;
     case base.id:
       return base;
     case bsc.id:

@@ -64,6 +64,16 @@ export default function CastVoteInput({
   const votes = data?.votes;
   const votingPower = data?.votingPower;
 
+  const { ui } = Tenant.current();
+
+  if (proposal.status !== "ACTIVE") {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
+        <DisabledVoteButton reason="Not open to voting" />
+      </div>
+    );
+  }
+
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
@@ -82,7 +92,10 @@ export default function CastVoteInput({
     );
   }
 
-  if (isSuccess && !delegate?.statement) {
+  const requireStatement =
+    ui.toggle("delegates/votingRequiresStatement")?.enabled !== false;
+
+  if (isSuccess && requireStatement && !delegate?.statement) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
         <NoStatementView />

@@ -216,6 +216,11 @@ export async function getForumSubscriptions(address: string) {
   }
 
   try {
+    // Intentionally left unauthenticated for now.
+    // We render subscription state on the forums landing page, and requiring
+    // SIWE/JWT here would force an auth prompt just to open the page.
+    // Signed requests still protect subscribe/unsubscribe writes; the remaining
+    // tradeoff is that read access can enumerate another wallet's subscriptions.
     const recipientId = address.toLowerCase();
 
     const cached = getCachedSubscriptions(recipientId);

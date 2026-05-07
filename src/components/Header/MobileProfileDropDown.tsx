@@ -7,6 +7,7 @@ import ENSAvatar from "../shared/ENSAvatar";
 import { Drawer } from "../ui/Drawer";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
 import EncourageDelegationDot from "./EncourageDelegationDot";
+import { SiweStatusBadge } from "./SiweStatusBadge";
 
 type Props = {
   ensName: string | undefined;
@@ -38,6 +39,7 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
             <EncourageDelegationDot className="right-[-3px]" />
           )}
           <ENSAvatar ensName={ensName} size={30} className="rounded-full" />
+          <SiweStatusBadge showTooltip={false} />
         </div>
       </button>
 

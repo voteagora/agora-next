@@ -109,24 +109,23 @@ export function PermissionGate(props: PermissionGateProps) {
   } = props;
 
   // Call all hooks unconditionally (React rules of hooks)
+  const permOpts = { address, daoSlug };
+
   const singlePermResult = useHasPermission(
     "module" in props && props.module ? props.module : "",
     "resource" in props && props.resource ? props.resource : "",
     "action" in props && props.action ? props.action : "",
-    address,
-    daoSlug
+    permOpts
   );
 
   const anyPermResult = useHasAnyPermission(
     "requireAny" in props && props.requireAny ? props.requireAny : [],
-    address,
-    daoSlug
+    permOpts
   );
 
   const allPermResult = useHasAllPermissions(
     "requireAll" in props && props.requireAll ? props.requireAll : [],
-    address,
-    daoSlug
+    permOpts
   );
 
   // Determine which result to use based on props
@@ -175,24 +174,23 @@ export function InversePermissionGate(props: PermissionGateProps) {
   } = props;
 
   // Call all hooks unconditionally (React rules of hooks)
+  const permOpts = { address, daoSlug };
+
   const singlePermResult = useHasPermission(
     "module" in props && props.module ? props.module : "",
     "resource" in props && props.resource ? props.resource : "",
     "action" in props && props.action ? props.action : "",
-    address,
-    daoSlug
+    permOpts
   );
 
   const anyPermResult = useHasAnyPermission(
     "requireAny" in props && props.requireAny ? props.requireAny : [],
-    address,
-    daoSlug
+    permOpts
   );
 
   const allPermResult = useHasAllPermissions(
     "requireAll" in props && props.requireAll ? props.requireAll : [],
-    address,
-    daoSlug
+    permOpts
   );
 
   // Determine which result to use based on props

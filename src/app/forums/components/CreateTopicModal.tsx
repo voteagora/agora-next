@@ -19,7 +19,7 @@ export default function CreateTopicModal({
   onClose,
 }: CreateTopicModalProps) {
   const router = useRouter();
-  const { createTopic, permissions, checkVPBeforeAction } = useForum();
+  const { createTopic, checkVPBeforeAction } = useForum();
   const requireLogin = useRequireLogin();
   const stableCreateTopic = useStableCallback(createTopic);
   const [showVPModal, setShowVPModal] = useState(false);

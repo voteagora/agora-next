@@ -20,12 +20,20 @@ import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
 import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import { extractFailedEasTxContext } from "@/lib/easTxContext";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  getFrontendMiradorTraceContext,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 const { contracts, ui } = Tenant.current();
 const plmToggle = ui.toggle("proposal-lifecycle");
 const config = plmToggle?.config as PLMConfig;
 const governorContract = contracts.governor;
-import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const OffchainProposalAction = ({
   draftProposal,
@@ -73,6 +81,25 @@ const OffchainProposalAction = ({
 
     setIsOffchainSubmitting(true);
     setOffchainSubmitError(null);
+    const trace = startFrontendMiradorFlowTrace({
+      name: "ProposalAttestation",
+      flow: MIRADOR_FLOW.proposalAttestation,
+      step: "offchain_proposal_submit",
+      context: {
+        walletAddress: address,
+        chainId: chain.id,
+      },
+      tags: ["governance", "proposal", "frontend", "offchain"],
+      attributes: {
+        draftProposalId: draftProposal.id,
+        proposalScope: draftProposal.proposal_scope,
+        votingModuleType: draftProposal.voting_module_type,
+      },
+      startEventName: "proposal_attestation_started",
+      startEventDetails: {
+        draftProposalId: draftProposal.id,
+      },
+    });
 
     try {
       const network = {
@@ -165,7 +192,32 @@ const OffchainProposalAction = ({
         });
       }
 
-      const { id, transactionHash } = await createProposalAttestation({
+      const messagePayload = {
+        action: "createOffchainProposal",
+        creatorAddress: address,
+        draftProposalId: draftProposal.id,
+        timestamp: new Date().toISOString(),
+      };
+      const auth = await getAuthenticationData(messagePayload);
+      if (!auth) {
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "proposal_attestation_failed",
+          eventName: "proposal_attestation_failed",
+          details: {
+            draftProposalId: draftProposal.id,
+            error: "Authentication failed",
+          },
+        });
+        return;
+      }
+
+      const {
+        id,
+        attestationUid,
+        txHash,
+        chainId: attestationChainId,
+        txInputData,
+      } = await createProposalAttestation({
         contract: governorContract.address as `0x${string}`,
         proposer: rawProposalDataForBackend.proposer,
         description: rawProposalDataForBackend.description,
@@ -182,8 +234,24 @@ const OffchainProposalAction = ({
         criteriaValue: rawProposalDataForBackend.criteriaValue,
         calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
       });
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: attestationChainId ?? chain.id,
+        inputData: txInputData,
+        txHash,
+        txDetails: "Offchain proposal attestation transaction",
+      });
+      const traceContext = getFrontendMiradorTraceContext(trace, {
+        flow: MIRADOR_FLOW.proposalAttestation,
+        step: "offchain_proposal_record",
+        context: {
+          walletAddress: address,
+          chainId: attestationChainId ?? chain.id,
+          proposalId: id.toString(),
+        },
+      });
 
-      const result = await createOffchainProposal({
+      await createOffchainProposal({
+        auth: { jwt: auth.jwt },
         proposalData: {
           proposer: rawProposalDataForBackend.proposer,
           description: rawProposalDataForBackend.description,
@@ -200,8 +268,9 @@ const OffchainProposalAction = ({
           calculationOptions: rawProposalDataForBackend.calculationOptions ?? 0,
         },
         id: id.toString(),
-        transactionHash,
+        attestationUid,
         onchainProposalId: onchainProposalId?.toString() ?? null,
+        traceContext,
       });
 
       toast.success("Proposal submitted successfully");
@@ -209,31 +278,44 @@ const OffchainProposalAction = ({
         type: "SPONSOR_OFFCHAIN_DRAFT_PROPOSAL",
         params: {
           redirectUrl: "/",
-          txHash: transactionHash as `0x${string}`,
+          attestationUid: attestationUid as `0x${string}`,
         },
       });
-      const messagePayload = {
-        action: "sponsorDraft",
-        draftProposalId: draftProposal.id,
-        creatorAddress: address,
-        timestamp: new Date().toISOString(),
-      };
-
-      const auth = await getAuthenticationData(messagePayload);
-      if (!auth) throw new Error("Authentication failed");
 
       await sponsorDraftProposal({
         draftProposalId: draftProposal.id,
-        onchain_transaction_hash: transactionHash,
         is_offchain_submission: true,
         proposal_scope: draftProposal.proposal_scope,
         creatorAddress: address as `0x${string}`,
-        message: auth.message,
-        signature: auth.signature,
         jwt: auth.jwt,
+      });
+      void closeFrontendMiradorFlowTrace(trace, {
+        reason: "proposal_attestation_succeeded",
+        eventName: "proposal_attestation_succeeded",
+        details: {
+          draftProposalId: draftProposal.id,
+          proposalId: id.toString(),
+          attestationUid,
+          txHash,
+        },
       });
     } catch (e: any) {
       console.error("Off-chain proposal submission error:", e);
+      const failedTxContext = extractFailedEasTxContext(e);
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: failedTxContext.chainId ?? chain.id,
+        inputData: failedTxContext.txInputData,
+        txHash: failedTxContext.txHash,
+        txDetails: "Offchain proposal attestation transaction",
+      });
+      void closeFrontendMiradorFlowTrace(trace, {
+        reason: "proposal_attestation_failed",
+        eventName: "proposal_attestation_failed",
+        details: {
+          draftProposalId: draftProposal.id,
+          error: e.message || "Failed to submit off-chain proposal.",
+        },
+      });
       setOffchainSubmitError(
         e.message || "Failed to submit off-chain proposal."
       );

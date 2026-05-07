@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { ForumAttachment } from "@/lib/forumUtils";
 import { useForum } from "@/hooks/useForum";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useHasAnyPermission } from "@/hooks/useRbacPermissions";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -38,23 +38,24 @@ export default function ImageAttachment({
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
 
-  // RBAC permission for posts (attachments are tied to posts)
-  const { hasPermission: hasPostPermission } = useHasPermission(
-    "forums",
-    "posts",
-    "delete"
+  const { hasPermission: canManageByPermission } = useHasAnyPermission(
+    [
+      { module: "forums", resource: "posts", action: "delete" },
+      { module: "forums", resource: "posts", action: "archive" },
+    ],
+    { autoAuthenticate: false }
   );
 
   const canDelete = (uploadedBy: string) => {
     const isAuthor =
       address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
-    return hasPostPermission || isAuthor;
+    return canManageByPermission || isAuthor;
   };
 
   const canArchive = (uploadedBy: string) => {
     const isAuthor =
       address?.toLowerCase() === (uploadedBy || postAuthor || "").toLowerCase();
-    return hasPostPermission || isAuthor;
+    return canManageByPermission || isAuthor;
   };
 
   const handleDelete = () => {
@@ -69,13 +70,7 @@ export default function ImageAttachment({
             return;
           }
 
-          const isAuthor =
-            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await stableDeleteAttachment(
-            attachment.id,
-            "post",
-            isAuthor
-          );
+          const ok = await stableDeleteAttachment(attachment.id, "post");
           if (ok) {
             // The parent component will handle removing from the list
           }
@@ -96,13 +91,7 @@ export default function ImageAttachment({
             return;
           }
 
-          const isAuthor =
-            loggedInAddress.toLowerCase() === (postAuthor || "").toLowerCase();
-          const ok = await stableArchiveAttachment(
-            attachment.id,
-            "post",
-            isAuthor
-          );
+          const ok = await stableArchiveAttachment(attachment.id, "post");
           if (ok) {
             // The parent component will handle removing from the list
           }

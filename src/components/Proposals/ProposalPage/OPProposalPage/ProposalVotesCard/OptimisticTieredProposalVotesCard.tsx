@@ -244,6 +244,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                     <TooltipTrigger asChild>
                       <button
                         type="button"
+                        data-testid="results-tooltip-trigger"
                         className={cn(
                           "absolute top-0 inline-flex items-center rounded-sm px-1 py-px text-[10px] font-semibold tabular-nums",
                           isTripped ? styles.badgeActive : styles.badge,
@@ -509,6 +510,7 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
           )}
           <VoteOnAtlas
             offchainProposalId={proposal.offchainProposalId || proposal.id}
+            isVotingOpen={proposal.status === "ACTIVE"}
           />
         </div>
       </div>

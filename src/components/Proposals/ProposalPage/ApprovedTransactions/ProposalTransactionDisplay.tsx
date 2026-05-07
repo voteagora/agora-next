@@ -25,6 +25,7 @@ import React, { useState } from "react";
 import { formatUnits } from "viem";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { toast } from "react-hot-toast";
+import { areAllActionsSupported, getAdapter } from "@/lib/knownSelectors";
 import {
   checkExistingProposal,
   checkNewProposal,
@@ -32,9 +33,63 @@ import {
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
+
 import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
+
+const PrettyButtonDisabled = () => {
+  return (
+    <TooltipProvider delayDuration={300}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            className="px-2 py-1 text-xs font-semibold text-secondary opacity-50 cursor-not-allowed"
+            type="button"
+            disabled
+          >
+            Pretty
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="text-xs">
+            Pretty view is not yet available for this proposal.
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+function getActionsLabel(status: string | null | undefined): string {
+  switch (status) {
+    case "EXECUTED":
+      return "Executed Actions";
+    case "CANCELLED":
+      return "Cancelled Actions";
+    case "QUEUED":
+      return "Queued Actions";
+    default:
+      return "Proposed Actions";
+  }
+}
+
+export function getActionsLink(
+  proposal: Proposal | undefined,
+  executedTransactionHash: string | null | undefined
+): string | null {
+  switch (proposal?.status) {
+    case "EXECUTED":
+      return executedTransactionHash ?? null;
+    case "CANCELLED":
+      return proposal?.cancelledTransactionHash ?? null;
+    case "QUEUED":
+      return proposal?.queuedTransactionHash ?? null;
+    default:
+      return null;
+  }
+}
 
 const tokenSymbolsToCheck = {
   [`${contracts.token.address.toLowerCase()}`]: {
@@ -53,7 +108,6 @@ const ProposalTransactionDisplay = ({
   values,
   descriptions,
   executedTransactionHash,
-  simulationDetails,
   network = "mainnet",
   signatures,
   proposal,
@@ -72,7 +126,10 @@ const ProposalTransactionDisplay = ({
   proposal?: Proposal;
 }) => {
   const [collapsed, setCollapsed] = useState(true);
-  const [viewMode, setViewMode] = useState<"summary" | "raw">("summary");
+  const allActionsSupported = areAllActionsSupported(calldatas);
+  const [viewMode, setViewMode] = useState<"decoded" | "raw" | "pretty">(() =>
+    allActionsSupported ? "pretty" : "decoded"
+  );
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
   const [showBenignExplanation, setShowBenignExplanation] = useState(false);
@@ -86,12 +143,33 @@ const ProposalTransactionDisplay = ({
   const hasRealActions =
     hasRealCalldatas || hasNonEmptySignatures || hasNonEmptyValues;
 
+  const actionsLabel = getActionsLabel(proposal?.status);
+  const actionsLink = getActionsLink(proposal, executedTransactionHash);
+
   if (targets.length === 0) {
     return (
       <div>
         <div className="flex flex-col border rounded-lg border-line p-4 text-xs text-secondary break-words overflow-hidden">
           <div className="w-full flex items-center justify-between">
-            <span className="text-xs text-tertiary">Actions</span>
+            <span className="text-xs text-tertiary">{actionsLabel}</span>
+            {actionsLink && (
+              <span className="inline-flex items-center gap-1">
+                <a
+                  href={getBlockScanUrl(actionsLink)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-tertiary hover:text-primary transition-colors"
+                >
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                </a>
+                {proposal?.status === "EXECUTED" && (
+                  <ExecutionTxInspectorIconLink
+                    txHash={actionsLink}
+                    iconClassName="h-3 w-3"
+                  />
+                )}
+              </span>
+            )}
           </div>
           <div className="text-xs text-tertiary mt-1">
             This proposal does not execute any transactions.
@@ -192,17 +270,22 @@ const ProposalTransactionDisplay = ({
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-primary">
-                    Actions
+                    {actionsLabel}
                   </span>
-                  {executedTransactionHash && (
-                    <a
-                      href={getBlockScanUrl(executedTransactionHash)}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                    </a>
+                  {actionsLink && (
+                    <span className="inline-flex items-center gap-1">
+                      <a
+                        href={getBlockScanUrl(actionsLink)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                      </a>
+                      {proposal?.status === "EXECUTED" && (
+                        <ExecutionTxInspectorIconLink txHash={actionsLink} />
+                      )}
+                    </span>
                   )}
                   {TENDERLY_VALID_CHAINS.includes(
                     contracts.governor.chain.id
@@ -224,11 +307,11 @@ const ProposalTransactionDisplay = ({
                 </div>
                 <div className="flex">
                   <button
-                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "summary" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
-                    onClick={() => setViewMode("summary")}
+                    className={`px-2 py-1 text-xs font-semibold ${viewMode === "decoded" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                    onClick={() => setViewMode("decoded")}
                     type="button"
                   >
-                    Summary
+                    Decoded
                   </button>
                   <button
                     className={`px-2 py-1 text-xs font-semibold ${viewMode === "raw" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
@@ -237,6 +320,17 @@ const ProposalTransactionDisplay = ({
                   >
                     Raw
                   </button>
+                  {allActionsSupported ? (
+                    <button
+                      className={`px-2 py-1 text-xs font-semibold ${viewMode === "pretty" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
+                      onClick={() => setViewMode("pretty")}
+                      type="button"
+                    >
+                      Pretty
+                    </button>
+                  ) : (
+                    <PrettyButtonDisabled />
+                  )}
                 </div>
               </div>
               {TENDERLY_VALID_CHAINS.includes(contracts.governor.chain.id) && (
@@ -257,7 +351,7 @@ const ProposalTransactionDisplay = ({
             </div>
 
             <div className="p-4 pt-2">
-              {viewMode === "summary" ? (
+              {viewMode === "decoded" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -281,10 +375,13 @@ const ProposalTransactionDisplay = ({
                           : undefined
                       }
                       index={idx}
+                      viewMode={viewMode}
+                      proposal={proposal}
                     />
                   ))}
                 </div>
-              ) : (
+              )}
+              {viewMode === "raw" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -300,24 +397,56 @@ const ProposalTransactionDisplay = ({
                   ))}
                 </div>
               )}
+              {viewMode === "pretty" && (
+                <div>
+                  {(collapsed
+                    ? [targets[0]]
+                    : targets.slice(0, normalizedLength)
+                  ).map((target, idx) => (
+                    <TransactionItem
+                      key={idx}
+                      target={target}
+                      calldata={idx < calldatas.length ? calldatas[idx] : "0x"}
+                      value={idx < values.length ? values[idx] : "0"}
+                      description={
+                        descriptions && idx < descriptions.length
+                          ? descriptions[idx]
+                          : undefined
+                      }
+                      collapsed={collapsed}
+                      network={network}
+                      signature={
+                        signatures && idx < signatures.length
+                          ? signatures[idx]
+                          : undefined
+                      }
+                      index={idx}
+                      viewMode={viewMode}
+                      proposal={proposal}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <div
-            className={cn(
-              "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
-              hasRealActions
-                ? "border border-t-0 border-line rounded-b-lg"
-                : "border-x border-b border-t border-line rounded-b-lg"
-            )}
-            onClick={() => {
-              setCollapsed(!collapsed);
-            }}
-          >
-            {collapsed
-              ? `Expand all actions (${normalizedLength})`
-              : "Collapse actions"}
-          </div>
+          {normalizedLength > 1 && (
+            <div
+              className={cn(
+                "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
+                hasRealActions
+                  ? "border border-t-0 border-line rounded-b-lg"
+                  : "border-x border-b border-t border-line rounded-b-lg"
+              )}
+              onClick={() => {
+                setCollapsed(!collapsed);
+              }}
+            >
+              {collapsed
+                ? `Expand all actions (${normalizedLength})`
+                : "Collapse actions"}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -333,6 +462,8 @@ const TransactionItem = ({
   network,
   index,
   signature,
+  viewMode = "decoded",
+  proposal,
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -342,6 +473,8 @@ const TransactionItem = ({
   network: string;
   index: number;
   signature?: string;
+  viewMode?: "decoded" | "raw" | "pretty";
+  proposal?: Proposal;
 }) => {
   const {
     data: decodedData,
@@ -352,13 +485,23 @@ const TransactionItem = ({
   });
 
   const isTransfer = decodedData?.function === "transfer";
+  const isPrettyMode = viewMode === "pretty";
+  const adapter = isPrettyMode ? getAdapter(calldata) : null;
+  const prettyMethodName = adapter?.prettyName ?? "Unknown";
 
   return (
     <div className={`${index > 0 ? "pt-4" : ""}`}>
       <div className="flex justify-between items-center mb-2">
-        <div className="text-base font-semibold text-primary">
-          Action {index + 1}
-        </div>
+        {isPrettyMode ? (
+          <div className="text-base font-semibold text-primary">
+            <span className="text-tertiary font-normal">{index + 1}.</span>{" "}
+            {prettyMethodName}
+          </div>
+        ) : (
+          <div className="text-base font-semibold text-primary">
+            Action {index + 1}
+          </div>
+        )}
         <a
           className="text-xs text-tertiary hover:text-primary transition-colors flex items-center"
           href={getBlockScanAddress(target)}
@@ -373,31 +516,102 @@ const TransactionItem = ({
       <div
         className={cn(
           "flex flex-col gap-y-10 rounded-lg p-4",
-          !isTransfer && "bg-wash border-line border"
+          (isPrettyMode || !isTransfer) && "bg-wash border-line border"
         )}
       >
-        <ActionSummary
-          decodedData={decodedData}
-          target={target}
-          value={value}
-          isLoading={isLoading}
-          calldata={calldata}
-          error={error ? (error as Error).message : null}
-        />
-
-        {!collapsed && decodedData?.function !== "transfer" && (
-          <ActionDetails
+        {isPrettyMode ? (
+          <PrettyView
             decodedData={decodedData}
             target={target}
             calldata={calldata}
-            value={value}
             isLoading={isLoading}
-            error={error ? (error as Error).message : null}
+            proposal={proposal}
           />
+        ) : (
+          <>
+            <DecodedActionView
+              decodedData={decodedData}
+              target={target}
+              value={value}
+              isLoading={isLoading}
+              calldata={calldata}
+              error={error ? (error as Error).message : null}
+            />
+
+            {!collapsed && decodedData?.function !== "transfer" && (
+              <ActionDetails
+                decodedData={decodedData}
+                target={target}
+                calldata={calldata}
+                value={value}
+                isLoading={isLoading}
+                error={error ? (error as Error).message : null}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
   );
+};
+
+const PrettyView = ({
+  decodedData,
+  target,
+  calldata,
+  isLoading,
+  proposal,
+}: {
+  decodedData: unknown;
+  target: string;
+  calldata: `0x${string}`;
+  isLoading: boolean;
+  proposal?: Proposal;
+}) => {
+  if (isLoading) {
+    return (
+      <div className="text-sm text-secondary">Decoding transaction...</div>
+    );
+  }
+
+  const adapter = getAdapter(calldata);
+  if (!adapter) {
+    return (
+      <div className="text-sm text-secondary">
+        Unable to render pretty view for this action.
+      </div>
+    );
+  }
+
+  if (!decodedData) {
+    return (
+      <div className="text-sm text-secondary">
+        Unable to decode transaction data.
+      </div>
+    );
+  }
+
+  try {
+    const proposalContext = proposal?.snapshotBlockNumber
+      ? { snapshotBlockNumber: proposal.snapshotBlockNumber }
+      : undefined;
+
+    return (
+      <>
+        {adapter.prettyRender(
+          decodedData as Parameters<typeof adapter.prettyRender>[0],
+          target,
+          proposalContext
+        )}
+      </>
+    );
+  } catch {
+    return (
+      <div className="text-sm text-secondary">
+        Error rendering pretty view for this action.
+      </div>
+    );
+  }
 };
 
 const RawTransactionItem = ({
@@ -456,7 +670,7 @@ const safelyFormatEther = (val: string) => {
   return `${BigInt(val).toString()}`;
 };
 
-const ActionSummary = ({
+const DecodedActionView = ({
   decodedData,
   target,
   value,

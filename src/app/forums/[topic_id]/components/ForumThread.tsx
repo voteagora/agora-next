@@ -13,6 +13,7 @@ import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { namespace } = Tenant.current();
 
@@ -39,6 +40,7 @@ export default function ForumThread({
   const requireLogin = useRequireLogin();
   const stableCreatePost = useStableCallback(createPost);
   const [showVPModal, setShowVPModal] = useState(false);
+  const { getAuthenticationData } = useProposalActionAuth();
 
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
@@ -46,11 +48,8 @@ export default function ForumThread({
     namespace === TENANT_NAMESPACES.SYNDICATE
       ? "bg-white"
       : "bg-buttonBackground";
-  const textStyle =
-    namespace === TENANT_NAMESPACES.SYNDICATE ||
-    namespace === TENANT_NAMESPACES.TOWNS
-      ? "text-primary"
-      : "text-neutral";
+  // text-primary adapts per tenant: dark for light themes (Shape, Syndicate), white for dark themes (Towns)
+  const textStyle = "text-primary";
 
   const onReply = async (commentId: number) => {
     if (!(await requireLogin())) {
@@ -117,11 +116,24 @@ export default function ForumThread({
       const loggedInAddress = await requireLogin();
       if (!loggedInAddress) return;
 
+      const messagePayload = {
+        action: "uploadAttachment",
+        address: loggedInAddress,
+        timestamp: new Date().toISOString(),
+      };
+      const authData = await getAuthenticationData(messagePayload);
+      if (!authData) {
+        throw new Error("Authentication failed");
+      }
+
       // Upload to IPFS only (no database record yet)
       const attachmentData = await convertFileToAttachmentData(file);
       const uploadResult = await uploadToIPFSOnly(
         attachmentData,
-        loggedInAddress
+        loggedInAddress,
+        {
+          jwt: authData.jwt,
+        }
       );
 
       if (!uploadResult.success || !uploadResult.ipfsUrl) {

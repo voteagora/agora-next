@@ -28,6 +28,7 @@ async function getDelegateStatementForAddress({
   const result = await prismaWeb2Client.delegateStatements
     .findFirst({
       where: { address: address.toLowerCase(), dao_slug: slug },
+      orderBy: [{ updated_at_ts: "desc" }, { created_at_ts: "desc" }],
       select: {
         address: true,
         dao_slug: true,
@@ -81,6 +82,12 @@ export async function getDelegateStatementsForAddresses({
             address: { in: lowercasedAddresses },
             dao_slug: slug,
           },
+          distinct: ["address"],
+          orderBy: [
+            { address: "asc" },
+            { updated_at_ts: "desc" },
+            { created_at_ts: "desc" },
+          ],
           select: {
             address: true,
             dao_slug: true,

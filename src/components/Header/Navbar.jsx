@@ -19,6 +19,7 @@ export default function Navbar() {
   const hasProposalsHref = Boolean(ui.page("proposals")?.href);
   const hasComingSoon =
     ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
+  const hasDuna = ui.toggle("duna") && ui.toggle("duna").enabled;
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -78,13 +79,11 @@ export default function Navbar() {
       {/* Sliding overlay */}
       {activeNavItem && (
         <div
-          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px]"
+          className="absolute rounded-full shadow-newDefault transition-all duration-150 ease-in-out h-[38px] bg-headerBackground"
           style={{
             left: `${activeIndicator.left}px`,
             width: `${activeIndicator.width}px`,
             opacity: activeIndicator.width ? 1 : 0,
-            backgroundColor:
-              ui.customization?.customButtonBackground || "rgb(255, 255, 255)",
           }}
         />
       )}
@@ -189,7 +188,20 @@ export default function Navbar() {
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
         >
-          Info
+          {hasDuna ? "About" : "Info"}
+        </HeaderLink>
+      )}
+
+      {hasDuna && (
+        <HeaderLink
+          ref={(el) => {
+            linkRefs.current.financials = el;
+          }}
+          href="/financials"
+          isActive={activeNavItem === "financials"}
+          onClick={() => handleNavClick("financials")}
+        >
+          Financials
         </HeaderLink>
       )}
     </div>

@@ -1,30 +1,15 @@
 "use client";
 
 import React, { useMemo, useState, useLayoutEffect } from "react";
-import { cn } from "@/lib/utils";
-import Tenant from "@/lib/tenant/tenant";
+import {
+  PROSE_LINKS,
+  PROSE_MEDIA,
+  PROSE_PRIMARY_BODY,
+} from "@/components/duna-editor/proseThemeClasses";
 import InternalLinkEmbed from "@/components/ForumShared/Embeds/InternalLinkEmbed";
 import Markdown from "@/components/shared/Markdown/Markdown";
-
-// Function to decode HTML entities
-function decodeHtmlEntities(text: string): string {
-  // More robust HTML entity decoding
-  const entities: { [key: string]: string } = {
-    "&lt;": "<",
-    "&gt;": ">",
-    "&amp;": "&",
-    "&quot;": '"',
-    "&#39;": "'",
-    "&nbsp;": " ",
-  };
-
-  let decoded = text;
-  Object.entries(entities).forEach(([entity, char]) => {
-    decoded = decoded.replace(new RegExp(entity, "g"), char);
-  });
-
-  return decoded;
-}
+import { sanitizeForumContent } from "@/lib/sanitizationUtils";
+import { cn } from "@/lib/utils";
 
 interface DunaContentRendererProps {
   content: string;
@@ -165,30 +150,38 @@ export default function DunaContentRenderer({
   className,
   enableEmbeds = true,
 }: DunaContentRendererProps) {
-  const { ui } = Tenant.current();
   const [mounted, setMounted] = useState(false);
 
   useLayoutEffect(() => {
     setMounted(true);
   }, []);
 
-  const decodedContent = content ? decodeHtmlEntities(content) : "";
-  const isMarkdown = content ? !looksLikeHtml(decodedContent) : true;
-
+  const sanitizedContent = useMemo(
+    () => sanitizeForumContent(content),
+    [content]
+  );
+  const isMarkdown = !looksLikeHtml(sanitizedContent);
   const renderedContent = useMemo(() => {
     if (!content) return null;
     if (isMarkdown) {
       return (
-        <div className="p-4 prose prose-sm max-w-none">
-          <Markdown content={decodedContent} originalHierarchy />
+        <div
+          className={cn(
+            "p-4 prose prose-sm max-w-none",
+            PROSE_PRIMARY_BODY,
+            PROSE_LINKS,
+            PROSE_MEDIA
+          )}
+        >
+          <Markdown content={sanitizedContent} originalHierarchy />
         </div>
       );
     }
     if (!enableEmbeds || !mounted) {
-      return <div dangerouslySetInnerHTML={{ __html: decodedContent }} />;
+      return <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
     }
-    return parseContentWithEmbeds(decodedContent);
-  }, [decodedContent, enableEmbeds, mounted, isMarkdown]);
+    return parseContentWithEmbeds(sanitizedContent);
+  }, [enableEmbeds, isMarkdown, mounted, sanitizedContent]);
 
   if (!content) return null;
 
@@ -197,15 +190,12 @@ export default function DunaContentRenderer({
       data-testid="duna-content"
       className={cn(
         "text-sm prose prose-sm max-w-none",
-        ui.customization?.cardBackground
-          ? "prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-ins:text-white prose-mark:text-white prose-s:text-white prose-a:text-white prose-li:text-white prose-ul:text-white prose-ol:text-white prose-img:rounded-lg"
-          : "prose-a:text-primary prose-a:underline hover:prose-a:no-underline prose-img:rounded-lg",
-        "prose-a:font-medium prose-img:max-w-full prose-img:h-auto prose-img:my-2",
+        PROSE_PRIMARY_BODY,
+        PROSE_LINKS,
+        PROSE_MEDIA,
         className
       )}
       style={{
-        // Force some basic styling to ensure content is visible
-        color: ui.customization?.cardBackground ? "white" : "inherit",
         fontSize: "inherit",
         lineHeight: "inherit",
       }}

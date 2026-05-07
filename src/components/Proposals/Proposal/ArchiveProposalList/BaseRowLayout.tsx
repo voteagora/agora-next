@@ -6,6 +6,7 @@ import ProposalStatus from "../../ProposalStatus/ProposalStatus";
 import ProposalTimeStatus from "../ProposalTimeStatus.jsx";
 import { RowDisplayData } from "./types";
 import { truncateTitle } from "./utils";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 type BaseRowLayoutProps = {
   data: RowDisplayData;
@@ -32,7 +33,10 @@ export function BaseRowLayout({
   } as const;
   return (
     <Link href={data.href}>
-      <div className="border-b border-line items-center flex flex-row bg-neutral">
+      <div
+        className="border-b border-line items-center flex flex-row bg-neutral"
+        data-testid={`proposal-list-item-${data.id}`}
+      >
         {/* Left column: Title and metadata */}
         <div
           className={cn(
@@ -64,7 +68,7 @@ export function BaseRowLayout({
             <div className="text-xs">
               <ProposalTimeStatus {...data.timeStatus} />
             </div>
-            <ProposalStatus proposal={statusProposal} />
+            <ProposalStatus proposal={statusProposal} testIdVariant="desktop" />
           </div>
         </div>
 
@@ -147,7 +151,7 @@ function OODaoBadges({
 
       {/* Mobile status */}
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );
@@ -165,14 +169,23 @@ function StandardHeader({
   statusProposal: { status: string; id: string };
   organizationTitle?: string;
 }) {
+  const { ui, namespace } = Tenant.current();
   return (
     <div className="flex flex-row text-xs text-secondary gap-1">
       <div>
         {data.proposalTypeName}{" "}
-        <span className="hidden sm:inline"> | The {organizationTitle}</span>
+        <span className="hidden sm:inline">
+          {namespace === TENANT_NAMESPACES.OPTIMISM ? (
+            `by The ${ui.organization?.title}`
+          ) : (
+            <>
+              by <ENSName address={data.proposerAddress} />{" "}
+            </>
+          )}
+        </span>
       </div>
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );

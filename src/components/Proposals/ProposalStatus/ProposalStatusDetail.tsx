@@ -53,6 +53,11 @@ export default function ProposalStatusDetail({
             SUCCEEDED
           </p>
         )}
+        {proposalStatus === "PASSED" && (
+          <p className="text-green-600 bg-green-200 rounded-sm px-1 py-0.5 font-semibold">
+            PASSED
+          </p>
+        )}
         {proposalStatus === "DEFEATED" && (
           <p className="text-red-600 bg-red-200 rounded-sm px-1 py-0.5 font-semibold">
             DEFEATED

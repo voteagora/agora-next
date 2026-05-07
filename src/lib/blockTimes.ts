@@ -39,6 +39,8 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
     case 8453: // Base Mainnet
     case 59144: // Linea Mainnet
     case 59141: // Linea Testnet
+    case 360: // Shape Mainnet
+    case 11011: // Shape Sepolia
     case 901: // Derive
     case 957: // Derive Testnet
     case 7560: // Cyber Mainnet

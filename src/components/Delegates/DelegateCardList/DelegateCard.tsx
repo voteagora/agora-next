@@ -34,6 +34,7 @@ const DelegateCard = ({
   return (
     <div
       key={delegate.address}
+      data-testid="delegate-card"
       className={cn(
         "flex flex-col",
         isDelegatesFiltering ? "animate-pulse" : ""

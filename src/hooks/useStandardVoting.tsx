@@ -1,12 +1,19 @@
 import { MissingVote } from "@/lib/voteUtils";
-import { useCallback, useState } from "react";
-import { useWriteContract } from "wagmi";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useAccount, useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
-import { useAccount } from "wagmi";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
+import { encodeFunctionData } from "viem";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 const useStandardVoting = ({
   proposalId,
@@ -39,18 +46,74 @@ const useStandardVoting = ({
     undefined
   );
   const [advancedTxHash] = useState<string | undefined>(undefined);
+  const traceRef = useRef<FrontendMiradorTrace>(null);
+
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "governance_vote_unmounted",
+        eventName: "governance_vote_unmounted",
+        details: {
+          proposalId,
+          voteKind: "standard",
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [proposalId]);
 
   const write = useCallback(() => {
     const _standardVote = async () => {
       setStandardVoteLoading(true);
+      const functionName = !!reason ? "castVoteWithReason" : "castVote";
+      const args = !!reason
+        ? [BigInt(proposalId), support, reason]
+        : [BigInt(proposalId), support];
+      const inputData = encodeFunctionData({
+        abi: contracts.governor.abi as any,
+        functionName,
+        args: args as any,
+      });
+      const trace = startFrontendMiradorFlowTrace({
+        name: "GovernanceVote",
+        flow: MIRADOR_FLOW.governanceVote,
+        step: "standard_vote_submit",
+        context: {
+          walletAddress: address,
+          chainId: contracts.governor.chain.id,
+          proposalId,
+        },
+        tags: ["governance", "vote", "frontend"],
+        attributes: {
+          voteKind: "standard",
+          support,
+          hasReason: Boolean(reason),
+          hasParams: Boolean(params),
+          missingVote,
+        },
+        startEventName: "governance_vote_started",
+        startEventDetails: {
+          proposalId,
+          voteKind: "standard",
+          support,
+        },
+      });
+      traceRef.current = trace;
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: contracts.governor.chain.id,
+        inputData,
+      });
+
       try {
         const directTx = await standardVote({
           address: contracts.governor.address as `0x${string}`,
           abi: contracts.governor.abi,
-          functionName: !!reason ? "castVoteWithReason" : "castVote",
-          args: !!reason
-            ? [BigInt(proposalId), support, reason]
-            : [BigInt(proposalId), support],
+          functionName,
+          args: args as any,
           chainId: contracts.governor.chain.id,
         });
 
@@ -61,24 +124,74 @@ const useStandardVoting = ({
           });
 
         if (status === "success") {
+          attachMiradorTransactionArtifacts(trace, {
+            chainId: contracts.governor.chain.id,
+            inputData,
+            submittedTxHash: directTx,
+            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
+            submittedTxDetails:
+              directTx !== transactionHash
+                ? "Submitted Safe governance vote transaction"
+                : "Submitted governance vote transaction",
+            txHash: transactionHash,
+            txDetails: "Governance vote transaction",
+          });
           setStandardTxHash(transactionHash);
 
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
               proposal_id: proposalId,
-              support: support,
-              reason: reason,
-              params: params,
+              support,
+              reason,
+              params,
               voter: address as `0x${string}`,
               transaction_hash: transactionHash,
             },
           });
           setStandardVoteSuccess(true);
+          void closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_succeeded",
+            eventName: "governance_vote_succeeded",
+            details: {
+              proposalId,
+              voteKind: "standard",
+              transactionHash,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
+        } else {
+          setStandardVoteError(true);
+          void closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_vote_failed",
+            eventName: "governance_vote_failed",
+            details: {
+              proposalId,
+              voteKind: "standard",
+              error: `Unexpected vote receipt status: ${status}`,
+            },
+          });
+          if (traceRef.current === trace) {
+            traceRef.current = null;
+          }
         }
       } catch (error) {
         setStandardVoteError(true);
-        setStandardVoteErrorDetails(_error);
+        setStandardVoteErrorDetails(error as WriteContractErrorType);
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "standard",
+            error: error instanceof Error ? error.message : String(error),
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
       } finally {
         setStandardVoteLoading(false);
       }
@@ -92,8 +205,19 @@ const useStandardVoting = ({
       }
     };
 
-    vote();
-  }, [standardVote, missingVote, params, proposalId, reason, support]);
+    void vote();
+  }, [
+    address,
+    contracts.governor.abi,
+    contracts.governor.address,
+    contracts.governor.chain.id,
+    missingVote,
+    params,
+    proposalId,
+    reason,
+    standardVote,
+    support,
+  ]);
 
   return {
     isLoading: standardVoteLoading,

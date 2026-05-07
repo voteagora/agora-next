@@ -412,6 +412,23 @@ export const demo3TenantUIConfig = new TenantUI({
     },
 
     {
+      name: "safe-proposal-choice",
+
+      enabled: true,
+    },
+
+    {
+      name: "safe-tracking",
+
+      enabled: true,
+
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+
+    {
       name: "use-archive-for-proposals",
 
       enabled: true,
@@ -543,7 +560,9 @@ export const demo3TenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">DUNA DISCLOSURES</div>
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+              DUNA DISCLOSURES
+            </div>
 
             <div className="font-medium">
               <p className="mt-2">

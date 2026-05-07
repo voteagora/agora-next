@@ -4,12 +4,28 @@ import CodeChange from "./CodeChange";
 import { useState } from "react";
 import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
 import { getBlockScanUrl } from "@/lib/utils";
+import { getActionsLink } from "./ProposalTransactionDisplay";
+
+function getTransactionsLabel(status) {
+  switch (status) {
+    case "EXECUTED":
+      return "Executed Transactions";
+    case "CANCELLED":
+      return "Cancelled Transactions";
+    case "QUEUED":
+      return "Queued Transactions";
+    default:
+      return "Proposed Transactions";
+  }
+}
 
 export default function ApprovedTransactions({
   proposalData,
   proposalType,
   executedTransactionHash,
+  proposal,
 }) {
   const [displayedOptions, setDisplayedOptions] = useState(1);
   const toggleElements = () => {
@@ -27,21 +43,33 @@ export default function ApprovedTransactions({
       proposalData.options[0].calldatas[0] === "0x") ||
     (proposalType === "HYBRID_STANDARD" &&
       proposalData.options[0].calldatas[0] === "0x");
+
+  const actionsLabel = getTransactionsLabel(proposal?.status);
+  const actionsLink = getActionsLink(proposal, executedTransactionHash);
+
   return (
     <div className="flex flex-col gap-1 border border-line rounded-lg bg-wash py-4">
       <div className="flex items-center justify-between px-4 mb-2">
         <p className="font-mono text-xs font-medium leading-4 text-tertiary">
           {isNoProposedTransactions ? "No " : ""}
-          Proposed Transactions{" "}
+          {actionsLabel}{" "}
         </p>
-        {executedTransactionHash && (
-          <a
-            href={getBlockScanUrl(executedTransactionHash)}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-          </a>
+        {actionsLink && (
+          <span className="inline-flex items-center gap-1">
+            <a
+              href={getBlockScanUrl(actionsLink)}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+            </a>
+            {proposal?.status === "EXECUTED" && (
+              <ExecutionTxInspectorIconLink
+                txHash={actionsLink}
+                iconClassName="h-3 w-3"
+              />
+            )}
+          </span>
         )}
       </div>
       {!isNoProposedTransactions && (

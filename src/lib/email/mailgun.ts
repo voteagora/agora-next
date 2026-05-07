@@ -15,14 +15,22 @@ interface EmailData {
   support_url: string;
 }
 
+interface GrantsEmailTenantConfig {
+  orgName?: string;
+  senderName?: string;
+  followXHandle?: string;
+}
+
 interface SendGrantConfirmationEmailParams {
   to: string;
   data: EmailData;
+  tenantConfig?: GrantsEmailTenantConfig;
 }
 
 export async function sendGrantConfirmationEmail({
   to,
   data,
+  tenantConfig,
 }: SendGrantConfirmationEmailParams) {
   try {
     // Check if Mailgun is configured
@@ -63,10 +71,17 @@ export async function sendGrantConfirmationEmail({
       .replace("25k-50k", "$25,000 - $50,000")
       .replace("over-50k", "Over $50,000");
 
-    // Prepare template variables
-    // Include both the original variable names and the template-specific names
+    // Prepare template variables - org_name and follow_x_handle for footer
+    // (You're receiving this email because you submitted a grant application to {{org_name}}.
+    //  Follow us on Twitter: @{{follow_x_handle}})
+    const orgName =
+      tenantConfig?.orgName ||
+      process.env.ORG_NAME ||
+      "Syndicate Network Collective";
+    const senderName = tenantConfig?.senderName || "Syndicate";
+    const followXHandle = tenantConfig?.followXHandle ?? "";
+
     const templateData = {
-      // Original variable names (for backward compatibility)
       applicant_name: data.applicant_name,
       grant_title: data.grant_title,
       application_id: data.application_id,
@@ -75,15 +90,15 @@ export async function sendGrantConfirmationEmail({
       applicant_email: data.applicant_email,
       telegram_handle: data.telegram_handle,
       support_url: data.support_url || "https://support.agora.vote",
-      // Template-specific variable names
-      org_name: process.env.ORG_NAME || "Syndicate Network Collective",
+      org_name: orgName,
       submitted_on: formattedDate,
       contact_email: data.applicant_email,
+      follow_x_handle: followXHandle,
     };
 
-    // Send email using Mailgun template
+    // Send email using same template for all tenants
     const result = await mg.messages.create(domain, {
-      from: `Agora × Syndicate Grants <grants@${domain}>`,
+      from: `Agora × ${senderName} Grants <grants@${domain}>`,
       to: [to],
       subject: `Grant Application Received - ${data.grant_title}`,
       template: "grant-application-confirmation-syndicate",

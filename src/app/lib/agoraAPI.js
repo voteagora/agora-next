@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 /**
  * AgoraAPI class provides a method to perform requests to the Agora API.
  */
@@ -33,17 +31,18 @@ class AgoraAPI {
   /**
    * POST request to the Agora API.
    */
-  async post(endpoint, version = "v1", data) {
+  async post(endpoint, version = "v1", data, extraHeaders = {}) {
+    const headers = new Headers(extraHeaders);
+    headers.set("authorization", this.bearerToken);
+    headers.set("Content-Type", "application/json");
+
     const res = await fetch(`/api/${version}${endpoint}`, {
       method: "POST",
-      headers: {
-        authorization: this.bearerToken,
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
     });
 
-    if (!res.status === 201) {
+    if (!res.ok) {
       throw new Error(res.statusText);
     }
 

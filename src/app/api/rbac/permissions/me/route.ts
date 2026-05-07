@@ -1,17 +1,23 @@
 /**
- * Get current user's permissions for a DAO
- * GET /api/rbac/permissions/me?daoSlug=optimism&address=0x...
+ * Get the authenticated user's permissions for a DAO.
+ * GET /api/rbac/permissions/me?daoSlug=optimism
  */
 
 import { type NextRequest, NextResponse } from "next/server";
 import { permissionService } from "@/server/services/permission.service";
 import type { DaoSlug } from "@prisma/client";
+import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireWalletJwtAuth(request);
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const { searchParams } = new URL(request.url);
     const daoSlug = searchParams.get("daoSlug") as DaoSlug | null;
-    const address = searchParams.get("address");
+    const requestedAddress = searchParams.get("address")?.toLowerCase();
 
     if (!daoSlug) {
       return NextResponse.json(
@@ -20,20 +26,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!address) {
-      return NextResponse.json(
-        { error: "address is required" },
-        { status: 400 }
-      );
+    if (requestedAddress && requestedAddress !== auth.address) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const permissions = await permissionService.getUserPermissions(
-      address,
+      auth.address,
       daoSlug
     );
 
     return NextResponse.json({
-      address: address.toLowerCase(),
+      address: auth.address,
       daoSlug,
       permissions,
     });

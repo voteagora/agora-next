@@ -10,6 +10,7 @@ import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
 import { easVotingTypeToNumber } from "@/app/create/types";
+import { extractEasTxInputData } from "./easTxContext";
 
 const { slug, contracts } = Tenant.current();
 
@@ -40,6 +41,25 @@ const schemaEncoder = new SchemaEncoder(
 );
 
 const eas = new EAS(getEASAddress(contracts.token.chain.id));
+
+function getEasTransactionHash(
+  txResponse: Record<string, any>,
+  fallback?: unknown
+): string | undefined {
+  if (typeof txResponse?.receipt?.hash === "string") {
+    return txResponse.receipt.hash;
+  }
+
+  if (typeof txResponse?.hash === "string") {
+    return txResponse.hash;
+  }
+
+  if (typeof fallback === "string") {
+    return fallback;
+  }
+
+  return undefined;
+}
 
 export async function createProposalAttestation({
   contract,
@@ -126,20 +146,24 @@ export async function createProposalAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(txResponse);
 
-  const receipt = await txResponse.wait();
+  const attestationUid = await txResponse.wait();
 
-  if (!receipt) {
+  if (!attestationUid) {
     console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
+      "Attestation failed or was not indexed. Full response:",
+      attestationUid
     );
-    throw new Error("Transaction failed or was not mined.");
+    throw new Error("Attestation failed or was not indexed.");
   }
 
   return {
-    transactionHash: receipt,
+    attestationUid,
     id,
+    txHash: getEasTransactionHash(txResponse),
+    chainId: contracts.token.chain.id,
+    txInputData,
   };
 }
 
@@ -161,12 +185,15 @@ export async function cancelProposalAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(transaction);
 
   const receipt = await transaction.wait();
 
   return {
-    transactionHash: receipt,
     attestationUID,
+    txHash: getEasTransactionHash(transaction, receipt),
+    chainId: contracts.token.chain.id,
+    txInputData,
   };
 }
 
@@ -303,9 +330,15 @@ export async function createV2CreateProposalAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(txResponse);
 
   const receipt = await txResponse.wait();
-  return { transactionHash: receipt };
+  return {
+    transactionHash: receipt,
+    txHash: getEasTransactionHash(txResponse, receipt),
+    chainId: contracts.token.chain.id,
+    txInputData,
+  };
 }
 
 export { EAS_V2_SCHEMA_IDS };
@@ -344,6 +377,7 @@ export async function createVoteAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(txResponse);
 
   const receipt = await txResponse.wait();
 
@@ -357,6 +391,9 @@ export async function createVoteAttestation({
 
   return {
     transactionHash: receipt,
+    txHash: getEasTransactionHash(txResponse, receipt),
+    chainId: contracts.token.chain.id,
+    txInputData,
   };
 }
 
@@ -404,6 +441,7 @@ export async function createApprovalVoteAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(txResponse);
 
   const receipt = await txResponse.wait();
 
@@ -417,6 +455,9 @@ export async function createApprovalVoteAttestation({
 
   return {
     transactionHash: receipt,
+    txHash: getEasTransactionHash(txResponse, receipt),
+    chainId: contracts.token.chain.id,
+    txInputData,
   };
 }
 
@@ -462,6 +503,7 @@ export async function createOptimisticVoteAttestation({
       value: 0n,
     },
   });
+  const txInputData = extractEasTxInputData(txResponse);
 
   const receipt = await txResponse.wait();
 
@@ -475,5 +517,8 @@ export async function createOptimisticVoteAttestation({
 
   return {
     transactionHash: receipt,
+    txHash: getEasTransactionHash(txResponse, receipt),
+    chainId: contracts.token.chain.id,
+    txInputData,
   };
 }

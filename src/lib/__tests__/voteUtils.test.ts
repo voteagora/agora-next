@@ -79,6 +79,7 @@ describe("calculateVoteMetadata", () => {
     status: "ACTIVE" as any,
     createdTransactionHash: "0x",
     cancelledTransactionHash: "0x",
+    queuedTransactionHash: "0x",
     executedTransactionHash: "0x",
   };
 

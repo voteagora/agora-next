@@ -35,7 +35,6 @@ interface DocumentsSectionProps {
 const DocumentsSection = ({
   initialDocuments,
   hideHeader = false,
-  hideComms = false,
 }: DocumentsSectionProps) => {
   const [documents, setDocuments] = useState<ForumDocument[]>(
     initialDocuments || []
@@ -99,14 +98,9 @@ const DocumentsSection = ({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
           const success = await stableDeleteAttachment(
             attachmentId,
-            "category",
-            isAuthor
+            "category"
           );
           if (success) {
             setDocuments((prev) =>
@@ -134,14 +128,9 @@ const DocumentsSection = ({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
           const success = await stableArchiveAttachment(
             attachmentId,
-            "category",
-            isAuthor
+            "category"
           );
           if (success) {
             setDocuments((prev) =>

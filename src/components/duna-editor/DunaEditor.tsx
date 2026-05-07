@@ -30,6 +30,7 @@ import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 // Toolbar button component
 const ToolbarButton = ({
@@ -191,16 +192,17 @@ export default function DunaEditor({
   variant = "post",
   onImageUpload,
 }: DunaEditorProps) {
+  const { address, isConnected } = useAccount();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkDialogUrl, setLinkDialogUrl] = useState("");
   const { ui } = Tenant.current();
-  const { address, isConnected } = useAccount();
+  const [isMounted, setIsMounted] = useState(false);
 
   // Debug link dialog state
   useEffect(() => {
     console.log("Link dialog state:", { linkDialogOpen, linkDialogUrl });
   }, [linkDialogOpen, linkDialogUrl]);
-  const [isMounted, setIsMounted] = useState(false);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -256,7 +258,7 @@ export default function DunaEditor({
           "prose prose-sm max-w-none outline-none",
           "prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-blockquote:my-1",
           "prose-li:my-0 prose-p:leading-relaxed",
-          ui.customization?.cardBackground
+          ui.theme === "dark"
             ? "prose-ol:text-white prose-ul:text-white prose-li:text-white prose-ol:marker:text-white prose-ul:marker:text-white prose-a:text-white prose-a:underline hover:prose-a:no-underline prose-p:text-white prose-blockquote:text-white prose-code:text-white prose-pre:text-white prose-headings:text-white prose-strong:text-white prose-b:text-white prose-em:text-white prose-i:text-white prose-del:text-white prose-s:text-white prose-ins:text-white prose-mark:text-white"
             : "prose-ol:text-primary prose-ul:text-primary prose-li:text-primary prose-ol:marker:text-primary prose-ul:marker:text-primary prose-a:text-primary prose-a:underline hover:prose-a:no-underline",
           "prose-ol:list-decimal prose-ul:list-disc"
@@ -344,10 +346,23 @@ export default function DunaEditor({
             imageUrl = await onImageUpload(file);
           } else {
             // Use IPFS upload only (no database record)
+            const messagePayload = {
+              action: "uploadAttachment",
+              address,
+              timestamp: new Date().toISOString(),
+            };
+            const authData = await getAuthenticationData(messagePayload);
+            if (!authData) {
+              throw new Error("Authentication failed");
+            }
+
             const attachmentData = await convertFileToAttachmentData(file);
             const uploadResult = await uploadToIPFSOnly(
               attachmentData,
-              address
+              address,
+              {
+                jwt: authData.jwt,
+              }
             );
 
             if (!uploadResult.success || !uploadResult.ipfsUrl) {
@@ -620,7 +635,7 @@ export default function DunaEditor({
         onKeyDown={handleKeyDown}
         onClick={() => editor?.chain().focus().run()}
         style={{
-          color: ui.customization?.cardBackground ? "white" : "inherit",
+          color: ui.theme === "dark" ? "white" : "inherit",
         }}
       >
         <EditorContent editor={editor} />

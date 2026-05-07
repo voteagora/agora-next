@@ -153,7 +153,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
         </div>
         <TooltipProvider delayDuration={0}>
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger data-testid="results-tooltip-trigger">
               <InfoIcon className="w-3 h-3 fill-neutral stroke-tertiary" />
             </TooltipTrigger>
             <TooltipContent className="max-w-[300px] p-4 text-xs text-tertiary">
@@ -285,6 +285,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
         </div>
         <VoteOnAtlas
           offchainProposalId={proposal.offchainProposalId || proposal.id}
+          isVotingOpen={proposal.status === "ACTIVE"}
         />
       </div>
     </>

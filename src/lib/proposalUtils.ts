@@ -429,6 +429,7 @@ export async function parseProposal(
     status,
     createdTransactionHash: proposal.created_transaction_hash,
     cancelledTransactionHash: proposal.cancelled_transaction_hash,
+    queuedTransactionHash: proposal.queued_transaction_hash ?? null,
     executedTransactionHash: proposal.executed_transaction_hash,
     offchainProposalId,
   };

@@ -18,6 +18,7 @@ import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { namespace } = Tenant.current();
 
@@ -58,6 +59,7 @@ export default function ComposerModal({
 }: ComposerModalProps) {
   const { isConnected, address } = useAccount();
   const { categories } = useForumCategories();
+  const { getAuthenticationData } = useProposalActionAuth();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachment, setAttachment] = useState<File | null>(null);
@@ -126,9 +128,21 @@ export default function ComposerModal({
       throw new Error("Wallet not connected");
     }
 
+    const messagePayload = {
+      action: "uploadAttachment",
+      address,
+      timestamp: new Date().toISOString(),
+    };
+    const authData = await getAuthenticationData(messagePayload);
+    if (!authData) {
+      throw new Error("Authentication failed");
+    }
+
     // Upload to IPFS only (no database record yet)
     const attachmentData = await convertFileToAttachmentData(file);
-    const uploadResult = await uploadToIPFSOnly(attachmentData, address);
+    const uploadResult = await uploadToIPFSOnly(attachmentData, address, {
+      jwt: authData.jwt,
+    });
 
     if (!uploadResult.success || !uploadResult.ipfsUrl) {
       throw new Error(uploadResult.error || "Upload failed");

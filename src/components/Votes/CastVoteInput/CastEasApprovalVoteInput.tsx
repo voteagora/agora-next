@@ -11,6 +11,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { parseVoteError } from "@/lib/voteErrorUtils";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
+import { DisabledVoteButton } from "../components/DisabledVoteButton";
 
 interface ApprovalOption {
   index: number;
@@ -40,6 +41,14 @@ export default function CastEasApprovalVoteInput({
   // Check if proposal hasn't started yet
   const now = new Date();
   const hasNotStarted = proposal.startTime && proposal.startTime > now;
+
+  if (proposal.status !== "ACTIVE") {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
+        <DisabledVoteButton reason="Not open to voting" />
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (

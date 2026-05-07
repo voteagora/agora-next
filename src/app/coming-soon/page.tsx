@@ -4,6 +4,17 @@ import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogR
 import townsStaticProposals from "@/assets/tenant/towns_static_proposals.svg";
 import syndicateStaticProposals from "@/assets/tenant/syndicate_static_proposals.svg";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `${brandName} Coming Soon`,
+    description: `Stay up to date while ${brandName} governance launches on Agora.`,
+    path: "/coming-soon",
+  });
+}
 
 export default async function ComingSoonPage() {
   const { ui, namespace } = Tenant.current();
@@ -27,7 +38,8 @@ export default async function ComingSoonPage() {
 
       {/* Proposals Section */}
       <div className="flex flex-col max-w-[76rem]">
-        <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
+        {/* Desktop section header */}
+        <div className="hidden sm:flex flex-row justify-between items-baseline gap-2 mb-4">
           <h1 className="text-primary text-2xl font-extrabold mb-0">
             Proposals
           </h1>

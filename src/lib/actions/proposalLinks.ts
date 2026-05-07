@@ -1,65 +1,84 @@
 "use server";
 
+import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
+import { createProposalLinksInternal } from "./proposalLinksInternal";
 
-interface CreateProposalLinksParams {
-  sourceId: string;
-  sourceType: string;
-  links: Array<{
-    targetId: string;
-    targetType: string;
-  }>;
+interface CreateDiscussionProposalLinkParams {
+  proposalId: string;
+  proposalType: string;
+  forumTopicId: string;
+  auth: AuthParams;
 }
 
-export async function createProposalLinks({
-  sourceId,
-  sourceType,
-  links,
-}: CreateProposalLinksParams) {
+function normalizeDiscussionProposalType(proposalType: string) {
+  if (proposalType === "gov-proposal") {
+    return "gov";
+  }
+
+  if (proposalType === "gov" || proposalType === "tempcheck") {
+    return proposalType;
+  }
+
+  return null;
+}
+
+// Public action for forum-topic authors linking their topic back to a proposal.
+export async function createDiscussionProposalLink({
+  proposalId,
+  proposalType,
+  forumTopicId,
+  auth,
+}: CreateDiscussionProposalLinkParams) {
   try {
-    if (!sourceId || !sourceType || !Array.isArray(links)) {
+    const normalizedProposalType =
+      normalizeDiscussionProposalType(proposalType);
+    if (!proposalId || !normalizedProposalType || !forumTopicId) {
       return { success: false, error: "Invalid request body" };
     }
 
-    const validatedLinks = links.filter((link) => {
-      if (!link.targetId || !link.targetType) return false;
-      return sourceId !== link.targetId;
-    });
-
-    if (validatedLinks.length === 0) {
-      return { success: true, created: 0 };
+    const authResult = await verifyAuth(auth, auth.address);
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
     }
 
-    const results = await Promise.allSettled(
-      validatedLinks.map((link) =>
-        prismaWeb2Client.proposalLinks.upsert({
-          where: {
-            sourceId_targetId: {
-              sourceId: sourceId,
-              targetId: link.targetId,
-            },
-          },
-          create: {
-            sourceId: sourceId,
-            sourceType: sourceType,
-            targetId: link.targetId,
-            targetType: link.targetType,
-          },
-          update: {},
-        })
-      )
-    );
+    const topicId = Number(forumTopicId);
+    if (!Number.isInteger(topicId) || topicId <= 0) {
+      return { success: false, error: "Invalid forum topic id" };
+    }
 
-    const created = results.filter((r) => r.status === "fulfilled").length;
+    const { slug } = Tenant.current();
+    const forumTopic = await prismaWeb2Client.forumTopic.findFirst({
+      where: {
+        id: topicId,
+        dao_slug: slug,
+      },
+      select: {
+        id: true,
+        address: true,
+      },
+    });
 
-    return {
-      success: true,
-      created,
-      total: validatedLinks.length,
-    };
+    if (!forumTopic) {
+      return { success: false, error: "Forum topic not found" };
+    }
+
+    if (forumTopic.address.toLowerCase() !== authResult.address.toLowerCase()) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    return await createProposalLinksInternal({
+      sourceId: proposalId,
+      sourceType: normalizedProposalType,
+      links: [{ targetId: forumTopicId, targetType: "forum_topic" }],
+    });
   } catch (error) {
-    console.error("Error creating proposal links:", error);
-    return { success: false, error: "Failed to create proposal links" };
+    console.error("Error creating discussion proposal link:", error);
+    return {
+      success: false,
+      error: "Failed to create discussion proposal link",
+    };
   }
 }
 

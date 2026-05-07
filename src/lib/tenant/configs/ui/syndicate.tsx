@@ -17,6 +17,7 @@ import DelegatingSectionContent from "@/app/info/components/DelegatingSectionCon
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",
   logo: syndicateLogo,
+  dunaTitle: "SNC",
   documentColors: ["#CBD49B", "#7C873A", "#4A5413", "#2B3300"],
   tokens: [
     {
@@ -44,6 +45,10 @@ export const syndicateTenantUIConfig = new TenantUI({
   organization: {
     title: "Syndicate Network",
   },
+
+  grantsFollowXHandle: "syndicateio",
+  grantsEmailOrgName: "Syndicate Network Collective",
+  grantsEmailSenderName: "Syndicate",
 
   dunaDisclaimers:
     "* DUNA Administration Docs will archive upon the release of the year-end financial statements and tax update.",
@@ -313,6 +318,18 @@ export const syndicateTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-archive-for-proposals",
       enabled: true,
     },
@@ -343,6 +360,16 @@ export const syndicateTenantUIConfig = new TenantUI({
     {
       name: "has-eas-oodao",
       enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        proposalAttestation: true,
+      },
     },
     {
       name: "tax-form",
@@ -397,10 +424,6 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "syndicate-hero-content",
-      enabled: true,
-    },
-    {
       name: "duna/use-community-dialogue-label",
       enabled: true,
     },
@@ -410,7 +433,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
               SYNDICATE NETWORK COLLECTIVE - DUNA DISCLOSURES
             </div>
 

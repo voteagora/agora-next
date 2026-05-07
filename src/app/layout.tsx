@@ -1,7 +1,6 @@
 import "@/styles/globals.scss";
 import ClientLayout from "./Web3Provider";
 import Header from "@/components/Header/Header";
-import { fetchMetrics } from "@/app/api/common/metrics/getMetrics";
 import DAOMetricsHeader from "@/components/Metrics/DAOMetricsHeader";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper, inter } from "@/styles/fonts";
@@ -50,6 +49,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const { ui } = Tenant.current();
+  const miradorWebApiKey = process.env.MIRADOR_WEB_API_KEY;
 
   const primary = ui?.customization?.primary || defaults.primary;
   const secondary = ui?.customization?.secondary || defaults.secondary;
@@ -153,7 +153,7 @@ export default async function RootLayout({
 
       <NuqsAdapter>
         <DevTenantProvider>
-          <ClientLayout>
+          <ClientLayout miradorWebApiKey={miradorWebApiKey}>
             <ForumPermissionsProvider>
               <Header />
               <div className="mx-auto max-w-[1280px] my-3 sm:my-4 px-3 sm:px-8">

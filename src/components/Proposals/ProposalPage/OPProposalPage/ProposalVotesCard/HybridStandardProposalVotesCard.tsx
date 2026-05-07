@@ -163,6 +163,7 @@ const HybridStandardProposalVotesCard = ({
         </div>
         <VoteOnAtlas
           offchainProposalId={proposal.offchainProposalId || proposal.id}
+          isVotingOpen={proposal.status === "ACTIVE"}
         />
       </div>
     </>

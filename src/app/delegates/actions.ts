@@ -21,15 +21,15 @@ import {
   fetchDirectDelegatee as apiFetchDirectDelegatee,
 } from "@/app/api/common/delegations/getDelegations";
 import { createDelegateStatement } from "@/app/api/common/delegateStatement/createDelegateStatement";
+import type { DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { requireAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
-import { fetchVotesCountForDelegate } from "@/app/api/common/votes/getVotes";
 import { prismaWeb3Client } from "@/app/lib/prisma";
-import { fetchBadgesForDelegate as apiFetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -103,22 +103,19 @@ export async function fetchDirectDelegatee(addressOrENSName: string) {
 export async function submitDelegateStatement({
   address,
   delegateStatement,
-  signature,
-  message,
   scwAddress,
+  auth,
 }: {
   address: `0x${string}`;
   delegateStatement: DelegateStatementFormValues;
-  signature: `0x${string}`;
-  message: string;
   scwAddress?: string;
+  auth: DelegateStatementAuthPayload;
 }) {
   const response = await createDelegateStatement({
     address,
     delegateStatement,
-    signature,
-    message,
     scwAddress,
+    auth,
   });
 
   revalidateDelegateAddressPage(address.toLowerCase());
@@ -192,8 +189,12 @@ export async function updateNotificationPreferencesForAddress(
   options: {
     wants_proposal_created_email: "prompt" | "prompted" | true | false;
     wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
-  }
+  },
+  auth: AuthParams
 ) {
+  // Verify authentication (throws on failure)
+  await requireAuth(auth, address);
+
   return fetchUpdateNotificationPreferencesForAddress(address, email, options);
 }
 

@@ -156,10 +156,12 @@ async function getCurrentDelegatorsForAddress({
     const daoDelegate = daoNodeData?.delegate;
 
     if (daoDelegate?.from_list && Array.isArray(daoDelegate.from_list)) {
+      const isERC20 = contracts.token.isERC20();
+      const isERC721 = contracts.token.isERC721();
       let balanceFilter = BigInt(0);
-      if (contracts.token.isERC20()) {
+      if (isERC20) {
         balanceFilter = BigInt(1e15);
-      } else if (contracts.token.isERC721()) {
+      } else if (isERC721) {
         balanceFilter = BigInt(0);
       } else {
         throw new Error(
@@ -178,11 +180,13 @@ async function getCurrentDelegatorsForAddress({
         const balance = BigInt(delegator.balance ?? 0);
         const isFull =
           pct === 10000 || pct === undefined || pct === null || pct === 0;
-        const allowance = isFull
-          ? balance
-          : pct !== undefined && pct !== null
-            ? (balance * BigInt(pct)) / BigInt(10000)
-            : balance;
+        const allowance = isERC721
+          ? BigInt(1)
+          : isFull
+            ? balance
+            : pct !== undefined && pct !== null
+              ? (balance * BigInt(pct)) / BigInt(10000)
+              : balance;
 
         const timestamp =
           latestBlock && bn
@@ -203,7 +207,7 @@ async function getCurrentDelegatorsForAddress({
       });
 
       const filtered = mapped.filter(
-        (delegator) => BigInt(delegator.allowance) > balanceFilter
+        (delegator) => BigInt(delegator.allowance || 0) >= balanceFilter
       );
 
       const totalCount =

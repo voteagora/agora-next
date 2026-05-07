@@ -26,6 +26,22 @@ export type UIGasRelayConfig = {
   minVPToUseGasRelay: string;
 };
 
+export type UIMiradorConfig = {
+  proposalCreation?: boolean;
+  siweLoginTracing?: boolean;
+  governanceVote?: boolean;
+  governanceDelegation?: boolean;
+  staking?: boolean;
+  governanceAdmin?: boolean;
+  proposalAttestation?: boolean;
+  membershipAdmin?: boolean;
+};
+
+export type UISafeTrackingConfig = {
+  offchainMessageTracking?: boolean;
+  onchainTransactionTracking?: boolean;
+};
+
 // UI config exists to give tenant specifc config options to a UI toggle
 // the canonical example is wanting to allow tenants to customize
 // their proposal lifecycle feature
@@ -76,7 +92,9 @@ type UIConfig =
   | UIInfoBannerConfig
   | UIDunaDisclosuresConfig
   | UITaxFormConfig
-  | UIFinancialStatementsConfig;
+  | UIFinancialStatementsConfig
+  | UIMiradorConfig
+  | UISafeTrackingConfig;
 
 // Note: Modular accounts are not yet supported
 // https://accountkit.alchemy.com/smart-contracts/light-account
@@ -95,12 +113,14 @@ export type UILink = {
   name: string;
   title: string;
   url: string;
-  image?: string | StaticImageData;
+  image?: UIImageSource;
 };
+
+export type UIImageSource = string | StaticImageData;
 
 type UIPage = {
   description: string | React.ReactNode;
-  hero?: StaticImageData | string;
+  hero?: UIImageSource;
   href?: string;
   links?: UILink[];
   route: string;
@@ -150,17 +170,21 @@ type UIOrganization = {
 type TenantUIParams = {
   assets: UIAssets;
   delegates?: UIDelegates;
+  grantsFollowXHandle?: string;
+  grantsEmailOrgName?: string;
+  grantsEmailSenderName?: string;
   googleAnalytics?: string;
   governanceIssues?: UIGovernanceIssue[];
   governanceStakeholders?: UIGovernanceStakeholder[];
   hideAgoraBranding?: boolean;
   links?: UILink[];
-  logo: string;
+  logo: UIImageSource;
   logoSize?: string;
   organization?: UIOrganization;
   pages?: UIPage[];
   smartAccountConfig?: UISmartAccountConfig;
   title: string;
+  dunaTitle?: string;
   toggles?: UIToggle[];
   tokens?: TenantToken[];
   customization?: {
@@ -197,11 +221,10 @@ type TenantUIParams = {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customButtonBackground?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   theme?: "light" | "dark";
   favicon?: {
@@ -220,18 +243,22 @@ type TenantUIParams = {
 export class TenantUI {
   private _assets: UIAssets;
   private _delegates?: UIDelegates;
+  private _grantsFollowXHandle?: string;
+  private _grantsEmailOrgName?: string;
+  private _grantsEmailSenderName?: string;
   private _googleAnalytics?: string;
   private _governanceIssues?: UIGovernanceIssue[];
   private _governanceStakeholders?: UIGovernanceStakeholder[];
   private _hideAgoraBranding?: boolean;
   private _links?: UILink[];
-  private _logo: string;
+  private _logo: UIImageSource;
   private _logoSize?: string;
   private _organization?: UIOrganization;
   private _pages?: UIPage[];
   private _title: string;
   private _toggles?: UIToggle[];
   private _tokens?: TenantToken[];
+  private _dunaTitle?: string;
   private _customization?: {
     primary?: string;
     secondary?: string;
@@ -266,11 +293,10 @@ export class TenantUI {
     customCardSize?: string;
     customIconColor?: string;
     noReportsFound?: string;
-    customButtonBackground?: string;
-    customHeroTitleWidth?: string;
     tagBackground?: string;
     infoBannerBackground?: string;
     heroCardGradient?: { from: string; to: string };
+    grantsListBackground?: string;
   };
   private _theme: "light" | "dark";
   private _favicon?: {
@@ -295,6 +321,9 @@ export class TenantUI {
     customization,
     delegates,
     documentColors,
+    grantsFollowXHandle,
+    grantsEmailOrgName,
+    grantsEmailSenderName,
     dunaDisclaimers,
     favicon,
     googleAnalytics,
@@ -312,10 +341,14 @@ export class TenantUI {
     tacticalStrings,
     theme,
     tokens,
+    dunaTitle,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
     this._delegates = delegates;
+    this._grantsFollowXHandle = grantsFollowXHandle;
+    this._grantsEmailOrgName = grantsEmailOrgName;
+    this._grantsEmailSenderName = grantsEmailSenderName;
     this._documentColors = documentColors;
     this._dunaDisclaimers = dunaDisclaimers;
     this._favicon = favicon;
@@ -334,6 +367,7 @@ export class TenantUI {
     this._tacticalStrings = tacticalStrings;
     this._theme = theme ?? "light";
     this._tokens = tokens;
+    this._dunaTitle = dunaTitle;
   }
 
   public get assets(): UIAssets {
@@ -342,6 +376,18 @@ export class TenantUI {
 
   public get delegates(): UIDelegates | undefined {
     return this._delegates;
+  }
+
+  public get grantsFollowXHandle(): string | undefined {
+    return this._grantsFollowXHandle;
+  }
+
+  public get grantsEmailOrgName(): string | undefined {
+    return this._grantsEmailOrgName;
+  }
+
+  public get grantsEmailSenderName(): string | undefined {
+    return this._grantsEmailSenderName;
   }
 
   public get governanceIssues(): UIGovernanceIssue[] | undefined {
@@ -364,8 +410,12 @@ export class TenantUI {
     return this._title;
   }
 
-  public get logo(): string {
+  public get logo(): UIImageSource {
     return this._logo;
+  }
+
+  public get dunaTitle(): string | undefined {
+    return this._dunaTitle;
   }
 
   public get logoSize(): string | undefined {
@@ -415,9 +465,10 @@ export class TenantUI {
         customCardSize?: string;
         customIconColor?: string;
         noReportsFound?: string;
-        customButtonBackground?: string;
         tagBackground?: string;
         infoBannerBackground?: string;
+        heroCardGradient?: { from: string; to: string };
+        grantsListBackground?: string;
       }
     | undefined {
     return this._customization;
@@ -443,7 +494,11 @@ export class TenantUI {
       return this._linksCache[name];
     }
 
-    const result = this._links?.find((t) => t.name === name);
+    let result = this._links?.find((t) => t.name === name);
+    // Canonical "twitter" resolves to any link with title "Twitter" (e.g. shape-twitter, townstwitter)
+    if (result === undefined && name === "twitter") {
+      result = this._links?.find((t) => t.title === "Twitter");
+    }
     this._linksCache[name] = result;
     return result;
   }
