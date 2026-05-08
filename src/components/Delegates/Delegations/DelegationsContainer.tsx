@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -15,6 +16,7 @@ import { PaginatedResult } from "@/app/lib/pagination";
 import { useEffect, useRef, useState } from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useQueryState } from "nuqs";
+import Tenant from "@/lib/tenant/tenant";
 
 const SUBTAB_PARAM = "subtab";
 
@@ -70,6 +72,10 @@ function DelegationsContainer({
       delegation.to !== "0x0000000000000000000000000000000000000000"
   );
 
+  const showDelegatedFromVotingPowerColumn =
+    !Tenant.current().contracts.token.isERC721();
+  const delegatedFromColumnCount = showDelegatedFromVotingPowerColumn ? 4 : 3;
+
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="flex flex-col gap-2">
@@ -111,9 +117,11 @@ function DelegationsContainer({
                 <Table className="min-w-full">
                   <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                     <TableRow>
-                      <TableHead className="h-10 text-secondary">
-                        Voting Power
-                      </TableHead>
+                      {showDelegatedFromVotingPowerColumn && (
+                        <TableHead className="h-10 text-secondary">
+                          Voting Power
+                        </TableHead>
+                      )}
                       <TableHead className="h-10 text-secondary">
                         Delegated on
                       </TableHead>
@@ -127,19 +135,24 @@ function DelegationsContainer({
                   </TableHeader>
                   <TableBody>
                     {delegators.length === 0 ? (
-                      <td
-                        className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                        colSpan={6}
-                      >
-                        {numOfDelegators > 0n
-                          ? "Accounts with OVP or Dust are hidden"
-                          : "None found"}
-                      </td>
+                      <TableRow>
+                        <TableCell
+                          className="w-full p-4 bg-neutral text-center text-secondary text-sm"
+                          colSpan={delegatedFromColumnCount}
+                        >
+                          {numOfDelegators > 0n
+                            ? "Accounts with 0 VP or Dust are hidden"
+                            : "None found"}
+                        </TableCell>
+                      </TableRow>
                     ) : (
                       delegators.map((delegation) => (
                         <DelegationFromRow
                           key={delegation.from}
                           delegation={delegation}
+                          showVotingPowerColumn={
+                            showDelegatedFromVotingPowerColumn
+                          }
                         />
                       ))
                     )}

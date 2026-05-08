@@ -203,12 +203,16 @@ async function getCurrentDelegatorsForAddress({
           amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
           transaction_hash:
             delegator.txhash || delegator.transaction_hash || "",
+          _balance: balance,
         };
       });
 
-      const filtered = mapped.filter(
-        (delegator) => BigInt(delegator.allowance || 0) >= balanceFilter
-      );
+      const filtered = mapped.filter((delegator) => {
+        if (isERC721) {
+          return delegator._balance > balanceFilter;
+        }
+        return BigInt(delegator.allowance || 0) >= balanceFilter;
+      });
 
       const totalCount =
         typeof daoDelegate.from_cnt === "number"
@@ -228,7 +232,7 @@ async function getCurrentDelegatorsForAddress({
           total_returned: sliced.length,
           total_count: totalCount,
         },
-        data: sliced,
+        data: sliced.map(({ _balance, ...rest }) => rest),
       };
     }
 

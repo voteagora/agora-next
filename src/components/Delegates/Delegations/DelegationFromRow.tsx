@@ -10,17 +10,21 @@ import ENSName from "@/components/shared/ENSName";
 
 export default function DelegationFromRow({
   delegation,
+  showVotingPowerColumn = true,
 }: {
   delegation: Delegation;
+  showVotingPowerColumn?: boolean;
 }) {
   return (
     <TableRow>
-      <TableCell>
-        {TokenAmountDisplay({
-          amount: delegation.allowance,
-          maximumSignificantDigits: 3,
-        })}
-      </TableCell>
+      {showVotingPowerColumn && (
+        <TableCell>
+          {TokenAmountDisplay({
+            amount: delegation.allowance,
+            maximumSignificantDigits: 3,
+          })}
+        </TableCell>
+      )}
       <TableCell>{format(delegation.timestamp || 0, "yyyy/MM/dd")}</TableCell>
       <TableCell>
         <Link
