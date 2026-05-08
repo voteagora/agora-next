@@ -24,6 +24,22 @@ import Markdown from "@/components/shared/Markdown/Markdown";
 
 const { token, ui } = Tenant.current();
 
+const ZERO_VP_VOTE_TOOLTIP =
+  "Zero weight at snapshot—does not affect the outcome.";
+
+const zeroVpTooltipContentClass =
+  "max-w-[11rem] px-3 py-2 text-xs text-secondary leading-snug";
+
+function isZeroVotingPowerWeight(weight: string): boolean {
+  const raw = (weight ?? "").toString().trim().replace(/,/g, "") || "0";
+  try {
+    return BigInt(raw) === 0n;
+  } catch {
+    const n = Number.parseFloat(raw);
+    return Number.isFinite(n) && n === 0;
+  }
+}
+
 export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { address } = useAccount();
   const {
@@ -52,6 +68,8 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
     }
   };
 
+  const zeroVpVote = isZeroVotingPowerWeight(weight);
+
   return (
     <VStack>
       <HoverCard
@@ -65,17 +83,41 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             justifyContent="justify-between"
             className="mb-2 text-xs leading-4"
           >
-            <div className="text-primary font-semibold flex items-center">
-              <ENSAvatar ensName={data} className="w-5 h-5 mr-1" />
-              <div className="text-primary hover:underline">
-                <Link href={`/delegates/${voterAddress}`}>
-                  <ENSName address={voterAddress} />
-                </Link>
+            <div
+              className={
+                zeroVpVote
+                  ? "text-tertiary font-semibold flex items-center"
+                  : "text-primary font-semibold flex items-center"
+              }
+            >
+              <div
+                className={zeroVpVote ? "mr-1 opacity-50 grayscale" : "mr-1"}
+              >
+                <ENSAvatar ensName={data} className="w-5 h-5" />
+              </div>
+              <div
+                className={
+                  zeroVpVote
+                    ? "text-tertiary cursor-default"
+                    : "text-primary hover:underline"
+                }
+              >
+                {zeroVpVote ? (
+                  <span className="text-tertiary">
+                    <ENSName address={voterAddress} />
+                  </span>
+                ) : (
+                  <Link href={`/delegates/${voterAddress}`}>
+                    <ENSName address={voterAddress} />
+                  </Link>
+                )}
               </div>
               {address?.toLowerCase() === voterAddress && (
-                <span className="text-primary">&nbsp;(you)</span>
+                <span className={zeroVpVote ? "text-tertiary" : "text-primary"}>
+                  &nbsp;(you)
+                </span>
               )}
-              {hovered && (
+              {hovered && !zeroVpVote && (
                 <>
                   <a
                     href={getBlockScanUrl(hash1)}
@@ -96,7 +138,13 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                 </>
               )}
             </div>
-            <div className={"font-semibold text-primary"}>
+            <div
+              className={
+                zeroVpVote
+                  ? "font-semibold text-tertiary"
+                  : "font-semibold text-primary"
+              }
+            >
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -112,8 +160,12 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                       />
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="p-4">
-                    {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                  <TooltipContent
+                    className={zeroVpVote ? zeroVpTooltipContentClass : "p-4"}
+                  >
+                    {zeroVpVote
+                      ? ZERO_VP_VOTE_TOOLTIP
+                      : `${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
