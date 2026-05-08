@@ -36,22 +36,23 @@ import { DelegateStatement } from "@/app/api/common/delegates/delegate";
 
 const PROFILE_AUX_PREFETCH = { offset: 0, limit: 20 } as const;
 
-/** Same rule as Past Votes “weight 0” rows + delegations dust empty state. */
+/** 0 total VP and at least one on-chain past vote (first page) with 0 weight—aligns with Past Votes list. */
 function shouldShowNoVotingPowerBanner(
-  delegate: {
-    votingPower: { total: string };
-    numOfDelegators: bigint;
-  },
-  inboundDelegatorsFirstPageCount: number,
+  delegate: { votingPower: { total: string } },
   onchainVotesFirstPage: readonly { weight: string }[]
 ): boolean {
-  if (BigInt(delegate.votingPower.total) !== 0n) {
+  if (BigInt(delegate.votingPower.total || "0") !== 0n) {
     return false;
   }
-  if (onchainVotesFirstPage.some((v) => BigInt(v.weight) === 0n)) {
-    return true;
-  }
-  return delegate.numOfDelegators > 0n && inboundDelegatorsFirstPageCount === 0;
+  return onchainVotesFirstPage.some((v) => {
+    const raw = (v.weight ?? "").toString().trim().replace(/,/g, "") || "0";
+    try {
+      return BigInt(raw) === 0n;
+    } catch {
+      const n = Number.parseFloat(raw);
+      return Number.isFinite(n) && n === 0;
+    }
+  });
 }
 
 export const dynamic = "force-dynamic"; // needed for both app and e2e
@@ -167,7 +168,6 @@ export default async function Page({
 
   const showNoVotingPowerBanner = shouldShowNoVotingPowerBanner(
     parsedDelegate,
-    inboundDelegatorsFirstPage.data.length,
     onchainVotesFirstPage.data
   );
 
