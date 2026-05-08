@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, type UIEvent } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
@@ -12,6 +12,7 @@ import type {
 } from "@/app/api/common/votes/vote";
 
 const NON_VOTER_ROW_ESTIMATE_PX = 60;
+const SCROLL_FETCH_THRESHOLD_PX = 360;
 
 type ArchiveProposalNonVoterListProps = {
   proposal: Proposal;
@@ -93,23 +94,45 @@ export default function ArchiveProposalNonVoterList({
   });
 
   const virtualRows = rowVirtualizer.getVirtualItems();
-  const lastVirtualRowIndex = virtualRows[virtualRows.length - 1]?.index;
+
+  const loadNextPageIfScrolledNearBottom = useCallback(
+    (element: HTMLDivElement | null) => {
+      if (!element || !hasNextPage || isFetchingNextPage) {
+        return;
+      }
+
+      if (element.scrollHeight <= element.clientHeight) {
+        return;
+      }
+
+      const distanceFromBottom =
+        element.scrollHeight - element.scrollTop - element.clientHeight;
+
+      if (distanceFromBottom <= SCROLL_FETCH_THRESHOLD_PX) {
+        void fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  const handleScroll = useCallback(
+    (event: UIEvent<HTMLDivElement>) => {
+      loadNextPageIfScrolledNearBottom(event.currentTarget);
+    },
+    [loadNextPageIfScrolledNearBottom]
+  );
 
   useEffect(() => {
     if (
-      lastVirtualRowIndex !== undefined &&
-      lastVirtualRowIndex >= filteredNonVoters.length - 8 &&
-      hasNextPage &&
-      !isFetchingNextPage
+      scrollParentRef.current &&
+      scrollParentRef.current.scrollTop > 0 &&
+      filteredNonVoters.length
     ) {
-      void fetchNextPage();
+      loadNextPageIfScrolledNearBottom(scrollParentRef.current);
     }
   }, [
-    fetchNextPage,
     filteredNonVoters.length,
-    hasNextPage,
-    isFetchingNextPage,
-    lastVirtualRowIndex,
+    loadNextPageIfScrolledNearBottom,
   ]);
 
   if (isLoading) {
@@ -144,6 +167,7 @@ export default function ArchiveProposalNonVoterList({
     <>
       <div
         ref={scrollParentRef}
+        onScroll={handleScroll}
         className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
       >
         <div
