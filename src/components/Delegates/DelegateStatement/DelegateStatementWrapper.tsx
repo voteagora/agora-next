@@ -14,7 +14,7 @@ function ZeroVotingPowerNotice() {
   return (
     <div
       role="alert"
-      className="mb-6 flex gap-3 rounded-lg border border-line bg-wash p-4 shadow-newDefault"
+      className="mb-4 flex gap-3 rounded-lg border border-line bg-wash p-4 shadow-newDefault"
     >
       <Info
         aria-hidden
