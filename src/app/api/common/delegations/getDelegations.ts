@@ -16,6 +16,28 @@ import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { getAlchemyId } from "@/lib/alchemyConfig";
+
+const BLOCKCACHE_URL = "https://blockcache-production.up.railway.app";
+
+async function fetchTxHashFromBlockcache(
+  chainId: number,
+  blockNumber: string | number,
+  transactionIndex: number
+): Promise<string> {
+  try {
+    const alchemyKey = getAlchemyId();
+    const response = await fetch(
+      `${BLOCKCACHE_URL}/transaction/${chainId}/${blockNumber}/${transactionIndex}`,
+      { headers: { "alchemy-api-key": alchemyKey } }
+    );
+    if (!response.ok) return "";
+    const data = await response.json();
+    return data?.tx ?? "";
+  } catch {
+    return "";
+  }
+}
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -174,37 +196,48 @@ async function getCurrentDelegatorsForAddress({
           ? await contracts.token.provider.getBlock("latest")
           : null;
 
-      const mapped = daoDelegate.from_list.map((delegator: any) => {
-        const bn = delegator.bn ?? delegator.block_number;
-        const pct = delegator.percentage;
-        const balance = BigInt(delegator.balance ?? 0);
-        const isFull =
-          pct === 10000 || pct === undefined || pct === null || pct === 0;
-        const allowance = isERC721
-          ? BigInt(1)
-          : isFull
-            ? balance
-            : pct !== undefined && pct !== null
-              ? (balance * BigInt(pct)) / BigInt(10000)
-              : balance;
+      const chainId = contracts.token.chain.id;
 
-        const timestamp =
-          latestBlock && bn
-            ? getHumanBlockTime(BigInt(bn), latestBlock, true)
-            : null;
+      const mapped = await Promise.all(
+        daoDelegate.from_list.map(async (delegator: any) => {
+          const bn = delegator.bn ?? delegator.block_number;
+          const pct = delegator.percentage;
+          const balance = BigInt(delegator.balance ?? 0);
+          const isFull =
+            pct === 10000 || pct === undefined || pct === null || pct === 0;
+          const allowance = isERC721
+            ? BigInt(1)
+            : isFull
+              ? balance
+              : pct !== undefined && pct !== null
+                ? (balance * BigInt(pct)) / BigInt(10000)
+                : balance;
 
-        return {
-          from: (delegator.delegator || delegator.from || "").toLowerCase(),
-          to: address,
-          allowance: allowance.toString(),
-          percentage: pct !== undefined && pct !== null ? String(pct) : "0",
-          timestamp,
-          type: "DIRECT" as const,
-          amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
-          transaction_hash:
-            delegator.txhash || delegator.transaction_hash || "",
-        };
-      });
+          const timestamp =
+            latestBlock && bn
+              ? getHumanBlockTime(BigInt(bn), latestBlock, true)
+              : null;
+
+          const existingHash =
+            delegator.txhash || delegator.transaction_hash || "";
+          const transactionHash =
+            existingHash ||
+            (bn != null && delegator.tid != null
+              ? await fetchTxHashFromBlockcache(chainId, bn, delegator.tid)
+              : "");
+
+          return {
+            from: (delegator.delegator || delegator.from || "").toLowerCase(),
+            to: address,
+            allowance: allowance.toString(),
+            percentage: pct !== undefined && pct !== null ? String(pct) : "0",
+            timestamp,
+            type: "DIRECT" as const,
+            amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
+            transaction_hash: transactionHash,
+          };
+        })
+      );
 
       const filtered = mapped.filter(
         (delegator) => BigInt(delegator.allowance || 0) >= balanceFilter
