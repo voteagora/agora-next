@@ -191,28 +191,47 @@ async function getCurrentDelegatorsForAddress({
         );
       }
 
+      const chainId = contracts.token.chain.id;
+
+      // Compute allowances synchronously, filter, and slice to the page first
+      // so blockcache calls are bounded to at most `limit` items.
+      const precomputed = daoDelegate.from_list.map((delegator: any) => {
+        const bn = delegator.bn ?? delegator.block_number;
+        const pct = delegator.percentage;
+        const balance = BigInt(delegator.balance ?? 0);
+        const isFull =
+          pct === 10000 || pct === undefined || pct === null || pct === 0;
+        const allowance = isERC721
+          ? BigInt(1)
+          : isFull
+            ? balance
+            : pct !== undefined && pct !== null
+              ? (balance * BigInt(pct)) / BigInt(10000)
+              : balance;
+        return { delegator, bn, pct, isFull, allowance };
+      });
+
+      const filtered = precomputed.filter(
+        ({ allowance }) => allowance >= balanceFilter
+      );
+
+      const totalCount =
+        typeof daoDelegate.from_cnt === "number"
+          ? daoDelegate.from_cnt
+          : filtered.length;
+
+      const page = filtered.slice(
+        pagination.offset,
+        pagination.offset + pagination.limit
+      );
+
       const latestBlock =
-        daoDelegate.from_list.length > 0
+        page.length > 0
           ? await contracts.token.provider.getBlock("latest")
           : null;
 
-      const chainId = contracts.token.chain.id;
-
-      const mapped = await Promise.all(
-        daoDelegate.from_list.map(async (delegator: any) => {
-          const bn = delegator.bn ?? delegator.block_number;
-          const pct = delegator.percentage;
-          const balance = BigInt(delegator.balance ?? 0);
-          const isFull =
-            pct === 10000 || pct === undefined || pct === null || pct === 0;
-          const allowance = isERC721
-            ? BigInt(1)
-            : isFull
-              ? balance
-              : pct !== undefined && pct !== null
-                ? (balance * BigInt(pct)) / BigInt(10000)
-                : balance;
-
+      const sliced = await Promise.all(
+        page.map(async ({ delegator, bn, pct, isFull, allowance }) => {
           const timestamp =
             latestBlock && bn
               ? getHumanBlockTime(BigInt(bn), latestBlock, true)
@@ -237,20 +256,6 @@ async function getCurrentDelegatorsForAddress({
             transaction_hash: transactionHash,
           };
         })
-      );
-
-      const filtered = mapped.filter(
-        (delegator) => BigInt(delegator.allowance || 0) >= balanceFilter
-      );
-
-      const totalCount =
-        typeof daoDelegate.from_cnt === "number"
-          ? daoDelegate.from_cnt
-          : filtered.length;
-
-      const sliced = filtered.slice(
-        pagination.offset,
-        pagination.offset + pagination.limit
       );
       const hasNext = pagination.offset + pagination.limit < filtered.length;
 
