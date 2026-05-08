@@ -4,7 +4,12 @@ import { Metadata, ResolvingMetadata } from "next";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
-import { fetchDelegate } from "@/app/delegates/actions";
+import {
+  fetchCurrentDelegatees,
+  fetchCurrentDelegators,
+  fetchDelegate,
+  fetchVotesForDelegate,
+} from "@/app/delegates/actions";
 import { fetchBadgesForDelegate } from "@/app/api/common/badges/getBadges";
 
 import { formatNumber } from "@/lib/tokenUtils";
@@ -28,6 +33,26 @@ import DiscussionsContainerWrapper, {
   DiscussionsContainerSkeleton,
 } from "@/components/Delegates/Discussions/DiscussionsContainerWrapper";
 import { DelegateStatement } from "@/app/api/common/delegates/delegate";
+
+const PROFILE_AUX_PREFETCH = { offset: 0, limit: 20 } as const;
+
+/** Same rule as Past Votes “weight 0” rows + delegations dust empty state. */
+function shouldShowNoVotingPowerBanner(
+  delegate: {
+    votingPower: { total: string };
+    numOfDelegators: bigint;
+  },
+  inboundDelegatorsFirstPageCount: number,
+  onchainVotesFirstPage: readonly { weight: string }[]
+): boolean {
+  if (BigInt(delegate.votingPower.total) !== 0n) {
+    return false;
+  }
+  if (onchainVotesFirstPage.some((v) => BigInt(v.weight) === 0n)) {
+    return true;
+  }
+  return delegate.numOfDelegators > 0n && inboundDelegatorsFirstPageCount === 0;
+}
 
 export const dynamic = "force-dynamic"; // needed for both app and e2e
 export const revalidate = 0;
@@ -130,6 +155,22 @@ export default async function Page({
       : null,
   });
 
+  const delegateesFetchAddress =
+    parsedDelegate.statement?.scw_address || parsedDelegate.address;
+
+  const [delegatees, inboundDelegatorsFirstPage, onchainVotesFirstPage] =
+    await Promise.all([
+      fetchCurrentDelegatees(delegateesFetchAddress),
+      fetchCurrentDelegators(parsedDelegate.address, PROFILE_AUX_PREFETCH),
+      fetchVotesForDelegate(parsedDelegate.address, PROFILE_AUX_PREFETCH),
+    ]);
+
+  const showNoVotingPowerBanner = shouldShowNoVotingPowerBanner(
+    parsedDelegate,
+    inboundDelegatorsFirstPage.data.length,
+    onchainVotesFirstPage.data
+  );
+
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 justify-between mt-12 w-full max-w-full">
       <div className="flex flex-col static md:sticky top-16 shrink-0 w-full md:max-w-[330px] lg:max-w-[350px]">
@@ -144,14 +185,24 @@ export default async function Page({
       </div>
       {!scwDelegate ? (
         <div className="flex flex-col md:ml-8 lg:ml-12 min-w-0 flex-1 max-w-full gap-8">
-          <DelegateStatementWrapper delegate={parsedDelegate} />
+          <DelegateStatementWrapper
+            delegate={parsedDelegate}
+            showNoVotingPowerBanner={showNoVotingPowerBanner}
+          />
 
           <Suspense fallback={<VotesContainerSkeleton />}>
-            <VotesContainerWrapper delegate={parsedDelegate} />
+            <VotesContainerWrapper
+              delegate={parsedDelegate}
+              initialOnchainVotes={onchainVotesFirstPage}
+            />
           </Suspense>
 
           <Suspense fallback={<DelegationsContainerSkeleton />}>
-            <DelegationsContainerWrapper delegate={parsedDelegate} />
+            <DelegationsContainerWrapper
+              delegate={parsedDelegate}
+              initialDelegatees={delegatees}
+              initialInboundDelegators={inboundDelegatorsFirstPage}
+            />
           </Suspense>
           {ui.toggle("forums")?.enabled && (
             <Suspense fallback={<DiscussionsContainerSkeleton />}>
@@ -160,7 +211,10 @@ export default async function Page({
           )}
         </div>
       ) : (
-        <DelegateStatementWrapper delegate={parsedDelegate} />
+        <DelegateStatementWrapper
+          delegate={parsedDelegate}
+          showNoVotingPowerBanner={showNoVotingPowerBanner}
+        />
       )}
     </div>
   );
