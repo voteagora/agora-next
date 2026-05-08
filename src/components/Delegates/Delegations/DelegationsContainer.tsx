@@ -132,7 +132,7 @@ function DelegationsContainer({
                         colSpan={6}
                       >
                         {numOfDelegators > 0n
-                          ? "Accounts with OVP or Dust are hidden"
+                          ? "Accounts with 0 VP or Dust are hidden"
                           : "None found"}
                       </td>
                     ) : (
