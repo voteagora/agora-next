@@ -45,18 +45,18 @@ export default function CopelandProposalSingleVote({
               : "text-primary font-semibold flex items-center"
           }
         >
-          <div className={zeroVpVote ? "mr-1 opacity-50 grayscale" : "mr-1"}>
+          <div className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}>
             <ENSAvatar ensName={voterAddress} className="w-5 h-5" />
           </div>
           <div
             className={
               zeroVpVote
-                ? "text-tertiary cursor-default"
+                ? "text-tertiary opacity-40 cursor-default"
                 : "text-primary hover:underline"
             }
           >
             {zeroVpVote ? (
-              <span className="text-tertiary">
+              <span>
                 <ENSName address={voterAddress} />
               </span>
             ) : (
@@ -66,7 +66,11 @@ export default function CopelandProposalSingleVote({
             )}
           </div>
           {address?.toLowerCase() === voterAddress && (
-            <span className={zeroVpVote ? "text-tertiary" : "text-primary"}>
+            <span
+              className={
+                zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+              }
+            >
               &nbsp;(you)
             </span>
           )}
@@ -74,7 +78,7 @@ export default function CopelandProposalSingleVote({
         <div
           className={
             zeroVpVote
-              ? "font-semibold text-tertiary"
+              ? "font-semibold text-tertiary opacity-40"
               : "font-semibold text-primary"
           }
         >

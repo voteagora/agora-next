@@ -184,7 +184,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
               <HStack gap={1} alignItems="items-center">
                 <div
                   className={
-                    zeroVpVote ? "shrink-0 opacity-50 grayscale" : "shrink-0"
+                    zeroVpVote ? "shrink-0 opacity-30 grayscale" : "shrink-0"
                   }
                 >
                   {ensAvatar()}
@@ -193,12 +193,12 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                   <div
                     className={
                       zeroVpVote
-                        ? "text-tertiary font-bold cursor-default"
+                        ? "text-tertiary opacity-40 font-bold cursor-default"
                         : "text-primary font-bold hover:underline"
                     }
                   >
                     {zeroVpVote ? (
-                      <span className="text-tertiary">
+                      <span>
                         {name ? name : <ENSName address={vote.address} />}
                       </span>
                     ) : (
@@ -225,7 +225,11 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                   )}
                 </div>
                 {vote.address === connectedAddress?.toLowerCase() && (
-                  <p className={zeroVpVote ? "text-tertiary" : "text-primary"}>
+                  <p
+                    className={
+                      zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+                    }
+                  >
                     (you)
                   </p>
                 )}
@@ -257,7 +261,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       <div
                         className={
                           zeroVpVote
-                            ? "text-tertiary"
+                            ? "text-tertiary opacity-40"
                             : vote.support === "AGAINST"
                               ? "text-negative"
                               : vote.support === "FOR"
