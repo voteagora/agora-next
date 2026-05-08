@@ -29,6 +29,10 @@ export function useVisibleRows({
       const distanceFromBottom =
         element.scrollHeight - element.scrollTop - element.clientHeight;
 
+      if (element.scrollHeight <= element.clientHeight) {
+        return;
+      }
+
       if (distanceFromBottom <= SCROLL_THRESHOLD_PX) {
         loadMore();
       }

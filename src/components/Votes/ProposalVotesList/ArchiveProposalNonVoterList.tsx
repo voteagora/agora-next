@@ -1,17 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
-import { useVisibleRows } from "@/hooks/useVisibleRows";
 import type {
   VotesSort,
   VotesSortOrder,
   VoterTypes,
 } from "@/app/api/common/votes/vote";
 
-const NON_VOTERS_PAGE_SIZE = 20;
+const NON_VOTER_ROW_ESTIMATE_PX = 60;
 
 type ArchiveProposalNonVoterListProps = {
   proposal: Proposal;
@@ -26,6 +26,7 @@ export default function ArchiveProposalNonVoterList({
   sort,
   sortOrder,
 }: ArchiveProposalNonVoterListProps) {
+  const scrollParentRef = useRef<HTMLDivElement | null>(null);
   const { nonVoters, isLoading, error } = useArchiveNonVoters({
     proposalId: proposal.id,
     sort,
@@ -73,21 +74,14 @@ export default function ArchiveProposalNonVoterList({
     });
   }, [nonVoters, selectedVoterType, shouldShowFilter]);
 
-  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
-    pageSize: NON_VOTERS_PAGE_SIZE,
-    resetKey: [
-      proposal.id,
-      selectedVoterType.type,
-      sort ?? "weight",
-      sortOrder ?? "desc",
-      filteredNonVoters.length,
-    ].join(":"),
-    totalCount: filteredNonVoters.length,
+  const rowVirtualizer = useVirtualizer({
+    count: filteredNonVoters.length,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => NON_VOTER_ROW_ESTIMATE_PX,
+    overscan: 8,
   });
 
-  const paginatedNonVoters = useMemo(() => {
-    return filteredNonVoters.slice(0, visibleCount);
-  }, [filteredNonVoters, visibleCount]);
+  const virtualRows = rowVirtualizer.getVirtualItems();
 
   if (isLoading) {
     return (
@@ -103,8 +97,16 @@ export default function ArchiveProposalNonVoterList({
 
   if (!nonVoters.length) {
     return (
-      <div className="px-4 pb-4 text-secondary text-xs">
+      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
         No non-voters data available.
+      </div>
+    );
+  }
+
+  if (!filteredNonVoters.length) {
+    return (
+      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
+        No non-voters match this filter.
       </div>
     );
   }
@@ -112,17 +114,32 @@ export default function ArchiveProposalNonVoterList({
   return (
     <>
       <div
-        ref={containerRef}
-        onScroll={handleScroll}
+        ref={scrollParentRef}
         className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
       >
-        <ul className="flex flex-col gap-2">
-          {paginatedNonVoters.map((nonVoter) => (
-            <li key={nonVoter.delegate}>
-              <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
-            </li>
-          ))}
-        </ul>
+        <div
+          className="relative w-full"
+          style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+        >
+          {virtualRows.map((virtualRow) => {
+            const nonVoter = filteredNonVoters[virtualRow.index];
+            if (!nonVoter) {
+              return null;
+            }
+
+            return (
+              <div
+                key={`${nonVoter.delegate}-${nonVoter.citizen_type ?? "TH"}`}
+                data-index={virtualRow.index}
+                ref={rowVirtualizer.measureElement}
+                className="absolute left-0 top-0 w-full"
+                style={{ transform: `translateY(${virtualRow.start}px)` }}
+              >
+                <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </>
   );

@@ -60,9 +60,10 @@ const OptimisticProposalVotesCard = ({
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
 
-  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+  const selectedVoterTypeHidesTimeSort = ["APP", "USER", "CHAIN"].includes(
     selectedVoterType.type
   );
+  const hideTimeSortOptions = selectedVoterTypeHidesTimeSort;
 
   useEffect(() => {
     const isTimeSortHidden = hideTimeSortOptions || !showVoters;

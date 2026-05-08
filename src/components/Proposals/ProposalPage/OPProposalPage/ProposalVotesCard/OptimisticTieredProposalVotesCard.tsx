@@ -375,9 +375,10 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
   const proposalData =
     proposal.proposalData as ParsedProposalData["HYBRID_OPTIMISTIC_TIERED"]["kind"];
 
-  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+  const selectedVoterTypeHidesTimeSort = ["APP", "USER", "CHAIN"].includes(
     selectedVoterType.type
   );
+  const hideTimeSortOptions = selectedVoterTypeHidesTimeSort;
 
   useEffect(() => {
     const isTimeSortHidden = hideTimeSortOptions || !showVoters;

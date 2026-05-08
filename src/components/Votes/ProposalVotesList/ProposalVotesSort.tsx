@@ -6,7 +6,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { Listbox } from "@headlessui/react";
 import { ChevronDown } from "lucide-react";
 import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { ArrowDownAZ } from "lucide-react";
@@ -58,40 +57,51 @@ export default function ProposalVotesSort({
     : sortOptions;
 
   return (
-    <div className="relative text-primary ml-auto flex-1 min-w-0">
-      <Listbox
-        value={sortOption.label}
-        onChange={(value: string) => {
-          const selected = sortOptions.find((opt) => opt.label === value);
-          if (selected) onSortChange(selected);
-        }}
-      >
-        <Listbox.Button className="text-primary w-full bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2 flex items-center justify-between text-[11px] min-h-[32px]">
-          <ArrowDownAZ className="stroke-primary w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
-          <span className="text-left flex-1 leading-tight break-words">
-            {sortOption.label}
-          </span>
-          <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
-        </Listbox.Button>
-        <Listbox.Options className="mt-3 absolute bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max right-0 shadow-xl">
-          {visibleOptions.map((option) => (
-            <Listbox.Option key={option.label} value={option.label}>
-              {({ selected }) => (
-                <div
-                  className={cn(
-                    "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
-                    selected
-                      ? "text-primary bg-wash border-line"
-                      : "text-tertiary border-transparent hover:bg-wash"
-                  )}
-                >
-                  {option.label}
-                </div>
-              )}
-            </Listbox.Option>
-          ))}
-        </Listbox.Options>
-      </Listbox>
+    <div className="text-primary ml-auto flex-1 min-w-0">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="text-primary w-full bg-transparent hover:bg-wash transition-colors font-medium rounded-lg py-1.5 px-2 flex items-center justify-between text-[11px] min-h-[32px]"
+          >
+            <ArrowDownAZ className="stroke-primary w-3.5 h-3.5 mr-1.5 flex-shrink-0" />
+            <span className="text-left flex-1 leading-tight break-words">
+              {sortOption.label}
+            </span>
+            <ChevronDown className="h-4 w-4 ml-2 opacity-30 hover:opacity-100 flex-shrink-0" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className="w-max min-w-[180px] bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 shadow-xl"
+        >
+          <DropdownMenuRadioGroup
+            className="flex flex-col gap-1"
+            value={sortOption.label}
+            onValueChange={(value: string) => {
+              const selected = sortOptions.find((opt) => opt.label === value);
+              if (selected) onSortChange(selected);
+            }}
+          >
+            {visibleOptions.map((option) => (
+              <DropdownMenuRadioItem
+                key={option.label}
+                value={option.label}
+                checked={sortOption.label === option.label}
+                className={cn(
+                  "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
+                  sortOption.label === option.label
+                    ? "text-primary bg-wash border-line"
+                    : "text-tertiary border-transparent hover:bg-wash"
+                )}
+              >
+                {option.label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

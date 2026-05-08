@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  canArchiveVotesSortByTime,
   processArchiveNonVoters,
   processArchiveVotes,
   type ArchiveNonVoter,
@@ -31,11 +32,13 @@ const makeVote = ({
   weight,
   blockNumber,
   citizenType = null,
+  timestamp = null,
 }: {
   address: string;
   weight: string;
-  blockNumber: bigint;
+  blockNumber: bigint | null;
   citizenType?: string | null;
+  timestamp?: Date | null;
 }): ArchiveVote => ({
   transactionHash: null,
   address,
@@ -48,7 +51,7 @@ const makeVote = ({
   params: null,
   reason: null,
   blockNumber,
-  timestamp: null,
+  timestamp,
 });
 
 describe("processArchiveNonVoters", () => {
@@ -84,6 +87,41 @@ describe("processArchiveNonVoters", () => {
     ).toEqual([
       "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    ]);
+  });
+
+  it("orders houses by VP direction when sorting all non-voters by VP", () => {
+    const nonVoters = [
+      makeNonVoter("0xcccccccccccccccccccccccccccccccccccccccc", "1", "USER"),
+      makeNonVoter("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "100"),
+      makeNonVoter("0xdddddddddddddddddddddddddddddddddddddddd", "5", "APP"),
+      makeNonVoter("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1"),
+    ];
+
+    expect(
+      processArchiveNonVoters(nonVoters, {
+        sort: "weight",
+        sortOrder: "desc",
+        voterType: "ALL",
+      }).map((row) => row.delegate)
+    ).toEqual([
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+    ]);
+
+    expect(
+      processArchiveNonVoters(nonVoters, {
+        sort: "weight",
+        sortOrder: "asc",
+        voterType: "ALL",
+      }).map((row) => row.delegate)
+    ).toEqual([
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     ]);
   });
@@ -201,5 +239,153 @@ describe("processArchiveVotes", () => {
         (vote) => vote.address
       )
     ).toEqual(["0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]);
+  });
+
+  it("orders houses by VP direction when sorting all votes by VP", () => {
+    const votes = [
+      makeVote({
+        address: "0xcccccccccccccccccccccccccccccccccccccccc",
+        weight: "1",
+        blockNumber: 3n,
+        citizenType: "USER",
+      }),
+      makeVote({
+        address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        weight: "100",
+        blockNumber: 2n,
+      }),
+      makeVote({
+        address: "0xdddddddddddddddddddddddddddddddddddddddd",
+        weight: "5",
+        blockNumber: 4n,
+        citizenType: "APP",
+      }),
+      makeVote({
+        address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        weight: "1",
+        blockNumber: 1n,
+      }),
+    ];
+
+    expect(
+      processArchiveVotes(votes, {
+        sort: "weight",
+        sortOrder: "desc",
+        voterType: "ALL",
+      }).map((vote) => vote.address)
+    ).toEqual([
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+    ]);
+
+    expect(
+      processArchiveVotes(votes, {
+        sort: "weight",
+        sortOrder: "asc",
+        voterType: "ALL",
+      }).map((vote) => vote.address)
+    ).toEqual([
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    ]);
+  });
+
+  it("sorts only temporal archive votes when some rows lack temporal data", () => {
+    const votes = [
+      makeVote({
+        address: "0xcccccccccccccccccccccccccccccccccccccccc",
+        weight: "1",
+        blockNumber: null,
+        citizenType: "USER",
+      }),
+      makeVote({
+        address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        weight: "100",
+        blockNumber: 20n,
+      }),
+      makeVote({
+        address: "0xdddddddddddddddddddddddddddddddddddddddd",
+        weight: "1",
+        blockNumber: null,
+        citizenType: "APP",
+      }),
+      makeVote({
+        address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        weight: "1",
+        blockNumber: 10n,
+      }),
+    ];
+
+    expect(
+      processArchiveVotes(votes, {
+        sort: "block_number",
+        sortOrder: "desc",
+      }).map((vote) => vote.address)
+    ).toEqual([
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    ]);
+
+    expect(
+      processArchiveVotes(votes, {
+        sort: "block_number",
+        sortOrder: "asc",
+      }).map((vote) => vote.address)
+    ).toEqual([
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    ]);
+  });
+
+  it("allows time sorting when any active archive vote has temporal data", () => {
+    expect(
+      canArchiveVotesSortByTime([
+        makeVote({
+          address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          weight: "1",
+          blockNumber: 1n,
+        }),
+        makeVote({
+          address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          weight: "1",
+          blockNumber: 2n,
+        }),
+      ])
+    ).toBe(true);
+
+    expect(
+      canArchiveVotesSortByTime([
+        makeVote({
+          address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          weight: "1",
+          blockNumber: null,
+          timestamp: null,
+        }),
+        makeVote({
+          address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          weight: "1",
+          blockNumber: 2n,
+        }),
+      ])
+    ).toBe(true);
+
+    expect(
+      canArchiveVotesSortByTime([
+        makeVote({
+          address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          weight: "1",
+          blockNumber: null,
+          timestamp: null,
+        }),
+      ])
+    ).toBe(false);
   });
 });

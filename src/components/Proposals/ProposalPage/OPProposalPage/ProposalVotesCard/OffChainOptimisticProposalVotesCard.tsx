@@ -120,9 +120,10 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
     "use-archive-for-vote-history"
   )?.enabled;
 
-  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
+  const selectedVoterTypeHidesTimeSort = ["APP", "USER", "CHAIN"].includes(
     selectedVoterType.type
   );
+  const hideTimeSortOptions = selectedVoterTypeHidesTimeSort;
 
   useEffect(() => {
     const isTimeSortHidden = hideTimeSortOptions || !showVoters;

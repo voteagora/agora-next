@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import type {
@@ -12,9 +13,8 @@ import type {
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
-import { useVisibleRows } from "@/hooks/useVisibleRows";
 
-const VOTES_PAGE_SIZE = 20;
+const VOTE_ROW_ESTIMATE_PX = 56;
 
 type ArchiveProposalVotesListProps = {
   proposal: Proposal;
@@ -30,6 +30,7 @@ export default function ArchiveProposalVotesList({
   voterType,
 }: ArchiveProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
+  const scrollParentRef = useRef<HTMLDivElement | null>(null);
 
   const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
 
@@ -98,21 +99,18 @@ export default function ArchiveProposalVotesList({
     );
   }, [normalizedVotes, userVoteAddressSet]);
 
-  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
-    pageSize: VOTES_PAGE_SIZE,
-    resetKey: [
-      proposal.id,
-      sort ?? "weight",
-      sortOrder ?? "desc",
-      voterType ?? "ALL",
-      remainingVotes.length,
-    ].join(":"),
-    totalCount: remainingVotes.length,
+  const listVotes = useMemo(() => {
+    return [...userVotes, ...remainingVotes];
+  }, [remainingVotes, userVotes]);
+
+  const rowVirtualizer = useVirtualizer({
+    count: listVotes.length,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => VOTE_ROW_ESTIMATE_PX,
+    overscan: 8,
   });
 
-  const paginatedVotes = useMemo(() => {
-    return remainingVotes.slice(0, visibleCount);
-  }, [remainingVotes, visibleCount]);
+  const virtualRows = rowVirtualizer.getVirtualItems();
 
   if (isLoading) {
     return (
@@ -126,38 +124,43 @@ export default function ArchiveProposalVotesList({
 
   if (!normalizedVotes.length) {
     return (
-      <div className="px-4 pb-4 text-secondary text-xs">No votes yet.</div>
+      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
+        No votes yet.
+      </div>
     );
   }
 
   return (
     <div
-      ref={containerRef}
-      onScroll={handleScroll}
+      ref={scrollParentRef}
       className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
     >
-      <ul className="flex flex-col">
-        {userVotes.map((vote) => (
-          <li
-            key={
-              vote.transactionHash ||
-              `${vote.address}-${vote.support}-${vote.weight}`
-            }
-          >
-            <ProposalSingleVote vote={vote} />
-          </li>
-        ))}
-        {paginatedVotes.map((vote) => (
-          <li
-            key={
-              vote.transactionHash ||
-              `${vote.address}-${vote.support}-${vote.weight}`
-            }
-          >
-            <ProposalSingleVote vote={vote} />
-          </li>
-        ))}
-      </ul>
+      <div
+        className="relative w-full"
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
+      >
+        {virtualRows.map((virtualRow) => {
+          const vote = listVotes[virtualRow.index];
+          if (!vote) {
+            return null;
+          }
+
+          return (
+            <div
+              key={
+                vote.transactionHash ||
+                `${vote.address}-${vote.support}-${vote.weight}-${virtualRow.index}`
+              }
+              data-index={virtualRow.index}
+              ref={rowVirtualizer.measureElement}
+              className="absolute left-0 top-0 w-full"
+              style={{ transform: `translateY(${virtualRow.start}px)` }}
+            >
+              <ProposalSingleVote vote={vote} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

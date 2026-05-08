@@ -24,7 +24,7 @@ export type ArchiveVote = {
   proposalType: ProposalType;
   params: number[] | null;
   reason: string | null;
-  blockNumber: bigint;
+  blockNumber: bigint | null;
   timestamp: Date | null;
 };
 
@@ -51,7 +51,9 @@ type ArchiveVotesProcessingOptions = {
   voterType?: VoterTypes["type"];
 };
 
-function parseComparableBigInt(value: string | number | bigint | undefined) {
+function parseComparableBigInt(
+  value: string | number | bigint | null | undefined
+) {
   if (typeof value === "bigint") {
     return value;
   }
@@ -71,9 +73,23 @@ function parseComparableBigInt(value: string | number | bigint | undefined) {
   return 0n;
 }
 
+function parseNullableBigInt(
+  value: string | number | bigint | null | undefined
+) {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  try {
+    return BigInt(value);
+  } catch {
+    return null;
+  }
+}
+
 function compareBigIntLike(
-  a: string | number | bigint | undefined,
-  b: string | number | bigint | undefined
+  a: string | number | bigint | null | undefined,
+  b: string | number | bigint | null | undefined
 ) {
   const aValue = parseComparableBigInt(a);
   const bValue = parseComparableBigInt(b);
@@ -83,6 +99,86 @@ function compareBigIntLike(
   }
 
   return aValue < bValue ? -1 : 1;
+}
+
+function getArchiveHouseOrder(
+  citizenType: string | null | undefined,
+  sortOrder: VotesSortOrder
+) {
+  const isCitizenHouse = !!citizenType;
+  if (sortOrder === "asc") {
+    return isCitizenHouse ? 0 : 1;
+  }
+
+  return isCitizenHouse ? 1 : 0;
+}
+
+function hasArchiveTemporalValue(
+  vote: Pick<ArchiveVote, "blockNumber" | "timestamp">
+) {
+  return vote.blockNumber !== undefined && vote.blockNumber !== null
+    ? true
+    : !!vote.timestamp;
+}
+
+export function canArchiveVotesSortByTime(votes: ArchiveVote[]) {
+  return votes.some(hasArchiveTemporalValue);
+}
+
+function getArchiveTemporalSortValue(vote: ArchiveVote) {
+  if (vote.blockNumber !== undefined && vote.blockNumber !== null) {
+    return parseComparableBigInt(vote.blockNumber);
+  }
+
+  const timestamp = vote.timestamp?.getTime();
+  if (timestamp !== undefined && Number.isFinite(timestamp)) {
+    return BigInt(timestamp);
+  }
+
+  return null;
+}
+
+function compareArchiveTemporalVotes(
+  a: { vote: ArchiveVote; index: number },
+  b: { vote: ArchiveVote; index: number },
+  direction: number
+) {
+  const aValue = getArchiveTemporalSortValue(a.vote);
+  const bValue = getArchiveTemporalSortValue(b.vote);
+
+  if (aValue !== null && bValue !== null && aValue !== bValue) {
+    return (aValue < bValue ? -1 : 1) * direction;
+  }
+
+  return a.index - b.index;
+}
+
+function sortArchiveVotesByTime(votes: ArchiveVote[], direction: number) {
+  const indexedVotes = votes.map((vote, index) => ({ vote, index }));
+  const temporalVotes = indexedVotes.filter(({ vote }) =>
+    hasArchiveTemporalValue(vote)
+  );
+
+  if (!temporalVotes.length) {
+    return votes;
+  }
+
+  const sortedTemporalVotes = [...temporalVotes].sort((a, b) =>
+    compareArchiveTemporalVotes(a, b, direction)
+  );
+
+  if (temporalVotes.length === indexedVotes.length) {
+    return sortedTemporalVotes.map(({ vote }) => vote);
+  }
+
+  let temporalIndex = 0;
+  return indexedVotes.map(({ vote }) => {
+    if (!hasArchiveTemporalValue(vote)) {
+      return vote;
+    }
+
+    return sortedTemporalVotes[temporalIndex++].vote;
+  });
 }
 
 function matchesArchiveVoterType(
@@ -116,21 +212,34 @@ export function processArchiveVotes(
   }: ArchiveVotesProcessingOptions
 ) {
   const direction = sortOrder === "asc" ? 1 : -1;
+  const shouldGroupByHouse = voterType === "ALL" && sort === "weight";
 
-  return votes
-    .filter((vote) => matchesArchiveVoterType(vote.citizenType, voterType))
-    .sort((a, b) => {
-      const comparison =
-        sort === "block_number"
-          ? compareBigIntLike(a.blockNumber, b.blockNumber)
-          : compareBigIntLike(a.weight, b.weight);
+  const filteredVotes = votes.filter((vote) =>
+    matchesArchiveVoterType(vote.citizenType, voterType)
+  );
 
-      if (comparison !== 0) {
-        return comparison * direction;
+  if (sort === "block_number") {
+    return sortArchiveVotesByTime(filteredVotes, direction);
+  }
+
+  return filteredVotes.sort((a, b) => {
+    if (shouldGroupByHouse) {
+      const houseComparison =
+        getArchiveHouseOrder(a.citizenType, sortOrder) -
+        getArchiveHouseOrder(b.citizenType, sortOrder);
+
+      if (houseComparison !== 0) {
+        return houseComparison;
       }
+    }
+    const comparison = compareBigIntLike(a.weight, b.weight);
 
-      return a.address.localeCompare(b.address);
-    });
+    if (comparison !== 0) {
+      return comparison * direction;
+    }
+
+    return a.address.localeCompare(b.address);
+  });
 }
 
 export function processArchiveNonVoters(
@@ -142,12 +251,23 @@ export function processArchiveNonVoters(
   }: ArchiveVotesProcessingOptions
 ) {
   const direction = sortOrder === "asc" ? 1 : -1;
+  const shouldGroupByHouse = voterType === "ALL" && sort === "weight";
 
   return nonVoters
     .filter((nonVoter) =>
       matchesArchiveVoterType(nonVoter.citizen_type, voterType)
     )
     .sort((a, b) => {
+      if (shouldGroupByHouse) {
+        const houseComparison =
+          getArchiveHouseOrder(a.citizen_type, sortOrder) -
+          getArchiveHouseOrder(b.citizen_type, sortOrder);
+
+        if (houseComparison !== 0) {
+          return houseComparison;
+        }
+      }
+
       const comparison =
         sort === "block_number"
           ? a.delegate.localeCompare(b.delegate)
@@ -256,7 +376,7 @@ async function fetchArchiveVotes({
         proposalType,
         reason: row.reason ?? null,
         params: row.params || row.choice || null,
-        blockNumber: row.block_number,
+        blockNumber: parseNullableBigInt(row.block_number),
         timestamp: row.ts ? new Date(Number(row.ts)) : null,
       } satisfies ArchiveVote;
     }) ?? [];
@@ -300,8 +420,17 @@ export function useArchiveVotes({
     return processArchiveVotes(data, { sort, sortOrder, voterType });
   }, [data, sort, sortOrder, voterType]);
 
+  const canSortByTime = useMemo(() => {
+    if (!processedVotes.length) {
+      return false;
+    }
+
+    return canArchiveVotesSortByTime(processedVotes);
+  }, [processedVotes]);
+
   return {
     votes: processedVotes,
+    canSortByTime,
     isLoading,
     error: error ? (error as Error).message : null,
   };

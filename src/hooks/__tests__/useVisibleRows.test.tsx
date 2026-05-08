@@ -84,4 +84,22 @@ describe("useVisibleRows", () => {
 
     expect(result.current.visibleCount).toBe(25);
   });
+
+  it("does not auto-load when the container has no scrollable overflow", () => {
+    const { result } = renderHook(() =>
+      useVisibleRows({
+        pageSize: 20,
+        resetKey: "initial",
+        totalCount: 100,
+      })
+    );
+
+    act(() => {
+      result.current.handleScroll(
+        scrollEvent({ clientHeight: 1000, scrollHeight: 1000, scrollTop: 0 })
+      );
+    });
+
+    expect(result.current.visibleCount).toBe(20);
+  });
 });
