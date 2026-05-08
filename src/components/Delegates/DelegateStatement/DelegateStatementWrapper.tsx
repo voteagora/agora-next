@@ -1,3 +1,5 @@
+import { Info } from "lucide-react";
+
 import DelegateStatementContainer from "./DelegateStatementContainer";
 import TopStakeholders from "./TopStakeholders";
 import TopIssues from "./TopIssues";
@@ -5,11 +7,41 @@ import { Delegate } from "@/app/api/common/delegates/delegate";
 
 interface Props {
   delegate: Delegate;
+  showNoVotingPowerBanner?: boolean;
 }
 
-const DelegateStatementWrapper = async ({ delegate }: Props) => {
+function ZeroVotingPowerNotice() {
+  return (
+    <div
+      role="alert"
+      className="mb-6 flex gap-3 rounded-lg border border-line bg-wash p-4 shadow-newDefault"
+    >
+      <Info
+        aria-hidden
+        className="mt-0.5 h-5 w-5 shrink-0 stroke-[2px] text-negative"
+      />
+      <div className="min-w-0 flex-1 flex flex-col gap-2 text-primary">
+        <p className="text-base font-semibold leading-snug">
+          This profile has no voting power
+        </p>
+        <p className="text-sm text-secondary leading-relaxed">
+          Our records show that this delegate currently holds no voting weight
+          on this protocol. Any statements or votes posted from this profile do
+          not influence proposal outcomes. Profiles like this are sometimes used
+          for signaling or scams; please review with appropriate context.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+const DelegateStatementWrapper = ({
+  delegate,
+  showNoVotingPowerBanner = false,
+}: Props) => {
   return (
     <>
+      {showNoVotingPowerBanner && <ZeroVotingPowerNotice />}
       <DelegateStatementContainer delegate={delegate} />
       {delegate.statement && (
         <>

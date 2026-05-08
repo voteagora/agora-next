@@ -1,18 +1,24 @@
 import VotesContainer from "./VotesContainer";
 import { fetchVotesForDelegate } from "@/app/delegates/actions";
 import { fetchSnapshotVotesForDelegate } from "@/app/api/common/votes/getVotes";
-import { PaginationParams } from "@/app/lib/pagination";
+import type { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegateVotes from "./DelegateVotes";
 import SnapshotVotes from "./SnapshotVotes";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import type { Vote } from "@/app/api/common/votes/vote";
 
 interface Props {
   delegate: Delegate;
+  /** First page of on-chain votes (same as Past Votes); avoids duplicate fetch from profile page. */
+  initialOnchainVotes?: PaginatedResult<Vote[]>;
 }
 
-const VotesContainerWrapper = async ({ delegate }: Props) => {
+const VotesContainerWrapper = async ({
+  delegate,
+  initialOnchainVotes,
+}: Props) => {
   const [delegateVotes, snapshotVotes] = await Promise.all([
-    fetchVotesForDelegate(delegate.address),
+    initialOnchainVotes ?? fetchVotesForDelegate(delegate.address),
     fetchSnapshotVotesForDelegate({ addressOrENSName: delegate.address }),
   ]);
 
