@@ -4,10 +4,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuRadioItem,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { FilterIcon } from "@/icons/filter";
 import { cn } from "@/lib/utils";
 import { VOTER_TYPES } from "@/lib/constants";
@@ -57,32 +56,20 @@ export default function ProposalVoterListFilter({
           sideOffset={8}
           className="w-max min-w-[200px] bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 shadow-xl"
         >
-          <DropdownMenuRadioGroup
-            className="flex flex-col gap-1"
-            value={selectedVoterType.type}
-            onValueChange={(value: string) => {
-              const selectedType = availableVoterTypes.find(
-                (type) => type.type === value
-              );
-              if (selectedType) onVoterTypeChange(selectedType);
-            }}
-          >
-            {availableVoterTypes.map((type) => (
-              <DropdownMenuRadioItem
-                key={type.value}
-                value={type.type}
-                checked={selectedVoterType.type === type.type}
-                className={cn(
-                  "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
-                  selectedVoterType.type === type.type
-                    ? "text-primary bg-wash border-line"
-                    : "text-tertiary border-transparent hover:bg-wash"
-                )}
-              >
-                {type.value}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
+          {availableVoterTypes.map((type) => (
+            <DropdownMenuItem
+              key={type.value}
+              onSelect={() => onVoterTypeChange(type)}
+              className={cn(
+                "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
+                selectedVoterType.type === type.type
+                  ? "text-primary bg-wash border-line"
+                  : "text-tertiary border-transparent hover:bg-wash"
+              )}
+            >
+              {type.value}
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
