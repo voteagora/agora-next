@@ -152,11 +152,10 @@ export default function ArchiveProposalVotesList({
                 `${vote.address}-${vote.support}-${vote.weight}-${virtualRow.index}`
               }
               data-index={virtualRow.index}
-              ref={rowVirtualizer.measureElement}
               className="absolute left-0 top-0 w-full"
               style={{ transform: `translateY(${virtualRow.start}px)` }}
             >
-              <ProposalSingleVote vote={vote} />
+              <ProposalSingleVote vote={vote} resolveEns={false} />
             </div>
           );
         })}

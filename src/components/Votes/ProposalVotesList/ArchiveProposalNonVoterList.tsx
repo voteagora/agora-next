@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
@@ -27,7 +27,14 @@ export default function ArchiveProposalNonVoterList({
   sortOrder,
 }: ArchiveProposalNonVoterListProps) {
   const scrollParentRef = useRef<HTMLDivElement | null>(null);
-  const { nonVoters, isLoading, error } = useArchiveNonVoters({
+  const {
+    nonVoters,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useArchiveNonVoters({
     proposalId: proposal.id,
     sort,
     sortOrder,
@@ -74,14 +81,36 @@ export default function ArchiveProposalNonVoterList({
     });
   }, [nonVoters, selectedVoterType, shouldShowFilter]);
 
+  const rowCount = hasNextPage
+    ? filteredNonVoters.length + 1
+    : filteredNonVoters.length;
+
   const rowVirtualizer = useVirtualizer({
-    count: filteredNonVoters.length,
+    count: rowCount,
     getScrollElement: () => scrollParentRef.current,
     estimateSize: () => NON_VOTER_ROW_ESTIMATE_PX,
     overscan: 8,
   });
 
   const virtualRows = rowVirtualizer.getVirtualItems();
+  const lastVirtualRowIndex = virtualRows[virtualRows.length - 1]?.index;
+
+  useEffect(() => {
+    if (
+      lastVirtualRowIndex !== undefined &&
+      lastVirtualRowIndex >= filteredNonVoters.length - 8 &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      void fetchNextPage();
+    }
+  }, [
+    fetchNextPage,
+    filteredNonVoters.length,
+    hasNextPage,
+    isFetchingNextPage,
+    lastVirtualRowIndex,
+  ]);
 
   if (isLoading) {
     return (
@@ -123,6 +152,20 @@ export default function ArchiveProposalNonVoterList({
         >
           {virtualRows.map((virtualRow) => {
             const nonVoter = filteredNonVoters[virtualRow.index];
+            const isLoaderRow = virtualRow.index > filteredNonVoters.length - 1;
+
+            if (isLoaderRow) {
+              return (
+                <div
+                  key="archive-non-voter-loader"
+                  className="absolute left-0 top-0 w-full py-2 text-xs text-secondary"
+                  style={{ transform: `translateY(${virtualRow.start}px)` }}
+                >
+                  {hasNextPage ? "Loading more non-voters..." : null}
+                </div>
+              );
+            }
+
             if (!nonVoter) {
               return null;
             }
@@ -131,11 +174,14 @@ export default function ArchiveProposalNonVoterList({
               <div
                 key={`${nonVoter.delegate}-${nonVoter.citizen_type ?? "TH"}`}
                 data-index={virtualRow.index}
-                ref={rowVirtualizer.measureElement}
                 className="absolute left-0 top-0 w-full"
                 style={{ transform: `translateY(${virtualRow.start}px)` }}
               >
-                <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
+                <ProposalSingleNonVoter
+                  voter={nonVoter}
+                  proposal={proposal}
+                  resolveEns={false}
+                />
               </div>
             );
           })}

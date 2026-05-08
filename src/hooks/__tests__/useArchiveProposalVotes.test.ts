@@ -91,12 +91,22 @@ describe("processArchiveNonVoters", () => {
     ]);
   });
 
-  it("orders houses by VP direction when sorting all non-voters by VP", () => {
+  it("sorts non-voters by displayed VP across houses", () => {
     const nonVoters = [
       makeNonVoter("0xcccccccccccccccccccccccccccccccccccccccc", "1", "USER"),
-      makeNonVoter("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "100"),
+      makeNonVoter(
+        "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "100000000000000000000"
+      ),
       makeNonVoter("0xdddddddddddddddddddddddddddddddddddddddd", "5", "APP"),
-      makeNonVoter("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1"),
+      makeNonVoter(
+        "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "500000000000000000"
+      ),
+      makeNonVoter(
+        "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "1000000000000000000"
+      ),
     ];
 
     expect(
@@ -107,9 +117,10 @@ describe("processArchiveNonVoters", () => {
       }).map((row) => row.delegate)
     ).toEqual([
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     ]);
 
     expect(
@@ -119,9 +130,10 @@ describe("processArchiveNonVoters", () => {
         voterType: "ALL",
       }).map((row) => row.delegate)
     ).toEqual([
-      "0xcccccccccccccccccccccccccccccccccccccccc",
-      "0xdddddddddddddddddddddddddddddddddddddddd",
       "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     ]);
   });
@@ -241,7 +253,7 @@ describe("processArchiveVotes", () => {
     ).toEqual(["0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"]);
   });
 
-  it("orders houses by VP direction when sorting all votes by VP", () => {
+  it("sorts votes by displayed VP across houses", () => {
     const votes = [
       makeVote({
         address: "0xcccccccccccccccccccccccccccccccccccccccc",
@@ -251,7 +263,7 @@ describe("processArchiveVotes", () => {
       }),
       makeVote({
         address: "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-        weight: "100",
+        weight: "100000000000000000000",
         blockNumber: 2n,
       }),
       makeVote({
@@ -262,8 +274,13 @@ describe("processArchiveVotes", () => {
       }),
       makeVote({
         address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-        weight: "1",
+        weight: "500000000000000000",
         blockNumber: 1n,
+      }),
+      makeVote({
+        address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        weight: "1000000000000000000",
+        blockNumber: 5n,
       }),
     ];
 
@@ -275,9 +292,10 @@ describe("processArchiveVotes", () => {
       }).map((vote) => vote.address)
     ).toEqual([
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "0xdddddddddddddddddddddddddddddddddddddddd",
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     ]);
 
     expect(
@@ -287,9 +305,10 @@ describe("processArchiveVotes", () => {
         voterType: "ALL",
       }).map((vote) => vote.address)
     ).toEqual([
-      "0xcccccccccccccccccccccccccccccccccccccccc",
-      "0xdddddddddddddddddddddddddddddddddddddddd",
       "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "0xcccccccccccccccccccccccccccccccccccccccc",
+      "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "0xdddddddddddddddddddddddddddddddddddddddd",
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
     ]);
   });
