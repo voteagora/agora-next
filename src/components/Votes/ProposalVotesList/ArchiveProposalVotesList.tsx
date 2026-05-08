@@ -151,6 +151,7 @@ export default function ArchiveProposalVotesList({
                 vote.transactionHash ||
                 `${vote.address}-${vote.support}-${vote.weight}-${virtualRow.index}`
               }
+              ref={rowVirtualizer.measureElement}
               data-index={virtualRow.index}
               className="absolute left-0 top-0 w-full"
               style={{ transform: `translateY(${virtualRow.start}px)` }}
