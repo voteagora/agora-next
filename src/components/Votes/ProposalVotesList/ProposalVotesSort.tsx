@@ -4,10 +4,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuRadioItem,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
-import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { ArrowDownAZ } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
@@ -76,30 +75,20 @@ export default function ProposalVotesSort({
           sideOffset={8}
           className="w-max min-w-[180px] bg-neutral border border-line p-2 rounded-2xl flex flex-col gap-1 shadow-xl"
         >
-          <DropdownMenuRadioGroup
-            className="flex flex-col gap-1"
-            value={sortOption.label}
-            onValueChange={(value: string) => {
-              const selected = sortOptions.find((opt) => opt.label === value);
-              if (selected) onSortChange(selected);
-            }}
-          >
-            {visibleOptions.map((option) => (
-              <DropdownMenuRadioItem
-                key={option.label}
-                value={option.label}
-                checked={sortOption.label === option.label}
-                className={cn(
-                  "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
-                  sortOption.label === option.label
-                    ? "text-primary bg-wash border-line"
-                    : "text-tertiary border-transparent hover:bg-wash"
-                )}
-              >
-                {option.label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
+          {visibleOptions.map((option) => (
+            <DropdownMenuItem
+              key={option.label}
+              onSelect={() => onSortChange(option)}
+              className={cn(
+                "cursor-pointer text-xs py-2 px-3 border rounded-xl font-medium",
+                sortOption.label === option.label
+                  ? "text-primary bg-wash border-line"
+                  : "text-tertiary border-transparent hover:bg-wash"
+              )}
+            >
+              {option.label}
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
