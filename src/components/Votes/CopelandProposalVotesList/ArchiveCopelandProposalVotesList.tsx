@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type {
+  SnapshotVote,
+  VoterTypes,
+  VotesSort,
+  VotesSortOrder,
+} from "@/app/api/common/votes/vote";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
+import { useVisibleRows } from "@/hooks/useVisibleRows";
 import { cn } from "@/lib/utils";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
@@ -15,13 +20,18 @@ const VOTES_PAGE_SIZE = 20;
 
 type ArchiveCopelandProposalVotesListProps = {
   proposal: Proposal;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 };
 
 export default function ArchiveCopelandProposalVotesList({
   proposal,
+  sort,
+  sortOrder,
+  voterType,
 }: ArchiveCopelandProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
-  const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
   const proposalType: ProposalType = proposal.proposalType ?? "SNAPSHOT";
   const choices =
@@ -41,11 +51,10 @@ export default function ArchiveCopelandProposalVotesList({
     proposalId: proposal.id,
     proposalType,
     startBlock,
+    sort,
+    sortOrder,
+    voterType,
   });
-
-  useEffect(() => {
-    setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length]);
 
   const normalizedVotes = useMemo(() => {
     return votes.map((vote): SnapshotVote => {
@@ -90,17 +99,21 @@ export default function ArchiveCopelandProposalVotesList({
     );
   }, [normalizedVotes, userVoteAddressSet]);
 
+  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
+    pageSize: VOTES_PAGE_SIZE,
+    resetKey: [
+      proposal.id,
+      sort ?? "",
+      sortOrder ?? "",
+      voterType ?? "",
+      remainingVotes.length,
+    ].join(":"),
+    totalCount: remainingVotes.length,
+  });
+
   const paginatedVotes = useMemo(() => {
     return remainingVotes.slice(0, visibleCount);
   }, [remainingVotes, visibleCount]);
-
-  const hasMore = visibleCount < remainingVotes.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + VOTES_PAGE_SIZE, remainingVotes.length)
-    );
-  }, [remainingVotes.length]);
 
   if (isLoading) {
     return (
@@ -119,34 +132,23 @@ export default function ArchiveCopelandProposalVotesList({
   }
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
-      <InfiniteScroll
-        hasMore={hasMore}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div
-            className="flex text-xs font-medium text-secondary justify-center pb-2"
-            key={0}
-          >
-            Loading more votes...
-          </div>
-        }
-      >
-        <ul className="flex flex-col divide-y">
-          {userVotes.map((vote) => (
-            <li key={vote.id} className="p-4">
-              <CopelandProposalSingleVote vote={vote} />
-            </li>
-          ))}
-          {paginatedVotes.map((vote) => (
-            <li key={vote.id} className="p-4">
-              <CopelandProposalSingleVote vote={vote} />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+    <div
+      ref={containerRef}
+      onScroll={handleScroll}
+      className={cn("overflow-y-scroll flex-1 min-h-0")}
+    >
+      <ul className="flex flex-col divide-y">
+        {userVotes.map((vote) => (
+          <li key={vote.id} className="p-4">
+            <CopelandProposalSingleVote vote={vote} />
+          </li>
+        ))}
+        {paginatedVotes.map((vote) => (
+          <li key={vote.id} className="p-4">
+            <CopelandProposalSingleVote vote={vote} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

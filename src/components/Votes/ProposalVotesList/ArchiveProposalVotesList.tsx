@@ -1,25 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+  Vote,
+} from "@/app/api/common/votes/vote";
 import { ProposalSingleVote } from "./ProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
 
-const VOTES_PAGE_SIZE = 20;
+const VOTE_ROW_ESTIMATE_PX = 56;
 
 type ArchiveProposalVotesListProps = {
   proposal: Proposal;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 };
 
 export default function ArchiveProposalVotesList({
   proposal,
+  sort,
+  sortOrder,
+  voterType,
 }: ArchiveProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
-  const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
+  const scrollParentRef = useRef<HTMLDivElement | null>(null);
 
   const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
 
@@ -37,11 +48,10 @@ export default function ArchiveProposalVotesList({
     proposalId: proposal.id,
     proposalType,
     startBlock,
+    sort,
+    sortOrder,
+    voterType,
   });
-
-  useEffect(() => {
-    setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length]);
 
   const normalizedVotes = useMemo(() => {
     return votes.map(
@@ -89,17 +99,18 @@ export default function ArchiveProposalVotesList({
     );
   }, [normalizedVotes, userVoteAddressSet]);
 
-  const paginatedVotes = useMemo(() => {
-    return remainingVotes.slice(0, visibleCount);
-  }, [remainingVotes, visibleCount]);
+  const listVotes = useMemo(() => {
+    return [...userVotes, ...remainingVotes];
+  }, [remainingVotes, userVotes]);
 
-  const hasMore = visibleCount < remainingVotes.length;
+  const rowVirtualizer = useVirtualizer({
+    count: listVotes.length,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => VOTE_ROW_ESTIMATE_PX,
+    overscan: 8,
+  });
 
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + VOTES_PAGE_SIZE, remainingVotes.length)
-    );
-  }, [remainingVotes.length]);
+  const virtualRows = rowVirtualizer.getVirtualItems();
 
   if (isLoading) {
     return (
@@ -113,47 +124,43 @@ export default function ArchiveProposalVotesList({
 
   if (!normalizedVotes.length) {
     return (
-      <div className="px-4 pb-4 text-secondary text-xs">No votes yet.</div>
+      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
+        No votes yet.
+      </div>
     );
   }
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
-      <InfiniteScroll
-        hasMore={hasMore}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div className="flex text-xs font-medium text-secondary" key={0}>
-            Loading more votes...
-          </div>
-        }
-        element="main"
+    <div
+      ref={scrollParentRef}
+      className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
+    >
+      <div
+        className="relative w-full"
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
       >
-        <ul className="flex flex-col">
-          {userVotes.map((vote) => (
-            <li
+        {virtualRows.map((virtualRow) => {
+          const vote = listVotes[virtualRow.index];
+          if (!vote) {
+            return null;
+          }
+
+          return (
+            <div
               key={
                 vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
+                `${vote.address}-${vote.support}-${vote.weight}-${virtualRow.index}`
               }
+              ref={rowVirtualizer.measureElement}
+              data-index={virtualRow.index}
+              className="absolute left-0 top-0 w-full"
+              style={{ transform: `translateY(${virtualRow.start}px)` }}
             >
-              <ProposalSingleVote vote={vote} />
-            </li>
-          ))}
-          {paginatedVotes.map((vote) => (
-            <li
-              key={
-                vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
-              }
-            >
-              <ProposalSingleVote vote={vote} />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+              <ProposalSingleVote vote={vote} resolveEns={false} />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

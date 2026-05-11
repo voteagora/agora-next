@@ -7,6 +7,22 @@ import ENSName from "@/components/shared/ENSName";
 import { isPostSubmission } from "../../draft/utils/stages";
 import ArchivedDraftProposal from "../../draft/components/ArchivedDraftProposal";
 import { DraftProposal } from "../../../proposals/draft/types";
+import Tenant from "@/lib/tenant/tenant";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `Sponsor Proposal | ${brandName}`,
+    description: `Review and sponsor a ${brandName} governance proposal draft.`,
+    path: `/proposals/sponsor/${params.id}`,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 const getDraftProposalByUuid = async (uuid: string) => {
   const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({

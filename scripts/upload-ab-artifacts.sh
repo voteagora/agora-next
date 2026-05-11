@@ -10,6 +10,10 @@ if [ ! -d "test-results/ab-diffs" ]; then
   exit 1
 fi
 
+DASHBOARD_SRC="tests/ab-runner/telemetry_dashboard.html"
+DASHBOARD_TARGET="gs://agora-ab-artifacts/dashboard/Agora-AB-Runner-Explorer.html"
+DASHBOARD_URL="https://storage.googleapis.com/agora-ab-artifacts/dashboard/Agora-AB-Runner-Explorer.html"
+
 # We use rsync to cleanly mirror the directory structure into a timestamped or latest folder.
 # By default, we keep a "latest" folder, and you can push to unique SHAs in CI.
 
@@ -35,12 +39,35 @@ if command -v gsutil &> /dev/null; then
         gsutil cp test-results/run_metadata.json "${TARGET_DIR}/run_metadata.json"
         echo "📝 Uploaded run_metadata.json"
     fi
+    if [ -f "$DASHBOARD_SRC" ]; then
+        gsutil cp "$DASHBOARD_SRC" "$DASHBOARD_TARGET"
+        echo "📊 Uploaded dashboard explorer"
+    fi
 else
     gcloud storage cp -r test-results/ab-diffs/* $TARGET_DIR
     if [ -f "test-results/run_metadata.json" ]; then
         gcloud storage cp test-results/run_metadata.json "${TARGET_DIR}/run_metadata.json"
         echo "📝 Uploaded run_metadata.json"
     fi
+    if [ -f "$DASHBOARD_SRC" ]; then
+        gcloud storage cp "$DASHBOARD_SRC" "$DASHBOARD_TARGET"
+        echo "📊 Uploaded dashboard explorer"
+    fi
 fi
 
 echo "Upload completed successfully! You can view the artifacts in the GCP Console."
+
+if [ -n "$GITHUB_RUN_ID" ]; then
+    RUN_DASHBOARD_URL="${DASHBOARD_URL}?runId=${GITHUB_RUN_ID}"
+    echo "Dashboard: $RUN_DASHBOARD_URL"
+
+    if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+        {
+            echo "### A/B Visual Regression Dashboard"
+            echo ""
+            echo "[Open dashboard]($RUN_DASHBOARD_URL)"
+        } >> "$GITHUB_STEP_SUMMARY"
+    fi
+else
+    echo "Dashboard: $DASHBOARD_URL"
+fi

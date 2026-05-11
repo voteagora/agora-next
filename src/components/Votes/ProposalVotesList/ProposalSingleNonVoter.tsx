@@ -16,12 +16,15 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { resolveIPFSUrl } from "@/lib/utils";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 export function ProposalSingleNonVoter({
   voter,
   proposal,
+  resolveEns = true,
 }: {
   proposal: Proposal;
+  resolveEns?: boolean;
   voter: {
     delegate: string;
     voting_power: string;
@@ -34,6 +37,7 @@ export function ProposalSingleNonVoter({
       image: string;
       type: string;
     } | null;
+    votingPowerSource?: "cpls_snapshot";
   };
 }) {
   const { namespace, ui } = Tenant.current();
@@ -44,14 +48,22 @@ export function ProposalSingleNonVoter({
 
   const { data: ensFromBlockCache } = useBlockCacheWrappedEns({
     address: voter.delegate as `0x${string}`,
+    enabled: resolveEns && !voter.voterMetadata?.name,
   });
 
   const { address: connectedAddress } = useAccount();
+  const usesCplsSnapshotVotingPower =
+    voter.votingPowerSource === "cpls_snapshot";
 
   const { data: pastVotes } = useGetVotes({
     address: voter.delegate as `0x${string}`,
-    blockNumber: BigInt(proposal.snapshotBlockNumber),
-    enabled: namespace !== TENANT_NAMESPACES.UNISWAP && !useArchiveVoteHistory,
+    blockNumber: proposal.snapshotBlockNumber
+      ? BigInt(proposal.snapshotBlockNumber)
+      : undefined,
+    enabled:
+      namespace !== TENANT_NAMESPACES.UNISWAP &&
+      !useArchiveVoteHistory &&
+      !usesCplsSnapshotVotingPower,
   });
 
   const ensAvatar = () => {
@@ -86,12 +98,22 @@ export function ProposalSingleNonVoter({
         );
       }
     }
-    return (
-      <ENSAvatar
-        ensName={ensFromBlockCache?.name || voter.delegate}
-        className="w-8 h-8"
-      />
-    );
+    if (!resolveEns || !ensFromBlockCache?.name) {
+      return (
+        <div
+          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+        >
+          <Image
+            alt="Delegate avatar"
+            className="animate-in"
+            src={ui.assets.delegate}
+            width={32}
+            height={32}
+          />
+        </div>
+      );
+    }
+    return <ENSAvatar ensName={ensFromBlockCache.name} className="w-8 h-8" />;
   };
 
   return (
@@ -111,8 +133,10 @@ export function ProposalSingleNonVoter({
               <Link href={`/delegates/${voter.delegate}`}>
                 {voter.voterMetadata?.name || ensFromBlockCache?.name ? (
                   voter.voterMetadata?.name || ensFromBlockCache?.name
-                ) : (
+                ) : resolveEns ? (
                   <ENSName address={voter.delegate} />
+                ) : (
+                  truncateAddress(voter.delegate)
                 )}
               </Link>
             </div>
@@ -189,7 +213,9 @@ export function ProposalSingleNonVoter({
               amount={
                 voter.citizen_type
                   ? voter.voting_power
-                  : pastVotes || voter.voting_power
+                  : usesCplsSnapshotVotingPower
+                    ? voter.voting_power
+                    : (pastVotes ?? voter.voting_power)
               }
               hideCurrency
               specialFormatting

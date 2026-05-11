@@ -4,8 +4,23 @@ import AdminForm from "@/components/Admin/AdminForm";
 import { fetchVotableSupply as apiFetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { fetchProposalTypes } from "@/app/admin/actions";
 import Tenant from "@/lib/tenant/tenant";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 export const revalidate = 0;
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `${brandName} Admin`,
+    description: `Manage ${brandName} governance settings and proposal types.`,
+    path: "/admin",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 async function fetchVotableSupply() {
   "use server";

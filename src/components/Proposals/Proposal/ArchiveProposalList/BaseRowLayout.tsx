@@ -67,7 +67,7 @@ export function BaseRowLayout({
             <div className="text-xs">
               <ProposalTimeStatus {...data.timeStatus} />
             </div>
-            <ProposalStatus proposal={statusProposal} />
+            <ProposalStatus proposal={statusProposal} testIdVariant="desktop" />
           </div>
         </div>
 
@@ -150,7 +150,7 @@ function OODaoBadges({
 
       {/* Mobile status */}
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );
@@ -184,7 +184,7 @@ function StandardHeader({
         </span>
       </div>
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );

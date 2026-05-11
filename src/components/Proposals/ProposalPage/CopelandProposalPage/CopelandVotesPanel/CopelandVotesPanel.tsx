@@ -1,13 +1,21 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
+import type {
+  SnapshotVote,
+  VoterTypes,
+  VotesSort,
+  VotesSortOrder,
+} from "@/app/api/common/votes/vote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
+import ProposalVotesSort, {
+  SortParams,
+} from "@/components/Votes/ProposalVotesList/ProposalVotesSort";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import CopelandProposalCriteria from "../CopelandProposalCriteria/CopelandProposalCriteria";
 import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/CopelandProposalVotesList";
@@ -23,7 +31,8 @@ type Props = {
   fetchVotesForProposal: (
     proposalId: string,
     pagination?: PaginationParams,
-    sort?: VotesSort
+    sort?: VotesSort,
+    sortOrder?: VotesSortOrder
   ) => Promise<PaginatedResult<SnapshotVote[]>>;
   fetchUserVotesForProposal: (
     proposalId: string,
@@ -39,6 +48,12 @@ export default function CopelandVotesPanel({
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
+  const [sortOption, setSortOption] = useState<SortParams>({
+    sortKey: "block_number",
+    sortOrder: "desc",
+    label: "Most Recent",
+  });
+  const selectedVoterType: VoterTypes = { type: "ALL", value: "All" };
   const { ui } = Tenant.current();
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
@@ -55,6 +70,16 @@ export default function CopelandVotesPanel({
       setActiveTab(index);
     });
   }
+
+  useEffect(() => {
+    if (!showVoters && sortOption.sortKey === "block_number") {
+      setSortOption({
+        sortKey: "weight",
+        sortOrder: "desc",
+        label: "Most Voting Power",
+      });
+    }
+  }, [showVoters, sortOption.sortKey]);
 
   const handleDownloadCSV = async () => {
     try {
@@ -84,12 +109,12 @@ export default function CopelandVotesPanel({
 
   return (
     <motion.div
-      className="flex flex-col flex-1"
+      className="flex flex-col flex-1 min-h-0"
       initial={{ opacity: 1 }}
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <div className="flex flex-col gap-1 relative min-h-0 h-full">
+      <div className="flex flex-col gap-1 relative min-h-0 flex-1">
         {/* Tabs */}
         <div className="flex h-12 pt-4 px-4 mb-1">
           {["Results", "Votes"].map((tab, index) => (
@@ -148,19 +173,38 @@ export default function CopelandVotesPanel({
           <OptionsResultsPanel proposal={proposal} />
         ) : (
           <>
-            <div className="px-4">
+            <div className="px-4 py-3 pb-2 flex flex-col gap-4">
               <ProposalVotesFilter
                 initialSelection={showVoters ? "Voters" : "Hasn't voted"}
                 onSelectionChange={(value) => {
                   setShowVoters(value === "Voters");
                 }}
               />
+              {(useArchiveVoteHistory || !showVoters) && (
+                <div className="flex justify-end items-center border-t border-line pt-2">
+                  <ProposalVotesSort
+                    sortOption={sortOption}
+                    onSortChange={setSortOption}
+                    hideTimeSortOptions={!showVoters}
+                  />
+                </div>
+              )}
             </div>
             {useArchiveVoteHistory ? (
               showVoters ? (
-                <ArchiveCopelandProposalVotesList proposal={proposal} />
+                <ArchiveCopelandProposalVotesList
+                  proposal={proposal}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                  voterType={selectedVoterType.type}
+                />
               ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
+                <ArchiveProposalNonVoterList
+                  proposal={proposal}
+                  selectedVoterType={selectedVoterType}
+                  sort={sortOption.sortKey}
+                  sortOrder={sortOption.sortOrder}
+                />
               )
             ) : showVoters ? (
               <CopelandProposalVotesList
@@ -169,7 +213,12 @@ export default function CopelandVotesPanel({
                 proposalId={proposal.id}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ProposalNonVoterList
+                proposal={proposal}
+                selectedVoterType={selectedVoterType}
+                sort={sortOption.sortKey}
+                sortOrder={sortOption.sortOrder}
+              />
             )}
           </>
         )}

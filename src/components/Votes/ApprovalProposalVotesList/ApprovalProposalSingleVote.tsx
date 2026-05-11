@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount, useEnsName } from "wagmi";
-import { type Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { useState } from "react";
 import {
   capitalizeFirstLetter,

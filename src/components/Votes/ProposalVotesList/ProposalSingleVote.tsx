@@ -1,4 +1,4 @@
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -26,6 +26,8 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
+import Image from "next/image";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const { token, ui } = Tenant.current();
 
@@ -74,7 +76,13 @@ const SUPPORT_TO_ICON: Record<Support, React.ReactNode> = {
   ["ABSTAIN"]: <MinusIcon strokeWidth={4} className="w-3 h-3 text-tertiary" />,
 };
 
-export function ProposalSingleVote({ vote }: { vote: Vote }) {
+export function ProposalSingleVote({
+  vote,
+  resolveEns = true,
+}: {
+  vote: Vote;
+  resolveEns?: boolean;
+}) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = vote.transactionHash?.split("|") || [];
@@ -84,6 +92,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
 
   const { data: ensFromBlockCache } = useBlockCacheWrappedEns({
     address: vote.address as `0x${string}`,
+    enabled: resolveEns && !vote.voterMetadata?.name,
   });
 
   const _onOpenChange = async (open: boolean) => {
@@ -129,6 +138,21 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
         );
       }
     }
+    if (!resolveEns) {
+      return (
+        <div
+          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
+        >
+          <Image
+            alt="Delegate avatar"
+            className="animate-in"
+            src={ui.assets.delegate}
+            width={32}
+            height={32}
+          />
+        </div>
+      );
+    }
     return <ENSAvatar ensName={ensFromBlockCache?.name} className="w-8 h-8" />;
   };
 
@@ -162,7 +186,13 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       target={vote.citizenType ? "_blank" : undefined}
                       rel={vote.citizenType ? "noopener noreferrer" : undefined}
                     >
-                      {name ? name : <ENSName address={vote.address} />}
+                      {name ? (
+                        name
+                      ) : resolveEns ? (
+                        <ENSName address={vote.address} />
+                      ) : (
+                        truncateAddress(vote.address)
+                      )}
                     </Link>
                   </div>
                   {vote.citizenType && (
