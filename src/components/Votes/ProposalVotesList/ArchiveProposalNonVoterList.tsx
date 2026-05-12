@@ -156,7 +156,6 @@ export default function ArchiveProposalNonVoterList({
                 <ProposalSingleNonVoter
                   voter={nonVoter}
                   proposal={proposal}
-                  resolveEns={false}
                 />
               </div>
             );

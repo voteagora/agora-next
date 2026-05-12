@@ -121,12 +121,12 @@ export default function ArchiveCopelandProposalVotesList({
       <ul className="flex flex-col divide-y">
         {userVotes.map((vote) => (
           <li key={vote.id} className="p-4">
-            <CopelandProposalSingleVote vote={vote} resolveEns={false} />
+            <CopelandProposalSingleVote vote={vote} />
           </li>
         ))}
         {paginatedVotes.map((vote) => (
           <li key={vote.id} className="p-4">
-            <CopelandProposalSingleVote vote={vote} resolveEns={false} />
+            <CopelandProposalSingleVote vote={vote} />
           </li>
         ))}
       </ul>

@@ -156,7 +156,7 @@ export default function ArchiveProposalVotesList({
               className="absolute left-0 top-0 w-full"
               style={{ transform: `translateY(${virtualRow.start}px)` }}
             >
-              <ProposalSingleVote vote={vote} resolveEns={false} />
+              <ProposalSingleVote vote={vote} />
             </div>
           );
         })}
