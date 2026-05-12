@@ -127,7 +127,7 @@ function makeCopelandVote(overrides: Partial<SnapshotVote> = {}): SnapshotVote {
   };
 }
 
-describe("archive vote rows with ENS disabled", () => {
+describe("archive vote rows with visible-row ENS resolution", () => {
   afterEach(() => {
     cleanup();
   });
@@ -137,7 +137,7 @@ describe("archive vote rows with ENS disabled", () => {
     mocks.useEnsName.mockReturnValue({ data: "resolved.eth" });
   });
 
-  it("uses approval archive metadata and disables the ENS name query", () => {
+  it("uses approval archive metadata without resolving ENS", () => {
     render(
       <ApprovalProposalSingleVote
         vote={makeApprovalVote({
@@ -147,7 +147,6 @@ describe("archive vote rows with ENS disabled", () => {
             type: "",
           },
         })}
-        resolveEns={false}
       />
     );
 
@@ -161,17 +160,25 @@ describe("archive vote rows with ENS disabled", () => {
     );
   });
 
-  it("uses truncated address and fallback avatar for Copeland archive rows without metadata", () => {
-    render(
-      <CopelandProposalSingleVote
-        vote={makeCopelandVote()}
-        resolveEns={false}
-      />
-    );
+  it("resolves approval ENS names for visible rows without metadata", () => {
+    render(<ApprovalProposalSingleVote vote={makeApprovalVote()} />);
 
-    expect(screen.getByText(`truncated:${voterAddress}`)).toBeInTheDocument();
-    expect(screen.getByTestId("avatar")).toHaveTextContent("fallback-avatar");
-    expect(screen.queryByTestId("ens-name")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("ens-avatar")).not.toBeInTheDocument();
+    expect(screen.getByText("resolved.eth")).toBeInTheDocument();
+    expect(screen.getByTestId("ens-avatar")).toBeInTheDocument();
+    expect(mocks.useEnsName).toHaveBeenCalledWith(
+      expect.objectContaining({
+        query: { enabled: true },
+      })
+    );
+  });
+
+  it("resolves Copeland ENS names for visible rows without metadata", () => {
+    render(<CopelandProposalSingleVote vote={makeCopelandVote()} />);
+
+    expect(screen.getByTestId("ens-name")).toBeInTheDocument();
+    expect(screen.getByTestId("ens-avatar")).toBeInTheDocument();
+    expect(
+      screen.queryByText(`truncated:${voterAddress}`)
+    ).not.toBeInTheDocument();
   });
 });
