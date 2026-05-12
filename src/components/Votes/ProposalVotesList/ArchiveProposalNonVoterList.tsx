@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, type UIEvent } from "react";
+import { useCallback, useEffect, useRef, type UIEvent } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
@@ -42,49 +42,7 @@ export default function ArchiveProposalNonVoterList({
     voterType: selectedVoterType.type,
   });
 
-  // Determine if we should show the filter (logic kept for filtering data, though UI is lifted)
-  const shouldShowFilter =
-    proposal.proposalType?.includes("HYBRID") ||
-    proposal.proposalType?.includes("OFFCHAIN") ||
-    !!proposal.offchainProposalId;
-
-  // Filter non-voters by citizen type
-  const filteredNonVoters = useMemo(() => {
-    if (!shouldShowFilter || !selectedVoterType) {
-      return nonVoters;
-    }
-
-    return nonVoters.filter((nonVoter) => {
-      const citizenType = nonVoter.citizen_type?.toUpperCase();
-      const selectedType = selectedVoterType.type.toUpperCase();
-
-      if (selectedType === "ALL") {
-        return true;
-      }
-
-      // Token House: show non-voters without citizen type
-      if (selectedType === "TH" && !citizenType) {
-        return true;
-      }
-
-      // Map citizen types to voter types
-      if (selectedType === "CHAIN" && citizenType === "CHAIN") {
-        return true;
-      }
-      if (selectedType === "APP" && citizenType === "APP") {
-        return true;
-      }
-      if (selectedType === "USER" && citizenType === "USER") {
-        return true;
-      }
-
-      return false;
-    });
-  }, [nonVoters, selectedVoterType, shouldShowFilter]);
-
-  const rowCount = hasNextPage
-    ? filteredNonVoters.length + 1
-    : filteredNonVoters.length;
+  const rowCount = hasNextPage ? nonVoters.length + 1 : nonVoters.length;
 
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
@@ -126,14 +84,11 @@ export default function ArchiveProposalNonVoterList({
     if (
       scrollParentRef.current &&
       scrollParentRef.current.scrollTop > 0 &&
-      filteredNonVoters.length
+      nonVoters.length
     ) {
       loadNextPageIfScrolledNearBottom(scrollParentRef.current);
     }
-  }, [
-    filteredNonVoters.length,
-    loadNextPageIfScrolledNearBottom,
-  ]);
+  }, [nonVoters.length, loadNextPageIfScrolledNearBottom]);
 
   if (isLoading) {
     return (
@@ -148,17 +103,14 @@ export default function ArchiveProposalNonVoterList({
   }
 
   if (!nonVoters.length) {
-    return (
-      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
-        No non-voters data available.
-      </div>
-    );
-  }
+    const emptyMessage =
+      selectedVoterType.type === "ALL"
+        ? "No non-voters data available."
+        : "No non-voters match this filter.";
 
-  if (!filteredNonVoters.length) {
     return (
       <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
-        No non-voters match this filter.
+        {emptyMessage}
       </div>
     );
   }
@@ -175,8 +127,8 @@ export default function ArchiveProposalNonVoterList({
           style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
         >
           {virtualRows.map((virtualRow) => {
-            const nonVoter = filteredNonVoters[virtualRow.index];
-            const isLoaderRow = virtualRow.index > filteredNonVoters.length - 1;
+            const nonVoter = nonVoters[virtualRow.index];
+            const isLoaderRow = virtualRow.index > nonVoters.length - 1;
 
             if (isLoaderRow) {
               return (

@@ -56,9 +56,10 @@ export default function ArchiveCopelandProposalVotesList({
         createdAt: vote.timestamp || new Date(),
         choice: "",
         title: "",
+        voterMetadata: vote.voterMetadata,
       } satisfies SnapshotVote;
     });
-  }, [votes]);
+  }, [choices, votes]);
 
   const connectedAddressLower = useMemo(
     () => connectedAddress?.toLowerCase(),
@@ -120,12 +121,12 @@ export default function ArchiveCopelandProposalVotesList({
       <ul className="flex flex-col divide-y">
         {userVotes.map((vote) => (
           <li key={vote.id} className="p-4">
-            <CopelandProposalSingleVote vote={vote} />
+            <CopelandProposalSingleVote vote={vote} resolveEns={false} />
           </li>
         ))}
         {paginatedVotes.map((vote) => (
           <li key={vote.id} className="p-4">
-            <CopelandProposalSingleVote vote={vote} />
+            <CopelandProposalSingleVote vote={vote} resolveEns={false} />
           </li>
         ))}
       </ul>

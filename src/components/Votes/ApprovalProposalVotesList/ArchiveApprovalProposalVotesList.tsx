@@ -190,7 +190,7 @@ export default function ArchiveApprovalProposalVotesList({
             }
             className="p-4"
           >
-            <ApprovalProposalSingleVote vote={vote} />
+            <ApprovalProposalSingleVote vote={vote} resolveEns={false} />
           </li>
         ))}
         {paginatedVotes.map((vote) => (
@@ -201,7 +201,7 @@ export default function ArchiveApprovalProposalVotesList({
             }
             className="p-4"
           >
-            <ApprovalProposalSingleVote vote={vote} />
+            <ApprovalProposalSingleVote vote={vote} resolveEns={false} />
           </li>
         ))}
       </ul>

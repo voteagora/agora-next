@@ -11,13 +11,17 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
+import AvatarImage from "@/components/shared/AvatarImage";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const { token, ui } = Tenant.current();
 
 export default function CopelandProposalSingleVote({
   vote,
+  resolveEns = true,
 }: {
   vote: SnapshotVote;
+  resolveEns?: boolean;
 }) {
   const { address } = useAccount();
   const {
@@ -27,14 +31,40 @@ export default function CopelandProposalSingleVote({
     choiceLabels,
   } = vote;
 
+  const displayName = vote.voterMetadata?.name;
+  const avatar = () => {
+    if (vote.voterMetadata?.image) {
+      return (
+        <AvatarImage
+          src={vote.voterMetadata.image}
+          alt="avatar"
+          className="mr-1"
+          size={20}
+        />
+      );
+    }
+
+    if (!resolveEns) {
+      return <AvatarImage alt="Delegate avatar" className="mr-1" size={20} />;
+    }
+
+    return <ENSAvatar ensName={voterAddress} className="mr-1" size={20} />;
+  };
+
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between mb-2 text-xs leading-4">
         <div className="text-primary font-semibold flex items-center">
-          <ENSAvatar ensName={voterAddress} className="w-5 h-5 mr-1" />
+          {avatar()}
           <div className="text-primary hover:underline">
             <Link href={`/delegates/${voterAddress}`}>
-              <ENSName address={voterAddress} />
+              {displayName ? (
+                displayName
+              ) : resolveEns ? (
+                <ENSName address={voterAddress} />
+              ) : (
+                truncateAddress(voterAddress)
+              )}
             </Link>
           </div>
           {address?.toLowerCase() === voterAddress && (

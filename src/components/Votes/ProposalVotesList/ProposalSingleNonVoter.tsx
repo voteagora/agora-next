@@ -15,8 +15,8 @@ import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
-import { resolveIPFSUrl } from "@/lib/utils";
 import { truncateAddress } from "@/app/lib/utils/text";
+import AvatarImage from "@/components/shared/AvatarImage";
 
 export function ProposalSingleNonVoter({
   voter,
@@ -68,50 +68,13 @@ export function ProposalSingleNonVoter({
 
   const ensAvatar = () => {
     if (voter.voterMetadata?.image) {
-      return (
-        <div
-          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={voter.voterMetadata.image}
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      );
+      return <AvatarImage src={voter.voterMetadata.image} alt="avatar" />;
     }
     if (ensFromBlockCache?.avatar) {
-      const avatarUrl = resolveIPFSUrl(ensFromBlockCache.avatar);
-      if (avatarUrl) {
-        return (
-          <div
-            className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        );
-      }
+      return <AvatarImage src={ensFromBlockCache.avatar} alt="avatar" />;
     }
     if (!resolveEns || !ensFromBlockCache?.name) {
-      return (
-        <div
-          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-        >
-          <Image
-            alt="Delegate avatar"
-            className="animate-in"
-            src={ui.assets.delegate}
-            width={32}
-            height={32}
-          />
-        </div>
-      );
+      return <AvatarImage alt="Delegate avatar" />;
     }
     return <ENSAvatar ensName={ensFromBlockCache.name} className="w-8 h-8" />;
   };

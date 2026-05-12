@@ -8,7 +8,6 @@ import {
   formatNumber,
   getBlockScanUrl,
   timeout,
-  resolveIPFSUrl,
 } from "@/lib/utils";
 import { useState } from "react";
 import ENSAvatar from "@/components/shared/ENSAvatar";
@@ -26,8 +25,8 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
-import Image from "next/image";
 import { truncateAddress } from "@/app/lib/utils/text";
+import AvatarImage from "@/components/shared/AvatarImage";
 
 const { token, ui } = Tenant.current();
 
@@ -108,50 +107,13 @@ export function ProposalSingleVote({
 
   const ensAvatar = () => {
     if (vote.voterMetadata?.image) {
-      return (
-        <div
-          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={vote.voterMetadata.image}
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      );
+      return <AvatarImage src={vote.voterMetadata.image} alt="avatar" />;
     }
     if (ensFromBlockCache?.avatar) {
-      const avatarUrl = resolveIPFSUrl(ensFromBlockCache.avatar);
-      if (avatarUrl) {
-        return (
-          <div
-            className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        );
-      }
+      return <AvatarImage src={ensFromBlockCache.avatar} alt="avatar" />;
     }
     if (!resolveEns) {
-      return (
-        <div
-          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-        >
-          <Image
-            alt="Delegate avatar"
-            className="animate-in"
-            src={ui.assets.delegate}
-            width={32}
-            height={32}
-          />
-        </div>
-      );
+      return <AvatarImage alt="Delegate avatar" />;
     }
     return <ENSAvatar ensName={ensFromBlockCache?.name} className="w-8 h-8" />;
   };

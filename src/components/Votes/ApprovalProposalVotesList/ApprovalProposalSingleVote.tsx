@@ -21,10 +21,18 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import AvatarImage from "@/components/shared/AvatarImage";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const { token, ui } = Tenant.current();
 
-export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
+export default function ApprovalProposalSingleVote({
+  vote,
+  resolveEns = true,
+}: {
+  vote: Vote;
+  resolveEns?: boolean;
+}) {
   const { address } = useAccount();
   const {
     address: voterAddress,
@@ -41,7 +49,31 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { data } = useEnsName({
     chainId: 1,
     address: voterAddress as `0x${string}`,
+    query: {
+      enabled: resolveEns && !vote.voterMetadata?.name,
+    },
   });
+
+  const displayName = vote.voterMetadata?.name || data;
+
+  const avatar = () => {
+    if (vote.voterMetadata?.image) {
+      return (
+        <AvatarImage
+          src={vote.voterMetadata.image}
+          alt="avatar"
+          className="mr-1"
+          size={20}
+        />
+      );
+    }
+
+    if (!resolveEns) {
+      return <AvatarImage alt="Delegate avatar" className="mr-1" size={20} />;
+    }
+
+    return <ENSAvatar ensName={data} className="w-5 h-5 mr-1" size={20} />;
+  };
 
   const _onOpenChange = async (open: boolean) => {
     if (open) {
@@ -66,10 +98,16 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
             className="mb-2 text-xs leading-4"
           >
             <div className="text-primary font-semibold flex items-center">
-              <ENSAvatar ensName={data} className="w-5 h-5 mr-1" />
+              {avatar()}
               <div className="text-primary hover:underline">
                 <Link href={`/delegates/${voterAddress}`}>
-                  <ENSName address={voterAddress} />
+                  {displayName ? (
+                    displayName
+                  ) : resolveEns ? (
+                    <ENSName address={voterAddress} />
+                  ) : (
+                    truncateAddress(voterAddress)
+                  )}
                 </Link>
               </div>
               {address?.toLowerCase() === voterAddress && (
