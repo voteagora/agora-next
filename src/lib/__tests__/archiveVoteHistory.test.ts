@@ -1,11 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  buildArchiveNonVotersResult,
   canArchiveVotesSortByTime,
   processArchiveNonVoters,
   processArchiveVotes,
+  transformArchiveNonVoterRows,
+  transformArchiveVoteRows,
   type ArchiveNonVoter,
   type ArchiveVote,
-} from "../useArchiveProposalVotes";
+} from "../archiveVoteHistory";
+import type { ArchiveNonVoterRow, ArchiveVoteRow } from "../archiveUtils";
 
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME = "optimism";
@@ -52,6 +56,104 @@ const makeVote = ({
   reason: null,
   blockNumber,
   timestamp,
+});
+
+describe("archive vote-history row transforms", () => {
+  it("transforms archive vote rows with metadata, Copeland VP, params, and temporal fields", () => {
+    const rows: ArchiveVoteRow[] = [
+      {
+        voter: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        support: "1",
+        vp: "42",
+        choice: [2, 1],
+        block_number: "123",
+        transaction_hash: "0xhash",
+        ts: "1700000000000",
+        ens: "alice.eth",
+        image: "ipfs://avatar",
+      },
+    ];
+
+    expect(
+      transformArchiveVoteRows(rows, {
+        parseSupport: (support) => (support === "1" ? "FOR" : "ABSTAIN"),
+        proposalId: "7",
+        proposalType: "SNAPSHOT",
+        startBlock: 1n,
+      })
+    ).toEqual([
+      expect.objectContaining({
+        address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        blockNumber: 123n,
+        params: [2, 1],
+        proposalId: "7",
+        support: "FOR",
+        transactionHash: "0xhash",
+        voterMetadata: {
+          name: "alice.eth",
+          image: "ipfs://avatar",
+          type: "",
+        },
+        weight: "42",
+      }),
+    ]);
+  });
+
+  it("dedupes non-voter rows within each voter type and preserves optional voting power source", () => {
+    const rows: ArchiveNonVoterRow[] = [
+      {
+        addr: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        vp: "100",
+        ens: "alice.eth",
+      },
+      {
+        addr: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        vp: "50",
+        ens: "ignored.eth",
+      },
+      {
+        addr: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        vp: "1",
+        citizen_type: "USER",
+        name: "Citizen Alice",
+      },
+    ];
+
+    expect(
+      transformArchiveNonVoterRows(rows, {
+        votingPowerSource: "cpls_snapshot",
+      })
+    ).toEqual([
+      {
+        delegate: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        voting_power: "100",
+        twitter: null,
+        warpcast: null,
+        discord: null,
+        citizen_type: null,
+        voterMetadata: {
+          name: "alice.eth",
+          image: "",
+          type: "",
+        },
+        votingPowerSource: "cpls_snapshot",
+      },
+      {
+        delegate: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        voting_power: "1",
+        twitter: null,
+        warpcast: null,
+        discord: null,
+        citizen_type: "USER",
+        voterMetadata: {
+          name: "Citizen Alice",
+          image: "",
+          type: "USER",
+        },
+        votingPowerSource: "cpls_snapshot",
+      },
+    ]);
+  });
 });
 
 describe("processArchiveNonVoters", () => {
@@ -180,6 +282,34 @@ describe("processArchiveNonVoters", () => {
       "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "0xcccccccccccccccccccccccccccccccccccccccc",
     ]);
+  });
+
+  it("filters, sorts, and paginates before slicing rows", () => {
+    const nonVoters = [
+      makeNonVoter("0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "1"),
+      makeNonVoter("0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "4", "USER"),
+      makeNonVoter("0xcccccccccccccccccccccccccccccccccccccccc", "2", "USER"),
+      makeNonVoter("0xdddddddddddddddddddddddddddddddddddddddd", "3", "APP"),
+    ];
+
+    expect(
+      buildArchiveNonVotersResult({
+        nonVoters,
+        pagination: { offset: 1, limit: 1 },
+        sort: "weight",
+        sortOrder: "desc",
+        voterType: "CH",
+      })
+    ).toEqual({
+      meta: {
+        has_next: true,
+        total_returned: 1,
+        next_offset: 2,
+      },
+      data: [
+        makeNonVoter("0xdddddddddddddddddddddddddddddddddddddddd", "3", "APP"),
+      ],
+    });
   });
 });
 
