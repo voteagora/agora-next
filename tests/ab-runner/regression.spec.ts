@@ -135,12 +135,7 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     }
   }
 
-  // === Targeted Proposal Types Regression ===
-  // E.g.: `TARGET_TYPES="STANDARD,APPROVAL" npm run test:ab`
-  const targetTypes = (process.env.TARGET_TYPES || "")
-    .split(",")
-    .map((t) => t.trim().toUpperCase())
-    .filter((t) => t.length > 0);
+  const scanAllArchive = process.env.SCAN_ALL_ARCHIVE === "true";
 
   // === GCS Archive Proposals Regression ===
   // Fetches all proposals from the archive and runs a diff for each proposal ID.
@@ -154,10 +149,9 @@ test.describe("Visual Regression A/B Diff Runner", () => {
           targetA.toLowerCase().includes(ns.toLowerCase())
         ) || TENANT_NAMESPACES.OPTIMISM;
 
-      let { data: proposals } = await fetchProposalsFromArchive(
-        activeTenant,
-        "relevant"
-      );
+      let { data: proposals } = scanAllArchive
+        ? await fetchProposalsFromArchive(activeTenant, "all")
+        : { data: [] };
 
       // Filter out snapshot proposals because they don't have a detail page on Agora
       // and redirect to snapshot.org, which would break the visual regression scanner.
@@ -165,51 +159,14 @@ test.describe("Visual Regression A/B Diff Runner", () => {
         (p: any) => String(p.proposal_type).toUpperCase() !== "SNAPSHOT"
       );
 
-      if (targetTypes.length > 0) {
-        const limitedProposals: any[] = [];
-        const typesCount: Record<string, number> = {};
-
-        for (const p of proposals) {
-          let rawType = String(
-            p.proposal_type || p.proposal_type_info?.name || "UNDEFINED"
-          ).toUpperCase();
-
-          let t = "UNDEFINED";
-          if (rawType.includes("OPTIMISTIC")) t = "OPTIMISTIC";
-          else if (rawType.includes("APPROVAL")) t = "APPROVAL";
-          else if (
-            rawType.includes("STANDARD") ||
-            rawType.includes("DEFAULT") ||
-            rawType.includes("SUPERMAJORITY")
-          ) {
-            t = "STANDARD";
-          }
-
-          if (targetTypes.includes(t)) {
-            typesCount[t] = (typesCount[t] || 0) + 1;
-            // Only keep up to 1 of each type to prevent massive loops, unless overridden
-            const limit = Number(process.env.TARGET_TYPES_LIMIT || "1");
-            if (typesCount[t] <= limit) {
-              limitedProposals.push(p);
-            }
-          }
-        }
-        proposals = limitedProposals;
-
+      if (scanAllArchive) {
         console.log(
-          `[Archive] Filtered to ${proposals.length} proposals matching types: [${targetTypes.join(", ")}] (Limit per type: ${process.env.TARGET_TYPES_LIMIT || "1"})`
+          `[Archive] Unbounded scan enabled: Loaded all ${proposals.length} archived proposals for tenant [${activeTenant}]`
         );
       } else {
-        if (process.env.SCAN_ALL_ARCHIVE === "true") {
-          console.log(
-            `[Archive] Unbounded scan enabled: Loaded all ${proposals.length} recent proposals for tenant [${activeTenant}]`
-          );
-        } else {
-          console.log(
-            `[Archive] Skipping archive crawler because no TARGET_TYPES were provided and SCAN_ALL_ARCHIVE is false.`
-          );
-          proposals = [];
-        }
+        console.log(
+          `[Archive] Skipping archive crawler because SCAN_ALL_ARCHIVE is false.`
+        );
       }
 
       const failedDrifts: string[] = [];
@@ -217,29 +174,10 @@ test.describe("Visual Regression A/B Diff Runner", () => {
       for (const proposal of proposals) {
         const pRoute = `/proposals/${proposal.id}`;
 
-        let rawType = String(
-          proposal.proposal_type ||
-            proposal.proposal_type_info?.name ||
-            "UNDEFINED"
-        ).toUpperCase();
-        let resolvedType = "UNDEFINED";
-        if (rawType.includes("OPTIMISTIC")) resolvedType = "OPTIMISTIC";
-        else if (rawType.includes("APPROVAL")) resolvedType = "APPROVAL";
-        else if (
-          rawType.includes("STANDARD") ||
-          rawType.includes("DEFAULT") ||
-          rawType.includes("SUPERMAJORITY")
-        ) {
-          resolvedType = "STANDARD";
-        }
-
-        console.log(
-          `[Archive] Testing Proposal [${proposal.id}]: ${pRoute} (Type: ${resolvedType})`
-        );
+        console.log(`[Archive] Testing Proposal [${proposal.id}]: ${pRoute}`);
         try {
           await engine.diffRoute(pRoute, pageA, pageB, {
             tenant: activeTenant,
-            type: resolvedType,
           });
         } catch (e: any) {
           failedDrifts.push(

@@ -4,11 +4,14 @@ import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { Address, encodeFunctionData, zeroAddress } from "viem";
 import AgoraAPI from "@/app/lib/agoraAPI";
 import { useSignTypedData } from "wagmi";
+import { waitForTransactionReceipt } from "wagmi/actions";
+import { config } from "@/app/Web3Provider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useEffect, useRef, useState } from "react";
 import { useTokenName } from "@/hooks/useTokenName";
 import { withMiradorTraceHeaders } from "@/lib/mirador/headers";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { addMiradorEvent } from "@/lib/mirador/webTrace";
 import {
   attachMiradorTransactionArtifacts,
   closeFrontendMiradorFlowTrace,
@@ -29,6 +32,7 @@ const types = {
     { name: "expiry", type: "uint256" },
   ],
 };
+const SPONSORED_DELEGATION_RECEIPT_TIMEOUT_MS = 10 * 60 * 1000;
 
 export const useSponsoredDelegation = ({ address, delegate }: Props) => {
   const { ui, contracts } = Tenant.current();
@@ -36,6 +40,7 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
   const [isFetching, setIsFetching] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
   const traceRef = useRef<FrontendMiradorTrace>(null);
 
@@ -76,9 +81,12 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
     setIsFetching(true);
     setIsFetched(false);
+    setError(undefined);
+    setTxHash(undefined);
 
     const isUndelegation = delegate.address === zeroAddress;
     const action = isUndelegation ? "undelegate" : "delegate";
+    let relayTxHash: `0x${string}` | undefined;
     const inputData = encodeFunctionData({
       abi: contracts.token.abi as any,
       functionName: "delegate",
@@ -161,49 +169,70 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
         )
       );
 
-      const hash = await response.json();
+      relayTxHash = (await response.json()) as `0x${string}`;
+      setTxHash(relayTxHash);
 
       attachMiradorTransactionArtifacts(trace, {
         chainId: contracts.token.chain.id,
-        inputData,
-        txHash: hash,
+        txHash: relayTxHash,
         txDetails: isUndelegation
           ? "Sponsored undelegation transaction"
           : "Sponsored delegation transaction",
       });
+
+      addMiradorEvent(trace, "governance_delegation_submitted", {
+        delegatee: delegate.address,
+        action,
+        transactionHash: relayTxHash,
+      });
+
+      const receipt = await waitForTransactionReceipt(config, {
+        hash: relayTxHash,
+        chainId: contracts.token.chain.id,
+        timeout: SPONSORED_DELEGATION_RECEIPT_TIMEOUT_MS,
+      });
+
+      if (receipt.status !== "success") {
+        throw new Error(
+          `Sponsored delegation transaction failed with status: ${receipt.status}`
+        );
+      }
+
       void closeFrontendMiradorFlowTrace(trace, {
-        reason: "governance_delegation_submitted",
-        eventName: "governance_delegation_submitted",
+        reason: "governance_delegation_succeeded",
+        eventName: "governance_delegation_succeeded",
         details: {
           delegatee: delegate.address,
           action,
-          transactionHash: hash,
+          transactionHash: relayTxHash,
         },
       });
       if (traceRef.current === trace) {
         traceRef.current = null;
       }
 
-      setTxHash(hash);
       setIsFetched(true);
     } catch (error) {
+      const nextError =
+        error instanceof Error ? error : new Error(String(error));
+      setError(nextError);
       void closeFrontendMiradorFlowTrace(trace, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
           action,
-          error: error instanceof Error ? error.message : String(error),
+          transactionHash: relayTxHash,
+          error: nextError.message,
         },
       });
       if (traceRef.current === trace) {
         traceRef.current = null;
       }
-      throw error;
     } finally {
       setIsFetching(false);
     }
   };
 
-  return { call, isFetching, isFetched, txHash };
+  return { call, isFetching, isFetched, isError: !!error, error, txHash };
 };

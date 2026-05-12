@@ -5,7 +5,7 @@
  * and assert that:
  *   - the row container is present (`data-testid="proposal-list-item-{id}"`)
  *   - the proposal title is rendered
- *   - the status pill (`data-testid="proposal-status-{id}"`) shows the expected text
+ *   - the responsive status pills show the expected text
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
@@ -75,6 +75,17 @@ function loadProposal(source: "dao_node" | "eas-atlas", id: string) {
   return JSON.parse(
     readFileSync(join(MOCK_ROOT, source, `${id}.json`), "utf8")
   );
+}
+
+function expectResponsiveStatus(id: string, expectedStatus: string) {
+  const statusEls = [
+    screen.getByTestId(`proposal-status-${id}-mobile`),
+    screen.getByTestId(`proposal-status-${id}-desktop`),
+  ];
+
+  for (const el of statusEls) {
+    expect(el.textContent?.toLowerCase()).toBe(expectedStatus);
+  }
 }
 
 /**
@@ -213,14 +224,7 @@ describe("ArchiveProposalRow – proposal list item rendering", () => {
         );
       }
 
-      // Status pill shows the correct state.
-      // ProposalStatus is rendered twice per row (mobile + desktop column)
-      // so we use getAllByTestId and assert every instance agrees.
-      const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
-      expect(statusEls.length).toBeGreaterThan(0);
-      for (const el of statusEls) {
-        expect(el.textContent?.toLowerCase()).toBe(expectedStatus);
-      }
+      expectResponsiveStatus(id, expectedStatus);
     });
   }
 });
@@ -234,8 +238,7 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
-    for (const el of statusEls) expect(el.textContent).toBe("executed");
+    expectResponsiveStatus(id, "executed");
   });
 
   it("renders a real succeeded hybrid optimistic tiered proposal", () => {
@@ -246,8 +249,7 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
-    for (const el of statusEls) expect(el.textContent).toBe("succeeded");
+    expectResponsiveStatus(id, "succeeded");
   });
 
   it("renders a real succeeded eas-atlas optimistic proposal", () => {
@@ -258,7 +260,6 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
-    for (const el of statusEls) expect(el.textContent).toBe("succeeded");
+    expectResponsiveStatus(id, "succeeded");
   });
 });

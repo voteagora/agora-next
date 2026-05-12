@@ -7,7 +7,7 @@ import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useSnapshotProposalVotes } from "@/hooks/useProposalVotes";
 import { cn } from "@/lib/utils";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type { SnapshotVote } from "@/app/api/common/votes/vote";
 
 type Props = {
   fetchVotesForProposal: (
@@ -48,15 +48,20 @@ export default function CopelandProposalVotesList({
   const loadMore = async () => {
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(proposalId, {
-        limit: LIMIT,
-        offset: meta.next_offset,
-      });
-      const existingIds = new Set(proposalVotes.map((v) => v.id));
-      const uniqueVotes = data?.data?.filter((v) => !existingIds.has(v.id));
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
-      setMeta(data.meta);
-      fetching.current = false;
+      try {
+        const data = await fetchVotesForProposal(proposalId, {
+          limit: LIMIT,
+          offset: meta.next_offset,
+        });
+        const existingIds = new Set(proposalVotes.map((v) => v.id));
+        const uniqueVotes = data?.data?.filter((v) => !existingIds.has(v.id));
+        setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+        setMeta(data.meta);
+      } catch (error) {
+        console.error("Failed to load more Copeland proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
   };
 
@@ -93,7 +98,7 @@ export default function CopelandProposalVotesList({
     isFetched && proposalVotes.length === 0 && userVotes.length === 0;
 
   return (
-    <div className={cn("overflow-y-scroll max-h-[calc(100vh-560px)]")}>
+    <div className={cn("overflow-y-scroll flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}

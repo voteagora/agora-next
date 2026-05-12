@@ -270,9 +270,10 @@ export const deriveStandardStatus = (
         ? Number((forVotes * 10000n) / thresholdVotes) / 100
         : 0;
 
+    const hasApprovalThreshold = thresholds.approvalThreshold > 0n;
     const hasMetThreshold =
-      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
-      Number(thresholds.approvalThreshold) === 0;
+      !hasApprovalThreshold ||
+      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100;
 
     const quorumVotes = calculateQuorumBigInt(
       forVotes,
@@ -283,10 +284,13 @@ export const deriveStandardStatus = (
     const quorumMet = quorumVotes >= thresholds.quorum;
 
     if (quorumMet && hasMetThreshold) {
-      const { namespace } = Tenant.current();
-      // this is just as backwards compatibility for optimism old governor where we dont
-      // have quorum set
-      if (forVotes < againstVotes) {
+      // Backwards compatibility for old governors where quorum is missing:
+      // require more for than against only when an approval threshold exists.
+      if (
+        thresholds.quorum === 0n &&
+        hasApprovalThreshold &&
+        forVotes < againstVotes
+      ) {
         return "DEFEATED";
       }
       return "SUCCEEDED";

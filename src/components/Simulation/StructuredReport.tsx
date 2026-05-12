@@ -1,4 +1,5 @@
 import {
+  CrossChainReportSummary,
   SimulationCheck,
   SimulationStateChange,
   StructuredSimulationReport,
@@ -97,6 +98,71 @@ interface StructuredReportProps {
   report: StructuredSimulationReport;
 }
 
+function CrossChainFollowUpSection({
+  crossChain,
+}: {
+  crossChain: CrossChainReportSummary;
+}) {
+  if (crossChain.jobs.length === 0) return null;
+  return (
+    <div className="mt-4 p-4 rounded-md border border-line bg-wash/50 space-y-3">
+      <h3 className="text-sm font-semibold text-primary">
+        Cross-chain follow-up
+      </h3>
+      <div className="flex items-center gap-2 flex-wrap">
+        {crossChain.crossChainFailure ? (
+          <span className="px-2 py-0.5 rounded-full text-xs bg-negative/20 text-negative">
+            Failed
+          </span>
+        ) : (
+          <span className="px-2 py-0.5 rounded-full text-xs bg-positive/20 text-positive">
+            OK (includes skips)
+          </span>
+        )}
+      </div>
+      <ul className="text-sm space-y-3">
+        {crossChain.jobs.map((job, ji) => (
+          <li
+            key={`xc-job-${ji}`}
+            className="border-l-2 border-brandPrimary pl-3"
+          >
+            <div className="text-tertiary font-mono text-xs">
+              {job.bridge} → chain {job.destinationChainId} (action #
+              {job.sourceActionIndex})
+            </div>
+            <ul className="mt-2 space-y-2">
+              {job.steps.map((step, si) => (
+                <li key={`xc-step-${ji}-${si}`} className="text-secondary">
+                  <span className="font-medium">{step.label}</span>
+                  {step.skipped && step.skipReason ? (
+                    <span className="text-tertiary ml-2">
+                      skipped: {step.skipReason}
+                    </span>
+                  ) : null}
+                  {step.error ? (
+                    <span className="text-negative ml-2">{step.error}</span>
+                  ) : null}
+                  {step.tenderlyHref ? (
+                    <a
+                      href={step.tenderlyHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm flex gap-1 items-center mt-1 text-tertiary hover:underline"
+                    >
+                      Destination Tenderly
+                      <ExternalLinkIcon className="h-3 w-3" />
+                    </a>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function StructuredReport({ report }: StructuredReportProps) {
   const checksToShow =
     report.status === "error"
@@ -135,6 +201,9 @@ export function StructuredReport({ report }: StructuredReportProps) {
           <span>View simulation on Tenderly</span>
           <ExternalLinkIcon className="h-3 w-3" />
         </a>
+        {report.crossChain ? (
+          <CrossChainFollowUpSection crossChain={report.crossChain} />
+        ) : null}
       </div>
 
       <div className="overflow-y-auto">
