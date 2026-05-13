@@ -12,23 +12,36 @@ import {
 } from "viem/chains";
 import axios from "axios";
 import { unstable_cache } from "next/cache";
+import { normalizeExplorerNetwork } from "./explorerNetwork";
 import Tenant from "./tenant/tenant";
 
-const EXPLORER_DOMAINS = {
-  [mainnet.name.toLowerCase()]: "https://api.etherscan.io/api",
+const ETHERSCAN_V2_API = "https://api.etherscan.io/v2/api";
+
+const LEGACY_EXPLORER_API: Record<string, string> = {
   derive: "https://explorer.derive.xyz/api",
   cyber: "https://api.socialscan.io/cyber",
 };
 
-const CHAIN_ID = {
-  [mainnet.name.toLowerCase()]: 1,
-  [sepolia.name.toLowerCase()]: 11155111,
-  [optimism.name.toLowerCase()]: 10,
-  [optimismSepolia.name.toLowerCase()]: 11155420,
-  [arbitrum.name.toLowerCase()]: 42161,
-  [arbitrumSepolia.name.toLowerCase()]: 421614,
-  [base.name.toLowerCase()]: 8453,
-  [scroll.name.toLowerCase()]: 534352,
+const CHAIN_ID: Record<string, number> = {
+  [mainnet.name.toLowerCase()]: mainnet.id,
+  mainnet: mainnet.id,
+  ethereum: mainnet.id,
+  homestead: mainnet.id,
+  eth: mainnet.id,
+  [sepolia.name.toLowerCase()]: sepolia.id,
+  sepolia: sepolia.id,
+  [optimism.name.toLowerCase()]: optimism.id,
+  optimism: optimism.id,
+  op: optimism.id,
+  [optimismSepolia.name.toLowerCase()]: optimismSepolia.id,
+  [arbitrum.name.toLowerCase()]: arbitrum.id,
+  arbitrum: arbitrum.id,
+  arb: arbitrum.id,
+  [arbitrumSepolia.name.toLowerCase()]: arbitrumSepolia.id,
+  [base.name.toLowerCase()]: base.id,
+  base: base.id,
+  [scroll.name.toLowerCase()]: scroll.id,
+  scroll: scroll.id,
 };
 
 interface AbiItem {
@@ -54,18 +67,35 @@ interface AbiItem {
 }
 
 function getExplorerDomain(networkName: string): {
-  domain: string;
+  domain: string | undefined;
   chainId: number | null;
+  canonicalNetwork: string;
+  useEtherscanV2: boolean;
 } {
-  const chainId =
-    CHAIN_ID[networkName.toLowerCase() as keyof typeof CHAIN_ID] || null;
-  const domain =
-    EXPLORER_DOMAINS[
-      networkName.toLowerCase() as keyof typeof EXPLORER_DOMAINS
-    ];
+  const canonicalNetwork = normalizeExplorerNetwork(networkName);
+  const chainId = CHAIN_ID[canonicalNetwork] ?? null;
+  const legacy = LEGACY_EXPLORER_API[canonicalNetwork];
+  if (legacy) {
+    return {
+      domain: legacy,
+      chainId,
+      canonicalNetwork,
+      useEtherscanV2: false,
+    };
+  }
+  if (chainId != null) {
+    return {
+      domain: ETHERSCAN_V2_API,
+      chainId,
+      canonicalNetwork,
+      useEtherscanV2: true,
+    };
+  }
   return {
-    domain,
-    chainId,
+    domain: undefined,
+    chainId: null,
+    canonicalNetwork,
+    useEtherscanV2: false,
   };
 }
 
@@ -91,10 +121,41 @@ const fallbackGetContractAbi = async (
 async function getContractAbi(
   contractAddress: string,
   etherscanApiKey: string,
-  network: string = "mainnet"
+  network: string = mainnet.name.toLowerCase()
 ): Promise<AbiItem[] | null> {
-  const { domain, chainId } = getExplorerDomain(network);
-  const url = `${domain}${chainId ? `?chainid=${chainId}&` : "?"}module=contract&action=getabi&address=${contractAddress}&apikey=${etherscanApiKey}`;
+  const { domain, chainId, canonicalNetwork, useEtherscanV2 } =
+    getExplorerDomain(network);
+  if (!domain) {
+    console.warn("[getContractAbi] No explorer URL for network", {
+      network,
+      canonicalNetwork,
+      contractAddress,
+    });
+    return await fallbackGetContractAbi(contractAddress);
+  }
+  if (useEtherscanV2 && chainId == null) {
+    console.warn("[getContractAbi] Etherscan V2 requires chainId", {
+      network,
+      canonicalNetwork,
+      contractAddress,
+    });
+    return await fallbackGetContractAbi(contractAddress);
+  }
+
+  const qs = new URLSearchParams({
+    module: "contract",
+    action: "getabi",
+    address: contractAddress,
+    apikey: etherscanApiKey,
+  });
+  if (useEtherscanV2) {
+    qs.set("chainid", String(chainId));
+  } else if (chainId != null && chainId !== mainnet.id) {
+    qs.set("chainid", String(chainId));
+  }
+  const sep = domain.includes("?") ? "&" : "?";
+  const url = `${domain}${sep}${qs.toString()}`;
+
   try {
     const response = await axios.get(url, {
       headers: {
@@ -103,17 +164,33 @@ async function getContractAbi(
     });
     if (response.data.status === "1") {
       return JSON.parse(response.data.result);
-    } else {
-      return await fallbackGetContractAbi(contractAddress);
     }
+    console.warn("[getContractAbi] Explorer getabi non-success", {
+      network,
+      canonicalNetwork,
+      chainId,
+      contractAddress,
+      message:
+        typeof response.data?.result === "string"
+          ? response.data.result.slice(0, 240)
+          : response.data?.message,
+    });
+    return await fallbackGetContractAbi(contractAddress);
   } catch (error) {
+    console.warn("[getContractAbi] Request failed", {
+      network,
+      canonicalNetwork,
+      chainId,
+      contractAddress,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return await fallbackGetContractAbi(contractAddress);
   }
 }
 
 export const cachedGetContractAbi = unstable_cache(
   getContractAbi,
-  ["contract-abi"],
+  ["contract-abi", "etherscan-v2"],
   {
     revalidate: 86400,
   }

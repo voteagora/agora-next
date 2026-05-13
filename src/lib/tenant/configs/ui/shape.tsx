@@ -225,6 +225,7 @@ export const shapeTenantUIConfig = new TenantUI({
     { name: "use-daonode-for-proposals", enabled: false },
     { name: "use-daonode-for-votable-supply", enabled: false },
     { name: "use-daonode-for-proposal-types", enabled: false },
+    { name: "use-daonode-for-voting-power", enabled: true },
     { name: "forums", enabled: true },
     { name: "grants", enabled: true },
     { name: "grants/intake-form", enabled: true },
@@ -313,7 +314,7 @@ export const shapeTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Structura",
+        title: "Structura Voting",
         sections: [
           {
             id: "voting-process",

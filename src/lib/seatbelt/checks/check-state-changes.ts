@@ -3,6 +3,7 @@ import { bullet } from "../report";
 import type { ProposalCheck, StateDiff } from "../types";
 import { getContractName } from "../simulate";
 import { decodeStorageSlot } from "../../seatbelt/encode-state";
+import { extractTenderlyRevertReason } from "../tenderlyRevert";
 
 /**
  * Reports all state changes from the proposal
@@ -14,14 +15,8 @@ export const checkStateChanges: ProposalCheck = {
     const warnings = [];
     // Check if the transaction reverted, and if so return revert reason
     if (!sim.transaction.status) {
-      const txInfo = sim.transaction.transaction_info;
-      const callTraceError = txInfo.call_trace.error_reason;
-      const reason = callTraceError
-        ? callTraceError
-        : txInfo.stack_trace
-          ? txInfo.stack_trace[0].error_reason
-          : "unknown error";
-      const error = `Transaction reverted with reason: ${reason}`;
+      const reason = extractTenderlyRevertReason(sim);
+      const error = `Transaction reverted: ${reason}`;
       return { info: [], warnings: [], errors: [error] };
     }
 

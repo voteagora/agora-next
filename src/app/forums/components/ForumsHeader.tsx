@@ -43,7 +43,7 @@ export default function ForumsHeader({
   fallbackTitle = "Discussions",
   isDuna = false,
   topicContext,
-  showSearch = true,
+  showSearch = false,
   headerActions,
 }: ForumsHeaderProps) {
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;

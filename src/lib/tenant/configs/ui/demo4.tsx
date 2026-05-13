@@ -674,7 +674,7 @@ export const demo4TenantUIConfig = new TenantUI({
       enabled: true,
 
       config: {
-        title: "Voting in the Canopy Agora",
+        title: "Canopy Agora Voting",
 
         sections: [
           {
