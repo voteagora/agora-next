@@ -153,10 +153,7 @@ export default function ArchiveProposalNonVoterList({
                 className="absolute left-0 top-0 w-full"
                 style={{ transform: `translateY(${virtualRow.start}px)` }}
               >
-                <ProposalSingleNonVoter
-                  voter={nonVoter}
-                  proposal={proposal}
-                />
+                <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
               </div>
             );
           })}

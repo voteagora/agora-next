@@ -330,7 +330,9 @@ export function processArchiveVotes(
   });
 }
 
-export function processArchiveNonVoters<TArchiveNonVoter extends ArchiveNonVoter>(
+export function processArchiveNonVoters<
+  TArchiveNonVoter extends ArchiveNonVoter,
+>(
   nonVoters: TArchiveNonVoter[],
   {
     sort = "weight",
