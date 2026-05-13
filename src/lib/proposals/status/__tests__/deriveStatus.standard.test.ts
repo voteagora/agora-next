@@ -48,9 +48,18 @@ describe("deriveStandardStatus – dao_node", () => {
     expect(deriveStandardStatus(p, "STANDARD", 0)).toBe("DEFEATED");
   });
 
-  it("SUCCEEDED – zero approval threshold bypasses approval check", () => {
-    // Even with against > for, threshold=0 passes approval check
+  it("DEFEATED – against > for is always DEFEATED, even with zero approval threshold", () => {
+    // threshold=0 bypasses the approval-percentage check, but the
+    // post-quorum guard still returns DEFEATED when forVotes < againstVotes.
     const p = makeStandard("200", "800", "0", "100", 0);
+    expect(deriveStandardStatus(p, "STANDARD", 0)).toBe("DEFEATED");
+  });
+
+  it("SUCCEEDED – zero approval threshold bypasses approval-percentage check when for >= against", () => {
+    // approval% = 100/(100+100) = 50% (would fail a non-zero threshold) but
+    // threshold=0 bypasses the check, and forVotes >= againstVotes so the
+    // post-quorum guard does not flip to DEFEATED.
+    const p = makeStandard("100", "100", "0", "100", 0);
     expect(deriveStandardStatus(p, "STANDARD", 0)).toBe("SUCCEEDED");
   });
 

@@ -5,7 +5,7 @@
  * and assert that:
  *   - the row container is present (`data-testid="proposal-list-item-{id}"`)
  *   - the proposal title is rendered
- *   - the status pill (`data-testid="proposal-status-{id}"`) shows the expected text
+ *   - the status pill (`data-testid="proposal-status-{id}-{mobile|desktop}"`) shows the expected text
  */
 
 import { describe, it, expect, vi, afterEach } from "vitest";
@@ -216,7 +216,9 @@ describe("ArchiveProposalRow – proposal list item rendering", () => {
       // Status pill shows the correct state.
       // ProposalStatus is rendered twice per row (mobile + desktop column)
       // so we use getAllByTestId and assert every instance agrees.
-      const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
+      const statusEls = screen.getAllByTestId(
+        new RegExp(`^proposal-status-${id}-(mobile|desktop)$`)
+      );
       expect(statusEls.length).toBeGreaterThan(0);
       for (const el of statusEls) {
         expect(el.textContent?.toLowerCase()).toBe(expectedStatus);
@@ -234,7 +236,9 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
+    const statusEls = screen.getAllByTestId(
+      new RegExp(`^proposal-status-${id}-(mobile|desktop)$`)
+    );
     for (const el of statusEls) expect(el.textContent).toBe("executed");
   });
 
@@ -246,7 +250,9 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
+    const statusEls = screen.getAllByTestId(
+      new RegExp(`^proposal-status-${id}-(mobile|desktop)$`)
+    );
     for (const el of statusEls) expect(el.textContent).toBe("succeeded");
   });
 
@@ -258,7 +264,9 @@ describe("ArchiveProposalRow – real archived proposals", () => {
     render(<ArchiveProposalRow proposal={proposal} tokenDecimals={18} />);
 
     expect(screen.getByTestId(`proposal-list-item-${id}`)).toBeTruthy();
-    const statusEls = screen.getAllByTestId(`proposal-status-${id}`);
+    const statusEls = screen.getAllByTestId(
+      new RegExp(`^proposal-status-${id}-(mobile|desktop)$`)
+    );
     for (const el of statusEls) expect(el.textContent).toBe("succeeded");
   });
 });

@@ -7,22 +7,14 @@
  */
 
 import { CITIZEN_TYPES } from "@/lib/constants";
-import type {
-  EasAtlasVoteOutcome,
-  EasOodaoProposal,
-} from "@/lib/types/archiveProposal";
+import type { EasOodaoProposal } from "@/lib/types/archiveProposal";
 import type {
   ArchiveProposalInput,
   ApprovalChoice,
   ApprovalMetrics,
   ExtractorOptions,
 } from "./types";
-import {
-  isDaoNodeSource,
-  isEasAtlasSource,
-  isEasOodaoSource,
-  getVotingData,
-} from "./guards";
+import { isDaoNodeSource, getVotingData } from "./guards";
 import { convertToNumber, ensurePercentage } from "./standard";
 
 // =============================================================================
@@ -155,9 +147,7 @@ function extractChoicesFromDaoNode(
           budgetTokensSpent = null;
         } else {
           // Newer format: [budgetTokensSpent, targets, values, calldatas, description]
-          budgetTokensSpent = optArr[0] != null
-            ? safeBigInt(optArr[0])
-            : null;
+          budgetTokensSpent = optArr[0] != null ? safeBigInt(optArr[0]) : null;
           targets = Array.isArray(optArr[1]) ? (optArr[1] as string[]) : [];
           values = Array.isArray(optArr[2])
             ? (optArr[2] as unknown[]).map((v) => String(v))

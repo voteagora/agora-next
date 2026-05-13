@@ -1263,21 +1263,21 @@ export function calculateHybridApprovalWeightedPercentage(
 
   weightedOptionPercentage +=
     (eligibleVoters.delegates > 0
-      ? (delegatesVotes / eligibleVoters.delegates)
+      ? delegatesVotes / eligibleVoters.delegates
       : 0) *
     weights.delegates *
     100;
 
   weightedOptionPercentage +=
-    (eligibleVoters.apps > 0 ? (appsVotes / eligibleVoters.apps) : 0) *
+    (eligibleVoters.apps > 0 ? appsVotes / eligibleVoters.apps : 0) *
     weights.apps *
     100;
   weightedOptionPercentage +=
-    (eligibleVoters.users > 0 ? (usersVotes / eligibleVoters.users) : 0) *
+    (eligibleVoters.users > 0 ? usersVotes / eligibleVoters.users : 0) *
     weights.users *
     100;
   weightedOptionPercentage +=
-    (eligibleVoters.chains > 0 ? (chainsVotes / eligibleVoters.chains) : 0) *
+    (eligibleVoters.chains > 0 ? chainsVotes / eligibleVoters.chains : 0) *
     weights.chains *
     100;
 
@@ -1304,28 +1304,28 @@ export function calculateHybridApprovalUniqueParticipationPercentage(
 
   uniqueParticipationPercentage +=
     (eligibleVoters.delegates > 0
-      ? (Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates)
+      ? Number(totalUniqueVoters.delegates || 0) / eligibleVoters.delegates
       : 0) *
     100 *
     weights.delegates;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.apps > 0
-      ? (Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps)
+      ? Number(totalUniqueVoters.apps || 0) / eligibleVoters.apps
       : 0) *
     100 *
     weights.apps;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.users > 0
-      ? (Number(totalUniqueVoters.users || 0) / eligibleVoters.users)
+      ? Number(totalUniqueVoters.users || 0) / eligibleVoters.users
       : 0) *
     100 *
     weights.users;
 
   uniqueParticipationPercentage +=
     (eligibleVoters.chains > 0
-      ? (Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains)
+      ? Number(totalUniqueVoters.chains || 0) / eligibleVoters.chains
       : 0) *
     100 *
     weights.chains;
