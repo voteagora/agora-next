@@ -23,11 +23,14 @@ if [ -n "$GITHUB_SHA" ]; then
     DATE_STR=$(date +'%Y-%m-%d')
     ACTOR=${GITHUB_ACTOR:-"cli"}
     
-    # Clean, parametric reporting taxonomy: reports / YYYY-MM-DD / username_run-ID / tenant
+    # Clean, parametric reporting taxonomy: reports / YYYY-MM-DD / username_run-ID
     TARGET_DIR="gs://agora-ab-artifacts/reports/${DATE_STR}/${ACTOR}_run-${GITHUB_RUN_ID}"
-    if [ -n "$TENANT_CONTEXT" ]; then
-        TARGET_DIR="${TARGET_DIR}/${TENANT_CONTEXT}"
-    fi
+fi
+
+REPORT_COUNT=$(find test-results/ab-diffs -name report.json -type f 2>/dev/null | wc -l | tr -d ' ')
+echo "Visual reports found locally: ${REPORT_COUNT}"
+if [ "${REPORT_COUNT}" -eq 0 ]; then
+    echo "Warning: no report.json files found under test-results/ab-diffs. The dashboard will not have visual results for this run."
 fi
 
 echo "Uploading artifacts to $TARGET_DIR..."

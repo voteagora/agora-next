@@ -16,6 +16,28 @@ import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
+import { getAlchemyId } from "@/lib/alchemyConfig";
+
+const BLOCKCACHE_URL = "https://blockcache-production.up.railway.app";
+
+async function fetchTxHashFromBlockcache(
+  chainId: number,
+  blockNumber: string | number,
+  transactionIndex: number
+): Promise<string> {
+  try {
+    const alchemyKey = getAlchemyId();
+    const response = await fetch(
+      `${BLOCKCACHE_URL}/transaction/${chainId}/${blockNumber}/${transactionIndex}`,
+      { headers: { "alchemy-api-key": alchemyKey } }
+    );
+    if (!response.ok) return "";
+    const data = await response.json();
+    return data?.tx ?? "";
+  } catch {
+    return "";
+  }
+}
 
 /**
  * Delegations for a given address (addresses the given address is delegating to)
@@ -169,12 +191,11 @@ async function getCurrentDelegatorsForAddress({
         );
       }
 
-      const latestBlock =
-        daoDelegate.from_list.length > 0
-          ? await contracts.token.provider.getBlock("latest")
-          : null;
+      const chainId = contracts.token.chain.id;
 
-      const mapped = daoDelegate.from_list.map((delegator: any) => {
+      // Compute allowances synchronously, filter, and slice to the page first
+      // so blockcache calls are bounded to at most `limit` items.
+      const precomputed = daoDelegate.from_list.map((delegator: any) => {
         const bn = delegator.bn ?? delegator.block_number;
         const pct = delegator.percentage;
         const balance = BigInt(delegator.balance ?? 0);
@@ -187,27 +208,11 @@ async function getCurrentDelegatorsForAddress({
             : pct !== undefined && pct !== null
               ? (balance * BigInt(pct)) / BigInt(10000)
               : balance;
-
-        const timestamp =
-          latestBlock && bn
-            ? getHumanBlockTime(BigInt(bn), latestBlock, true)
-            : null;
-
-        return {
-          from: (delegator.delegator || delegator.from || "").toLowerCase(),
-          to: address,
-          allowance: allowance.toString(),
-          percentage: pct !== undefined && pct !== null ? String(pct) : "0",
-          timestamp,
-          type: "DIRECT" as const,
-          amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
-          transaction_hash:
-            delegator.txhash || delegator.transaction_hash || "",
-        };
+        return { delegator, bn, pct, isFull, allowance };
       });
 
-      const filtered = mapped.filter(
-        (delegator) => BigInt(delegator.allowance || 0) >= balanceFilter
+      const filtered = precomputed.filter(
+        ({ allowance }) => allowance >= balanceFilter
       );
 
       const totalCount =
@@ -215,9 +220,42 @@ async function getCurrentDelegatorsForAddress({
           ? daoDelegate.from_cnt
           : filtered.length;
 
-      const sliced = filtered.slice(
+      const page = filtered.slice(
         pagination.offset,
         pagination.offset + pagination.limit
+      );
+
+      const latestBlock =
+        page.length > 0
+          ? await contracts.token.provider.getBlock("latest")
+          : null;
+
+      const sliced = await Promise.all(
+        page.map(async ({ delegator, bn, pct, isFull, allowance }) => {
+          const timestamp =
+            latestBlock && bn
+              ? getHumanBlockTime(BigInt(bn), latestBlock, true)
+              : null;
+
+          const existingHash =
+            delegator.txhash || delegator.transaction_hash || "";
+          const transactionHash =
+            existingHash ||
+            (bn != null && delegator.tid != null
+              ? await fetchTxHashFromBlockcache(chainId, bn, delegator.tid)
+              : "");
+
+          return {
+            from: (delegator.delegator || delegator.from || "").toLowerCase(),
+            to: address,
+            allowance: allowance.toString(),
+            percentage: pct !== undefined && pct !== null ? String(pct) : "0",
+            timestamp,
+            type: "DIRECT" as const,
+            amount: isFull ? ("FULL" as const) : ("PARTIAL" as const),
+            transaction_hash: transactionHash,
+          };
+        })
       );
       const hasNext = pagination.offset + pagination.limit < filtered.length;
 

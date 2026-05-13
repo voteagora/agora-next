@@ -314,7 +314,7 @@ export const shapeTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Structura",
+        title: "Structura Voting",
         sections: [
           {
             id: "voting-process",

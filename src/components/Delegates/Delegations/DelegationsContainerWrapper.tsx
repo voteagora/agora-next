@@ -1,25 +1,34 @@
-import { PaginationParams } from "@/app/lib/pagination";
+import type { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import DelegationsContainer from "./DelegationsContainer";
 import {
   fetchCurrentDelegatees,
   fetchCurrentDelegators,
 } from "@/app/delegates/actions";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Delegation } from "@/app/api/common/delegations/delegation";
 
 interface Props {
   delegate: Delegate;
+  initialDelegatees?: Delegation[];
+  initialInboundDelegators?: PaginatedResult<Delegation[]>;
 }
 
-const DelegationsContainerWrapper = async ({ delegate }: Props) => {
-  // Use scw address for the 'delegated to' if exists
-  const hasSCWAddress = Boolean(delegate.statement?.scw_address);
+const DelegationsContainerWrapper = async ({
+  delegate,
+  initialDelegatees,
+  initialInboundDelegators,
+}: Props) => {
+  const delegateesAddress = delegate.statement?.scw_address || delegate.address;
 
-  const [delegatees, delegators] = await Promise.all([
-    fetchCurrentDelegatees(
-      hasSCWAddress ? delegate.statement?.scw_address : delegate.address
-    ),
-    fetchCurrentDelegators(delegate.address),
-  ]);
+  const hasPrefetch =
+    initialDelegatees !== undefined && initialInboundDelegators !== undefined;
+
+  const [delegatees, delegators] = hasPrefetch
+    ? [initialDelegatees, initialInboundDelegators]
+    : await Promise.all([
+        fetchCurrentDelegatees(delegateesAddress),
+        fetchCurrentDelegators(delegate.address),
+      ]);
   return (
     <DelegationsContainer
       delegatees={delegatees}
