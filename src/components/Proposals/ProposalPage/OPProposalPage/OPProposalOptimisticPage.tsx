@@ -16,7 +16,7 @@ export default async function OPProposalPage({
 }: {
   proposal: Proposal;
 }) {
-  const votableSupply = await fetchVotableSupply();
+  const votableSupply = proposal.votableSupply?.toString() || "0";
   const tokenDecimals = Tenant.current().token.decimals;
 
   const { againstRelativeAmount, status } = calculateOptimisticProposalMetrics(

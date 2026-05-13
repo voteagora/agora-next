@@ -1,0 +1,46 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "138897343",
+  "data_eng_properties": {
+    "hash": "synthetic-optimistic-defeated-veto",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [[2000, true]],
+  "description": "# [SYNTHETIC] Optimistic — vetoed\n\nRelative threshold = 2000 bps of votable supply (~23.2M OP). Against votes exceed the threshold → DEFEATED.",
+  "end_block": 139156543,
+  "end_blocktime": 1753911863,
+  "hybrid": false,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000011",
+  "lifecycle_stage": "DEFEATED",
+  "log_index": 1,
+  "num_of_votes": 4200,
+  "proposal_data": "00000000000000000000000000000000000000000000000000000000000007d00000000000000000000000000000000000000000000000000000000000000001",
+  "proposal_type_id": 2,
+  "proposal_type_info": {
+    "approval_threshold": 0,
+    "module": null,
+    "name": "Optimistic",
+    "quorum": 0,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "34810871407579755069545456",
+  "start_block": 138897343,
+  "start_blocktime": 1753393463,
+  "timestamp": 1753393463,
+  "title": "[SYNTHETIC] Optimistic — Vetoed",
+  "total_voting_power_at_start": "116036238025265850231818187",
+  "totals": {
+    "no-param": {
+      "0": "30000000000000000000000000",
+      "1": "2000000000000000000000000",
+      "2": "500000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000011",
+  "transaction_index": 1,
+  "voting_module": "0x8980c97f0e8a3a69831139e51003e65238f1f343",
+  "voting_module_name": "optimistic"
+}

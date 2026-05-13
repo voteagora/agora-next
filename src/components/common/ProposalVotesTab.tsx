@@ -15,10 +15,18 @@ export const ProposalVotesTab = ({
         className="w-full"
       >
         <TabsList className="h-auto">
-          <TabsTrigger value="results" variant="underlined">
+          <TabsTrigger
+            data-testid="proposal-results-tab"
+            value="results"
+            variant="underlined"
+          >
             Results
           </TabsTrigger>
-          <TabsTrigger value="votes" variant="underlined">
+          <TabsTrigger
+            data-testid="proposal-votes-tab"
+            value="votes"
+            variant="underlined"
+          >
             Votes
           </TabsTrigger>
         </TabsList>

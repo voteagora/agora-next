@@ -1,0 +1,36 @@
+---
+description: Governance proposal types reference for Agora. Applies when working with proposal components, proposal logic, or vote calculation code.
+globs: src/components/Proposals/**,src/lib/proposals/**,src/lib/types.d.ts,src/app/**/proposals/**
+alwaysApply: false
+---
+
+# Proposal Types
+
+This project has multiple governance proposal types with distinct vote structures, status logic, and data shapes.
+
+**Before writing or modifying any proposal component or vote calculation, read the relevant docs:**
+
+- Index + shared concepts (vote weights, status flow, voter groups): [`docs/PROPOSAL_TYPES.md`](../../docs/PROPOSAL_TYPES.md)
+- Individual types: [`docs/proposal-types/`](../../docs/proposal-types/)
+
+## Quick type lookup
+
+| Type | Source | Key signal |
+|---|---|---|
+| STANDARD | `dao_node` | `hybrid=false`, `voting_module_name="standard"` |
+| HYBRID_STANDARD | `dao_node`+`eas-atlas` | `hybrid=true`, `voting_module_name="standard"` |
+| APPROVAL | `dao_node` | `hybrid=false`, `voting_module_name="approval"` |
+| HYBRID_APPROVAL | `dao_node`+`eas-atlas` | `hybrid=true`, `voting_module_name="approval"` |
+| OPTIMISTIC | `dao_node` | `hybrid=false`, `voting_module_name="optimistic"` |
+| HYBRID_OPTIMISTIC_TIERED | `dao_node`+`eas-atlas` | `hybrid=true`, `tiers` has values |
+| OFFCHAIN_OPTIMISTIC | `eas-atlas` | `proposal_type="OPTIMISTIC"`, `tiers=[]` |
+| OFFCHAIN_OPTIMISTIC_TIERED | `eas-atlas` | `proposal_type="OPTIMISTIC_TIERED"` |
+| OFFCHAIN_STANDARD | `eas-oodao` | source=`eas-oodao` |
+
+## Critical shared concepts
+
+- **Hybrid vote weights**: delegates=50%, users=~16.67%, apps=~16.67%, chains=~16.67%
+- **Eligible counts**: USER=1000, APP=100, CHAIN=15
+- **Status order**: terminal states (cancel/execute/queue) → timing (PENDING/ACTIVE) → vote-based
+- **HYBRID_STANDARD status**: OR logic — passes if threshold OR quorum met (not AND)
+- **Optimistic proposals**: SUCCEEDED by default unless veto threshold triggered

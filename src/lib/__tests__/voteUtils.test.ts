@@ -110,7 +110,7 @@ describe("calculateVoteMetadata", () => {
           against: BigInt(300),
           abstain: BigInt(100),
         },
-        endTime: new Date("2024-03-08T23:59:59Z"),
+        endTime: new Date(2024, 2, 8, 23, 59, 59),
       };
 
       const vote = {

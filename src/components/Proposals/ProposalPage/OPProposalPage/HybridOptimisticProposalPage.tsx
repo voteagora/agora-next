@@ -17,7 +17,8 @@ export default async function HybridOptimisticProposalPage({
       <div className="flex gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
         <ProposalDescription proposal={proposal} />
         <div>
-          {proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? (
+          {proposal.proposalType === "HYBRID_OPTIMISTIC" ||
+          proposal.proposalType === "HYBRID_OPTIMISTIC_TIERED" ? (
             <OptimisticTieredProposalVotesCard proposal={proposal} />
           ) : (
             <OffChainOptimisticProposalVotesCard proposal={proposal} />

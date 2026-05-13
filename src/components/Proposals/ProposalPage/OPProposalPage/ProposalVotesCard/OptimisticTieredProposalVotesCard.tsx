@@ -205,6 +205,7 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
         {/* Header */}
         <div className="mb-3">
           <p
+            data-testid="proposal-optimistic-summary-title"
             className={cn("text-xs font-bold", {
               "text-negative": vetoThresholdMet,
               "text-positive": !vetoThresholdMet,
@@ -212,7 +213,12 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
           >
             {outcomeLabel}
           </p>
-          <p className="text-xs text-secondary mt-1 font-normal">{subtitle}</p>
+          <p
+            data-testid="proposal-optimistic-summary-description"
+            className="text-xs text-secondary mt-1 font-normal"
+          >
+            {subtitle}
+          </p>
         </div>
 
         {/* Single container for consistent coordinate system */}
@@ -283,7 +289,10 @@ function OptimisticTieredResultsView({ proposal }: { proposal: Proposal }) {
                 return (
                   <div key={group.name}>
                     <div className="flex items-baseline justify-between mb-1">
-                      <span className="text-xs leading-none text-primary">
+                      <span
+                        data-testid={`proposal-veto-group-${group.name.toLowerCase()}`}
+                        className="text-xs leading-none text-primary"
+                      >
                         {group.name}
                       </span>
                       <span className="text-xs tabular-nums text-tertiary">
@@ -425,11 +434,11 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
               )}
             </>
           )}
-          <VoteOnAtlas
-            offchainProposalId={proposal.offchainProposalId || proposal.id}
-            isVotingOpen={proposal.status === "ACTIVE"}
-          />
         </div>
+        <VoteOnAtlas
+          offchainProposalId={proposal.offchainProposalId || proposal.id}
+          isVotingOpen={proposal.status === "ACTIVE"}
+        />
       </div>
     </>
   );

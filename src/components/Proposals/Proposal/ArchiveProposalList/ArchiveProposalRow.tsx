@@ -2,6 +2,7 @@
 
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 import { StandardProposalRow } from "./StandardProposalRow";
+import { OptimisticTieredProposalRow } from "./OptimisticTieredProposalRow";
 import { SnapshotProposalRow } from "./SnapshotProposalRow";
 import { ApprovalProposalRow } from "./ApprovalProposalRow";
 import { OptimisticProposalRow } from "./OptimisticProposalRow";
@@ -30,14 +31,11 @@ export function ArchiveProposalRow({
 }: ArchiveRowProps) {
   // Derive the proposal type from raw data
   const proposalType = deriveProposalType(proposal);
-
   // Route to the appropriate row component
   switch (proposalType) {
     case "SNAPSHOT":
       return <SnapshotProposalRow proposal={proposal} />;
-    // Standard / eas-oodao variants
-    // We currently only support snapshot, standard onchain, and eas-oodao proposals
-    // All standard-like variants are rendered using StandardProposalRow
+    // Standard variants
     case "STANDARD":
     case "HYBRID_STANDARD":
     case "OFFCHAIN_STANDARD":
@@ -48,21 +46,35 @@ export function ArchiveProposalRow({
           proposalType={proposalType}
         />
       );
+    // Approval variants
     case "APPROVAL":
+    case "HYBRID_APPROVAL":
+    case "OFFCHAIN_APPROVAL":
       return (
         <ApprovalProposalRow
           proposal={proposal}
           tokenDecimals={tokenDecimals}
-          proposalType={proposalType}
         />
       );
 
+    // Optimistic variants (non-tiered)
     case "OPTIMISTIC":
+    case "HYBRID_OPTIMISTIC":
+    case "OFFCHAIN_OPTIMISTIC":
       return (
         <OptimisticProposalRow
           proposal={proposal}
           tokenDecimals={tokenDecimals}
-          proposalType={proposalType}
+        />
+      );
+
+    // Optimistic tiered variants
+    case "HYBRID_OPTIMISTIC_TIERED":
+    case "OFFCHAIN_OPTIMISTIC_TIERED":
+      return (
+        <OptimisticTieredProposalRow
+          proposal={proposal}
+          tokenDecimals={tokenDecimals}
         />
       );
 

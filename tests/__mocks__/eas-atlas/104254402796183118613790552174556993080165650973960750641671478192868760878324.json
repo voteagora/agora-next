@@ -1,0 +1,48 @@
+{
+  "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+  "calculationOptions": 0,
+  "chain_id": "10",
+  "choices": [],
+  "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+  "created_blocktime": 1753386167,
+  "criteria": 99,
+  "criteria_value": 0,
+  "data_eng_properties": {
+    "hash": "10fb56549d4f38e2642e984aa55e3e865e7037dee95545e292fdd1b2e8e42284",
+    "liveness": "archived",
+    "source": "eas-atlas"
+  },
+  "description": "# S8 Retro Funding Mission: Developer Tooling\n**This is an optimistic approval. You should only cast a vote if you want to veto this proposal.**  You can read more about this proposal type in our [operating manual](https://github.com/ethereum-optimism/OPerating-manual/blob/main/manual.md).\n\nThis proposal seeks to approve a Retro Funding Mission for Season 8\n\nThe final proposal from the Budget Board is the following:\n\n- Developer Tooling: Up to 3.65M OP\n\n\nYou can read about the proposal in its entirety [here](https://gov.optimism.io/t/s8-retro-funding-missions/10003#p-44525-dev-tooling-2 ).",
+  "end_block": 139152890,
+  "end_blocktime": 1753904557,
+  "expirationTime": 0,
+  "hybrid": false,
+  "id": "104254402796183118613790552174556993080165650973960750641671478192868760878324",
+  "max_approvals": 0,
+  "num_of_votes": 144,
+  "onchain_proposalid": 0,
+  "outcome": {
+    "APP": {
+      "0": 1
+    },
+    "USER": {
+      "0": 143
+    }
+  },
+  "proposal_type": "OPTIMISTIC",
+  "proposal_type_id": 2,
+  "proposer": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+  "proposer_ens": null,
+  "recipient": "0x0000000000000000",
+  "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+  "revocable": true,
+  "revocationTime": 0,
+  "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+  "start_block": 138893690,
+  "start_blocktime": 1753386157,
+  "tiers": [],
+  "time": 1753386167,
+  "title": "S8 Retro Funding Mission: Developer Tooling",
+  "uid": "0x0701b609c2904f1b05bdaa38ab898ad74478c3a3eff4e0691a60509090ef2af2"
+}
