@@ -1,7 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount, useEnsName } from "wagmi";
-import { type Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { useState } from "react";
 import {
   capitalizeFirstLetter,
@@ -21,6 +21,8 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import Markdown from "@/components/shared/Markdown/Markdown";
+import AvatarImage from "@/components/shared/AvatarImage";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const { token, ui } = Tenant.current();
 
@@ -40,7 +42,13 @@ function isZeroVotingPowerWeight(weight: string): boolean {
   }
 }
 
-export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
+export default function ApprovalProposalSingleVote({
+  vote,
+  resolveEns = true,
+}: {
+  vote: Vote;
+  resolveEns?: boolean;
+}) {
   const { address } = useAccount();
   const {
     address: voterAddress,
@@ -57,7 +65,26 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
   const { data } = useEnsName({
     chainId: 1,
     address: voterAddress as `0x${string}`,
+    query: {
+      enabled: resolveEns && !vote.voterMetadata?.name,
+    },
   });
+
+  const displayName = vote.voterMetadata?.name || data;
+
+  const avatar = () => {
+    if (vote.voterMetadata?.image) {
+      return (
+        <AvatarImage src={vote.voterMetadata.image} alt="avatar" size={20} />
+      );
+    }
+
+    if (!resolveEns) {
+      return <AvatarImage alt="Delegate avatar" size={20} />;
+    }
+
+    return <ENSAvatar ensName={data} className="w-5 h-5" size={20} />;
+  };
 
   const _onOpenChange = async (open: boolean) => {
     if (open) {
@@ -93,7 +120,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
               <div
                 className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}
               >
-                <ENSAvatar ensName={data} className="w-5 h-5" />
+                {avatar()}
               </div>
               <div
                 className={
@@ -104,11 +131,23 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
               >
                 {zeroVpVote ? (
                   <span>
-                    <ENSName address={voterAddress} />
+                    {displayName ? (
+                      displayName
+                    ) : resolveEns ? (
+                      <ENSName address={voterAddress} />
+                    ) : (
+                      truncateAddress(voterAddress)
+                    )}
                   </span>
                 ) : (
                   <Link href={`/delegates/${voterAddress}`}>
-                    <ENSName address={voterAddress} />
+                    {displayName ? (
+                      displayName
+                    ) : resolveEns ? (
+                      <ENSName address={voterAddress} />
+                    ) : (
+                      truncateAddress(voterAddress)
+                    )}
                   </Link>
                 )}
               </div>

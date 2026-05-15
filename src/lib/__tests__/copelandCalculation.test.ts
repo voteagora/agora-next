@@ -1,5 +1,5 @@
 import { calculateCopelandVote } from "../copelandCalculation";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type { SnapshotVote } from "@/app/api/common/votes/vote";
 import { expect, describe, it, vi } from "vitest";
 
 vi.mock("../../lib/tenant/tenant", () => ({

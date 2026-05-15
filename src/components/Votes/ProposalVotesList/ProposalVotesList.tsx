@@ -3,7 +3,7 @@
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
+import type { Vote, VoterTypes } from "@/app/api/common/votes/vote";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchProposalVotes,
@@ -11,10 +11,14 @@ import {
 } from "@/app/proposals/actions";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
+import type { VotesSort, VotesSortOrder } from "@/app/api/common/votes/vote";
 
 interface Props {
   proposalId: string;
   offchainProposalId?: string;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: string;
 }
 
 const LIMIT = 10;
@@ -22,6 +26,9 @@ const LIMIT = 10;
 export default function ProposalVotesList({
   proposalId,
   offchainProposalId,
+  sort = "weight",
+  sortOrder = "desc",
+  voterType = "ALL",
 }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     enabled: true,
@@ -29,6 +36,9 @@ export default function ProposalVotesList({
     offset: 0,
     proposalId: proposalId,
     offchainProposalId,
+    sort,
+    sortOrder,
+    voterType,
   });
 
   const { address: connectedAddress } = useAccount();
@@ -65,7 +75,7 @@ export default function ProposalVotesList({
         meta: fetchedVotes.meta,
       });
     }
-  }, [fetchedVotes, isFetched]);
+  }, [fetchedVotes, isFetched, sort, sortOrder, voterType]); // Reset on sort/filter change
 
   useEffect(() => {
     if (connectedAddress) {
@@ -86,25 +96,39 @@ export default function ProposalVotesList({
   const loadMore = useCallback(async () => {
     if (!fetching.current && voteState.meta?.has_next) {
       fetching.current = true;
-      const data = await fetchProposalVotes(
-        proposalId,
-        {
-          limit: LIMIT,
-          offset: voteState.meta.next_offset,
-        },
-        undefined,
-        offchainProposalId
-      );
-      setVoteState((prev) => ({
-        pages: [...prev.pages, { ...data, votes: data.data }],
-        meta: data.meta,
-      }));
-      fetching.current = false;
+      try {
+        const data = await fetchProposalVotes(
+          proposalId,
+          {
+            limit: LIMIT,
+            offset: voteState.meta.next_offset,
+          },
+          sort,
+          offchainProposalId,
+          sortOrder,
+          voterType
+        );
+        setVoteState((prev) => ({
+          pages: [...prev.pages, { ...data, votes: data.data }],
+          meta: data.meta,
+        }));
+      } catch (error) {
+        console.error("Failed to load more proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
-  }, [proposalId, voteState.meta]);
+  }, [
+    proposalId,
+    voteState.meta,
+    sort,
+    sortOrder,
+    voterType,
+    offchainProposalId,
+  ]);
 
   return (
-    <div className="px-4 pb-4 overflow-y-auto min-h-[36px] max-h-[calc(100vh-437px)]">
+    <div className="px-4 pb-4 overflow-y-auto flex-1 min-h-0">
       {isFetched && fetchedVotes ? (
         <InfiniteScroll
           hasMore={voteState.meta?.has_next}
@@ -132,6 +156,11 @@ export default function ProposalVotesList({
                 <ProposalSingleVote vote={vote} />
               </li>
             ))}
+            {userVotes.length === 0 && proposalVotes.length === 0 && (
+              <div className="px-4 pb-4 text-center text-secondary text-xs">
+                No votes yet
+              </div>
+            )}
           </ul>
         </InfiniteScroll>
       ) : (
