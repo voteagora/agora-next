@@ -159,6 +159,7 @@ export default function DunaContentRenderer({
   );
   const isMarkdown = !looksLikeHtml(sanitizedContent);
   const renderedContent = useMemo(() => {
+    if (!content) return null;
     if (isMarkdown) {
       return (
         <div className="p-4 prose prose-sm max-w-none">

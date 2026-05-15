@@ -46,7 +46,7 @@ export default async function CopelandProposalPage({
       <div className="flex-1 proposal-description pb-6 md:pb-0">
         <ProposalDescription proposal={proposal} />
       </div>
-      <div className="w-full md:max-w-[24rem] sticky flex-none top-20 bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between max-h-none h-auto">
+      <div className="w-full md:max-w-[24rem] sticky flex flex-col flex-none top-20 bg-neutral border-line border rounded-xl shadow-newDefault mb-8 items-stretch sm:items-start justify-end sm:justify-between max-h-none md:max-h-[calc(100vh-220px)] h-auto min-h-0">
         <CopelandVotesPanel
           proposal={proposal}
           fetchVotesForProposal={fetchProposalVotes}

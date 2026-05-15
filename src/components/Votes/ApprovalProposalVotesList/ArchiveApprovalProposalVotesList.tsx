@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useMemo } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type {
+  Vote,
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";
+import { useVisibleRows } from "@/hooks/useVisibleRows";
 import { cn } from "@/lib/utils";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
@@ -16,14 +21,19 @@ const VOTES_PAGE_SIZE = 20;
 type ArchiveApprovalProposalVotesListProps = {
   proposal: Proposal;
   isThresholdCriteria: boolean;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: VoterTypes["type"];
 };
 
 export default function ArchiveApprovalProposalVotesList({
   proposal,
   isThresholdCriteria,
+  sort,
+  sortOrder,
+  voterType,
 }: ArchiveApprovalProposalVotesListProps) {
   const { address: connectedAddress } = useAccount();
-  const [visibleCount, setVisibleCount] = useState(VOTES_PAGE_SIZE);
 
   const proposalType: ProposalType = proposal.proposalType ?? "STANDARD";
 
@@ -41,11 +51,10 @@ export default function ArchiveApprovalProposalVotesList({
     proposalId: proposal.id,
     proposalType,
     startBlock,
+    sort,
+    sortOrder,
+    voterType,
   });
-
-  useEffect(() => {
-    setVisibleCount(VOTES_PAGE_SIZE);
-  }, [votes.length]);
 
   const approvalOptionLabels = useMemo(() => {
     if (!proposalType?.includes("APPROVAL") || !proposal.proposalData) {
@@ -134,17 +143,21 @@ export default function ArchiveApprovalProposalVotesList({
     );
   }, [normalizedVotes, userVoteAddressSet]);
 
+  const { containerRef, handleScroll, visibleCount } = useVisibleRows({
+    pageSize: VOTES_PAGE_SIZE,
+    resetKey: [
+      proposal.id,
+      sort ?? "weight",
+      sortOrder ?? "desc",
+      voterType ?? "ALL",
+      remainingVotes.length,
+    ].join(":"),
+    totalCount: remainingVotes.length,
+  });
+
   const paginatedVotes = useMemo(() => {
     return remainingVotes.slice(0, visibleCount);
   }, [remainingVotes, visibleCount]);
-
-  const hasMore = visibleCount < remainingVotes.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + VOTES_PAGE_SIZE, remainingVotes.length)
-    );
-  }, [remainingVotes.length]);
 
   if (isLoading) {
     return (
@@ -164,52 +177,34 @@ export default function ArchiveApprovalProposalVotesList({
 
   return (
     <div
-      className={cn(
-        "overflow-y-scroll min-h-[36px]",
-        isThresholdCriteria
-          ? "max-h-[calc(100vh-560px)]"
-          : "max-h-[calc(100vh-527px)]"
-      )}
+      ref={containerRef}
+      onScroll={handleScroll}
+      className={cn("overflow-y-scroll min-h-[36px]", "flex-1 min-h-0")}
     >
-      <InfiniteScroll
-        hasMore={hasMore}
-        pageStart={0}
-        loadMore={loadMore}
-        useWindow={false}
-        loader={
-          <div
-            className="flex text-xs font-medium text-secondary justify-center pb-2"
-            key={0}
+      <ul className="flex flex-col divide-y">
+        {userVotes.map((vote) => (
+          <li
+            key={
+              vote.transactionHash ||
+              `${vote.address}-${vote.support}-${vote.weight}`
+            }
+            className="p-4"
           >
-            Loading more votes...
-          </div>
-        }
-      >
-        <ul className="flex flex-col divide-y">
-          {userVotes.map((vote) => (
-            <li
-              key={
-                vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
-              }
-              className="p-4"
-            >
-              <ApprovalProposalSingleVote vote={vote} />
-            </li>
-          ))}
-          {paginatedVotes.map((vote) => (
-            <li
-              key={
-                vote.transactionHash ||
-                `${vote.address}-${vote.support}-${vote.weight}`
-              }
-              className="p-4"
-            >
-              <ApprovalProposalSingleVote vote={vote} />
-            </li>
-          ))}
-        </ul>
-      </InfiniteScroll>
+            <ApprovalProposalSingleVote vote={vote} />
+          </li>
+        ))}
+        {paginatedVotes.map((vote) => (
+          <li
+            key={
+              vote.transactionHash ||
+              `${vote.address}-${vote.support}-${vote.weight}`
+            }
+            className="p-4"
+          >
+            <ApprovalProposalSingleVote vote={vote} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
