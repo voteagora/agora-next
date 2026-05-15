@@ -178,6 +178,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0xb45ad160634c528cc3d2926d9807104fa3157305": "sDOLA", // Inverse Finance Staked DOLA, 18 decimals
   "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": "OBOL", // Obol Network Token, 18 decimals
   "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": "CC", // Wrapped CurrencyCoin, 0 decimals
+  "0xa27ec0006e59f245217ff08cd52a7e8b169e62d2": "AZTEC", // Aztec Network Token, 18 decimals
 
   // ─── Common ERC-20 Tokens (Ethereum Mainnet) ───
 
@@ -215,6 +216,7 @@ export const KNOWN_TOKEN_DECIMALS: Record<string, number> = {
   "0xb45ad160634c528cc3d2926d9807104fa3157305": 18, // sDOLA
   "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": 18, // OBOL
   "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": 0, // CC — non-standard, 0 decimals
+  "0xa27ec0006e59f245217ff08cd52a7e8b169e62d2": 18, // AZTEC
 
   // Common ERC-20 Tokens
   "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 18, // WETH
