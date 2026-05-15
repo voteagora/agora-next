@@ -21,7 +21,7 @@ import { doInSpan } from "@/app/lib/logging";
 import { findVotes } from "@/lib/prismaUtils";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 import { unstable_cache } from "next/cache";
 import { ProposalType } from "@/lib/types";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";

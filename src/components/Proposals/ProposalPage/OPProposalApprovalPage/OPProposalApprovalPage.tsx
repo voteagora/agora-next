@@ -33,7 +33,7 @@ async function fetchUserVotes(
   });
 }
 
-export default async function OPProposalApprovalPage({
+export default function OPProposalApprovalPage({
   proposal,
 }: {
   proposal: Proposal;

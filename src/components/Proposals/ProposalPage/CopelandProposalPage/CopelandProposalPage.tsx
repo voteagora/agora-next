@@ -32,7 +32,7 @@ async function fetchUserVotesForProposal(
   });
 }
 
-export default async function CopelandProposalPage({
+export default function CopelandProposalPage({
   proposal,
 }: {
   proposal: Proposal;

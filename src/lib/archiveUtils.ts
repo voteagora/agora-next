@@ -192,7 +192,13 @@ const isBrowser = typeof window !== "undefined";
 
 async function gunzipToString(buffer: ArrayBuffer): Promise<string> {
   if (!isBrowser) {
-    const { gunzipSync } = await import("zlib");
+    const importNodeModule = new Function(
+      "specifier",
+      "return import(specifier)"
+    ) as (specifier: string) => Promise<{
+      gunzipSync: (input: Uint8Array) => Buffer;
+    }>;
+    const { gunzipSync } = await importNodeModule("node:zlib");
     return gunzipSync(Buffer.from(buffer)).toString("utf-8");
   }
 

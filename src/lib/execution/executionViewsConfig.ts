@@ -7,6 +7,7 @@ const VIEWS = {
     tabLabel: "Event logs",
     pageEyebrow: "Receipt",
     pageTitle: "Event logs",
+    lead: "Decoded fields, friendly addresses, and raw hex when needed.",
     cardTitle: "Event logs",
     cardDescription:
       "Decoded fields, friendly addresses, and raw hex when needed",
@@ -16,6 +17,8 @@ const VIEWS = {
     tabLabel: "State & trace",
     pageEyebrow: "Trace",
     pageTitle: "State & trace",
+    lead:
+      "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",
     cardTitle: "State & trace",
     cardDescription:
       "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",
@@ -27,6 +30,7 @@ const VIEWS = {
     tabLabel: string;
     pageEyebrow: string;
     pageTitle: string;
+    lead: string;
     cardTitle: string;
     cardDescription: string;
   }

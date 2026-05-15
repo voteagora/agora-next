@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 
@@ -9,7 +9,7 @@ export type WalletJwtAuthResult =
   | { ok: false; response: NextResponse };
 
 export async function requireWalletJwtAuth(
-  request: NextRequest
+  request: Request
 ): Promise<WalletJwtAuthResult> {
   const auth = await validateBearerToken(request);
   if (!auth.authenticated || auth.type !== "jwt" || !auth.userId) {

@@ -5,7 +5,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import OffChainOptimisticProposalVotesCard from "./ProposalVotesCard/OffChainOptimisticProposalVotesCard";
 import { TaxFormBanner } from "../TaxFormBanner";
 
-export default async function HybridOptimisticProposalPage({
+export default function HybridOptimisticProposalPage({
   proposal,
 }: {
   proposal: Proposal;

@@ -1,4 +1,3 @@
-import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
 import { formatNumber } from "@/lib/utils";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
@@ -11,12 +10,13 @@ import Tenant from "@/lib/tenant/tenant";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TaxFormBanner } from "../TaxFormBanner";
 
-export default async function OPProposalPage({
+export default function OPProposalPage({
   proposal,
+  votableSupply = "",
 }: {
   proposal: Proposal;
+  votableSupply?: string;
 }) {
-  const votableSupply = await fetchVotableSupply();
   const tokenDecimals = Tenant.current().token.decimals;
 
   const { againstRelativeAmount, status } = calculateOptimisticProposalMetrics(

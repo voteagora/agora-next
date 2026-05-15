@@ -30,7 +30,7 @@ import {
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { Block } from "ethers";
 
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 import { unstable_cache } from "next/cache";
 import { getPublicClient } from "@/lib/viem";
 import {

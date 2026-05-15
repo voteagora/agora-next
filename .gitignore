@@ -51,6 +51,11 @@ next-env.d.ts
 
 dist
 
+# tanstack start (vite + nitro)
+.output/
+.nitro/
+src/routeTree.gen.ts
+
 # version manager
 .tool-versions
 output/

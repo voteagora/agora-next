@@ -4,7 +4,7 @@ import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmi
 import HybridStandardProposalVotesCard from "./ProposalVotesCard/HybridStandardProposalVotesCard";
 import { TaxFormBanner } from "../TaxFormBanner";
 
-export default async function HybridStandardProposalPage({
+export default function HybridStandardProposalPage({
   proposal,
 }: {
   proposal: Proposal;

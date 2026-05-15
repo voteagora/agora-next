@@ -14,7 +14,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
 import { getAlchemyId } from "@/lib/alchemyConfig";
 

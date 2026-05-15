@@ -14,7 +14,7 @@ import {
   findDelagatee,
   findVotingPower,
 } from "@/lib/prismaUtils";
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 
 /**
  * Voting Power for a given block

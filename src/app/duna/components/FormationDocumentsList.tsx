@@ -126,15 +126,7 @@ export default function FormationDocumentsList({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
-          const success = await stableDeleteAttachment(
-            attachmentId,
-            "category",
-            isAuthor
-          );
+          const success = await stableDeleteAttachment(attachmentId, "category");
           if (success) {
             setDocuments((prev) =>
               prev.filter((doc) => doc.id !== attachmentId)
@@ -161,14 +153,9 @@ export default function FormationDocumentsList({
             return;
           }
 
-          const isAuthor =
-            documents
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
           const success = await stableArchiveAttachment(
             attachmentId,
-            "category",
-            isAuthor
+            "category"
           );
           if (success) {
             setDocuments((prev) =>

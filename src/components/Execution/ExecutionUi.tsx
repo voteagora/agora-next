@@ -184,10 +184,12 @@ export function ExecutionEmptyState({
 export function ExecutionPageIntro({
   eyebrow,
   title,
+  lead,
   className,
 }: {
   eyebrow: string;
   title: string;
+  lead?: string;
   className?: string;
 }) {
   return (
@@ -198,6 +200,7 @@ export function ExecutionPageIntro({
       <h2 className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
         {title}
       </h2>
+      {lead && <p className="max-w-3xl text-sm text-secondary">{lead}</p>}
     </header>
   );
 }

@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { validate as validateUuid } from "uuid";
 import { jwtVerify } from "jose";
 
@@ -26,9 +25,7 @@ export function extractBearerTokenFromHeader(
   return null;
 }
 
-export async function validateBearerToken(
-  request: NextRequest
-): Promise<AuthInfo> {
+export async function validateBearerToken(request: Request): Promise<AuthInfo> {
   const token = extractBearerTokenFromHeader(
     request.headers.get("Authorization")
   );
@@ -116,13 +113,14 @@ export async function validateBearerToken(
 */
 export async function validateScopeAgainstRoute(
   scope: string,
-  request: NextRequest
+  request: Request
 ): Promise<boolean> {
   const roles = scope.split(";");
   const isBadge = roles.includes(ROLE_BADGEHOLDER);
   const isDemoUser = roles.includes(ROLE_RF_DEMO_USER);
   const isPublic = roles.includes(ROLE_PUBLIC_READER);
-  if (request.nextUrl.pathname.includes("ballots")) {
+  const pathname = new URL(request.url).pathname;
+  if (pathname.includes("ballots")) {
     return isBadge || isDemoUser;
   } else {
     return isPublic;

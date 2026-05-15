@@ -2,6 +2,7 @@ import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 import { setupFawkes } from "./utils/fawkes-setup";
+import { type PLMConfig } from "../../src/app/proposals/draft/types";
 
 test.describe("Proposal Creation & List", () => {
   test.beforeEach(async ({ page }) => {
@@ -51,7 +52,11 @@ test.describe("Proposal Creation & List", () => {
     page,
   }) => {
     const { ui } = Tenant.current();
-    if (!ui.proposalLifecycle?.config.proposalTypes?.includes("BASIC"))
+    const proposalLifecycle = ui.toggle("proposal-lifecycle");
+    const proposalLifecycleConfig = proposalLifecycle?.config as
+      | PLMConfig
+      | undefined;
+    if (!proposalLifecycleConfig?.proposalTypes?.includes("BASIC"))
       test.skip(true, "Tenant has no BASIC proposals");
     await page.goto("/proposals");
     const typeLabel = page.getByText(/Standard Proposal/i).first();

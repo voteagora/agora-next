@@ -5,7 +5,7 @@ import {
 } from "@/app/lib/pagination";
 import { DelegateChunk } from "../delegates/delegate";
 import { doInSpan } from "@/app/lib/logging";
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 import { unstable_cache } from "next/cache";
 import { getDelegatesFromDaoNode } from "@/app/lib/dao-node/client";
 

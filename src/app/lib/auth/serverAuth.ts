@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { createHash } from "crypto";
 import { SignJWT, type JWTPayload } from "jose";
 import { PrismaClient } from "@prisma/client";
@@ -30,7 +29,7 @@ type SiweData = {
 // Note: this is not included in lib/middleware/auth.ts since that file will be
 // used in a non-node environment. This file is only intended to be used in/on node.
 export async function authenticateApiUser(
-  request: NextRequest
+  request: Request
 ): Promise<AuthInfo> {
   const { prismaWeb2Client: prisma } = await import("@/app/lib/prisma");
   let authResponse: AuthInfo = await validateBearerToken(request);

@@ -1,7 +1,5 @@
 import "server-only";
 
-import { NextRequest } from "next/server";
-
 import {
   MIRADOR_FLOW,
   MIRADOR_FLOW_HEADER,
@@ -22,7 +20,7 @@ function getMiradorFlowFromHeader(
 }
 
 export function getMiradorTraceContextFromHeaders(
-  request: NextRequest
+  request: Request
 ): MiradorTraceContext | undefined {
   const traceId = request.headers.get(MIRADOR_TRACE_ID_HEADER);
   if (!traceId) {

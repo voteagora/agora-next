@@ -1,6 +1,6 @@
 import "server-only";
 
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import redis from "@/lib/redis";
 import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
@@ -24,7 +24,7 @@ function getBearerToken(authorizationHeader: string | null) {
   return token.trim();
 }
 
-function getRequesterIp(request: NextRequest) {
+function getRequesterIp(request: Request) {
   const isVercelEnvironment =
     process.env.VERCEL === "1" || Boolean(process.env.VERCEL_ENV);
 
@@ -53,7 +53,7 @@ export function safeAddressesMatch(left: string, right: string) {
   return normalizeAddress(left) === normalizeAddress(right);
 }
 
-export async function getOptionalSafeJwtAddress(request: NextRequest): Promise<
+export async function getOptionalSafeJwtAddress(request: Request): Promise<
   | {
       address?: `0x${string}`;
       response?: ReturnType<typeof buildAuthError>;
@@ -85,7 +85,7 @@ export async function getOptionalSafeJwtAddress(request: NextRequest): Promise<
 }
 
 export async function requireSafeJwtForAddress(
-  request: NextRequest,
+  request: Request,
   safeAddress: string
 ): Promise<
   | {
@@ -171,7 +171,7 @@ async function enforceSafeRateLimit(params: {
 }
 
 export async function enforceUnauthenticatedSafeStatusRateLimit(
-  request: NextRequest,
+  request: Request,
   routeKey: string,
   maxRequests: number,
   errorMessage?: string
@@ -186,7 +186,7 @@ export async function enforceUnauthenticatedSafeStatusRateLimit(
 }
 
 export async function enforceAuthenticatedSafeRateLimit(
-  request: NextRequest,
+  request: Request,
   routeKey: string,
   address: string,
   maxRequests: number

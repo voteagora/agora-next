@@ -6,7 +6,7 @@ import { ProposalPayload } from "./proposal";
 import { fetchVotableSupply } from "../votableSupply/getVotableSupply";
 import { fetchQuorumForProposal } from "../quorum/getQuorum";
 import { Block } from "ethers";
-import { withMetrics } from "@/lib/metricWrapper";
+import { withMetrics } from "@/lib/metricWrapper.server";
 import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 
 async function getNeedsMyVoteProposals(address: string) {
