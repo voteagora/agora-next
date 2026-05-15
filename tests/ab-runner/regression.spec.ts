@@ -94,10 +94,22 @@ test.describe("Visual Regression A/B Diff Runner", () => {
     engine = new ABRunnerEngine();
     const browser = await chromium.launch();
 
+    // Forward Vercel Deployment Protection bypass on every request so
+    // tenant preview URLs that require Vercel auth are reachable in CI.
+    const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+    const contextOptions = bypassSecret
+      ? {
+          extraHTTPHeaders: {
+            "x-vercel-protection-bypass": bypassSecret,
+            "x-vercel-set-bypass-cookie": "true",
+          },
+        }
+      : {};
+
     // We launch two completely separate contexts to ensure cookies/localStorage
     // never infect one another during the dual-crawl.
-    contextA = await browser.newContext();
-    contextB = await browser.newContext();
+    contextA = await browser.newContext(contextOptions);
+    contextB = await browser.newContext(contextOptions);
 
     pageA = await contextA.newPage();
     pageB = await contextB.newPage();

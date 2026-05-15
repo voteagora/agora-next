@@ -127,6 +127,7 @@ jobs:
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
           NEXT_PUBLIC_AGORA_ENV: prod
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: npm run test:ab
 
       - name: Google Auth
