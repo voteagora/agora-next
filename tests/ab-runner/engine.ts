@@ -2,7 +2,6 @@ import { Page } from "@playwright/test";
 import * as fs from "fs";
 import * as path from "path";
 
-
 export interface OverrideConfig {
   ignoreSelectors?: string[];
   expectDiff?: boolean;
@@ -113,7 +112,7 @@ export class ABRunnerEngine {
         ? "index-page"
         : proposalId
           ? `proposal-${proposalId}`
-        : route.replace(/^\//, "").replace(/\//g, "-");
+          : route.replace(/^\//, "").replace(/\//g, "-");
     let artifactsDir = "";
     if (meta && meta.tenant) {
       const segments = [
@@ -136,8 +135,6 @@ export class ABRunnerEngine {
     if (!fs.existsSync(artifactsDir)) {
       fs.mkdirSync(artifactsDir, { recursive: true });
     }
-
-
 
     const compareTrees = (tA: any[], tB: any[]) => {
       const rawDrifts: any[] = [];
@@ -432,13 +429,6 @@ export class ABRunnerEngine {
       pageA.keyboard.press("Escape").catch(() => {}),
       pageB.keyboard.press("Escape").catch(() => {}),
     ]);
-
-
-
-
-
-
-
 
     // 2. Extract DOM trees
     const treeA = await this.extractDOMTree(pageA, route);
@@ -750,7 +740,6 @@ export class ABRunnerEngine {
       await captureTooltipLayer();
     }
 
-
     const reportWithMeta = [
       {
         reportDescription: {
@@ -1045,7 +1034,8 @@ export class ABRunnerEngine {
         let scope = cs || "*";
         if (!cs) {
           if (rt.includes("/delegates")) scope = "a[href*='/delegates/'] *";
-          if (rt === "/proposals" || rt === "/") scope = "a[href*='/proposals/'] *";
+          if (rt === "/proposals" || rt === "/")
+            scope = "a[href*='/proposals/'] *";
         }
 
         const MAX_ELEMENTS = 10000;
