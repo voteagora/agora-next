@@ -66,9 +66,7 @@ export default function ApprovalVotesPanel({
     value: "All",
   });
 
-  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
-    selectedVoterType.type
-  );
+  const hideTimeSortOptions = false;
 
   useEffect(() => {
     const isTimeSortHidden = hideTimeSortOptions || !showVoters;

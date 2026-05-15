@@ -49,9 +49,7 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
     value: "All",
   });
 
-  const hideTimeSortOptions = ["APP", "USER", "CHAIN"].includes(
-    selectedVoterType.type
-  );
+  const hideTimeSortOptions = false;
 
   useEffect(() => {
     const isTimeSortHidden = hideTimeSortOptions || !showVoters;
