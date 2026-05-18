@@ -4,7 +4,7 @@ import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import {
   fetchDirectDelegatee,
   fetchBalanceForDirectDelegation,
-} from "@/app/delegates/actions";
+} from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 export function UndelegateButton({

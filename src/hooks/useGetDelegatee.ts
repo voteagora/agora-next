@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchCurrentDelegatees } from "@/app/delegates/actions";
+import { fetchCurrentDelegatees } from "@/server/delegates/actions";
 
 export const DELEGATEE_QK = "delegatee";
 

@@ -1,7 +1,7 @@
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { fetchCurrentDelegatees } from "@/app/delegates/actions";
+import { fetchCurrentDelegatees } from "@/server/delegates/actions";
 
 interface Props {
   full: boolean;

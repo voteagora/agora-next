@@ -213,11 +213,11 @@ TanStack Start has no global middleware.
 ## 9. Phase tracker
 
 - [x] Phase A — Scaffolding
-- [~] Phase B — Foundations (fonts ✓, root layout shell ✓, providers deferred)
-- [~] Phase C — API layer (22 / 90 routes ported; all bearer-auth patterns + custom-auth + cron + Prisma raw all covered)
-- [~] Phase D — Server actions (4 / 56 ported across `proposalTypes`, `votes`, `getTenant`; covers no-arg + zod-validator patterns)
-- [~] Phase E — Routes & UI (1 / 39 pages ported; redirect pattern locked. Blocker found: porting pages that import client components from `src/app/**` pulls Node-only `src/lib/**` modules into the browser chunk — see task #13)
-- [ ] Phase F — Cutover
+- [x] Phase B — Foundations (fonts ✓, root layout ✓, all providers wired: Web3Provider, NuqsAdapter, DevTenantProvider, ForumPermissionsProvider, Header, DAOMetricsHeader, Footer)
+- [x] Phase C — API layer (90 / 90 routes ported across v1/ + analytics, archive, balances, common, dao, dao-node, duna, embeds, forum, grants, internal, proposals, rbac, simulate, staking, votes, retropgf)
+- [x] Phase D — Server actions (all client-imported "use server" actions wrapped: delegates (13 fns), proposals/votes (5 fns), retropgf (1 fn), paymaster (1 fn), draft proposals (7 fns in src/server/proposals/draft/); Vite aliases redirect draft action relative imports to wrappers; next.config.js webpack aliases keep Next.js working; both builds pass; remaining "use server" files only called from RSC-pattern async components whose default exports are unused in TanStack Start routes)
+- [x] Phase E — Routes & UI (42 routes ported; all async component issues resolved)
+- [~] Phase F — Cutover (in progress: scripts swapped, all Next.js page/layout/loading/error/route convention files deleted, src/middleware.ts + src/instrumentation.{ts,node.ts} + src/pages/ + next.config.js deleted, next/link + next/server shims added, forum unpublishedTopic ported to createServerFn, SERVICE_NAME inlined in logging.ts, stale .next/ cache removed, tsconfig cleaned; build + typecheck both pass; remaining: remove next from package.json deps, update ESLint to drop eslint-config-next, port OG image routes from next/og)
 
 **Patterns locked (see §4 + §9b):**
 

@@ -295,7 +295,13 @@ export default defineConfig(({ mode }) => ({
       // next/navigation hooks require the Next.js App Router context and crash
       // under Vite SSR. This shim maps each hook to its TanStack Router
       // equivalent so all 59 import sites work without source changes.
+      // Both bare and .js-suffixed forms are covered: @vercel/* packages import
+      // "next/navigation.js" (ESM explicit extension).
       "next/navigation": path.resolve(
+        __dirname,
+        "src/lib/shims/next-navigation.ts"
+      ),
+      "next/navigation.js": path.resolve(
         __dirname,
         "src/lib/shims/next-navigation.ts"
       ),
@@ -304,6 +310,55 @@ export default defineConfig(({ mode }) => ({
       // This shim makes unstable_cache a no-op pass-through and silences the
       // revalidation helpers.
       "next/cache": path.resolve(__dirname, "src/lib/shims/next-cache.ts"),
+      // next/link uses Next.js router internals. This shim renders a plain <a>
+      // element that works for all navigation without framework coupling.
+      "next/link": path.resolve(__dirname, "src/lib/shims/next-link.tsx"),
+      // next/server (NextResponse, NextRequest) used in walletJwt.ts and API
+      // route helpers. This shim extends the standard Response/Request classes.
+      "next/server": path.resolve(__dirname, "src/lib/shims/next-server.ts"),
+      // next/headers — throws at runtime; only used in dead-code paths.
+      "next/headers": path.resolve(__dirname, "src/lib/shims/next-headers.ts"),
+      // next/og — OG image routes not yet ported; shim satisfies TypeScript.
+      "next/og": path.resolve(__dirname, "src/lib/shims/next-og.ts"),
+      // next (bare) — Metadata type used in metadata.ts.
+      next: path.resolve(__dirname, "src/lib/shims/next.ts"),
+      // Draft proposal "use server" actions → createServerFn wrappers.
+      // The stub plugin would make these undefined in the client bundle;
+      // these aliases redirect to our src/server/ wrappers before stubbing runs.
+      "@/app/proposals/draft/actions/deleteDraftProposal": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/deleteDraftProposal.ts"
+      ),
+      "@/app/proposals/draft/actions/requestSponsorship": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/requestSponsorship.ts"
+      ),
+      "@/app/proposals/draft/actions/createDraftProposal": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/createDraftProposal.ts"
+      ),
+      "@/app/proposals/draft/actions/createTempCheck": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/createTempCheck.ts"
+      ),
+      "@/app/proposals/draft/actions/createGithubChecklistItem": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/createGithubChecklistItem.ts"
+      ),
+      "@/app/proposals/draft/actions/sponsorDraftProposal": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/sponsorDraftProposal.ts"
+      ),
+      "@/app/proposals/draft/actions/revalidatePath": path.resolve(
+        __dirname,
+        "src/server/proposals/draft/revalidatePath.ts"
+      ),
+      // Forum unpublished-topic actions — "use server" + next/headers in the
+      // original; redirected to a createServerFn wrapper for TanStack Start.
+      "@/lib/actions/forum/unpublishedTopic": path.resolve(
+        __dirname,
+        "src/server/forum/unpublishedTopic.ts"
+      ),
     },
   },
   css: {

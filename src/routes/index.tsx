@@ -177,7 +177,9 @@ export const Route = createFileRoute("/")({
         ? townsStaticProposals
         : syndicateStaticProposals;
       const proposalsImageSrc =
-        typeof proposalsImage === "string" ? proposalsImage : proposalsImage.src;
+        typeof proposalsImage === "string"
+          ? proposalsImage
+          : proposalsImage.src;
       const overlayText = isTowns
         ? "Coming soon in January 2026"
         : "Coming Soon";

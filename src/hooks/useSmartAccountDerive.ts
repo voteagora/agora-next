@@ -23,7 +23,7 @@ import {
 import { createLightAccount, LightAccount } from "@alchemy/aa-accounts";
 import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
-import { fetchPaymasterData } from "@/app/api/paymaster/fetchPaymasterData";
+import { fetchPaymasterData } from "@/server/paymaster/fetchPaymasterData";
 import {
   DERIVE_MAINNET_RPC,
   DERIVE_TESTNET_RPC,

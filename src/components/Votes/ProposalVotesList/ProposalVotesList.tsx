@@ -8,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
-} from "@/app/proposals/actions";
+} from "@/server/proposals/votes";
 import { PaginatedResult } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 

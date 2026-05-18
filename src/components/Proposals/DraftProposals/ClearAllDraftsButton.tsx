@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { onSubmitAction as deleteAllAction } from "@/app/proposals/draft/actions/deleteAllDraftProposals";
+import { onSubmitAction as deleteAllAction } from "@/server/proposals/draftActions";
 import toast from "react-hot-toast";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { TrashIcon } from "@heroicons/react/20/solid";

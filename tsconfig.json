@@ -16,11 +16,6 @@
     "typeRoots": ["./src/app/types", "./node_modules/@types"],
     "types": ["node", "react", "react-dom"],
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./src/*"],
       "*.svg": ["./tests/mockMedia.ts"],
@@ -29,16 +24,24 @@
       "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
       "@react-native-async-storage/async-storage": [
         "./src/lib/shims/asyncStorage"
-      ]
+      ],
+      "next": ["./src/lib/shims/next"],
+      "next/link": ["./src/lib/shims/next-link"],
+      "next/image": ["./src/lib/shims/next-image"],
+      "next/navigation": ["./src/lib/shims/next-navigation"],
+      "next/cache": ["./src/lib/shims/next-cache"],
+      "next/server": ["./src/lib/shims/next-server"],
+      "next/headers": ["./src/lib/shims/next-headers"],
+      "next/og": ["./src/lib/shims/next-og"],
+      "next/font/local": ["./src/lib/shims/next-font-local"],
+      "next/dist/compiled/@next/font": ["./src/lib/shims/next-font-local"]
     }
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.jsx",
     "**/*.js",
-    ".next/types/**/*.ts",
     "setupTests.ts"
   ],
   "exclude": ["node_modules"]

@@ -46,9 +46,9 @@ export const Route = createFileRoute("/badges/$badgeId")({
   component: function BadgePage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Route.useLoaderData() as any;
+    const { badgeId } = Route.useParams();
     if (!data) return null;
     const { badgeDefinition, initialDelegates } = data;
-    const { badgeId } = Route.useParams();
 
     if (!badgeDefinition) {
       return (

@@ -1,7 +1,7 @@
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { fetchDirectDelegatee } from "@/app/delegates/actions";
+import { fetchDirectDelegatee } from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 export function DelegateButton({

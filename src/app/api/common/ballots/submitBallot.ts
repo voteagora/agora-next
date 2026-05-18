@@ -2,10 +2,10 @@ import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import verifyMessage from "@/lib/serverVerifyMessage";
 import { prismaWeb2Client } from "@/app/lib/prisma";
-import {
+import type {
   MetricsBallotSubmission,
   ProjectsBallotSubmission,
-} from "../../v1/retrofunding/rounds/[roundId]/ballots/[ballotCasterAddressOrEns]/submit/route";
+} from "@/routes/api/v1/retrofunding/rounds/$roundId/ballots/$ballotCasterAddressOrEns/submit";
 
 const submitBallotApi = async (
   data: MetricsBallotSubmission | ProjectsBallotSubmission,

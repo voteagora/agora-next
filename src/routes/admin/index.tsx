@@ -43,10 +43,7 @@ export const Route = createFileRoute("/admin/")({
   component: function AdminPage() {
     const { votableSupply, proposalTypes } = Route.useLoaderData();
     return (
-      <AdminForm
-        votableSupply={votableSupply}
-        proposalTypes={proposalTypes}
-      />
+      <AdminForm votableSupply={votableSupply} proposalTypes={proposalTypes} />
     );
   },
 });

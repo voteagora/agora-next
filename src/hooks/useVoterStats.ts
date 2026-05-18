@@ -3,7 +3,7 @@ import {
   fetchDelegateStats,
   fetchVoterStats,
   fetchArchiveParticipation,
-} from "@/app/delegates/actions";
+} from "@/server/delegates/actions";
 import { VoterStats, DelegateResponse, DelegateStats } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";

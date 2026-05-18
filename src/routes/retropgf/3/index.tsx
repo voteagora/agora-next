@@ -11,7 +11,7 @@ import RetroPGFResults, {
 } from "@/components/RetroPGF/RetroPGFResults";
 import RetroPGFHero from "@/components/RetroPGF/RetroPGFHero";
 import RetroPGFFilters from "@/components/RetroPGF/RetroPGFFilters";
-import { getRetroPGFResults } from "@/app/retropgf/actions";
+import { getRetroPGFResults } from "@/server/retropgf/actions";
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 
 type RetroPGFSearch = {

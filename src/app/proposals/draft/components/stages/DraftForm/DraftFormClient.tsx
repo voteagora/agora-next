@@ -11,8 +11,8 @@ import SelectInput from "../../form/SelectInput";
 import MarkdownTextareaInput from "../../form/MarkdownTextareaInput";
 import { UpdatedButton } from "@/components/Button";
 import { DraftProposalSchema } from "../../../schemas/DraftProposalSchema";
-import { onSubmitAction as draftProposalAction } from "../../../actions/createDraftProposal";
-import { invalidatePath } from "../../../actions/revalidatePath";
+import { onSubmitAction as draftProposalAction } from "@/app/proposals/draft/actions/createDraftProposal";
+import { invalidatePath } from "@/app/proposals/draft/actions/revalidatePath";
 import {
   ProposalType,
   parseProposalToForm,

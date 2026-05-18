@@ -3,7 +3,7 @@ import {
   fetchAllForAdvancedDelegation,
   fetchCurrentDelegatees,
   fetchDirectDelegatee,
-} from "@/app/delegates/actions";
+} from "@/server/delegates/actions";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Button } from "@/components/ui/button";

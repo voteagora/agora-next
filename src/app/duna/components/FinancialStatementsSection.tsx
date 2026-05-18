@@ -87,7 +87,10 @@ export default function FinancialStatementsSection({
             return;
           }
 
-          const success = await stableDeleteAttachment(attachmentId, "category");
+          const success = await stableDeleteAttachment(
+            attachmentId,
+            "category"
+          );
           if (success) {
             setLocalStatements((prev) =>
               prev.filter((doc) => doc.id !== attachmentId)

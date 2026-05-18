@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount } from "wagmi";
-import { submitDelegateStatement } from "@/app/delegates/actions";
+import { submitDelegateStatement } from "@/server/delegates/actions";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";

@@ -26,11 +26,10 @@ type CacheOptions = {
  * No-op replacement for Next.js `unstable_cache`.
  * Returns the original function so call sites keep working without changes.
  */
-export function unstable_cache<T extends (...args: unknown[]) => Promise<unknown>>(
-  fn: T,
-  _keyParts?: unknown[],
-  _options?: CacheOptions
-): T {
+export function unstable_cache<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends (...args: any[]) => Promise<any>,
+>(fn: T, _keyParts?: unknown[], _options?: CacheOptions): T {
   return fn;
 }
 

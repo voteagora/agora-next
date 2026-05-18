@@ -126,7 +126,10 @@ export default function FormationDocumentsList({
             return;
           }
 
-          const success = await stableDeleteAttachment(attachmentId, "category");
+          const success = await stableDeleteAttachment(
+            attachmentId,
+            "category"
+          );
           if (success) {
             setDocuments((prev) =>
               prev.filter((doc) => doc.id !== attachmentId)

@@ -13,14 +13,23 @@
 
 import React from "react";
 
-type StaticImport = { src: string; width?: number; height?: number };
+export type StaticImageData = {
+  src: string;
+  width: number;
+  height: number;
+  blurDataURL?: string;
+};
+type StaticImport = StaticImageData;
 
 export interface NextImageProps
-  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
+  extends Omit<
+    React.ImgHTMLAttributes<HTMLImageElement>,
+    "src" | "width" | "height"
+  > {
   src: string | StaticImport;
   alt: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
   fill?: boolean;
   priority?: boolean;
   quality?: number;
@@ -52,11 +61,23 @@ const NextImageShim = React.forwardRef<HTMLImageElement, NextImageProps>(
     ref
   ) {
     const resolvedSrc = typeof src === "string" ? src : src.src;
-    const resolvedWidth = width ?? (typeof src !== "string" ? src.width : undefined);
-    const resolvedHeight = height ?? (typeof src !== "string" ? src.height : undefined);
+    const resolvedWidth =
+      width ?? (typeof src !== "string" ? src.width : undefined);
+    const resolvedHeight =
+      height ?? (typeof src !== "string" ? src.height : undefined);
+    const numericWidth =
+      resolvedWidth !== undefined ? Number(resolvedWidth) : undefined;
+    const numericHeight =
+      resolvedHeight !== undefined ? Number(resolvedHeight) : undefined;
 
     const fillStyle: React.CSSProperties = fill
-      ? { position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }
+      ? {
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }
       : {};
 
     return (
@@ -64,8 +85,8 @@ const NextImageShim = React.forwardRef<HTMLImageElement, NextImageProps>(
         ref={ref}
         src={resolvedSrc}
         alt={alt}
-        width={resolvedWidth}
-        height={resolvedHeight}
+        width={numericWidth}
+        height={numericHeight}
         style={{ ...fillStyle, ...style }}
         {...rest}
       />

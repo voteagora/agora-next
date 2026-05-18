@@ -3,7 +3,7 @@ import { performance } from "perf_hooks";
 import * as util from "util";
 
 import { SEMATTRS_EXCEPTION_ESCAPED } from "@opentelemetry/semantic-conventions";
-import { SERVICE_NAME } from "@/instrumentation";
+const SERVICE_NAME = "agora-app";
 
 // 'dev' is used in vercel dev and preview, both of which need to have coloring disabled
 // for emission and ingestion of logs into datadog

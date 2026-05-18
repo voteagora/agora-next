@@ -15,7 +15,7 @@ type LocalFontOptions = {
   style?: string;
 };
 
-type NextFontShim = {
+export type NextFontShim = {
   className: string;
   variable: string;
   style: { fontFamily: string; fontWeight?: string; fontStyle?: string };

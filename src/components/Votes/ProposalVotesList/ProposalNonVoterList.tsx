@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PaginatedResult } from "@/app/lib/pagination";
-import { fetchVotersWhoHaveNotVotedForProposal } from "@/app/proposals/actions";
+import { fetchVotersWhoHaveNotVotedForProposal } from "@/server/proposals/votes";
 import InfiniteScroll from "react-infinite-scroller";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";

@@ -13,7 +13,7 @@ import projectPlaceholder from "@/icons/projectPlaceholder.svg";
 import Image from "next/image";
 import InfiniteScroll from "react-infinite-scroller";
 import { useEffect, useRef, useState } from "react";
-import { getRetroPGFResults } from "@/app/retropgf/actions";
+import { getRetroPGFResults } from "@/server/retropgf/actions";
 import { shortAddress } from "@/lib/utils";
 import { VStack } from "@/components/Layout/Stack";
 import { useSearchParams } from "next/navigation";

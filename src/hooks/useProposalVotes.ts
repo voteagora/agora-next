@@ -2,7 +2,7 @@ import {
   fetchProposalVotes,
   fetchSnapshotProposalVotes,
   fetchUserVotesForProposal,
-} from "@/app/proposals/actions";
+} from "@/server/proposals/votes";
 
 import { useQuery } from "@tanstack/react-query";
 import { PaginatedResult } from "@/app/lib/pagination";

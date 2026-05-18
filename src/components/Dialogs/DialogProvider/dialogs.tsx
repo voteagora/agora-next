@@ -27,7 +27,7 @@ import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialo
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { ProposalType, StakedDeposit } from "@/lib/types";
-import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
+import { fetchAllForAdvancedDelegation } from "@/server/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
 import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalPage/ShareVoteDialog/ShareVoteDialog";

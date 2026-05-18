@@ -38,10 +38,10 @@ export function useRouter() {
   const navigate = useNavigate();
 
   return {
-    push(href: string) {
+    push(href: string, _options?: Record<string, unknown>) {
       navigate({ href } as never);
     },
-    replace(href: string) {
+    replace(href: string, _options?: Record<string, unknown>) {
       navigate({ href, replace: true } as never);
     },
     back() {
@@ -82,10 +82,13 @@ export function useSearchParams(): URLSearchParams | null {
 
 // ─── useParams ────────────────────────────────────────────────────────────────
 
-export function useParams(): Record<string, string> {
+export function useParams<
+  T extends Record<string, string> = Record<string, string>,
+>(): T {
   // strict: false lets us call this outside a specific route context, matching
   // the Next.js semantics where any component can call useParams().
-  return useTSParams({ strict: false }) as Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (useTSParams as any)({ strict: false }) as T;
 }
 
 // ─── redirect / notFound ──────────────────────────────────────────────────────

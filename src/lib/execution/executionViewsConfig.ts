@@ -17,8 +17,7 @@ const VIEWS = {
     tabLabel: "State & trace",
     pageEyebrow: "Trace",
     pageTitle: "State & trace",
-    lead:
-      "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",
+    lead: "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",
     cardTitle: "State & trace",
     cardDescription:
       "Action summaries, bridge/messenger envelopes, token transfers, and callTracer output.",

@@ -2,7 +2,7 @@ import {
   fetchConnectedDelegate,
   fetchDelegate,
   revalidateDelegateAddressPage,
-} from "@/app/delegates/actions";
+} from "@/server/delegates/actions";
 import { useAccount } from "wagmi";
 import { useState } from "react";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";

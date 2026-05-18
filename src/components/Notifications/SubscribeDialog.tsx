@@ -1,6 +1,6 @@
 "use client";
 
-import { updateNotificationPreferencesForAddress } from "@/app/delegates/actions";
+import { updateNotificationPreferencesForAddress } from "@/server/delegates/actions";
 import { useDelegate } from "@/hooks/useDelegate";
 import { useState } from "react";
 import toast from "react-hot-toast";

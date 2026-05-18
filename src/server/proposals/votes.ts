@@ -1,18 +1,27 @@
 /*
- * TanStack Start port of select server actions from src/app/proposals/actions.tsx.
+ * TanStack Start createServerFn wrappers for proposal vote actions.
  *
- * Pattern: multi-arg actions become server fns with a zod validator that takes
- * a single object. Call sites change from `fetchUserVotesForProposal(a, b)`
- * to `fetchUserVotesForProposal({ data: { proposalId: a, address: b } })`.
+ * Each wrapper preserves the original function signature so client components
+ * only need to update their import path — call sites stay unchanged.
  */
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import {
-  fetchUserVotesForProposal as apiFetchUserVotesForProposal,
-  fetchVotesForProposal as apiFetchVotesForProposal,
-} from "@/app/api/common/votes/getVotes";
+import type {
+  fetchUserVotesForProposal as _OrigFetchUserVotes,
+  fetchProposalVotes as _OrigFetchProposalVotes,
+  fetchVotersWhoHaveNotVotedForProposal as _OrigFetchNonVoters,
+  fetchSnapshotProposalVotes as _OrigFetchSnapshotProposalVotes,
+} from "@/app/proposals/actions";
+
+import type { VoterTypes } from "@/app/api/common/votes/vote";
+import type { PaginationParams } from "@/app/lib/pagination";
+import type { VotesSort } from "@/app/api/common/votes/vote.d";
+
+// ─── fetchProposalsCount ──────────────────────────────────────────────────────
+// (no-arg, used by admin/index.tsx loader; no original wrapper needed)
+
 import { getProposalsCount } from "@/lib/prismaUtils";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -26,23 +35,32 @@ export const fetchProposalsCount = createServerFn({ method: "GET" }).handler(
   }
 );
 
-const fetchUserVotesInput = z.object({
-  proposalId: z.string(),
-  address: z.string(),
-});
+// ─── fetchUserVotesForProposal ────────────────────────────────────────────────
 
-export const fetchUserVotesForProposal = createServerFn({ method: "GET" })
-  .inputValidator((data: z.input<typeof fetchUserVotesInput>) =>
-    fetchUserVotesInput.parse(data)
+const _serverFetchUserVotesForProposal = createServerFn({ method: "GET" })
+  .inputValidator(
+    z
+      .object({ proposalId: z.string(), address: z.string() })
+      .parse.bind(z.object({ proposalId: z.string(), address: z.string() }))
   )
-  .handler(async ({ data }) => {
-    return apiFetchUserVotesForProposal({
-      proposalId: data.proposalId,
-      address: data.address as `0x${string}` | string,
-    });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ data }): Promise<any> => {
+    const { fetchUserVotesForProposal: fn } = await import(
+      "@/app/proposals/actions"
+    );
+    return fn(data.proposalId, data.address);
   });
 
-const fetchProposalVotesInput = z.object({
+export const fetchUserVotesForProposal: typeof _OrigFetchUserVotes = (
+  proposalId,
+  address
+) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  _serverFetchUserVotesForProposal({ data: { proposalId, address } }) as any;
+
+// ─── fetchProposalVotes ───────────────────────────────────────────────────────
+
+const _fetchProposalVotesInput = z.object({
   proposalId: z.string(),
   pagination: z
     .object({
@@ -54,15 +72,97 @@ const fetchProposalVotesInput = z.object({
   offchainProposalId: z.string().optional(),
 });
 
-export const fetchProposalVotes = createServerFn({ method: "GET" })
-  .inputValidator((data: z.input<typeof fetchProposalVotesInput>) =>
-    fetchProposalVotesInput.parse(data)
+const _serverFetchProposalVotes = createServerFn({ method: "GET" })
+  .inputValidator((data: z.input<typeof _fetchProposalVotesInput>) =>
+    _fetchProposalVotesInput.parse(data)
   )
-  .handler(async ({ data }) => {
-    return apiFetchVotesForProposal({
-      proposalId: data.proposalId,
-      pagination: data.pagination,
-      sort: data.sort as never,
-      offchainProposalId: data.offchainProposalId,
-    });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ data }): Promise<any> => {
+    const { fetchProposalVotes: fn } = await import("@/app/proposals/actions");
+    return fn(
+      data.proposalId,
+      data.pagination,
+      data.sort as VotesSort | undefined,
+      data.offchainProposalId
+    );
   });
+
+export const fetchProposalVotes: typeof _OrigFetchProposalVotes = (
+  proposalId,
+  pagination?,
+  sort?,
+  offchainProposalId?
+) =>
+  _serverFetchProposalVotes({
+    data: { proposalId, pagination, sort, offchainProposalId },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as any;
+
+// ─── fetchVotersWhoHaveNotVotedForProposal ────────────────────────────────────
+
+const _fetchNonVotersInput = z.object({
+  proposalId: z.string(),
+  pagination: z
+    .object({
+      limit: z.number().int().positive(),
+      offset: z.number().int().nonnegative(),
+    })
+    .optional(),
+  offchainProposalId: z.string().optional(),
+  type: z.string().optional(),
+});
+
+const _serverFetchNonVoters = createServerFn({ method: "GET" })
+  .inputValidator((data: z.input<typeof _fetchNonVotersInput>) =>
+    _fetchNonVotersInput.parse(data)
+  )
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ data }): Promise<any> => {
+    const { fetchVotersWhoHaveNotVotedForProposal: fn } = await import(
+      "@/app/proposals/actions"
+    );
+    return fn(
+      data.proposalId,
+      data.pagination,
+      data.offchainProposalId,
+      data.type as VoterTypes["type"] | undefined
+    );
+  });
+
+export const fetchVotersWhoHaveNotVotedForProposal: typeof _OrigFetchNonVoters =
+  (proposalId, pagination?, offchainProposalId?, type?) =>
+    _serverFetchNonVoters({
+      data: { proposalId, pagination, offchainProposalId, type },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any;
+
+// ─── fetchSnapshotProposalVotes ───────────────────────────────────────────────
+
+const _fetchSnapshotVotesInput = z.object({
+  proposalId: z.string(),
+  pagination: z
+    .object({
+      limit: z.number().int().positive(),
+      offset: z.number().int().nonnegative(),
+    })
+    .optional(),
+});
+
+const _serverFetchSnapshotProposalVotes = createServerFn({ method: "GET" })
+  .inputValidator((data: z.input<typeof _fetchSnapshotVotesInput>) =>
+    _fetchSnapshotVotesInput.parse(data)
+  )
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ data }): Promise<any> => {
+    const { fetchSnapshotProposalVotes: fn } = await import(
+      "@/app/proposals/actions"
+    );
+    return fn(data.proposalId, data.pagination);
+  });
+
+export const fetchSnapshotProposalVotes: typeof _OrigFetchSnapshotProposalVotes =
+  (proposalId, pagination?) =>
+    _serverFetchSnapshotProposalVotes({
+      data: { proposalId, pagination },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any;

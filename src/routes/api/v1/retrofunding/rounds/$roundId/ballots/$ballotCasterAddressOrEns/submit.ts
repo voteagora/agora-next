@@ -37,6 +37,13 @@ const projectsBallotSubmissionSchema = z.object({
   signature: z.string().regex(/^0x[a-fA-F0-9]+$/),
 });
 
+export type MetricsBallotSubmission = z.infer<
+  typeof metricsBallotSubmissionSchema
+>;
+export type ProjectsBallotSubmission = z.infer<
+  typeof projectsBallotSubmissionSchema
+>;
+
 export const Route = createFileRoute(
   "/api/v1/retrofunding/rounds/$roundId/ballots/$ballotCasterAddressOrEns/submit"
 )({

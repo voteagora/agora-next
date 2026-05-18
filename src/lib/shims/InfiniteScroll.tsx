@@ -28,7 +28,8 @@ export type InfiniteScrollProps = {
 };
 
 const getScrollTop = () => {
-  const doc = document.documentElement || document.body.parentNode || document.body;
+  const doc =
+    document.documentElement || document.body.parentNode || document.body;
   return window.pageYOffset !== undefined ? window.pageYOffset : doc.scrollTop;
 };
 

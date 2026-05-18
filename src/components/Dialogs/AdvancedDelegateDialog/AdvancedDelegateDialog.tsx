@@ -29,7 +29,7 @@ import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";
-import { fetchDelegate } from "@/app/delegates/actions";
+import { fetchDelegate } from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
