@@ -10,7 +10,7 @@ import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
 import AgoraProvider from "@/contexts/AgoraContext";
 import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { Toaster } from "react-hot-toast";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import Tenant from "@/lib/tenant/tenant";

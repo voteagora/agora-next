@@ -25,7 +25,7 @@ import { CloseIcon } from "@/components/shared/CloseIcon";
 import { Button } from "@/components/ui/button";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
-import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
+import type { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "next/navigation";
 import { resolveENSName } from "@/app/lib/ENSUtils";

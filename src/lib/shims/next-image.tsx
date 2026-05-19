@@ -60,11 +60,33 @@ const NextImageShim = React.forwardRef<HTMLImageElement, NextImageProps>(
     },
     ref
   ) {
-    const resolvedSrc = typeof src === "string" ? src : src.src;
+    // In Vite SSR, static asset imports (SVG/PNG) may come back as undefined,
+    // a namespace object with a `default` key, or a StaticImageData object.
+    // Guard every case so SSR rendering doesn't throw.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const normalised: string | StaticImport | undefined =
+      src == null
+        ? undefined
+        : typeof src === "string"
+          ? src
+          : typeof (src as any).src === "string"
+            ? (src as any).src
+            : typeof (src as any).default === "string"
+              ? (src as any).default
+              : undefined;
+
+    if (!normalised) {
+      // Return a placeholder so the DOM stays valid during SSR without crashing.
+      return <img ref={ref} alt={alt} style={style} {...rest} />;
+    }
+
+    const resolvedSrc =
+      typeof normalised === "string" ? normalised : normalised.src;
     const resolvedWidth =
-      width ?? (typeof src !== "string" ? src.width : undefined);
+      width ?? (typeof normalised !== "string" ? normalised.width : undefined);
     const resolvedHeight =
-      height ?? (typeof src !== "string" ? src.height : undefined);
+      height ??
+      (typeof normalised !== "string" ? normalised.height : undefined);
     const numericWidth =
       resolvedWidth !== undefined ? Number(resolvedWidth) : undefined;
     const numericHeight =

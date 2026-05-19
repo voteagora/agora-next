@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { DelegateDialogProvider } from "@/components/Dialogs/DialogProvider/DelegateDialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -97,7 +97,7 @@ export default function DelegateCardList({
   const isBannerVisible = useInfoBannerVisibility("delegates-page-info-banner");
 
   return (
-    <DialogProvider>
+    <DelegateDialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       <div className="relative">
         <DelegatesPageInfoBanner />
@@ -143,6 +143,6 @@ export default function DelegateCardList({
           </InfiniteScroll>
         </div>
       </div>
-    </DialogProvider>
+    </DelegateDialogProvider>
   );
 }

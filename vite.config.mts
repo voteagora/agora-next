@@ -35,7 +35,8 @@ function stubServerOnlyModulesInClient(): Plugin {
   const apiTreePrefix = path.resolve(__dirname, "src/app/api") + path.sep;
   const prismaPath = path.resolve(__dirname, "src/app/lib/prisma.ts");
   const appSrcPrefix = path.resolve(__dirname, "src/app") + path.sep;
-  const libActionsPrefix = path.resolve(__dirname, "src/lib/actions") + path.sep;
+  const libActionsPrefix =
+    path.resolve(__dirname, "src/lib/actions") + path.sep;
   const libSrcPrefix = path.resolve(__dirname, "src/lib") + path.sep;
   const instrumentationPath = path.resolve(__dirname, "src/instrumentation");
   // Directories that are legitimately isomorphic TanStack Start files.
@@ -216,18 +217,21 @@ function polyfillReactCacheInSSR(): Plugin {
       if (!code.includes("cache") || !code.includes("react")) return null;
 
       let changed = false;
-      const result = code.replace(IMPORT_RE, (_match, open, before, _cache, after, close) => {
-        changed = true;
-        // Other named imports (if any) stay in the original `from 'react'` import.
-        const others = (before + after)
-          .split(",")
-          .map((s: string) => s.trim())
-          .filter(Boolean)
-          .join(", ");
-        const reactImport = others ? `${open} ${others} ${close}` : null;
-        const cacheImport = `import { cache } from ${shimPath}`;
-        return [reactImport, cacheImport].filter(Boolean).join(";\n");
-      });
+      const result = code.replace(
+        IMPORT_RE,
+        (_match, open, before, _cache, after, close) => {
+          changed = true;
+          // Other named imports (if any) stay in the original `from 'react'` import.
+          const others = (before + after)
+            .split(",")
+            .map((s: string) => s.trim())
+            .filter(Boolean)
+            .join(", ");
+          const reactImport = others ? `${open} ${others} ${close}` : null;
+          const cacheImport = `import { cache } from ${shimPath}`;
+          return [reactImport, cacheImport].filter(Boolean).join(";\n");
+        }
+      );
 
       return changed ? { code: result } : null;
     },
@@ -255,18 +259,18 @@ function buildPublicEnvDefines(mode: string): Record<string, string> {
 export default defineConfig(({ mode }) => ({
   define: buildPublicEnvDefines(mode),
   server: {
-    port: 3001,
+    port: 3000,
   },
   ssr: {
     // Packages whose ESM builds have broken imports (CSS imports, or
     // extensionless relative imports like `./foo` without `.js`) must be
     // processed by Vite's bundler rather than Node's raw ESM loader.
     noExternal: [
-      /^@uiw\//,                                   // imports .css in ESM
-      "@ethereum-attestation-service/eas-sdk",      // extensionless ESM imports
-      /^@aa-sdk\//,                                 // extensionless ESM imports
-      /^@account-kit\//,                            // extensionless ESM imports
-      /^@alchemy\/aa-/,                             // extensionless ESM imports
+      /^@uiw\//, // imports .css in ESM
+      "@ethereum-attestation-service/eas-sdk", // extensionless ESM imports
+      /^@aa-sdk\//, // extensionless ESM imports
+      /^@account-kit\//, // extensionless ESM imports
+      /^@alchemy\/aa-/, // extensionless ESM imports
     ],
   },
   resolve: {
@@ -358,6 +362,12 @@ export default defineConfig(({ mode }) => ({
       "@/lib/actions/forum/unpublishedTopic": path.resolve(
         __dirname,
         "src/server/forum/unpublishedTopic.ts"
+      ),
+      // dao-node server-client — "use server"; imported by isomorphic
+      // votingPowerUtils which runs client-side via useForumPermissions.
+      "@/app/lib/dao-node/server-client": path.resolve(
+        __dirname,
+        "src/server/dao-node/serverClient.ts"
       ),
     },
   },

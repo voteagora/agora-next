@@ -14,7 +14,7 @@ import {
   getForumSubscriptions,
   subscribeToForumContent,
   unsubscribeFromForumContent,
-} from "@/lib/actions/forum";
+} from "@/server/forum/subscriptions";
 import toast from "react-hot-toast";
 import {
   FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,

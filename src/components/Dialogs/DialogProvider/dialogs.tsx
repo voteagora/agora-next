@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { DialogDefinitions } from "./types";
 import { DelegateDialog } from "../DelegateDialog/DelegateDialog";
 import { UndelegateDialog } from "../UndelegateDialog/UndelegateDialog";
@@ -8,7 +9,6 @@ import {
 } from "@/components/Proposals/ProposalPage/CastVoteDialog/CastVoteDialog";
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
-import { EasApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
@@ -23,7 +23,6 @@ import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/Dele
 import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
 import CreateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/CreateDraftProposalDialog";
 import UpdateDraftProposalDialog from "@/app/proposals/draft/components/dialogs/UpdateDraftProposalDialog";
-import SponsorOnchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog";
 import SponsorSnapshotProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorSnapshotProposalDialog";
 import AddGithubPRDialog from "@/app/proposals/draft/components/dialogs/AddGithubPRDialog";
 import { ProposalType, StakedDeposit } from "@/lib/types";
@@ -50,6 +49,18 @@ import {
   SafeOffchainSigningPurpose,
 } from "@/lib/safeOffchainFlow";
 import { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
+
+const EasApprovalCastVoteDialog = lazy(() =>
+  import(
+    "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog"
+  ).then((module) => ({
+    default: module.EasApprovalCastVoteDialog,
+  }))
+);
+
+const SponsorOnchainProposalDialog = lazy(
+  () => import("@/app/proposals/draft/components/dialogs/SponsorOnchainProposalDialog")
+);
 
 export type DialogType =
   | AdvancedDelegateDialogType
@@ -499,11 +510,13 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   EAS_APPROVAL_CAST_VOTE: ({ proposal, votingPower }, closeDialog) => {
     return (
-      <EasApprovalCastVoteDialog
-        proposal={proposal}
-        votingPower={votingPower}
-        closeDialog={closeDialog}
-      />
+      <Suspense fallback={null}>
+        <EasApprovalCastVoteDialog
+          proposal={proposal}
+          votingPower={votingPower}
+          closeDialog={closeDialog}
+        />
+      </Suspense>
     );
   },
   SHARE_VOTE: ({
@@ -597,13 +610,15 @@ export const dialogs: DialogDefinitions<DialogType> = {
     { redirectUrl, txHash, isHybrid, draftProposal },
     closeDialog
   ) => (
-    <SponsorOnchainProposalDialog
-      redirectUrl={redirectUrl}
-      txHash={txHash}
-      closeDialog={closeDialog}
-      isHybrid={isHybrid}
-      draftProposal={draftProposal}
-    />
+    <Suspense fallback={null}>
+      <SponsorOnchainProposalDialog
+        redirectUrl={redirectUrl}
+        txHash={txHash}
+        closeDialog={closeDialog}
+        isHybrid={isHybrid}
+        draftProposal={draftProposal}
+      />
+    </Suspense>
   ),
   SPONSOR_OFFCHAIN_DRAFT_PROPOSAL: (
     { redirectUrl, attestationUid },
