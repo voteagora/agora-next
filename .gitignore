@@ -61,3 +61,4 @@ src/routeTree.gen.ts
 output/
 test-results/
 playwright-report/
+.tanstack/*
