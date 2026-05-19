@@ -1,5 +1,3 @@
-import Tenant from "./tenant/tenant";
-
 interface MetricOptions {
   name: string;
   value: number;
@@ -17,6 +15,10 @@ interface ApiRequestOptions {
   error?: unknown;
 }
 
+function getTenantNamespace() {
+  return process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME || "unknown";
+}
+
 class MonitoringService {
   private datadogEnabled: boolean;
   private axiomEnabled: boolean;
@@ -28,7 +30,7 @@ class MonitoringService {
   private requestTimeoutMs: number;
 
   constructor() {
-    this.namespace = `agora-next.${Tenant.current().namespace}`;
+    this.namespace = `agora-next.${getTenantNamespace()}`;
     this.requestTimeoutMs = 2000;
 
     this.axiomEnabled = process.env.ENABLE_AXIOM_METRICS !== "false";
@@ -87,10 +89,12 @@ class MonitoringService {
   }
 
   private getCommonAxiomFields() {
+    const tenantNamespace = getTenantNamespace();
+
     return {
       service: "agora-next",
-      namespace: this.namespace,
-      tenant: Tenant.current().namespace,
+      namespace: `agora-next.${tenantNamespace}`,
+      tenant: tenantNamespace,
       env:
         process.env.VERCEL_ENV === "production" ? "production" : "development",
       vercelEnv: process.env.VERCEL_ENV,
