@@ -19,7 +19,7 @@ import { getPublicClient } from "@/lib/viem";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
-import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { createOffchainProposal } from "@/server/proposals/offchainActions";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { extractFailedEasTxContext } from "@/lib/easTxContext";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
