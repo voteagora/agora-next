@@ -3,7 +3,6 @@
  * URL: /proposals/sponsor/:id
  */
 
-import Image from "next/image";
 import { createFileRoute } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -65,7 +64,7 @@ export const Route = createFileRoute("/proposals/sponsor/$id")({
             <div className="self-start">
               <div className="border bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] p-6 rounded-lg">
                 <div className="flex flex-row items-center space-x-4">
-                  <Image
+                  <img
                     className="border bg-[#FAFAF2] border-[#ECE3CA] rounded-md p-2 shadow-newDefault"
                     src={icons.sponsor}
                     alt="Sponsor"

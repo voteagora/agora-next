@@ -4,24 +4,22 @@
  */
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
 import GrantIntakeForm from "@/app/grants/[slug]/components/GrantIntakeForm";
 
-export const Route = createFileRoute("/grants/$slug")({
-  beforeLoad: () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("grants")) {
-      throw redirect({ to: "/" });
-    }
-  },
-  loader: async ({ params }) => {
+const serverGetGrant = createServerFn({ method: "GET" })
+  .inputValidator((data: { slug: string }) => data)
+  .handler(async ({ data }) => {
     const { getGrant } = await import("@/app/api/common/grants/getGrant");
-    const grant = await getGrant(params.slug);
+    const grant = await getGrant(data.slug);
+
     if (!grant) {
-      throw redirect({ to: "/grants" });
+      return null;
     }
-    const transformedGrant = {
+
+    return {
       id: grant.id,
       title: grant.title,
       description: grant.description,
@@ -40,7 +38,23 @@ export const Route = createFileRoute("/grants/$slug")({
       bottom_text: grant.bottom_text || null,
       category: grant.category || null,
     };
-    return { grant: transformedGrant };
+  });
+
+export const Route = createFileRoute("/grants/$slug")({
+  beforeLoad: () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("grants")) {
+      throw redirect({ to: "/" });
+    }
+  },
+  loader: async ({ params }) => {
+    const grant = await serverGetGrant({ data: { slug: params.slug } });
+
+    if (!grant) {
+      throw redirect({ to: "/grants" });
+    }
+
+    return { grant };
   },
   head: ({ loaderData }) => ({
     meta: [

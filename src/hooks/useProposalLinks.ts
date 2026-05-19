@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getProposalLinks } from "@/lib/actions/proposalLinks";
+import { getProposalLinks } from "@/server/forum/actions";
 
 interface ProposalLink {
   id: string;

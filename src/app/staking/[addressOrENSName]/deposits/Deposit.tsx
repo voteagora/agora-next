@@ -166,7 +166,7 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
                     alignOffset={0}
                     align="end"
                   >
-                    {tokenBalance && tokenBalance > 0n && (
+                    {tokenBalance !== undefined && tokenBalance > 0n && (
                       // Hide edit button when no token balance
                       <div className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer">
                         <Link href={`/staking/deposits/${deposit.id}`}>

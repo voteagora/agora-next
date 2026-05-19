@@ -65,7 +65,7 @@ export const HybridStandardVotesSummaryTooltip = ({
           </div>
         </div>
 
-        {proposal.approvalThreshold && (
+        {proposal.approvalThreshold !== undefined && (
           <div className="flex justify-between">
             <span className="text-secondary">Approval</span>
             <div className="flex items-center gap-1">

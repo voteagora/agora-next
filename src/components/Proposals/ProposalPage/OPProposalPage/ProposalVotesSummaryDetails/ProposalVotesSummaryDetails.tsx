@@ -204,7 +204,7 @@ export default function ProposalVotesSummaryDetails({
                 </p>
               </div>
             ) : (
-              proposal.quorum && (
+              proposal.quorum != null && (
                 <div className="flex items-center gap-1 ">
                   {hasMetQuorum && (
                     <Image
@@ -247,7 +247,7 @@ export default function ProposalVotesSummaryDetails({
             </div>
           </div>
         ) : !hasPendingRanges ? (
-          proposal.approvalThreshold && (
+          proposal.approvalThreshold !== undefined && (
             <div className="flex justify-between">
               <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
                 Threshold

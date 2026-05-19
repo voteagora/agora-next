@@ -102,7 +102,6 @@ export default function DelegateCardList({
       <div className="relative">
         <DelegatesPageInfoBanner />
         <div className={`relative z-10 ${isBannerVisible ? "mt-6" : "mt-4"}`}>
-          {/* @ts-expect-error InfiniteScroll types are missing from community typedefs */}
           <InfiniteScroll
             className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"
             hasMore={meta.has_next}

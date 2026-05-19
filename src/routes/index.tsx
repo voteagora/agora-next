@@ -65,6 +65,89 @@ const serverFetchSponsorshipProposals = createServerFn({ method: "GET" })
     return fetchDraftProposalForSponsor(data.address as `0x${string}`);
   });
 
+const serverLoadHome = createServerFn({ method: "GET" }).handler(async () => {
+  const { ui, namespace } = Tenant.current();
+
+  if (ui.toggle("coming-soon")?.enabled) {
+    return {
+      comingSoon: true as const,
+      supportsNotifications:
+        ui.toggle("email-subscriptions")?.enabled ?? false,
+      showStaticProposals:
+        ui.toggle("coming-soon/show-static-proposals")?.enabled ?? false,
+      isTowns: namespace === TENANT_NAMESPACES.TOWNS,
+    };
+  }
+
+  const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled ?? false;
+  const supportsNotifications =
+    ui.toggle("email-subscriptions")?.enabled ?? false;
+  const useArchiveForProposals =
+    ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+
+  const { fetchVotableSupply } = await import(
+    "@/app/api/common/votableSupply/getVotableSupply"
+  );
+  const { fetchGovernanceCalendar } = await import(
+    "@/app/api/common/governanceCalendar/getGovernanceCalendar"
+  );
+
+  const emptyPaginated = () => ({
+    meta: { has_next: false, total_returned: 0, next_offset: 0 },
+    data: [] as any[],
+  });
+
+  let governanceCalendar: any;
+  let relevantProposals: any;
+  let allProposals: any;
+  let votableSupply: string;
+  let archivedProposals = emptyPaginated();
+
+  if (useArchiveForProposals) {
+    const { fetchProposalsFromArchive } = await import("@/lib/archiveUtils");
+    [governanceCalendar, archivedProposals, votableSupply] =
+      await Promise.all([
+        fetchGovernanceCalendar(),
+        fetchProposalsFromArchive(
+          namespace,
+          proposalsFilterOptions.everything.filter
+        ),
+        fetchVotableSupply(),
+      ]);
+    relevantProposals = emptyPaginated();
+    allProposals = emptyPaginated();
+  } else {
+    const { fetchProposals } = await import(
+      "@/app/api/common/proposals/getProposals"
+    );
+    [governanceCalendar, relevantProposals, allProposals, votableSupply] =
+      await Promise.all([
+        fetchGovernanceCalendar(),
+        fetchProposals({
+          filter: proposalsFilterOptions.relevant.filter,
+          pagination: { limit: 10, offset: 0 },
+        }),
+        fetchProposals({
+          filter: proposalsFilterOptions.everything.filter,
+          pagination: { limit: 10, offset: 0 },
+        }),
+        fetchVotableSupply(),
+      ]);
+  }
+
+  return {
+    comingSoon: false as const,
+    plmEnabled,
+    supportsNotifications,
+    useArchiveForProposals,
+    governanceCalendar,
+    relevantProposals,
+    allProposals,
+    votableSupply,
+    archivedProposals,
+  };
+});
+
 // ─── route ────────────────────────────────────────────────────────────────────
 
 export const Route = createFileRoute("/")({
@@ -84,88 +167,7 @@ export const Route = createFileRoute("/")({
       ],
     };
   },
-  loader: async () => {
-    const { ui, namespace } = Tenant.current();
-
-    if (ui.toggle("coming-soon")?.enabled) {
-      return {
-        comingSoon: true as const,
-        supportsNotifications:
-          ui.toggle("email-subscriptions")?.enabled ?? false,
-        showStaticProposals:
-          ui.toggle("coming-soon/show-static-proposals")?.enabled ?? false,
-        isTowns: namespace === TENANT_NAMESPACES.TOWNS,
-      };
-    }
-
-    const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled ?? false;
-    const supportsNotifications =
-      ui.toggle("email-subscriptions")?.enabled ?? false;
-    const useArchiveForProposals =
-      ui.toggle("use-archive-for-proposals")?.enabled ?? false;
-
-    const { fetchVotableSupply } = await import(
-      "@/app/api/common/votableSupply/getVotableSupply"
-    );
-    const { fetchGovernanceCalendar } = await import(
-      "@/app/api/common/governanceCalendar/getGovernanceCalendar"
-    );
-
-    const emptyPaginated = () => ({
-      meta: { has_next: false, total_returned: 0, next_offset: 0 },
-      data: [] as any[],
-    });
-
-    let governanceCalendar: any;
-    let relevantProposals: any;
-    let allProposals: any;
-    let votableSupply: string;
-    let archivedProposals = emptyPaginated();
-
-    if (useArchiveForProposals) {
-      const { fetchProposalsFromArchive } = await import("@/lib/archiveUtils");
-      [governanceCalendar, archivedProposals, votableSupply] =
-        await Promise.all([
-          fetchGovernanceCalendar(),
-          fetchProposalsFromArchive(
-            namespace,
-            proposalsFilterOptions.everything.filter
-          ),
-          fetchVotableSupply(),
-        ]);
-      relevantProposals = emptyPaginated();
-      allProposals = emptyPaginated();
-    } else {
-      const { fetchProposals } = await import(
-        "@/app/api/common/proposals/getProposals"
-      );
-      [governanceCalendar, relevantProposals, allProposals, votableSupply] =
-        await Promise.all([
-          fetchGovernanceCalendar(),
-          fetchProposals({
-            filter: proposalsFilterOptions.relevant.filter,
-            pagination: { limit: 10, offset: 0 },
-          }),
-          fetchProposals({
-            filter: proposalsFilterOptions.everything.filter,
-            pagination: { limit: 10, offset: 0 },
-          }),
-          fetchVotableSupply(),
-        ]);
-    }
-
-    return {
-      comingSoon: false as const,
-      plmEnabled,
-      supportsNotifications,
-      useArchiveForProposals,
-      governanceCalendar,
-      relevantProposals,
-      allProposals,
-      votableSupply,
-      archivedProposals,
-    };
-  },
+  loader: async () => serverLoadHome(),
   component: function Home() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Route.useLoaderData() as any;
@@ -176,10 +178,7 @@ export const Route = createFileRoute("/")({
       const proposalsImage = isTowns
         ? townsStaticProposals
         : syndicateStaticProposals;
-      const proposalsImageSrc =
-        typeof proposalsImage === "string"
-          ? proposalsImage
-          : proposalsImage.src;
+      const proposalsImageSrc = proposalsImage;
       const overlayText = isTowns
         ? "Coming soon in January 2026"
         : "Coming Soon";

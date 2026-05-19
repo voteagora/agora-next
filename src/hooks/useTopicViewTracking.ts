@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
-import { trackForumView } from "@/lib/actions/forum/analytics";
+import { trackForumView } from "@/server/forum/actions";
 
 interface UseTopicViewTrackingProps {
   topicId: number;

@@ -1,18 +1,16 @@
 /*
- * Vite shim for `next/link`.
+ * Shim for `next/link`.
  *
- * next/link uses Next.js router internals for client-side navigation.
- * Under TanStack Start we render a plain <a> element, which is sufficient
- * for all in-app links since TanStack Router's own Link components handle
- * navigation at the route level.  Components that need prefetching or
- * typed params should migrate to `<Link>` from @tanstack/react-router.
+ * Routes internal paths (starting with /) through TanStack Router's Link for
+ * proper SPA navigation and prefetching. External URLs (http/https/mailto/tel)
+ * fall back to a plain <a> element.
  *
- * Props handled: href (string | object), className, children, target, rel,
- *   prefetch (ignored), replace (ignored), scroll (ignored), shallow (ignored).
- * `as` and `locale` are Next.js-specific and silently dropped.
+ * Props handled: href (string | object), replace, prefetch (ignored),
+ *   scroll (ignored), shallow (ignored), locale (ignored), as (ignored).
  */
 
 import React from "react";
+import { Link as TanstackLink } from "@tanstack/react-router";
 
 export interface NextLinkProps
   extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
@@ -26,13 +24,17 @@ export interface NextLinkProps
   children?: React.ReactNode;
 }
 
+function isExternal(href: string): boolean {
+  return /^(https?:|mailto:|tel:|\/\/)/i.test(href);
+}
+
 const NextLinkShim = React.forwardRef<HTMLAnchorElement, NextLinkProps>(
   function NextLinkShim(
     {
       href,
+      replace,
       // intentionally unused next/link-specific props
       prefetch: _prefetch,
-      replace: _replace,
       scroll: _scroll,
       shallow: _shallow,
       locale: _locale,
@@ -50,10 +52,23 @@ const NextLinkShim = React.forwardRef<HTMLAnchorElement, NextLinkProps>(
             href.query ? "?" + new URLSearchParams(href.query).toString() : "",
           ].join("");
 
+    if (isExternal(resolvedHref)) {
+      return (
+        <a ref={ref} href={resolvedHref} {...rest}>
+          {children}
+        </a>
+      );
+    }
+
     return (
-      <a ref={ref} href={resolvedHref} {...rest}>
+      <TanstackLink
+        ref={ref}
+        to={resolvedHref}
+        replace={replace}
+        {...(rest as object)}
+      >
         {children}
-      </a>
+      </TanstackLink>
     );
   }
 );

@@ -57,17 +57,17 @@ export const Route = createFileRoute("/coming-soon")({
           {showStaticProposals && (
             <div className="relative">
               <img
-                src={(proposalsImage as { src: string }).src}
+                src={proposalsImage}
                 alt="Static proposals"
                 className="w-full h-auto blur-sm opacity-60 block"
               />
               <img
-                src={(proposalsImage as { src: string }).src}
+                src={proposalsImage}
                 alt="Static proposals"
                 className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
               />
               <img
-                src={(proposalsImage as { src: string }).src}
+                src={proposalsImage}
                 alt="Static proposals"
                 className="w-full h-auto blur-sm opacity-60 block -mt-1 sm:hidden"
               />

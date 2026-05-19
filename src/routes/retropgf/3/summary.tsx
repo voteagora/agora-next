@@ -3,9 +3,7 @@
  * URL: /retropgf/3/summary
  */
 
-import Image from "next/image";
-import Link from "next/link";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { HStack, VStack } from "@/components/Layout/Stack";
@@ -36,12 +34,12 @@ export const Route = createFileRoute("/retropgf/3/summary")({
           RetroPGF Round 3 Summary
         </h1>
         <HStack gap={4}>
-          <Image src={badge} alt="badge" width={24} height={24} />
-          <Image src={sunny} alt="sunny" width={24} height={24} />
+          <img src={badge} alt="badge" width={24} height={24} />
+          <img src={sunny} alt="sunny" width={24} height={24} />
         </HStack>
         <p className="text-secondary">
           Round 3 results are now final.{" "}
-          <Link href="/retropgf/3" className="text-primary underline">
+          <Link to="/retropgf/3" className="text-primary underline">
             View all projects
           </Link>
         </p>

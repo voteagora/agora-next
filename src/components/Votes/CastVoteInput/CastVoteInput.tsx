@@ -277,7 +277,7 @@ function VotingBanner() {
 
   return (
     <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-      <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
+      <img src={freeGasMegaphon} alt="Free gas" className="w-6 h-6 mr-2" />
       Voting on Agora is free!
     </div>
   );
@@ -481,7 +481,7 @@ export function SuccessMessage({
         variant="outline"
         className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
       >
-        <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
+        <Image src={shareIcon} alt="Share icon" height={18} width={18} />
         <span>Share your vote</span>
       </Button>
       <p className="text-[14px] font-bold text-secondary text-center mt-2">

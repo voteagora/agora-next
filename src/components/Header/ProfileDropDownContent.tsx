@@ -16,7 +16,6 @@ import { SiweStatusBadge } from "./SiweStatusBadge";
 import ENSAvatar from "../shared/ENSAvatar";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
-import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { ShieldCheckIcon } from "@heroicons/react/20/solid";
@@ -47,7 +46,7 @@ const DelegatePanelRow = ({
   });
 
   return (
-    <Link
+    <a
       href={`/delegates/${delegate.to}`}
       className="flex justify-start text-neutral-900 items-center gap-2"
       onClick={onClick}
@@ -61,7 +60,7 @@ const DelegatePanelRow = ({
           {shortAddress(delegate.to)}
         </div>
       </div>
-    </Link>
+    </a>
   );
 };
 
@@ -155,13 +154,13 @@ export const ProfileDropDownContent = ({
                 />
               ))}
               {filteredDelegations?.length > 3 && (
-                <Link
+                <a
                   href={`/delegates/${address}?tab=delegations&subtab=delegatedTo`}
                   onClick={handleCloseDrawer}
                   className="text-sm text-tertiary font-xs border border-line self-end rounded-full px-2 py-1 "
                 >
                   +{filteredDelegations?.length - 3}
-                </Link>
+                </a>
               )}
             </div>
           }
@@ -288,39 +287,39 @@ export const ProfileDropDownContent = ({
         ) : (
           <div className="flex flex-col p-6 font-medium">
             {canCreateDelegateStatement && !hasStatement ? (
-              <Link
+              <a
                 href={`/delegates/create`}
                 className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:rounded-md"
                 onClick={handleCloseDrawer}
               >
                 Create delegate statement
-              </Link>
+              </a>
             ) : (
               <>
-                <Link
+                <a
                   href={`/delegates/${ensName ?? address}`}
                   onClick={handleCloseDrawer}
                   className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   View my profile
-                </Link>
-                <Link
+                </a>
+                <a
                   href={`/delegates/create`}
                   onClick={handleCloseDrawer}
                   className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
                   Edit delegate statement
-                </Link>
+                </a>
               </>
             )}
             {ui.toggle("notifications")?.enabled && (
-              <Link
+              <a
                 href={`/notification-preferences`}
                 onClick={handleCloseDrawer}
                 className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
               >
                 Sign to manage notifications
-              </Link>
+              </a>
             )}
           </div>
         )}

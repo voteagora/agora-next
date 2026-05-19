@@ -1,4 +1,3 @@
-import Link from "next/link";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
@@ -14,7 +13,7 @@ export function Button({ href = "", className = "", ...props }) {
         <div
           className={`rounded-lg border border-line font-medium shadow-newDefault cursor-pointer transition-all px-4 py-3 hover:shadow-newHover ${className}`}
         >
-          <Link href={href} {...props} />{" "}
+          <a href={href} {...props} />{" "}
         </div>
       ) : (
         <button
@@ -64,9 +63,9 @@ export function UpdatedButton({
             "font-medium py-2 px-4 border border-line cursor-pointer shadow-newDefault"
           )}
         >
-          <Link href={href} {...props}>
+          <a href={href} {...props}>
             {children}
-          </Link>
+          </a>
         </div>
       ) : (
         <button

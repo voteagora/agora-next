@@ -17,12 +17,12 @@ export default async function FinancialsComingSoon() {
         {ui.toggle("financials-coming-soon")?.enabled && (
           <div className="relative">
             <img
-              src={financialMock.src}
+              src={financialMock}
               alt="Static proposals"
               className="w-full h-auto blur-[10px] opacity-60 block"
             />
             <img
-              src={financialDocMock.src}
+              src={financialDocMock}
               alt="Static proposals"
               className="w-full h-auto blur-[10px] opacity-60 block mt-4"
             />

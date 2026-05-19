@@ -165,7 +165,7 @@ const GovernorSettingsProposalTypes = ({
               className={cn(!proposalTypes?.length && "rounded-br-lg")}
               colSpan={4}
             >
-              {isQuorumFetched && quorum && (
+              {isQuorumFetched && quorum !== undefined && (
                 <TokenAmountDecorated
                   amount={BigInt(quorum.toString())}
                   currency={token.symbol}

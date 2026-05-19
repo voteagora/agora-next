@@ -1,5 +1,4 @@
 import * as React from "react";
-import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,9 +43,9 @@ BreadcrumbItem.displayName = "BreadcrumbItem";
 
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
-  React.ComponentPropsWithoutRef<typeof Link>
+  React.ComponentPropsWithoutRef<"a">
 >(({ className, ...props }, ref) => (
-  <Link
+  <a
     ref={ref}
     className={cn(
       "text-gray-500 hover:text-primary transition-colors",

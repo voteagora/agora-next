@@ -96,7 +96,7 @@ const OptimisticProposalVotesCard = ({
           className="border w-10 h-10 rounded-full bg-neutral absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block md:hidden"
         >
           <HStack justifyContent="justify-center">
-            <img className="opacity-60" src={icons.expand.src} alt="expand" />
+            <img className="opacity-60" src={icons.expand} alt="expand" />
           </HStack>
         </button>
         <div>

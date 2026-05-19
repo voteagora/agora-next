@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getForumCategories } from "@/lib/actions/forum";
+import { getForumCategories } from "@/server/forum/actions";
 import type { ForumCategory } from "@/lib/forumUtils";
 
 export const useForumCategories = () => {

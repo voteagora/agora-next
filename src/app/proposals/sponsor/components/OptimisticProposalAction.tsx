@@ -118,7 +118,9 @@ const OptimisticProposalAction = ({
                   expectedTo: contracts.governor.address as `0x${string}`,
                   expectedData: encodedInputData,
                   createdAfter,
-                  onTrackedTransactionDiscovered: (publish) => {
+                  onTrackedTransactionDiscovered: (
+                    publish: SafeTrackedTransactionSummary
+                  ) => {
                     discoveredSafePublishRef.current = publish;
                     openDialog({
                       type: "SAFE_PROPOSAL_PUBLISH_STATUS",

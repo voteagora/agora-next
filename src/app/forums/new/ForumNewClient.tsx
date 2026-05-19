@@ -14,7 +14,7 @@ import MarkdownTextareaInput from "@/app/proposals/draft/components/form/Markdow
 import { CommunityGuidelinesCard } from "@/app/create/components/CommunityGuidelinesCard";
 import toast from "react-hot-toast";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import { createDiscussionProposalLink } from "@/lib/actions/proposalLinks";
+import { createDiscussionProposalLink } from "@/server/forum/actions";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -22,7 +22,7 @@ import { ExternalLink, FileText, Thermometer, Clock } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
-import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { uploadToIPFSOnly } from "@/server/forum/actions";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 

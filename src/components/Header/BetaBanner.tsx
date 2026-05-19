@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 export default function BetaBanner() {
   return (
@@ -16,7 +16,7 @@ export default function BetaBanner() {
             using this form.
           </a>{" "}
           Follow the{" "}
-          <Link className="underline" href="/changelog">
+          <Link className="underline" to="/changelog">
             changelog
           </Link>{" "}
           for updates.

@@ -5,7 +5,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import Link from "next/link";
+
 
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -339,7 +339,7 @@ export const Route = createFileRoute("/info")({
                     <div className="flex flex-col gap-1">
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {communityLinks.map((link: any, idx: number) => (
-                        <Link
+                        <a
                           key={idx}
                           href={link.url}
                           target="_blank"
@@ -351,7 +351,7 @@ export const Route = createFileRoute("/info")({
                             {link.title}{" "}
                             <span className="text-tertiary">↗</span>
                           </span>
-                        </Link>
+                        </a>
                       ))}
                     </div>
                   </div>

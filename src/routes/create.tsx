@@ -4,6 +4,7 @@
  */
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { formatDistanceToNow } from "date-fns";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -16,37 +17,16 @@ import {
 } from "@/app/create/types";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 
-export const Route = createFileRoute("/create")({
-  beforeLoad: () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("easv2-govlessvoting")?.enabled) {
-      throw redirect({ to: "/" });
-    }
-  },
-  validateSearch: (search: Record<string, unknown>) => ({
-    type: (search.type as string) ?? undefined,
-    fromTopicId: (search.fromTopicId as string) ?? undefined,
-    fromTempCheckId: (search.fromTempCheckId as string) ?? undefined,
-  }),
-  head: () => {
-    const { brandName } = Tenant.current();
-    return {
-      meta: [
-        { title: `Create Post | ${brandName}` },
-        {
-          name: "description",
-          content: `Create a proposal for the ${brandName} community.`,
-        },
-      ],
-    };
-  },
-  loaderDeps: ({ search }) => ({
-    type: search.type,
-    fromTopicId: search.fromTopicId,
-    fromTempCheckId: search.fromTempCheckId,
-  }),
-  loader: async ({ deps }) => {
-    const { type, fromTopicId, fromTempCheckId } = deps;
+const serverLoadCreatePage = createServerFn({ method: "GET" })
+  .inputValidator(
+    (data: {
+      type: string | undefined;
+      fromTopicId: string | undefined;
+      fromTempCheckId: string | undefined;
+    }) => data
+  )
+  .handler(async ({ data }) => {
+    const { type, fromTopicId, fromTempCheckId } = data;
 
     const initialPostType: PostType =
       type && ["tempcheck", "gov-proposal"].includes(type)
@@ -162,7 +142,38 @@ export const Route = createFileRoute("/create")({
         ];
 
     return { initialPostType, initialFormData: formData, proposalTypes };
+  });
+
+export const Route = createFileRoute("/create")({
+  beforeLoad: () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("easv2-govlessvoting")?.enabled) {
+      throw redirect({ to: "/" });
+    }
   },
+  validateSearch: (search: Record<string, unknown>) => ({
+    type: (search.type as string) ?? undefined,
+    fromTopicId: (search.fromTopicId as string) ?? undefined,
+    fromTempCheckId: (search.fromTempCheckId as string) ?? undefined,
+  }),
+  head: () => {
+    const { brandName } = Tenant.current();
+    return {
+      meta: [
+        { title: `Create Post | ${brandName}` },
+        {
+          name: "description",
+          content: `Create a proposal for the ${brandName} community.`,
+        },
+      ],
+    };
+  },
+  loaderDeps: ({ search }) => ({
+    type: search.type,
+    fromTopicId: search.fromTopicId,
+    fromTempCheckId: search.fromTempCheckId,
+  }),
+  loader: async ({ deps }) => serverLoadCreatePage({ data: deps }),
   component: function CreatePostPage() {
     const { initialPostType, initialFormData, proposalTypes } =
       Route.useLoaderData();

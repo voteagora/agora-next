@@ -1,4 +1,4 @@
-import { getDunaCategoryId } from "@/lib/actions/forum";
+import { getDunaCategoryId } from "@/server/forum/actions";
 import { useQuery } from "@tanstack/react-query";
 
 const DUNA_CATEGORY_STORAGE_KEY = "duna-category-id";

@@ -27,7 +27,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import { useForumSubscriptions } from "@/contexts/ForumSubscriptionsContext";
-import { getMyVotesForTopics } from "@/lib/actions/forum";
+import { getMyVotesForTopics } from "@/server/forum/actions";
 
 const { ui } = Tenant.current();
 

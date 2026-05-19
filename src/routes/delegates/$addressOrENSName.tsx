@@ -235,10 +235,6 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
     const { fetchSnapshotVotesForDelegate } = await import(
       "@/app/api/common/votes/getVotes"
     );
-    const { getForumTopicsByUser, getForumPostsByUser } = await import(
-      "@/lib/actions/forum"
-    );
-
     const [
       delegatees,
       inboundDelegatorsFirstPage,
@@ -254,10 +250,14 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
         addressOrENSName: parsedDelegate.address,
       }),
       hasForums
-        ? getForumTopicsByUser(parsedDelegate.address, { limit: 10, offset: 0 })
+        ? serverFetchForumTopics({
+            data: { address: parsedDelegate.address, limit: 10, offset: 0 },
+          })
         : null,
       hasForums
-        ? getForumPostsByUser(parsedDelegate.address, { limit: 10, offset: 0 })
+        ? serverFetchForumPosts({
+            data: { address: parsedDelegate.address, limit: 10, offset: 0 },
+          })
         : null,
     ]);
 
@@ -271,40 +271,8 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
       data: [],
     };
 
-    const initialTopics = forumTopicsResult?.success
-      ? {
-          meta: forumTopicsResult.data.meta,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: forumTopicsResult.data.data.map((topic: any) => ({
-            id: topic.id,
-            title: topic.title,
-            address: topic.address,
-            createdAt:
-              topic.createdAt instanceof Date
-                ? topic.createdAt.toISOString()
-                : new Date(topic.createdAt).toISOString(),
-            category: topic.category,
-            postsCount: topic.postsCount,
-          })),
-        }
-      : emptyPaginated;
-
-    const initialPosts = forumPostsResult?.success
-      ? {
-          meta: forumPostsResult.data.meta,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data: forumPostsResult.data.data.map((post: any) => ({
-            id: post.id,
-            address: post.address,
-            content: post.content,
-            createdAt:
-              post.createdAt instanceof Date
-                ? post.createdAt.toISOString()
-                : new Date(post.createdAt).toISOString(),
-            topic: post.topic,
-          })),
-        }
-      : emptyPaginated;
+    const initialTopics = forumTopicsResult ?? emptyPaginated;
+    const initialPosts = forumPostsResult ?? emptyPaginated;
 
     const { formatNumber } = await import("@/lib/tokenUtils");
     const statement = (
@@ -468,26 +436,9 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
           {hasForums &&
             (initialTopics !== undefined && initialPosts !== undefined ? (
               <DiscussionsContainer
+                delegateAddress={delegateAddress}
                 initialTopics={initialTopics}
                 initialPosts={initialPosts}
-                fetchTopics={(pagination) =>
-                  serverFetchForumTopics({
-                    data: {
-                      address: delegateAddress,
-                      offset: pagination.offset,
-                      limit: pagination.limit,
-                    },
-                  })
-                }
-                fetchPosts={(pagination) =>
-                  serverFetchForumPosts({
-                    data: {
-                      address: delegateAddress,
-                      offset: pagination.offset,
-                      limit: pagination.limit,
-                    },
-                  })
-                }
               />
             ) : (
               <DiscussionsContainerSkeleton />

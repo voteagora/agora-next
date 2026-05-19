@@ -8,7 +8,7 @@ import { ExistingTempCheckModal } from "./ExistingTempCheckModal";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { getForumTopicTempChecks } from "@/lib/actions/proposalLinks";
+import { getForumTopicTempChecks } from "@/server/forum/actions";
 
 const { namespace, ui } = Tenant.current();
 

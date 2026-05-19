@@ -9,6 +9,10 @@ import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
 import Link from "next/link";
+import {
+  getForumPostsByUser,
+  getForumTopicsByUser,
+} from "@/server/forum/actions";
 
 interface ForumTopicData {
   id: number;
@@ -38,23 +42,15 @@ interface ForumPostData {
 }
 
 interface Props {
+  delegateAddress: string;
   initialTopics: PaginatedResult<ForumTopicData[]>;
   initialPosts: PaginatedResult<ForumPostData[]>;
-  fetchTopics: (pagination: {
-    limit: number;
-    offset: number;
-  }) => Promise<PaginatedResult<ForumTopicData[]>>;
-  fetchPosts: (pagination: {
-    limit: number;
-    offset: number;
-  }) => Promise<PaginatedResult<ForumPostData[]>>;
 }
 
 const DiscussionsContainer = ({
+  delegateAddress,
   initialTopics,
   initialPosts,
-  fetchTopics,
-  fetchPosts,
 }: Props) => {
   const { ui } = Tenant.current();
   const isDarkTenant = ui.theme === "dark";
@@ -72,14 +68,60 @@ const DiscussionsContainer = ({
   const topicsLoadingRef = useRef(false);
   const postsLoadingRef = useRef(false);
 
+  const normalizeTopics = (result: Awaited<ReturnType<typeof getForumTopicsByUser>>) => {
+    if (result.success) {
+      return {
+        meta: result.data.meta,
+        data: result.data.data.map((topic) => ({
+          id: topic.id,
+          title: topic.title,
+          address: topic.address,
+          createdAt:
+            topic.createdAt instanceof Date
+              ? topic.createdAt.toISOString()
+              : new Date(topic.createdAt).toISOString(),
+          category: topic.category,
+          postsCount: topic.postsCount,
+        })),
+      };
+    }
+    return {
+      meta: { has_next: false, total_returned: 0, next_offset: 0 },
+      data: [],
+    };
+  };
+
+  const normalizePosts = (result: Awaited<ReturnType<typeof getForumPostsByUser>>) => {
+    if (result.success) {
+      return {
+        meta: result.data.meta,
+        data: result.data.data.map((post) => ({
+          id: post.id,
+          address: post.address,
+          content: post.content,
+          createdAt:
+            post.createdAt instanceof Date
+              ? post.createdAt.toISOString()
+              : new Date(post.createdAt).toISOString(),
+          topic: post.topic,
+        })),
+      };
+    }
+    return {
+      meta: { has_next: false, total_returned: 0, next_offset: 0 },
+      data: [],
+    };
+  };
+
   const loadMoreTopics = async () => {
     if (!topicsLoadingRef.current && topicsMeta.has_next) {
       topicsLoadingRef.current = true;
       try {
-        const data = await fetchTopics({
+        const result = await getForumTopicsByUser(delegateAddress, {
           limit: 10,
           offset: topicsMeta.next_offset,
         });
+        const data = normalizeTopics(result);
         setTopicsMeta(data.meta);
         setTopics((prev) => [...prev, ...data.data]);
       } catch (error) {
@@ -94,10 +136,11 @@ const DiscussionsContainer = ({
     if (!postsLoadingRef.current && postsMeta.has_next) {
       postsLoadingRef.current = true;
       try {
-        const data = await fetchPosts({
+        const result = await getForumPostsByUser(delegateAddress, {
           limit: 10,
           offset: postsMeta.next_offset,
         });
+        const data = normalizePosts(result);
         setPostsMeta(data.meta);
         setPosts((prev) => [...prev, ...data.data]);
       } catch (error) {

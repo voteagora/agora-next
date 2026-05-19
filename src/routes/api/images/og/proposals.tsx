@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ImageResponse } from "@vercel/og";
 
-import { LogoPill } from "./assets/shared";
+import { LogoPill } from "./assets/-shared";
 import { TenantNamespace } from "@/lib/types";
 
 export const Route = createFileRoute("/api/images/og/proposals")({

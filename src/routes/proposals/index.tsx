@@ -63,21 +63,8 @@ const serverFetchSponsorshipProposals = createServerFn({ method: "GET" })
     return fetchDraftProposalForSponsor(data.address as `0x${string}`);
   });
 
-// ─── route ────────────────────────────────────────────────────────────────────
-
-export const Route = createFileRoute("/proposals/")({
-  head: () => {
-    const { ui } = Tenant.current();
-    const page = ui.page("proposals");
-    const { title, description } = page?.meta ?? {
-      title: "Proposals",
-      description: "",
-    };
-    return {
-      meta: [{ title }, { name: "description", content: description }],
-    };
-  },
-  loader: async () => {
+const serverLoadProposalsPage = createServerFn({ method: "GET" }).handler(
+  async () => {
     const { ui, namespace } = Tenant.current();
 
     const plmEnabled = ui.toggle("proposal-lifecycle")?.enabled ?? false;
@@ -146,7 +133,24 @@ export const Route = createFileRoute("/proposals/")({
       votableSupply,
       archivedProposals,
     };
+  }
+);
+
+// ─── route ────────────────────────────────────────────────────────────────────
+
+export const Route = createFileRoute("/proposals/")({
+  head: () => {
+    const { ui } = Tenant.current();
+    const page = ui.page("proposals");
+    const { title, description } = page?.meta ?? {
+      title: "Proposals",
+      description: "",
+    };
+    return {
+      meta: [{ title }, { name: "description", content: description }],
+    };
   },
+  loader: async () => serverLoadProposalsPage(),
   component: function ProposalsPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Route.useLoaderData() as any;

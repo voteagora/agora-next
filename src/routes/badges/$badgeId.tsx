@@ -26,15 +26,23 @@ const serverFetchDelegatesWithBadge = createServerFn({ method: "GET" })
     });
   });
 
+const serverFetchBadgeDefinition = createServerFn({ method: "GET" })
+  .inputValidator((data: { badgeId: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchBadgeDefinition } = await import(
+      "@/app/api/common/badges/getBadges"
+    );
+    return fetchBadgeDefinition(data.badgeId);
+  });
+
 export const Route = createFileRoute("/badges/$badgeId")({
   head: () => ({
     meta: [{ title: "Badge Holders" }],
   }),
   loader: async ({ params }) => {
-    const { fetchBadgeDefinition } = await import(
-      "@/app/api/common/badges/getBadges"
-    );
-    const badgeDefinition = await fetchBadgeDefinition(params.badgeId);
+    const badgeDefinition = await serverFetchBadgeDefinition({
+      data: { badgeId: params.badgeId },
+    });
     if (!badgeDefinition) {
       return { badgeDefinition: null, initialDelegates: null };
     }

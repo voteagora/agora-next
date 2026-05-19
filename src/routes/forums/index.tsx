@@ -4,32 +4,15 @@
  */
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
 import ForumsHeader from "@/app/forums/components/ForumsHeader";
 import ForumsSidebar from "@/app/forums/ForumsSidebar";
 import TopicList from "@/app/forums/components/TopicList";
 
-export const Route = createFileRoute("/forums/")({
-  beforeLoad: () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("forums")?.enabled) {
-      throw redirect({ to: "/" });
-    }
-  },
-  head: () => {
-    const { brandName } = Tenant.current();
-    return {
-      meta: [
-        { title: `${brandName} Forum Discussions` },
-        {
-          name: "description",
-          content: `Browse the latest topics, questions, and community updates from the ${brandName} forum.`,
-        },
-      ],
-    };
-  },
-  loader: async () => {
+const serverLoadForums = createServerFn({ method: "GET" }).handler(
+  async () => {
     const { getForumData } = await import("@/lib/actions/forum/topics");
     const result = await getForumData({ categoryId: undefined });
     if (!result.success) {
@@ -58,7 +41,29 @@ export const Route = createFileRoute("/forums/")({
       latestPost,
       uncategorizedCount,
     };
+  }
+);
+
+export const Route = createFileRoute("/forums/")({
+  beforeLoad: () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("forums")?.enabled) {
+      throw redirect({ to: "/" });
+    }
   },
+  head: () => {
+    const { brandName } = Tenant.current();
+    return {
+      meta: [
+        { title: `${brandName} Forum Discussions` },
+        {
+          name: "description",
+          content: `Browse the latest topics, questions, and community updates from the ${brandName} forum.`,
+        },
+      ],
+    };
+  },
+  loader: async () => serverLoadForums(),
   component: function ForumsPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data = Route.useLoaderData() as any;

@@ -3,9 +3,8 @@
  * URL: /notification-preferences/verify-email
  */
 
-import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
@@ -91,7 +90,7 @@ export const Route = createFileRoute("/notification-preferences/verify-email")({
         )}
 
         <Button asChild variant="elevatedOutline">
-          <Link href="/notification-preferences">
+          <Link to="/notification-preferences">
             Return to Notification Preferences
           </Link>
         </Button>

@@ -10,7 +10,7 @@ import { TenantUI } from "@/lib/tenant/tenantUI";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { ProposalType, TenantNamespace } from "@/lib/types";
 import { formatNumber } from "@/lib/utils";
-import { ogLogoForShareVote } from "./assets/shared";
+import { ogLogoForShareVote } from "./assets/-shared";
 
 function OptionsResultsPanel({
   options,

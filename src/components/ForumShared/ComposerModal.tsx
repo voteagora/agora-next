@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { ConnectKitButton } from "connectkit";
 import { DunaEditor } from "@/components/duna-editor";
 import { useForumCategories } from "@/hooks/useForumCategories";
-import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { uploadToIPFSOnly } from "@/server/forum/actions";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";

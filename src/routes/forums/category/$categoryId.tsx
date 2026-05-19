@@ -4,43 +4,22 @@
  */
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
 import ForumsHeader from "@/app/forums/components/ForumsHeader";
 import ForumsSidebar from "@/app/forums/ForumsSidebar";
 import TopicList from "@/app/forums/components/TopicList";
 
-export const Route = createFileRoute("/forums/category/$categoryId")({
-  beforeLoad: () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("forums")?.enabled) {
-      throw redirect({ to: "/" });
-    }
-  },
-  head: ({ loaderData }) => {
-    const d = loaderData as { categoryName?: string | null } | undefined;
-    const { brandName } = Tenant.current();
-    const categoryName = d?.categoryName;
-    const pageTitle = categoryName
-      ? `${brandName} Forum – ${categoryName}`
-      : `${brandName} Forum Discussions`;
-    return {
-      meta: [
-        { title: pageTitle },
-        {
-          name: "description",
-          content: `Explore discussions in the ${categoryName || "selected"} forum category for ${brandName}.`,
-        },
-      ],
-    };
-  },
-  loader: async ({ params }) => {
+const serverLoadForumsCategory = createServerFn({ method: "GET" })
+  .inputValidator((data: { categoryId: string }) => data)
+  .handler(async ({ data }) => {
     const { getForumCategory } = await import("@/lib/actions/forum/categories");
 
-    const rawId = params.categoryId;
+    const rawId = data.categoryId;
     const parsed = Number(rawId);
     if (!Number.isFinite(parsed)) {
-      throw redirect({ to: "/forums" });
+      return { redirectToForums: true as const };
     }
     const id = Math.abs(Math.trunc(parsed));
 
@@ -53,7 +32,7 @@ export const Route = createFileRoute("/forums/category/$categoryId")({
     } else {
       const response = await getForumCategory(id);
       if (!response?.success || !response.data) {
-        throw redirect({ to: "/forums" });
+        return { redirectToForums: true as const };
       }
       categoryName = response.data.name || null;
       description = response.data.description || null;
@@ -92,6 +71,40 @@ export const Route = createFileRoute("/forums/category/$categoryId")({
       latestPost,
       uncategorizedCount,
     };
+  });
+
+export const Route = createFileRoute("/forums/category/$categoryId")({
+  beforeLoad: () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("forums")?.enabled) {
+      throw redirect({ to: "/" });
+    }
+  },
+  head: ({ loaderData }) => {
+    const d = loaderData as { categoryName?: string | null } | undefined;
+    const { brandName } = Tenant.current();
+    const categoryName = d?.categoryName;
+    const pageTitle = categoryName
+      ? `${brandName} Forum – ${categoryName}`
+      : `${brandName} Forum Discussions`;
+    return {
+      meta: [
+        { title: pageTitle },
+        {
+          name: "description",
+          content: `Explore discussions in the ${categoryName || "selected"} forum category for ${brandName}.`,
+        },
+      ],
+    };
+  },
+  loader: async ({ params }) => {
+    const data = await serverLoadForumsCategory({
+      data: { categoryId: params.categoryId },
+    });
+    if ("redirectToForums" in data) {
+      throw redirect({ to: "/forums" });
+    }
+    return data;
   },
   component: function ForumsCategoryPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

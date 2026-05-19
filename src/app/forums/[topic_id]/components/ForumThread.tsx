@@ -7,7 +7,7 @@ import { useForum } from "@/hooks/useForum";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { DunaEditor } from "@/components/duna-editor";
 import { Button } from "@/components/ui/button";
-import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { uploadToIPFSOnly } from "@/server/forum/actions";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";

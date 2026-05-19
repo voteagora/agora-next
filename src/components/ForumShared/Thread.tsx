@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ADMIN_TYPES } from "@/lib/constants";
 import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments";
-import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { uploadToIPFSOnly } from "@/server/forum/actions";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import toast from "react-hot-toast";
 import { useHasPermission } from "@/hooks/useRbacPermissions";

@@ -15,7 +15,7 @@ export const DepositList = async ({
   return (
     <div className="flex flex-col rounded-xl border border-line w-auto h-100 bg-wash shadow-newDefault">
       <div className="border-b border-line rounded-xl bg-neutral shadow-newDefault">
-        {deposits.map(async (deposit) => {
+        {deposits.map((deposit) => {
           return (
             <div key={`deposit-${deposit.id}`} className="flex w-auto h-100">
               <Deposit deposit={deposit} refreshPath={refreshPath} />

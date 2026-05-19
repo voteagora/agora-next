@@ -13,6 +13,8 @@ import {
 } from "@/lib/forumUtils";
 import UnpublishedTopicGate from "@/app/forums/[topic_id]/components/UnpublishedTopicGate";
 import FinancialStatementLayout from "@/app/forums/[topic_id]/components/FinancialStatementLayout";
+import { getForumTopic } from "@/server/forum/actions";
+import { hasUnpublishedTopicAccess } from "@/server/forum/unpublishedTopic";
 
 export const Route = createFileRoute("/forum-article/$topic_id/$slug")({
   head: ({ loaderData }) => {
@@ -25,11 +27,6 @@ export const Route = createFileRoute("/forum-article/$topic_id/$slug")({
     };
   },
   loader: async ({ params }) => {
-    const { getForumTopic } = await import("@/lib/actions/forum");
-    const { hasUnpublishedTopicAccess } = await import(
-      "@/lib/actions/forum/unpublishedTopic"
-    );
-
     const topicId = Number(params.topic_id);
     if (!Number.isFinite(topicId)) {
       throw redirect({ to: "/forums" });

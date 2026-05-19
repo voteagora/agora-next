@@ -4,6 +4,7 @@
  */
 
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -27,28 +28,9 @@ import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";
 
-export const Route = createFileRoute("/forums/$topic_id/$slug")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    post: (search.post as string) ?? undefined,
-  }),
-  beforeLoad: () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("forums")?.enabled) {
-      throw redirect({ to: "/" });
-    }
-  },
-  head: ({ loaderData }) => {
-    const d = loaderData as
-      | { metaTitle?: string; metaDescription?: string }
-      | undefined;
-    return {
-      meta: [
-        { title: d?.metaTitle ?? "Forum Topic" },
-        { name: "description", content: d?.metaDescription ?? "" },
-      ],
-    };
-  },
-  loader: async ({ params }) => {
+const serverLoadForumTopic = createServerFn({ method: "GET" })
+  .inputValidator((data: { topicIdParam: string; slug?: string }) => data)
+  .handler(async ({ data }) => {
     const {
       getForumTopic,
       getForumCategories,
@@ -57,12 +39,12 @@ export const Route = createFileRoute("/forums/$topic_id/$slug")({
     } = await import("@/lib/actions/forum");
     const { getForumAdmins } = await import("@/lib/actions/forum/admin");
     const { hasUnpublishedTopicAccess } = await import(
-      "@/lib/actions/forum/unpublishedTopic"
+      "@/server/forum/unpublishedTopic"
     );
 
-    const topicId = Number(params.topic_id);
+    const topicId = Number(data.topicIdParam);
     if (!Number.isFinite(topicId)) {
-      throw redirect({ to: "/forums" });
+      return { redirectTo: "/forums" as const };
     }
 
     const [
@@ -80,31 +62,29 @@ export const Route = createFileRoute("/forums/$topic_id/$slug")({
     ]);
 
     if (!topicResult?.success || !topicResult.data) {
-      throw redirect({ to: "/forums" });
+      return { redirectTo: "/forums" as const };
     }
 
     const transformedTopics = transformForumTopics([topicResult.data]);
     const transformed = transformedTopics[0];
     if (!transformed) {
-      throw redirect({ to: "/forums" });
+      return { redirectTo: "/forums" as const };
     }
 
-    // Canonicalize slug
     const canonicalSlug = buildForumTopicSlug(transformed.title);
     if (
-      (canonicalSlug && params.slug !== canonicalSlug) ||
-      (!canonicalSlug && params.slug)
+      (canonicalSlug && data.slug !== canonicalSlug) ||
+      (!canonicalSlug && data.slug)
     ) {
-      throw redirect({
-        to: (canonicalSlug
+      return {
+        redirectTo: (canonicalSlug
           ? `/forums/${topicId}/${canonicalSlug}`
           : `/forums/${topicId}`) as string,
-      });
+      };
     }
 
     const topicData = topicResult.data;
 
-    // Unpublished access check
     const revealTime = topicData.revealTime
       ? new Date(topicData.revealTime)
       : null;
@@ -114,7 +94,6 @@ export const Route = createFileRoute("/forums/$topic_id/$slug")({
       ? await hasUnpublishedTopicAccess()
       : true;
 
-    // Admin directory
     const adminRolesMap = adminsResult?.success
       ? adminsResult.data.reduce(
           (map: Map<string, string | null>, admin: any) => {
@@ -194,8 +173,7 @@ export const Route = createFileRoute("/forums/$topic_id/$slug")({
       ? uncategorizedCountResult.data
       : 0;
 
-    const { namespace } = Tenant.current();
-    const { brandName } = Tenant.current();
+    const { namespace, brandName } = Tenant.current();
     const isOnArticlePage = namespace === TENANT_NAMESPACES.UNISWAP;
     const showDiscussButton = isFinancialStatement && !isOnArticlePage;
 
@@ -236,6 +214,37 @@ export const Route = createFileRoute("/forums/$topic_id/$slug")({
       metaTitle,
       metaDescription: transformed.title,
     };
+  });
+
+export const Route = createFileRoute("/forums/$topic_id/$slug")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    post: (search.post as string) ?? undefined,
+  }),
+  beforeLoad: () => {
+    const { ui } = Tenant.current();
+    if (!ui.toggle("forums")?.enabled) {
+      throw redirect({ to: "/" });
+    }
+  },
+  head: ({ loaderData }) => {
+    const d = loaderData as
+      | { metaTitle?: string; metaDescription?: string }
+      | undefined;
+    return {
+      meta: [
+        { title: d?.metaTitle ?? "Forum Topic" },
+        { name: "description", content: d?.metaDescription ?? "" },
+      ],
+    };
+  },
+  loader: async ({ params }) => {
+    const data = await serverLoadForumTopic({
+      data: { topicIdParam: params.topic_id, slug: params.slug },
+    });
+    if ("redirectTo" in data) {
+      throw redirect({ to: data.redirectTo });
+    }
+    return data;
   },
   component: function ForumTopicPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

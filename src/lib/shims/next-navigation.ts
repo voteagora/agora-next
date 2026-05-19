@@ -77,7 +77,25 @@ export function usePathname(): string {
  */
 export function useSearchParams(): URLSearchParams | null {
   const location = useLocation();
-  return new URLSearchParams(location.search);
+  const search = location.search;
+
+  if (typeof search === "string") {
+    return new URLSearchParams(search);
+  }
+
+  const params = new URLSearchParams();
+  Object.entries(search ?? {}).forEach(([key, value]) => {
+    if (value == null) return;
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item != null) params.append(key, String(item));
+      });
+      return;
+    }
+    params.set(key, String(value));
+  });
+
+  return params;
 }
 
 // ─── useParams ────────────────────────────────────────────────────────────────

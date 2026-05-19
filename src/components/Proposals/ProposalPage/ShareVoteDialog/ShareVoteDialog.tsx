@@ -190,7 +190,7 @@ const SuccessMessageCard = ({
               <span className="flex items-center gap-1 sm:gap-2">
                 <div className="w-4 h-4 sm:w-[18px] sm:h-[18px]">
                   <Image
-                    src={blockIcon.src}
+                    src={blockIcon}
                     alt="Block"
                     width={18}
                     height={18}
@@ -207,7 +207,7 @@ const SuccessMessageCard = ({
         <div className="flex justify-end items-center mt-4 sm:mt-6">
           <div className="w-[48px] h-[12px] sm:w-[62px] sm:h-[16px]">
             <Image
-              src={agoraLogo.src}
+              src={agoraLogo}
               alt="Agora Logo"
               width={62}
               height={16}
@@ -363,7 +363,7 @@ export function ShareDialog({
               height={20}
               width={20}
               className="w-5 h-5"
-              src={warpcastIcon.src}
+              src={warpcastIcon}
               alt="Warpcast icon"
             />
             Share on Warpcast
@@ -384,7 +384,7 @@ export function ShareDialog({
               height={20}
               width={20}
               className="w-5 h-5"
-              src={xIcon.src}
+              src={xIcon}
               alt="X icon"
             />
             Share on X

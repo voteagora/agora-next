@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getForumTopics } from "@/lib/actions/forum";
+import { getForumTopics } from "@/server/forum/actions";
 import { useDunaCategory } from "@/hooks/useDunaCategory";
 import Tenant from "@/lib/tenant/tenant";
 

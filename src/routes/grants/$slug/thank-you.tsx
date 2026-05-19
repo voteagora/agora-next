@@ -3,8 +3,7 @@
  * URL: /grants/:slug/thank-you
  */
 
-import Link from "next/link";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 
@@ -52,7 +51,7 @@ export const Route = createFileRoute("/grants/$slug/thank-you")({
               you as soon as possible.
             </p>
             <Link
-              href="/grants"
+              to="/grants"
               className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:opacity-90"
             >
               Back to Grants

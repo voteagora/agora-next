@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
-import { loadEnvConfig } from "@next/env";
-loadEnvConfig(process.cwd());
+import { config as loadEnv } from "dotenv";
+
+loadEnv({ path: ".env.local" });
+loadEnv();
 
 if (
   !process.env.WALLET_CONNECT_PROJECT_ID &&

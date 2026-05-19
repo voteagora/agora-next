@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ListOrdered, Quote } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
-import { uploadToIPFSOnly } from "@/lib/actions/attachment";
+import { uploadToIPFSOnly } from "@/server/forum/actions";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";

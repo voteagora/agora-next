@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run generate-typechain & npx prisma generate & NODE_OPTIONS='--max-old-space-size=8192' vite dev",
-    "build": "vite build",
-    "start": "node .output/server/index.mjs",
+    "dev": "npm run generate-typechain & npx prisma generate & vite dev",
+    "build": "vite build && cp dist/server/server.mjs dist/server/server.js",
+    "start": "vite preview --host 0.0.0.0 --port 3000",
     "lint": "eslint src/ --ext .ts,.tsx,.js,.jsx",
     "generate-typechain": "typechain --target ethers-v6 --out-dir src/lib/contracts/generated src/lib/contracts/abis/*.json",
     "generate-typechain:pretty": "yarn generate-typechain && prettier -w src/lib/contracts/generated",

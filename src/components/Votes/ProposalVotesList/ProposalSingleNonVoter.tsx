@@ -136,7 +136,7 @@ export function ProposalSingleNonVoter({
                   window.open(`https://twitter.com/${voter.twitter}`, "_blank");
               }}
             >
-              <Image height={8} width={8} src={xIcon.src} alt="x icon" />
+              <Image height={8} width={8} src={xIcon} alt="x icon" />
             </button>
           )}
           {voter.discord && (
@@ -152,7 +152,7 @@ export function ProposalSingleNonVoter({
               <Image
                 height={10}
                 width={10}
-                src={discordIcon.src}
+                src={discordIcon}
                 alt="discord icon"
               />
             </button>
@@ -173,7 +173,7 @@ export function ProposalSingleNonVoter({
               <Image
                 height={10}
                 width={10}
-                src={warpcastIcon.src}
+                src={warpcastIcon}
                 alt="warpcast icon"
               />
             </button>

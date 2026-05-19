@@ -152,7 +152,7 @@ export function useEnsureSiweSession(params: {
           purpose,
           signingKind: "siwe",
           onAuthenticated: options?.onSafeAuthenticated,
-          onClosed: (reason) => {
+          onClosed: (reason: "cancelled" | "failed" | "expired") => {
             if (shouldTrackMiradorSiweLogin(purpose)) {
               void closeStoredSiweLoginTrace(getSiweLoginCloseOptions(reason));
             }

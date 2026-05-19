@@ -57,10 +57,10 @@ export const scrollTenantUIConfig = new TenantUI({
   },
 
   favicon: {
-    "apple-touch-icon": appleTouchIcon.src,
-    icon32x32: favicon32x32.src,
-    icon16x16: favicon16x16.src,
-    "shortcut-icon": shortcutIcon.src,
+    "apple-touch-icon": appleTouchIcon,
+    icon32x32: favicon32x32,
+    icon16x16: favicon16x16,
+    "shortcut-icon": shortcutIcon,
   },
 
   links: [

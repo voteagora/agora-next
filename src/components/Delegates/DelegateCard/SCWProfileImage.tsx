@@ -39,7 +39,7 @@ export function SCWProfileImage({ address, copyable = false }: Props) {
               <ENSName address={address} />
             )}
           </div>
-          {tokenBalance && (
+          {tokenBalance !== undefined && (
             <div className="text-secondary text-xs font-semibold">
               {"Balance "}
               {formatNumber(tokenBalance)} {token.symbol}

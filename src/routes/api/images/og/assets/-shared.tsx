@@ -5,7 +5,7 @@ import {
   OG_SYNDICATE_WORDMARK_PATH,
   OG_TOWNS_WORDMARK_PATH,
   OG_UNISWAP_WORDMARK_PATH,
-} from "./tenantWordmarkPaths";
+} from "./-tenantWordmarkPaths";
 
 /** Towns / Syndicate OG uses Instrument-style wordmark SVGs only (no Agora + divider). */
 const isOgWordmarkOnlyTenant = (namespace: TenantNamespace) =>

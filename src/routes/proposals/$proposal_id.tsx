@@ -5,6 +5,7 @@
 
 import React from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
@@ -20,22 +21,9 @@ import HybridOptimisticProposalPage from "@/components/Proposals/ProposalPage/OP
 import ArchiveOptimisticProposalPage from "@/components/Proposals/ProposalPage/OPProposalPage/ArchiveOptimisticProposalPage";
 import ArchiveApprovalProposalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/ArchiveApprovalProposalPage";
 
-export const Route = createFileRoute("/proposals/$proposal_id")({
-  head: ({ loaderData }) => {
-    const d = loaderData as
-      | { metaTitle?: string; metaDescription?: string }
-      | undefined;
-    return {
-      meta: [
-        { title: d?.metaTitle ?? "Proposal" },
-        { name: "description", content: d?.metaDescription ?? "" },
-      ],
-    };
-  },
-  loader: async ({ params }) => {
-    const { fetchProposal } = await import(
-      "@/app/api/common/proposals/getProposals"
-    );
+const serverLoadProposal = createServerFn({ method: "GET" })
+  .inputValidator((data: { proposalId: string }) => data)
+  .handler(async ({ data }) => {
     const { ui, namespace, token } = Tenant.current();
     const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
 
@@ -57,8 +45,8 @@ export const Route = createFileRoute("/proposals/$proposal_id")({
       );
 
       const [archiveResults, taxFormMetadata] = await Promise.all([
-        fetchProposalFromArchive(namespace, params.proposal_id),
-        fetchProposalTaxFormMetadata(params.proposal_id),
+        fetchProposalFromArchive(namespace, data.proposalId),
+        fetchProposalTaxFormMetadata(data.proposalId),
       ]);
 
       const archiveProposal = archiveResults ?? undefined;
@@ -95,8 +83,44 @@ export const Route = createFileRoute("/proposals/$proposal_id")({
         }
       }
     } else {
-      proposal = await fetchProposal(params.proposal_id);
+      const { fetchProposal } = await import(
+        "@/app/api/common/proposals/getProposals"
+      );
+      proposal = await fetchProposal(data.proposalId);
     }
+
+    let votableSupply = "";
+    if (proposal?.proposalType === "OPTIMISTIC" && !useArchive) {
+      const { fetchVotableSupply } = await import(
+        "@/app/api/common/votableSupply/getVotableSupply"
+      );
+      votableSupply = await fetchVotableSupply();
+    }
+
+    return {
+      proposal,
+      useArchiveForProposals: useArchive,
+      votableSupply,
+    } as any;
+  });
+
+export const Route = createFileRoute("/proposals/$proposal_id")({
+  head: ({ loaderData }) => {
+    const d = loaderData as
+      | { metaTitle?: string; metaDescription?: string }
+      | undefined;
+    return {
+      meta: [
+        { title: d?.metaTitle ?? "Proposal" },
+        { name: "description", content: d?.metaDescription ?? "" },
+      ],
+    };
+  },
+  loader: async ({ params }) => {
+    const { proposal, useArchiveForProposals, votableSupply } =
+      (await serverLoadProposal({
+        data: { proposalId: params.proposal_id },
+      })) as any;
 
     if (!proposal) {
       throw redirect({ to: "/proposals" });
@@ -120,17 +144,9 @@ export const Route = createFileRoute("/proposals/$proposal_id")({
       80
     );
 
-    let votableSupply = "";
-    if (proposal.proposalType === "OPTIMISTIC" && !useArchive) {
-      const { fetchVotableSupply } = await import(
-        "@/app/api/common/votableSupply/getVotableSupply"
-      );
-      votableSupply = await fetchVotableSupply();
-    }
-
     return {
       proposal,
-      useArchiveForProposals: useArchive,
+      useArchiveForProposals,
       metaTitle,
       metaDescription,
       votableSupply,

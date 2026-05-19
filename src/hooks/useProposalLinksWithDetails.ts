@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getProposalLinksWithDetails } from "@/lib/actions/proposalLinksWithDetails";
+import { getProposalLinksWithDetails } from "@/server/forum/actions";
 import Tenant from "@/lib/tenant/tenant";
 
 interface LinkedItemDetails {

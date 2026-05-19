@@ -7,11 +7,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { transformForumTopics, buildForumTopicSlug } from "@/lib/forumUtils";
+import { getForumTopic } from "@/server/forum/actions";
 
 export const Route = createFileRoute("/forum-article/$topic_id/")({
   loader: async ({ params }) => {
-    const { getForumTopic } = await import("@/lib/actions/forum");
-
     const topicId = Number(params.topic_id);
     if (!Number.isFinite(topicId)) {
       throw redirect({ to: "/forums" });

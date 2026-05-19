@@ -2,7 +2,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
 import Image from "next/image";
 import lineaLogo from "@/assets/tenant/linea_logo.svg";
-import { OG_UNISWAP_WORDMARK_PATH } from "@/routes/api/images/og/assets/tenantWordmarkPaths";
+import { OG_UNISWAP_WORDMARK_PATH } from "@/routes/api/images/og/assets/-tenantWordmarkPaths";
 
 export const ogLogoForShareVote = (namespace: TenantNamespace) => {
   switch (namespace) {

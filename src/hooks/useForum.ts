@@ -22,15 +22,15 @@ import {
   subscribeToForumContent,
   unsubscribeFromForumContent,
   getForumSubscriptions,
-} from "@/lib/actions/forum";
-import { addForumReaction, removeForumReaction } from "@/lib/actions/forum";
-import {
+  addForumReaction,
+  removeForumReaction,
   upvoteForumTopic,
   removeUpvoteForumTopic,
   getForumTopicUpvotes,
   getMyForumTopicVote,
-} from "@/lib/actions/forum";
-import { uploadAttachment } from "@/lib/actions/attachment";
+  uploadAttachment,
+  getForumAdmins,
+} from "@/server/forum/actions";
 import { convertFileToAttachmentData, AttachmentData } from "@/lib/fileUtils";
 import {
   transformForumTopics,
@@ -41,7 +41,6 @@ import {
 import toast from "react-hot-toast";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { useQuery } from "@tanstack/react-query";
-import { getForumAdmins } from "@/lib/actions/forum/admin";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import {
   FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,

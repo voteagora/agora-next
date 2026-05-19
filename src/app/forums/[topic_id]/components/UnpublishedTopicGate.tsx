@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { verifyUnpublishedTopicPassword } from "@/lib/actions/forum/unpublishedTopic";
+import { verifyUnpublishedTopicPassword } from "@/server/forum/unpublishedTopic";
 import toast from "react-hot-toast";
 
 interface UnpublishedTopicGateProps {

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ImageResponse } from "@vercel/og";
 
-import { LogoPill } from "./assets/shared";
+import { LogoPill } from "./assets/-shared";
 import { sanitizeOgParam } from "@/lib/sanitizationUtilsEdge";
 import { truncateString } from "@/app/lib/utils/text";
 import { TenantNamespace } from "@/lib/types";

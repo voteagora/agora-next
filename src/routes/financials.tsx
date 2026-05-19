@@ -170,12 +170,12 @@ export const Route = createFileRoute("/financials")({
           <div className="flex flex-col max-w-[76rem]">
             <div className="relative">
               <img
-                src={(financialMock as { src: string }).src}
+                src={financialMock}
                 alt="Static proposals"
                 className="w-full h-auto blur-[10px] opacity-60 block"
               />
               <img
-                src={(financialDocMock as { src: string }).src}
+                src={financialDocMock}
                 alt="Static proposals"
                 className="w-full h-auto blur-[10px] opacity-60 block mt-4"
               />

@@ -278,7 +278,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     className="w-6 h-6"
                   >
                     <Image
-                      src={discordIcon.src}
+                      src={discordIcon}
                       alt="Discord"
                       width={24}
                       height={24}
@@ -332,7 +332,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           {/* Agora Logo Section */}
           <div className="p-8 bg-neutral-50 flex justify-start items-center gap-2">
             <Image
-              src={agoraLogo.src}
+              src={agoraLogo}
               alt="Agora Logo"
               width={82}
               height={21}
