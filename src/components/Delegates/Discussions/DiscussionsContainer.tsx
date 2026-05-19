@@ -68,7 +68,9 @@ const DiscussionsContainer = ({
   const topicsLoadingRef = useRef(false);
   const postsLoadingRef = useRef(false);
 
-  const normalizeTopics = (result: Awaited<ReturnType<typeof getForumTopicsByUser>>) => {
+  const normalizeTopics = (
+    result: Awaited<ReturnType<typeof getForumTopicsByUser>>
+  ) => {
     if (result.success) {
       return {
         meta: result.data.meta,
@@ -91,7 +93,9 @@ const DiscussionsContainer = ({
     };
   };
 
-  const normalizePosts = (result: Awaited<ReturnType<typeof getForumPostsByUser>>) => {
+  const normalizePosts = (
+    result: Awaited<ReturnType<typeof getForumPostsByUser>>
+  ) => {
     if (result.success) {
       return {
         meta: result.data.meta,

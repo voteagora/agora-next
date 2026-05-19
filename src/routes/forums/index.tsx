@@ -11,38 +11,36 @@ import ForumsHeader from "@/app/forums/components/ForumsHeader";
 import ForumsSidebar from "@/app/forums/ForumsSidebar";
 import TopicList from "@/app/forums/components/TopicList";
 
-const serverLoadForums = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const { getForumData } = await import("@/lib/actions/forum/topics");
-    const result = await getForumData({ categoryId: undefined });
-    if (!result.success) {
-      return { error: true };
-    }
-    const {
-      topics,
-      totalCount,
-      admins,
-      categories,
-      latestPost,
-      uncategorizedCount,
-    } = result.data;
-    const sortedTopics = topics
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    return {
-      error: false,
-      sortedTopics,
-      totalCount,
-      admins,
-      categories,
-      latestPost,
-      uncategorizedCount,
-    };
+const serverLoadForums = createServerFn({ method: "GET" }).handler(async () => {
+  const { getForumData } = await import("@/lib/actions/forum/topics");
+  const result = await getForumData({ categoryId: undefined });
+  if (!result.success) {
+    return { error: true };
   }
-);
+  const {
+    topics,
+    totalCount,
+    admins,
+    categories,
+    latestPost,
+    uncategorizedCount,
+  } = result.data;
+  const sortedTopics = topics
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  return {
+    error: false,
+    sortedTopics,
+    totalCount,
+    admins,
+    categories,
+    latestPost,
+    uncategorizedCount,
+  };
+});
 
 export const Route = createFileRoute("/forums/")({
   beforeLoad: () => {

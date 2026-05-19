@@ -331,12 +331,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
           {/* Agora Logo Section */}
           <div className="p-8 bg-neutral-50 flex justify-start items-center gap-2">
-            <Image
-              src={agoraLogo}
-              alt="Agora Logo"
-              width={82}
-              height={21}
-            />
+            <Image src={agoraLogo} alt="Agora Logo" width={82} height={21} />
             <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
             </div>

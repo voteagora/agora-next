@@ -6,7 +6,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";

@@ -6,7 +6,7 @@ import { cancelProposalAttestation } from "@/lib/eas";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { useState } from "react";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { cancelOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { cancelOffchainProposal } from "@/server/proposals/offchainActions";
 import { PLMConfig } from "../draft/types";
 import Tenant from "@/lib/tenant/tenant";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";

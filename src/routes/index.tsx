@@ -71,8 +71,7 @@ const serverLoadHome = createServerFn({ method: "GET" }).handler(async () => {
   if (ui.toggle("coming-soon")?.enabled) {
     return {
       comingSoon: true as const,
-      supportsNotifications:
-        ui.toggle("email-subscriptions")?.enabled ?? false,
+      supportsNotifications: ui.toggle("email-subscriptions")?.enabled ?? false,
       showStaticProposals:
         ui.toggle("coming-soon/show-static-proposals")?.enabled ?? false,
       isTowns: namespace === TENANT_NAMESPACES.TOWNS,
@@ -105,15 +104,14 @@ const serverLoadHome = createServerFn({ method: "GET" }).handler(async () => {
 
   if (useArchiveForProposals) {
     const { fetchProposalsFromArchive } = await import("@/lib/archiveUtils");
-    [governanceCalendar, archivedProposals, votableSupply] =
-      await Promise.all([
-        fetchGovernanceCalendar(),
-        fetchProposalsFromArchive(
-          namespace,
-          proposalsFilterOptions.everything.filter
-        ),
-        fetchVotableSupply(),
-      ]);
+    [governanceCalendar, archivedProposals, votableSupply] = await Promise.all([
+      fetchGovernanceCalendar(),
+      fetchProposalsFromArchive(
+        namespace,
+        proposalsFilterOptions.everything.filter
+      ),
+      fetchVotableSupply(),
+    ]);
     relevantProposals = emptyPaginated();
     allProposals = emptyPaginated();
   } else {

@@ -7,7 +7,7 @@ import { createSnapshot } from "../../draft/utils/createSnapshot";
 import { PLMConfig, SocialProposal } from "../../../proposals/draft/types";
 import { useAccount } from "wagmi";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { onSubmitAction as sponsorDraftProposal } from "@/app/proposals/draft/actions/sponsorDraftProposal";
+import { onSubmitAction as sponsorDraftProposal } from "@/server/proposals/draft/sponsorDraftProposal";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const SocialProposalAction = ({

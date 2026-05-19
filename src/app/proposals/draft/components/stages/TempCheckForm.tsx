@@ -9,7 +9,7 @@ import FormCard from "../form/FormCard";
 import TextInput from "../form/TextInput";
 import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
-import { onSubmitAction as tempCheckAction } from "@/app/proposals/draft/actions/createTempCheck";
+import { onSubmitAction as tempCheckAction } from "@/server/proposals/draft/createTempCheck";
 import { useAccount } from "wagmi";
 import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";

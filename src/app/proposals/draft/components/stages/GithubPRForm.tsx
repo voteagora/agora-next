@@ -5,7 +5,7 @@ import { useState } from "react";
 import FormCard from "../form/FormCard";
 import { UpdatedButton } from "@/components/Button";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
-import { onSubmitAction as createGithubChecklistItem } from "@/app/proposals/draft/actions/createGithubChecklistItem";
+import { onSubmitAction as createGithubChecklistItem } from "@/server/proposals/draft/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";

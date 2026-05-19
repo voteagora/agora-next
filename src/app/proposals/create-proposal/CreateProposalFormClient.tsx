@@ -44,7 +44,7 @@ import {
   ProposalType as LibProposalType,
 } from "@/lib/types.d";
 import { createProposalAttestation } from "@/lib/eas";
-import { createOffchainProposal } from "@/app/api/offchain-proposals/actions";
+import { createOffchainProposal } from "@/server/proposals/offchainActions";
 import { generateProposalId } from "@/lib/seatbelt/simulate";
 import { getPublicClient } from "@/lib/viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
