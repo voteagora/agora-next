@@ -12,6 +12,54 @@ interface TimingContext {
   requestId: string;
 }
 
+async function recordRequestMetrics({
+  api,
+  result,
+  duration,
+  requestId,
+  labels,
+  error,
+}: {
+  api: string;
+  result: "success" | "error";
+  duration: number;
+  requestId: string;
+  labels: Record<string, string>;
+  error?: unknown;
+}) {
+  await Promise.all([
+    monitoring.recordApiRequest({
+      api,
+      result,
+      durationMs: duration,
+      requestId,
+      source: "operation",
+      labels,
+      error,
+    }),
+    monitoring.recordMetric({
+      name: "api.duration",
+      value: duration,
+      labels: {
+        api,
+        result,
+        ...labels,
+      },
+      type: "distribution",
+    }),
+    monitoring.recordMetric({
+      name: "api.requests",
+      value: 1,
+      labels: {
+        api,
+        result,
+        ...labels,
+      },
+      type: "count",
+    }),
+  ]);
+}
+
 export async function withMetrics<T>(
   api: string,
   fn: () => Promise<T>,
@@ -41,26 +89,12 @@ export async function withMetrics<T>(
       //   `[${currentContext.requestId}] ### ${api} succeeded at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
       // );
 
-      await monitoring.recordMetric({
-        name: "api.duration",
-        value: duration,
-        labels: {
-          api,
-          result: "success",
-          ...labels,
-        },
-        type: "distribution",
-      });
-
-      await monitoring.recordMetric({
-        name: "api.requests",
-        value: 1,
-        labels: {
-          api,
-          result: "success",
-          ...labels,
-        },
-        type: "count",
+      await recordRequestMetrics({
+        api,
+        result: "success",
+        duration,
+        requestId: currentContext.requestId,
+        labels,
       });
 
       return result;
@@ -74,26 +108,13 @@ export async function withMetrics<T>(
       //   `[${currentContext.requestId}] ### ${api} failed at ${new Date(endTime).toISOString()} (${endTime}ms) - duration: ${duration}ms`
       // );
 
-      await monitoring.recordMetric({
-        name: "api.duration",
-        value: duration,
-        labels: {
-          api,
-          result: "error",
-          ...labels,
-        },
-        type: "distribution",
-      });
-
-      await monitoring.recordMetric({
-        name: "api.requests",
-        value: 1,
-        labels: {
-          api,
-          result: "error",
-          ...labels,
-        },
-        type: "count",
+      await recordRequestMetrics({
+        api,
+        result: "error",
+        duration,
+        requestId: currentContext.requestId,
+        labels,
+        error,
       });
 
       throw error;

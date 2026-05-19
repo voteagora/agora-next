@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   const authResponse = await authenticateApiUser(request);
   if (!authResponse.authenticated) {
     return new Response(authResponse.failReason, { status: 401 });
@@ -76,3 +77,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withApiRouteMonitoring("api.simulate_bundle", post);

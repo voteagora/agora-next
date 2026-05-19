@@ -26,8 +26,9 @@ import {
   normalizeSafeAddress,
   normalizeSafeTxHash,
 } from "@/lib/safeValidation";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function GET(request: NextRequest) {
+async function get(request: NextRequest) {
   if (!isSafeOnchainTransactionTrackingEnabled()) {
     return NextResponse.json(
       { message: SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE },
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   if (!isSafeOnchainTransactionTrackingEnabled()) {
     return NextResponse.json(
       { message: SAFE_ONCHAIN_TRANSACTION_TRACKING_DISABLED_MESSAGE },
@@ -196,3 +197,12 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const GET = withApiRouteMonitoring(
+  "api.internal.safe.tracked_transactions.list",
+  get
+);
+export const POST = withApiRouteMonitoring(
+  "api.internal.safe.tracked_transactions.create",
+  post
+);

@@ -21,8 +21,9 @@ import {
   normalizeSafeAddress,
   normalizeSafeMessageHash,
 } from "@/lib/safeValidation";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function GET(request: NextRequest) {
+async function get(request: NextRequest) {
   if (!isSafeOffchainMessageTrackingEnabled()) {
     return NextResponse.json(
       { message: SAFE_OFFCHAIN_MESSAGE_TRACKING_DISABLED_MESSAGE },
@@ -103,3 +104,8 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withApiRouteMonitoring(
+  "api.internal.safe.message_status",
+  get
+);

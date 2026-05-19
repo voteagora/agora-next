@@ -1,4 +1,6 @@
-export async function POST(request: Request) {
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
+
+async function post(request: Request) {
   const body = await request.json();
   const user = process.env.TENDERLY_USER;
   const project = process.env.TENDERLY_PROJECT;
@@ -55,3 +57,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = withApiRouteMonitoring("api.simulate", post);
