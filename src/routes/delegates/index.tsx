@@ -11,7 +11,7 @@ import Tenant from "@/lib/tenant/tenant";
 import Hero from "@/components/Hero/Hero";
 import DelegateTabs from "@/components/Delegates/DelegatesTabs/DelegatesTabs";
 import DelegateContent from "@/components/Delegates/DelegateCardList/DelegateContent";
-import { DelegateCardLoadingState } from "@/components/Delegates/DelegateCardList/DelegateCardLoadingState";
+import { DelegateCardLoadingState } from "@/components/Delegates/DelegateCardList/DelegateCardWrapper";
 import { buildDelegateFilters } from "@/components/Delegates/DelegateCardList/delegateUtils";
 import {
   ENDORSED_FILTER_PARAM,

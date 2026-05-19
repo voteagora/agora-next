@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { DelegateDialogProvider } from "@/components/Dialogs/DialogProvider/DelegateDialogProvider";
+import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
 import { useAgoraContext } from "@/contexts/AgoraContext";
@@ -97,12 +97,12 @@ export default function DelegateCardList({
   const isBannerVisible = useInfoBannerVisibility("delegates-page-info-banner");
 
   return (
-    <DelegateDialogProvider>
+    <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       <div className="relative">
         <DelegatesPageInfoBanner />
         <div className={`relative z-10 ${isBannerVisible ? "mt-6" : "mt-4"}`}>
-          {/* @ts-ignore */}
+          {/* @ts-expect-error InfiniteScroll types are missing from community typedefs */}
           <InfiniteScroll
             className="grid grid-flow-row grid-cols-1 md:grid-cols-2 lg:grid-cols-3  justify-around sm:justify-between py-4 gap-4 sm:gap-8"
             hasMore={meta.has_next}
@@ -143,6 +143,6 @@ export default function DelegateCardList({
           </InfiniteScroll>
         </div>
       </div>
-    </DelegateDialogProvider>
+    </DialogProvider>
   );
 }

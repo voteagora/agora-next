@@ -77,15 +77,9 @@ const Modal: FC<
 };
 
 export const DialogProviderCore: FC<
-  Props & {
-    dialogDefinitions?: DialogDefinitionMap;
-    loadDialogDefinitions?: () => Promise<DialogDefinitionMap>;
-  }
-> = ({ children, dialogDefinitions, loadDialogDefinitions }) => {
+  Props & { dialogDefinitions: DialogDefinitionMap }
+> = ({ children, dialogDefinitions }) => {
   const [currentDialog, setCurrentDialog] = useState<any | null>(null);
-  const [loadedDialogDefinitions, setLoadedDialogDefinitions] = useState<
-    DialogDefinitionMap | undefined
-  >(dialogDefinitions);
 
   const closeCurrentDialog = () => {
     const onClose = (currentDialog as { params?: { onClose?: () => void } })
@@ -107,25 +101,8 @@ export const DialogProviderCore: FC<
     };
   }, [currentDialog]);
 
-  useEffect(() => {
-    if (!currentDialog || loadedDialogDefinitions || !loadDialogDefinitions) {
-      return;
-    }
-
-    let cancelled = false;
-    loadDialogDefinitions().then((definitions) => {
-      if (!cancelled) {
-        setLoadedDialogDefinitions(definitions);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currentDialog, loadedDialogDefinitions, loadDialogDefinitions]);
-
   const renderDialog = currentDialog
-    ? loadedDialogDefinitions?.[currentDialog.type]
+    ? dialogDefinitions[currentDialog.type]
     : null;
   const renderedDialog =
     currentDialog && renderDialog

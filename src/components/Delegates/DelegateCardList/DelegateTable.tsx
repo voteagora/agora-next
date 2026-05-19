@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { DelegateDialogProvider } from "@/components/Dialogs/DialogProvider/DelegateDialogProvider";
+import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
@@ -103,7 +103,7 @@ export default function DelegateTable({
   const isBannerVisible = useInfoBannerVisibility("delegates-page-info-banner");
 
   return (
-    <DelegateDialogProvider>
+    <DialogProvider>
       {isDelegationEncouragementEnabled && <DelegateToSelfBanner />}
       <div className="relative">
         <DelegatesPageInfoBanner />
@@ -185,6 +185,6 @@ export default function DelegateTable({
           </Table>
         </div>
       </div>
-    </DelegateDialogProvider>
+    </DialogProvider>
   );
 }

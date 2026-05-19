@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode, FC } from "react";
-import type { DialogType } from "./dialogs";
+import { dialogs, DialogType } from "./dialogs";
 import {
   DialogProviderCore,
   useOpenDialog,
@@ -14,12 +14,7 @@ type Props = {
 
 export const DialogProvider: FC<Props> = ({ children }) => {
   return (
-    <DialogProviderCore
-      loadDialogDefinitions={async () => {
-        const { dialogs } = await import("./dialogs");
-        return dialogs;
-      }}
-    >
+    <DialogProviderCore dialogDefinitions={dialogs}>
       {children}
     </DialogProviderCore>
   );
