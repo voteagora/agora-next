@@ -33,7 +33,7 @@ class MonitoringService {
     this.namespace = `agora-next.${getTenantNamespace()}`;
     this.requestTimeoutMs = 2000;
 
-    this.axiomEnabled = process.env.ENABLE_AXIOM_METRICS !== "false";
+    this.axiomEnabled = process.env.ENABLE_AXIOM_METRICS === "true";
     this.axiomToken = process.env.AXIOM_TOKEN;
     this.axiomDataset = process.env.AXIOM_DATASET;
     this.axiomIngestUrl = `https://api.axiom.co/v1/datasets/${encodeURIComponent(process.env.AXIOM_DATASET || "")}/ingest`;
