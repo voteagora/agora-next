@@ -6,7 +6,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
-import Tenant from "@/lib/tenant/tenant";
 import Hero from "@/components/Hero/Hero";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateContent from "@/components/Delegates/DelegateCardList/DelegateContent";
