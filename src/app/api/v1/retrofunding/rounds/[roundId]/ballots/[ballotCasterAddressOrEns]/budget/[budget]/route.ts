@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const budgetParser = z.string(z.number().min(2000000).max(8000000)); // number between 2M and 8M
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: {
     params: {
@@ -62,3 +63,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.budget",
+  post
+);

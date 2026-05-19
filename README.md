@@ -227,6 +227,21 @@ This project uses various environment variables for configuration. Below is a co
 
 ### 📊 Monitoring & Analytics
 
+#### **ENABLE_AXIOM_METRICS**
+
+- **Purpose**: Toggle Axiom ingestion for canonical API request events emitted by monitored API routes, server actions, and `withMetrics`
+- **Required**: NO
+- **Values**: `"true"` to enable
+- **Default**: Disabled
+- **Related**: Requires `AXIOM_TOKEN` and `AXIOM_DATASET`
+
+#### **AXIOM_TOKEN**, **AXIOM_DATASET**
+
+- **Purpose**: Axiom API token and dataset used for application metric events
+- **Required**: YES when `ENABLE_AXIOM_METRICS=true`
+- **Usage**: Sends one `api.request` event per wrapped API call with `source`, `result`, `api`, `durationMs`, `requestId`, `tenant`, environment, status, and bounded error fields
+- **Example dataset**: `agora-next-monitoring`
+
 #### **DD_API_KEY**, **DD_APP_KEY**
 
 - **Purpose**: DataDog monitoring integration

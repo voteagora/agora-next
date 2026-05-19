@@ -6,6 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
 import { notificationCenterClient } from "@/lib/notification-center/client";
 import type { ChannelType } from "@/lib/notification-center/types";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const VALID_CHANNELS: ChannelType[] = [
   "email",
@@ -19,7 +20,7 @@ function isValidChannel(channel: string): channel is ChannelType {
   return VALID_CHANNELS.includes(channel as ChannelType);
 }
 
-export async function DELETE(
+async function del(
   request: NextRequest,
   { params }: { params: Promise<{ channel: string }> }
 ) {
@@ -46,3 +47,8 @@ export async function DELETE(
     );
   }
 }
+
+export const DELETE = withApiRouteMonitoring(
+  "api.notification_preferences.channels.delete",
+  del
+);
