@@ -1,4 +1,7 @@
-import { useRef, useLayoutEffect, useCallback } from "react";
+import { useRef, useLayoutEffect, useEffect, useCallback } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /**
  * Creates a stable callback reference that always calls the latest version of the function.
@@ -16,7 +19,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(
   const callbackRef = useRef(callback);
 
   // Update ref before render to ensure it's always current
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     callbackRef.current = callback;
   });
 

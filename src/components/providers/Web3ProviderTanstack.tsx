@@ -19,7 +19,7 @@
  *     TanStack Start has no async Server Component for the root
  */
 
-import { type FC, type PropsWithChildren } from "react";
+import { type FC, type PropsWithChildren, useState } from "react";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
@@ -81,16 +81,6 @@ export const wagmiConfig =
         transports,
       });
 
-// ─── QueryClient (module-level singleton, same as Web3Provider.tsx) ───────────
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      queryKeyHashFn: hashFn,
-    },
-  },
-});
-
 // ─── Provider component ───────────────────────────────────────────────────────
 
 export const shouldHideAgoraBranding = ui.hideAgoraBranding;
@@ -101,6 +91,17 @@ const miradorWebApiKey =
     : undefined;
 
 const Web3ProviderTanstack: FC<PropsWithChildren> = ({ children }) => {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            queryKeyHashFn: hashFn,
+          },
+        },
+      })
+  );
+
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>

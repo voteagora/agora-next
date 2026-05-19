@@ -1,12 +1,14 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { getForumTopics } from "@/lib/actions/forum";
+import {
+  getForumTopics,
+  getProposalLinks,
+  getArchivedProposals,
+} from "@/server/forum/actions";
 import { transformForumTopics } from "@/lib/forumUtils";
 import { RelatedItem } from "../types";
-import { getProposalLinks } from "@/lib/actions/proposalLinks";
 import { buildForumTopicPath } from "@/lib/forumUtils";
-import { getArchivedProposals } from "@/lib/actions/archive";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { useAccount } from "wagmi";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";

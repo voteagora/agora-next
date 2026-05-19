@@ -1,10 +1,13 @@
 // Implementation of https://react.dev/reference/react/experimental_useEffectEvent
-import { useCallback, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const useEffectEvent = (handler: Function) => {
   const handlerRef = useRef<null | Function>(null);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     handlerRef.current = handler;
   });
 

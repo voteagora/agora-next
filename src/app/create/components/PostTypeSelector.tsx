@@ -1,4 +1,7 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import { PostType, postTypeOptions } from "../types";
 
 interface PostTypeSelectorProps {
@@ -14,7 +17,7 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
     "gov-proposal": null,
   });
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const buttonElement = buttonRefs.current[value];
     const selectorElement = selectorRef.current;
 

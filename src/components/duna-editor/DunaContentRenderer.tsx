@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useMemo, useState, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 import {
   PROSE_LINKS,
   PROSE_MEDIA,
@@ -154,7 +157,7 @@ export default function DunaContentRenderer({
   const { ui } = Tenant.current();
   const [mounted, setMounted] = useState(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setMounted(true);
   }, []);
 

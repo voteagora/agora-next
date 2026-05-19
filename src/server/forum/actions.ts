@@ -43,16 +43,15 @@ import type {
   getProposalLinks as _GetProposalLinks,
 } from "@/lib/actions/proposalLinks";
 import type { getProposalLinksWithDetails as _GetProposalLinksWithDetails } from "@/lib/actions/proposalLinksWithDetails";
+import type { getArchivedProposals as _GetArchivedProposals } from "@/lib/actions/archive";
 
 const serverForumAction = createServerFn({ method: "POST" })
-  .inputValidator(
-    (data: { action: string; args: unknown[] }) => data
-  )
+  .inputValidator((data: { action: string; args: unknown[] }) => data)
   .handler(async ({ data }): Promise<any> => {
     const forum = await import("@/lib/actions/forum");
-    const fn = (forum as unknown as Record<string, (...args: unknown[]) => any>)[
-      data.action
-    ];
+    const fn = (
+      forum as unknown as Record<string, (...args: unknown[]) => any>
+    )[data.action];
 
     if (typeof fn !== "function") {
       throw new Error(`Unknown forum action: ${data.action}`);
@@ -112,6 +111,13 @@ const serverGetProposalLinks = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<any> => {
     const { getProposalLinks } = await import("@/lib/actions/proposalLinks");
     return getProposalLinks(data);
+  });
+
+const serverGetArchivedProposals = createServerFn({ method: "GET" })
+  .inputValidator((data: { filter?: string }) => data)
+  .handler(async ({ data }): Promise<any> => {
+    const { getArchivedProposals } = await import("@/lib/actions/archive");
+    return getArchivedProposals(data.filter);
   });
 
 const serverGetProposalLinksWithDetails = createServerFn({ method: "GET" })
@@ -211,3 +217,5 @@ export const getProposalLinks: typeof _GetProposalLinks = (data) =>
 export const getProposalLinksWithDetails: typeof _GetProposalLinksWithDetails =
   (proposalId) =>
     serverGetProposalLinksWithDetails({ data: { proposalId } }) as any;
+export const getArchivedProposals: typeof _GetArchivedProposals = (filter) =>
+  serverGetArchivedProposals({ data: { filter } }) as any;
