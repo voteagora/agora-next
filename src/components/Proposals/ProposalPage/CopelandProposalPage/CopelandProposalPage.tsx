@@ -2,35 +2,10 @@ import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import CopelandVotesPanel from "./CopelandVotesPanel/CopelandVotesPanel";
 import {
-  fetchSnapshotVotesForProposal,
-  fetchSnapshotUserVotesForProposal,
-} from "@/app/api/common/votes/getVotes";
-import { PaginationParams } from "@/app/lib/pagination";
+  fetchSnapshotProposalVotes as fetchProposalVotes,
+  fetchSnapshotUserVotesForProposal as fetchUserVotesForProposal,
+} from "@/server/proposals/votes";
 import { TaxFormBanner } from "../TaxFormBanner";
-
-async function fetchProposalVotes(
-  proposalId: string,
-  pagination?: PaginationParams
-) {
-  "use server";
-
-  return fetchSnapshotVotesForProposal({
-    proposalId,
-    pagination,
-  });
-}
-
-async function fetchUserVotesForProposal(
-  proposalId: string,
-  address: string | `0x${string}`
-) {
-  "use server";
-
-  return await fetchSnapshotUserVotesForProposal({
-    proposalId,
-    address,
-  });
-}
 
 export default function CopelandProposalPage({
   proposal,

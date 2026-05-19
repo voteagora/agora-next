@@ -13,10 +13,10 @@ import type {
   fetchProposalVotes as _OrigFetchProposalVotes,
   fetchVotersWhoHaveNotVotedForProposal as _OrigFetchNonVoters,
   fetchSnapshotProposalVotes as _OrigFetchSnapshotProposalVotes,
+  fetchSnapshotUserVotesForProposal as _OrigFetchSnapshotUserVotes,
 } from "@/app/proposals/actions";
 
 import type { VoterTypes } from "@/app/api/common/votes/vote";
-import type { PaginationParams } from "@/app/lib/pagination";
 import type { VotesSort } from "@/app/api/common/votes/vote.d";
 
 // ─── fetchProposalsCount ──────────────────────────────────────────────────────
@@ -166,3 +166,24 @@ export const fetchSnapshotProposalVotes: typeof _OrigFetchSnapshotProposalVotes 
       data: { proposalId, pagination },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
+
+// ─── fetchSnapshotUserVotesForProposal ────────────────────────────────────────
+
+const _serverFetchSnapshotUserVotes = createServerFn({ method: "GET" })
+  .inputValidator(
+    z
+      .object({ proposalId: z.string(), address: z.string() })
+      .parse.bind(z.object({ proposalId: z.string(), address: z.string() }))
+  )
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .handler(async ({ data }): Promise<any> => {
+    const { fetchSnapshotUserVotesForProposal: fn } = await import(
+      "@/app/proposals/actions"
+    );
+    return fn(data.proposalId, data.address);
+  });
+
+export const fetchSnapshotUserVotesForProposal: typeof _OrigFetchSnapshotUserVotes =
+  (proposalId, address) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _serverFetchSnapshotUserVotes({ data: { proposalId, address } }) as any;

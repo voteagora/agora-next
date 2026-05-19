@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { cachedDecodeEnhanced } from "@/lib/transactionDecoder";
+import { cachedDecodeEnhanced } from "@/server/lib/transactionDecoder";
 import { keccak256 } from "viem";
 import { toUtf8Bytes } from "ethers";
 

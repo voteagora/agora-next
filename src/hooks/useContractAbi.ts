@@ -1,6 +1,6 @@
 import { isAddress } from "viem";
 import { keccak256, toUtf8Bytes } from "ethers";
-import { cachedGetContractAbi } from "@/lib/abiUtils";
+import { cachedGetContractAbi } from "@/server/lib/abiUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { useQuery } from "@tanstack/react-query";
 import { getCanonicalType } from "@/lib/utils";

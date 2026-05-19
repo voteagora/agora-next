@@ -3,35 +3,10 @@ import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import {
-  fetchVotesForProposal,
-  fetchUserVotesForProposal,
-} from "@/app/api/common/votes/getVotes";
-import { PaginationParams } from "@/app/lib/pagination";
+  fetchProposalVotes,
+  fetchUserVotesForProposal as fetchUserVotes,
+} from "@/server/proposals/votes";
 import { TaxFormBanner } from "../TaxFormBanner";
-
-async function fetchProposalVotes(
-  proposalId: string,
-  pagination?: PaginationParams
-) {
-  "use server";
-
-  return fetchVotesForProposal({
-    proposalId,
-    pagination,
-  });
-}
-
-async function fetchUserVotes(
-  proposalId: string,
-  address: string | `0x${string}`
-) {
-  "use server";
-
-  return await fetchUserVotesForProposal({
-    proposalId,
-    address,
-  });
-}
 
 export default function OPProposalApprovalPage({
   proposal,

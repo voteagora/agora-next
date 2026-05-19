@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { type Abi, type Log, decodeEventLog, isHash } from "viem";
 import { getPublicClient } from "@/lib/viem";
-import { cachedGetContractAbi } from "@/lib/abiUtils";
+import { cachedGetContractAbi } from "@/server/lib/abiUtils";
 import { getExecutionEventNameForLog } from "@/lib/execution/executionEventTopic0Names";
 import { tryDecodeKnownExecutionLog } from "@/lib/execution/knownLogDecoders";
 import Tenant from "@/lib/tenant/tenant";

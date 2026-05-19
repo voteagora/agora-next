@@ -5,6 +5,7 @@ import {
   fetchVotesForProposal as apiFetchVotesForProposal,
   fetchVotersWhoHaveNotVotedForProposal as apiFetchVotersWhoHaveNotVotedForProposal,
   fetchSnapshotVotesForProposal as apiFetchSnapshotVotesForProposal,
+  fetchSnapshotUserVotesForProposal as apiFetchSnapshotUserVotesForProposal,
 } from "@/app/api/common/votes/getVotes";
 import { getProposalsCount } from "@/lib/prismaUtils";
 import { PaginationParams } from "../lib/pagination";
@@ -59,6 +60,15 @@ export const fetchUserVotesForProposal = (
   address: string | `0x${string}`
 ) =>
   apiFetchUserVotesForProposal({
+    proposalId,
+    address,
+  });
+
+export const fetchSnapshotUserVotesForProposal = (
+  proposalId: string,
+  address: string | `0x${string}`
+) =>
+  apiFetchSnapshotUserVotesForProposal({
     proposalId,
     address,
   });
