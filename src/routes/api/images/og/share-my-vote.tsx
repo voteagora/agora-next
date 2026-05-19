@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { createFileRoute } from "@tanstack/react-router";
 import { ImageResponse } from "@vercel/og";
 

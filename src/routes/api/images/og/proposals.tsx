@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { createFileRoute } from "@tanstack/react-router";
 import { ImageResponse } from "@vercel/og";
 
@@ -42,7 +43,7 @@ export const Route = createFileRoute("/api/images/og/proposals")({
                 flexWrap: "nowrap",
               }}
             >
-              {/* @ts-ignore */}
+              {/* @ts-expect-error -- bg prop type incompatible with @vercel/og img */}
               <img src={bg} style={{ position: "absolute" }} />
               <div tw="flex h-full w-full px-[76px] pt-[70px] pb-[110px]">
                 <div tw="flex flex-col justify-between h-full w-[470px]">

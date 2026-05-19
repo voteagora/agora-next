@@ -44,7 +44,7 @@ export const Route = createFileRoute("/api/duna/financial-metrics")({
             },
           });
 
-          function isDeletedMetric(row: (typeof rows)[number]) {
+          const isDeletedMetric = (row: (typeof rows)[number]) => {
             if (
               !row.data ||
               typeof row.data !== "object" ||
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/api/duna/financial-metrics")({
               return false;
             }
             return "__deleted" in row.data;
-          }
+          };
 
           const activeRows = rows.filter((row) => !isDeletedMetric(row));
 

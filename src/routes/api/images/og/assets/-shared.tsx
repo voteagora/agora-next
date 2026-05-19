@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
 
