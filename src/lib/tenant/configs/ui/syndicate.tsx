@@ -547,7 +547,7 @@ export const syndicateTenantUIConfig = new TenantUI({
       name: "info/governance-sections",
       enabled: true,
       config: {
-        title: "Voting in the Syndicate Collective",
+        title: "Syndicate Collective Voting",
         sections: [
           {
             id: "voting-process",

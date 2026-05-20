@@ -2335,13 +2335,47 @@
           const dateStr = run.created_at.split("T")[0];
           const gcpPrefix = `reports/${dateStr}/${run.actor?.login}_run-${run.id}/`;
 
-          const gcpRes = await fetch(
-            `https://storage.googleapis.com/storage/v1/b/agora-ab-artifacts/o?prefix=${encodeURIComponent(gcpPrefix)}`
-          );
-          if (!gcpRes.ok) throw new Error("Failed to query GCP Bucket.");
-          const gcpData = await gcpRes.json();
+          const fetchGcpItems = async (prefix) => {
+            const allItems = [];
+            let pageToken = "";
+            do {
+              const url =
+                `https://storage.googleapis.com/storage/v1/b/agora-ab-artifacts/o?prefix=${encodeURIComponent(prefix)}` +
+                (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : "");
+              const gcpRes = await fetch(url);
+              if (!gcpRes.ok) throw new Error("Failed to query GCP Bucket.");
+              const gcpData = await gcpRes.json();
+              allItems.push(...(gcpData.items || []));
+              pageToken = gcpData.nextPageToken || "";
+            } while (pageToken);
+            return allItems;
+          };
 
-          const items = gcpData.items || [];
+          const getScopePath = (relativePath) => {
+            if (!relativePath || !relativePath.includes("/")) return null;
+            if (relativePath.endsWith("/report.json")) {
+              return {
+                scopeName: relativePath.replace(/\/report\.json$/, ""),
+                fileName: "report.json",
+              };
+            }
+
+            const focusedIdx = relativePath.indexOf("/focused-crops/");
+            if (focusedIdx >= 0) {
+              return {
+                scopeName: relativePath.slice(0, focusedIdx),
+                fileName: relativePath.slice(focusedIdx + 1),
+              };
+            }
+
+            const lastSlash = relativePath.lastIndexOf("/");
+            return {
+              scopeName: relativePath.slice(0, lastSlash),
+              fileName: relativePath.slice(lastSlash + 1),
+            };
+          };
+
+          const items = await fetchGcpItems(gcpPrefix);
 
           // Try to load run metadata for URL A/B (since GitHub API doesn't return inputs for non-default branches)
           const metaItem = items.find((i) =>
@@ -2381,9 +2415,9 @@
 
           items.forEach((item) => {
             const relativePath = item.name.replace(gcpPrefix, "");
-            const parts = relativePath.split("/");
-            const scopeName = parts[0];
-            if (!scopeName || parts.length < 2) return;
+            const scopedPath = getScopePath(relativePath);
+            if (!scopedPath) return;
+            const { scopeName, fileName } = scopedPath;
 
             if (!scopesMap[scopeName])
               scopesMap[scopeName] = {
@@ -2393,8 +2427,6 @@
                 scans: new Set(),
                 images: [],
               };
-
-            const fileName = parts.slice(1).join("/");
 
             if (fileName.endsWith(".png")) {
               // Skip clean/ crops — they are reserved for AI analysis, not human viewing
@@ -2425,7 +2457,9 @@
                     if (
                       r.includes("data") ||
                       r.includes("style") ||
-                      r.includes("layout")
+                      r.includes("layout") ||
+                      r.includes("runner") ||
+                      r.includes("error")
                     ) {
                       scopesMap[scopeName].regressions++;
                     } else {
@@ -2459,6 +2493,20 @@
             .sort(
               (a, b) => b.regressions - a.regressions || b.drifts - a.drifts
             );
+
+          if (globalTelemetryData.length === 0) {
+            document.getElementById("sidebarList").innerHTML =
+              `<div class="px-4 py-2 text-sm text-gray-500 italic">No visual reports found for this run.</div>`;
+            document.getElementById("tableBody").innerHTML =
+              `<tr><td colspan="3" class="px-6 py-8 text-center text-gray-500 italic">No visual report artifacts were uploaded for this run.</td></tr>`;
+            document.getElementById("chartContainer").innerHTML =
+              `<div class="flex items-center justify-center h-full text-gray-500 italic">No visual report artifacts found.</div>`;
+            document.getElementById("viewerTitle").textContent =
+              "No visual reports";
+            document.getElementById("viewerSubtitle").textContent =
+              "This run uploaded metadata but no report.json artifacts.";
+            return;
+          }
 
           renderTelemetryTab();
           renderResultsSidebar();

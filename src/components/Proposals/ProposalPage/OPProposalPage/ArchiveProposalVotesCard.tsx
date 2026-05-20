@@ -29,7 +29,7 @@ export default function ArchiveProposalVotesCard({
   return (
     <>
       <div
-        className={`fixed flex justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${
+        className={`fixed flex flex-col justify-between gap-4 md:sticky top-[auto] md:top-20 md:max-h-[calc(100vh-220px)] max-h-[calc(100%-160px)] items-stretch flex-shrink w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] md:w-[20rem] lg:w-[24rem] bg-neutral border border-line rounded-xl shadow-newDefault mb-8 transition-all ${
           isClicked
             ? "bottom-[20px]"
             : "bottom-[calc(-100%+350px)] h-[calc(100%-160px)] md:h-auto"
@@ -38,7 +38,7 @@ export default function ArchiveProposalVotesCard({
           transition: "bottom 600ms cubic-bezier(0, 0.975, 0.015, 0.995)",
         }}
       >
-        <div className="flex flex-col gap-4 min-h-0 shrink pt-4 w-full">
+        <div className="flex flex-col flex-1 gap-4 min-h-0 pt-4 w-full">
           <button
             onClick={handleClick}
             className="border w-10 h-10 rounded-full bg-neutral absolute top-[-20px] left-[calc(50%-20px)] shadow-newDefault block md:hidden"
@@ -65,7 +65,10 @@ export default function ArchiveProposalVotesCard({
           {showVoters ? (
             <ArchiveProposalVotesList proposal={proposal} />
           ) : (
-            <ArchiveProposalNonVoterList proposal={proposal} />
+            <ArchiveProposalNonVoterList
+              proposal={proposal}
+              selectedVoterType={{ type: "ALL", value: "All" }}
+            />
           )}
 
           {isProposalActive && (

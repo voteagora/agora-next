@@ -8,7 +8,7 @@ import {
   calculateHybridOptimisticProposalMetrics,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import {
+import type {
   SnapshotVote,
   Vote,
   VotePayload,

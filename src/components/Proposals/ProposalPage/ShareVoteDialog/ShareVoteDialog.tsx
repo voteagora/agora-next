@@ -10,7 +10,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
 import blockIcon from "@/icons/block.svg";
 import { ogLogoForShareVote } from "./TenantLogo";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { format } from "date-fns";
 import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useState, useEffect } from "react";

@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+import { useQueryState } from "nuqs";
+
 import { Delegation } from "@/app/api/common/delegations/delegation";
-import DelegationToRow from "./DelegationToRow";
-import DelegationFromRow from "./DelegationFromRow";
+import { PaginatedResult } from "@/app/lib/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -11,10 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PaginatedResult } from "@/app/lib/pagination";
-import { useEffect, useRef, useState } from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import { useQueryState } from "nuqs";
+import Tenant from "@/lib/tenant/tenant";
+
+import DelegationFromRow from "./DelegationFromRow";
+import DelegationToRow from "./DelegationToRow";
 
 const SUBTAB_PARAM = "subtab";
 
@@ -32,6 +35,10 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
+  const { contracts } = Tenant.current();
+  const isERC721 = contracts.token.isERC721();
+  const delegatedFromColumnCount = isERC721 ? 3 : 4;
+
   const [meta, setMeta] = useState(initialDelegators.meta);
   const [delegators, setDelegators] = useState(initialDelegators.data);
 
@@ -111,9 +118,11 @@ function DelegationsContainer({
                 <Table className="min-w-full">
                   <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                     <TableRow>
-                      <TableHead className="h-10 text-secondary">
-                        Voting Power
-                      </TableHead>
+                      {!isERC721 && (
+                        <TableHead className="h-10 text-secondary">
+                          Voting Power
+                        </TableHead>
+                      )}
                       <TableHead className="h-10 text-secondary">
                         Delegated on
                       </TableHead>
@@ -129,10 +138,10 @@ function DelegationsContainer({
                     {delegators.length === 0 ? (
                       <td
                         className="w-full p-4 bg-neutral text-center text-secondary text-sm"
-                        colSpan={6}
+                        colSpan={delegatedFromColumnCount}
                       >
                         {numOfDelegators > 0n
-                          ? "Accounts with OVP or Dust are hidden"
+                          ? "Accounts with 0 VP or Dust are hidden"
                           : "None found"}
                       </td>
                     ) : (
@@ -140,6 +149,7 @@ function DelegationsContainer({
                         <DelegationFromRow
                           key={delegation.from}
                           delegation={delegation}
+                          hideVotingPower={isERC721}
                         />
                       ))
                     )}

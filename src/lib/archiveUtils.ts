@@ -157,7 +157,7 @@ export const fetchProposalFromArchive = async (
 export type ArchiveVoteRow = {
   citizen_type?: string | null;
   transaction_hash?: string | null;
-  block_number: bigint;
+  block_number?: bigint | number | string | null;
   chain_id?: number | null;
   voter: string;
   support?: string | null;

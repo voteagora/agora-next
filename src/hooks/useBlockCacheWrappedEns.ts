@@ -19,7 +19,7 @@ const useBlockCacheWrappedEns = ({
 }: UseBlockCacheWrappedEnsProps) => {
   const { data } = useQuery<EnsData>({
     queryKey: ["blockCacheEns", chainId, address],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const headers: HeadersInit = {};
 
       // Add Alchemy API key header if available
@@ -34,6 +34,7 @@ const useBlockCacheWrappedEns = ({
         `https://blockcache-production.up.railway.app/ens_avatar/${chainId}/${address}`,
         {
           headers,
+          signal,
         }
       );
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: {
     params: {
@@ -53,3 +54,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.os_multiplier",
+  post
+);

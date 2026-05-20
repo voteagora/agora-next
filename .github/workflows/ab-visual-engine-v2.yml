@@ -89,6 +89,7 @@ jobs:
         env:
           TENANT_CONTEXT: ${{ matrix.tenant }}
           SCAN_ALL_ARCHIVE: false
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: npm run test:ab
 
       - name: Google Auth
