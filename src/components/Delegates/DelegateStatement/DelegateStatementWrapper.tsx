@@ -46,8 +46,12 @@ const DelegateStatementWrapper = ({
       <DelegateStatementContainer delegate={delegate} />
       {delegate.statement && (
         <>
-          <TopIssues statement={delegate.statement as unknown as DelegateStatement} />
-          <TopStakeholders statement={delegate.statement as unknown as DelegateStatement} />
+          <TopIssues
+            statement={delegate.statement as unknown as DelegateStatement}
+          />
+          <TopStakeholders
+            statement={delegate.statement as unknown as DelegateStatement}
+          />
         </>
       )}
     </>

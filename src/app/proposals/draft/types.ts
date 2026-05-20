@@ -1,4 +1,13 @@
-export type { EthereumAddress, PLMConfig, BaseProposal, BasicProposal, SocialProposal, ApprovalProposal, OptimisticProposal, DraftProposal } from "@/lib/types/proposalDraft";
+export type {
+  EthereumAddress,
+  PLMConfig,
+  BaseProposal,
+  BasicProposal,
+  SocialProposal,
+  ApprovalProposal,
+  OptimisticProposal,
+  DraftProposal,
+} from "@/lib/types/proposalDraft";
 export {
   ProposalLifecycleStageMetadata,
   SocialProposalType,

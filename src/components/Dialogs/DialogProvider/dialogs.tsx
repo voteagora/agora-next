@@ -14,10 +14,7 @@ import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDial
 import { DelegateChunk } from "@/lib/types/delegate";
 import { VotingPowerData } from "@/lib/types/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
-import {
-  DelegateePayload,
-  Delegation,
-} from "@/lib/types/delegation";
+import { DelegateePayload, Delegation } from "@/lib/types/delegation";
 import { Chain } from "viem/chains";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
 import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
