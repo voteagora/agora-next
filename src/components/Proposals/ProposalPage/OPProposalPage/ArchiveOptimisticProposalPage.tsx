@@ -5,6 +5,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import ArchiveProposalTypeApproval from "../OPProposalPage/ArchiveProposalTypeApproval";
+import { TaxFormBanner } from "../TaxFormBanner";
 
 export default function ArchiveOptimisticProposalPage({
   proposal,
@@ -45,6 +46,7 @@ export default function ArchiveOptimisticProposalPage({
 
   return (
     <div className="flex flex-col">
+      <TaxFormBanner proposal={proposal} />
       <div className="flex gap-0 md:gap-16 justify-between items-start max-w-[76rem] flex-col md:flex-row md:items-start md:justify-between">
         <div className="w-full proposal-description pb-8 md:pb-0">
           <ProposalDescription proposal={proposal} />
