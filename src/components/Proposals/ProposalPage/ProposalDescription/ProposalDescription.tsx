@@ -12,6 +12,16 @@ import ProposalTitle from "../ProposalTitle/ProposalTitle";
 import RelatedProposalLinks from "../RelatedProposalLinks/RelatedProposalLinks";
 const { contracts, namespace } = Tenant.current();
 
+function stripLeadingUndefinedFromDescription(
+  description: string | null | undefined
+): string | null {
+  if (description == null) return description ?? null;
+  let d = description.replace(/^undefined[\s\r\n]*/, "");
+  d = d.replace(/^(#\s[^\n]+\n\n)undefined[\s\r\n]*/m, "$1");
+  d = d.replace(/\n\nundefined(?=\n|$|\r)/g, "\n\n");
+  return d;
+}
+
 export default function ProposalDescription({
   proposal,
 }: {
@@ -34,9 +44,12 @@ export default function ProposalDescription({
 
   // removes the "## Description" line that was previously added to the description
   // without the users input via the PLM tool
+  const strippedDescription = stripLeadingUndefinedFromDescription(
+    proposal.description
+  );
   const patchedDescription = proposalsWithBadDescription.includes(proposal.id)
-    ? proposal.description?.split("\\n ")[1]
-    : proposal.description?.replace(/\n\n ## Description \n/, "");
+    ? strippedDescription?.split("\\n ")[1]
+    : strippedDescription?.replace(/\n\n ## Description \n/, "");
 
   const title = proposal.markdowntitle;
 
