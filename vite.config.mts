@@ -263,6 +263,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     port: 3000,
   },
+  preview: {
+    allowedHosts: [
+      "agora-next-production.up.railway.app",
+      ...(process.env.RAILWAY_PUBLIC_DOMAIN
+        ? [process.env.RAILWAY_PUBLIC_DOMAIN]
+        : []),
+    ],
+  },
   ssr: {
     // Packages whose ESM builds have broken imports (CSS imports, or
     // extensionless relative imports like `./foo` without `.js`) must be
