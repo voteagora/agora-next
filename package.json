@@ -2,6 +2,9 @@
   "name": "agora-next",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
     "dev": "npm run generate-typechain & npx prisma generate & vite dev",
     "build": "vite build && cp dist/server/server.mjs dist/server/server.js",
