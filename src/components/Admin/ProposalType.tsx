@@ -221,12 +221,18 @@ export default function ProposalType({
       throw new Error("Proposal type address not found");
     }
 
-    const quorum =
-      votingModuleType === ProposalTypeEnum.OPTIMISTIC ? 0 : formValues.quorum;
-    const approvalThreshold =
-      votingModuleType === ProposalTypeEnum.OPTIMISTIC
-        ? 0
-        : formValues.approval_threshold;
+    const quorum = [
+      ProposalTypeEnum.OPTIMISTIC,
+      ProposalTypeEnum.OPTMISTIC_EXECUTABLE,
+    ].includes(votingModuleType)
+      ? 0
+      : formValues.quorum;
+    const approvalThreshold = [
+      ProposalTypeEnum.OPTIMISTIC,
+      ProposalTypeEnum.OPTMISTIC_EXECUTABLE,
+    ].includes(votingModuleType)
+      ? 0
+      : formValues.approval_threshold;
 
     const setProposalTypeArgs = [
       BigInt(index),
@@ -404,6 +410,17 @@ export default function ProposalType({
     }
   }, []);
 
+  const hasOptimisticExecutableProposalType = useMemo(() => {
+    try {
+      const address = getProposalTypeAddress(
+        ProposalTypeEnum.OPTMISTIC_EXECUTABLE
+      );
+      return address !== null;
+    } catch (e) {
+      return false;
+    }
+  }, []);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 my-4">
@@ -472,6 +489,13 @@ export default function ProposalType({
                             Optimistic
                           </SelectItem>
                         )}
+                        {hasOptimisticExecutableProposalType && (
+                          <SelectItem
+                            value={ProposalTypeEnum.OPTMISTIC_EXECUTABLE}
+                          >
+                            Optimistic Executable
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </FormItem>
                   </Select>
@@ -481,7 +505,10 @@ export default function ProposalType({
             )}
           />
         </div>
-        {formValues.voting_module_type === ProposalTypeEnum.OPTIMISTIC ? (
+        {[
+          ProposalTypeEnum.OPTIMISTIC,
+          ProposalTypeEnum.OPTMISTIC_EXECUTABLE,
+        ].includes(formValues.voting_module_type) ? (
           <div>
             <p>
               Optimistic proposals do not require a quorum or approval

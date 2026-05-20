@@ -24,13 +24,25 @@ function getFormattedTransactionTable(
       : [];
 
   const transactionObject = options[0];
+  const functionArgsName =
+    "functionArgsName" in transactionObject
+      ? (
+          transactionObject as {
+            functionArgsName: {
+              functionName: string;
+              functionArgs: string[];
+            }[];
+          }
+        ).functionArgsName
+      : null;
   for (let i = 0; i < transactionObject.targets.length; i++) {
+    const fn = functionArgsName?.[i];
     markDownArray.push([
-      transactionObject.targets[i], // target
-      transactionObject.values[i], // value
-      transactionObject.functionArgsName[i].functionName, // fn
-      transactionObject.functionArgsName[i].functionArgs.join(", "), // args
-      "", // value?
+      transactionObject.targets[i],
+      transactionObject.values[i],
+      fn?.functionName ?? "unknown",
+      fn?.functionArgs?.join(", ") ?? "",
+      "",
     ]);
   }
 
@@ -70,7 +82,8 @@ function formatGithubProposal(proposal: DraftProposal) {
 
   const abstract = `# Description \n ${proposal.abstract}`;
   const transactions =
-    proposal.voting_module_type === ProposalType.BASIC
+    proposal.voting_module_type === ProposalType.BASIC ||
+    proposal.voting_module_type === ProposalType.OPTMISTIC_EXECUTABLE
       ? `# Transactions \n ${getFormattedTransactionTable(proposal)}`
       : "";
 

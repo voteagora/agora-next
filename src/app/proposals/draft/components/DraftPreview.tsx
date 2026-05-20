@@ -200,6 +200,18 @@ const DraftPreview = ({
           </div>
         );
 
+      case ProposalType.OPTMISTIC_EXECUTABLE:
+        return (
+          <div>
+            <p className="text-secondary mt-2">
+              This is an <PreText text="optimistic executable" /> proposal
+            </p>
+            {scopeDescription && (
+              <p className="text-secondary mt-2">{scopeDescription}</p>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }
@@ -383,7 +395,9 @@ const DraftPreview = ({
         </h2>
         {renderProposalDescription(proposalDraft)}
         <div className="mt-6">
-          {proposalDraft.voting_module_type === ProposalType.BASIC &&
+          {(proposalDraft.voting_module_type === ProposalType.BASIC ||
+            proposalDraft.voting_module_type ===
+              ProposalType.OPTMISTIC_EXECUTABLE) &&
             proposalDraft.proposal_scope !== ProposalScope.OFFCHAIN_ONLY && (
               <ProposalTransactionDisplay
                 descriptions={description as string[]}

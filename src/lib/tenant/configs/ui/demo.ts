@@ -259,13 +259,18 @@ export const demoTenantUIConfig = new TenantUI({
           },
           {
             type: ProposalType?.APPROVAL,
-            prodAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
-            testnetAddress: "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1",
+            prodAddress: "0x1a5628aF2C02B9513722Cc22FF606724C67Ecb76",
+            testnetAddress: "0x1a5628aF2C02B9513722Cc22FF606724C67Ecb76",
           },
           {
             type: ProposalType?.OPTIMISTIC,
-            prodAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
-            testnetAddress: "0x368723068b6C762b416e5A7d506a605E8b816C22",
+            prodAddress: "0x5eC8FDaa5040Be3408C04CC1Ee84481C735bBcD9",
+            testnetAddress: "0x5eC8FDaa5040Be3408C04CC1Ee84481C735bBcD9",
+          },
+          {
+            type: ProposalType?.OPTMISTIC_EXECUTABLE,
+            prodAddress: "0x7f730aeA758432bb0D5a1359746F2255e345F4E1",
+            testnetAddress: "0x7f730aeA758432bb0D5a1359746F2255e345F4E1",
           },
         ],
         copy: {

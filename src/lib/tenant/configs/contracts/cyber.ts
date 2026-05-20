@@ -77,15 +77,6 @@ export const cyberTenantConfig = ({
     ? "0x11caA7DF2a1FCAea7149fc01aC8D2DB5d3C82421"
     : "0xa9E1A6856bcd9e8b3c4B336f229061c1C5461Bc6";
 
-  const APPROVAL_MODULE = isProd
-    ? "0x751a4989E01776522B6989511D0B969311Dd5f4e"
-    : "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49";
-
-  //     // main - 0x751a4989E01776522B6989511D0B969311Dd5f4e
-  // // testnet - 0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49
-  //     export const cyberApprovalModuleAddress =
-  //       "0x096F1e0e82CaD5540BF04bd95A6802C0350d8E49" as `0x${string}`;
-
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
   const provider = usingForkedNode
@@ -129,7 +120,6 @@ export const cyberTenantConfig = ({
     }),
 
     treasury: TREASURY,
-    governorApprovalModule: APPROVAL_MODULE,
 
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,

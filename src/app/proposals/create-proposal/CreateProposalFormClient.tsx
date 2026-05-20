@@ -764,6 +764,8 @@ export default function CreateProposalFormClient({
                   return <ApprovalProposalForm />;
                 case ProposalType.OPTIMISTIC:
                   return <OptimisticProposalForm />;
+                case ProposalType.OPTMISTIC_EXECUTABLE:
+                  return <BasicProposalForm />;
                 default:
                   return null;
               }

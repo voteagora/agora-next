@@ -22,15 +22,13 @@ interface Props {
   alchemyId: string;
 }
 export const demoTenantConfig = ({ alchemyId }: Props): TenantContracts => {
-  const TOKEN = "0xd5741323b3ddfe5556C3477961B5160600C29c53";
+  const TOKEN = "0xCeF36E1Cff76c957e68e42817b71cdCDa270ACD5";
 
-  const GOVERNOR = "0x95a35Cd8638b732E839C6CCDD0d8B7FA06319677";
+  const GOVERNOR = "0x18423BD547D402C0CE50B31df9868e5089C33006";
 
-  const TYPES = "0x7d377a66c4A803bbB457b4541e5ec62b1dCe2Ad3";
+  const TYPES = "0xb6992f1f0659820f3DAF4ebDD16FaFD6ea9EF8eB";
 
-  const TIMELOCK = "0xf8D15c3132eFA557989A1C9331B6667Ca8Caa3a9";
-
-  const APPROVAL_MODULE = "0x05a9C4a400cfA64C9639cc2f00B2CF95710f9af1";
+  const TIMELOCK = "0x8b64522450e97c1c3bf00FD54803449b15242BdF";
 
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
@@ -73,8 +71,6 @@ export const demoTenantConfig = ({ alchemyId }: Props): TenantContracts => {
       contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
-
-    governorApprovalModule: APPROVAL_MODULE,
 
     delegationModel: DELEGATION_MODEL.PARTIAL,
     governorType: GOVERNOR_TYPE.AGORA,

@@ -42,10 +42,6 @@ export const b3TenantConfig = ({
     ? "0x5d729d4c0BF5d0a2Fa0F801c6e0023BD450c4fd6"
     : "0xaDe915ec0208a77d464C4837b252bC6a822F457A";
 
-  const APPROVAL_MODULE = isProd
-    ? "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa"
-    : "0x2c349e564037e184Fe787CA4906C53507c70A7E0";
-
   const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
 
   const provider = usingForkedNode
@@ -87,8 +83,6 @@ export const b3TenantConfig = ({
       contract: ProposalTypesConfigurator__factory.connect(TYPES, provider),
       provider,
     }),
-
-    governorApprovalModule: APPROVAL_MODULE,
 
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,

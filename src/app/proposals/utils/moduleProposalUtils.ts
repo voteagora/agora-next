@@ -29,6 +29,10 @@ export const getModuleAddressForProposal = (proposalType: string): string => {
     case "HYBRID_OPTIMISTIC_TIERED":
       moduleAddress = getProposalTypeAddress(ProposalType.OPTIMISTIC);
       break;
+    case "OPTIMISTIC_EXECUTABLE":
+    case "HYBRID_OPTIMISTIC_EXECUTABLE":
+      moduleAddress = getProposalTypeAddress(ProposalType.OPTMISTIC_EXECUTABLE);
+      break;
     default:
       throw new Error(`Unsupported proposal type: ${proposalType}`);
   }

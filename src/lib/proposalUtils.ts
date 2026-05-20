@@ -6,7 +6,13 @@ import {
   ProposalPayload,
   ProposalTypeData,
 } from "@/app/api/common/proposals/proposal";
-import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
+import {
+  Abi,
+  decodeAbiParameters,
+  decodeFunctionData,
+  keccak256,
+  parseUnits,
+} from "viem";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes, formatUnits } from "ethers";
 import { mapArbitrumBlockToMainnetBlock } from "./utils";
@@ -443,7 +449,8 @@ export function getProposalTotalValue(
 ) {
   switch (proposalData.key) {
     case "STANDARD":
-    case "OPTIMISTIC": {
+    case "OPTIMISTIC":
+    case "OPTIMISTIC_EXECUTABLE": {
       return proposalData.kind.options.reduce((acc, option) => {
         return (
           option.values.reduce((sum, val) => {
@@ -563,6 +570,17 @@ export type ParsedProposalData = {
     key: "OPTIMISTIC";
     kind: {
       options: [];
+      disapprovalThreshold: number;
+    };
+  };
+  OPTIMISTIC_EXECUTABLE: {
+    key: "OPTIMISTIC_EXECUTABLE";
+    kind: {
+      options: {
+        targets: string[];
+        values: string[];
+        calldatas: string[];
+      }[];
       disapprovalThreshold: number;
     };
   };
@@ -749,6 +767,53 @@ export function parseProposalData(
         kind: { options: [], disapprovalThreshold },
       } as ParsedProposalData["OPTIMISTIC"];
     }
+    case "OPTIMISTIC_EXECUTABLE": {
+      let targets: string[] = [];
+      let values: string[] = [];
+      let calldatas: string[] = [];
+      let disapprovalThreshold = 20;
+      if (proposalData.startsWith("0x")) {
+        const decoded = decodeAbiParameters(
+          [
+            { name: "targets", type: "address[]" },
+            { name: "values", type: "uint256[]" },
+            { name: "calldatas", type: "bytes[]" },
+            {
+              name: "proposalSettings",
+              type: "tuple",
+              components: [
+                { name: "againstThreshold", type: "uint248" },
+                { name: "isRelativeToVotableSupply", type: "bool" },
+              ],
+            },
+          ],
+          proposalData as `0x${string}`
+        );
+        targets = decoded[0] as string[];
+        values = (decoded[1] as bigint[]).map(String);
+        calldatas = (decoded[2] as `0x${string}`[]).map((c) => c as string);
+        const settings = decoded[3] as {
+          againstThreshold: bigint;
+          isRelativeToVotableSupply: boolean;
+        };
+        disapprovalThreshold = Number(settings.againstThreshold) / 100;
+      } else {
+        const parsed = JSON.parse(proposalData);
+        targets = parsed.targets ?? parsed[0] ?? [];
+        values = (parsed.values ?? parsed[1] ?? []).map(String);
+        calldatas = parsed.calldatas ?? parsed[2] ?? [];
+        disapprovalThreshold =
+          Number(parsed?.proposalSettings?.[0] ?? parsed?.[3]?.[0] ?? 2000) /
+          100;
+      }
+      return {
+        key: "OPTIMISTIC_EXECUTABLE",
+        kind: {
+          options: [{ targets, values, calldatas }],
+          disapprovalThreshold,
+        },
+      } as ParsedProposalData[ProposalType];
+    }
     case "HYBRID_OPTIMISTIC_TIERED": {
       const parsedProposalData = JSON.parse(proposalData);
       return {
@@ -923,6 +988,14 @@ export type ParsedProposalResults = {
   };
   OPTIMISTIC: {
     key: "OPTIMISTIC";
+    kind: {
+      for: bigint;
+      against: bigint;
+      abstain: bigint;
+    };
+  };
+  OPTIMISTIC_EXECUTABLE: {
+    key: "OPTIMISTIC_EXECUTABLE";
     kind: {
       for: bigint;
       against: bigint;
