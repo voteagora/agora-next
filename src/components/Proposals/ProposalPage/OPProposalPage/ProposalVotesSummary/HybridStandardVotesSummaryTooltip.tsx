@@ -1,6 +1,6 @@
 import checkIcon from "@/icons/check.svg";
 import { X } from "lucide-react";
-import { Proposal } from "@/app/api/common/proposals/proposal.d";
+import { Proposal } from "@/lib/types/proposal";
 import { VotesBar } from "@/components/common/VotesBar";
 import { StepperRow } from "@/components/common/StepperRow";
 

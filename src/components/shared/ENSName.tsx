@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useEnsName } from "wagmi";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { Copy } from "lucide-react";
-import { truncateAddress } from "@/app/lib/utils/text";
+import { truncateAddress } from "@/lib/utils/text";
 import {
   Tooltip,
   TooltipContent,

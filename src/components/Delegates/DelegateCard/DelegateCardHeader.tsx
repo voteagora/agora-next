@@ -1,6 +1,6 @@
 "use client";
 
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Delegate } from "@/lib/types/delegate";
 import {
   useDelegateStats,
   useArchiveParticipation,

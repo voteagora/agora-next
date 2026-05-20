@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/lib/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import InfiniteScroll from "react-infinite-scroller";
 import { MessageCircle, Clock, User } from "lucide-react";

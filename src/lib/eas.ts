@@ -9,7 +9,7 @@ import Tenant from "./tenant/tenant";
 import { keccak256 } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
-import { easVotingTypeToNumber } from "@/app/create/types";
+import { easVotingTypeToNumber } from "@/lib/types/create";
 import { extractEasTxInputData } from "./easTxContext";
 
 const { slug, contracts } = Tenant.current();

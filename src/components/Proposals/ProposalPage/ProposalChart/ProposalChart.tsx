@@ -4,7 +4,7 @@ import { useState } from "react";
 import { TimelineChart } from "@/components/Proposals/ProposalPage/Charts/TimelineChart";
 import TreeMapChart from "../TreeMapChart/TreeMapChart";
 import BubbleChart from "../BubbleChart/BubbleChart";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { useProposalVotesChart } from "@/hooks/useProposalVotesChart";
 import { ExpandCollapseIcon } from "@/icons/ExpandCollapseIcon";
 import Tenant from "@/lib/tenant/tenant";

@@ -1,4 +1,4 @@
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote } from "@/lib/types/vote";
 import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";

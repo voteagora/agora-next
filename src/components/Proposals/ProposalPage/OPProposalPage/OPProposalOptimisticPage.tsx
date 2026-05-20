@@ -7,7 +7,7 @@ import {
   ParsedProposalData,
 } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { TaxFormBanner } from "../TaxFormBanner";
 
 export default function OPProposalPage({

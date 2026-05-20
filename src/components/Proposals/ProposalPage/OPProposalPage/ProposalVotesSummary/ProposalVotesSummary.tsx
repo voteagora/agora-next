@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import {
   isProposalCreatedBeforeUpgradeCheck,

@@ -1,5 +1,5 @@
 import { pluralize } from "@/lib/utils";
-import { type Proposal } from "@/app/api/common/proposals/proposal";
+import { type Proposal } from "@/lib/types/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 
 type ApprovalStatusViewProps = {

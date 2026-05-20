@@ -14,7 +14,7 @@ import {
   EASVotingType,
   ApprovalCriteria,
   approvalCriteriaToNumber,
-} from "@/app/create/types";
+} from "@/lib/types/create";
 import { extractFailedEasTxContext } from "@/lib/easTxContext";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import {

@@ -3,7 +3,7 @@
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useAccount } from "wagmi";
 import DelegateStatement from "./DelegateStatement";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Delegate } from "@/lib/types/delegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { useEffect, useRef } from "react";
 

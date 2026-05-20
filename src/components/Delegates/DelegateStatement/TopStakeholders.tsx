@@ -1,4 +1,4 @@
-import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
+import { DelegateStatement as DelegateStatementType } from "@/lib/types/delegateStatement";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { capitalizeFirstLetter } from "@/lib/utils";

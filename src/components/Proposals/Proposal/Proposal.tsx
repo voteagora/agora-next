@@ -11,7 +11,7 @@ import SnapshotProposalStatus from "./SnapshotProposalStatus";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
-import { type Proposal } from "@/app/api/common/proposals/proposal";
+import { type Proposal } from "@/lib/types/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import ENSName from "@/components/shared/ENSName";
 import HybridStandardProposalStatus from "./HybridStandardProposalStatus";

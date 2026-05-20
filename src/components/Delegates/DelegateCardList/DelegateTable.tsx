@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
 import {
   Table,
   TableCell,
@@ -18,7 +18,7 @@ import { DelegateToSelfBanner } from "./DelegateToSelfBanner";
 import Tenant from "@/lib/tenant/tenant";
 import DelegatesPageInfoBanner from "../DelegatesPageInfoBanner";
 import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import useIsAdvancedUser from "@/hooks/useIsAdvancedUser";
 import useConnectedDelegate from "@/hooks/useConnectedDelegate";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 

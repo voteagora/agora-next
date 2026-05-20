@@ -10,7 +10,7 @@ import infoPageCard03 from "@/assets/tenant/xai_info_3.svg";
 import infoPageCard04 from "@/assets/tenant/xai_info_4.svg";
 import infoPageHero from "@/assets/tenant/xai_info_page_hero.svg";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";

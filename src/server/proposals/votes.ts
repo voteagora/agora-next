@@ -16,7 +16,7 @@ import type {
   fetchSnapshotUserVotesForProposal as _OrigFetchSnapshotUserVotes,
 } from "@/app/proposals/actions";
 
-import type { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/lib/types/vote";
 import type { VotesSort } from "@/app/api/common/votes/vote.d";
 
 // ─── fetchProposalsCount ──────────────────────────────────────────────────────

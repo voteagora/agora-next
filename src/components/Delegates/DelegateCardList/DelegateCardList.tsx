@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { DialogProvider } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import { DelegateChunk } from "@/lib/types/delegate";
+import useIsAdvancedUser from "@/hooks/useIsAdvancedUser";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
 import DelegateCard from "./DelegateCard";
 import { stripMarkdown } from "@/lib/sanitizationUtils";
 import { DelegateToSelfBanner } from "./DelegateToSelfBanner";

@@ -1,6 +1,6 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import lineaLogo from "@/assets/tenant/linea_logo.svg";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import infoPageCard01 from "@/assets/tenant/linea_info_1.png";
 import infoPageCard02 from "@/assets/tenant/linea_info_2.png";

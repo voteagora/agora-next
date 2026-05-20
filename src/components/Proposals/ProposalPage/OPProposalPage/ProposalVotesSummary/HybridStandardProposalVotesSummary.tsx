@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Proposal } from "@/app/api/common/proposals/proposal.d";
+import { Proposal } from "@/lib/types/proposal";
 import { HYBRID_VOTE_WEIGHTS } from "@/lib/constants";
 import {
   ParsedProposalResults,

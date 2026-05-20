@@ -5,7 +5,7 @@ import delegateImage from "@/assets/tenant/derive_delegate.svg";
 import successImage from "@/assets/tenant/derive_success.svg";
 import pendingImage from "@/assets/tenant/derive_pending.svg";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import infoPageCard01 from "@/assets/tenant/derive_info_0.png";
 import infoPageCard02 from "@/assets/tenant/derive_info_1.png";
 import infoPageCard03 from "@/assets/tenant/derive_info_2.png";

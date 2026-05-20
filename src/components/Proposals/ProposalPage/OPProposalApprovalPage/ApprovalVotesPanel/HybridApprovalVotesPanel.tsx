@@ -3,7 +3,7 @@
 import { useState } from "react";
 import HybridOptionsResultsPanel from "../OptionResultsPanel/HybridOptionsResultsPanel";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";

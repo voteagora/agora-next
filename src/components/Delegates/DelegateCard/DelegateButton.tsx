@@ -1,6 +1,6 @@
 import { UpdatedButton } from "@/components/Button";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { fetchDirectDelegatee } from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
 

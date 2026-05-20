@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/lib/pagination";
 import { fetchVotersWhoHaveNotVotedForProposal } from "@/server/proposals/votes";
 import InfiniteScroll from "react-infinite-scroller";
 import { useProposalNonVotes } from "@/hooks/useProposalNonVotes";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/lib/types/vote";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";

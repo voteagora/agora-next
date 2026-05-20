@@ -1,6 +1,6 @@
 "use client";
 
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { Delegation } from "@/lib/types/delegation";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { getBlockScanUrl, TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
@@ -47,7 +47,7 @@ const DelegateCard = ({
           <div className="flex flex-col gap-4 justify-center pt-4">
             <div className="px-4">
               <DelegateProfileImage
-                endorsed={delegate.statement?.endorsed}
+                endorsed={delegate.statement?.endorsed ?? false}
                 address={delegate.address}
                 votingPower={delegate.votingPower.total}
                 participation={delegate.participation}

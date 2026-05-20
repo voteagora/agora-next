@@ -13,7 +13,7 @@ import {
   buildForumTopicSlug,
   type ForumPost,
 } from "@/lib/forumUtils";
-import { truncateAddress } from "@/app/lib/utils/text";
+import { truncateAddress } from "@/lib/utils/text";
 import { hasMarkdownHeadings } from "@/app/forums/[topic_id]/components/markdownHeadings";
 import ForumsHeader from "@/app/forums/components/ForumsHeader";
 import ForumsSidebar from "@/app/forums/ForumsSidebar";

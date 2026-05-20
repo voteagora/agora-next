@@ -11,7 +11,7 @@ import townsInfoCard3 from "@/assets/tenant/towns_info_3.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
 
 export const townsTenantUIConfig = new TenantUI({

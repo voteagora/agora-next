@@ -33,7 +33,7 @@ export function InsufficientVPModal({
   const { token } = Tenant.current();
 
   const delegate = delegateData.delegate;
-  const hasStatement = hasDelegateStatement(delegate);
+  const hasStatement = hasDelegateStatement(delegate as any);
 
   // Calculate required VP based on action type
   const requiredVP =

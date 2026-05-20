@@ -1,4 +1,4 @@
-import { Proposal, ProposalPayload } from "@/app/api/common/proposals/proposal";
+import { Proposal, ProposalPayload } from "@/lib/types/proposal";
 import {
   calculateHybridApprovalProposalMetrics,
   calculateHybridOptimisticProposalMetrics,

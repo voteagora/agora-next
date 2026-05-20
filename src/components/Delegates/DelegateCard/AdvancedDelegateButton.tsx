@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { fetchAllForAdvancedDelegation } from "@/server/delegates/actions";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 
 export function AdvancedDelegateButton({
   delegate,

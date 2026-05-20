@@ -1,7 +1,7 @@
 import { DelegateProfileImageWithMetadata } from "./DelegateProfileImage";
 import DelegateCardClient from "./DelegateCardClient";
 import { formatNumber } from "@/lib/tokenUtils";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Delegate } from "@/lib/types/delegate";
 import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/DelegateCardHeader";
 import { DelegateCardEditProfile } from "./DelegateCardEditProfile";
 import Tenant from "@/lib/tenant/tenant";
@@ -40,7 +40,7 @@ export default function DelegateCard({
       >
         <div className="flex flex-col items-stretch p-7 gap-4">
           <DelegateProfileImageWithMetadata
-            endorsed={delegate.statement?.endorsed}
+            endorsed={delegate.statement?.endorsed ?? false}
             address={delegate.address}
             votingPower={delegate.votingPower.total}
             copyable={true}
@@ -48,7 +48,7 @@ export default function DelegateCard({
             location={location}
             followersCount={followersCount}
             followingCount={followingCount}
-            scwAddress={delegate.statement?.scw_address}
+            scwAddress={delegate.statement?.scw_address ?? undefined}
           />
         </div>
         <div className="overflow-visible -mt-2 mb-4">

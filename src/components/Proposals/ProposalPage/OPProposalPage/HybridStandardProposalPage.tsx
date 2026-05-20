@@ -1,5 +1,5 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import HybridStandardProposalVotesCard from "./ProposalVotesCard/HybridStandardProposalVotesCard";
 import { TaxFormBanner } from "../TaxFormBanner";

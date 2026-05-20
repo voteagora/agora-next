@@ -6,7 +6,7 @@ import AgoraAPI from "@/app/lib/agoraAPI";
 import { useSignTypedData } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { config } from "@/app/Web3Provider";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { useEffect, useRef, useState } from "react";
 import { useTokenName } from "@/hooks/useTokenName";
 import { withMiradorTraceHeaders } from "@/lib/mirador/headers";

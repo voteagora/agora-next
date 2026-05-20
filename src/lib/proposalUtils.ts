@@ -5,7 +5,7 @@ import {
   TimestampBasedProposal,
   ProposalPayload,
   ProposalTypeData,
-} from "@/app/api/common/proposals/proposal";
+} from "@/lib/types/proposal";
 import { Abi, decodeFunctionData, keccak256, parseUnits } from "viem";
 import Tenant from "./tenant/tenant";
 import { Block, toUtf8Bytes, formatUnits } from "ethers";

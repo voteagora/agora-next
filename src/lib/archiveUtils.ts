@@ -1,4 +1,4 @@
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/lib/pagination";
 import { ArchiveListProposal } from "./types/archiveProposal";
 import {
   getArchiveSlugAllProposals,

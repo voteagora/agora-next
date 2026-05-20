@@ -1,6 +1,6 @@
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount } from "wagmi";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import { SnapshotVote } from "@/lib/types/vote";
 import { formatNumber } from "@/lib/utils";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";

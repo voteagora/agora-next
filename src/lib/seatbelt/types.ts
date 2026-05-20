@@ -4,7 +4,7 @@ import { GOVERNOR_TYPE } from "../constants";
 import { TenantContract } from "../tenant/tenantContract";
 import { IGovernorContract } from "../contracts/common/interfaces/IGovernorContract";
 import { ITimelockContract } from "../contracts/common/interfaces/ITimelockContract";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 
 export interface ApprovalProposalOption {
   budgetTokensSpent: bigint;

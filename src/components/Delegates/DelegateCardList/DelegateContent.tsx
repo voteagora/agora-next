@@ -2,8 +2,8 @@
 
 import DelegateCardList from "./DelegateCardList";
 import DelegateTable from "./DelegateTable";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { useQueryState, parseAsString } from "nuqs";
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
 "use client";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { useState } from "react";
 import HybridStandardProposalVotesSummary from "../ProposalVotesSummary/HybridStandardProposalVotesSummary";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";

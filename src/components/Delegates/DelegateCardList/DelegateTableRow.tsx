@@ -2,7 +2,7 @@
 
 import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useNavigate } from "@tanstack/react-router";
 import { DelegationSelector } from "../DelegateCard/DelegationSelector";
@@ -43,7 +43,7 @@ export default function DelegateTableRow({
         <div className="w-64">
           <DelegateProfileImage
             truncateText
-            endorsed={delegate.statement?.endorsed}
+            endorsed={delegate.statement?.endorsed ?? false}
             address={delegate.address}
             votingPower={delegate.votingPower.total}
           />

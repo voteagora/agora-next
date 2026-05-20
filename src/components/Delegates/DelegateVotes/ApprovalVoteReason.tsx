@@ -1,4 +1,4 @@
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote } from "@/lib/types/vote";
 import React, { Fragment } from "react";
 import Markdown from "@/components/shared/Markdown/Markdown";
 

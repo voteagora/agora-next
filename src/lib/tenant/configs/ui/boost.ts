@@ -7,7 +7,7 @@ import delegateImage from "@/assets/tenant/boost_logo.svg";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
 export const boostTenantUIConfig = new TenantUI({

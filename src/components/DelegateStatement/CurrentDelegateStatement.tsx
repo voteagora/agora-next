@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { fetchDelegateStatement } from "@/server/delegates/actions";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
-import { DelegateStatement } from "@/app/api/common/delegateStatement/delegateStatement";
+import { DelegateStatement } from "@/lib/types/delegateStatement";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";

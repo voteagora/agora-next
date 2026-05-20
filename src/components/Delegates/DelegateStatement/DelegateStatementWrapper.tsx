@@ -3,7 +3,8 @@ import { Info } from "lucide-react";
 import DelegateStatementContainer from "./DelegateStatementContainer";
 import TopStakeholders from "./TopStakeholders";
 import TopIssues from "./TopIssues";
-import { Delegate } from "@/app/api/common/delegates/delegate";
+import { Delegate } from "@/lib/types/delegate";
+import { DelegateStatement } from "@/lib/types/delegateStatement";
 
 interface Props {
   delegate: Delegate;
@@ -45,8 +46,8 @@ const DelegateStatementWrapper = ({
       <DelegateStatementContainer delegate={delegate} />
       {delegate.statement && (
         <>
-          <TopIssues statement={delegate.statement} />
-          <TopStakeholders statement={delegate.statement} />
+          <TopIssues statement={delegate.statement as unknown as DelegateStatement} />
+          <TopStakeholders statement={delegate.statement as unknown as DelegateStatement} />
         </>
       )}
     </>

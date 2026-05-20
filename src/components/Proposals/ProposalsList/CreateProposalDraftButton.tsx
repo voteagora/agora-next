@@ -8,7 +8,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { useManager } from "@/hooks/useManager";
 import { useProposalThreshold } from "@/hooks/useProposalThreshold";
-import { PLMConfig } from "@/app/proposals/draft/types";
+import { PLMConfig } from "@/lib/types/proposalDraft";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 import { useNavigate } from "@tanstack/react-router";

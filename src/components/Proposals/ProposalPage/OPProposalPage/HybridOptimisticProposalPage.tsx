@@ -1,7 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
 import OptimisticTieredProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticTieredProposalVotesCard";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import OffChainOptimisticProposalVotesCard from "./ProposalVotesCard/OffChainOptimisticProposalVotesCard";
 import { TaxFormBanner } from "../TaxFormBanner";
 

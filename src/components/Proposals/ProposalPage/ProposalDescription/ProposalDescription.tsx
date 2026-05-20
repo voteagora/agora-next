@@ -1,6 +1,6 @@
 "use client";
 
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";

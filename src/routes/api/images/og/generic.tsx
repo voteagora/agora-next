@@ -4,7 +4,7 @@ import { ImageResponse } from "@vercel/og";
 
 import { LogoPill } from "./assets/-shared";
 import { sanitizeOgParam } from "@/lib/sanitizationUtilsEdge";
-import { truncateString } from "@/app/lib/utils/text";
+import { truncateString } from "@/lib/utils/text";
 import { TenantNamespace } from "@/lib/types";
 
 export const Route = createFileRoute("/api/images/og/generic")({

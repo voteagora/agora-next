@@ -273,7 +273,7 @@ async function getDelegates({
               advanced: votingPower.advanced || "0",
             },
             citizen: false,
-            statement: sanitizedStatement,
+            statement: sanitizedStatement as any,
             numOfDelegators: BigInt(String(delegate.numOfDelegators || 0)),
             mostRecentDelegationBlock: BigInt(
               String(delegate.mostRecentDelegationBlock || 0)

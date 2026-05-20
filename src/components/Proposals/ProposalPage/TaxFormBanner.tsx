@@ -4,7 +4,7 @@ import { addDays, isPast, differenceInMilliseconds } from "date-fns";
 import { CheckCircle, Clock, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { UpdatedButton } from "@/components/Button";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 import { PROPOSAL_STATUS } from "@/lib/constants";

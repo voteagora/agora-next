@@ -1,4 +1,4 @@
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { Delegation } from "@/lib/types/delegation";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { useEnsName } from "wagmi";
 import { Input } from "@/components/ui/input";

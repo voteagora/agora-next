@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState, useMemo, memo } from "react";
 import * as d3 from "d3";
 import { useNavigate } from "@tanstack/react-router";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ChartVote } from "@/lib/types";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import { Plus, Minus, RotateCcw } from "lucide-react";
 
 // TreeMap constants

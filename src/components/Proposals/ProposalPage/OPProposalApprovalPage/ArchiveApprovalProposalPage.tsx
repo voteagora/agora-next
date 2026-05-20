@@ -1,5 +1,5 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ArchiveApprovalVotesPanel from "./ApprovalVotesPanel/ArchiveApprovalVotesPanel";
 import ArchiveProposalTypeApproval from "../OPProposalPage/ArchiveProposalTypeApproval";
 

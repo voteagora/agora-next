@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Proposal } from "@/lib/types/proposal";
+import { Vote } from "@/lib/types/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import type { ProposalType } from "@/lib/types";
 import { useArchiveVotes } from "@/hooks/useArchiveProposalVotes";

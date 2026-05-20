@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { DelegateToSelf } from "../Delegations/DelegateToSelf";
 import { useProfileData } from "@/hooks/useProfileData";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { ZERO_ADDRESS } from "@/lib/constants";
 
 export const DelegateToSelfBanner = () => {

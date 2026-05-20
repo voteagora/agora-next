@@ -5,7 +5,7 @@ import { delegatesFilterOptions } from "@/lib/constants";
 import FilterResetListbox from "@/components/common/FilterResetListbox";
 import { SortIcon } from "@/icons/Sort";
 import Tenant from "@/lib/tenant/tenant";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { SortOption } from "./FilterSortOption";
 import { useDelegatesSort } from "./useDelegatesSort";

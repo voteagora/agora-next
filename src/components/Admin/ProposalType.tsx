@@ -48,7 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ProposalType as ProposalTypeEnum } from "@/app/proposals/draft/types";
+import { ProposalType as ProposalTypeEnum } from "@/lib/types/proposalDraft";
 
 type Props = {
   proposalType: FormattedProposalType;

@@ -1,5 +1,5 @@
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import { parseUnits } from "viem";
 import { tokenForContractAddress } from "@/lib/tokenUtils";

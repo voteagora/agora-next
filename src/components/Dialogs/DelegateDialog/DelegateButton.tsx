@@ -1,6 +1,6 @@
 import { Button as ShadcnButton } from "@/components/ui/button";
 import Tenant from "@/lib/tenant/tenant";
-import { Delegate, DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { Delegate, DelegateChunk } from "@/lib/types/delegate";
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 interface Props {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ProposalVotesSummary from "./ProposalVotesSummary/ProposalVotesSummary";
 import CastEasVoteInput from "@/components/Votes/CastVoteInput/CastEasVoteInput";
 import ProposalVotesFilter from "./ProposalVotesCard/ProposalVotesFilter";

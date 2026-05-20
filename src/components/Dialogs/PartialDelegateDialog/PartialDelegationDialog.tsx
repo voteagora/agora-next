@@ -1,8 +1,8 @@
 import { useAccount } from "wagmi";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AdvancedDelegationDisplayAmount } from "../AdvancedDelegateDialog/AdvancedDelegationDisplayAmount";
-import { Delegation } from "@/app/api/common/delegations/delegation";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { Delegation } from "@/lib/types/delegation";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { PartialDelegationEntry } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationEntry";
 import Tenant from "@/lib/tenant/tenant";
 import {

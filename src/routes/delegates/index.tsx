@@ -20,8 +20,8 @@ import {
   ISSUES_FILTER_PARAM,
   STAKEHOLDERS_FILTER_PARAM,
 } from "@/lib/constants";
-import type { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import type { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import type { PaginatedResult, PaginationParams } from "@/lib/pagination";
+import type { DelegateChunk } from "@/lib/types/delegate";
 import type { DelegateFilters } from "@/components/Delegates/DelegateCardList/delegateUtils";
 
 // ─── server function ──────────────────────────────────────────────────────────

@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
 import ProposalVoterListFilter from "./ProsalVoterListFilter";
 import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import { VoterTypes } from "@/lib/types/vote";
 
 const NON_VOTERS_PAGE_SIZE = 20;
 

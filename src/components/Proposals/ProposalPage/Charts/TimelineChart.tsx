@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { format } from "date-fns";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import {
   formatFullDate,
@@ -20,7 +20,7 @@ import {
   isScientificNotation,
 } from "@/lib/utils";
 import { GOVERNOR_TYPE } from "@/lib/constants";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import { ChartVote } from "@/lib/types";
 import { getHumanBlockTime } from "@/lib/blockTimes";
 import { Block } from "ethers";

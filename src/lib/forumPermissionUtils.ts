@@ -1,5 +1,5 @@
 import { ForumPermissions } from "@/contexts/ForumPermissionsContext";
-import { RelatedItem } from "@/app/create/types";
+import { RelatedItem } from "@/lib/types/create";
 
 export function canCreateTempCheck(permissions: ForumPermissions): boolean {
   // User can create temp check if they have topic creation permission (via RBAC or VP)

@@ -1,5 +1,5 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import CopelandVotesPanel from "./CopelandVotesPanel/CopelandVotesPanel";
 import {
   fetchSnapshotProposalVotes as fetchProposalVotes,

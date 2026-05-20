@@ -14,7 +14,7 @@ import {
   type PostType,
   type CreatePostFormData,
   type ProposalType,
-} from "@/app/create/types";
+} from "@/lib/types/create";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 
 const serverLoadCreatePage = createServerFn({ method: "GET" })

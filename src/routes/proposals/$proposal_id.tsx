@@ -8,7 +8,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
-import { cleanString, truncateString } from "@/app/lib/utils/text";
+import { cleanString, truncateString } from "@/lib/utils/text";
 import { type ParsedProposalData } from "@/lib/proposalUtils";
 import CopelandProposalPage from "@/components/Proposals/ProposalPage/CopelandProposalPage/CopelandProposalPage";
 import OPProposalApprovalPage from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OPProposalApprovalPage";

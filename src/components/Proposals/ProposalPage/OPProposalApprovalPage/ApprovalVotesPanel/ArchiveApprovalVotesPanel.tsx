@@ -7,7 +7,7 @@ import OptionResultsPanel from "../OptionResultsPanel/OptionResultsPanel";
 import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ArchiveApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import EasApprovalCastVoteButton from "@/components/Votes/EasApprovalCastVoteButton/EasApprovalCastVoteButton";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";

@@ -27,7 +27,7 @@ import {
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
 import { getIPFSUrl } from "@/lib/pinata";
-import { stripHtmlToText } from "@/app/forums/stripHtml";
+import { stripHtmlToText } from "@/lib/stripHtml";
 import {
   addRecipientAttributeValue,
   emitCompoundEvent,

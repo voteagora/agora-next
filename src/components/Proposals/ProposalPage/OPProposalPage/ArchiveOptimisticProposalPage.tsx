@@ -1,5 +1,5 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import OptimisticProposalVotesCard from "./ProposalVotesCard/OptimisticProposalVotesCard";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { formatNumber } from "@/lib/utils";

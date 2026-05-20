@@ -1,6 +1,6 @@
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import { Proposal } from "@/lib/types/proposal";
+import { Vote } from "@/lib/types/vote";
+import { VotingPowerData } from "@/lib/types/votingPower";
 import useAdvancedVoting from "@/hooks/useAdvancedVoting";
 import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";

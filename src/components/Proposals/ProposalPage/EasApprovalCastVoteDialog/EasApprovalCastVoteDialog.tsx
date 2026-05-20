@@ -6,7 +6,7 @@ import { ParsedProposalData } from "@/lib/proposalUtils";
 import { Button } from "@/components/ui/button";
 import { EasApprovalCastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { useEnsName, useAccount } from "wagmi";
-import { truncateAddress } from "@/app/lib/utils/text";
+import { truncateAddress } from "@/lib/utils/text";
 import { cn } from "@/lib/utils";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEASV2 } from "@/hooks/useEASV2";

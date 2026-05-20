@@ -3,13 +3,13 @@
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
 import { ProposalSingleVote } from "./ProposalSingleVote";
-import { Vote, VoterTypes } from "@/app/api/common/votes/vote";
+import { Vote, VoterTypes } from "@/lib/types/vote";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchProposalVotes,
   fetchUserVotesForProposal,
 } from "@/server/proposals/votes";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginatedResult } from "@/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
 
 interface Props {

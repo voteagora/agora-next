@@ -1,44 +1,3 @@
-import DelegateContent from "@/components/Delegates/DelegateCardList/DelegateContent";
-import { PaginationParams } from "@/app/lib/pagination";
-import { SearchParams } from "nuqs/server";
-import Tenant from "@/lib/tenant/tenant";
-import { BadgeDefinition } from "@/app/api/common/badges/getBadges";
-import { fetchDelegatesWithBadge } from "@/app/api/common/badges/getDelegatesWithBadge";
-
-async function fetchDelegatesWithBadgeParams(
-  badgeId: string,
-  pagination: PaginationParams
-) {
-  "use server";
-  return fetchDelegatesWithBadge({
-    badgeDefinitionId: badgeId,
-    pagination,
-  });
-}
-
-const BadgeDelegateWrapper = async ({
-  badgeId,
-}: {
-  badgeId: string;
-  badgeDefinition: BadgeDefinition;
-  searchParams: SearchParams;
-}) => {
-  const delegates = await fetchDelegatesWithBadgeParams(badgeId, {
-    offset: 0,
-    limit: 500,
-  });
-
-  return (
-    <DelegateContent
-      initialDelegates={delegates}
-      fetchDelegates={async ({ pagination = { offset: 0, limit: 500 } }) => {
-        "use server";
-        return fetchDelegatesWithBadgeParams(badgeId, pagination);
-      }}
-    />
-  );
-};
-
 export const BadgeDelegateLoadingState = () => {
   return (
     <div>
@@ -65,5 +24,3 @@ export const BadgeDelegateLoadingState = () => {
     </div>
   );
 };
-
-export default BadgeDelegateWrapper;

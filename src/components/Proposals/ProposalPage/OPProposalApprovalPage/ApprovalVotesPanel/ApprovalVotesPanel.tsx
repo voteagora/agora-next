@@ -8,14 +8,14 @@ import ArchiveApprovalProposalVotesList from "@/components/Votes/ApprovalProposa
 import ApprovalProposalVotesList from "@/components/Votes/ApprovalProposalVotesList/ApprovalProposalVotesList";
 import ApprovalProposalCriteria from "../ApprovalProposalCriteria/ApprovalProposalCriteria";
 import ApprovalCastVoteButton from "@/components/Votes/ApprovalCastVoteButton/ApprovalCastVoteButton";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
-import { PaginationParams } from "@/app/lib/pagination";
-import { Vote } from "@/app/api/common/votes/vote";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { PaginationParams } from "@/lib/pagination";
+import { Vote } from "@/lib/types/vote";
+import { PaginatedResult } from "@/lib/pagination";
 import Tenant from "@/lib/tenant/tenant";
 
 type Props = {

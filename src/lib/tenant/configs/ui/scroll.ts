@@ -14,7 +14,7 @@ import favicon32x32 from "@/assets/tenant/scroll_favicon/favicon-32x32.png";
 import favicon16x16 from "@/assets/tenant/scroll_favicon/favicon-16x16.png";
 import shortcutIcon from "@/assets/tenant/scroll_favicon/favicon.ico";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 

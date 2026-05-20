@@ -5,8 +5,8 @@ import { HStack, VStack } from "../../Layout/Stack";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import { pluralizeSnapshotVote } from "@/lib/tokenUtils";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
+import { SnapshotVote } from "@/lib/types/vote";
 
 const propHeader = (vote: SnapshotVote) => {
   return `Snapshot vote - ${formatDistanceToNow(vote.createdAt)} ago`;

@@ -7,7 +7,7 @@ import {
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AgoraLoaderSmall,
@@ -17,7 +17,7 @@ import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { DelegateePayload } from "@/app/api/common/delegations/delegation";
+import { DelegateePayload } from "@/lib/types/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
 import { encodeFunctionData, formatEther, zeroAddress } from "viem";

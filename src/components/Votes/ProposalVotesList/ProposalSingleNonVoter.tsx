@@ -7,7 +7,7 @@ import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
 import { toast } from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";

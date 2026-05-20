@@ -6,7 +6,7 @@ import demoDocs from "@/assets/tenant/demo_docs.png";
 import demoVision from "@/assets/tenant/demo_vision.png";
 import demoForum from "@/assets/tenant/demo_forum.png";
 import demoDiscord from "@/assets/tenant/demo_discord.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";

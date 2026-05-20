@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
 import { useSnapshotProposalVotes } from "@/hooks/useProposalVotes";
 import { cn } from "@/lib/utils";
 import CopelandProposalSingleVote from "./CopelandProposalSingleVote";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import { SnapshotVote } from "@/lib/types/vote";
 
 type Props = {
   fetchVotesForProposal: (

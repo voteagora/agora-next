@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryState } from "nuqs";
 
-import { Delegation } from "@/app/api/common/delegations/delegation";
-import { PaginatedResult } from "@/app/lib/pagination";
+import { Delegation } from "@/lib/types/delegation";
+import { PaginatedResult } from "@/lib/pagination";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,

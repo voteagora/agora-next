@@ -7,7 +7,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
-import { type DelegateStatement } from "@/app/api/common/delegates/delegate";
+import { type DelegateStatement } from "@/lib/types/delegate";
 import DelegateCard from "@/components/Delegates/DelegateCard/DelegateCard";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateStatementWrapper from "@/components/Delegates/DelegateStatement/DelegateStatementWrapper";

@@ -13,8 +13,8 @@ import {
   Vote,
   VotePayload,
   SnapshotVotePayload,
-} from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+} from "@/lib/types/vote";
+import { VotingPowerData } from "@/lib/types/votingPower";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Block } from "ethers";
@@ -23,7 +23,7 @@ import { mapArbitrumBlockToMainnetBlock } from "./utils";
 import { formatUnits, parseUnits } from "viem";
 import { format } from "date-fns";
 import { tokenForContractAddress } from "./tokenUtils";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ProposalType } from "./types";
 
 /**

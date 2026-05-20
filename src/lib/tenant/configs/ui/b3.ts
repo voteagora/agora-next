@@ -8,7 +8,7 @@ import infoPageCard02 from "@/assets/tenant/b3_info_2.png";
 import infoPageCard03 from "@/assets/tenant/b3_info_3.png";
 import infoPageCard04 from "@/assets/tenant/b3_info_4.png";
 import infoPageHero from "@/assets/tenant/b3_info_hero.png";
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
 import { TENANT_NAMESPACES } from "@/lib/constants";

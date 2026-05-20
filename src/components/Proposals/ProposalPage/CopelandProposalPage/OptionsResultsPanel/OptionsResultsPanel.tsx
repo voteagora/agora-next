@@ -1,4 +1,4 @@
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { CopelandResult } from "@/lib/copelandCalculation";
 import {

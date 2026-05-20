@@ -2,9 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
+import { Proposal } from "@/lib/types/proposal";
+import { SnapshotVote, VotesSort } from "@/lib/types/vote";
+import { PaginatedResult, PaginationParams } from "@/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { formatDistanceToNow } from "date-fns";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { RelatedItem } from "@/app/create/types";
+import { RelatedItem } from "@/lib/types/create";
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";

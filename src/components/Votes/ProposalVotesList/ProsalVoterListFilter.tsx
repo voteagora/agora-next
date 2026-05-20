@@ -10,7 +10,7 @@ import { DropdownMenuRadioGroup } from "@radix-ui/react-dropdown-menu";
 import { FilterIcon } from "@/icons/filter";
 import { cn } from "@/lib/utils";
 import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import { VoterTypes } from "@/lib/types/vote";
 
 interface ProposalVoterListFilterProps {
   selectedVoterType: VoterTypes;

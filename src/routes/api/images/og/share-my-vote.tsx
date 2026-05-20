@@ -2,7 +2,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ImageResponse } from "@vercel/og";
 
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import { getScaledBarPercentage } from "@/components/Proposals/ProposalPage/OPProposalApprovalPage/OptionResultsPanel/OptionResultsPanel";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { BRAND_NAME_MAPPINGS } from "@/lib/tenant/tenant";

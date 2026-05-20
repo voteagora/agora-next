@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import {
   Tooltip,
   TooltipContent,
@@ -18,7 +18,7 @@ import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useAccount } from "wagmi";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote } from "@/lib/types/vote";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 
 type Props = {

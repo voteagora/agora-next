@@ -16,7 +16,7 @@ import demoForum from "@/assets/tenant/demo_forum.png";
 
 import demoDiscord from "@/assets/tenant/demo_discord.png";
 
-import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
+import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 

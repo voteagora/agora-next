@@ -2,10 +2,10 @@
 
 import { useAccount } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
-import { type Proposal } from "@/app/api/common/proposals/proposal";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
-import { Delegate } from "@/app/api/common/delegates/delegate";
-import { Vote } from "@/app/api/common/votes/vote";
+import { type Proposal } from "@/lib/types/proposal";
+import { VotingPowerData } from "@/lib/types/votingPower";
+import { Delegate } from "@/lib/types/delegate";
+import { Vote } from "@/lib/types/vote";
 
 const useFetchAllForVoting = ({
   proposal,

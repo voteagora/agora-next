@@ -10,7 +10,7 @@ import CastVoteInput, {
   OffchainCastVoteInput,
 } from "@/components/Votes/CastVoteInput/CastVoteInput";
 import { icons } from "@/assets/icons/icons";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import ProposalVotesFilter from "./ProposalVotesFilter";
 import Tenant from "@/lib/tenant/tenant";
 

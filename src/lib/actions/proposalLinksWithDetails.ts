@@ -2,7 +2,7 @@
 
 import { getProposalLinks } from "./proposalLinks";
 import { getForumTopic } from "./forum/topics";
-import { stripHtmlToText } from "@/app/forums/stripHtml";
+import { stripHtmlToText } from "@/lib/stripHtml";
 import { getArchivedProposal } from "./archive";
 
 interface LinkedItemDetails {

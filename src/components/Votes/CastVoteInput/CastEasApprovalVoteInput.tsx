@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useEASV2 } from "@/hooks/useEASV2";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { parseVoteError } from "@/lib/voteErrorUtils";

@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import { Proposal } from "@/lib/types/proposal";
+import { Vote } from "@/lib/types/vote";
+import { VotingPowerData } from "@/lib/types/votingPower";
 import { MissingVote, checkMissingVoteForDelegate } from "@/lib/voteUtils";
 import {
   Tooltip,

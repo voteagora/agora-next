@@ -1,7 +1,7 @@
 import { ReactNode, useMemo, useState } from "react";
 import { useDisconnect } from "wagmi";
 import { shortAddress } from "@/lib/utils";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import { CubeIcon } from "@/icons/CubeIcon";
 import { Logout } from "@/icons/logout";
 import {
@@ -19,9 +19,9 @@ import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Tenant from "@/lib/tenant/tenant";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
 import { ShieldCheckIcon } from "@heroicons/react/20/solid";
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { Delegation } from "@/lib/types/delegation";
 import { useEnsName } from "wagmi";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";

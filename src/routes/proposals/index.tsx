@@ -13,11 +13,8 @@ import ProposalsList from "@/components/Proposals/ProposalsList/ProposalsList";
 import ArchiveProposalsList from "@/components/Proposals/ProposalsList/ArchiveProposalsList";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { DraftsTabsWrapper } from "@/components/Proposals/DraftsTabsWrapper";
-import {
-  type PaginatedResult,
-  type PaginationParams,
-} from "@/app/lib/pagination";
-import { type Proposal } from "@/app/api/common/proposals/proposal";
+import { type PaginatedResult, type PaginationParams } from "@/lib/pagination";
+import { type Proposal } from "@/lib/types/proposal";
 import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 
 // ─── server functions for client-invoked callbacks ───────────────────────────

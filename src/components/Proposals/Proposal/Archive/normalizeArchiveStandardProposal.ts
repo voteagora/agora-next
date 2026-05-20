@@ -1,4 +1,4 @@
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import {
   deriveStatus,
   deriveTimeStatus,
@@ -10,7 +10,7 @@ import {
   resolveArchiveThresholds,
   extractVoteValue,
 } from "./archiveProposalUtils";
-import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/app/proposals/data/archiveDefaults";
+import { ARCHIVE_PROPOSAL_DEFAULTS } from "@/lib/archiveDefaults";
 import { ParsedProposalData, ParsedProposalResults } from "@/lib/proposalUtils";
 import {
   ArchiveListProposal,

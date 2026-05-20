@@ -6,7 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import CopyableHumanAddress from "@/components/shared/CopyableHumanAddress";
 import { CubeIcon } from "@/icons/CubeIcon";
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import ENSName from "@/components/shared/ENSName";
 
 interface Props {

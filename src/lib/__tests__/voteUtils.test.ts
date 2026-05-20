@@ -1,6 +1,6 @@
 import { calculateVoteMetadata, Support } from "../voteUtils";
-import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Proposal } from "@/lib/types/proposal";
+import { Vote } from "@/lib/types/vote";
 import { expect, describe, it, vi } from "vitest";
 
 vi.mock("../tenant/tenant", () => ({

@@ -1,4 +1,4 @@
-import { rgbStringToHex } from "@/app/lib/utils/color";
+import { rgbStringToHex } from "@/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";

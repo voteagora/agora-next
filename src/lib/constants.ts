@@ -1,4 +1,4 @@
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import { VoterTypes } from "@/lib/types/vote";
 import { type Chain } from "viem";
 import {
   mainnet,

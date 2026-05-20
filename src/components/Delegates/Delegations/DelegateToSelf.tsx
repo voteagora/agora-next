@@ -1,10 +1,10 @@
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import { DelegateChunk } from "@/lib/types/delegate";
 import {
   fetchAllForAdvancedDelegation,
   fetchCurrentDelegatees,
   fetchDirectDelegatee,
 } from "@/server/delegates/actions";
-import useIsAdvancedUser from "@/app/lib/hooks/useIsAdvancedUser";
+import useIsAdvancedUser from "@/hooks/useIsAdvancedUser";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { Button } from "@/components/ui/button";
 import { DELEGATION_MODEL } from "@/lib/constants";

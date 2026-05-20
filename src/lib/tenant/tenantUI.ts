@@ -1,6 +1,6 @@
 import type { StaticImageData } from "@/lib/shims/next-image";
 import { icons } from "@/icons/icons";
-import { PLMConfig } from "@/app/proposals/draft/types";
+import { PLMConfig } from "@/lib/types/proposalDraft";
 import { TenantToken } from "../types";
 import React, { ReactNode } from "react";
 

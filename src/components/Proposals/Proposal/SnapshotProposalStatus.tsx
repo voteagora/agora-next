@@ -1,4 +1,4 @@
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { pluralize } from "@/lib/utils";
 

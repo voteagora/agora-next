@@ -6,7 +6,7 @@ import {
 } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { Delegation } from "@/lib/types/delegation";
 import { useEffect } from "react";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";

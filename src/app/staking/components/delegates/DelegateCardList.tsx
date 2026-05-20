@@ -87,10 +87,13 @@ export default function DelegateCardList({
         {delegates.map((delegate) => {
           // Filter out the current user from the list of delegates
           if (delegate.address !== address.toLowerCase()) {
-            const twitter = delegate?.statement?.twitter;
-            const discord = delegate?.statement?.discord;
-            const warpcast = delegate?.statement?.warpcast;
-            const truncatedStatement = getTruncatedStatement(delegate, 120);
+            const twitter = delegate?.statement?.twitter ?? undefined;
+            const discord = delegate?.statement?.discord ?? undefined;
+            const warpcast = delegate?.statement?.warpcast ?? undefined;
+            const truncatedStatement = getTruncatedStatement(
+              delegate as any,
+              120
+            );
 
             return (
               <DelegateCard

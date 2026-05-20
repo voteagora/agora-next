@@ -8,7 +8,7 @@
  * @returns Object containing calculated Copeland scores, winners, and details
  */
 
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import { SnapshotVote } from "@/lib/types/vote";
 
 // Constants
 const NONE_BELOW = "none below";

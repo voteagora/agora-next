@@ -9,15 +9,15 @@ import {
 import { AdvancedDelegateDialog } from "../AdvancedDelegateDialog/AdvancedDelegateDialog";
 import { ApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/ApprovalCastVoteDialog/ApprovalCastVoteDialog";
 import { EasApprovalCastVoteDialog } from "@/components/Proposals/ProposalPage/EasApprovalCastVoteDialog/EasApprovalCastVoteDialog";
-import { Proposal } from "@/app/api/common/proposals/proposal";
+import { Proposal } from "@/lib/types/proposal";
 import RetroPGFShareCardDialog from "@/components/RetroPGF/RetroPGFShareCardDialog";
-import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { VotingPowerData } from "@/app/api/common/voting-power/votingPower";
+import { DelegateChunk } from "@/lib/types/delegate";
+import { VotingPowerData } from "@/lib/types/votingPower";
 import { MissingVote } from "@/lib/voteUtils";
 import {
   DelegateePayload,
   Delegation,
-} from "@/app/api/common/delegations/delegation";
+} from "@/lib/types/delegation";
 import { Chain } from "viem/chains";
 import { DeleteDraftProposalDialog } from "@/app/proposals/draft/components/DeleteDraftButton";
 import { DeleteAllDraftProposalsDialog as DeleteAllDraftProposalsDialogComponent } from "@/components/Proposals/DraftProposals/ClearAllDraftsButton";
@@ -31,7 +31,7 @@ import { fetchAllForAdvancedDelegation } from "@/server/delegates/actions";
 import { PartialDelegationDialog } from "@/components/Dialogs/PartialDelegateDialog/PartialDelegationDialog";
 import SubscribeDialog from "@/components/Notifications/SubscribeDialog";
 import { ShareDialog as ShareVoteDialog } from "@/components/Proposals/ProposalPage/ShareVoteDialog/ShareVoteDialog";
-import { Vote } from "@/app/api/common/votes/vote";
+import { Vote } from "@/lib/types/vote";
 import { SimulationReportDialog } from "../SimulationReportDialog/SimulationReportDialog";
 import { StructuredSimulationReport } from "@/lib/seatbelt/types";
 import { EncourageConnectWalletDialog } from "@/components/Delegates/Delegations/EncourageConnectWalletDialog";
@@ -39,7 +39,7 @@ import { CreateScopeDialog } from "@/components/Admin/CreateScopeDialog";
 import { ScopeData } from "@/lib/types";
 import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActionDialog";
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
-import { DraftProposal } from "@/app/proposals/draft/types";
+import { DraftProposal } from "@/lib/types/proposalDraft";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
 import { SafeProposalChoiceDialog } from "../SafeProposalChoiceDialog/SafeProposalChoiceDialog";
 import SafeOffchainSigningDialog from "../SafeOffchainSigningDialog/SafeOffchainSigningDialog";
