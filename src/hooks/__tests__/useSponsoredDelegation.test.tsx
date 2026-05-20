@@ -11,6 +11,7 @@ const {
   closeFrontendMiradorFlowTraceMock,
   getFrontendMiradorTraceContextMock,
   postMock,
+  readContractMock,
   signTypedDataAsyncMock,
   startFrontendMiradorFlowTraceMock,
   useNonceMock,
@@ -23,6 +24,7 @@ const {
   closeFrontendMiradorFlowTraceMock: vi.fn(),
   getFrontendMiradorTraceContextMock: vi.fn(),
   postMock: vi.fn(),
+  readContractMock: vi.fn(),
   signTypedDataAsyncMock: vi.fn(),
   startFrontendMiradorFlowTraceMock: vi.fn(),
   useNonceMock: vi.fn(),
@@ -64,6 +66,12 @@ vi.mock("@/hooks/useTokenName", () => ({
 vi.mock("@/app/lib/agoraAPI", () => ({
   default: vi.fn().mockImplementation(() => ({
     post: postMock,
+  })),
+}));
+
+vi.mock("@/lib/viem", () => ({
+  getPublicClient: vi.fn(() => ({
+    readContract: readContractMock,
   })),
 }));
 
@@ -134,6 +142,9 @@ describe("useSponsoredDelegation", () => {
         ),
     });
     waitForTransactionReceiptMock.mockResolvedValue({ status: "success" });
+    readContractMock.mockResolvedValue(
+      "0x0000000000000000000000000000000000000000"
+    );
   });
 
   it("marks a sponsored delegation as fetched only after a successful receipt", async () => {
@@ -217,5 +228,107 @@ describe("useSponsoredDelegation", () => {
     );
     expect(result.current.isFetched).toBe(false);
     expect(result.current.isError).toBe(true);
+  });
+
+  it("marks a sponsored delegation as fetched when the relay request fails after the chain state already changed", async () => {
+    postMock.mockRejectedValue(new Error("Internal Server Error"));
+    readContractMock.mockResolvedValue(
+      "0x0000000000000000000000000000000000000003"
+    );
+
+    const { result } = renderHook(() =>
+      useSponsoredDelegation({
+        address: "0x0000000000000000000000000000000000000002",
+        delegate: {
+          address: "0x0000000000000000000000000000000000000003",
+          votingPower: { total: "0", direct: "0", advanced: "0" },
+          statement: null,
+          participation: 0,
+        },
+      })
+    );
+
+    await act(async () => {
+      await result.current.call();
+    });
+
+    expect(readContractMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        functionName: "delegates",
+        args: ["0x0000000000000000000000000000000000000002"],
+      })
+    );
+    expect(addMiradorEventMock).toHaveBeenCalledWith(
+      { traceId: "trace-id" },
+      "governance_delegation_reconciliation_checked",
+      expect.objectContaining({
+        reconciled: true,
+        originalError: "Internal Server Error",
+      })
+    );
+    expect(closeFrontendMiradorFlowTraceMock).toHaveBeenCalledWith(
+      { traceId: "trace-id" },
+      expect.objectContaining({
+        reason: "governance_delegation_succeeded",
+        details: expect.objectContaining({
+          reconciled: true,
+          currentDelegatee: "0x0000000000000000000000000000000000000003",
+        }),
+      })
+    );
+    expect(waitForTransactionReceiptMock).not.toHaveBeenCalled();
+    expect(result.current.isFetched).toBe(true);
+    expect(result.current.isError).toBe(false);
+  });
+
+  it("marks a sponsored delegation as fetched when receipt waiting fails but the chain state matches", async () => {
+    waitForTransactionReceiptMock.mockRejectedValue(
+      new Error("Timed out while waiting for transaction receipt")
+    );
+    readContractMock.mockResolvedValue(
+      "0x0000000000000000000000000000000000000003"
+    );
+
+    const { result } = renderHook(() =>
+      useSponsoredDelegation({
+        address: "0x0000000000000000000000000000000000000002",
+        delegate: {
+          address: "0x0000000000000000000000000000000000000003",
+          votingPower: { total: "0", direct: "0", advanced: "0" },
+          statement: null,
+          participation: 0,
+        },
+      })
+    );
+
+    await act(async () => {
+      await result.current.call();
+    });
+
+    expect(addMiradorEventMock).toHaveBeenCalledWith(
+      { traceId: "trace-id" },
+      "governance_delegation_reconciliation_checked",
+      expect.objectContaining({
+        transactionHash:
+          "0x000000000000000000000000000000000000000000000000000000000000000a",
+        reconciled: true,
+      })
+    );
+    expect(closeFrontendMiradorFlowTraceMock).toHaveBeenCalledWith(
+      { traceId: "trace-id" },
+      expect.objectContaining({
+        reason: "governance_delegation_succeeded",
+        details: expect.objectContaining({
+          reconciled: true,
+          originalTransactionHash:
+            "0x000000000000000000000000000000000000000000000000000000000000000a",
+        }),
+      })
+    );
+    expect(result.current.txHash).toBe(
+      "0x000000000000000000000000000000000000000000000000000000000000000a"
+    );
+    expect(result.current.isFetched).toBe(true);
+    expect(result.current.isError).toBe(false);
   });
 });
