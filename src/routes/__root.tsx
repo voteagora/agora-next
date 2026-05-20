@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
-import "@/styles/globals.scss";
-import "@/styles/fonts.css";
+import globalsStylesUrl from "@/styles/globals.scss?url";
+import fontsStylesUrl from "@/styles/fonts.css?url";
 
 import type { ReactNode } from "react";
 import {
@@ -138,6 +138,8 @@ export const Route = createRootRoute({
         { name: "msapplication-config", content: "/favicon/browserconfig.xml" },
       ],
       links: [
+        { rel: "stylesheet", href: fontsStylesUrl },
+        { rel: "stylesheet", href: globalsStylesUrl },
         {
           rel: "apple-touch-icon",
           sizes: "180x180",
