@@ -72,9 +72,10 @@ const nextConfig = withBundleAnalyzer({
       __dirname,
       "src/lib/shims/InfiniteScroll.tsx"
     );
-    config.resolve.alias["swagger-ui-react$"] = path.resolve(
-      __dirname,
-      "src/lib/shims/SwaggerUI.tsx"
+    // Map swagger-ui-react-real to the actual package so the shim can
+    // re-export without a circular alias.
+    config.resolve.alias["swagger-ui-react-real$"] = require.resolve(
+      "swagger-ui-react"
     );
     config.resolve.alias["@react-native-async-storage/async-storage$"] =
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");

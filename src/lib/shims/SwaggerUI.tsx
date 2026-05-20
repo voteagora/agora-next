@@ -1,8 +1,4 @@
-import React, { type CSSProperties, type ReactNode } from "react";
-
-// Avoid resolving to this shim by importing from the package entry via require.
-const RawSwaggerUI: React.ComponentType<any> =
-  require("swagger-ui-react").default ?? require("swagger-ui-react");
+import { type CSSProperties, type ReactNode } from "react";
 
 export type SwaggerUIProps = {
   url?: string;
@@ -38,8 +34,7 @@ export type SwaggerUIProps = {
   children?: ReactNode;
 };
 
-const SwaggerUI = (props: SwaggerUIProps): JSX.Element => {
-  return <RawSwaggerUI {...props} />;
-};
-
-export default SwaggerUI;
+// Re-export the real swagger-ui-react component.
+// The webpack alias (swagger-ui-react$ -> this file) is removed;
+// instead, only the page that needs it imports this shim directly.
+export { default } from "swagger-ui-react-real";
