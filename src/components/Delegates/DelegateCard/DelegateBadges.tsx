@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Shield, BadgeCheck, Wallet, Users, Eye, Info } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 type DelegateBadgesProps = {
   badges: IdentityBadge[];
@@ -98,7 +98,7 @@ export function DelegateBadges({ badges }: DelegateBadgesProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  href={`/badges/${badge.badge_definition_id}`}
+                  to={`/badges/${badge.badge_definition_id}` as never}
                   className={`inline-flex items-center gap-2 px-4 py-3 border-2 rounded-full cursor-pointer transition-all hover:scale-105 flex-shrink-0 shadow-sm ${getBadgeStyle(badge.definition.name, index)}`}
                   style={{ transform: `rotate(${rotation}deg)` }}
                 >

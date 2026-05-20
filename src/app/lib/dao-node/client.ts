@@ -4,7 +4,7 @@ import {
 } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { DelegateResponse, ProposalType } from "@/lib/types";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { cache } from "react";
 import { fetchDelegateStatements } from "@/app/api/common/delegateStatement/getDelegateStatement";
 

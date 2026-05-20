@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useNavigate, useLocation, useSearch } from "@tanstack/react-router";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { Listbox } from "@headlessui/react";
 import { useMemo, useCallback } from "react";
@@ -8,9 +8,8 @@ import { ChevronDown } from "lucide-react";
 import Tenant from "@/lib/tenant/tenant";
 
 export default function ProposalsFilter() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { ui } = Tenant.current();
   const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
 
@@ -27,7 +26,10 @@ export default function ProposalsFilter() {
     return base;
   }, [tenantHaseasOO]);
 
-  const filterParam = searchParams?.get("filter");
+  const { filter: filterParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const selected = useMemo(() => {
     const candidate = filterParam ?? proposalsFilterOptions.relevant.filter;
 
@@ -42,12 +44,12 @@ export default function ProposalsFilter() {
       const isRelevant = nextFilter === proposalsFilterOptions.relevant.filter;
 
       if (isRelevant) {
-        router.push(basePath);
+        navigate({ to: basePath as never });
       } else {
-        router.push(`${basePath}?filter=${nextFilter}`);
+        navigate({ to: `${basePath}?filter=${nextFilter}` as never });
       }
     },
-    [pathname, router]
+    [pathname, navigate]
   );
 
   return (

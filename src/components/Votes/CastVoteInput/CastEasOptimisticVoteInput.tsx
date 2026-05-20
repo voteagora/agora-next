@@ -9,7 +9,6 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { icons } from "@/icons/icons";
 import {
   Tooltip,
@@ -307,8 +306,8 @@ function ErrorState({
         <TooltipTrigger asChild>
           <div className="flex flex-col gap-3 p-3 border-t border-line">
             <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
-              <Image
-                src={icons.infoRed}
+              <img
+                src={icons.infoRed as string}
                 alt="Info"
                 width={24}
                 height={24}

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { Bell, Loader2 } from "lucide-react";
 import { useAccount } from "wagmi";
 import {
@@ -64,7 +64,7 @@ export default function CategoryList({
             }`}
           >
             <Link
-              href={href}
+              to={href as never}
               aria-current={isSelected ? "page" : undefined}
               className="flex items-center gap-2 flex-1 min-w-0"
             >

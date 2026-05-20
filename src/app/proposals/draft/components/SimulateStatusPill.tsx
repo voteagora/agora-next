@@ -1,5 +1,4 @@
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const SimulationStatusPill = ({
@@ -27,7 +26,12 @@ const SimulationStatusPill = ({
             target="_blank"
             rel="noreferrer"
           >
-            <Image src={icons.link} height="16" width="16" alt="link icon" />
+            <img
+              src={icons.link as string}
+              height={16}
+              width={16}
+              alt="link icon"
+            />
           </a>
         </div>
       )}

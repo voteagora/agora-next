@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import {
   Loader2,
   Wallet,
@@ -394,7 +394,7 @@ function useSafeOffchainSigningFlow({
   onClosed,
   signMessage,
 }: UseSafeOffchainSigningFlowParams) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const { isSignedIn, reset, signIn, signOut } = useSIWE();
   const { chain, connector } = useAccount();

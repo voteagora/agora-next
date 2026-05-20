@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer } from "@/components/ui/Drawer";
@@ -374,7 +374,7 @@ export default function FinancialStatementLayout({
           {!hideDiscussButton &&
             (isOnArticlePage ? (
               <Button asChild size="lg">
-                <Link href={forumPagePath}>{discussButtonText}</Link>
+                <Link to={forumPagePath as never}>{discussButtonText}</Link>
               </Button>
             ) : (
               <Button onClick={handleScrollToComments} size="lg">

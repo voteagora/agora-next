@@ -1,4 +1,4 @@
-import { StaticImageData } from "next/image";
+import type { StaticImageData } from "@/lib/shims/next-image";
 import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { TenantToken } from "../types";

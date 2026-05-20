@@ -4,7 +4,6 @@ import xIcon from "@/icons/x.svg";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import OptionsResultsPanel from "../OPProposalApprovalPage/OptionResultsPanel/OptionResultsPanel";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
@@ -189,7 +188,12 @@ const SuccessMessageCard = ({
             <div className="flex items-center">
               <span className="flex items-center gap-1 sm:gap-2">
                 <div className="w-4 h-4 sm:w-[18px] sm:h-[18px]">
-                  <Image src={blockIcon} alt="Block" width={18} height={18} />
+                  <img
+                    src={blockIcon as string}
+                    alt="Block"
+                    width={18}
+                    height={18}
+                  />
                 </div>
                 {blockNumber} · {voteDate}
               </span>
@@ -201,7 +205,12 @@ const SuccessMessageCard = ({
         {/* Footer */}
         <div className="flex justify-end items-center mt-4 sm:mt-6">
           <div className="w-[48px] h-[12px] sm:w-[62px] sm:h-[16px]">
-            <Image src={agoraLogo} alt="Agora Logo" width={62} height={16} />
+            <img
+              src={agoraLogo as string}
+              alt="Agora Logo"
+              width={62}
+              height={16}
+            />
           </div>
         </div>
       </div>
@@ -349,11 +358,11 @@ export function ShareDialog({
               trackShareVote("WARPCAST");
             }}
           >
-            <Image
+            <img
               height={20}
               width={20}
               className="w-5 h-5"
-              src={warpcastIcon}
+              src={warpcastIcon as string}
               alt="Warpcast icon"
             />
             Share on Warpcast
@@ -370,11 +379,11 @@ export function ShareDialog({
               trackShareVote("X");
             }}
           >
-            <Image
+            <img
               height={20}
               width={20}
               className="w-5 h-5"
-              src={xIcon}
+              src={xIcon as string}
               alt="X icon"
             />
             Share on X

@@ -1,6 +1,5 @@
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
-import Image from "next/image";
 import lineaLogo from "@/assets/tenant/linea_logo.svg";
 import { OG_UNISWAP_WORDMARK_PATH } from "@/routes/api/images/og/assets/-tenantWordmarkPaths";
 
@@ -404,8 +403,8 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
       );
     case TENANT_NAMESPACES.LINEA:
       return (
-        <Image
-          src={lineaLogo}
+        <img
+          src={lineaLogo as string}
           alt="Linea Logo"
           className="w-[52px] h-[52px] sm:w-[80px] sm:h-[80px]"
         />

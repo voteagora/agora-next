@@ -5,7 +5,6 @@ import { useAccount } from "wagmi";
 import discordIcon from "@/icons/discord.svg";
 import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
-import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -13,7 +12,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { resolveIPFSUrl } from "@/lib/utils";
 
@@ -108,7 +107,7 @@ export function ProposalSingleNonVoter({
           {ensAvatar()}
           <div className="flex flex-col">
             <div className="text-primary font-bold hover:underline">
-              <Link href={`/delegates/${voter.delegate}`}>
+              <Link to={`/delegates/${voter.delegate}` as never}>
                 {voter.voterMetadata?.name || ensFromBlockCache?.name ? (
                   voter.voterMetadata?.name || ensFromBlockCache?.name
                 ) : (
@@ -136,7 +135,7 @@ export function ProposalSingleNonVoter({
                   window.open(`https://twitter.com/${voter.twitter}`, "_blank");
               }}
             >
-              <Image height={8} width={8} src={xIcon} alt="x icon" />
+              <img height={8} width={8} src={xIcon as string} alt="x icon" />
             </button>
           )}
           {voter.discord && (
@@ -149,10 +148,10 @@ export function ProposalSingleNonVoter({
                 navigator.clipboard.writeText(voter.discord ?? "");
               }}
             >
-              <Image
+              <img
                 height={10}
                 width={10}
-                src={discordIcon}
+                src={discordIcon as string}
                 alt="discord icon"
               />
             </button>
@@ -170,10 +169,10 @@ export function ProposalSingleNonVoter({
                   );
               }}
             >
-              <Image
+              <img
                 height={10}
                 width={10}
-                src={warpcastIcon}
+                src={warpcastIcon as string}
                 alt="warpcast icon"
               />
             </button>

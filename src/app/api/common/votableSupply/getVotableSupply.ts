@@ -1,7 +1,7 @@
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { findVotableSupply } from "@/lib/prismaUtils";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { getVotableSupplyFromDaoNode } from "@/app/lib/dao-node/client";
 
 async function getVotableSupply() {

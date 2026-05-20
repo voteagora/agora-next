@@ -4,7 +4,7 @@ import { DelegateProfileImage } from "../DelegateCard/DelegateProfileImage";
 import { formatNumber } from "@/lib/tokenUtils";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { DelegationSelector } from "../DelegateCard/DelegationSelector";
 import { DelegateSocialLinks } from "../DelegateCard/DelegateSocialLinks";
 
@@ -25,7 +25,7 @@ export default function DelegateTableRow({
   showParticipation: boolean;
   show7dChange: boolean;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const twitter = delegate?.statement?.twitter;
   const discord = delegate?.statement?.discord;
@@ -36,7 +36,7 @@ export default function DelegateTableRow({
       data-testid="delegate-row"
       className="font-semibold cursor-pointer bg-neutral text-secondary"
       onClick={() => {
-        router.push(`/delegates/${delegate.address}`);
+        navigate({ to: `/delegates/${delegate.address}` as never });
       }}
     >
       <TableCell>

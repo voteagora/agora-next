@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/table";
 import profileIcon from "@/icons/profile.svg";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
-import Image from "next/image";
 import InfiniteScroll from "react-infinite-scroller";
 import { useEffect, useRef, useState } from "react";
 import { getRetroPGFResults } from "@/server/retropgf/actions";
 import { shortAddress } from "@/lib/utils";
 import { VStack } from "@/components/Layout/Stack";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import { retroPGFCategories, retroPGFSort } from "@/lib/constants";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 
@@ -77,7 +76,10 @@ export default function RetroPGFResults({
   initialResults: Results;
   initialPageInfo: pageInfo;
 }) {
-  const searchParams = useSearchParams();
+  const searchParams = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const [results, setResults] = useState(initialResults);
   const [pageInfo, setPageInfo] = useState(initialPageInfo);
   const fetching = useRef(false);
@@ -92,12 +94,11 @@ export default function RetroPGFResults({
     if (!fetching.current && pageInfo.hasNextPage) {
       fetching.current = true;
       const _results = await getRetroPGFResults({
-        search: searchParams?.get("search") || "",
+        search: searchParams["search"] || "",
         category:
-          (searchParams?.get("category") as keyof typeof retroPGFCategories) ||
-          null,
+          (searchParams["category"] as keyof typeof retroPGFCategories) || null,
         orderBy:
-          (searchParams?.get("orderBy") as keyof typeof retroPGFSort) ||
+          (searchParams["orderBy"] as keyof typeof retroPGFSort) ||
           "mostAwarded",
         endCursor: pageInfo.endCursor,
       }).catch((error) => console.error("error", error));
@@ -200,11 +201,14 @@ export default function RetroPGFResults({
                   }
                 >
                   <TableCell className="px-6">
-                    <Image
-                      src={profile?.profileImageUrl || projectPlaceholder}
+                    <img
+                      src={
+                        profile?.profileImageUrl ||
+                        (projectPlaceholder as string)
+                      }
                       alt={displayName}
-                      width="32"
-                      height="32"
+                      width={32}
+                      height={32}
                       className="inline mr-2"
                     />
                     <span className="font-semibold text-primary inline-block max-w-[calc(100%-40px)] align-middle">
@@ -212,8 +216,8 @@ export default function RetroPGFResults({
                     </span>
                   </TableCell>
                   <TableCell className="gap-2 px-6 hidden sm:table-cell">
-                    <Image
-                      src={profileIcon}
+                    <img
+                      src={profileIcon as string}
                       alt={submittedBy}
                       className="inline mr-2 mb-1"
                     />

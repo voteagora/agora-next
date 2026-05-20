@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
@@ -113,7 +113,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
   return (
     <>
       <Link
-        href={topicPath}
+        to={topicPath as never}
         className="group block bg-cardBackground border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
       >
         <div className="flex items-start gap-3">

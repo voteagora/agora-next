@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { useForm, FormProvider } from "react-hook-form";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormCard from "../form/FormCard";
 import TextInput from "../form/TextInput";
@@ -11,7 +11,6 @@ import { UpdatedButton } from "@/components/Button";
 import { schema as tempCheckSchema } from "../../schemas/tempCheckSchema";
 import { onSubmitAction as tempCheckAction } from "@/server/proposals/draft/createTempCheck";
 import { useAccount } from "wagmi";
-import Image from "next/image";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { DraftProposal } from "../../types";
@@ -19,9 +18,11 @@ import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
 
 const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const shareParam = searchParams?.get("share");
+  const navigate = useNavigate();
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
   const [isSkipPending, setIsSkipPending] = useState(false);
@@ -74,7 +75,9 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         return;
       }
       const nextId = draftProposal.uuid;
-      router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
+      navigate({
+        to: buildDraftUrl(nextId, stageIndex + 1, shareParam) as never,
+      });
     } catch (e: any) {
       console.error("An error was uncaught in `tempCheckAction`: ", e);
       toast.error(e.message);
@@ -87,13 +90,13 @@ const TempCheckForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
         <FormCard>
           <FormCard.Section>
             <div className="w-full rounded-md h-[350px] block relative">
-              <Image
+              <img
                 // TODO: do we want to make this something that is configurable by tenant?
                 // Or should we have a default for all tenants?
                 src="/images/ens_temp_check.png"
                 alt="Digital collage of sparkles and thumbs ups promoting caputuring a temp check."
-                fill={true}
                 className="object-cover rounded-md"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
             {/*

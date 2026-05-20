@@ -2,8 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import useAdvancedVoting from "../../../../hooks/useAdvancedVoting";
 import { CastVoteDialogProps } from "@/components/Dialogs/DialogProvider/dialogs";
 import { Button } from "@/components/ui/button";
@@ -365,10 +364,10 @@ export function SuccessMessage({
 
   return (
     <div className="flex flex-col w-full">
-      <Image
-        width="457"
-        height="155"
-        src={ui.assets.success}
+      <img
+        width={457}
+        height={155}
+        src={ui.assets.success as string}
         className="w-full mb-3"
         alt="agora loading"
       />
@@ -404,8 +403,8 @@ export function LoadingVote() {
 
   return (
     <div className="flex flex-col w-full">
-      <Image
-        src={ui.assets.pending}
+      <img
+        src={ui.assets.pending as string}
         className="w-full mb-3"
         alt="Vote pending"
       />
@@ -432,11 +431,7 @@ export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
   return (
     <div className="py-2 px-4 z-[1099] bg-line text-xs text-secondary rounded-lg">
       You do not have a delegate statement.{" "}
-      <Link
-        href={"/delegates/create"}
-        className="underline"
-        onClick={closeDialog}
-      >
+      <Link to="/delegates/create" className="underline" onClick={closeDialog}>
         Please set one up to vote.
       </Link>
     </div>
@@ -452,10 +447,10 @@ export function DisabledVoteDialog({
 
   return (
     <div className="flex flex-col w-full">
-      <Image
-        width="457"
-        height="155"
-        src={ui.assets.pending}
+      <img
+        width={457}
+        height={155}
+        src={ui.assets.pending as string}
         className="w-full mb-3"
         alt="agora loading"
       />

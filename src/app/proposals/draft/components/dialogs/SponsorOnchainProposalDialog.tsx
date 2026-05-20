@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { VStack } from "@/components/Layout/Stack";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
-import Image from "next/image";
-import Link from "next/link";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
@@ -29,7 +27,7 @@ const SponsorOnchainProposalDialog = ({
   const config = plmToggle?.config as PLMConfig;
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const waitForTransaction = async () => {
@@ -55,9 +53,11 @@ const SponsorOnchainProposalDialog = ({
       <VStack className="w-full bg-neutral rounded-xl">
         <VStack>
           <VStack className="w-full">
-            <Image
+            <img
               src={
-                isLoading ? tenant.ui.assets.pending : tenant.ui.assets.success
+                (isLoading
+                  ? tenant.ui.assets.pending
+                  : tenant.ui.assets.success) as string
               }
               className="w-full mb-3"
               alt={isLoading ? "Pending" : "Success"}
@@ -96,7 +96,7 @@ const SponsorOnchainProposalDialog = ({
                   isLoading={isLoading}
                   onClick={async () => {
                     // TODO: redirect to the proposal page once we have indexing available
-                    router.push(redirectUrl);
+                    navigate({ to: redirectUrl as never });
                     closeDialog();
                   }}
                 >
@@ -112,14 +112,18 @@ const SponsorOnchainProposalDialog = ({
                   View transaction on block explorer
                 </span>
                 <div className="flex flex-row items-center space-x-2">
-                  <Link href={`${getBlockScanUrl(txHash)}`}>
-                    <Image
-                      src={icons.link}
-                      height="16"
-                      width="16"
+                  <a
+                    href={`${getBlockScanUrl(txHash)}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    <img
+                      src={icons.link as string}
+                      height={16}
+                      width={16}
                       alt="link icon"
                     />
-                  </Link>
+                  </a>
                 </div>
               </div>
             )}

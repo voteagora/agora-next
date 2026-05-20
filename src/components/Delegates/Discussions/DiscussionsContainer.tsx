@@ -8,7 +8,7 @@ import { MessageCircle, Clock, User } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import {
   getForumPostsByUser,
   getForumTopicsByUser,
@@ -207,7 +207,7 @@ const DiscussionsContainer = ({
                 {topics.map((topic) => (
                   <Link
                     key={topic.id}
-                    href={buildForumTopicPath(topic.id, topic.title)}
+                    to={buildForumTopicPath(topic.id, topic.title) as never}
                     className={itemContainerClass}
                   >
                     <div className="flex items-start gap-3">
@@ -274,10 +274,12 @@ const DiscussionsContainer = ({
                 {posts.map((post) => (
                   <Link
                     key={post.id}
-                    href={buildForumTopicPath(
-                      post.topic?.id || 0,
-                      post.topic?.title || ""
-                    )}
+                    to={
+                      buildForumTopicPath(
+                        post.topic?.id || 0,
+                        post.topic?.title || ""
+                      ) as never
+                    }
                     className={itemContainerClass}
                   >
                     <div className="flex items-start gap-3">

@@ -13,11 +13,11 @@ import { useStableCallback } from "@/hooks/useStableCallback";
 
 interface ForumDocument {
   id: number;
-  name: string;
+  name: string | null;
   url: string;
   ipfsCid: string;
   createdAt: string;
-  uploadedBy: string;
+  uploadedBy: string | null;
   archived?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
@@ -97,7 +97,7 @@ export default function FormationDocumentsList({
         const url = window.URL.createObjectURL(blob);
         const link = window.document.createElement("a");
         link.href = url;
-        link.download = document.name;
+        link.download = document.name ?? "";
         window.document.body.appendChild(link);
         link.click();
         window.document.body.removeChild(link);
@@ -181,7 +181,7 @@ export default function FormationDocumentsList({
   return (
     <div className="flex flex-col">
       {documents.map((document, index) => {
-        const displayName = document.name.replace(/\.[^/.]+$/, "");
+        const displayName = (document.name ?? "").replace(/\.[^/.]+$/, "");
         const displayDate = formatDocumentDate(document.createdAt);
         const displaySize = formatFileSize(document.fileSize);
         const isLast = index === documents.length - 1;

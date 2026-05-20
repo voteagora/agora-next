@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import FinancialStatementsSection from "./FinancialStatementsSection";
 import { buildForumArticlePath } from "@/lib/forumUtils";
 
@@ -27,13 +27,16 @@ export default function FinancialStatementsClient({
   statements,
   title,
 }: FinancialStatementsClientProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const handleStatementClick = (statement: FinancialStatement) => {
     if (statement.topicId && statement.topicTitle) {
-      router.push(
-        buildForumArticlePath(statement.topicId, statement.topicTitle)
-      );
+      navigate({
+        to: buildForumArticlePath(
+          statement.topicId,
+          statement.topicTitle
+        ) as never,
+      });
     }
   };
 

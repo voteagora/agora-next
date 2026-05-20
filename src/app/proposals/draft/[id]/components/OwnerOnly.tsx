@@ -1,7 +1,7 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import Tenant from "@/lib/tenant/tenant";
 import { PLMConfig } from "@/app/proposals/draft/types";
 
@@ -13,8 +13,10 @@ const OnlyOwner = ({
   children: React.ReactNode;
 }) => {
   const { address, isConnecting, isReconnecting } = useAccount();
-  const searchParams = useSearchParams();
-  const shareParam = searchParams?.get("share");
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const config = proposalLifecycleToggle?.config as PLMConfig;

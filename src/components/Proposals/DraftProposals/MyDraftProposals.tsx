@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
@@ -76,7 +76,9 @@ const MyDraftProposals = ({
           return (
             <Link
               key={proposal.id}
-              href={`/proposals/draft/${proposal.uuid}?stage=${getStageIndexForTenant(proposal.stage)}`}
+              to={
+                `/proposals/draft/${proposal.uuid}?stage=${getStageIndexForTenant(proposal.stage)}` as never
+              }
               className="block"
               onClick={(e) => {
                 const target = e.target as HTMLElement;

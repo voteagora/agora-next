@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { ForumCategory, ForumPost } from "@/lib/forumUtils";
 import Tenant from "@/lib/tenant/tenant";
@@ -69,7 +69,7 @@ export default function ForumsSidebar({
           ) : (
             <div className="space-y-2">
               <Link
-                href="/forums"
+                to="/forums"
                 aria-current={selectedCategoryId == null ? "page" : undefined}
                 className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                   selectedCategoryId == null
@@ -96,7 +96,7 @@ export default function ForumsSidebar({
 
               {uncategorizedCount > 0 && (
                 <Link
-                  href="/forums/category/0/uncategorized"
+                  to={"/forums/category/0/uncategorized" as never}
                   aria-current={selectedCategoryId === 0 ? "page" : undefined}
                   className={`flex items-center justify-between px-3 py-2 rounded-md transition-colors ${
                     selectedCategoryId === 0

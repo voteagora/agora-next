@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "@tanstack/react-router";
 import { BoltIcon, ArrowsRightLeftIcon } from "@heroicons/react/20/solid";
 import { cn } from "@/lib/utils";
 import {
@@ -25,7 +24,7 @@ export function ExecutionTxNav({
   pendingHref: string | null;
   onPendingNavigate: (href: string) => void;
 }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const ids = listExecutionViewIds();
 
   return (
@@ -45,7 +44,7 @@ export function ExecutionTxNav({
           return (
             <Link
               key={id}
-              href={href}
+              to={href as never}
               onClick={() => {
                 if (href !== pathname) {
                   onPendingNavigate(href);

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import {
   MessageCircle,
   Clock,
@@ -75,7 +75,7 @@ function RelatedLinkCard({
 
   return (
     <Link
-      href={linkUrl}
+      to={linkUrl as never}
       target="_blank"
       rel="noopener noreferrer"
       className="border border-[#e0e0e0] rounded-lg p-3 cursor-pointer"

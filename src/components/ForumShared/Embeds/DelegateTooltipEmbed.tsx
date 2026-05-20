@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { DelegateProfileImageWithMetadata } from "@/components/Delegates/DelegateCard/DelegateProfileImage";
 import { PanelRow } from "@/components/Delegates/DelegateCard/DelegateCard";
 import Tenant from "@/lib/tenant/tenant";
@@ -74,7 +74,7 @@ export default function DelegateTooltipEmbed({
 
   return (
     <Link
-      href={data.url}
+      to={data.url as never}
       className="block no-underline hover:no-underline [&_*]:no-underline [&_*]:hover:no-underline"
     >
       <div

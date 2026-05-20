@@ -1,7 +1,7 @@
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
 import { AlchemyProvider } from "ethers";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { cache } from "react";
 import { getAlchemyId } from "@/lib/alchemyConfig";
 

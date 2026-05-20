@@ -2,7 +2,6 @@ import { HStack, VStack } from "@/components/Layout/Stack";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { type RetroPGFProject } from "@/lib/types";
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
-import Image from "next/image";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
 import ENSName from "@/components/shared/ENSName";
 
@@ -55,15 +54,15 @@ export default function RetroPGFApplicationBanner({
             filter: `blur(${profile?.bannerImageUrl ? "0px" : "40px"})`,
           }}
         />
-        <Image
-          src={profile?.profileImageUrl || projectPlaceholder}
+        <img
+          src={profile?.profileImageUrl || (projectPlaceholder as string)}
           alt={`${displayName} icon`}
           className={cn(
             "absolute top-[200px] sm:top-[258px] left-[50%] sm:left-[20px] -translate-x-1/2 sm:translate-x-0",
             "b-[calc(0%+20px)] z-20 border-[6px] border-white  rounded-2xl bg-neutral shadow-newDefault"
           )}
-          height="120"
-          width="120"
+          height={120}
+          width={120}
         />
         <div className="absolute flex flex-col sm:flex-row items-center justify-between top-[316px] sm:top-auto bottom-auto sm:bottom-0 left-0 sm:left-[144px] w-full sm:w-[calc(100%-144px)] py-0 px-3 sm:pl-6 sm:pb-6">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full">

@@ -3,8 +3,6 @@ import { Label } from "@/components/ui/label";
 import { X, MessageSquare, Calendar, ExternalLink } from "lucide-react";
 import { RelatedItem } from "../types";
 import { RelatedItemsDialog } from "./RelatedItemsDialog";
-import Link from "next/link";
-import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { useState } from "react";
 
@@ -47,8 +45,8 @@ export function RelatedItemsSection({
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.id} className="group relative flex items-center gap-3">
-            <Image
-              src={ui.logo}
+            <img
+              src={ui.logo as string}
               alt="logo"
               width={40}
               height={40}
@@ -61,13 +59,14 @@ export function RelatedItemsSection({
                     {item.title}
                   </p>
                   {item.url && (
-                    <Link
+                    <a
                       href={item.url}
                       target="_blank"
+                      rel="noreferrer noopener"
                       className="text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
-                    </Link>
+                    </a>
                   )}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">

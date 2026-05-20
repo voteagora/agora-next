@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { headers } from "@/lib/shims/next-headers";
 
 type BuildPageMetadataParams = {
   title: string;

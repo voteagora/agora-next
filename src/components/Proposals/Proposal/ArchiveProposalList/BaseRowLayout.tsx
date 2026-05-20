@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { cn } from "@/lib/utils";
@@ -32,7 +32,7 @@ export function BaseRowLayout({
     id: data.id,
   } as const;
   return (
-    <Link href={data.href}>
+    <Link to={data.href as never}>
       <div
         className="border-b border-line items-center flex flex-row bg-neutral"
         data-testid={`proposal-list-item-${data.id}`}

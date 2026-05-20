@@ -2,7 +2,7 @@
 
 import { useDepositorTotalStaked } from "@/hooks/useDepositorTotalStaked";
 import Tenant from "@/lib/tenant/tenant";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React from "react";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -27,7 +27,7 @@ export const DepositListAction = ({ address }: Props) => {
           <>
             <div className="font-medium">
               {canDepositMore ? (
-                <Link href="/staking/new" className="flex gap-2 items-center">
+                <Link to="/staking/new" className="flex gap-2 items-center">
                   <div className="w-8 h-8 border rounded-full items-center justify-center align-baseline mr-2 shadow-newDefault pl-[10px] pt-[2px]">
                     +
                   </div>

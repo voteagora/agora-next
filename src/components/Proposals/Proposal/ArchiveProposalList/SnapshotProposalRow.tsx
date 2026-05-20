@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import ProposalTimeStatus from "../ProposalTimeStatus.jsx";
 import { ArchiveRowProps, RowDisplayData } from "./types";
 import { truncateTitle, ensurePercentage } from "./utils";
@@ -223,12 +223,10 @@ export function SnapshotProposalRow({ proposal }: ArchiveRowProps) {
     return { displayData, metrics };
   }, [snapshotProposal]);
 
-  const linkProps = displayData.isExternal
-    ? { href: displayData.href, target: "_blank" as const }
-    : { href: `/proposals/${proposal.id}` };
+  const internalHref = `/proposals/${proposal.id}`;
 
-  return (
-    <Link {...linkProps}>
+  return displayData.isExternal ? (
+    <a href={displayData.href} target="_blank" rel="noreferrer noopener">
       <div className="border-b border-line items-center flex flex-row bg-neutral">
         {/* Left column: Title and metadata */}
         <div
@@ -242,6 +240,48 @@ export function SnapshotProposalRow({ proposal }: ArchiveRowProps) {
             {displayData.isExternal && (
               <ArrowTopRightOnSquareIcon className="w-3 h-3 mt-1" />
             )}
+            <div className="block sm:hidden">
+              <SnapshotStatusBadge status={displayData.statusLabel} />
+            </div>
+          </div>
+          <div className="overflow-ellipsis overflow-visible whitespace-normal break-words text-primary w-max">
+            {truncateTitle(displayData.title)}
+          </div>
+        </div>
+
+        {/* Middle column: Time and status (tablet+) */}
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 md:w-[45%] lg:w-[20%] sm:w-[45%] flex-start justify-center hidden sm:block">
+          <div className="flex flex-col items-end text-secondary">
+            <div className="text-xs">
+              <ProposalTimeStatus {...displayData.timeStatus} />
+            </div>
+            <SnapshotStatusBadge status={displayData.statusLabel} />
+          </div>
+        </div>
+
+        {/* Right column: Metrics (desktop only) */}
+        <div className="flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6 w-[25%] flex-start justify-center hidden lg:block">
+          <div className="overflow-hidden overflow-ellipsis">
+            <SnapshotMetricsView
+              metrics={metrics}
+              votingType={snapshotProposal.type}
+            />
+          </div>
+        </div>
+      </div>
+    </a>
+  ) : (
+    <Link to={internalHref as never}>
+      <div className="border-b border-line items-center flex flex-row bg-neutral">
+        {/* Left column: Title and metadata */}
+        <div
+          className={cn(
+            "flex flex-col whitespace-nowrap overflow-ellipsis overflow-hidden py-4 px-6",
+            "w-full sm:w-[55%] items-start justify-center"
+          )}
+        >
+          <div className="flex flex-row text-xs text-secondary gap-1">
+            <p>{displayData.proposalTypeName}</p>
             <div className="block sm:hidden">
               <SnapshotStatusBadge status={displayData.statusLabel} />
             </div>

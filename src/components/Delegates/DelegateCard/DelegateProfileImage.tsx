@@ -5,7 +5,6 @@ import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import React, { useEffect, useMemo } from "react";
-import Image from "next/image";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
@@ -127,8 +126,8 @@ export function DelegateProfileImage({
             <TooltipProvider delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger className="shrink-0">
-                  <Image
-                    src={icons.endorsed}
+                  <img
+                    src={icons.endorsed as string}
                     alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
                     className="w-4 h-4"
                   />
@@ -276,8 +275,8 @@ export function DelegateProfileImageWithMetadata({
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Image
-                      src={icons.endorsed}
+                    <img
+                      src={icons.endorsed as string}
                       alt={(endorsedToggle.config as UIEndorsedConfig).tooltip}
                       className="w-4 h-4"
                     />

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Bell, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
 import {
   Tooltip,
@@ -206,7 +206,7 @@ function TopicCard({
   return (
     <>
       <Link
-        href={buildForumTopicPath(topic.id, topic.title)}
+        to={buildForumTopicPath(topic.id, topic.title) as never}
         className="group block bg-cardBackground border border-cardBorder rounded-lg p-3 hover:shadow-sm transition-shadow"
       >
         <div className="flex min-w-0 items-start">

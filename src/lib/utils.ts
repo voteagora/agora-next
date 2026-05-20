@@ -15,7 +15,7 @@ import {
   WaitForTransactionReceiptParameters,
   WaitForTransactionReceiptReturnType,
 } from "viem";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { ParsedProposalData } from "./proposalUtils";
 import { getChainById, getPublicClient } from "./viem";
 import {

@@ -7,8 +7,7 @@ import { UpdatedButton } from "@/components/Button";
 import { createGithubProposal } from "@/app/proposals/draft/utils/github";
 import { onSubmitAction as createGithubChecklistItem } from "@/server/proposals/draft/createGithubChecklistItem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { DraftProposal } from "../../types";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
@@ -20,9 +19,11 @@ import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
  * So, keep in mind that currently this component (and the github actions) are tightly coupled to the ENS tenant.
  */
 const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const shareParam = searchParams?.get("share");
+  const navigate = useNavigate();
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const openDialog = useOpenDialog();
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
@@ -59,7 +60,7 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
 
       setIsSkipPending(false);
       const nextId = draftProposal.uuid;
-      router.push(buildDraftUrl(nextId, 3, shareParam));
+      navigate({ to: buildDraftUrl(nextId, 3, shareParam) as never });
     } catch (e) {
       setIsSkipPending(false);
     }
@@ -110,11 +111,11 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
     <FormCard>
       <FormCard.Section>
         <div className="w-full rounded-md h-[350px] block relative">
-          <Image
+          <img
             src="/images/ens_temp_check.png"
             alt="Temp Check"
-            fill={true}
             className="object-cover rounded-md"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
         <p className="mt-4 text-secondary">
@@ -144,7 +145,9 @@ const GithubPRForm = ({ draftProposal }: { draftProposal: DraftProposal }) => {
               fullWidth={true}
               type="primary"
               onClick={() => {
-                router.push(buildDraftUrl(draftProposal.uuid, 3, shareParam));
+                navigate({
+                  to: buildDraftUrl(draftProposal.uuid, 3, shareParam) as never,
+                });
               }}
             >
               Continue

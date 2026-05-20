@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { useAccount } from "wagmi";
@@ -102,7 +102,7 @@ export default function InfoBanner({ toggleName }: InfoBannerProps) {
       <div className="flex items-center gap-3 flex-1">
         <BookOpenIcon className={`w-5 h-5 flex-shrink-0 ${bannerIconClass}`} />
         <Link
-          href={config.link}
+          to={config.link as never}
           className={`text-sm font-medium hover:opacity-80 transition-opacity ${bannerTextClass}`}
         >
           {config.text}

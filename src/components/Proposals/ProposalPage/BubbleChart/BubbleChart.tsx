@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo, memo } from "react";
 import * as d3 from "d3";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ChartVote } from "@/lib/types";
 import Tenant from "@/lib/tenant/tenant";
@@ -70,7 +70,7 @@ ZoomButton.displayName = "ZoomButton";
 
 const BubbleNode = memo(
   ({ node, transform }: { node: BubbleNode; transform: d3.ZoomTransform }) => {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { ui } = Tenant.current();
 
     const fillColor = useMemo(() => {
@@ -89,7 +89,7 @@ const BubbleNode = memo(
         transform={`translate(${node.x},${node.y})`}
         onClick={(e) => {
           e.stopPropagation();
-          router.push(`/delegates/${node.address}`);
+          navigate({ to: `/delegates/${node.address}` as never });
         }}
         style={{ cursor: "pointer" }}
       >

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Wallet, AlertTriangle, ArrowRight } from "lucide-react";
 import { useSIWE } from "connectkit";
 import toast from "react-hot-toast";
@@ -43,7 +43,7 @@ export function SafeProposalChoiceDialog({
   onCreateDraftProposal,
   onAuthenticated,
 }: SafeProposalChoiceDialogProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { signIn } = useSIWE();
   const openDialog = useOpenDialog();
   const [acknowledged, setAcknowledged] = useState(false);
@@ -74,7 +74,7 @@ export function SafeProposalChoiceDialog({
   const goDirectOnchain = async () => {
     if (!isSafeWallet) {
       closeDialog();
-      router.push("/proposals/create-proposal");
+      navigate({ to: "/proposals/create-proposal" });
       return;
     }
 
@@ -97,7 +97,7 @@ export function SafeProposalChoiceDialog({
     });
 
     closeDialog();
-    router.push("/proposals/create-proposal");
+    navigate({ to: "/proposals/create-proposal" });
   };
 
   const handleCloseChoiceScreen = async () => {

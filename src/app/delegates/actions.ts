@@ -2,7 +2,11 @@
 
 import { fetchAllForAdvancedDelegation as apiFetchAllForAdvancedDelegation } from "@/app/api/delegations/getDelegations";
 import { type DelegateStatementFormValues } from "@/components/DelegateStatement/CurrentDelegateStatement";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import {
+  revalidatePath,
+  revalidateTag,
+  unstable_cache,
+} from "@/lib/shims/next-cache";
 import { fetchVotesForDelegate as apiFetchVotesForDelegate } from "@/app/api/common/votes/getVotes";
 import {
   fetchIsDelegatingToProxy,

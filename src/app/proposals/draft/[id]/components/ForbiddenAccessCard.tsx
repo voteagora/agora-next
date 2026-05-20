@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { UpdatedButton } from "@/components/Button";
 
 export function ForbiddenAccessCard({ message }: { message?: string | null }) {
@@ -16,7 +16,7 @@ export function ForbiddenAccessCard({ message }: { message?: string | null }) {
       </div>
 
       <div className="mt-6 flex items-center gap-3">
-        <Link href="/" className="sm:w-auto">
+        <Link to="/" className="sm:w-auto">
           <UpdatedButton type="primary">Back to Home</UpdatedButton>
         </Link>
       </div>

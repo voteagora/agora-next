@@ -1,6 +1,5 @@
 import React from "react";
-import Image, { StaticImageData } from "next/image";
-import Link from "next/link";
+import type { StaticImageData } from "@/lib/shims/next-image";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/assets/icons/icons";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -107,11 +106,11 @@ export const InfoHero = () => {
           {renderDesc(page!.description)}
           {namespace === TENANT_NAMESPACES.SCROLL && (
             <div className="flex flex-row gap-2 mt-4">
-              <Link href={"https://claim.scroll.io/faq"}>
+              <a href={"https://claim.scroll.io/faq"}>
                 <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
                   FAQ
                 </Button>
-              </Link>
+              </a>
             </div>
           )}
         </div>
@@ -153,9 +152,10 @@ const Card = ({
 
   return (
     <div className="relative">
-      <Link
+      <a
         target="_blank"
         href={link}
+        rel="noreferrer noopener"
         className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
         style={{ backgroundColor: "var(--card-background)" }}
       >
@@ -163,11 +163,15 @@ const Card = ({
           className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
         >
           {image ? (
-            <Image
-              src={image}
+            <img
+              src={
+                typeof image === "string"
+                  ? image
+                  : (image as StaticImageData).src
+              }
               className="w-full rounded scale"
-              fill={true}
               alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : ui.customization?.heroCardGradient ? (
             <div
@@ -180,15 +184,15 @@ const Card = ({
         </div>
         <div className="w-full flex flex-row justify-between gap-1 items-center text-xs font-medium text-secondary mt-1.5">
           <span>{linkText}</span>
-          <Image
-            src={icons.northEast}
+          <img
+            src={icons.northEast as string}
             width={12}
             height={12}
             alt="arrow pointing right"
             className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? (ui.customization.infoSectionBackground === "#FFFFFF" ? "brightness-0" : "brightness-0 invert") : ""} ${isDisabled ? "opacity-50" : ""}`}
           />
         </div>
-      </Link>
+      </a>
     </div>
   );
 };

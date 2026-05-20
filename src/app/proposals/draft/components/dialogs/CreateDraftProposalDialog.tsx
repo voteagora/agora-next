@@ -1,6 +1,5 @@
 import { UpdatedButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
 
 const CreateDraftProposalDialog = ({
   redirectUrl,
@@ -18,7 +17,12 @@ const CreateDraftProposalDialog = ({
         <div className="flex flexr-row items-center space-x-2">
           <span className="text-green-500">Completed</span>
           <a href={githubUrl} target="_blank" rel="noreferrer">
-            <Image src={icons.link} height="16" width="16" alt="link icon" />
+            <img
+              src={icons.link as string}
+              height={16}
+              width={16}
+              alt="link icon"
+            />
           </a>
         </div>
       </div>

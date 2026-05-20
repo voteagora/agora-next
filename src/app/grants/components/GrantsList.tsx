@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -118,7 +118,7 @@ export default function GrantsList() {
 
                       <div className="flex-shrink-0">
                         <Link
-                          href={`/grants/${grant.slug}`}
+                          to={`/grants/${grant.slug}` as never}
                           className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
                         >
                           Apply Now

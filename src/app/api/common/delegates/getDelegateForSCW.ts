@@ -2,7 +2,7 @@ import "server-only";
 
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 
 // Returns an owner delegate for a given SCW address
 async function getDelegateForSCW(address: string) {

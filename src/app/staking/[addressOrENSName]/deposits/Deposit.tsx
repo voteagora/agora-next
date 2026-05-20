@@ -4,7 +4,7 @@ import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import React, { useEffect, useRef } from "react";
 import { StakedDeposit } from "@/lib/types";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useAccount,
@@ -12,7 +12,6 @@ import {
   useWriteContract,
 } from "wagmi";
 
-import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { TOKEN_BALANCE_QK, useTokenBalance } from "@/hooks/useTokenBalance";
@@ -37,7 +36,6 @@ interface DepositProps {
 
 export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   const queryClient = useQueryClient();
-  const router = useRouter();
   const traceRef = useRef<FrontendMiradorTrace>(null);
 
   const { isConnected, address } = useAccount();
@@ -89,7 +87,7 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
           }),
         ]).then(() => {
           refreshPath(`/staking/${deposit.depositor}`);
-          router.refresh();
+          window.location.reload();
         });
       }, INDEXER_DELAY);
     }
@@ -169,13 +167,15 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
                     {tokenBalance !== undefined && tokenBalance > 0n && (
                       // Hide edit button when no token balance
                       <div className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer">
-                        <Link href={`/staking/deposits/${deposit.id}`}>
+                        <Link to={`/staking/deposits/${deposit.id}` as never}>
                           Edit amount
                         </Link>
                       </div>
                     )}
                     <div className="py-3 px-5 font-medium border-b border-line text-secondary hover:text-primary cursor-pointer">
-                      <Link href={`/staking/deposits/${deposit.id}/delegate`}>
+                      <Link
+                        to={`/staking/deposits/${deposit.id}/delegate` as never}
+                      >
                         Change delegate
                       </Link>
                     </div>

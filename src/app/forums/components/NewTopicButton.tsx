@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { ExistingTempCheckModal } from "./ExistingTempCheckModal";
@@ -37,7 +37,7 @@ export default function NewTopicButton({
     string | null
   >(null);
   const requireLogin = useRequireLogin();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
 
@@ -47,7 +47,7 @@ export default function NewTopicButton({
       return;
     }
 
-    router.push("/forums/new");
+    navigate({ to: "/forums/new" as never });
   };
 
   const handleCreateTempCheck = async () => {
@@ -75,13 +75,13 @@ export default function NewTopicButton({
         type: "tempcheck",
         fromTopicId: topicContext.id.toString(),
       });
-      router.push(`/create?${params.toString()}`);
+      navigate({ to: `/create?${params.toString()}` as never });
     }
   };
 
   const handleViewTempCheck = () => {
     if (existingTempCheckId) {
-      router.push(`/proposals/${existingTempCheckId}`);
+      navigate({ to: `/proposals/${existingTempCheckId}` as never });
     }
     setShowExistingTempCheckModal(false);
   };

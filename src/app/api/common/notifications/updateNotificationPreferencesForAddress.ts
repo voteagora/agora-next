@@ -2,7 +2,7 @@ import { prismaWeb2Client } from "@/app/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { cache } from "react";
 import { z } from "zod";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "@/lib/shims/next-cache";
 import { revalidateDelegateAddressPage } from "@/app/delegates/actions";
 
 const NotificationPreferencesOptionsSchema = z.object({

@@ -2,20 +2,20 @@
 
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 
 export const RedirectOrConnect = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { setOpen } = useModal();
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
     if (address && isConnected) {
-      router.push(`/staking/${address}`);
+      navigate({ to: `/staking/${address}` as never });
     }
-  }, [address, isConnected, router]);
+  }, [address, isConnected, navigate]);
 
   return (
     <Button

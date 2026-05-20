@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import DraftProposalForm from "../components/DraftProposalForm";
 import DeleteDraftButton from "../components/DeleteDraftButton";
 import ReactMarkdown from "react-markdown";
@@ -44,8 +44,10 @@ export default function DraftProposalPageClient({
   const hasDraftRef = useRef<boolean>(false);
   const wasConnectedRef = useRef<boolean>(false);
 
-  const urlSearchParams = useSearchParams();
-  const shareParam = urlSearchParams?.get("share");
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const { ui } = Tenant.current();
   const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
   const isShareMode = Boolean(plmConfig?.allowDraftSharing && shareParam);

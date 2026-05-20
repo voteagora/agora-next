@@ -18,7 +18,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import Markdown from "@/components/shared/Markdown/Markdown";
 
@@ -107,7 +107,7 @@ export default function ApprovalProposalSingleVote({ vote }: { vote: Vote }) {
                     <ENSName address={voterAddress} />
                   </span>
                 ) : (
-                  <Link href={`/delegates/${voterAddress}`}>
+                  <Link to={`/delegates/${voterAddress}` as never}>
                     <ENSName address={voterAddress} />
                   </Link>
                 )}

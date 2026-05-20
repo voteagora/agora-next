@@ -10,7 +10,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 const { token, ui } = Tenant.current();
 
@@ -60,7 +60,7 @@ export default function CopelandProposalSingleVote({
                 <ENSName address={voterAddress} />
               </span>
             ) : (
-              <Link href={`/delegates/${voterAddress}`}>
+              <Link to={`/delegates/${voterAddress}` as never}>
                 <ENSName address={voterAddress} />
               </Link>
             )}

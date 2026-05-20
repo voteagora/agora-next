@@ -1,8 +1,7 @@
 import { HStack, VStack } from "@/components/Layout/Stack";
 import shareCard from "@/icons/shareCard.svg";
 import projectPlaceholder from "@/icons/projectPlaceholder.svg";
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 function parseProjectId(projectId: string) {
   return projectId.split("|")[1];
@@ -38,19 +37,19 @@ export default function RetroPGFShareCardDialog({
     <VStack className="items-center justify-center p-8 h-full relative">
       <Link
         onClick={closeDialog}
-        href={`/retropgf/3/application/${parseProjectId(id)}`}
+        to={`/retropgf/3/application/${parseProjectId(id)}` as never}
         className="p-8 relative flex w-[320px] sm:w-[800px] bottom-[20vh]"
       >
-        <Image
-          src={shareCard}
+        <img
+          src={shareCard as string}
           alt="Background"
           className="absolute w-full top-0 left-0 z-10 rounded-2xl shadow-newDefault"
         />
-        <Image
+        <img
           src="/rpgf/overlay.png"
           alt="Overlay"
-          width="200"
-          height="200"
+          width={200}
+          height={200}
           className="absolute z-50 w-[80px] sm:w-[200px] top-[92px] sm:top-[230px] left-[13px] sm:left-[32px] rounded-[50%]"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}

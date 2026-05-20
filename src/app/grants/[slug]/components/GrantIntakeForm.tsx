@@ -7,7 +7,7 @@ import { useModal } from "connectkit";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import toast from "react-hot-toast";
 import DynamicFormField from "./DynamicFormField";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
@@ -110,7 +110,7 @@ function renderTextWithLinks(text: string) {
 export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { isConnected, address } = useAccount();
   const { setOpen } = useModal();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const grantsFollowXHandle = Tenant.current().ui.grantsFollowXHandle;
   const { getAuthenticationData } = useProposalActionAuth();
@@ -348,7 +348,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
       await response.json();
 
       // Redirect to thank you page after successful submission
-      router.push(`/grants/${grant.slug}/thank-you`);
+      navigate({ to: `/grants/${grant.slug}/thank-you` as never });
     } catch (error) {
       console.error("Error submitting grant application:", error);
       const errorMessage =

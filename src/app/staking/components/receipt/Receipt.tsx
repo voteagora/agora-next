@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import ENSName from "@/components/shared/ENSName";
 import Tenant from "@/lib/tenant/tenant";
 import { formatNumber, numberToToken } from "@/lib/utils";
@@ -24,8 +23,8 @@ export const Receipt = ({
 
   return (
     <div className="flex flex-col font-code max-w-[408px] w-full px-[34px] py-8 mt-6 rounded-lg border border-gray-300 bg-neutral">
-      <Image
-        src={ui.assets.delegate}
+      <img
+        src={ui.assets.delegate as string}
         alt="img"
         width={40}
         height={40}

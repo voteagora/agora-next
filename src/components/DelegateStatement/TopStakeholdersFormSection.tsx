@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { icons } from "@/assets/icons/icons";
 import { Input } from "@/components/ui/input";
 import { type UseFormReturn, useWatch } from "react-hook-form";
@@ -123,7 +122,7 @@ const StakeholderInput = ({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-line shadow-newDefault p-2">
-        <Image src={icons.community} alt="Stakeholders" />
+        <img src={icons.community as string} alt="Stakeholders" />
       </div>
 
       <div className="flex flex-col flex-1 relative">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm, FormProvider } from "react-hook-form";
 import { useForum } from "@/hooks/useForum";
 import { useForumCategories } from "@/hooks/useForumCategories";
@@ -17,7 +17,7 @@ import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
 import { createDiscussionProposalLink } from "@/server/forum/actions";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ExternalLink, FileText, Thermometer, Clock } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import Tenant from "@/lib/tenant/tenant";
@@ -49,7 +49,7 @@ export default function ForumNewClient({
   initialFormData,
   relatedProposal,
 }: ForumNewClientProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { createTopic, checkVPBeforeAction } = useForum();
   const { categories } = useForumCategories();
   const permissions = useForumPermissionsContext();
@@ -152,7 +152,9 @@ export default function ForumNewClient({
         }
 
         toast.success("Forum topic created successfully! Redirecting...");
-        router.push(buildForumTopicPath(created.id, created.title));
+        navigate({
+          to: buildForumTopicPath(created.id, created.title) as never,
+        });
       }
     } catch (error) {
       console.error("Failed to create topic:", error);
@@ -178,7 +180,7 @@ export default function ForumNewClient({
                 <div>
                   {relatedProposal && (
                     <Link
-                      href={`/proposals/${relatedProposal.id}`}
+                      to={`/proposals/${relatedProposal.id}` as never}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="border border-[#e0e0e0] rounded-lg p-3 cursor-pointer block hover:bg-gray-50 transition-colors my-4"
@@ -310,7 +312,7 @@ export default function ForumNewClient({
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => router.back()}
+                      onClick={() => window.history.back()}
                       disabled={isSubmitting}
                     >
                       Cancel

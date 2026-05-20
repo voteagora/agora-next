@@ -1,6 +1,6 @@
 import React from "react";
 import { VStack } from "@/components/Layout/Stack";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 function VoteDetailsContainer({
   children,
@@ -11,7 +11,7 @@ function VoteDetailsContainer({
 }) {
   return (
     <Link
-      href={`/proposals/${proposalId}`}
+      to={`/proposals/${proposalId}` as never}
       title={`Prop ${proposalId}`}
       className="block"
     >

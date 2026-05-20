@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { Link, useSearch } from "@tanstack/react-router";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { buildDraftUrl } from "../utils/shareParam";
 
@@ -12,13 +11,15 @@ const BackButton = ({
   draftProposalId: string | number;
   index: number;
 }) => {
-  const searchParams = useSearchParams();
-  const shareParam = searchParams?.get("share");
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
 
   return (
     <Link
       className="cursor-pointer border border-line rounded-full p-1 w-8 h-8 flex items-center justify-center shadow-newDefault"
-      href={buildDraftUrl(draftProposalId, index - 1, shareParam)}
+      to={buildDraftUrl(draftProposalId, index - 1, shareParam) as never}
     >
       <ChevronLeftIcon className="h-6 w-6 text-secondary" />
     </Link>

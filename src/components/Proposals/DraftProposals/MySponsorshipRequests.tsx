@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
@@ -50,7 +50,7 @@ const MySponsorshipRequests = ({
         {draftProposals.map((proposal) => (
           <Link
             key={proposal.id}
-            href={`/proposals/sponsor/${proposal.uuid || proposal.id}`}
+            to={`/proposals/sponsor/${proposal.uuid || proposal.id}` as never}
             className="block"
           >
             <DraftProposalCard proposal={proposal} showDelete={false} />

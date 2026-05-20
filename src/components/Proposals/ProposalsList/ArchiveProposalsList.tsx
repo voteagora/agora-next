@@ -12,7 +12,7 @@ import { useInfoBannerVisibility } from "@/hooks/useInfoBannerVisibility";
 import { useAccount } from "wagmi";
 import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
 import { DaoSlug } from "@prisma/client";
@@ -53,9 +53,9 @@ export default function ArchiveProposalsList({
 }) {
   const { address } = useAccount();
   const { token, namespace } = Tenant.current();
-  const searchParams = useSearchParams();
-  const filter =
-    searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
+  const { filter = proposalsFilterOptions.relevant.filter } = useSearch({
+    strict: false,
+  }) as Record<string, string | undefined>;
   const { ui, slug } = Tenant.current();
 
   let tenantSupportsProposalLifecycle =

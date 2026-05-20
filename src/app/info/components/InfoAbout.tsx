@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { CoinsIcon } from "@/icons/CoinsIcon";
@@ -86,11 +85,11 @@ const InfoAbout = () => {
             <div
               className={`w-full sm:w-1/2 relative ${ui.customization?.customHeroImageSize ? ui.customization.customHeroImageSize : "h-[200px] sm:h-auto"}`}
             >
-              <Image
-                src={page.hero!}
+              <img
+                src={page.hero! as string}
                 alt={page.title}
-                fill
                 className="rounded-lg object-cover object-center"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
               />
             </div>
           )}

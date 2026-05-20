@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useEnsAvatar } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { GetEnsNameData } from "wagmi/query";
-import Image from "next/image";
 import { resolveIPFSUrl } from "@/lib/utils";
 
 // TODO: Might be better to load the avatar on the server
@@ -50,10 +49,10 @@ export default function ENSAvatar({
           src={avatar}
         />
       ) : (
-        <Image
+        <img
           alt="ENS Avatar"
           className="animate-in"
-          src={ui.assets.delegate}
+          src={ui.assets.delegate as string}
           width={size}
           height={size}
         />

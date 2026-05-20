@@ -1,8 +1,6 @@
 import { VStack } from "@/components/Layout/Stack";
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import Tenant from "@/lib/tenant/tenant";
 
 const SponsorSnapshotProposalDialog = ({
@@ -15,14 +13,14 @@ const SponsorSnapshotProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const tenant = Tenant.current();
-  const router = useRouter();
+  const navigate = useNavigate();
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-white rounded-xl">
         <VStack>
           <VStack className="w-full">
-            <Image
-              src={tenant.ui.assets.success}
+            <img
+              src={tenant.ui.assets.success as string}
               className="w-full mb-3"
               alt="Cheerful scene with ENS + agora logo and thumbs up emojis."
             />
@@ -32,21 +30,25 @@ const SponsorSnapshotProposalDialog = ({
               <div className="flex flex-row items-center space-x-2">
                 <span className="text-green-500">Created</span>
 
-                <Link href={snapshotLink}>
-                  <Image
-                    src={icons.link}
-                    height="16"
-                    width="16"
+                <a
+                  href={snapshotLink}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <img
+                    src={icons.link as string}
+                    height={16}
+                    width={16}
                     alt="link icon"
                   />
-                </Link>
+                </a>
               </div>
             </div>
 
             <div
               className="mt-4 flex flex-row justify-center w-full py-3 rounded-lg bg-gray-eo cursor-pointer"
               onClick={() => {
-                router.push(redirectUrl);
+                navigate({ to: redirectUrl as never });
                 closeDialog();
               }}
             >

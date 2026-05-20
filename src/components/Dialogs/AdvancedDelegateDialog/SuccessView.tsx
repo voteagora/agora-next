@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
-import Image from "next/image";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { useEffect } from "react";
 import Tenant from "@/lib/tenant/tenant";
@@ -29,9 +28,9 @@ export function SuccessView({
   return (
     <div>
       <div className="w-full">
-        <Image
+        <img
           className="w-full"
-          src={ui.assets.success}
+          src={ui.assets.success as string}
           alt="Delegation successful image"
         />
       </div>

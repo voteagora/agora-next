@@ -1,8 +1,7 @@
 "use client";
 import { UpdatedButton } from "@/components/Button";
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 const AddGithubPRDialog = ({
   redirectUrl,
@@ -13,7 +12,7 @@ const AddGithubPRDialog = ({
   githubUrl: string;
   closeDialog: () => void;
 }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   return (
     <div>
       <span className="block h-[150px] w-full bg-agora-stone-100 rounded-lg"></span>
@@ -23,7 +22,12 @@ const AddGithubPRDialog = ({
         <div className="flex flexr-row items-center space-x-2">
           <span className="text-green-500">Completed</span>
           <a href={githubUrl} target="_blank" rel="noreferrer">
-            <Image src={icons.link} height="16" width="16" alt="link icon" />
+            <img
+              src={icons.link as string}
+              height={16}
+              width={16}
+              alt="link icon"
+            />
           </a>
         </div>
       </div>
@@ -33,7 +37,7 @@ const AddGithubPRDialog = ({
           type="primary"
           onClick={async () => {
             closeDialog();
-            router.push(redirectUrl);
+            navigate({ to: redirectUrl as never });
           }}
         >
           Continue

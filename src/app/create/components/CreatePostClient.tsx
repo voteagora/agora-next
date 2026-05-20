@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import Tenant from "@/lib/tenant/tenant";
@@ -51,7 +51,7 @@ export function CreatePostClient({
   proposalTypes,
 }: CreatePostClientProps) {
   const { address } = useAccount();
-  const router = useRouter();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { ui, contracts } = Tenant.current();
   const { createProposalWithVotingType } = useEASV2();
@@ -265,7 +265,7 @@ export function CreatePostClient({
 
   const handleCloseIndexingModal = () => {
     setShowIndexingModal(false);
-    router.push("/");
+    navigate({ to: "/" });
   };
 
   useEffect(() => {

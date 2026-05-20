@@ -1,7 +1,5 @@
 import { VStack } from "@/components/Layout/Stack";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+import { useNavigate } from "@tanstack/react-router";
 import { icons } from "@/assets/icons/icons";
 import Tenant from "@/lib/tenant/tenant";
 import { UpdatedButton } from "@/components/Button";
@@ -17,15 +15,15 @@ const SponsorOffchainProposalDialog = ({
   closeDialog: () => void;
 }) => {
   const tenant = Tenant.current();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   return (
     <VStack alignItems="items-center">
       <VStack className="w-full bg-neutral rounded-xl">
         <VStack>
           <VStack className="w-full">
-            <Image
-              src={tenant.ui.assets.success}
+            <img
+              src={tenant.ui.assets.success as string}
               className="w-full mb-3"
               alt="Success"
             />
@@ -42,7 +40,7 @@ const SponsorOffchainProposalDialog = ({
                 type="primary"
                 onClick={async () => {
                   // TODO: redirect to the proposal page once we have indexing available
-                  router.push(redirectUrl);
+                  navigate({ to: redirectUrl as never });
                   closeDialog();
                 }}
               >
@@ -52,14 +50,18 @@ const SponsorOffchainProposalDialog = ({
             <div className="flex flex-row justify-between items-center mt-4">
               <span className="text-secondary">View attestation on EAS</span>
               <div className="flex flex-row items-center space-x-2">
-                <Link href={`${getBlockScanUrl(attestationUid, true)}`}>
-                  <Image
-                    src={icons.link}
-                    height="16"
-                    width="16"
+                <a
+                  href={`${getBlockScanUrl(attestationUid, true)}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <img
+                    src={icons.link as string}
+                    height={16}
+                    width={16}
                     alt="link icon"
                   />
-                </Link>
+                </a>
               </div>
             </div>
           </VStack>

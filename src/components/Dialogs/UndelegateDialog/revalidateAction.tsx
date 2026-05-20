@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "@/lib/shims/next-cache";
 
 export async function revalidateData() {
   revalidatePath("/delegates");

@@ -1,5 +1,4 @@
 import DraftPreview from "./DraftPreview";
-import Image from "next/image";
 import { icons } from "@/icons/icons";
 import { DraftProposal } from "../../../proposals/draft/types";
 
@@ -18,9 +17,9 @@ const ArchivedDraftProposal = ({
           {/* yellow color for draft proposal -- not themeable right now */}
           <div className="border bg-[#FAFAF2] border-[#ECE3CA] text-[#B16B19] p-6 rounded-lg">
             <div className="flex flex-row items-center space-x-4">
-              <Image
+              <img
                 className="border bg-[#FAFAF2] border-[#ECE3CA] rounded-md p-2 shadow-newDefault"
-                src={icons.sponsor}
+                src={icons.sponsor as string}
                 alt="Sponsor"
                 width={42}
                 height={42}

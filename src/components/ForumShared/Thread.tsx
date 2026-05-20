@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
@@ -224,7 +224,7 @@ const CommentItem = ({
         <div className="flex-shrink-0">
           {profileHref ? (
             <Link
-              href={profileHref}
+              to={profileHref as never}
               aria-label={profileLabel}
               className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
             >
@@ -251,7 +251,7 @@ const CommentItem = ({
             <div className="flex items-center gap-1">
               {profileHref ? (
                 <Link
-                  href={profileHref}
+                  to={profileHref as never}
                   aria-label={profileLabel}
                   className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >

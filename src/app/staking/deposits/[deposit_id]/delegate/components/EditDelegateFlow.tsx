@@ -9,7 +9,6 @@ import { Receipt } from "@/app/staking/components/receipt/Receipt";
 import DelegateCardList from "@/app/staking/components/delegates/DelegateCardList";
 import { EditDelegateConfirm } from "@/app/staking/deposits/[deposit_id]/delegate/components/EditDelegateConfirm";
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 
@@ -49,8 +48,8 @@ export const EditDelegateFlow = ({
         <>
           <div className="border border-line rounded-xl flex gap-4 w-full shadow-newDefault p-4 font-medium text-primary">
             <div className={`p-1 rounded-lg bg-tertiary`}>
-              <Image
-                src={icons.speakerCone}
+              <img
+                src={icons.speakerCone as string}
                 alt="Uniswap voters manage staking rewards"
               />
             </div>

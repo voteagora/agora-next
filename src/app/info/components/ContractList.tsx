@@ -6,10 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Image from "next/image";
 import linkIcon from "@/assets/icons/link.svg";
 import Tenant from "@/lib/tenant/tenant";
-import Link from "next/link";
 import { getBlockScanAddress } from "@/lib/utils";
 
 const ContractList = () => {
@@ -54,17 +52,18 @@ const ContractList = () => {
             <TableCell
               className={`px-1 ${index === list.length - 1 && "rounded-br-lg"}`}
             >
-              <Link
+              <a
                 href={getBlockScanAddress(contract.address)}
                 target="_blank"
+                rel="noreferrer noopener"
               >
-                <Image
+                <img
                   alt={contract.title}
                   width={20}
                   height={20}
-                  src={linkIcon}
+                  src={linkIcon as string}
                 />
-              </Link>
+              </a>
             </TableCell>
           </TableRow>
         ))}

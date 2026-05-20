@@ -1,5 +1,5 @@
 import { fetchDelegateForSCW } from "@/app/api/common/delegates/getDelegateForSCW";
-import { redirect } from "next/navigation";
+import { redirect } from "@/lib/shims/next-navigation";
 import Tenant from "@/lib/tenant/tenant";
 
 // Redirect from a smart contract wallet address to the owner delegate page

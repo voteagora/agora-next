@@ -11,7 +11,7 @@ import { useProposalThreshold } from "@/hooks/useProposalThreshold";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { getStoredSiweJwt } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
@@ -42,7 +42,7 @@ const CreateProposalDraftButton = ({
   const [isPending, setIsPending] = useState(false);
   const { getAuthenticationData } = useProposalActionAuth();
   const [isClient, setIsClient] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
   const { chain } = useAccount();
   const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
@@ -120,7 +120,7 @@ const CreateProposalDraftButton = ({
       }
 
       const proposal = await res.json();
-      router.push(`/proposals/draft/${proposal.uuid}`);
+      navigate({ to: `/proposals/draft/${proposal.uuid}` as never });
     } catch (error) {
       console.error("Error creating draft proposal:", error);
       const message = (error as Error)?.message || "Error creating draft";
@@ -179,7 +179,7 @@ const CreateProposalDraftButton = ({
         reason: "proposal_draft_created",
       });
     }
-    router.push(`/proposals/draft/${proposal.uuid}`);
+    navigate({ to: `/proposals/draft/${proposal.uuid}` as never });
   };
 
   const openProposalChoiceDialog = async (isSafe: boolean) => {
@@ -270,7 +270,7 @@ const CreateProposalDraftButton = ({
 
         if (isSafe) {
           setIsPending(false);
-          router.push(`/proposals/create-proposal`);
+          navigate({ to: "/proposals/create-proposal" });
           return;
         }
 

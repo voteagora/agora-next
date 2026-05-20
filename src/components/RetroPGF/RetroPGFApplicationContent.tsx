@@ -3,7 +3,6 @@ import { icons } from "@/icons/icons";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import RetroPGFApplicationContentFundingSource from "./RetroPGFApplicationContentFundingSource";
 import { type RetroPGFProject } from "@/lib/types";
-import Image from "next/image";
 
 export default function RetroPGFApplicationContent({
   retroPGFProject,
@@ -105,7 +104,7 @@ const ContributionLink = ({
       <HStack className="items-start justify-between gap-2 mt-4">
         <HStack className="gap-3">
           <div className="mt-1">
-            <Image src={icons[icon]} alt={icon} />
+            <img src={icons[icon] as string} alt={icon} />
           </div>
           <p className="max-w-[300px] text-primary overflow-hidden text-ellipsis">
             {contributionLink.description}

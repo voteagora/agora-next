@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { cn } from "@/lib/utils";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -40,7 +40,7 @@ const DelegateCard = ({
         isDelegatesFiltering ? "animate-pulse" : ""
       )}
     >
-      <Link href={`/delegates/${delegate.address}`}>
+      <Link to={`/delegates/${delegate.address}` as never}>
         <div
           className={`flex flex-col gap-4 h-full rounded-xl ${useNeutral ? "bg-neutral" : "bg-wash"} border border-line shadow-newDefault`}
         >

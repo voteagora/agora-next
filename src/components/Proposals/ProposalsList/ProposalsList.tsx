@@ -7,7 +7,7 @@ import PageHeader from "@/components/Layout/PageHeader/PageHeader";
 import ProposalsFilter from "@/components/Proposals/ProposalsFilter/ProposalsFilter";
 import InfiniteScroll from "react-infinite-scroller";
 import CurrentGovernanceStage from "@/components/Proposals/CurrentGovernanceStage/CurrentGovernanceStage";
-import { useSearchParams } from "next/navigation";
+import { useSearch } from "@tanstack/react-router";
 import Tenant from "@/lib/tenant/tenant";
 import CreateProposalDraftButton from "./CreateProposalDraftButton";
 import ProposalsPageInfoBanner from "../ProposalsPageInfoBanner";
@@ -55,7 +55,10 @@ export default function ProposalsList({
     tenantSupportsProposalLifecycle = proposalCreators.includes(address || "");
   }
 
-  const filter = useSearchParams()?.get("filter") || "relevant";
+  const { filter = "relevant" } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const fetching = useRef(false);
   const [pages, setPages] = useState([initRelevantProposals]);
   const [meta, setMeta] = useState(initRelevantProposals.meta);

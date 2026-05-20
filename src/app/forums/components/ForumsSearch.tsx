@@ -3,7 +3,7 @@
 import React from "react";
 import { InstantSearch, useHits, useSearchBox } from "react-instantsearch";
 import type { SearchClient } from "instantsearch.js";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Search as SearchIcon } from "lucide-react";
 import { createForumSearchConfig } from "@/lib/instantSearch";
 import { buildForumTopicPath } from "@/lib/forumUtils";
@@ -173,7 +173,7 @@ function formatDate(timestamp?: number): string | null {
 }
 
 const ForumsSearch: React.FC<ForumsSearchProps> = ({ className }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isFocused, setIsFocused] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const clearRef = React.useRef<(() => void) | null>(null);
@@ -217,9 +217,9 @@ const ForumsSearch: React.FC<ForumsSearchProps> = ({ className }) => {
       setIsFocused(false);
       setQuery("");
       clearRef.current?.();
-      router.push(path);
+      navigate({ to: path as never });
     },
-    [router]
+    [navigate]
   );
 
   const isOpen = isFocused && query.trim().length > 0;

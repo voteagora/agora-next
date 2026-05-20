@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import {
   getDunaCategoryId,
   getForumCategoryAttachments,
@@ -10,8 +9,21 @@ import { ExternalLink } from "@/icons/ExternalLink";
 import FormationDocumentsList from "./FormationDocumentsList";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 
+type AttachmentDoc = {
+  id: number;
+  name: string | null;
+  url: string;
+  ipfsCid: string;
+  createdAt: string;
+  uploadedBy: string | null;
+  archived: boolean;
+  isFinancialStatement: boolean;
+  revealTime: string | null;
+  expirationTime: string | null;
+};
+
 const DunaAbout = async () => {
-  let documents: any[] = [];
+  let documents: AttachmentDoc[] = [];
 
   try {
     const dunaCategoryId = await getDunaCategoryId();
@@ -29,8 +41,7 @@ const DunaAbout = async () => {
       }
       if (archivedDocumentsResult.success) {
         const archivedDocs = archivedDocumentsResult.data.filter(
-          (archivedDoc: any) =>
-            !documents.some((doc: any) => doc.id === archivedDoc.id)
+          (archivedDoc) => !documents.some((doc) => doc.id === archivedDoc.id)
         );
         documents = [...documents, ...archivedDocs];
       }
@@ -59,7 +70,8 @@ const DunaAbout = async () => {
     "Redacted EIN",
   ];
 
-  const getDocumentOrderIndex = (docName: string) => {
+  const getDocumentOrderIndex = (docName: string | null) => {
+    if (!docName) return documentOrder.length;
     const index = documentOrder.findIndex((suffix) => docName.includes(suffix));
     return index === -1 ? documentOrder.length : index;
   };
@@ -102,7 +114,7 @@ const DunaAbout = async () => {
               </p>
               <div className="flex flex-col gap-1">
                 {communityLinks.map((link, idx) => (
-                  <Link
+                  <a
                     key={idx}
                     href={link.url}
                     target="_blank"
@@ -113,7 +125,7 @@ const DunaAbout = async () => {
                     <span className="text-base font-medium">
                       {link.title} <span className="text-tertiary">↗</span>
                     </span>
-                  </Link>
+                  </a>
                 ))}
               </div>
             </div>

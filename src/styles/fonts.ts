@@ -1,4 +1,4 @@
-import localFont from "next/font/local";
+import localFont from "@/lib/shims/next-font-local";
 import type { NextFontShim as NextFontWithVariable } from "@/lib/shims/next-font-local";
 
 export const inter = localFont({

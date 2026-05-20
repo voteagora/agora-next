@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useMemo, memo } from "react";
 import * as d3 from "d3";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ChartVote } from "@/lib/types";
 import ENSName from "@/components/shared/ENSName";
@@ -49,7 +49,7 @@ const transformVotesToTreeData = (votes: ChartVote[]) => {
 
 const TreeMapNode = memo(
   ({ node, transform }: { node: TreeNode; transform: d3.ZoomTransform }) => {
-    const router = useRouter();
+    const navigate = useNavigate();
     const { ui } = Tenant.current();
 
     const width = node.x1 - node.x0;
@@ -76,7 +76,7 @@ const TreeMapNode = memo(
         transform={`translate(${node.x0},${node.y0})`}
         onClick={(e) => {
           e.stopPropagation();
-          router.push(`/delegates/${node.data.address}`);
+          navigate({ to: `/delegates/${node.data.address}` as never });
         }}
         style={{ cursor: "pointer" }}
       >

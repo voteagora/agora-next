@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useNavigate, useLocation } from "@tanstack/react-router";
 import { Megaphone, X } from "lucide-react";
 import { useRecentlyReleasedStatement } from "@/hooks/useRecentlyReleasedStatement";
 import { buildForumArticlePath } from "@/lib/forumUtils";
@@ -49,8 +49,8 @@ export default function RecentlyReleasedBanner() {
   const { isDismissed, dismiss } = useBannerDismissal(
     recentlyReleasedStatement?.id ?? null
   );
-  const router = useRouter();
-  const pathname = usePathname();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { ui } = Tenant.current();
   const infoBannerBackground = ui.customization?.infoBannerBackground;
   const bannerStyle = infoBannerBackground
@@ -92,7 +92,7 @@ export default function RecentlyReleasedBanner() {
     if ((e.target as HTMLElement).closest("button")) {
       return;
     }
-    router.push(articlePath);
+    navigate({ to: articlePath as never });
     dismiss();
   };
 

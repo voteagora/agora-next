@@ -1,4 +1,3 @@
-import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
 import { X } from "lucide-react";
 import { Proposal } from "@/app/api/common/proposals/proposal.d";
@@ -55,7 +54,12 @@ export const HybridStandardVotesSummaryTooltip = ({
           <span className="text-secondary">Quorum</span>
           <div className="flex items-center gap-1">
             {quorumMet ? (
-              <Image width="12" height="12" src={checkIcon} alt="check icon" />
+              <img
+                width={12}
+                height={12}
+                src={checkIcon as string}
+                alt="check icon"
+              />
             ) : (
               <X className="h-3 w-3 text-negative" />
             )}
@@ -71,10 +75,10 @@ export const HybridStandardVotesSummaryTooltip = ({
             <div className="flex items-center gap-1">
               {finalApproval * 100 >=
               Number(proposal.approvalThreshold) / 100 ? (
-                <Image
-                  width="12"
-                  height="12"
-                  src={checkIcon}
+                <img
+                  width={12}
+                  height={12}
+                  src={checkIcon as string}
                   alt="check icon"
                 />
               ) : (

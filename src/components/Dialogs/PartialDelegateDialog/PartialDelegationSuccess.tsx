@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 import Tenant from "@/lib/tenant/tenant";
@@ -14,9 +13,9 @@ export const PartialDelegationSuccess = ({ hash, closeDialog }: Props) => {
   return (
     <div>
       <div className="w-full">
-        <Image
+        <img
           className="w-full"
-          src={ui.assets.success}
+          src={ui.assets.success as string}
           alt="Delegation successful image"
         />
       </div>

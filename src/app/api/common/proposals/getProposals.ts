@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound } from "@/lib/shims/next-navigation";
 import { cache } from "react";
 import {
   PaginatedResult,
@@ -31,7 +31,7 @@ import { fetchOffchainProposalsMap } from "./fetchOffchainProposalsMap";
 import { Block } from "ethers";
 
 import { withMetrics } from "@/lib/metricWrapper.server";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { getPublicClient } from "@/lib/viem";
 import {
   adaptDAONodeResponse,

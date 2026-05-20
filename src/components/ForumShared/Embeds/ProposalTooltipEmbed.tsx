@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import ProposalStatus from "@/components/Proposals/ProposalStatus/ProposalStatus";
 import ProposalTimeStatus from "@/components/Proposals/Proposal/ProposalTimeStatus";
 import { OPStandardStatusView } from "@/components/Proposals/Proposal/OPStandardProposalStatus";
@@ -99,7 +99,7 @@ export default function ProposalTooltipEmbed({
 
   return (
     <Link
-      href={data.url}
+      to={data.url as never}
       className="block no-underline hover:no-underline [&_*]:no-underline [&_*]:hover:no-underline"
     >
       <div

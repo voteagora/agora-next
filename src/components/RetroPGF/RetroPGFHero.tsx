@@ -1,6 +1,5 @@
-import Image from "next/image";
 import { HStack, VStack } from "@/components/Layout/Stack";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 export default function RetroPGFHero() {
   return (
@@ -11,17 +10,17 @@ export default function RetroPGFHero() {
         </div>
         <Link
           className="text-secondary hover:text-primary transition-colors ease-in-out delay-200"
-          href="/retropgf/3/summary"
+          to="/retropgf/3/summary"
         >
           View more stats →
         </Link>
       </HStack>
-      <Image
+      <img
         src="/rpgf/infographic_5.png"
         alt="RetroPGF 3 results 5"
         className="w-full max-w-6xl rounded-xl border border-line"
-        height="1216"
-        width="1216"
+        height={1216}
+        width={1216}
       />
     </VStack>
   );

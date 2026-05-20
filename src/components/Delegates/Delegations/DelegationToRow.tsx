@@ -4,7 +4,7 @@ import { Delegation } from "@/app/api/common/delegations/delegation";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { getBlockScanUrl, TokenAmountDisplay } from "@/lib/utils";
 import { format } from "date-fns";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import ENSName from "@/components/shared/ENSName";
 
@@ -26,7 +26,7 @@ export default function DelegationToRow({
       <TableCell>{format(delegation.timestamp || 0, "yyyy/MM/dd")}</TableCell>
       <TableCell>
         <Link
-          href={`/delegates/${delegation.to}`}
+          to={`/delegates/${delegation.to}` as never}
           title={`Address ${delegation.to}`}
         >
           <ENSName address={delegation.to} includeCtoC={true} />

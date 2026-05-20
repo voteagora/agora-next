@@ -5,7 +5,7 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {

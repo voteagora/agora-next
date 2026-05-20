@@ -24,7 +24,7 @@ import ApprovalProposalForm from "../../ApprovalProposalForm";
 import OptimisticProposalForm from "../../OptimisticProposalForm";
 import SwitchInput from "../../form/SwitchInput";
 import toast from "react-hot-toast";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
 import { buildDraftUrl } from "@/app/proposals/draft/utils/shareParam";
 import { getProposalTypeMetaDataForTenant } from "../../../utils/proposalTypes";
@@ -54,9 +54,11 @@ const DraftFormClient = ({
   const [validProposalTypes, setValidProposalTypes] = useState<
     FormattedProposalType[]
   >(getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC));
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const shareParam = searchParams?.get("share");
+  const navigate = useNavigate();
+  const { share: shareParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const { address } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
 
@@ -137,7 +139,9 @@ const DraftFormClient = ({
       } else {
         invalidatePath(draftProposal.id);
         const nextId = draftProposal.uuid;
-        router.push(buildDraftUrl(nextId, stageIndex + 1, shareParam));
+        navigate({
+          to: buildDraftUrl(nextId, stageIndex + 1, shareParam) as never,
+        });
       }
     } catch (error: any) {
       setIsPending(false);

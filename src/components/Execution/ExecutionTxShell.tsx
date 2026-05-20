@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ExecutionTxHeader } from "@/components/Execution/ExecutionTxHeader";
 import { ExecutionTxNav } from "@/components/Execution/ExecutionTxNav";
@@ -14,7 +14,7 @@ export function ExecutionTxShell({
   txHash: string;
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   useEffect(() => {

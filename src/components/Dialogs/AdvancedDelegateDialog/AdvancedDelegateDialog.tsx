@@ -27,7 +27,7 @@ import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
-import { useParams } from "next/navigation";
+import { useParams } from "@tanstack/react-router";
 import { resolveENSName } from "@/app/lib/ENSUtils";
 import { fetchDelegate } from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
@@ -65,7 +65,10 @@ export function AdvancedDelegateDialog({
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
   const { setOpen } = useModal();
-  const params = useParams<{ addressOrENSName: string }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const params = (useParams as any)({ strict: false }) as {
+    addressOrENSName?: string;
+  };
   const { ui, slug } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 

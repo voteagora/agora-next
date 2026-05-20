@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { Changelog } from "@/app/api/common/changelogs/changelog";
 import ChangelogListEntry from "./ChangelogListEntry";
-import Image from "next/image";
 
 interface ChangelogListProps {
   initChangelog: {
@@ -54,7 +53,7 @@ const ChangelogList: React.FC<ChangelogListProps> = ({
           It seems nothing has happened on the change log yet.
         </p>
         <div className="mt-8">
-          <Image
+          <img
             alt="Vacationing changelog"
             src="https://i.pinimg.com/originals/97/52/18/97521834afab9745868c144cfe189b69.gif"
             width={300}

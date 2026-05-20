@@ -19,7 +19,7 @@ import {
 } from "viem/chains";
 import { getPublicClient } from "../viem";
 import { StorageEncodingResponse } from "./types";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 
 // --- Type Definitions ---
 

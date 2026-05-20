@@ -3,7 +3,7 @@
 import { TextInputWithTooltip } from "@/components/shared/Form/TextInputWithTooltip";
 import { useState } from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 
 export default function DelegatesSearch({
   className,
@@ -14,7 +14,7 @@ export default function DelegatesSearch({
   closeButton?: boolean;
   onClose?: () => void;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [enteredName, setEnteredName] = useState("");
 
   return (
@@ -26,7 +26,7 @@ export default function DelegatesSearch({
           enteredName.match(/^(0x)?[0-9a-f]{40}$/i) ||
           enteredName.endsWith(".eth")
         ) {
-          router.push(`/delegates/${enteredName}`);
+          navigate({ to: `/delegates/${enteredName}` as never });
         }
       }}
     >

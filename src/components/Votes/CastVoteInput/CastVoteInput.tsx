@@ -22,7 +22,6 @@ import CastVoteContextProvider, {
 import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
-import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { formatEther } from "viem";
@@ -481,7 +480,12 @@ export function SuccessMessage({
         variant="outline"
         className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
       >
-        <Image src={shareIcon} alt="Share icon" height={18} width={18} />
+        <img
+          src={shareIcon as string}
+          alt="Share icon"
+          height={18}
+          width={18}
+        />
         <span>Share your vote</span>
       </Button>
       <p className="text-[14px] font-bold text-secondary text-center mt-2">
@@ -560,7 +564,7 @@ function NoStatementView() {
   return (
     <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
-        <Image src={icons.info} alt="Info" width={24} height={24} />
+        <img src={icons.info as string} alt="Info" width={24} height={24} />
         Voting requires a delegate statement. Set yours one now to participate.
       </div>
       <Button
@@ -590,8 +594,8 @@ function ErrorState({
         <TooltipTrigger asChild>
           <div className="flex flex-col gap-3 p-3 border-t border-line">
             <div className="py-2 px-4 bg-red-300 text-xs text-red-700 font-medium rounded-lg flex items-center gap-2">
-              <Image
-                src={icons.infoRed}
+              <img
+                src={icons.infoRed as string}
                 alt="Info"
                 width={24}
                 height={24}

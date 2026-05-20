@@ -24,7 +24,7 @@ import ApprovalProposalForm from "@/app/proposals/draft/components/ApprovalPropo
 import OptimisticProposalForm from "@/app/proposals/draft/components/OptimisticProposalForm";
 import SwitchInput from "@/app/proposals/draft/components/form/SwitchInput";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { getProposalTypeMetaDataForTenant } from "@/app/proposals/draft/utils/proposalTypes";
 import {
   DEFAULT_FORM,
@@ -86,7 +86,7 @@ export default function CreateProposalFormClient({
     FormattedProposalType[]
   >(getValidProposalTypesForVotingType(proposalTypes, ProposalType.BASIC));
 
-  const router = useRouter();
+  const navigate = useNavigate();
   const openDialog = useOpenDialog();
   const { address, chain } = useAccount();
   const { getAuthenticationData } = useProposalActionAuth();
@@ -579,7 +579,7 @@ export default function CreateProposalFormClient({
           duration: 10000,
         }
       );
-      if (!isHybrid && !isSafeConnectedWallet) router.push("/");
+      if (!isHybrid && !isSafeConnectedWallet) navigate({ to: "/" });
     } catch (err: unknown) {
       if (!discoveredSafePublishRef.current) {
         openDialog(null);
@@ -662,7 +662,7 @@ export default function CreateProposalFormClient({
           attestationUid,
         },
       });
-      router.push("/");
+      navigate({ to: "/" });
     } catch (err: unknown) {
       traceProposalEvent("proposal_offchain_submit_failed", {
         message: err instanceof Error ? err.message : "Transaction failed",

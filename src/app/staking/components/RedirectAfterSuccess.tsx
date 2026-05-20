@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { INDEXER_DELAY } from "@/lib/constants";
 
@@ -31,7 +31,7 @@ export const RedirectAfterSuccess = ({
         {isIndexing ? (
           "Indexing transaction..."
         ) : (
-          <Link className="underline" href={linkURI}>
+          <Link className="underline" to={linkURI as never}>
             {linkTitle}
           </Link>
         )}

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useForum } from "@/hooks/useForum";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import ComposerModal from "@/components/ForumShared/ComposerModal";
 import { buildForumTopicPath } from "@/lib/forumUtils";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -18,7 +18,7 @@ export default function CreateTopicModal({
   isOpen,
   onClose,
 }: CreateTopicModalProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { createTopic, checkVPBeforeAction } = useForum();
   const requireLogin = useRequireLogin();
   const stableCreateTopic = useStableCallback(createTopic);
@@ -57,7 +57,9 @@ export default function CreateTopicModal({
           });
           if (created?.id) {
             onClose();
-            router.push(buildForumTopicPath(created.id, created.title));
+            navigate({
+              to: buildForumTopicPath(created.id, created.title) as never,
+            });
           }
         }}
       />

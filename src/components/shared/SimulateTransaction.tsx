@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ethers } from "ethers";
 import { useAccount } from "wagmi";
 import { icons } from "../../icons/icons";
-import Image from "next/image";
 import { Button } from "../ui/button";
 import { HStack } from "../Layout/Stack";
 import Tenant from "@/lib/tenant/tenant";
@@ -102,7 +101,11 @@ export default function SimulateTransaction({
         type="button"
       >
         {isLoading ? (
-          <Image src={icons.spinner} alt={icons.spinner} className="mx-auto" />
+          <img
+            src={icons.spinner as string}
+            alt={icons.spinner as string}
+            className="mx-auto"
+          />
         ) : (
           "Simulate"
         )}

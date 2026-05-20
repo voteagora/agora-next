@@ -5,7 +5,7 @@ import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import { formatDistanceToNow } from "date-fns";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
 import { canCreateGovernanceProposal } from "@/lib/forumPermissionUtils";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useAccount } from "wagmi";
 import {
@@ -34,7 +34,7 @@ export default function ArchiveProposalTypeApproval({
   proposal: Proposal;
 }) {
   const permissions = useForumPermissionsContext();
-  const router = useRouter();
+  const navigate = useNavigate();
   const { address } = useAccount();
   const { links: relatedLinks, isLoading: isLoadingLinks } =
     useProposalLinksWithDetails(proposal.id);
@@ -114,7 +114,7 @@ export default function ArchiveProposalTypeApproval({
       fromTempCheckId: proposal.id,
     });
 
-    router.push(`/create?${params.toString()}`);
+    navigate({ to: `/create?${params.toString()}` as never });
   };
 
   const handleCreateDiscussion = () => {
@@ -123,7 +123,7 @@ export default function ArchiveProposalTypeApproval({
       proposalTag: isTempCheck ? "tempcheck" : "gov",
     });
 
-    router.push(`/forums/new?${params.toString()}`);
+    navigate({ to: `/forums/new?${params.toString()}` as never });
   };
   const now = new Date();
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
 
 import { truncateAddress } from "@/app/lib/utils/text";
@@ -51,7 +51,7 @@ export default function TopicHeader({
         <div className="flex items-center gap-2">
           {profileHref ? (
             <Link
-              href={profileHref}
+              to={profileHref as never}
               aria-label={profileLabel}
               className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
             >

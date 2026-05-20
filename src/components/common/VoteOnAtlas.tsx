@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const ATLAS_URL =
   process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
     ? "https://atlas.optimism.io/"
@@ -21,13 +19,14 @@ export const VoteOnAtlas = ({
         <span className="text-secondary text-xs font-bold leading-[18px]">
           Are you a citizen?{" "}
         </span>
-        <Link
+        <a
           href={`${ATLAS_URL}proposals/${offchainProposalId}`}
           target="_blank"
+          rel="noreferrer noopener"
           className="text-secondary text-xs font-bold underline leading-[18px]"
         >
           {linkLabel}
-        </Link>
+        </a>
       </div>
     </div>
   );

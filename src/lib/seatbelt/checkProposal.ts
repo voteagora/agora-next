@@ -1,6 +1,6 @@
 "use server";
 
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";

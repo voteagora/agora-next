@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { icons } from "@/icons/icons";
 import { Input } from "@/components/ui/input";
 import { type UseFormReturn, useWatch } from "react-hook-form";
@@ -130,7 +129,7 @@ const IssueInput = ({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="flex justify-center items-center w-12 h-12 min-w-12 bg-white rounded-md border border-line shadow-newDefault p-2">
-        <Image src={icons[icon]} alt={title} />
+        <img src={icons[icon] as string} alt={title} />
       </div>
 
       <div className="flex flex-col flex-1 relative">

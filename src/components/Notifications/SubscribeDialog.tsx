@@ -11,7 +11,7 @@ import EnvelopeBottom from "./DialogImage/EnvelopeBottom";
 import EnvelopePaper from "./DialogImage/EnvelopePaper";
 import EnvelopeTop from "./DialogImage/EnvelopeTop";
 import StarIcon from "./DialogImage/Star";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
 const HeroImage = ({ isHovering }: { isHovering: boolean }) => {
   return (
@@ -106,7 +106,10 @@ const SubscribeDialog = ({
                 <span>
                   No problem! We won&apos;t bug you again. You can change your
                   preferences in{" "}
-                  <Link className="underline" href={`/delegates/${address}`}>
+                  <Link
+                    className="underline"
+                    to={`/delegates/${address}` as never}
+                  >
                     your profile
                   </Link>
                 </span>

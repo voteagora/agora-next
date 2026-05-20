@@ -1,5 +1,4 @@
 import { formatNumberForAdvancedDelegation } from "@/lib/tokenUtils";
-import Image from "next/image";
 import { useMemo } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -17,7 +16,7 @@ export function AdvancedDelegationDisplayAmount({
   return (
     <div className="flex flex-row gap-2 text-primary text-4xl sm:text-5xl font-semibold leading-none items-center">
       {formattedNumber}
-      <Image src={ui.logo} alt={token.symbol} width={36} height={36} />
+      <img src={ui.logo as string} alt={token.symbol} width={36} height={36} />
     </div>
   );
 }

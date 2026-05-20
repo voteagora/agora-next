@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 
 interface BreadcrumbsProps {
   step: number;
@@ -17,13 +16,11 @@ export const Breadcrumbs = ({
   onClick,
   totalSteps = 3,
 }: BreadcrumbsProps) => {
-  const router = useRouter();
-
   const onBackButton = () => {
     if (step > 1) {
       onClick(step - 1);
     } else {
-      router.back();
+      window.history.back();
     }
   };
 

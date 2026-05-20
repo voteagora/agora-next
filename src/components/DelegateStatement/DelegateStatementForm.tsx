@@ -10,7 +10,7 @@ import { Form } from "@/components/ui/form";
 import { useAccount } from "wagmi";
 import { submitDelegateStatement } from "@/server/delegates/actions";
 import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "@tanstack/react-router";
 import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
@@ -25,7 +25,7 @@ export default function DelegateStatementForm({
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { ui } = Tenant.current();
   const { address, chain } = useAccount();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -83,9 +83,9 @@ export default function DelegateStatementForm({
       }
 
       setSaveSuccess(true);
-      router.push(`/delegates/${connectedAddress}`);
+      navigate({ to: `/delegates/${connectedAddress}` as never });
     },
-    [router, scwAddress, setSaveSuccess]
+    [navigate, scwAddress, setSaveSuccess]
   );
 
   async function onSubmit(values: DelegateStatementFormValues) {

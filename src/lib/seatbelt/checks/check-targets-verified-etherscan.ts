@@ -1,7 +1,7 @@
 import { bullet, toAddressLink } from "../report";
 import type { ProposalCheck, TenderlySimulation } from "../types";
 import { Provider } from "ethers";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 
 const ONE_DAY_IN_SECONDS = 60 * 60 * 24;
 

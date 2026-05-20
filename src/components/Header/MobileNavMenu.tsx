@@ -1,12 +1,10 @@
 import React from "react";
 import { Drawer } from "../ui/Drawer";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
-import Image from "next/image";
 import agoraLogo from "@/icons/agoraIconWithText.svg";
 import discordIcon from "@/icons/discord.svg";
 import XIcon from "@/icons/x.svg";
@@ -20,7 +18,7 @@ interface MobileNavMenuProps {
 }
 
 export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
-  const pathname = usePathname() || "";
+  const { pathname } = useLocation();
   const { ui, token, contracts } = Tenant.current();
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -185,7 +183,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           {navItems.map((item) => (
             <Link
               key={item.name}
-              href={item.href}
+              to={item.href as never}
               target={item.target}
               onClick={() => setTimeout(onClose, 100)}
               className={cn(
@@ -246,7 +244,10 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                   </a>
                 )}
                 {changeLogLink && (
-                  <Link href={changeLogLink.url} className="justify-start">
+                  <Link
+                    to={changeLogLink.url as never}
+                    className="justify-start"
+                  >
                     {changeLogLink.title}
                   </Link>
                 )}
@@ -277,8 +278,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     rel="noreferrer"
                     className="w-6 h-6"
                   >
-                    <Image
-                      src={discordIcon}
+                    <img
+                      src={discordIcon as string}
                       alt="Discord"
                       width={24}
                       height={24}
@@ -292,8 +293,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     rel="noreferrer"
                     className="w-6 h-6"
                   >
-                    <Image
-                      src={XIcon}
+                    <img
+                      src={XIcon as string}
                       alt="Twitter"
                       width={24}
                       height={24}
@@ -312,8 +313,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
                     rel="noreferrer"
                     className="w-6 h-6"
                   >
-                    <Image
-                      src={FarcasterIcon}
+                    <img
+                      src={FarcasterIcon as string}
                       alt="Farcaster"
                       width={24}
                       height={24}
@@ -331,7 +332,12 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
           {/* Agora Logo Section */}
           <div className="p-8 bg-neutral-50 flex justify-start items-center gap-2">
-            <Image src={agoraLogo} alt="Agora Logo" width={82} height={21} />
+            <img
+              src={agoraLogo as string}
+              alt="Agora Logo"
+              width={82}
+              height={21}
+            />
             <div className="justify-start text-primary font-normal text-sm">
               Onchain Governance
             </div>

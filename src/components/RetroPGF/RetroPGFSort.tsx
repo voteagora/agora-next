@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Listbox } from "@headlessui/react";
 import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
@@ -9,24 +8,23 @@ import { retroPGFSort } from "@/lib/constants";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 
 export default function RetroPGFSort() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
-  const _orderByParam = searchParams?.get("orderBy");
+  const { orderBy: _orderByParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const orderByParam = _orderByParam
     ? retroPGFSort[_orderByParam as keyof typeof retroPGFSort]
     : retroPGFSort.mostAwarded;
 
   const handleSelect = (value: string) => {
-    router.push(
-      value !== "byMostRPGFReceived"
+    navigate({
+      to: (value !== "byMostRPGFReceived"
         ? addSearchParam({ name: "orderBy", value })
-        : deleteSearchParam({ name: "orderBy" }),
-      {
-        scroll: false,
-      }
-    );
+        : deleteSearchParam({ name: "orderBy" })) as never,
+    });
   };
 
   return (

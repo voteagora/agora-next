@@ -1,7 +1,5 @@
 import "server-only";
 
-import { NextResponse } from "next/server";
-
 import redis from "@/lib/redis";
 import { verifyJwtAndGetAddress } from "@/lib/siweAuth.server";
 
@@ -46,7 +44,7 @@ function getRequesterIp(request: Request) {
 }
 
 function buildAuthError(message: string, status: number) {
-  return NextResponse.json({ message }, { status });
+  return Response.json({ message }, { status });
 }
 
 export function safeAddressesMatch(left: string, right: string) {
@@ -147,7 +145,7 @@ async function enforceSafeRateLimit(params: {
       await redis.expire(redisKey, windowSeconds);
     }
 
-    return NextResponse.json(
+    return Response.json(
       {
         message:
           params.errorMessage ??

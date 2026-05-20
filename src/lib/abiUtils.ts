@@ -11,7 +11,7 @@ import {
   scroll,
 } from "viem/chains";
 import axios from "axios";
-import { unstable_cache } from "next/cache";
+import { unstable_cache } from "@/lib/shims/next-cache";
 import { normalizeExplorerNetwork } from "./explorerNetwork";
 import Tenant from "./tenant/tenant";
 

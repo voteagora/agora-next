@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { Listbox } from "@headlessui/react";
 import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
@@ -9,25 +8,24 @@ import { retroPGFCategories } from "@/lib/constants";
 import { useAddSearchParam, useDeleteSearchParam } from "@/hooks";
 
 export default function RetroPGFCategoryFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
   const addSearchParam = useAddSearchParam();
   const deleteSearchParam = useDeleteSearchParam();
-  const _categoryParam = searchParams?.get("category");
+  const { category: _categoryParam } = useSearch({ strict: false }) as Record<
+    string,
+    string | undefined
+  >;
   const categoryParam = _categoryParam
     ? retroPGFCategories[_categoryParam as keyof typeof retroPGFCategories]
         .filter
     : retroPGFCategories.ALL.filter;
 
   const handleSelect = (value: string) => {
-    router.push(
-      value !== "ALL"
+    navigate({
+      to: (value !== "ALL"
         ? addSearchParam({ name: "category", value })
-        : deleteSearchParam({ name: "category" }),
-      {
-        scroll: false,
-      }
-    );
+        : deleteSearchParam({ name: "category" })) as never,
+    });
   };
 
   return (

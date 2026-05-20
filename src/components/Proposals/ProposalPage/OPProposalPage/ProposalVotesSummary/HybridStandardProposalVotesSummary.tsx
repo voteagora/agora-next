@@ -7,7 +7,6 @@ import {
   calculateHybridStandardProposalMetrics,
 } from "@/lib/proposalUtils";
 import { ExclamationCircleIcon } from "@/icons/ExclamationCircleIcon";
-import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
 import CastVoteInput from "@/components/Votes/CastVoteInput/CastVoteInput";
 import VotesGroupTable from "@/components/common/VotesGroupTable";
@@ -155,10 +154,10 @@ const QuorumStatus = ({
             </div>
             <div className="w-3 h-3 relative overflow-hidden">
               {quorumMet && (
-                <Image
-                  width="12"
-                  height="12"
-                  src={checkIcon}
+                <img
+                  width={12}
+                  height={12}
+                  src={checkIcon as string}
                   alt="check icon"
                 />
               )}

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -207,10 +206,10 @@ export default function ProposalVotesSummaryDetails({
               proposal.quorum != null && (
                 <div className="flex items-center gap-1 ">
                   {hasMetQuorum && (
-                    <Image
-                      width="12"
-                      height="12"
-                      src={checkIcon}
+                    <img
+                      width={12}
+                      height={12}
+                      src={checkIcon as string}
                       alt="check icon"
                     />
                   )}
@@ -254,7 +253,7 @@ export default function ProposalVotesSummaryDetails({
               </div>
               <div className="flex flex-row gap-1 ">
                 {hasMetThreshold ? (
-                  <Image src={checkIcon} alt="check icon" />
+                  <img src={checkIcon as string} alt="check icon" />
                 ) : (
                   <X className="h-4 w-4 text-negative" />
                 )}

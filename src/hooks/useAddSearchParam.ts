@@ -1,11 +1,10 @@
 "use client";
 
-import { useSearchParams, usePathname } from "next/navigation";
+import { useLocation } from "@tanstack/react-router";
 import { useCallback } from "react";
 
 export const useAddSearchParam = () => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
+  const location = useLocation();
 
   return useCallback(
     ({
@@ -18,11 +17,11 @@ export const useAddSearchParam = () => {
       clean?: boolean;
     }) => {
       const params = new URLSearchParams(
-        clean ? undefined : searchParams?.toString()
+        clean ? undefined : location.searchStr
       );
       params.set(name, value);
-      return pathname + "?" + params.toString();
+      return location.pathname + "?" + params.toString();
     },
-    [searchParams, pathname]
+    [location]
   );
 };

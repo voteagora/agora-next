@@ -1,6 +1,5 @@
 import { DelegateStatement as DelegateStatementType } from "@/app/api/common/delegateStatement/delegateStatement";
 import { icons } from "@/assets/icons/icons";
-import Image from "next/image";
 import Tenant from "@/lib/tenant/tenant";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
@@ -60,7 +59,7 @@ const Stakeholder = ({ title }: StakeholderProps) => {
       <div className="flex flex-row gap-4 items-start">
         <div className="flex flex-col justify-center shrink-0">
           <div className="flex flex-col p-3 rounded-lg shadow-newDefault border border-gray-eb">
-            <Image src={icons.community} alt={title} />
+            <img src={icons.community as string} alt={title} />
           </div>
         </div>
 

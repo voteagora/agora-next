@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 
@@ -201,18 +201,16 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                       <span>
                         {name ? name : <ENSName address={vote.address} />}
                       </span>
-                    ) : (
-                      <Link
-                        href={
-                          vote.citizenType
-                            ? `https://atlas.optimism.io/voter_address_info/${vote.address}`
-                            : `/delegates/${vote.address}`
-                        }
-                        target={vote.citizenType ? "_blank" : undefined}
-                        rel={
-                          vote.citizenType ? "noopener noreferrer" : undefined
-                        }
+                    ) : vote.citizenType ? (
+                      <a
+                        href={`https://atlas.optimism.io/voter_address_info/${vote.address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
+                        {name ? name : <ENSName address={vote.address} />}
+                      </a>
+                    ) : (
+                      <Link to={`/delegates/${vote.address}` as never}>
                         {name ? name : <ENSName address={vote.address} />}
                       </Link>
                     )}
