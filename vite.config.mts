@@ -2,6 +2,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { nitro } from "nitro/vite";
 import viteReact from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -238,6 +239,28 @@ function polyfillReactCacheInSSR(): Plugin {
   };
 }
 
+const familyShimPath = path.resolve(__dirname, "src/lib/shims/family.ts");
+
+/**
+ * Stubs browser-only packages in the SSR / server bundle.
+ *
+ * ConnectKit top-level-imports `family`, which reads `window` at module load.
+ * We only need a no-op connector on the server (`enableFamily: false`).
+ */
+function stubBrowserOnlyModulesInSSR(): Plugin {
+  return {
+    name: "agora:stub-browser-only-in-ssr",
+    enforce: "pre",
+    applyToEnvironment(env) {
+      return env.name === "ssr";
+    },
+    resolveId(source) {
+      if (source === "family") return familyShimPath;
+      return null;
+    },
+  };
+}
+
 function buildPublicEnvDefines(mode: string): Record<string, string> {
   const loadedEnv = loadEnv(mode, process.cwd(), "");
   const env = { ...loadedEnv, ...process.env };
@@ -402,8 +425,12 @@ export default defineConfig(({ mode }) => ({
     }),
     stubServerOnlyModulesInClient(),
     polyfillReactCacheInSSR(),
-    tanstackStart({
-      target: "vercel",
+    stubBrowserOnlyModulesInSSR(),
+    tanstackStart(),
+    nitro({
+      alias: {
+        family: familyShimPath,
+      },
     }),
     viteReact(),
   ],
