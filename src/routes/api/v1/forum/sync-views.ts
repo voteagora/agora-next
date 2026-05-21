@@ -8,7 +8,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ViewTracker } from "@/lib/redis";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 

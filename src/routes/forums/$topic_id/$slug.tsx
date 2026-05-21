@@ -14,16 +14,16 @@ import {
   type ForumPost,
 } from "@/lib/forumUtils";
 import { truncateAddress } from "@/lib/utils/text";
-import { hasMarkdownHeadings } from "@/app/forums/[topic_id]/components/markdownHeadings";
-import ForumsHeader from "@/app/forums/components/ForumsHeader";
-import ForumsSidebar from "@/app/forums/ForumsSidebar";
-import TopicHeader from "@/app/forums/[topic_id]/components/TopicHeader";
-import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments";
+import { hasMarkdownHeadings } from "@/components/Forum/topic/markdownHeadings";
+import ForumsHeader from "@/components/Forum/ForumsHeader";
+import ForumsSidebar from "@/components/Forum/ForumsSidebar";
+import TopicHeader from "@/components/Forum/topic/TopicHeader";
+import PostAttachments from "@/components/Forum/topic/PostAttachments";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
-import ForumThread from "@/app/forums/[topic_id]/components/ForumThread";
-import UnpublishedTopicGate from "@/app/forums/[topic_id]/components/UnpublishedTopicGate";
-import FinancialStatementLayout from "@/app/forums/[topic_id]/components/FinancialStatementLayout";
-import ForumDiscussAction from "@/app/forums/[topic_id]/components/ForumDiscussAction";
+import ForumThread from "@/components/Forum/topic/ForumThread";
+import UnpublishedTopicGate from "@/components/Forum/topic/UnpublishedTopicGate";
+import FinancialStatementLayout from "@/components/Forum/topic/FinancialStatementLayout";
+import ForumDiscussAction from "@/components/Forum/topic/ForumDiscussAction";
 import { DunaContentRenderer } from "@/components/duna-editor";
 import { formatRelative } from "@/components/ForumShared/utils";
 import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedProposalLinks/RelatedProposalLinks";

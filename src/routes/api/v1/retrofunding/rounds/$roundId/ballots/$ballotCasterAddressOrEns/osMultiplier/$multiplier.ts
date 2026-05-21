@@ -5,7 +5,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute(
@@ -21,7 +21,7 @@ export const Route = createFileRoute(
           "@/app/api/common/ballots/updateBallot"
         );
         const { createOptionalFloatNumberValidator } = await import(
-          "@/app/api/common/utils/validators"
+          "@/lib/utils/validators"
         );
 
         const multiplierValidator = createOptionalFloatNumberValidator(1, 5, 1);

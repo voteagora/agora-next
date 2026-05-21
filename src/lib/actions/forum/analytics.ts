@@ -4,7 +4,7 @@ import { z } from "zod";
 import { handlePrismaError } from "./shared";
 import { ViewTracker } from "@/lib/redis";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 
 const { slug } = Tenant.current();
 

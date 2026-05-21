@@ -6,7 +6,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute(
@@ -22,7 +22,7 @@ export const Route = createFileRoute(
           "@/app/api/common/comments/getImpactMetricComments"
         );
         const { createOptionalNumberValidator, createOptionalStringValidator } =
-          await import("@/app/api/common/utils/validators");
+          await import("@/lib/utils/validators");
 
         const DEFAULT_SORT = "newest";
         const DEFAULT_MAX_LIMIT = 100;

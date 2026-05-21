@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/dao/settings")({
   server: {
     handlers: {
       GET: withApiAuth(async ({ request }) => {
-        const { prismaWeb3Client } = await import("@/app/lib/prisma");
+        const { prismaWeb3Client } = await import("@/lib/prisma");
         const { default: Tenant } = await import("@/lib/tenant/tenant");
 
         try {

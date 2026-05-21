@@ -2,7 +2,7 @@ import {
   AuhtorityChainsAggregate,
   AuthorityChainRules,
   AuthorityChainsSnaps,
-} from "@/app/api/common/authority-chains/authorityChains";
+} from "@/lib/types/authorityChains";
 import { bigIntMax, bigIntMin } from "./bigintUtils";
 import Tenant from "@/lib/tenant/tenant";
 

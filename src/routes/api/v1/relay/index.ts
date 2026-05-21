@@ -5,7 +5,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { apiFetchRelayStatus } from "@/app/api/v1/relay/getRelayStatus";
+import { apiFetchRelayStatus } from "@/lib/relay/getRelayStatus";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute("/api/v1/relay/")({

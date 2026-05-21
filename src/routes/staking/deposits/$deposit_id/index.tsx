@@ -8,7 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
-import { EditDepositAmount } from "@/app/staking/deposits/[deposit_id]/components/EditDepositAmount";
+import { EditDepositAmount } from "@/components/Staking/EditDepositAmount";
 
 const serverFetchDeposit = createServerFn({ method: "GET" })
   .inputValidator((data: { id: number }) => data)

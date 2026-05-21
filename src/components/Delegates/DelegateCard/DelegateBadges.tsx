@@ -1,4 +1,4 @@
-import { IdentityBadge } from "@/app/api/common/badges/getBadges";
+import { IdentityBadge } from "@/lib/types/badge";
 import {
   Tooltip,
   TooltipContent,

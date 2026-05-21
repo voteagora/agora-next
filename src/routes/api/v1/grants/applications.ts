@@ -9,10 +9,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Prisma } from "@prisma/client";
 import type { DaoSlug } from "@prisma/client";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import Tenant from "@/lib/tenant/tenant";
 import { permissionService } from "@/server/services/permission.service";
-import { requireWalletJwtAuth } from "@/app/lib/auth/walletJwt";
+import { requireWalletJwtAuth } from "@/lib/auth/walletJwt";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute("/api/v1/grants/applications")({

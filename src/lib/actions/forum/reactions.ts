@@ -3,7 +3,7 @@
 import { z } from "zod";
 import Tenant from "@/lib/tenant/tenant";
 import { verifyAuth } from "@/lib/auth/authHelpers";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import { canPerformAction, formatVPError } from "@/lib/forumSettings";
 import { checkPermission } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";

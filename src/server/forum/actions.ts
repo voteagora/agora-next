@@ -11,6 +11,7 @@ import type {
   deleteForumTopic as _DeleteForumTopic,
   deleteForumTopicWithAuth as _DeleteForumTopicWithAuth,
   getForumAttachments as _GetForumAttachments,
+  getForumCategoryAttachments as _GetForumCategoryAttachments,
   getForumCategories as _GetForumCategories,
   getForumTopic as _GetForumTopic,
   getForumTopicUpvotes as _GetForumTopicUpvotes,
@@ -155,6 +156,8 @@ export const deleteForumAttachment: typeof _DeleteForumAttachment = (...args) =>
   callForumAction("deleteForumAttachment", args);
 export const getForumAttachments: typeof _GetForumAttachments = (...args) =>
   callForumAction("getForumAttachments", args);
+export const getForumCategoryAttachments: typeof _GetForumCategoryAttachments =
+  (...args) => callForumAction("getForumCategoryAttachments", args);
 export const uploadDocumentFromBase64: typeof _UploadDocumentFromBase64 = (
   ...args
 ) => callForumAction("uploadDocumentFromBase64", args);

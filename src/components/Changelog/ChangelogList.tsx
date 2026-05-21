@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroller";
-import { Changelog } from "@/app/api/common/changelogs/changelog";
+import { Changelog } from "@/lib/types/changelog";
 import ChangelogListEntry from "./ChangelogListEntry";
 
 interface ChangelogListProps {

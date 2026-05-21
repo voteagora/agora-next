@@ -6,9 +6,9 @@
 import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
-import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots/ballotDistributionStrategy";
+import type { DistributionStrategy as DistStrat } from "@/lib/types/ballotDistribution";
 
 export const Route = createFileRoute(
   "/api/v1/retrofunding/rounds/$roundId/ballots/$ballotCasterAddressOrEns/distribution_method/$distributionMethod"

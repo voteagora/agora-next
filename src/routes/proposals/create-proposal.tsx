@@ -7,7 +7,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { fetchProposalTypes } from "@/server/admin/proposalTypes";
-import CreateProposalFormClient from "@/app/proposals/create-proposal/CreateProposalFormClient";
+import CreateProposalFormClient from "@/components/Proposals/CreateProposalFormClient";
 
 export const Route = createFileRoute("/proposals/create-proposal")({
   beforeLoad: () => {

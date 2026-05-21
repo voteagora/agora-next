@@ -31,7 +31,7 @@ import {
   checkNewProposal,
 } from "@/lib/seatbelt/checkProposal";
 import { Proposal } from "@/lib/types/proposal";
-import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
+import { TENDERLY_VALID_CHAINS } from "@/components/Proposals/draft/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
 

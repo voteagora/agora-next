@@ -31,7 +31,7 @@ import {
   PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TENANT_NAMESPACES,
 } from "@/lib/constants";
-import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { getProposalTypeAddress } from "@/lib/proposalDraftStages";
 import { useTotalSupply } from "@/hooks/useTotalSupply";
 import { formatUnits } from "viem";
 import { useEffect, useMemo, useState } from "react";

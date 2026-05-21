@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/grants/$grantSlug/applications")({
       POST: withApiAuth(
         async ({ request, params }) => {
           const { Prisma } = await import("@prisma/client");
-          const { prismaWeb2Client } = await import("@/app/lib/prisma");
+          const { prismaWeb2Client } = await import("@/lib/prisma");
           const { default: Tenant } = await import("@/lib/tenant/tenant");
           const { z } = await import("zod");
           const { sendGrantConfirmationEmail } = await import(

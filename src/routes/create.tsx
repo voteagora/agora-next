@@ -9,7 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import Tenant from "@/lib/tenant/tenant";
 import { buildForumTopicPath } from "@/lib/forumUtils";
-import { CreatePostClient } from "@/app/create/components/CreatePostClient";
+import { CreatePostClient } from "@/components/Create/CreatePostClient";
 import {
   type PostType,
   type CreatePostFormData,

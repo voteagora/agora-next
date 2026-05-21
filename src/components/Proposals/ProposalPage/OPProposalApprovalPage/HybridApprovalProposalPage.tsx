@@ -1,7 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import HybridApprovalVotesPanel from "./ApprovalVotesPanel/HybridApprovalVotesPanel";
 import { Proposal } from "@/lib/types/proposal";
-import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
+import { ProposalStateAdmin } from "@/components/Proposals/ProposalStateAdmin";
 import { TaxFormBanner } from "../TaxFormBanner";
 
 export default function HybridApprovalProposalPage({

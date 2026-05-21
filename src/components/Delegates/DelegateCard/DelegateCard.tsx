@@ -6,7 +6,7 @@ import { DelegateCardHeader } from "@/components/Delegates/DelegateCard/Delegate
 import { DelegateCardEditProfile } from "./DelegateCardEditProfile";
 import Tenant from "@/lib/tenant/tenant";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
-import { IdentityBadge } from "@/app/api/common/badges/getBadges";
+import { IdentityBadge } from "@/lib/types/badge";
 import { DelegateBadges } from "./DelegateBadges";
 
 export default function DelegateCard({

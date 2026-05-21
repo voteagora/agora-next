@@ -41,7 +41,7 @@ const delegateAbi = [
   },
 ] as const;
 
-vi.mock("@/app/Web3Provider", () => ({
+vi.mock("@/components/providers/Web3Provider", () => ({
   config: {},
 }));
 
@@ -61,7 +61,7 @@ vi.mock("@/hooks/useTokenName", () => ({
   useTokenName: useTokenNameMock,
 }));
 
-vi.mock("@/app/lib/agoraAPI", () => ({
+vi.mock("@/lib/agoraAPI", () => ({
   default: vi.fn().mockImplementation(() => ({
     post: postMock,
   })),

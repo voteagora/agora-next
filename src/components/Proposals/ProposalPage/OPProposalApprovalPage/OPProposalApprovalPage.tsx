@@ -1,7 +1,7 @@
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
 import ApprovalVotesPanel from "./ApprovalVotesPanel/ApprovalVotesPanel";
 import { Proposal } from "@/lib/types/proposal";
-import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
+import { ProposalStateAdmin } from "@/components/Proposals/ProposalStateAdmin";
 import {
   fetchProposalVotes,
   fetchUserVotesForProposal as fetchUserVotes,

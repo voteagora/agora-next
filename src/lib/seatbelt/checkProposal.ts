@@ -3,7 +3,7 @@
 import { unstable_cache } from "@/lib/shims/next-cache";
 
 import { Proposal } from "@/lib/types/proposal";
-import { getProposalTypeAddress } from "@/app/proposals/draft/utils/stages";
+import { getProposalTypeAddress } from "@/lib/proposalDraftStages";
 
 import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";

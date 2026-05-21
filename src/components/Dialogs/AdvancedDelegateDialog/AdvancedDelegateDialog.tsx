@@ -28,10 +28,10 @@ import ENSName from "@/components/shared/ENSName";
 import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 import { useModal } from "connectkit";
 import { useParams } from "@tanstack/react-router";
-import { resolveENSName } from "@/app/lib/ENSUtils";
+import { resolveENSName } from "@/lib/ENSUtils";
 import { fetchDelegate } from "@/server/delegates/actions";
 import Tenant from "@/lib/tenant/tenant";
-import { config } from "@/app/Web3Provider";
+import { config } from "@/components/providers/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 

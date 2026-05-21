@@ -2,7 +2,7 @@ import "server-only";
 
 import { Prisma } from "@prisma/client";
 
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import type { MiradorTraceContext } from "@/lib/mirador/types";

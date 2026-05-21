@@ -5,7 +5,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute(
@@ -15,7 +15,7 @@ export const Route = createFileRoute(
     handlers: {
       GET: withApiAuth(async ({ request, params }) => {
         const { authenticateApiUser, getCategoryScope, validateAddressScope } =
-          await import("@/app/lib/auth/serverAuth");
+          await import("@/lib/auth/serverAuth");
         const { fetchBallot } = await import(
           "@/app/api/common/ballots/getBallots"
         );

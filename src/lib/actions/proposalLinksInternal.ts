@@ -1,4 +1,4 @@
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 
 export interface ProposalLinkTarget {
   targetId: string;

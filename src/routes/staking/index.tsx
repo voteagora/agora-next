@@ -6,11 +6,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
-import { StakingStats } from "@/app/staking/components/StakingStats";
-import { RedirectOrConnect } from "@/app/staking/components/RedirectOrConnect";
-import StakingFaq from "@/app/staking/components/StakingFaq";
-import { PanelNewDeposit } from "@/app/staking/components/PanelNewDeposit";
-import { StakingIntro } from "@/app/staking/components/StakingIntro";
+import { StakingStats } from "@/components/Staking/StakingStats";
+import { RedirectOrConnect } from "@/components/Staking/RedirectOrConnect";
+import StakingFaq from "@/components/Staking/StakingFaq";
+import { PanelNewDeposit } from "@/components/Staking/PanelNewDeposit";
+import { StakingIntro } from "@/components/Staking/StakingIntro";
 
 export const Route = createFileRoute("/staking/")({
   beforeLoad: () => {

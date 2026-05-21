@@ -1,7 +1,7 @@
 "use server";
 
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import {

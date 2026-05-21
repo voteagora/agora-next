@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/v1/drafts")({
       POST: withApiAuth(
         async ({ request }) => {
           const { verifyAuth } = await import("@/lib/auth/authHelpers");
-          const { prismaWeb2Client } = await import("@/app/lib/prisma");
+          const { prismaWeb2Client } = await import("@/lib/prisma");
           const { getMiradorTraceContextFromHeaders } = await import(
             "@/lib/mirador/requestContext"
           );

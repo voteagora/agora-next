@@ -12,7 +12,7 @@ import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
-import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
+import DelegatingSectionContent from "@/components/Governance/DelegatingSectionContent";
 
 export const syndicateTenantUIConfig = new TenantUI({
   title: "Syndicate Agora",

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/forum/settings")({
   server: {
     handlers: {
       GET: withApiAuth(async ({ request }) => {
-        const { prismaWeb2Client } = await import("@/app/lib/prisma");
+        const { prismaWeb2Client } = await import("@/lib/prisma");
         const { Prisma } = await import("@prisma/client");
 
         try {

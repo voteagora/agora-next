@@ -1,0 +1,198 @@
+import React from "react";
+import type { StaticImageData } from "@/lib/shims/next-image";
+import Tenant from "@/lib/tenant/tenant";
+import { icons } from "@/assets/icons/icons";
+import { TENANT_NAMESPACES } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
+import { instrumentSerif } from "@/styles/fonts";
+
+export const InfoHero = () => {
+  const { ui, namespace } = Tenant.current();
+  const page = ui!.page("info");
+
+  const hasDunaAdministration = ui.toggle("duna")?.enabled === true;
+
+  const rotationClasses = [
+    "sm:-rotate-2",
+    "sm:rotate-4",
+    "sm:-rotate-5",
+    "sm:rotate-1",
+  ];
+
+  const renderDesc = (desc: any, className = "whitespace-pre-line") => {
+    if (Array.isArray(desc)) {
+      return (
+        <ul className={`${className} list-disc pl-5`}>
+          {desc.map((d: string, i: number) => (
+            <li key={i}>{d}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <div className={className}>{desc}</div>;
+  };
+
+  if (hasDunaAdministration) {
+    let disclosureLabel = "View DUNI Member";
+    let disclosureLinkText = "Disclosure";
+    if (namespace === TENANT_NAMESPACES.TOWNS) {
+      disclosureLabel = "View Towns Lodge DUNA Member";
+    } else if (namespace === TENANT_NAMESPACES.SYNDICATE) {
+      disclosureLabel = "View Syndicate DUNA Member";
+      disclosureLinkText = "Disclosures";
+    } else if (namespace === TENANT_NAMESPACES.SHAPE) {
+      disclosureLabel = "View Structura DUNA Member";
+      disclosureLinkText = "Disclosures";
+    }
+
+    return (
+      <div className="flex flex-col gap-3 mt-12">
+        <h1
+          className={`${instrumentSerif.className} font-normal text-[56px] leading-[1.1] text-primary`}
+        >
+          {page!.title}
+        </h1>
+        <p className="text-base font-medium text-secondary whitespace-pre-line leading-snug">
+          {String(page!.description)}
+        </p>
+        <div className="mt-1">
+          <a
+            href="#duna-disclosures"
+            className="inline-flex items-center gap-2 px-[10px] py-[6px] bg-[rgba(255,0,0,0.1)] border border-[rgba(255,0,0,0.3)] rounded-[40px] hover:bg-[rgba(255,0,0,0.15)] transition-colors cursor-pointer"
+          >
+            <svg
+              width="18"
+              height="18"
+              className="flex-shrink-0 text-[#ff0101]"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="8"
+                cy="8"
+                r="7"
+                stroke="currentColor"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M8 4V6M8 8V12"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="text-[#ff0101] font-semibold text-base">
+              {disclosureLabel}{" "}
+              <span className="underline">{disclosureLinkText}</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col md:flex-col mt-12 gap-y-6 sm:gap-y-0 gap-x-0 sm:gap-x-6 flex-wrap sm:flex-nowrap lg:flex-row">
+      <div
+        className={`flex flex-col w-full ${ui.customization?.customTitleSize ? "lg:w-3/5" : "lg:w-2/5"}`}
+      >
+        <h1
+          className={`font-black text-primary whitespace-pre-line ${ui.customization?.customTitleSize || "text-4xl leading-[36px] sm:text-[40px] sm:leading-[40px]"}`}
+        >
+          {page!.title}
+        </h1>
+        <div className="text-base text-secondary mt-4">
+          {renderDesc(page!.description)}
+          {namespace === TENANT_NAMESPACES.SCROLL && (
+            <div className="flex flex-row gap-2 mt-4">
+              <a href={"https://claim.scroll.io/faq"}>
+                <Button className="bg-wash text-primary border border-line hover:bg-wash/90 hover:text-secondary cursor-pointer block">
+                  FAQ
+                </Button>
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:flex sm:flex-row md:w-fit md:flex-auto md:mx-auto self-start justify-between sm:justify-end w-full gap-4 sm:mt-4 lg:mt-0">
+        {page!.links!.map((link, idx) => (
+          <Card
+            className={rotationClasses[idx % rotationClasses.length]}
+            image={link.image || ""}
+            index={idx}
+            key={`card-${idx}`}
+            link={link.url}
+            linkText={link.title}
+            ui={ui}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Card = ({
+  className,
+  index = 0,
+  link,
+  linkText,
+  image,
+  ui,
+}: {
+  className?: string;
+  index?: number;
+  link: string;
+  linkText: string;
+  image: StaticImageData | string;
+  ui: any;
+}) => {
+  const isDisabled = link === "" && ui.dunaDisclaimers;
+
+  return (
+    <div className="relative">
+      <a
+        target="_blank"
+        href={link}
+        rel="noreferrer noopener"
+        className={`flex flex-col grow-0 p-1.5 border border-line rounded-[6px] shadow-[0px_3.044px_9.131px_0px_rgba(0,0,0,0.02),0px_1.522px_1.522px_0px_rgba(0,0,0,0.03)] hover:rotate-0 transition-all hover:z-10 hover:scale-110 ${className} ${isDisabled ? "opacity-50 pointer-events-none" : ""}`}
+        style={{ backgroundColor: "var(--card-background)" }}
+      >
+        <div
+          className={`relative w-full aspect-square ${ui.customization?.customCardSize || "sm:h-[130px] sm:w-[130px] lg:h-[150px] lg:w-[150px]"}`}
+        >
+          {image ? (
+            <img
+              src={
+                typeof image === "string"
+                  ? image
+                  : (image as StaticImageData).src
+              }
+              className="w-full rounded scale"
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+          ) : ui.customization?.heroCardGradient ? (
+            <div
+              className="absolute inset-0 rounded"
+              style={{
+                background: `linear-gradient(${135 + index * 90}deg, ${ui.customization.heroCardGradient.from}, ${ui.customization.heroCardGradient.to})`,
+              }}
+            />
+          ) : null}
+        </div>
+        <div className="w-full flex flex-row justify-between gap-1 items-center text-xs font-medium text-secondary mt-1.5">
+          <span>{linkText}</span>
+          <img
+            src={icons.northEast as string}
+            width={12}
+            height={12}
+            alt="arrow pointing right"
+            className={`self-start mt-1 ${ui.customization?.infoSectionBackground ? (ui.customization.infoSectionBackground === "#FFFFFF" ? "brightness-0" : "brightness-0 invert") : ""} ${isDisabled ? "opacity-50" : ""}`}
+          />
+        </div>
+      </a>
+    </div>
+  );
+};

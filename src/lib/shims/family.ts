@@ -8,9 +8,7 @@
 
 import type { CreateConnectorFn } from "wagmi";
 
-export function familyAccountsConnector(
-  _options?: unknown
-): CreateConnectorFn {
+export function familyAccountsConnector(_options?: unknown): CreateConnectorFn {
   return () =>
     ({
       id: "familyAccountsProvider",

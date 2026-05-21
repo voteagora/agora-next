@@ -1,0 +1,6 @@
+export enum DistributionStrategy {
+  IMPACT_GROUPS = "IMPACT_GROUPS",
+  TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
+  TOP_WEIGHTED = "TOP_WEIGHTED",
+  PARETO = "PARETO",
+}

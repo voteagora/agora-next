@@ -9,7 +9,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { delegatesFilterOptions } from "@/lib/constants";
-import { NewStakeFlow } from "@/app/staking/new/components/NewStakeFlow";
+import { NewStakeFlow } from "@/components/Staking/NewStakeFlow";
 
 const sort = delegatesFilterOptions.weightedRandom.sort;
 

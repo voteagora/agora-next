@@ -6,7 +6,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
-import GrantsList from "@/app/grants/components/GrantsList";
+import GrantsList from "@/components/Grants/GrantsList";
 
 export const Route = createFileRoute("/grants/")({
   beforeLoad: () => {

@@ -6,7 +6,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
-import NotificationPreferencesClient from "@/app/notification-preferences/components/NotificationPreferencesClient";
+import NotificationPreferencesClient from "@/components/Notifications/NotificationPreferencesClient";
 
 export const Route = createFileRoute("/notification-preferences/")({
   beforeLoad: () => {

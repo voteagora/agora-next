@@ -10,7 +10,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
+import { requireNotificationPreferencesAuth } from "@/lib/notification-preferences/auth";
 import { notificationCenterClient } from "@/lib/notification-center/client";
 import { resolveEventTypes } from "@/lib/notification-center/eventTypes.server";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";

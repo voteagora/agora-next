@@ -6,10 +6,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
-import { InfoHero } from "@/app/info/components/InfoHero";
-import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
+import { InfoHero } from "@/components/Governance/InfoHero";
+import DunaDisclosuresContent from "@/components/Duna/DunaDisclosuresContent";
 import { Card, CardContent } from "@/components/ui/card";
-import DocumentsSection from "@/app/duna/components/DocumentsSection";
+import DocumentsSection from "@/components/Duna/DocumentsSection";
 
 export const Route = createFileRoute("/document-archive")({
   beforeLoad: () => {
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/document-archive")({
     if (hasDunaAdministration) {
       try {
         const { getDunaCategoryId, getForumCategoryAttachments } = await import(
-          "@/lib/actions/forum"
+          "@/server/forum/actions"
         );
         const dunaCategoryId = await getDunaCategoryId();
         if (dunaCategoryId) {

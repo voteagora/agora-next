@@ -1,14 +1,10 @@
 import { cache } from "react";
 import { addressOrEnsNameWrap } from "../utils/ensName";
 import { fetchBallot } from "./getBallots";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 
-export enum DistributionStrategy {
-  IMPACT_GROUPS = "IMPACT_GROUPS",
-  TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
-  TOP_WEIGHTED = "TOP_WEIGHTED",
-  PARETO = "PARETO",
-}
+export { DistributionStrategy } from "@/lib/types/ballotDistribution";
+import { DistributionStrategy } from "@/lib/types/ballotDistribution";
 
 const applyDistributionStrategyApi = async (
   strategy: DistributionStrategy,

@@ -11,8 +11,8 @@ import {
   buildForumTopicSlug,
   buildForumArticlePath,
 } from "@/lib/forumUtils";
-import UnpublishedTopicGate from "@/app/forums/[topic_id]/components/UnpublishedTopicGate";
-import FinancialStatementLayout from "@/app/forums/[topic_id]/components/FinancialStatementLayout";
+import UnpublishedTopicGate from "@/components/Forum/topic/UnpublishedTopicGate";
+import FinancialStatementLayout from "@/components/Forum/topic/FinancialStatementLayout";
 import { getForumTopic } from "@/server/forum/actions";
 import { hasUnpublishedTopicAccess } from "@/server/forum/unpublishedTopic";
 

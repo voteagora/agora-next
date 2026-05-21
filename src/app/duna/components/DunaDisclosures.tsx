@@ -1,1 +1,1 @@
-export { default } from "./DunaDisclosuresContent";
+export { default } from "@/components/Duna/DunaDisclosures";

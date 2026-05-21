@@ -5,7 +5,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 export const Route = createFileRoute("/api/v1/projects")({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/v1/projects")({
           "@/app/api/common/projects/getProjects"
         );
         const { createOptionalNumberValidator } = await import(
-          "@/app/api/common/utils/validators"
+          "@/lib/utils/validators"
         );
 
         const DEFAULT_MAX_LIMIT = 100;

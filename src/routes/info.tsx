@@ -10,17 +10,17 @@ import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
 import { UIDunaDescriptionConfig } from "@/lib/tenant/tenantUI";
 import Hero from "@/components/Hero/Hero";
-import InfoAbout from "@/app/info/components/InfoAbout";
-import { InfoHero } from "@/app/info/components/InfoHero";
-import { ChartTreasury } from "@/app/info/components/ChartTreasury";
-import GovernanceCharts from "@/app/info/components/GovernanceCharts";
-import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
-import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
-import FormationDocumentsList from "@/app/duna/components/FormationDocumentsList";
+import InfoAbout from "@/components/Governance/InfoAbout";
+import { InfoHero } from "@/components/Governance/InfoHero";
+import { ChartTreasury } from "@/components/Governance/ChartTreasury";
+import GovernanceCharts from "@/components/Governance/GovernanceCharts";
+import DunaDisclosuresContent from "@/components/Duna/DunaDisclosuresContent";
+import GovernanceInfoSections from "@/components/Governance/GovernanceInfoSections";
+import FormationDocumentsList from "@/components/Duna/FormationDocumentsList";
 import { ExternalLink } from "@/icons/ExternalLink";
-import GovernorSettingsParams from "@/app/info/components/GovernorSettingsParams";
-import ContractList from "@/app/info/components/ContractList";
-import GovernorSettingsProposalTypes from "@/app/info/components/GovernorSettingsProposalTypes";
+import GovernorSettingsParams from "@/components/Governance/GovernorSettingsParams";
+import ContractList from "@/components/Governance/ContractList";
+import GovernorSettingsProposalTypes from "@/components/Governance/GovernorSettingsProposalTypes";
 import {
   Accordion,
   AccordionContent,
@@ -92,7 +92,7 @@ export const Route = createFileRoute("/info")({
       let documents: any[] = [];
       try {
         const { getDunaCategoryId, getForumCategoryAttachments } = await import(
-          "@/lib/actions/forum"
+          "@/server/forum/actions"
         );
         const dunaCategoryId = await getDunaCategoryId();
         if (dunaCategoryId) {

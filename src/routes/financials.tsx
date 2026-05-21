@@ -8,10 +8,10 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
-import { ChartTreasury } from "@/app/info/components/ChartTreasury";
-import GovernanceCharts from "@/app/info/components/GovernanceCharts";
-import DunaMetricsCards from "@/app/duna/components/DunaMetricsCards";
-import FinancialStatementsClient from "@/app/duna/components/FinancialStatementsClient";
+import { ChartTreasury } from "@/components/Governance/ChartTreasury";
+import GovernanceCharts from "@/components/Governance/GovernanceCharts";
+import DunaMetricsCards from "@/components/Duna/DunaMetricsCards";
+import FinancialStatementsClient from "@/components/Duna/FinancialStatementsClient";
 import financialMock from "@/assets/tenant/financial_mock.png";
 import financialDocMock from "@/assets/tenant/financial-doc-mock.png";
 
@@ -104,7 +104,7 @@ export const Route = createFileRoute("/financials")({
     if (isFinancialStatementsEnabled) {
       try {
         const { getDunaCategoryId, getForumTopics } = await import(
-          "@/lib/actions/forum"
+          "@/server/forum/actions"
         );
         const dunaCategoryId = await getDunaCategoryId();
         if (dunaCategoryId) {

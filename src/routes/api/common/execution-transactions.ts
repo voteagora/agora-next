@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/common/execution-transactions")({
     handlers: {
       GET: withApiAuth(async ({ request }) => {
         const { default: Tenant } = await import("@/lib/tenant/tenant");
-        const { prismaWeb3Client } = await import("@/app/lib/prisma");
+        const { prismaWeb3Client } = await import("@/lib/prisma");
 
         try {
           const { namespace } = Tenant.current();

@@ -1,7 +1,7 @@
 import { PublicClient } from "viem";
 import Tenant from "@/lib/tenant/tenant";
 import { getChainById, getPublicClient } from "@/lib/viem";
-import { getDelegateVotingPowerFromDaoNode } from "@/app/lib/dao-node/server-client";
+import { getDelegateVotingPowerFromDaoNode } from "@/lib/dao-node/server-client";
 
 interface VotingPowerConfig {
   namespace: string;

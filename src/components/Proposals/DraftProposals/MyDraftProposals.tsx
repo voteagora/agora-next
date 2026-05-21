@@ -4,7 +4,7 @@ import { Link } from "@tanstack/react-router";
 import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
-import { getStageIndexForTenant } from "@/app/proposals/draft/utils/stages";
+import { getStageIndexForTenant } from "@/lib/proposalDraftStages";
 import DraftProposalCard from "./DraftProposalCard";
 import Tenant from "@/lib/tenant/tenant";
 import ClearAllDraftsButton from "./ClearAllDraftsButton";

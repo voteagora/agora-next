@@ -7,11 +7,11 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
-import SponsorForm from "@/app/proposals/sponsor/components/SponsorForm";
-import SponsorAuthCheck from "@/app/proposals/sponsor/components/SponsorAuthCheck";
+import SponsorForm from "@/components/Proposals/SponsorForm";
+import SponsorAuthCheck from "@/components/Proposals/SponsorAuthCheck";
 import ENSName from "@/components/shared/ENSName";
-import ArchivedDraftProposal from "@/app/proposals/draft/components/ArchivedDraftProposal";
-import { isPostSubmission } from "@/app/proposals/draft/utils/stages";
+import ArchivedDraftProposal from "@/components/Proposals/ArchivedDraftProposal";
+import { isPostSubmission } from "@/lib/proposalDraftStages";
 
 export const Route = createFileRoute("/proposals/sponsor/$id")({
   head: () => {
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/proposals/sponsor/$id")({
     };
   },
   loader: async ({ params }) => {
-    const { prismaWeb2Client } = await import("@/app/lib/prisma");
+    const { prismaWeb2Client } = await import("@/lib/prisma");
     const draftProposal = await prismaWeb2Client.proposalDraft.findUnique({
       where: { uuid: params.id },
       include: {

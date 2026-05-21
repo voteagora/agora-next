@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/v1/drafts/$id")({
           const { verifyJwtAndGetAddress } = await import(
             "@/app/proposals/draft/actions/siweAuth"
           );
-          const { prismaWeb2Client } = await import("@/app/lib/prisma");
+          const { prismaWeb2Client } = await import("@/lib/prisma");
           const Tenant = (await import("@/lib/tenant/tenant")).default;
 
           try {

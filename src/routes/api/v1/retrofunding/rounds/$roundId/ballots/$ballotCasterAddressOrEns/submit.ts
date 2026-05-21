@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 const METRICS_BASED_ROUNDS = ["4"];

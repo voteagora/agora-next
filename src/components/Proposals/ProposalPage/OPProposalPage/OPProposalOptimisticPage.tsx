@@ -1,6 +1,6 @@
 import { formatNumber } from "@/lib/utils";
 import ProposalDescription from "../ProposalDescription/ProposalDescription";
-import { ProposalStateAdmin } from "@/app/proposals/components/ProposalStateAdmin";
+import { ProposalStateAdmin } from "@/components/Proposals/ProposalStateAdmin";
 import OptimisticProposalVotesCard from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/OptimisticProposalVotesCard";
 import {
   calculateOptimisticProposalMetrics,

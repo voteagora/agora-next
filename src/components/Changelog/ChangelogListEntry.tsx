@@ -1,5 +1,5 @@
 import React from "react";
-import { Changelog } from "@/app/api/common/changelogs/changelog";
+import { Changelog } from "@/lib/types/changelog";
 import { formatFullDate } from "@/lib/utils";
 
 interface ChangelogListEntryProps {

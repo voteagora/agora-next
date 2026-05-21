@@ -11,7 +11,7 @@
  * the existing Next build until Phase F cutover.
  */
 
-import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
+import { validateBearerToken } from "@/lib/auth/edgeAuth";
 import { corsPreflightResponse, withCorsHeaders } from "./cors";
 
 type HandlerCtx = {

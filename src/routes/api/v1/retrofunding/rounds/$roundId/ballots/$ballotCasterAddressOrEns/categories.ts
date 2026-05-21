@@ -6,7 +6,7 @@
 import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 const ballotPayloadSchema = z.object({
@@ -22,7 +22,7 @@ export const Route = createFileRoute(
     handlers: {
       POST: withApiAuth(async ({ request, params }) => {
         const { authenticateApiUser, validateAddressScope, getCategoryScope } =
-          await import("@/app/lib/auth/serverAuth");
+          await import("@/lib/auth/serverAuth");
         const { updateBallotCategory } = await import(
           "@/app/api/common/ballots/updateBallotCategories"
         );

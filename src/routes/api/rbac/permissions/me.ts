@@ -15,9 +15,7 @@ export const Route = createFileRoute("/api/rbac/permissions/me")({
           const { permissionService } = await import(
             "@/server/services/permission.service"
           );
-          const { requireWalletJwtAuth } = await import(
-            "@/app/lib/auth/walletJwt"
-          );
+          const { requireWalletJwtAuth } = await import("@/lib/auth/walletJwt");
 
           try {
             const auth = await requireWalletJwtAuth(request as never);

@@ -5,7 +5,7 @@ const executeRawMock = vi.fn();
 const getSafeMultisigTransactionForClientMock = vi.fn();
 const appendServerTraceEventMock = vi.fn();
 
-vi.mock("@/app/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prismaWeb2Client: {
     $queryRaw: queryRawMock,
     $executeRaw: executeRawMock,

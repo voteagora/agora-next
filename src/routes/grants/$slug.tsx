@@ -7,7 +7,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
-import GrantIntakeForm from "@/app/grants/[slug]/components/GrantIntakeForm";
+import GrantIntakeForm from "@/components/Grants/GrantIntakeForm";
 
 const serverGetGrant = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)

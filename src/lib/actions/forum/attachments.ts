@@ -5,7 +5,7 @@ import { z } from "zod";
 import { handlePrismaError, archiveAttachmentSchema } from "./shared";
 import { getIPFSUrl, uploadFileToPinata } from "@/lib/pinata";
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import { logForumAuditAction } from "./admin";
 import { checkAnyPermission, checkPermission } from "@/lib/rbac";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";

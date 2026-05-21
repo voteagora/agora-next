@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DaoSlug } from "@prisma/client";
 
-import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
-import { ensureNotificationRecipient } from "@/app/api/v1/notification-preferences/recipient";
+import { requireNotificationPreferencesAuth } from "@/lib/notification-preferences/auth";
+import { ensureNotificationRecipient } from "@/lib/notification-preferences/recipient";
 import { notificationCenterClient } from "@/lib/notification-center/client";
 import { resolveEventTypes } from "@/lib/notification-center/eventTypes.server";
 import { PermissionService } from "@/server/services/permission.service";

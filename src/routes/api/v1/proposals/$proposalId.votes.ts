@@ -5,11 +5,11 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 
-import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { traceWithUserId } from "@/lib/apiUtils";
 import {
   createOptionalNumberValidator,
   createOptionalStringValidator,
-} from "@/app/api/common/utils/validators";
+} from "@/lib/utils/validators";
 import { withApiAuth } from "@/lib/start-server/withApiAuth";
 
 const DEFAULT_SORT = "weight";

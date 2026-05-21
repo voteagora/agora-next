@@ -20,7 +20,7 @@ import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 
-import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
+import DelegatingSectionContent from "@/components/Governance/DelegatingSectionContent";
 
 export const demo4TenantUIConfig = new TenantUI({
   title: "Canopy Agora",

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/analytics/track")({
     handlers: {
       POST: withApiAuth(async ({ request }) => {
         const { default: Tenant } = await import("@/lib/tenant/tenant");
-        const { prismaWeb2Client } = await import("@/app/lib/prisma");
+        const { prismaWeb2Client } = await import("@/lib/prisma");
         const { authenticateApiUser } = await import(
           "@/app/lib/auth/serverAuth"
         );

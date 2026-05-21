@@ -9,7 +9,7 @@ import {
   type SendEventPayload,
 } from "./client";
 import type { ChannelType, RecipientType } from "./types";
-import { processAddressOrEnsName } from "@/app/lib/ENSUtils";
+import { processAddressOrEnsName } from "@/lib/ENSUtils";
 
 const ALL_CHANNELS: ChannelType[] = [
   "email",

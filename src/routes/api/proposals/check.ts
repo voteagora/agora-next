@@ -26,7 +26,7 @@ export const Route = createFileRoute("/api/proposals/check")({
           );
           const { getPublicClient } = await import("@/lib/viem");
           const { default: Tenant } = await import("@/lib/tenant/tenant");
-          const { prismaWeb2Client } = await import("@/app/lib/prisma");
+          const { prismaWeb2Client } = await import("@/lib/prisma");
           const { TENANT_NAMESPACES } = await import("@/lib/constants");
           const { erc721Abi } = await import("viem");
           const { checkPermission } = await import("@/lib/rbac");

@@ -8,7 +8,7 @@ import demoForum from "@/assets/tenant/demo_forum.png";
 import demoDiscord from "@/assets/tenant/demo_discord.png";
 import { ProposalGatingType, ProposalType } from "@/lib/types/proposalDraft";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import DelegatingSectionContent from "@/app/info/components/DelegatingSectionContent";
+import DelegatingSectionContent from "@/components/Governance/DelegatingSectionContent";
 
 export const demo2TenantUIConfig = new TenantUI({
   title: "Canopy Agora",

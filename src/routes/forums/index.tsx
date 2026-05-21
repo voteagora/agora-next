@@ -7,9 +7,9 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 
 import Tenant from "@/lib/tenant/tenant";
-import ForumsHeader from "@/app/forums/components/ForumsHeader";
-import ForumsSidebar from "@/app/forums/ForumsSidebar";
-import TopicList from "@/app/forums/components/TopicList";
+import ForumsHeader from "@/components/Forum/ForumsHeader";
+import ForumsSidebar from "@/components/Forum/ForumsSidebar";
+import TopicList from "@/components/Forum/TopicList";
 
 const serverLoadForums = createServerFn({ method: "GET" }).handler(async () => {
   const { getForumData } = await import("@/lib/actions/forum/topics");

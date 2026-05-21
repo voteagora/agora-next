@@ -1,7 +1,7 @@
 "use server";
 
 import Tenant from "@/lib/tenant/tenant";
-import { prismaWeb2Client } from "@/app/lib/prisma";
+import { prismaWeb2Client } from "@/lib/prisma";
 import { checkPermission, isSuperAdmin } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
 

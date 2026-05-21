@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/common/notifications/subscriptions")(
         POST: withApiAuth(
           async ({ request }) => {
             const { requireNotificationPreferencesAuth } = await import(
-              "@/app/api/v1/notification-preferences/auth"
+              "@/lib/notification-preferences/auth"
             );
             const { default: Tenant } = await import("@/lib/tenant/tenant");
             const { z } = await import("zod");
@@ -82,7 +82,7 @@ export const Route = createFileRoute("/api/common/notifications/subscriptions")(
         DELETE: withApiAuth(
           async ({ request }) => {
             const { requireNotificationPreferencesAuth } = await import(
-              "@/app/api/v1/notification-preferences/auth"
+              "@/lib/notification-preferences/auth"
             );
 
             const auth = await requireNotificationPreferencesAuth(

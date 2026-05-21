@@ -9,7 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import Hero from "@/components/Hero/Hero";
 import ResourceNotFound from "@/components/shared/ResourceNotFound/ResourceNotFound";
 import DelegateContent from "@/components/Delegates/DelegateCardList/DelegateContent";
-import { BadgeDelegateLoadingState } from "@/app/badges/[badgeId]/BadgeDelegateWrapper";
+import { BadgeDelegateLoadingState } from "@/components/Badges/BadgeDelegateWrapper";
 
 const serverFetchDelegatesWithBadge = createServerFn({ method: "GET" })
   .inputValidator(

@@ -9,7 +9,7 @@ import Tenant from "@/lib/tenant/tenant";
 import ForumNewClient, {
   type FormData,
   type RelatedProposal,
-} from "@/app/forums/new/ForumNewClient";
+} from "@/components/Forum/ForumNewClient";
 
 export const Route = createFileRoute("/forums/new")({
   validateSearch: (search: Record<string, unknown>) => ({

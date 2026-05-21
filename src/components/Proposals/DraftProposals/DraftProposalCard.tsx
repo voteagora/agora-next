@@ -1,7 +1,7 @@
 import { ProposalDraft } from "@prisma/client";
-import { getStageMetadata } from "@/app/proposals/draft/utils/stages";
+import { getStageMetadata } from "@/lib/proposalDraftStages";
 import Tenant from "@/lib/tenant/tenant";
-import DeleteDraftButton from "@/app/proposals/draft/components/DeleteDraftButton";
+import DeleteDraftButton from "@/components/Proposals/DeleteDraftButton";
 
 const DraftProposalCard = ({
   proposal,
