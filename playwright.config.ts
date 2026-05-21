@@ -39,6 +39,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: ["**/ab-runner/**"],
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "ab",
+      testDir: "./tests/ab-runner",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
@@ -57,7 +63,7 @@ export default defineConfig({
             url: "http://127.0.0.1:4000/wallet/status",
             reuseExistingServer: true,
             timeout: 120 * 1000,
-            stdout: "pipe",
+            stdout: "ignore",
             stderr: "pipe",
           },
         ],
