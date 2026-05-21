@@ -22,6 +22,88 @@ import { DiscussionsContainerSkeleton } from "@/components/Delegates/Discussions
 
 const PROFILE_AUX_PREFETCH = { offset: 0, limit: 20 } as const;
 
+// ─── server functions ─────────────────────────────────────────────────────────
+
+const serverResolveDelegateAddress = createServerFn({ method: "GET" })
+  .inputValidator((data: { addressOrENSName: string }) => data)
+  .handler(async ({ data }) => {
+    const { ensNameToAddress, processAddressOrEnsName } = await import(
+      "@/app/lib/ENSUtils"
+    );
+    const [address, ensOrTruncatedAddress] = await Promise.all([
+      ensNameToAddress(data.addressOrENSName),
+      processAddressOrEnsName(data.addressOrENSName),
+    ]);
+    return { address, ensOrTruncatedAddress };
+  });
+
+const serverFetchDelegateForSCW = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchDelegateForSCW } = await import(
+      "@/app/api/common/delegates/getDelegateForSCW"
+    );
+    return fetchDelegateForSCW(data.address);
+  });
+
+const serverFetchDelegate = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchDelegate } = await import("@/app/delegates/actions");
+    return fetchDelegate(data.address);
+  });
+
+const serverFetchDelegateExtras = createServerFn({ method: "GET" })
+  .inputValidator(
+    (data: {
+      address: string;
+      showEnsTextRecords: boolean;
+      showEfpStats: boolean;
+      showDelegateBadges: boolean;
+    }) => data
+  )
+  .handler(async ({ data }) => {
+    const { resolveENSTextRecords, resolveEFPStats } = await import(
+      "@/app/lib/ENSUtils"
+    );
+    const { fetchBadgesForDelegate } = await import(
+      "@/app/api/common/badges/getBadges"
+    );
+    const [textRecords, efpStats, badges] = await Promise.all([
+      data.showEnsTextRecords
+        ? resolveENSTextRecords(data.address, ["description", "location"])
+        : null,
+      data.showEfpStats ? resolveEFPStats(data.address) : null,
+      data.showDelegateBadges ? fetchBadgesForDelegate(data.address) : null,
+    ]);
+    return { textRecords, efpStats, badges };
+  });
+
+const serverFetchCurrentDelegatees = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchCurrentDelegatees } = await import("@/app/delegates/actions");
+    return fetchCurrentDelegatees(data.address);
+  });
+
+const serverFetchInitialDelegateVotes = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchVotesForDelegate } = await import("@/app/delegates/actions");
+    return fetchVotesForDelegate(data.address, PROFILE_AUX_PREFETCH);
+  });
+
+const serverFetchInitialSnapshotVotes = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    const { fetchSnapshotVotesForDelegate } = await import(
+      "@/app/api/common/votes/getVotes"
+    );
+    return fetchSnapshotVotesForDelegate({
+      addressOrENSName: data.address,
+    });
+  });
+
 // ─── server functions for client-invoked callbacks ───────────────────────────
 
 const serverFetchDelegateVotes = createServerFn({ method: "GET" })
@@ -162,26 +244,19 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
     };
   },
   loader: async ({ params }) => {
-    const {
-      ensNameToAddress,
-      processAddressOrEnsName,
-      resolveENSTextRecords,
-      resolveEFPStats,
-    } = await import("@/app/lib/ENSUtils");
     const { ui, token } = Tenant.current();
 
-    const [address, ensOrTruncatedAddress] = await Promise.all([
-      ensNameToAddress(params.addressOrENSName),
-      processAddressOrEnsName(params.addressOrENSName),
-    ]);
+    const { address, ensOrTruncatedAddress } =
+      await serverResolveDelegateAddress({
+        data: { addressOrENSName: params.addressOrENSName },
+      });
 
     // Check for SCW address and redirect to owner if found
     const scwConfig = ui.smartAccountConfig;
     if (scwConfig) {
-      const { fetchDelegateForSCW } = await import(
-        "@/app/api/common/delegates/getDelegateForSCW"
-      );
-      const scwDelegate = await fetchDelegateForSCW(address);
+      const scwDelegate = await serverFetchDelegateForSCW({
+        data: { address },
+      });
       if (scwDelegate) {
         throw redirect({
           to: "/delegates/$addressOrENSName",
@@ -190,25 +265,18 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
       }
     }
 
-    const {
-      fetchDelegate,
-      fetchCurrentDelegatees,
-      fetchCurrentDelegators,
-      fetchVotesForDelegate,
-    } = await import("@/app/delegates/actions");
-    const { fetchBadgesForDelegate } = await import(
-      "@/app/api/common/badges/getBadges"
-    );
-
-    const [delegate, textRecords, efpStats, badges] = await Promise.all([
-      fetchDelegate(address),
-      ui.toggle("show-ens-text-records")?.enabled
-        ? resolveENSTextRecords(address, ["description", "location"])
-        : null,
-      ui.toggle("show-efp-stats")?.enabled ? resolveEFPStats(address) : null,
-      ui.toggle("show-delegate-badges")?.enabled
-        ? fetchBadgesForDelegate(address)
-        : null,
+    const [delegate, { textRecords, efpStats, badges }] = await Promise.all([
+      serverFetchDelegate({ data: { address } }),
+      serverFetchDelegateExtras({
+        data: {
+          address,
+          showEnsTextRecords:
+            ui.toggle("show-ens-text-records")?.enabled ?? false,
+          showEfpStats: ui.toggle("show-efp-stats")?.enabled ?? false,
+          showDelegateBadges:
+            ui.toggle("show-delegate-badges")?.enabled ?? false,
+        },
+      }),
     ]);
 
     if (!delegate) {
@@ -232,9 +300,6 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
     const hasForums = ui.toggle("forums")?.enabled === true;
 
     // Fetch data for all three async wrappers in parallel
-    const { fetchSnapshotVotesForDelegate } = await import(
-      "@/app/api/common/votes/getVotes"
-    );
     const [
       delegatees,
       inboundDelegatorsFirstPage,
@@ -243,11 +308,21 @@ export const Route = createFileRoute("/delegates/$addressOrENSName")({
       forumTopicsResult,
       forumPostsResult,
     ] = await Promise.all([
-      fetchCurrentDelegatees(delegateesFetchAddress),
-      fetchCurrentDelegators(parsedDelegate.address, PROFILE_AUX_PREFETCH),
-      fetchVotesForDelegate(parsedDelegate.address, PROFILE_AUX_PREFETCH),
-      fetchSnapshotVotesForDelegate({
-        addressOrENSName: parsedDelegate.address,
+      serverFetchCurrentDelegatees({
+        data: { address: delegateesFetchAddress },
+      }),
+      serverFetchDelegators({
+        data: {
+          address: parsedDelegate.address,
+          offset: PROFILE_AUX_PREFETCH.offset,
+          limit: PROFILE_AUX_PREFETCH.limit,
+        },
+      }),
+      serverFetchInitialDelegateVotes({
+        data: { address: parsedDelegate.address },
+      }),
+      serverFetchInitialSnapshotVotes({
+        data: { address: parsedDelegate.address },
       }),
       hasForums
         ? serverFetchForumTopics({
