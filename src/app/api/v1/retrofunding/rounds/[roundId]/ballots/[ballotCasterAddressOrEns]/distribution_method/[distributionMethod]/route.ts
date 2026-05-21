@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { z } from "zod";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots/ballotDistributionStrategy";
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: {
     params: {
@@ -65,3 +66,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.distribution_method",
+  post
+);

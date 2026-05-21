@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const impactParser = z.number().int().gte(0).lte(5); // integer between 0 and 5
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: {
     params: {
@@ -66,3 +67,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.projects.impact",
+  post
+);

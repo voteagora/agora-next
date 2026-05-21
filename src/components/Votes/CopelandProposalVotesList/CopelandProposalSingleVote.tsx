@@ -1,6 +1,6 @@
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import { useAccount } from "wagmi";
-import { SnapshotVote } from "@/app/api/common/votes/vote";
+import type { SnapshotVote } from "@/app/api/common/votes/vote";
 import { formatNumber } from "@/lib/utils";
 import ENSAvatar from "@/components/shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
@@ -11,6 +11,8 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import Tenant from "@/lib/tenant/tenant";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
+import AvatarImage from "@/components/shared/AvatarImage";
+import { truncateAddress } from "@/app/lib/utils/text";
 
 const { token, ui } = Tenant.current();
 
@@ -22,8 +24,10 @@ const zeroVpTooltipContentClass =
 
 export default function CopelandProposalSingleVote({
   vote,
+  resolveEns = true,
 }: {
   vote: SnapshotVote;
+  resolveEns?: boolean;
 }) {
   const { address } = useAccount();
   const {
@@ -33,6 +37,20 @@ export default function CopelandProposalSingleVote({
     choiceLabels,
   } = vote;
 
+  const displayName = vote.voterMetadata?.name;
+  const avatar = () => {
+    if (vote.voterMetadata?.image) {
+      return (
+        <AvatarImage src={vote.voterMetadata.image} alt="avatar" size={20} />
+      );
+    }
+
+    if (!resolveEns) {
+      return <AvatarImage alt="Delegate avatar" size={20} />;
+    }
+
+    return <ENSAvatar ensName={voterAddress} className="w-5 h-5" size={20} />;
+  };
   const zeroVpVote = vote.votingPower === 0 || Math.round(weight) === 0;
 
   return (
@@ -46,7 +64,7 @@ export default function CopelandProposalSingleVote({
           }
         >
           <div className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}>
-            <ENSAvatar ensName={voterAddress} className="w-5 h-5" />
+            {avatar()}
           </div>
           <div
             className={
@@ -57,11 +75,23 @@ export default function CopelandProposalSingleVote({
           >
             {zeroVpVote ? (
               <span>
-                <ENSName address={voterAddress} />
+                {displayName ? (
+                  displayName
+                ) : resolveEns ? (
+                  <ENSName address={voterAddress} />
+                ) : (
+                  truncateAddress(voterAddress)
+                )}
               </span>
             ) : (
               <Link href={`/delegates/${voterAddress}`}>
-                <ENSName address={voterAddress} />
+                {displayName ? (
+                  displayName
+                ) : resolveEns ? (
+                  <ENSName address={voterAddress} />
+                ) : (
+                  truncateAddress(voterAddress)
+                )}
               </Link>
             )}
           </div>

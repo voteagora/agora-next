@@ -1,4 +1,4 @@
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { useAccount } from "wagmi";
 import { HStack, VStack } from "@/components/Layout/Stack";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -8,7 +8,6 @@ import {
   cn,
   formatNumber,
   getBlockScanUrl,
-  resolveIPFSUrl,
   timeout,
 } from "@/lib/utils";
 import { useState } from "react";
@@ -27,6 +26,8 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
+import { truncateAddress } from "@/app/lib/utils/text";
+import AvatarImage from "@/components/shared/AvatarImage";
 
 const { token, ui } = Tenant.current();
 
@@ -105,7 +106,13 @@ function supportIconForVote(support: Support, muteColors: boolean) {
   }
 }
 
-export function ProposalSingleVote({ vote }: { vote: Vote }) {
+export function ProposalSingleVote({
+  vote,
+  resolveEns = true,
+}: {
+  vote: Vote;
+  resolveEns?: boolean;
+}) {
   const { address: connectedAddress } = useAccount();
   const [hovered, setHovered] = useState(false);
   const [hash1, hash2] = vote.transactionHash?.split("|") || [];
@@ -115,6 +122,7 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
 
   const { data: ensFromBlockCache } = useBlockCacheWrappedEns({
     address: vote.address as `0x${string}`,
+    enabled: resolveEns && !vote.voterMetadata?.name,
   });
 
   const _onOpenChange = async (open: boolean) => {
@@ -131,35 +139,13 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
 
   const ensAvatar = () => {
     if (vote.voterMetadata?.image) {
-      return (
-        <div
-          className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={vote.voterMetadata.image}
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      );
+      return <AvatarImage src={vote.voterMetadata.image} alt="avatar" />;
     }
     if (ensFromBlockCache?.avatar) {
-      const avatarUrl = resolveIPFSUrl(ensFromBlockCache.avatar);
-      if (avatarUrl) {
-        return (
-          <div
-            className={`overflow-hidden rounded-full flex justify-center items-center w-8 h-8`}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        );
-      }
+      return <AvatarImage src={ensFromBlockCache.avatar} alt="avatar" />;
+    }
+    if (!resolveEns) {
+      return <AvatarImage alt="Delegate avatar" />;
     }
     return <ENSAvatar ensName={ensFromBlockCache?.name} className="w-8 h-8" />;
   };
@@ -199,7 +185,13 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                   >
                     {zeroVpVote ? (
                       <span>
-                        {name ? name : <ENSName address={vote.address} />}
+                        {name ? (
+                          name
+                        ) : resolveEns ? (
+                          <ENSName address={vote.address} />
+                        ) : (
+                          truncateAddress(vote.address)
+                        )}
                       </span>
                     ) : (
                       <Link
@@ -213,7 +205,13 @@ export function ProposalSingleVote({ vote }: { vote: Vote }) {
                           vote.citizenType ? "noopener noreferrer" : undefined
                         }
                       >
-                        {name ? name : <ENSName address={vote.address} />}
+                        {name ? (
+                          name
+                        ) : resolveEns ? (
+                          <ENSName address={vote.address} />
+                        ) : (
+                          truncateAddress(vote.address)
+                        )}
                       </Link>
                     )}
                   </div>

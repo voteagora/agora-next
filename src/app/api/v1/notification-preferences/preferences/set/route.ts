@@ -11,6 +11,7 @@ import { resolveEventTypes } from "@/lib/notification-center/eventTypes.server";
 import { PermissionService } from "@/server/services/permission.service";
 import Tenant from "@/lib/tenant/tenant";
 import type { DaoSlug } from "@prisma/client";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const BodySchema = z.object({
   eventType: z.string().min(1),
@@ -18,7 +19,7 @@ const BodySchema = z.object({
   state: z.enum(["on", "off"]),
 });
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   const auth = await requireNotificationPreferencesAuth(request);
   if (!auth.ok) return auth.response;
 
@@ -78,3 +79,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.notification_preferences.preferences.set",
+  post
+);

@@ -5,8 +5,9 @@ import {
   appendServerTraceEvent,
   withMiradorTraceStep,
 } from "@/lib/mirador/serverTrace";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { z } = await import("zod");
   const { delegateBySignatureApi } = await import("./delegate");
@@ -82,3 +83,5 @@ export async function POST(request: NextRequest) {
     });
   }
 }
+
+export const POST = withApiRouteMonitoring("api.v1.relay.delegate", post);

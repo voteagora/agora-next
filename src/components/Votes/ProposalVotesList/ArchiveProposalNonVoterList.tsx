@@ -1,86 +1,94 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroller";
+import { useCallback, useEffect, useRef, type UIEvent } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ProposalSingleNonVoter } from "./ProposalSingleNonVoter";
 import { useArchiveNonVoters } from "@/hooks/useArchiveProposalVotes";
-import ProposalVoterListFilter from "./ProsalVoterListFilter";
-import { VOTER_TYPES } from "@/lib/constants";
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type {
+  VotesSort,
+  VotesSortOrder,
+  VoterTypes,
+} from "@/app/api/common/votes/vote";
 
-const NON_VOTERS_PAGE_SIZE = 20;
+const NON_VOTER_ROW_ESTIMATE_PX = 60;
+const SCROLL_FETCH_THRESHOLD_PX = 360;
 
 type ArchiveProposalNonVoterListProps = {
   proposal: Proposal;
+  selectedVoterType: VoterTypes;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
 };
 
 export default function ArchiveProposalNonVoterList({
   proposal,
+  selectedVoterType,
+  sort,
+  sortOrder,
 }: ArchiveProposalNonVoterListProps) {
-  const [visibleCount, setVisibleCount] = useState(NON_VOTERS_PAGE_SIZE);
-  const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>(
-    proposal.proposalType?.includes("HYBRID") ||
-      proposal.proposalType?.includes("OFFCHAIN")
-      ? VOTER_TYPES[0]
-      : VOTER_TYPES[VOTER_TYPES.length - 1]
-  );
-
-  const { nonVoters, isLoading, error } = useArchiveNonVoters({
+  const scrollParentRef = useRef<HTMLDivElement | null>(null);
+  const {
+    nonVoters,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useArchiveNonVoters({
     proposalId: proposal.id,
+    sort,
+    sortOrder,
+    voterType: selectedVoterType.type,
   });
 
+  const rowCount = hasNextPage ? nonVoters.length + 1 : nonVoters.length;
+
+  const rowVirtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => NON_VOTER_ROW_ESTIMATE_PX,
+    overscan: 8,
+  });
+
+  const virtualRows = rowVirtualizer.getVirtualItems();
+
+  const loadNextPageIfScrolledNearBottom = useCallback(
+    (element: HTMLDivElement | null) => {
+      if (!element || !hasNextPage || isFetchingNextPage) {
+        return;
+      }
+
+      if (element.scrollHeight <= element.clientHeight) {
+        return;
+      }
+
+      const distanceFromBottom =
+        element.scrollHeight - element.scrollTop - element.clientHeight;
+
+      if (distanceFromBottom <= SCROLL_FETCH_THRESHOLD_PX) {
+        void fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  const handleScroll = useCallback(
+    (event: UIEvent<HTMLDivElement>) => {
+      loadNextPageIfScrolledNearBottom(event.currentTarget);
+    },
+    [loadNextPageIfScrolledNearBottom]
+  );
+
   useEffect(() => {
-    setVisibleCount(NON_VOTERS_PAGE_SIZE);
-  }, [selectedVoterType]);
-
-  // Determine if we should show the filter
-  const shouldShowFilter =
-    proposal.proposalType?.includes("HYBRID") ||
-    proposal.proposalType?.includes("OFFCHAIN") ||
-    !!proposal.offchainProposalId;
-
-  // Filter non-voters by citizen type
-  const filteredNonVoters = useMemo(() => {
-    if (!shouldShowFilter || !selectedVoterType) {
-      return nonVoters;
+    if (
+      scrollParentRef.current &&
+      scrollParentRef.current.scrollTop > 0 &&
+      nonVoters.length
+    ) {
+      loadNextPageIfScrolledNearBottom(scrollParentRef.current);
     }
-
-    return nonVoters.filter((nonVoter) => {
-      const citizenType = nonVoter.citizen_type?.toUpperCase();
-      const selectedType = selectedVoterType.type.toUpperCase();
-
-      // Token House: show non-voters without citizen type
-      if (selectedType === "TH" && !citizenType) {
-        return true;
-      }
-
-      // Map citizen types to voter types
-      if (selectedType === "CHAIN" && citizenType === "CHAIN") {
-        return true;
-      }
-      if (selectedType === "APP" && citizenType === "APP") {
-        return true;
-      }
-      if (selectedType === "USER" && citizenType === "USER") {
-        return true;
-      }
-
-      return false;
-    });
-  }, [nonVoters, selectedVoterType, shouldShowFilter]);
-
-  const paginatedNonVoters = useMemo(() => {
-    return filteredNonVoters.slice(0, visibleCount);
-  }, [filteredNonVoters, visibleCount]);
-
-  const hasMore = visibleCount < filteredNonVoters.length;
-
-  const loadMore = useCallback(() => {
-    setVisibleCount((prev) =>
-      Math.min(prev + NON_VOTERS_PAGE_SIZE, filteredNonVoters.length)
-    );
-  }, [filteredNonVoters.length]);
+  }, [nonVoters.length, loadNextPageIfScrolledNearBottom]);
 
   if (isLoading) {
     return (
@@ -95,53 +103,61 @@ export default function ArchiveProposalNonVoterList({
   }
 
   if (!nonVoters.length) {
+    const emptyMessage =
+      selectedVoterType.type === "ALL"
+        ? "No non-voters data available."
+        : "No non-voters match this filter.";
+
     return (
-      <div className="px-4 pb-4 text-secondary text-xs">
-        No non-voters data available.
+      <div className="px-4 pb-4 min-h-[160px] text-secondary text-xs">
+        {emptyMessage}
       </div>
     );
   }
 
-  const isOffchain = proposal.proposalType?.includes("OFFCHAIN") ?? false;
-
   return (
     <>
-      {shouldShowFilter && (
-        <ProposalVoterListFilter
-          selectedVoterType={selectedVoterType}
-          onVoterTypeChange={setSelectedVoterType}
-          isOffchain={isOffchain}
-        />
-      )}
       <div
-        className="px-4 pb-4 overflow-y-auto min-h-[36px]"
-        style={{
-          maxHeight: shouldShowFilter
-            ? "calc(100vh - 487px)"
-            : "calc(100vh - 437px)",
-        }}
+        ref={scrollParentRef}
+        onScroll={handleScroll}
+        className="px-4 pb-4 overflow-y-auto flex-1 min-h-0"
       >
-        <InfiniteScroll
-          key={selectedVoterType.type}
-          hasMore={hasMore}
-          pageStart={0}
-          loadMore={loadMore}
-          useWindow={false}
-          loader={
-            <div className="flex text-xs font-medium text-secondary" key={0}>
-              Loading ...
-            </div>
-          }
-          element="main"
+        <div
+          className="relative w-full"
+          style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
         >
-          <ul className="flex flex-col gap-2">
-            {paginatedNonVoters.map((nonVoter) => (
-              <li key={nonVoter.delegate}>
+          {virtualRows.map((virtualRow) => {
+            const nonVoter = nonVoters[virtualRow.index];
+            const isLoaderRow = virtualRow.index > nonVoters.length - 1;
+
+            if (isLoaderRow) {
+              return (
+                <div
+                  key="archive-non-voter-loader"
+                  className="absolute left-0 top-0 w-full py-2 text-xs text-secondary"
+                  style={{ transform: `translateY(${virtualRow.start}px)` }}
+                >
+                  {hasNextPage ? "Loading more non-voters..." : null}
+                </div>
+              );
+            }
+
+            if (!nonVoter) {
+              return null;
+            }
+
+            return (
+              <div
+                key={`${nonVoter.delegate}-${nonVoter.citizen_type ?? "TH"}`}
+                data-index={virtualRow.index}
+                className="absolute left-0 top-0 w-full"
+                style={{ transform: `translateY(${virtualRow.start}px)` }}
+              >
                 <ProposalSingleNonVoter voter={nonVoter} proposal={proposal} />
-              </li>
-            ))}
-          </ul>
-        </InfiniteScroll>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </>
   );
