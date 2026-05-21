@@ -10,6 +10,7 @@ import { PermissionService } from "@/server/services/permission.service";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { extractBearerTokenFromHeader } from "@/app/lib/auth/edgeAuth";
 import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 export const revalidate = 0;
 
@@ -190,7 +191,7 @@ function buildDynamicSchema(grant: any) {
   return z.object(allFields);
 }
 
-export async function POST(
+async function post(
   req: NextRequest,
   { params }: { params: { grantSlug: string } }
 ) {
@@ -522,3 +523,11 @@ export async function POST(
     );
   }
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.grants.applications.submit",
+  post,
+  {
+    getLabels: (_req, { params }) => ({ grantSlug: params.grantSlug }),
+  }
+);

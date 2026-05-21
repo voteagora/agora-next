@@ -18,7 +18,7 @@ import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useAccount } from "wagmi";
 import { SuccessMessage } from "../CastVoteInput/CastVoteInput";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 
 type Props = {

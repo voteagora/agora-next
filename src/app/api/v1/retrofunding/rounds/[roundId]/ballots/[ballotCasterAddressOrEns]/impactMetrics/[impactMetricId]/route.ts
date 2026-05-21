@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function DELETE(
+async function del(
   request: NextRequest,
   route: {
     params: {
@@ -46,3 +47,8 @@ export async function DELETE(
     }
   });
 }
+
+export const DELETE = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.impact_metrics.delete",
+  del
+);

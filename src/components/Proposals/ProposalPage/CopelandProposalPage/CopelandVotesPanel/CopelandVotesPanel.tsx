@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
+import type { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
 import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
@@ -84,12 +84,12 @@ export default function CopelandVotesPanel({
 
   return (
     <motion.div
-      className="flex flex-col flex-1"
+      className="flex flex-col flex-1 min-h-0"
       initial={{ opacity: 1 }}
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <div className="flex flex-col gap-1 relative min-h-0 h-full">
+      <div className="flex flex-col gap-1 relative min-h-0 flex-1">
         {/* Tabs */}
         <div className="flex h-12 pt-4 px-4 mb-1">
           {["Results", "Votes"].map((tab, index) => (
@@ -160,7 +160,10 @@ export default function CopelandVotesPanel({
               showVoters ? (
                 <ArchiveCopelandProposalVotesList proposal={proposal} />
               ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
+                <ArchiveProposalNonVoterList
+                  proposal={proposal}
+                  selectedVoterType={{ type: "ALL", value: "All" }}
+                />
               )
             ) : showVoters ? (
               <CopelandProposalVotesList
@@ -169,7 +172,10 @@ export default function CopelandVotesPanel({
                 proposalId={proposal.id}
               />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ProposalNonVoterList
+                proposal={proposal}
+                selectedVoterType={{ type: "ALL", value: "All" }}
+              />
             )}
           </>
         )}
