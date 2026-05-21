@@ -45,7 +45,7 @@ import {
 } from "@/lib/types.d";
 import { createProposalAttestation } from "@/lib/eas";
 import { createOffchainProposal } from "@/server/proposals/offchainActions";
-import { generateProposalId } from "@/lib/seatbelt/simulate";
+import { generateProposalId } from "@/server/seatbelt/simulate";
 import { getPublicClient } from "@/lib/viem";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { encodeFunctionData } from "viem";

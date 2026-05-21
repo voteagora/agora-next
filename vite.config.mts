@@ -394,6 +394,12 @@ export default defineConfig(({ mode }) => ({
         __dirname,
         "src/server/dao-node/serverClient.ts"
       ),
+      // Seatbelt simulation — "use server" in checkProposal.ts; client forms
+      // and proposal transaction display import these for Tenderly checks.
+      "@/lib/seatbelt/checkProposal": path.resolve(
+        __dirname,
+        "src/server/seatbelt/checkProposal.ts"
+      ),
     },
   },
   css: {

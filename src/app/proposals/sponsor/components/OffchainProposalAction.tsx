@@ -16,7 +16,7 @@ import { ProposalType as LibProposalType } from "@/lib/types.d";
 import { useAccount, useReadContract, useWalletClient } from "wagmi";
 import { BrowserProvider, JsonRpcSigner } from "ethers";
 import { getPublicClient } from "@/lib/viem";
-import { generateProposalId } from "@/lib/seatbelt/simulate";
+import { generateProposalId } from "@/server/seatbelt/simulate";
 import { createProposalAttestation } from "@/lib/eas";
 import toast from "react-hot-toast";
 import { createOffchainProposal } from "@/server/proposals/offchainActions";
