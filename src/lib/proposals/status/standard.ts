@@ -241,7 +241,7 @@ export const deriveStandardStatus = (
         : 0;
 
     const hasMetThreshold =
-      voteThresholdPercent >= Number(thresholds.approvalThreshold) / 100 ||
+      voteThresholdPercent > Number(thresholds.approvalThreshold) / 100 ||
       Number(thresholds.approvalThreshold) === 0;
 
     const quorumVotes = calculateQuorumBigInt(
@@ -249,7 +249,7 @@ export const deriveStandardStatus = (
       againstVotes,
       abstainVotes
     );
-    const quorumMet = quorumVotes >= thresholds.quorum;
+    const quorumMet = quorumVotes > thresholds.quorum;
 
     if (quorumMet && hasMetThreshold) {
       return "SUCCEEDED";
