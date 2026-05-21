@@ -88,7 +88,10 @@ export function DelegateBadges({ badges }: DelegateBadgesProps) {
   const remainingCount = activeBadges.length - MAX_VISIBLE_BADGES;
 
   return (
-    <div className="flex flex-wrap gap-y-3.5 gap-x-8 -ml-4 -mr-12">
+    <div
+      data-testid="delegate-badges"
+      className="flex flex-wrap gap-y-3.5 gap-x-8 -ml-4 -mr-12"
+    >
       {visibleBadges.map((badge, index) => {
         const seed = parseInt(badge.badge_definition_id, 10) || index;
         const rotation = ((seed * 2654435761) % 100) / 15 - 3.5;

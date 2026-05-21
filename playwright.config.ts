@@ -14,6 +14,17 @@ if (!process.env.JSON_RPC_URL && process.env.NEXT_PUBLIC_ALCHEMY_ID) {
   process.env.JSON_RPC_URL = `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
 }
 
+if (!process.env.JSON_RPC_URL && process.env.NEXT_PUBLIC_RPC_URL) {
+  process.env.JSON_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL;
+}
+
+const fawkesEnv = {
+  ...process.env,
+  PORT: "4000",
+  WALLET_CONNECT_PROJECT_ID: process.env.WALLET_CONNECT_PROJECT_ID ?? "",
+  JSON_RPC_URL: process.env.JSON_RPC_URL ?? "",
+};
+
 export default defineConfig({
   testDir: "./tests",
   timeout: 120000,
@@ -63,6 +74,7 @@ export default defineConfig({
             url: "http://127.0.0.1:4000/wallet/status",
             reuseExistingServer: true,
             timeout: 120 * 1000,
+            env: fawkesEnv,
             stdout: "ignore",
             stderr: "pipe",
           },
