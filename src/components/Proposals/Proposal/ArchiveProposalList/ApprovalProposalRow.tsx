@@ -5,7 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { OPApprovalArchiveStatusView } from "./OPApprovalArchiveStatusView";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
-import { extractDisplayData } from "./utils";
+import { extractDisplayData, getProposalTypeBadgeName } from "./utils";
 import { extractApprovalMetrics } from "@/lib/proposals/extractors";
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 
@@ -21,7 +21,7 @@ export function ApprovalProposalRow({
   const proposalType = deriveProposalType(proposal);
 
   // Compute display data and metrics
-  const { displayData, metrics } = useMemo(() => {
+  const { displayData, metrics, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
     const metrics = extractApprovalMetrics(proposal, {
       tokenDecimals: decimals,
@@ -29,6 +29,7 @@ export function ApprovalProposalRow({
     return {
       displayData,
       metrics,
+      proposalTypeName: getProposalTypeBadgeName(proposal, proposalType),
     };
   }, [proposal, decimals, proposalType]);
 
@@ -41,7 +42,7 @@ export function ApprovalProposalRow({
           optionCount={metrics.choices.length}
         />
       }
-      proposalTypeName={proposalType}
+      proposalTypeName={proposalTypeName}
     />
   );
 }

@@ -6,12 +6,15 @@ import { OPStandardStatusView } from "../OPStandardProposalStatus";
 import { HybridStandardStatusView } from "../HybridStandardProposalStatus";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
-import { extractDisplayData, isHybridProposal } from "./utils";
+import {
+  extractDisplayData,
+  getProposalTypeBadgeName,
+  isHybridProposal,
+} from "./utils";
 import {
   extractStandardMetrics,
   type StandardMetrics,
 } from "@/lib/proposals/extractors";
-import { FixedProposalType } from "@/lib/types/archiveProposal";
 
 /**
  * Row component for STANDARD, HYBRID_STANDARD, OFFCHAIN_STANDARD proposals
@@ -35,8 +38,7 @@ export function StandardProposalRow({
     return {
       displayData,
       metrics,
-      proposalTypeName:
-        (proposal.proposal_type as FixedProposalType)?.name ?? proposalType,
+      proposalTypeName: getProposalTypeBadgeName(proposal, effectiveType),
     };
   }, [proposal, decimals, proposalType, isHybrid]);
 

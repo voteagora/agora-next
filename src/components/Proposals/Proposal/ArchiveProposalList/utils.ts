@@ -1,4 +1,7 @@
-import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import {
+  ArchiveListProposal,
+  FixedProposalType,
+} from "@/lib/types/archiveProposal";
 import {
   STATUS_LABEL_MAP,
   convertToNumber,
@@ -23,6 +26,17 @@ export const truncateTitle = (value: string, maxLength = 80) =>
 
 // Re-export guards for convenience
 export { isDaoNodeSource, isHybridProposal, getVotingData };
+
+/**
+ * Human-readable proposal type label for eas-oodao badge rows.
+ * Uses the configured proposal type name when available (e.g. "low threshold").
+ */
+export function getProposalTypeBadgeName(
+  proposal: ArchiveListProposal,
+  proposalType: ProposalType
+): string {
+  return (proposal.proposal_type as FixedProposalType)?.name ?? proposalType;
+}
 
 /**
  * Extract common display data from a proposal

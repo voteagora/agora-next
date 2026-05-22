@@ -5,7 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { OPOptimisticTieredArchiveStatusView } from "./OPOptimisticTieredArchiveStatusView";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
-import { extractDisplayData } from "./utils";
+import { extractDisplayData, getProposalTypeBadgeName } from "./utils";
 import { extractOptimisticTieredMetrics } from "@/lib/proposals/extractors";
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 
@@ -21,12 +21,16 @@ export function OptimisticTieredProposalRow({
   const proposalType = deriveProposalType(proposal);
 
   // Compute display data and metrics
-  const { displayData, metrics } = useMemo(() => {
+  const { displayData, metrics, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
     const metrics = extractOptimisticTieredMetrics(proposal, {
       tokenDecimals: decimals,
     });
-    return { displayData, metrics };
+    return {
+      displayData,
+      metrics,
+      proposalTypeName: getProposalTypeBadgeName(proposal, proposalType),
+    };
   }, [proposal, decimals, proposalType]);
 
   const statusText = metrics.isDefeated ? "defeated" : "approved";
@@ -43,7 +47,7 @@ export function OptimisticTieredProposalRow({
           statusText={statusText}
         />
       }
-      proposalTypeName={proposalType}
+      proposalTypeName={proposalTypeName}
     />
   );
 }

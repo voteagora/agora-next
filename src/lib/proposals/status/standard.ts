@@ -124,7 +124,6 @@ export const deriveStandardStatus = (
     proposalType === "HYBRID_STANDARD" || isHybridProposal(proposal);
   const isOffchain =
     proposalType === "OFFCHAIN_STANDARD" || isEasAtlasSource(proposal);
-
   // Handle hybrid/offchain with numbers
   if (isHybrid) {
     // HYBRID_STANDARD: Weighted combination of delegate + citizen votes
@@ -217,7 +216,6 @@ export const deriveStandardStatus = (
       abstainVotes
     );
     const quorumMet = quorumVotes >= Number(thresholds.quorum);
-
     if (quorumMet && hasMetThreshold) {
       return "SUCCEEDED";
     }

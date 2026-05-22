@@ -5,7 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { OPOptimisticArchiveStatusView } from "./OPOptimisticArchiveStatusView";
 import { BaseRowLayout } from "./BaseRowLayout";
 import { ArchiveRowProps } from "./types";
-import { extractDisplayData } from "./utils";
+import { extractDisplayData, getProposalTypeBadgeName } from "./utils";
 import { extractOptimisticMetrics } from "@/lib/proposals/extractors";
 import { deriveProposalType } from "@/lib/types/archiveProposal";
 
@@ -20,7 +20,7 @@ export function OptimisticProposalRow({
   const decimals = tokenDecimals ?? token.decimals ?? 18;
   const proposalType = deriveProposalType(proposal);
   // Compute display data and metrics
-  const { displayData, metrics } = useMemo(() => {
+  const { displayData, metrics, proposalTypeName } = useMemo(() => {
     const displayData = extractDisplayData(proposal, proposalType, decimals);
     const metrics = extractOptimisticMetrics(proposal, {
       tokenDecimals: decimals,
@@ -29,6 +29,7 @@ export function OptimisticProposalRow({
     return {
       displayData,
       metrics,
+      proposalTypeName: getProposalTypeBadgeName(proposal, proposalType),
     };
   }, [proposal, decimals, proposalType]);
   const status = metrics.isDefeated ? "defeated" : "approved";
@@ -43,7 +44,7 @@ export function OptimisticProposalRow({
           status={status}
         />
       }
-      proposalTypeName={proposalType}
+      proposalTypeName={proposalTypeName}
     />
   );
 }

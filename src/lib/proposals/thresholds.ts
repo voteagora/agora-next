@@ -26,15 +26,6 @@ export const extractThresholds = (
 ): ProposalThresholds => {
   // Handle eas-oodao proposals
   if (isEasOodaoSource(proposal)) {
-    // Check for pending approval ranges
-    if (proposal.default_proposal_type_ranges) {
-      return {
-        quorum: proposal.default_proposal_type_ranges.min_quorum_pct / 100,
-        approvalThreshold:
-          proposal.default_proposal_type_ranges.min_approval_threshold_pct /
-          100,
-      };
-    }
     // Use fixed proposal type values - proposal_type is FixedProposalType for eas-oodao
     const propType = proposal.proposal_type as {
       quorum: number;
@@ -67,34 +58,6 @@ export const resolveArchiveThresholds = (
   proposal: ArchiveListProposal
 ): ResolvedThresholds => {
   if (isEasOodaoSource(proposal)) {
-    if (
-      proposal.default_proposal_type_ranges &&
-      Object.keys(proposal.default_proposal_type_ranges || {}).length > 0
-    ) {
-      //standard awaiting approval easOodao proposals
-      // Values are in basis points (e.g. 10 = 0.1%, 5000 = 50%)
-      // Use same pattern as non-pending branch: integer math to compute absolute quorum
-      const quorumBp = BigInt(
-        proposal.default_proposal_type_ranges.min_quorum_pct
-      );
-      const totalVotingPower = safeBigInt(
-        proposal.total_voting_power_at_start ?? 0
-      );
-
-      // Convert basis points to absolute quorum: (totalVotingPower * bps) / 10000
-      let quorumValue = quorumBp;
-      if (quorumValue > 0n && totalVotingPower > 0n) {
-        quorumValue = (totalVotingPower * quorumBp) / 10000n;
-      }
-
-      return {
-        quorum: quorumValue,
-        approvalThreshold: BigInt(
-          proposal.default_proposal_type_ranges.min_approval_threshold_pct
-        ),
-        votableSupply: totalVotingPower,
-      };
-    }
     const propType = proposal.proposal_type as {
       quorum: number;
       approval_threshold: number;
