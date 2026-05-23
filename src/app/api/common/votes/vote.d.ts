@@ -57,6 +57,11 @@ export type SnapshotVote = {
   title: string;
   reason: string;
   choiceLabels: Record<string, any>;
+  voterMetadata?: {
+    name: string | null;
+    image: string | null;
+    type: string | null;
+  } | null;
 };
 
 export type DelegatesSort =
