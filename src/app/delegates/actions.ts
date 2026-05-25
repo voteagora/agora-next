@@ -33,18 +33,7 @@ import { prismaWeb3Client } from "@/app/lib/prisma";
 
 export const fetchDelegate = async (address: string) => {
   try {
-    const cachedFetchDelegate = unstable_cache(
-      async () => {
-        return await apiFetchDelegate(address);
-      },
-      [`delegate-${address.toLowerCase()}`],
-      {
-        revalidate: 60, // 1 minute
-        tags: [`delegate-${address.toLowerCase()}`],
-      }
-    );
-
-    return await cachedFetchDelegate();
+    return await apiFetchDelegate(address);
   } catch (error) {
     console.error("Error fetching delegate data:", error);
     throw error;
