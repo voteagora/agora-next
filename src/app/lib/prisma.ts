@@ -70,7 +70,9 @@ const isConnectionError = (error: unknown) => {
     typeof errorWithDetails.code === "string" ? errorWithDetails.code : "";
   const message = error instanceof Error ? error.message : String(error);
   const cause =
-    errorWithDetails.cause instanceof Error ? errorWithDetails.cause.message : "";
+    errorWithDetails.cause instanceof Error
+      ? errorWithDetails.cause.message
+      : "";
   const text = `${message} ${cause}`;
 
   return (
@@ -81,8 +83,7 @@ const isConnectionError = (error: unknown) => {
   );
 };
 
-const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const retryReadMiddleware: Prisma.Middleware = async (params, next) => {
   if (!isRetryableRead(params)) {

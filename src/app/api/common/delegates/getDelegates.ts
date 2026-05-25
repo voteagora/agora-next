@@ -5,7 +5,6 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
@@ -27,27 +26,6 @@ import {
   getDelegatesFromDaoNode,
   getDelegateVotingPowerFromDaoNode,
 } from "@/app/lib/dao-node/client";
-
-// Create a cached version of getDelegatesFromDaoNode
-const cachedGetDelegatesFromDaoNode = unstable_cache(
-  (args: {
-    sortBy?: string;
-    reverse?: boolean;
-    limit?: number;
-    offset?: number;
-    filters?: {
-      delegator?: `0x${string}`;
-    };
-    withParticipation?: boolean;
-  }) => {
-    return getDelegatesFromDaoNode(args);
-  },
-  ["delegates-dao-node-filters"],
-  {
-    revalidate: 30, // Cache for 30 seconds
-    tags: ["delegates-dao-node-filters"],
-  }
-);
 
 /*
  * Fetches a list of delegates
@@ -124,7 +102,7 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      const daoNodeResult = await cachedGetDelegatesFromDaoNode({
+      const daoNodeResult = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
         reverse: reverse,
         filters,
