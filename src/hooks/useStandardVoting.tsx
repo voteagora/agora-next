@@ -174,17 +174,23 @@ const useStandardVoting = ({
           });
           setStandardTxHash(transactionHash);
 
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support,
-              reason,
-              params,
-              voter: address as `0x${string}`,
-              transaction_hash: transactionHash,
-            },
-          });
+          void Promise.resolve()
+            .then(() =>
+              trackEvent({
+                event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+                event_data: {
+                  proposal_id: proposalId,
+                  support,
+                  reason,
+                  params,
+                  voter: address as `0x${string}`,
+                  transaction_hash: transactionHash,
+                },
+              })
+            )
+            .catch((error) => {
+              console.error("Standard vote analytics tracking failed", error);
+            });
           setStandardVoteSuccess(true);
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",

@@ -219,17 +219,23 @@ const useAdvancedVoting = ({
             txHash: transactionHash,
             txDetails: "Governance vote transaction",
           });
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support,
-              reason,
-              params,
-              voter: address as `0x${string}`,
-              transaction_hash: transactionHash,
-            },
-          });
+          void Promise.resolve()
+            .then(() =>
+              trackEvent({
+                event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+                event_data: {
+                  proposal_id: proposalId,
+                  support,
+                  reason,
+                  params,
+                  voter: address as `0x${string}`,
+                  transaction_hash: transactionHash,
+                },
+              })
+            )
+            .catch((error) => {
+              console.error("Standard vote analytics tracking failed", error);
+            });
           setStandardTxHash(transactionHash);
           setStandardVoteSuccess(true);
           void closeFrontendMiradorFlowTrace(trace, {
@@ -353,17 +359,23 @@ const useAdvancedVoting = ({
             txHash: transactionHash,
             txDetails: "Advanced governance vote transaction",
           });
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support,
-              reason,
-              params,
-              voter: address as `0x${string}`,
-              transaction_hash: transactionHash,
-            },
-          });
+          void Promise.resolve()
+            .then(() =>
+              trackEvent({
+                event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
+                event_data: {
+                  proposal_id: proposalId,
+                  support,
+                  reason,
+                  params,
+                  voter: address as `0x${string}`,
+                  transaction_hash: transactionHash,
+                },
+              })
+            )
+            .catch((error) => {
+              console.error("Advanced vote analytics tracking failed", error);
+            });
           setAdvancedTxHash(transactionHash);
           setAdvancedVoteSuccess(true);
           void closeFrontendMiradorFlowTrace(trace, {

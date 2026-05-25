@@ -206,6 +206,38 @@ describe("useSponsoredVoting", () => {
     );
   });
 
+  it("does not wait for analytics before completing a confirmed sponsored vote", async () => {
+    trackEventMock.mockReturnValue(new Promise(() => {}));
+
+    const { result } = renderHook(() =>
+      useSponsoredVoting({
+        proposalId: "96",
+        support: 1,
+      })
+    );
+
+    await act(async () => {
+      result.current.write();
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.isLoading).toBe(false);
+    expect(trackEventMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event_name: "standard_vote",
+        event_data: expect.objectContaining({
+          transaction_hash: relayTxHash,
+        }),
+      })
+    );
+    expect(closeFrontendMiradorFlowTraceMock).toHaveBeenCalledWith(
+      { traceId: "trace-id" },
+      expect.objectContaining({
+        reason: "governance_vote_succeeded",
+      })
+    );
+  });
+
   it("records a broadcasted sponsored vote that does not confirm before timeout", async () => {
     waitForTransactionReceiptMock.mockRejectedValue(
       new Error("Timed out while waiting for transaction receipt")

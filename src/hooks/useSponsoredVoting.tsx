@@ -229,15 +229,21 @@ const useSponsoredVoting = ({
           });
           setSponsoredVoteTxHash(relayTxHash);
           setSponsoredVoteSuccess(true);
-          await trackEvent({
-            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-            event_data: {
-              proposal_id: proposalId,
-              support,
-              voter: address as `0x${string}`,
-              transaction_hash: relayTxHash,
-            },
-          });
+          void Promise.resolve()
+            .then(() =>
+              trackEvent({
+                event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+                event_data: {
+                  proposal_id: proposalId,
+                  support,
+                  voter: address as `0x${string}`,
+                  transaction_hash: relayTxHash,
+                },
+              })
+            )
+            .catch((error) => {
+              console.error("Sponsored vote analytics tracking failed", error);
+            });
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",
