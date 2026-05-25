@@ -23,7 +23,7 @@ export async function voteBySignatureApi({
   support: number;
   traceContext?: MiradorTraceContext;
 }): Promise<`0x${string}`> {
-  const { request } = await prepareVoteBySignatureApi({
+  const { request, sponsorAddress } = await prepareVoteBySignatureApi({
     signature,
     proposalId,
     support,
@@ -35,11 +35,16 @@ export async function voteBySignatureApi({
 
   const { governor } = Tenant.current().contracts;
   const transport = getTransportForChain(governor.chain.id)!;
+  const publicClient = getPublicClient();
 
   const walletClient = createWalletClient({
     chain: governor.chain,
     transport,
   });
+  const nonceSnapshot = await getSponsorNonceSnapshot(
+    publicClient,
+    sponsorAddress
+  );
 
   appendServerTraceEvent({
     traceContext: withMiradorTraceStep(
@@ -51,6 +56,10 @@ export async function voteBySignatureApi({
     details: {
       proposalId,
       support,
+      sponsorAddress,
+      governorAddress: governor.address,
+      chainId: governor.chain.id,
+      ...nonceSnapshot,
     },
     txInputData: requestData,
   });
@@ -62,14 +71,21 @@ export async function voteBySignatureApi({
     appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
-        "relay_vote_write_success",
+        "relay_vote_broadcasted",
         "backend"
       ),
-      eventName: "relay_vote_submission_succeeded",
+      eventName: "relay_vote_broadcasted",
       details: {
         proposalId,
         support,
         txHash,
+        sponsorAddress,
+        governorAddress: governor.address,
+        chainId: governor.chain.id,
+        broadcastState: "broadcasted",
+        confirmationState: "unconfirmed",
+        ...nonceSnapshot,
+        ...getRelayVoteRequestTraceDetails(request),
       },
       txInputData: requestData,
       txHashHints: miradorChain
@@ -77,7 +93,8 @@ export async function voteBySignatureApi({
             {
               txHash,
               chain: miradorChain,
-              details: "Governance vote relayed by sponsor",
+              details:
+                "Governance vote broadcast by sponsor; awaiting confirmation",
             },
           ]
         : undefined,
@@ -95,6 +112,10 @@ export async function voteBySignatureApi({
       details: {
         proposalId,
         support,
+        sponsorAddress,
+        governorAddress: governor.address,
+        chainId: governor.chain.id,
+        ...nonceSnapshot,
         message: error instanceof Error ? error.message : String(error),
       },
       txInputData: requestData,
@@ -136,5 +157,58 @@ async function prepareVoteBySignatureApi({
     account: account,
   });
 
-  return { request };
+  return { request, sponsorAddress: account.address };
+}
+
+async function getSponsorNonceSnapshot(
+  publicClient: ReturnType<typeof getPublicClient>,
+  sponsorAddress: `0x${string}`
+) {
+  const [latestNonce, pendingNonce] = await Promise.allSettled([
+    publicClient.getTransactionCount({
+      address: sponsorAddress,
+      blockTag: "latest",
+    }),
+    publicClient.getTransactionCount({
+      address: sponsorAddress,
+      blockTag: "pending",
+    }),
+  ]);
+
+  return {
+    sponsorLatestNonceBeforeBroadcast:
+      latestNonce.status === "fulfilled" ? latestNonce.value : undefined,
+    sponsorPendingNonceBeforeBroadcast:
+      pendingNonce.status === "fulfilled" ? pendingNonce.value : undefined,
+  };
+}
+
+function getRelayVoteRequestTraceDetails(
+  request: Record<string, unknown>
+): Record<string, unknown> {
+  return {
+    requestGas: getSerializableTxRequestValue(request.gas),
+    requestGasPrice: getSerializableTxRequestValue(request.gasPrice),
+    requestMaxFeePerGas: getSerializableTxRequestValue(request.maxFeePerGas),
+    requestMaxPriorityFeePerGas: getSerializableTxRequestValue(
+      request.maxPriorityFeePerGas
+    ),
+    requestNonce: getSerializableTxRequestValue(request.nonce),
+  };
+}
+
+function getSerializableTxRequestValue(value: unknown) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+
+  return undefined;
 }

@@ -18,6 +18,7 @@ import {
   getFrontendMiradorTraceContext,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { addMiradorEvent } from "@/lib/mirador/webTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
 import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
 
@@ -27,6 +28,7 @@ const types = {
     { name: "support", type: "uint8" },
   ],
 };
+const SPONSORED_VOTE_RECEIPT_TIMEOUT_MS = 10 * 60 * 1000;
 
 const useSponsoredVoting = ({
   proposalId,
@@ -86,6 +88,7 @@ const useSponsoredVoting = ({
     }
 
     const _sponsoredVote = async () => {
+      let relayTxHash: `0x${string}` | undefined;
       const inputData = encodeFunctionData({
         abi: contracts.governor.abi as any,
         functionName: "castVote",
@@ -191,20 +194,40 @@ const useSponsoredVoting = ({
             MIRADOR_FLOW.governanceVote
           )
         );
-        const voteTxHash = await response.json();
-        const { status } = await waitForTransactionReceipt(config, {
-          hash: voteTxHash,
-          chainId: contracts.governor.chain.id,
+        relayTxHash = (await response.json()) as `0x${string}`;
+        addMiradorEvent(trace, "governance_vote_relay_broadcasted", {
+          proposalId,
+          voteKind: "sponsored",
+          support,
+          transactionHash: relayTxHash,
+          confirmationState: "awaiting_receipt",
+          receiptTimeoutMs: SPONSORED_VOTE_RECEIPT_TIMEOUT_MS,
         });
 
-        if (status === "success") {
+        const receipt = await waitForTransactionReceipt(config, {
+          hash: relayTxHash,
+          chainId: contracts.governor.chain.id,
+          timeout: SPONSORED_VOTE_RECEIPT_TIMEOUT_MS,
+        });
+
+        if (receipt.status === "success") {
+          addMiradorEvent(trace, "governance_vote_relay_confirmed", {
+            proposalId,
+            voteKind: "sponsored",
+            support,
+            transactionHash: relayTxHash,
+            receiptStatus: receipt.status,
+            blockHash: receipt.blockHash,
+            blockNumber: receipt.blockNumber?.toString(),
+            transactionIndex: receipt.transactionIndex,
+          });
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.governor.chain.id,
             inputData,
-            txHash: voteTxHash,
-            txDetails: "Sponsored governance vote transaction",
+            txHash: relayTxHash,
+            txDetails: "Sponsored governance vote transaction confirmed",
           });
-          setSponsoredVoteTxHash(voteTxHash);
+          setSponsoredVoteTxHash(relayTxHash);
           setSponsoredVoteSuccess(true);
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
@@ -212,7 +235,7 @@ const useSponsoredVoting = ({
               proposal_id: proposalId,
               support,
               voter: address as `0x${string}`,
-              transaction_hash: voteTxHash,
+              transaction_hash: relayTxHash,
             },
           });
           void closeFrontendMiradorFlowTrace(trace, {
@@ -221,21 +244,38 @@ const useSponsoredVoting = ({
             details: {
               proposalId,
               voteKind: "sponsored",
-              transactionHash: voteTxHash,
+              transactionHash: relayTxHash,
+              receiptStatus: receipt.status,
             },
           });
           if (traceRef.current === trace) {
             traceRef.current = null;
           }
         } else {
+          const receiptError = new Error(
+            `Sponsored vote transaction failed with status: ${receipt.status}`
+          );
+          setError(receiptError);
           setSponsoredVoteError(true);
+          addMiradorEvent(trace, "governance_vote_relay_confirmation_failed", {
+            proposalId,
+            voteKind: "sponsored",
+            support,
+            transactionHash: relayTxHash,
+            receiptStatus: receipt.status,
+            blockHash: receipt.blockHash,
+            blockNumber: receipt.blockNumber?.toString(),
+            transactionIndex: receipt.transactionIndex,
+            error: receiptError.message,
+          });
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_failed",
             eventName: "governance_vote_failed",
             details: {
               proposalId,
               voteKind: "sponsored",
-              error: `Unexpected vote receipt status: ${status}`,
+              transactionHash: relayTxHash,
+              error: receiptError.message,
             },
           });
           if (traceRef.current === trace) {
@@ -243,16 +283,28 @@ const useSponsoredVoting = ({
           }
         }
       } catch (error) {
-        setError(error);
+        const nextError = getSponsoredVoteError(error, relayTxHash);
+        setError(nextError);
         setSponsoredVoteError(true);
         setWaitingForSignature(false);
+        if (relayTxHash) {
+          addMiradorEvent(trace, "governance_vote_relay_confirmation_failed", {
+            proposalId,
+            voteKind: "sponsored",
+            support,
+            transactionHash: relayTxHash,
+            receiptTimeoutMs: SPONSORED_VOTE_RECEIPT_TIMEOUT_MS,
+            error: nextError.message,
+          });
+        }
         void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_failed",
           eventName: "governance_vote_failed",
           details: {
             proposalId,
             voteKind: "sponsored",
-            error: error instanceof Error ? error.message : String(error),
+            transactionHash: relayTxHash,
+            error: nextError.message,
           },
         });
         if (traceRef.current === trace) {
@@ -296,5 +348,24 @@ const useSponsoredVoting = ({
     data: { sponsoredVoteTxHash },
   };
 };
+
+function getSponsoredVoteError(
+  error: unknown,
+  relayTxHash?: `0x${string}`
+): Error {
+  const message = error instanceof Error ? error.message : String(error);
+
+  if (relayTxHash && isReceiptTimeoutError(message)) {
+    return new Error(
+      `Sponsored vote transaction ${relayTxHash} was broadcast but was not confirmed within 10 minutes.`
+    );
+  }
+
+  return error instanceof Error ? error : new Error(message);
+}
+
+function isReceiptTimeoutError(message: string) {
+  return /timed?\s*out|timeout/i.test(message);
+}
 
 export default useSponsoredVoting;
