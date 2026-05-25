@@ -4,6 +4,12 @@ import { FC, PropsWithChildren } from "react";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
+import {
+  coinbaseWallet,
+  injected,
+  safe,
+  walletConnect,
+} from "wagmi/connectors";
 import Footer from "@/components/Footer";
 import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
@@ -45,6 +51,39 @@ const tokenChainId = toNumericChainId(contracts.token.chain.id);
 
 const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
 
+function getConnectors() {
+  const isSafeIframe =
+    typeof window !== "undefined" && window.parent !== window;
+  return [
+    ...(isSafeIframe
+      ? [
+          safe({
+            allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+          }),
+        ]
+      : []),
+    injected({ target: "metaMask" }),
+    coinbaseWallet({
+      appName: metadata.name,
+      appLogoUrl: metadata.icons[0],
+    }),
+    ...(projectId
+      ? [
+          walletConnect({
+            showQrModal: false,
+            projectId,
+            metadata: {
+              name: metadata.name,
+              description: metadata.description,
+              url: metadata.url,
+              icons: metadata.icons,
+            },
+          }),
+        ]
+      : []),
+  ];
+}
+
 // Create config only on client side to avoid SSR issues with indexedDB
 export const config =
   typeof window !== "undefined"
@@ -59,6 +98,7 @@ export const config =
           appName: metadata.name,
           appDescription: metadata.description,
           appUrl: metadata.url,
+          connectors: getConnectors(),
           enableFamily: false,
         }),
         ssr: true,

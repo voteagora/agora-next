@@ -31,6 +31,11 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+
+function getDelegationErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -127,7 +132,12 @@ export function UndelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const { address: accountAddress } = useAccount();
+  const {
+    address: accountAddress,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -176,12 +186,14 @@ export function UndelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
+    error: writeError,
   } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
+    error: receiptError,
   } = useWaitForTransactionReceipt({
     hash: isGasRelayLive ? undefined : delegateTxHash,
   });
@@ -232,6 +244,12 @@ export function UndelegateDialog({
         attributes: {
           delegatee: zeroAddress,
           delegationAction: "undelegate",
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.token.chain.id,
+          }),
         },
         startEventName: "governance_delegation_started",
         startEventDetails: {
@@ -305,12 +323,15 @@ export function UndelegateDialog({
         details: {
           delegatee: zeroAddress,
           action: "undelegate",
-          error: "Undelegation transaction failed",
+          error: getDelegationErrorMessage(
+            writeError ?? receiptError,
+            "Undelegation transaction failed"
+          ),
         },
       });
       delegationTraceRef.current = null;
     }
-  }, [didFailDelegation, isError, isGasRelayLive]);
+  }, [didFailDelegation, isError, isGasRelayLive, receiptError, writeError]);
 
   useEffect(() => {
     return () => {

@@ -14,6 +14,8 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
 
 const useStandardVoting = ({
   proposalId,
@@ -29,7 +31,12 @@ const useStandardVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const {
+    address,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
@@ -68,7 +75,6 @@ const useStandardVoting = ({
 
   const write = useCallback(() => {
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
       const functionName = !!reason ? "castVoteWithReason" : "castVote";
       const args = !!reason
         ? [BigInt(proposalId), support, reason]
@@ -94,6 +100,12 @@ const useStandardVoting = ({
           hasReason: Boolean(reason),
           hasParams: Boolean(params),
           missingVote,
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.governor.chain.id,
+          }),
         },
         startEventName: "governance_vote_started",
         startEventDetails: {
@@ -107,6 +119,30 @@ const useStandardVoting = ({
         chainId: contracts.governor.chain.id,
         inputData,
       });
+
+      const readinessError = getWalletTransactionReadinessError({
+        connector,
+        status: accountStatus,
+      });
+      if (readinessError) {
+        setStandardVoteError(true);
+        setStandardVoteErrorDetails(readinessError as WriteContractErrorType);
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "standard",
+            error: readinessError.message,
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
+        return;
+      }
+
+      setStandardVoteLoading(true);
 
       try {
         const directTx = await standardVote({
@@ -208,6 +244,9 @@ const useStandardVoting = ({
     void vote();
   }, [
     address,
+    accountChainId,
+    accountStatus,
+    connector,
     contracts.governor.abi,
     contracts.governor.address,
     contracts.governor.chain.id,

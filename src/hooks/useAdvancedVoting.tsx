@@ -16,6 +16,8 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -35,7 +37,12 @@ const useAdvancedVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const {
+    address,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const {
     writeContractAsync: advancedVote,
     isError: _advancedVoteError,
@@ -113,6 +120,12 @@ const useAdvancedVoting = ({
           hasParams: Boolean(params),
           missingVote,
           hasAdvancedVp: advancedVP !== null,
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: chainId,
+          }),
         },
         startEventName: "governance_vote_started",
         startEventDetails: {
@@ -130,7 +143,6 @@ const useAdvancedVoting = ({
     };
 
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
       const functionName = reason
         ? params
           ? "castVoteWithReasonAndParams"
@@ -156,6 +168,30 @@ const useAdvancedVoting = ({
         chainId: contracts.governor.chain.id,
         inputData,
       });
+
+      const readinessError = getWalletTransactionReadinessError({
+        connector,
+        status: accountStatus,
+      });
+      if (readinessError) {
+        setStandardVoteError(true);
+        setStandardVoteErrorDetails(readinessError as WriteContractErrorType);
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "standard",
+            error: readinessError.message,
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
+        return;
+      }
+
+      setStandardVoteLoading(true);
 
       try {
         const directTx = await standardVote({
@@ -268,6 +304,28 @@ const useAdvancedVoting = ({
         chainId: contracts.alligator?.chain.id,
         inputData,
       });
+
+      const readinessError = getWalletTransactionReadinessError({
+        connector,
+        status: accountStatus,
+      });
+      if (readinessError) {
+        setAdvancedVoteError(true);
+        setAdvancedVoteErrorDetails(readinessError as WriteContractErrorType);
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "advanced",
+            error: readinessError.message,
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
+        return;
+      }
 
       try {
         const advancedTx = await advancedVote({
@@ -398,9 +456,12 @@ const useAdvancedVoting = ({
     void vote();
   }, [
     address,
+    accountChainId,
+    accountStatus,
     advancedVP,
     advancedVote,
     authorityChains,
+    connector,
     contracts.alligator,
     contracts.governor.abi,
     contracts.governor.address,

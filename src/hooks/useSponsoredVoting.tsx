@@ -18,6 +18,8 @@ import {
   getFrontendMiradorTraceContext,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
 
 const types = {
   Ballot: [
@@ -35,7 +37,12 @@ const useSponsoredVoting = ({
 }) => {
   const { ui, contracts } = Tenant.current();
   const { signTypedDataAsync } = useSignTypedData();
-  const { address } = useAccount();
+  const {
+    address,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const isGasRelayEnabled = ui.toggle("sponsoredVote")?.enabled === true;
   const gasRelayConfig =
     (ui.toggle("sponsoredVote")?.config as UIGasRelayConfig) || {};
@@ -97,6 +104,12 @@ const useSponsoredVoting = ({
         attributes: {
           voteKind: "sponsored",
           support,
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.governor.chain.id,
+          }),
         },
         startEventName: "governance_vote_started",
         startEventDetails: {
@@ -110,6 +123,28 @@ const useSponsoredVoting = ({
         chainId: contracts.governor.chain.id,
         inputData,
       });
+
+      const readinessError = getWalletTransactionReadinessError({
+        connector,
+        status: accountStatus,
+      });
+      if (readinessError) {
+        setError(readinessError);
+        setSponsoredVoteError(true);
+        void closeFrontendMiradorFlowTrace(trace, {
+          reason: "governance_vote_failed",
+          eventName: "governance_vote_failed",
+          details: {
+            proposalId,
+            voteKind: "sponsored",
+            error: readinessError.message,
+          },
+        });
+        if (traceRef.current === trace) {
+          traceRef.current = null;
+        }
+        return;
+      }
 
       setWaitingForSignature(true);
       try {
@@ -231,6 +266,9 @@ const useSponsoredVoting = ({
     void _sponsoredVote();
   }, [
     address,
+    accountChainId,
+    accountStatus,
+    connector,
     contracts.governor.abi,
     contracts.governor.address,
     contracts.governor.chain.id,

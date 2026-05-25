@@ -40,6 +40,11 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+
+function getDelegationErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
 
 export function DelegateDialog({
   delegate,
@@ -58,7 +63,12 @@ export function DelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { address: accountAddress } = useAccount();
+  const {
+    address: accountAddress,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -110,6 +120,7 @@ export function DelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
+    error: writeError,
   } = useWriteContract();
 
   const [localDelegateTxHash, setLocalDelegateTxHash] = useState<
@@ -121,6 +132,7 @@ export function DelegateDialog({
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
+    error: receiptError,
   } = useWaitForTransactionReceipt({
     hash: isGasRelayLive ? undefined : (localDelegateTxHash ?? delegateTxHash),
   });
@@ -189,7 +201,10 @@ export function DelegateDialog({
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
-          error: "Delegation transaction failed",
+          error: getDelegationErrorMessage(
+            writeError ?? receiptError,
+            "Delegation transaction failed"
+          ),
         },
       });
       delegationTraceRef.current = null;
@@ -202,6 +217,8 @@ export function DelegateDialog({
     directDelegationTxHash,
     isError,
     isGasRelayLive,
+    receiptError,
+    writeError,
   ]);
 
   useEffect(() => {
@@ -251,6 +268,12 @@ export function DelegateDialog({
         attributes: {
           delegatee: delegate.address,
           delegationAction: "delegate",
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.token.chain.id,
+          }),
         },
         startEventName: "governance_delegation_started",
         startEventDetails: {
