@@ -6,6 +6,7 @@ import {
   withMiradorTraceStep,
 } from "@/lib/mirador/serverTrace";
 import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
+import { getRelayVoteClientError, getRelayVoteErrorMessage } from "./errors";
 
 async function post(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -65,6 +66,9 @@ async function post(request: NextRequest) {
     });
     return NextResponse.json(voteTxHash);
   } catch (e: any) {
+    const errorMessage = getRelayVoteErrorMessage(e);
+    const clientError = getRelayVoteClientError(e);
+
     appendServerTraceEvent({
       traceContext: withMiradorTraceStep(
         traceContext,
@@ -73,9 +77,22 @@ async function post(request: NextRequest) {
       ),
       eventName: "relay_vote_request_failed",
       details: {
-        message: e instanceof Error ? e.message : String(e),
+        message: errorMessage,
+        code: clientError?.code,
+        status: clientError?.status ?? 500,
       },
     });
+
+    if (clientError) {
+      return NextResponse.json(
+        {
+          error: clientError.error,
+          code: clientError.code,
+        },
+        { status: clientError.status }
+      );
+    }
+
     return new Response("Internal server error: " + e.toString(), {
       status: 500,
     });
