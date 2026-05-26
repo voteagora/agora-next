@@ -34,6 +34,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { isUserCancellationDetails } from "@/lib/mirador/eventSeverity";
 import {
   attachMiradorTransactionArtifacts,
   closeFrontendMiradorFlowTrace,
@@ -43,7 +44,15 @@ import {
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
 
 function getDelegationErrorMessage(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.length > 0) {
+    return error;
+  }
+
+  return fallback;
 }
 
 export function DelegateDialog({
@@ -196,13 +205,18 @@ export function DelegateDialog({
     }
 
     if (didFailDelegation || isError) {
+      const delegationError = writeError ?? receiptError;
+      if (!delegationError) {
+        return;
+      }
+
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
           error: getDelegationErrorMessage(
-            writeError ?? receiptError,
+            delegationError,
             "Delegation transaction failed"
           ),
         },
@@ -316,6 +330,24 @@ export function DelegateDialog({
         setLocalDelegateTxHash(txHash);
       } catch (error) {
         console.error("delegate via viem failed", error);
+        if (isUserCancellationDetails(error)) {
+          void closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_delegation_failed",
+            eventName: "governance_delegation_failed",
+            details: {
+              delegatee: delegate.address,
+              error: getDelegationErrorMessage(
+                error,
+                "Delegation transaction failed"
+              ),
+            },
+          });
+          if (delegationTraceRef.current === trace) {
+            delegationTraceRef.current = null;
+          }
+          return;
+        }
+
         // Fallback to wagmi write (may still fail under Safe CAIP-2)
         try {
           write({

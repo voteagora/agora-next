@@ -34,7 +34,15 @@ import {
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
 
 function getDelegationErrorMessage(error: unknown, fallback: string) {
-  return error instanceof Error ? error.message : fallback;
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.length > 0) {
+    return error;
+  }
+
+  return fallback;
 }
 
 interface UndelegateActionButtonsProps {
@@ -317,6 +325,11 @@ export function UndelegateDialog({
     }
 
     if (didFailDelegation || isError) {
+      const delegationError = writeError ?? receiptError;
+      if (!delegationError) {
+        return;
+      }
+
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
@@ -324,7 +337,7 @@ export function UndelegateDialog({
           delegatee: zeroAddress,
           action: "undelegate",
           error: getDelegationErrorMessage(
-            writeError ?? receiptError,
+            delegationError,
             "Undelegation transaction failed"
           ),
         },

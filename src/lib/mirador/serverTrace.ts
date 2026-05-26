@@ -7,6 +7,7 @@ import type {
 
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import { isMiradorFlowTracingEnabled } from "./config";
+import { inferMiradorEventSeverity } from "./eventSeverity";
 import { getMiradorServerClient } from "./serverClient";
 import { getTenantTag } from "./tags";
 import {
@@ -50,24 +51,6 @@ type AppendServerTraceEventArgs = {
 
 const MIRADOR_SERVER_DEFAULT_TRACE_NAME = "AgoraServerTrace";
 let hasWarnedMissingTraceId = false;
-
-type EventSeverity = "info" | "warn" | "error";
-
-function inferEventSeverity(eventName: string): EventSeverity {
-  if (eventName.endsWith("_failed") || eventName.endsWith("_error")) {
-    return "error";
-  }
-
-  if (
-    eventName.endsWith("_skipped") ||
-    eventName.includes("_mismatch") ||
-    eventName.endsWith("_replaced")
-  ) {
-    return "warn";
-  }
-
-  return "info";
-}
 
 function buildContextAttributes(
   traceContext?: MiradorTraceContext | null
@@ -209,7 +192,7 @@ export async function appendServerTraceEvent({
       trace.addTags(allTags);
     }
 
-    const severity = inferEventSeverity(eventName);
+    const severity = inferMiradorEventSeverity(eventName, details);
     trace[severity](eventName, toEventDetails(details));
 
     const web3Trace = trace as MiradorServerTraceWithWeb3;

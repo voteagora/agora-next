@@ -6,6 +6,7 @@ import type {
 } from "@miradorlabs/web-sdk/dist/index.esm.js";
 
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
+import { inferMiradorEventSeverity } from "./eventSeverity";
 import {
   MiradorAttributeMap,
   MiradorChainName,
@@ -105,24 +106,6 @@ export function startMiradorTrace(
   }
 }
 
-type EventSeverity = "info" | "warn" | "error";
-
-function inferEventSeverity(eventName: string): EventSeverity {
-  if (eventName.endsWith("_failed") || eventName.endsWith("_error")) {
-    return "error";
-  }
-
-  if (
-    eventName.endsWith("_skipped") ||
-    eventName.includes("_mismatch") ||
-    eventName.endsWith("_replaced")
-  ) {
-    return "warn";
-  }
-
-  return "info";
-}
-
 export function addMiradorEvent(
   trace: Trace | null | undefined,
   eventName: string,
@@ -133,7 +116,7 @@ export function addMiradorEvent(
   }
 
   try {
-    const severity = inferEventSeverity(eventName);
+    const severity = inferMiradorEventSeverity(eventName, details);
     trace[severity](eventName, details);
   } catch (error) {
     console.error("Failed to add Mirador event", { eventName, error });
