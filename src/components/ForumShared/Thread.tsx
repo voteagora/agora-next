@@ -98,8 +98,14 @@ const CommentItem = ({
     const mediaQuery = window.matchMedia("(min-width: 640px)");
     const updateSize = () => setAvatarSize(mediaQuery.matches ? 32 : 24);
     updateSize();
-    mediaQuery.addEventListener("change", updateSize);
-    return () => mediaQuery.removeEventListener("change", updateSize);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updateSize);
+      return () => mediaQuery.removeEventListener("change", updateSize);
+    }
+
+    mediaQuery.addListener(updateSize);
+    return () => mediaQuery.removeListener(updateSize);
   }, []);
 
   // RBAC permission checks
