@@ -92,6 +92,15 @@ const CommentItem = ({
   const stableDeletePost = useStableCallback(deletePost);
   const stableRestorePost = useStableCallback(restorePost);
   const [showReplies, setShowReplies] = React.useState(forForums ?? false);
+  const [avatarSize, setAvatarSize] = React.useState(24);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
+    const updateSize = () => setAvatarSize(mediaQuery.matches ? 32 : 24);
+    updateSize();
+    mediaQuery.addEventListener("change", updateSize);
+    return () => mediaQuery.removeEventListener("change", updateSize);
+  }, []);
 
   // RBAC permission checks
   const { hasPermission: canSoftDeleteOrRestore } = useHasPermission(
@@ -228,16 +237,10 @@ const CommentItem = ({
               aria-label={profileLabel}
               className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
             >
-              <ENSAvatar
-                ensName={comment.author}
-                className="w-6 h-6 sm:w-8 sm:h-8"
-              />
+              <ENSAvatar ensName={comment.author} size={avatarSize} />
             </Link>
           ) : (
-            <ENSAvatar
-              ensName={comment.author}
-              className="w-6 h-6 sm:w-8 sm:h-8"
-            />
+            <ENSAvatar ensName={comment.author} size={avatarSize} />
           )}
         </div>
         {hasReplies && forForums && (
