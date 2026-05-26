@@ -79,9 +79,7 @@ function collectDetailValues(value: unknown, values: string[], depth = 0) {
   }
 }
 
-export function isUserCancellationDetails(
-  details?: unknown
-): boolean {
+export function isUserCancellationDetails(details?: unknown): boolean {
   const values: string[] = [];
   collectDetailValues(details, values);
 
