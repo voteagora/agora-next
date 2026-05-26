@@ -60,6 +60,11 @@ on:
         required: false
         type: boolean
         default: false
+      use_prod_env:
+        description: "Prod environment. Uncheck for dev."
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   visual-regression:
@@ -111,7 +116,8 @@ jobs:
             "tenant": "${{ inputs.tenant }}",
             "routes": "${{ steps.scopes.outputs.route_scopes }}",
             "target_proposals": "${{ inputs.target_proposals }}",
-            "scan_all_archive": "${{ inputs.scan_all_archive }}"
+            "scan_all_archive": "${{ inputs.scan_all_archive }}",
+            "agora_env": "${{ inputs.use_prod_env == true && 'prod' || 'dev' }}"
           }
           METAEOF
           echo "📝 Metadata written"
@@ -126,7 +132,7 @@ jobs:
           SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
           TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
           TENANT_CONTEXT: ${{ inputs.tenant }}
-          NEXT_PUBLIC_AGORA_ENV: prod
+          NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_env == true && 'prod' || 'dev' }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: npm run test:ab
 
