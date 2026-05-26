@@ -1,7 +1,7 @@
 "use client";
 
 import { addDays, isPast, differenceInMilliseconds } from "date-fns";
-import { CheckCircle, Clock, ExternalLink } from "lucide-react";
+import { CheckCircle, ExternalLink } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -11,14 +11,11 @@ import { PROPOSAL_STATUS } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import {
   addressesMatch,
-  COWRIE_VERIFICATION_COMPLETED_KEY,
   EXECUTION_TRANSACTIONS_KEY,
-  extractPayeeFromMetadata,
-  FORM_COMPLETED_KEY,
+  extractPayeesFromMetadata,
   getExplorerTxUrl,
-  normalizeBoolean,
   PAYEE_FORM_URL_KEY,
-  TAX_FORM_MANUAL_STATUS_KEY,
+  type PayeeBannerInfo,
 } from "@/lib/taxFormUtils";
 
 const TAX_FORM_DEADLINE_DAYS = 15;
@@ -31,7 +28,11 @@ type ExecutionTransaction = {
   executed_at: string;
 };
 
-function useTaxFormDeadline(endTime: Date | null, enabled: boolean) {
+function useTaxFormDeadline(
+  endTime: Date | null,
+  enabled: boolean,
+  isFormCompleted: boolean
+) {
   const deadline = useMemo(() => {
     if (!endTime) return null;
     return addDays(new Date(endTime), TAX_FORM_DEADLINE_DAYS);
@@ -40,17 +41,14 @@ function useTaxFormDeadline(endTime: Date | null, enabled: boolean) {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    if (!enabled || !deadline) return;
+    if (!enabled || !deadline || isFormCompleted) return;
 
-    // Refresh immediately when enabled changes (e.g. user signs in)
     setNow(new Date());
 
     if (isPast(deadline)) return;
 
-    // Update once per minute since UI only shows days/hours/minutes.
     const minuteTimer = setInterval(() => setNow(new Date()), 60000);
 
-    // Also schedule a one-off update right at the deadline so the button disables promptly.
     const msUntilDeadline = deadline.getTime() - Date.now();
     const expiryTimer =
       msUntilDeadline > 0
@@ -61,9 +59,9 @@ function useTaxFormDeadline(endTime: Date | null, enabled: boolean) {
       clearInterval(minuteTimer);
       if (expiryTimer) clearTimeout(expiryTimer);
     };
-  }, [deadline, enabled]);
+  }, [deadline, enabled, isFormCompleted]);
 
-  const isExpired = deadline ? isPast(deadline) : false;
+  const isExpired = !isFormCompleted && deadline ? isPast(deadline) : false;
 
   return { deadline, isExpired, now };
 }
@@ -79,28 +77,30 @@ function formatTimeLeft(deadline: Date, now: Date) {
   return { days, hours, minutes };
 }
 
-function CountdownTimer({
+function DeadlineDisplay({
   deadline,
   isExpired,
+  isFormCompleted,
   now,
-  compact = false,
 }: {
   deadline: Date | null;
   isExpired: boolean;
+  isFormCompleted: boolean;
   now: Date;
-  compact?: boolean;
 }) {
   if (!deadline) return null;
 
-  if (isExpired) {
-    if (compact) {
-      return <span className="text-negative font-medium">Passed</span>;
-    }
+  if (isFormCompleted) {
     return (
-      <div className="flex items-center gap-1.5 text-negative text-sm">
-        <span className="font-medium">Deadline passed</span>
-      </div>
+      <span className="text-positive inline-flex items-center gap-1">
+        <CheckCircle className="w-3.5 h-3.5" />
+        Complete
+      </span>
     );
+  }
+
+  if (isExpired) {
+    return <span className="text-negative font-medium">Passed</span>;
   }
 
   const timeLeft = formatTimeLeft(deadline, now);
@@ -109,31 +109,127 @@ function CountdownTimer({
   const isUrgent = timeLeft.days < 3;
   const colorClass = isUrgent ? "text-negative" : "text-positive";
 
-  if (compact) {
-    return (
-      <span className={`tabular-nums font-medium ${colorClass}`}>
-        {timeLeft.days > 0 && `${timeLeft.days}d `}
-        {String(timeLeft.hours).padStart(2, "0")}h{" "}
-        {String(timeLeft.minutes).padStart(2, "0")}m
-      </span>
-    );
-  }
-
   return (
-    <div className={`flex items-center gap-1.5 text-sm ${colorClass}`}>
-      <Clock className="w-3.5 h-3.5" />
-      <span className="tabular-nums font-medium">
-        {timeLeft.days > 0 && `${timeLeft.days}d `}
-        {String(timeLeft.hours).padStart(2, "0")}h{" "}
-        {String(timeLeft.minutes).padStart(2, "0")}m
-      </span>
-      <span className="font-normal">left to complete form</span>
-    </div>
+    <span className={`tabular-nums font-medium ${colorClass}`}>
+      {timeLeft.days > 0 && `${timeLeft.days}d `}
+      {String(timeLeft.hours).padStart(2, "0")}h{" "}
+      {String(timeLeft.minutes).padStart(2, "0")}m
+    </span>
   );
 }
 
-function truncateAddress(address: string) {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+function PayeeRow({
+  payee,
+  deadline,
+  isDeadlinePassed,
+  now,
+  executionTransactions,
+  isMultiPayee,
+}: {
+  payee: PayeeBannerInfo;
+  deadline: Date | null;
+  isDeadlinePassed: boolean;
+  now: Date;
+  executionTransactions: ExecutionTransaction[];
+  isMultiPayee: boolean;
+}) {
+  const hasTxHash = Boolean(payee.txHash);
+  const matchingTx = payee.txHash
+    ? executionTransactions.find(
+        (tx) =>
+          tx.transaction_hash.toLowerCase() === payee.txHash!.toLowerCase()
+      )
+    : null;
+
+  return (
+    <div className="flex items-center gap-3 flex-wrap">
+      {/* Payee */}
+      <span>
+        <span className="font-medium text-primary">Payee:</span>{" "}
+        <span className="font-mono text-secondary">{payee.address}</span>
+        {(payee.paymentType || payee.paymentAmount) && (
+          <span className="text-secondary ml-1">
+            (
+            {[payee.paymentType, payee.paymentAmount]
+              .filter(Boolean)
+              .join(" · ")}
+            )
+          </span>
+        )}
+      </span>
+
+      <span className="text-line">·</span>
+
+      {/* Deadline — stops when this payee's form is complete */}
+      <span>
+        <span className="font-medium text-primary">Deadline:</span>{" "}
+        <DeadlineDisplay
+          deadline={deadline}
+          isExpired={isDeadlinePassed}
+          isFormCompleted={payee.isFormCompleted}
+          now={now}
+        />
+      </span>
+
+      <span className="text-line">·</span>
+
+      {/* Tax Form */}
+      <span>
+        <span className="font-medium text-primary">Tax Form:</span>{" "}
+        {payee.isFormCompleted ? (
+          <span className="text-positive inline-flex items-center gap-1">
+            <CheckCircle className="w-3.5 h-3.5" />
+            Done
+          </span>
+        ) : (
+          <span className="text-secondary">Pending</span>
+        )}
+      </span>
+
+      <span className="text-line">·</span>
+
+      {/* Payment */}
+      <span>
+        <span className="font-medium text-primary">Payment:</span>{" "}
+        {hasTxHash && matchingTx ? (
+          <a
+            href={getExplorerTxUrl(
+              matchingTx.chain_id,
+              matchingTx.transaction_hash
+            )}
+            target="_blank"
+            rel="noreferrer"
+            className="text-positive inline-flex items-center gap-1 hover:underline"
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            Paid
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        ) : hasTxHash ? (
+          <span className="text-positive inline-flex items-center gap-1">
+            <CheckCircle className="w-3.5 h-3.5" />
+            Paid
+          </span>
+        ) : !isMultiPayee && executionTransactions.length > 0 ? (
+          <a
+            href={getExplorerTxUrl(
+              executionTransactions[0].chain_id,
+              executionTransactions[0].transaction_hash
+            )}
+            target="_blank"
+            rel="noreferrer"
+            className="text-positive inline-flex items-center gap-1 hover:underline"
+          >
+            <CheckCircle className="w-3.5 h-3.5" />
+            Paid
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        ) : (
+          <span className="text-secondary">Pending</span>
+        )}
+      </span>
+    </div>
+  );
 }
 
 type Props = {
@@ -151,63 +247,39 @@ export function TaxFormBanner({ proposal }: Props) {
       | undefined
   )?.payeeFormUrl;
 
-  const {
-    hasPayeeKey,
-    payeeAddress,
-    currentUserIsPayee,
-    isFormCompleted,
-    payeeFormUrl,
-    executionTransactions,
-  } = useMemo(() => {
+  const { payees, payeeFormUrl, executionTransactions } = useMemo(() => {
     const metadata = proposal.taxFormMetadata ?? {};
-    const { hasPayeeKey, payeeAddress } = extractPayeeFromMetadata(metadata);
-
-    // Tax form status logic: manual override > API result > default
-    // This matches the logic in agora-admin
-    let isFormCompleted = false;
-
-    // Check for manual override first (takes precedence)
-    const manualStatus = metadata[TAX_FORM_MANUAL_STATUS_KEY];
-    if (manualStatus === "complete" || manualStatus === "done") {
-      isFormCompleted = true;
-    } else if (manualStatus === "pending" || manualStatus === "not_done") {
-      isFormCompleted = false;
-    } else {
-      // Fall back to API results (Cowrie or form_completed)
-      const hasCowrieStatus = Object.prototype.hasOwnProperty.call(
-        metadata,
-        COWRIE_VERIFICATION_COMPLETED_KEY
-      );
-      const isCowrieComplete = normalizeBoolean(
-        metadata[COWRIE_VERIFICATION_COMPLETED_KEY]
-      );
-      isFormCompleted = hasCowrieStatus
-        ? isCowrieComplete
-        : normalizeBoolean(metadata[FORM_COMPLETED_KEY]);
-    }
+    const payees = extractPayeesFromMetadata(metadata);
 
     const executionTransactions = (metadata[EXECUTION_TRANSACTIONS_KEY] ??
       []) as ExecutionTransaction[];
 
     return {
-      hasPayeeKey,
-      payeeAddress,
-      currentUserIsPayee:
-        hasPayeeKey && addressesMatch(payeeAddress, address ?? null),
-      isFormCompleted,
+      payees,
       payeeFormUrl:
         (metadata[PAYEE_FORM_URL_KEY] as string | undefined) ??
         togglePayeeFormUrl,
       executionTransactions,
     };
-  }, [address, proposal.taxFormMetadata, togglePayeeFormUrl]);
+  }, [proposal.taxFormMetadata, togglePayeeFormUrl]);
 
   const isWaitingForPayment = proposal.status === PROPOSAL_STATUS.SUCCEEDED;
   const isSignedIn = Boolean(address);
-  const hasPaymentBeenMade = executionTransactions.length > 0;
+  const hasAnyPayee = payees.length > 0;
 
-  // Check if this is an onchain governance proposal (not a temp check)
-  // Can be identified by tag or by proposal type
+  // Identify whether connected user matches any payee
+  const currentUserPayee = useMemo(
+    () =>
+      isSignedIn
+        ? payees.find((p) => addressesMatch(p.address, address ?? null))
+        : undefined,
+    [payees, address, isSignedIn]
+  );
+  const currentUserIsPayee = Boolean(currentUserPayee);
+  const currentUserFormDone = currentUserPayee?.isFormCompleted ?? false;
+  const allFormsDone =
+    payees.length > 0 && payees.every((p) => p.isFormCompleted);
+
   const rawTag =
     proposal.archiveMetadata?.rawTag ??
     (Array.isArray((proposal as unknown as { tags?: string[] }).tags)
@@ -215,7 +287,6 @@ export function TaxFormBanner({ proposal }: Props) {
       : undefined);
   const normalizedTag = rawTag?.toLowerCase();
 
-  // Temp checks should never show the tax form banner, even if they have onchain types
   const isTempCheck =
     normalizedTag === "tempcheck" || normalizedTag === "temp-check";
 
@@ -229,31 +300,32 @@ export function TaxFormBanner({ proposal }: Props) {
 
   const isOnchainProposal = hasGovTag || hasOnchainType;
 
-  // Show banner if: enabled, succeeded proposal, onchain, not temp check, has payee set
   const shouldShowBanner =
     isEnabled &&
     isWaitingForPayment &&
     isOnchainProposal &&
     !isTempCheck &&
-    hasPayeeKey;
+    hasAnyPayee;
 
   const {
     deadline,
     isExpired: isDeadlinePassed,
     now,
-  } = useTaxFormDeadline(proposal.endTime, shouldShowBanner);
+  } = useTaxFormDeadline(proposal.endTime, shouldShowBanner, allFormsDone);
 
-  // Hide banner if basic conditions not met
   if (!shouldShowBanner) {
     return null;
   }
 
-  // Only show the payee-specific CTA to the payee themselves
   const showPayeeCTA =
-    isSignedIn && currentUserIsPayee && !isFormCompleted && !isDeadlinePassed;
-  const showSignInPrompt = !isSignedIn && !isFormCompleted && !isDeadlinePassed;
+    isSignedIn &&
+    currentUserIsPayee &&
+    !currentUserFormDone &&
+    !isDeadlinePassed;
+  const showSignInPrompt = !isSignedIn && !allFormsDone && !isDeadlinePassed;
 
   const hasSecondRow = showSignInPrompt || showPayeeCTA;
+  const isMultiPayee = payees.length > 1;
 
   return (
     <>
@@ -276,73 +348,18 @@ export function TaxFormBanner({ proposal }: Props) {
 
           {/* Right: Content stacked vertically */}
           <div className="flex flex-col gap-2">
-            {/* Top row: Status items */}
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Payee */}
-              {payeeAddress && (
-                <>
-                  <span>
-                    <span className="font-medium text-primary">Payee:</span>{" "}
-                    <span className="font-mono text-secondary">
-                      {payeeAddress}
-                    </span>
-                  </span>
-                  <span className="text-line">·</span>
-                </>
-              )}
+            {payees.map((payee) => (
+              <PayeeRow
+                key={payee.index}
+                payee={payee}
+                deadline={deadline}
+                isDeadlinePassed={isDeadlinePassed}
+                now={now}
+                executionTransactions={executionTransactions}
+                isMultiPayee={isMultiPayee}
+              />
+            ))}
 
-              {/* Deadline */}
-              <span>
-                <span className="font-medium text-primary">Deadline:</span>{" "}
-                <CountdownTimer
-                  deadline={deadline}
-                  isExpired={isDeadlinePassed}
-                  now={now}
-                  compact
-                />
-              </span>
-
-              <span className="text-line">·</span>
-
-              {/* Tax Form */}
-              <span>
-                <span className="font-medium text-primary">Tax Form:</span>{" "}
-                {isFormCompleted ? (
-                  <span className="text-positive inline-flex items-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    Done
-                  </span>
-                ) : (
-                  <span className="text-secondary">Pending</span>
-                )}
-              </span>
-
-              <span className="text-line">·</span>
-
-              {/* Payment */}
-              <span>
-                <span className="font-medium text-primary">Payment:</span>{" "}
-                {hasPaymentBeenMade ? (
-                  <a
-                    href={getExplorerTxUrl(
-                      executionTransactions[0].chain_id,
-                      executionTransactions[0].transaction_hash
-                    )}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-positive inline-flex items-center gap-1 hover:underline"
-                  >
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    Paid
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                ) : (
-                  <span className="text-secondary">Pending</span>
-                )}
-              </span>
-            </div>
-
-            {/* Bottom row: Payee CTA text or Sign-in prompt */}
             {showPayeeCTA && (
               <p className="text-secondary">
                 You&apos;re almost ready to receive the funds from this
@@ -360,7 +377,6 @@ export function TaxFormBanner({ proposal }: Props) {
         </div>
       </div>
 
-      {/* Full-width CTA button below banner */}
       {showPayeeCTA && payeeFormUrl && (
         <UpdatedButton
           href={payeeFormUrl}
