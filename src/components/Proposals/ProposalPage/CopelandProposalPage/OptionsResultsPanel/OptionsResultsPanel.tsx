@@ -111,6 +111,7 @@ export default function OptionsResultsPanel({
 
   return (
     <div
+      data-testid="proposal-results-panel"
       ref={containerRef}
       className="flex flex-col flex-1 overflow-y-auto flex-shrink px-4 mt-1 min-h-0 [&::-webkit-scrollbar]:hidden"
     >
