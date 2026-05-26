@@ -251,7 +251,9 @@ export function extractApprovalMetrics(
     budgetToken =
       ("budget_token" in kwargs && String(kwargs.budget_token)) || "";
     budgetAmount = BigInt(
-      ("budget_amount" in kwargs && String(kwargs.budget_amount)) || "0"
+      ("budget_amount" in kwargs && String(kwargs.budget_amount)) ||
+        ("budget" in kwargs && String(kwargs.budget)) ||
+        "0"
     );
   }
 

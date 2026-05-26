@@ -36,10 +36,7 @@ export default function ApprovedTransactions({
   };
 
   const { ui } = Tenant.current();
-  const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
-  if (tenantHaseasOO) {
-    return null;
-  }
+
   if (proposalData.options.length === 0) {
     return null;
   }
