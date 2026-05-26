@@ -13,6 +13,7 @@ import {
 } from "./knownAddresses";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { useInView } from "react-intersection-observer";
+import { useEnsName } from "wagmi";
 import { useOwnerOfAtBlock } from "@/hooks/useOwnerOfAtBlock";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -120,12 +121,21 @@ function SplitRecipientTableRow({
     enabled: inView && !!address,
   });
 
+  // Fallback to on-chain ENS resolution for subnames and other names
+  // the BlockCache service may not index
+  const { data: onChainEnsName } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+    query: { enabled: inView && !!address && !ensData?.name },
+  });
+
   const pct =
     totalAllocation > 0n
       ? ((Number(allocation) / Number(totalAllocation)) * 100).toFixed(4)
       : "0.0000";
 
-  const displayName = ensData?.name || address;
+  const resolvedName = ensData?.name || onChainEnsName;
+  const displayName = resolvedName || address;
 
   return (
     <tr ref={ref}>
@@ -134,7 +144,7 @@ function SplitRecipientTableRow({
           href={getBlockScanAddress(address)}
           target="_blank"
           rel="noopener noreferrer"
-          className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+          className={`hover:underline ${resolvedName ? "" : "font-mono"}`}
         >
           {displayName}
         </a>
@@ -213,7 +223,14 @@ function BurnTokenRow({
     enabled: inView && !!owner,
   });
 
-  const ownerDisplay = owner ? ensData?.name || owner : null;
+  const { data: onChainEnsName } = useEnsName({
+    chainId: 1,
+    address: (owner || "0x") as `0x${string}`,
+    query: { enabled: inView && !!owner && !ensData?.name },
+  });
+
+  const resolvedName = ensData?.name || onChainEnsName;
+  const ownerDisplay = owner ? resolvedName || owner : null;
 
   return (
     <div ref={ref} className="text-xs flex items-center">
@@ -225,7 +242,7 @@ function BurnTokenRow({
             href={getBlockScanAddress(owner!)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+            className={`hover:underline ${resolvedName ? "" : "font-mono"}`}
           >
             {ownerDisplay}
           </a>
