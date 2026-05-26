@@ -12,6 +12,18 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x18e433c7bf8a2e1d0197ce5d8f9afada1a771360": "Uniswap V2 FeeToSetter",
   "0x1a9c8182c09f50c8318d769245bea52c32be35bc": "Governance Timelock",
   "0x000000000000000000000000000000000000dead": "Burn address",
+  "0xf754a7e347f81cfdc70af9fbcce9df3d826360fa": "FranchiserFactory",
+
+  // ─── Uniswap Franchiser Delegates ───
+
+  "0xa37131410a76791f4a0210e91edd554d85afb4d4": "Uniswap Foundation",
+  "0xecc2a9240268bc7a26386ecb49e1befca2706ac9": "Anode",
+  "0xe93d59cc0bcecfd4ac204827ef67c5266079e2b5": "Axia Network",
+  "0x3fb19771947072629c8eee7995a2ef23b72d4c8a": "PGov",
+  "0xb933aee47c438f22de0747d57fc239fe37878dd1": "Wintermute",
+  "0x1855f41b8a86e701e33199de7c25d3e3830698ba": "Keyrock",
+  "0x8787fc2de4de95c53e5e3a4e5459247d9773ea52": "KPK",
+  "0xaac35d953ef23ae2e61a866ab93dea6ec0050bcd": "Atiselsts.eth",
 
   // ─── Protocol Fees (Ethereum Mainnet) ───
 
