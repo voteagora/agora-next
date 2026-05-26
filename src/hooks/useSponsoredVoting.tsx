@@ -7,7 +7,7 @@ import { config } from "@/app/Web3Provider";
 import AgoraAPI from "@/app/lib/agoraAPI";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useGovernorName } from "@/hooks/useGovernorName";
-import { trackEvent } from "@/lib/analytics";
+import { trackEventFireAndForget } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { withMiradorTraceHeaders } from "@/lib/mirador/headers";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
@@ -20,7 +20,7 @@ import {
 } from "@/lib/mirador/frontendFlowTrace";
 import { addMiradorEvent } from "@/lib/mirador/webTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
-import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 const types = {
   Ballot: [
@@ -127,25 +127,17 @@ const useSponsoredVoting = ({
         inputData,
       });
 
-      const readinessError = getWalletTransactionReadinessError({
+      const readinessError = checkWalletReadinessOrCloseTrace({
         connector,
         status: accountStatus,
+        trace,
+        traceRef,
+        proposalId,
+        voteKind: "sponsored",
       });
       if (readinessError) {
         setError(readinessError);
         setSponsoredVoteError(true);
-        void closeFrontendMiradorFlowTrace(trace, {
-          reason: "governance_vote_failed",
-          eventName: "governance_vote_failed",
-          details: {
-            proposalId,
-            voteKind: "sponsored",
-            error: readinessError.message,
-          },
-        });
-        if (traceRef.current === trace) {
-          traceRef.current = null;
-        }
         return;
       }
 
@@ -229,21 +221,15 @@ const useSponsoredVoting = ({
           });
           setSponsoredVoteTxHash(relayTxHash);
           setSponsoredVoteSuccess(true);
-          void Promise.resolve()
-            .then(() =>
-              trackEvent({
-                event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-                event_data: {
-                  proposal_id: proposalId,
-                  support,
-                  voter: address as `0x${string}`,
-                  transaction_hash: relayTxHash,
-                },
-              })
-            )
-            .catch((error) => {
-              console.error("Sponsored vote analytics tracking failed", error);
-            });
+          trackEventFireAndForget({
+            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+            event_data: {
+              proposal_id: proposalId,
+              support,
+              voter: address as `0x${string}`,
+              transaction_hash: relayTxHash,
+            },
+          });
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",
             eventName: "governance_vote_succeeded",

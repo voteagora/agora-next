@@ -68,12 +68,19 @@ function collectDetailValues(value: unknown, values: string[], depth = 0) {
       collectDetailValues(errorLike.cause, values, depth + 1);
     }
 
+    const visited = new Set([
+      "name",
+      "message",
+      "shortMessage",
+      "details",
+      "code",
+      "errorCode",
+      "cause",
+    ]);
     for (const [key, nestedValue] of Object.entries(
       value as Record<string, unknown>
     )) {
-      if (key === "code" || key === "errorCode") {
-        values.push(`${nestedValue}`);
-      }
+      if (visited.has(key)) continue;
       collectDetailValues(nestedValue, values, depth + 1);
     }
   }

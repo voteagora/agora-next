@@ -2,7 +2,7 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { trackEvent } from "@/lib/analytics";
+import { trackEventFireAndForget } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
@@ -15,7 +15,7 @@ import {
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
-import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 const useStandardVoting = ({
   proposalId,
@@ -120,25 +120,17 @@ const useStandardVoting = ({
         inputData,
       });
 
-      const readinessError = getWalletTransactionReadinessError({
+      const readinessError = checkWalletReadinessOrCloseTrace({
         connector,
         status: accountStatus,
+        trace,
+        traceRef,
+        proposalId,
+        voteKind: "standard",
       });
       if (readinessError) {
         setStandardVoteError(true);
         setStandardVoteErrorDetails(readinessError as WriteContractErrorType);
-        void closeFrontendMiradorFlowTrace(trace, {
-          reason: "governance_vote_failed",
-          eventName: "governance_vote_failed",
-          details: {
-            proposalId,
-            voteKind: "standard",
-            error: readinessError.message,
-          },
-        });
-        if (traceRef.current === trace) {
-          traceRef.current = null;
-        }
         return;
       }
 
@@ -174,23 +166,17 @@ const useStandardVoting = ({
           });
           setStandardTxHash(transactionHash);
 
-          void Promise.resolve()
-            .then(() =>
-              trackEvent({
-                event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
-                event_data: {
-                  proposal_id: proposalId,
-                  support,
-                  reason,
-                  params,
-                  voter: address as `0x${string}`,
-                  transaction_hash: transactionHash,
-                },
-              })
-            )
-            .catch((error) => {
-              console.error("Standard vote analytics tracking failed", error);
-            });
+          trackEventFireAndForget({
+            event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
+            event_data: {
+              proposal_id: proposalId,
+              support,
+              reason,
+              params,
+              voter: address as `0x${string}`,
+              transaction_hash: transactionHash,
+            },
+          });
           setStandardVoteSuccess(true);
           void closeFrontendMiradorFlowTrace(trace, {
             reason: "governance_vote_succeeded",

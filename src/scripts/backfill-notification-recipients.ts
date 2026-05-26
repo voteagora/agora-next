@@ -210,7 +210,7 @@ function parseLegacyPreferences(value: unknown): LegacyPreferences {
 function normalizeEmail(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const email = value.trim().toLowerCase();
-  return email.length > 5 ? email : null;
+  return email.length >= 5 ? email : null;
 }
 
 function getPayloadEmail(payload: Prisma.JsonValue): string | null {

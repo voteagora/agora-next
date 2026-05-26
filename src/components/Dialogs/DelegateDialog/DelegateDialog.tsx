@@ -42,18 +42,7 @@ import {
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
-
-function getDelegationErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  if (typeof error === "string" && error.length > 0) {
-    return error;
-  }
-
-  return fallback;
-}
+import { getWalletErrorMessage } from "@/lib/wallet/errors";
 
 export function DelegateDialog({
   delegate,
@@ -215,7 +204,7 @@ export function DelegateDialog({
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
-          error: getDelegationErrorMessage(
+          error: getWalletErrorMessage(
             delegationError,
             "Delegation transaction failed"
           ),
@@ -336,7 +325,7 @@ export function DelegateDialog({
             eventName: "governance_delegation_failed",
             details: {
               delegatee: delegate.address,
-              error: getDelegationErrorMessage(
+              error: getWalletErrorMessage(
                 error,
                 "Delegation transaction failed"
               ),

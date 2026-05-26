@@ -93,7 +93,7 @@ async function post(request: NextRequest) {
       );
     }
 
-    return new Response("Internal server error: " + e.toString(), {
+    return new Response("Internal server error", {
       status: 500,
     });
   }

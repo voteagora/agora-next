@@ -87,6 +87,8 @@ function createTestConfig(storage: ReturnType<typeof createMemoryStorage>) {
   });
 }
 
+// Guards against a Wagmi bug where persisted connector shells lack live methods.
+// If Wagmi fixes this upstream, remove the readiness check and this test together.
 describe("Wagmi persisted connector regression", () => {
   it("throws the getChainId TypeError when a persisted connector shell is used for a write", async () => {
     const storage = createMemoryStorage();

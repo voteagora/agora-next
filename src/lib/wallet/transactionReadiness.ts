@@ -1,3 +1,10 @@
+import type { MutableRefObject } from "react";
+
+import {
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+} from "@/lib/mirador/frontendFlowTrace";
+
 type WalletConnectionStatus =
   | "connected"
   | "connecting"
@@ -36,4 +43,34 @@ export function getWalletTransactionReadinessError({
   }
 
   return null;
+}
+
+export function checkWalletReadinessOrCloseTrace({
+  connector,
+  status,
+  trace,
+  traceRef,
+  proposalId,
+  voteKind,
+}: {
+  connector?: WalletConnectorLike;
+  status: WalletConnectionStatus;
+  trace: FrontendMiradorTrace;
+  traceRef: MutableRefObject<FrontendMiradorTrace | null>;
+  proposalId: string;
+  voteKind: string;
+}): Error | null {
+  const error = getWalletTransactionReadinessError({ connector, status });
+  if (!error) return null;
+
+  void closeFrontendMiradorFlowTrace(trace, {
+    reason: "governance_vote_failed",
+    eventName: "governance_vote_failed",
+    details: { proposalId, voteKind, error: error.message },
+  });
+  if (traceRef.current === trace) {
+    traceRef.current = null;
+  }
+
+  return error;
 }

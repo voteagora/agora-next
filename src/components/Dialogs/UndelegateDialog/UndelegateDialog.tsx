@@ -32,18 +32,7 @@ import {
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
-
-function getDelegationErrorMessage(error: unknown, fallback: string) {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  if (typeof error === "string" && error.length > 0) {
-    return error;
-  }
-
-  return fallback;
-}
+import { getWalletErrorMessage } from "@/lib/wallet/errors";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -336,7 +325,7 @@ export function UndelegateDialog({
         details: {
           delegatee: zeroAddress,
           action: "undelegate",
-          error: getDelegationErrorMessage(
+          error: getWalletErrorMessage(
             delegationError,
             "Undelegation transaction failed"
           ),

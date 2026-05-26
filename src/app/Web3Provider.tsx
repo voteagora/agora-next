@@ -58,11 +58,11 @@ function getConnectors() {
     ...(isSafeIframe
       ? [
           safe({
-            allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+            allowedDomains: [/gnosis-safe\.io$/, /app\.safe\.global$/],
           }),
         ]
       : []),
-    injected({ target: "metaMask" }),
+    injected(),
     coinbaseWallet({
       appName: metadata.name,
       appLogoUrl: metadata.icons[0],

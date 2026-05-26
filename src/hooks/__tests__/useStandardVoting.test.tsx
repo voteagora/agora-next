@@ -55,6 +55,7 @@ vi.mock("@/lib/tenant/tenant", () => ({
 
 vi.mock("@/lib/analytics", () => ({
   trackEvent: vi.fn(),
+  trackEventFireAndForget: vi.fn(),
 }));
 
 vi.mock("@/lib/utils", () => ({

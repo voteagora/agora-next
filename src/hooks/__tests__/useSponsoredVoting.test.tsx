@@ -104,6 +104,9 @@ vi.mock("@/lib/tenant/tenant", () => ({
 
 vi.mock("@/lib/analytics", () => ({
   trackEvent: trackEventMock,
+  trackEventFireAndForget: (...args: unknown[]) => {
+    void trackEventMock(...args).catch(() => {});
+  },
 }));
 
 vi.mock("@/lib/mirador/headers", () => ({
