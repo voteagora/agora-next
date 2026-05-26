@@ -1278,6 +1278,73 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       );
     },
   },
+
+  // recallMany(address[],address[]) — Governance Recall
+  "0x5b145a75": {
+    name: "recallMany",
+    prettyName: "Recall Many",
+    prettyRender: (decodedData, target) => {
+      const arrays: string[][] = [];
+      for (const param of Object.values(decodedData.parameters)) {
+        if (param.type === "address[]" && Array.isArray(param.value)) {
+          arrays.push((param.value as unknown[]).map(String));
+        }
+      }
+
+      const arr0 = arrays[0] ?? [];
+      const arr1 = arrays[1] ?? [];
+      const count = Math.max(arr0.length, arr1.length);
+
+      const renderAddr = (address?: string) => {
+        if (!address) return <span className="text-secondary">Unknown</span>;
+        if (hasFriendlyName(address)) {
+          return (
+            <LabelWithTooltip
+              label={getFriendlyName(address)!}
+              tooltip={address}
+            />
+          );
+        }
+        return <span className="font-mono text-xs">{address}</span>;
+      };
+
+      const allDestsIdentical =
+        arr1.length > 0 &&
+        arr1.every((a) => a.toLowerCase() === arr1[0].toLowerCase());
+
+      const destination = allDestsIdentical ? arr1[0] : undefined;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Recall delegated voting power from{" "}
+            <span className="font-semibold">{count}</span> delegate
+            {count !== 1 ? "s" : ""} on the {maybeFriendlyAddress(target)}{" "}
+            contract
+            {destination ? (
+              <>, returning tokens to {renderAddr(destination)}.</>
+            ) : (
+              <>.</>
+            )}
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {arr0.map((addr, i) => (
+                <div key={i}>
+                  {i + 1}. {renderAddr(addr)}
+                  {!allDestsIdentical && arr1[i] && (
+                    <> → {renderAddr(arr1[i])}</>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
 };
 
 // ────────────────────────────────────────────────────────────────────────────
