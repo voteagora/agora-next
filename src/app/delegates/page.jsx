@@ -44,7 +44,8 @@ export async function generateMetadata({}, parent) {
   };
 }
 
-export default async function Page({ searchParams }) {
+export default async function Page(props) {
+  const searchParams = await props.searchParams;
   return (
     <section>
       <Hero page="delegates" />

@@ -85,10 +85,9 @@ const nextConfig = withBundleAnalyzer({
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
     return config;
   },
+  // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
+  serverExternalPackages: ["@opentelemetry/sdk-node"],
   experimental: {
-    instrumentationHook: true,
-    // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
     serverActions: {
       bodySizeLimit: "10mb",
     },

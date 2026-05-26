@@ -3,8 +3,9 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { roundId: string } }
+  props: { params: Promise<{ roundId: string }> }
 ) {
+  const params = await props.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
   const { fetchImpactMetricsApi } = await import(

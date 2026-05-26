@@ -14,7 +14,7 @@ export async function generateMetadata() {
   const page = ui.page("proposals");
   const { title, description, imageTitle, imageDescription } = page!.meta;
 
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     imageTitle
   )}&description=${encodeURIComponent(imageDescription)}`;

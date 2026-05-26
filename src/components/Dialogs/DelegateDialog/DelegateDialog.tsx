@@ -32,7 +32,7 @@ import {
 import { getPublicClient } from "@/lib/viem";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import {
   attachMiradorTransactionArtifacts,

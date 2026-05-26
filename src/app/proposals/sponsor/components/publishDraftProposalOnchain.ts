@@ -20,7 +20,7 @@ import {
   flushMiradorTrace,
 } from "@/lib/mirador/webTrace";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { resolveSafeTx } from "@/lib/utils";
 
 export async function prepareDraftOnchainPublishTrace(params: {

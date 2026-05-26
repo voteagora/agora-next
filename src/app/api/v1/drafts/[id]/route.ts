@@ -6,8 +6,9 @@ import { PLMConfig } from "@/app/proposals/draft/types";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params;
   try {
     const tenant = Tenant.current();
     const plmToggle = tenant.ui.toggle("proposal-lifecycle");

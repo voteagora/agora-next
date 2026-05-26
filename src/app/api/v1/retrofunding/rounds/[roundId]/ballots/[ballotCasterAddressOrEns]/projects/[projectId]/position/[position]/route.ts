@@ -9,12 +9,12 @@ const impactParser = z.number().int().gte(0); // positive integer
 async function post(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       projectId: string;
-      position: number;
-    };
+      position: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -35,7 +35,7 @@ async function post(
   }
 
   const { roundId, ballotCasterAddressOrEns, projectId, position } =
-    route.params;
+    await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

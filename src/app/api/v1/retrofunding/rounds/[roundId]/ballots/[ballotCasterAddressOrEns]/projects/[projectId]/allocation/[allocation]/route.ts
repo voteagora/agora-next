@@ -8,12 +8,12 @@ const allocationParser = z.string(z.number().min(0).max(100)); // number between
 async function post(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       projectId: string;
       allocation: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -34,7 +34,7 @@ async function post(
   }
 
   const { roundId, ballotCasterAddressOrEns, projectId, allocation } =
-    route.params;
+    await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
 import { encodeFunctionData } from "viem";

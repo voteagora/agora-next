@@ -437,7 +437,7 @@ const inferTypes = (
   });
 };
 
-export const guessAbiEncodedData = (bytes: BytesLike): ParamType[] | null => {
+const guessAbiEncodedData = (bytes: BytesLike): ParamType[] | null => {
   try {
     const data = decodeHex(bytes);
     if (data.length === 0) return null;
@@ -464,7 +464,7 @@ export const guessAbiEncodedData = (bytes: BytesLike): ParamType[] | null => {
   }
 };
 
-export const guessFragment = (calldata: BytesLike): FunctionFragment | null => {
+const guessFragment = (calldata: BytesLike): FunctionFragment | null => {
   const bytes = decodeHex(calldata);
   if (bytes.length < 4) return null;
   const params = guessAbiEncodedData(bytes.slice(4));

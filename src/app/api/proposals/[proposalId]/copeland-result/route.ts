@@ -92,11 +92,11 @@ const BUDGET_1Y = 3000000;
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
   try {
     const { namespace } = Tenant.current();
-    const proposalId = route.params.proposalId;
+    const proposalId = (await route.params).proposalId;
 
     const [proposal, rawVotes] = await Promise.all([
       loadProposal(proposalId),

@@ -18,10 +18,10 @@ import FinancialStatementLayout from "@/app/forums/[topic_id]/components/Financi
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     topic_id: string;
     slug?: string[];
-  };
+  }>;
 }
 
 type TopicBundle = {
@@ -30,8 +30,8 @@ type TopicBundle = {
   transformed: ForumTopic;
 };
 
-function getRequestBaseUrl(): string {
-  const headerList = headers();
+async function getRequestBaseUrl(): Promise<string> {
+  const headerList = await headers();
   const forwardedHost = headerList.get("x-forwarded-host");
   const host = forwardedHost || headerList.get("host") || "localhost:3000";
   const protoHeader = headerList.get("x-forwarded-proto");
@@ -93,9 +93,8 @@ function buildDescription(content: string, title: string): string {
   return truncateForMeta(`Financial Statement: ${title}`);
 }
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
   const topicBundle = await loadTopic(params.topic_id);
   if (!topicBundle) {
     return {};
@@ -120,7 +119,7 @@ export async function generateMetadata({
     };
   }
 
-  const baseUrl = getRequestBaseUrl();
+  const baseUrl = await getRequestBaseUrl();
   const canonicalPath = buildForumArticlePath(topicId, transformed.title);
 
   const description = " ";
@@ -169,7 +168,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function ForumArticlePage({ params }: PageProps) {
+export default async function ForumArticlePage(props: PageProps) {
+  const params = await props.params;
   const topicBundle = await loadTopic(params.topic_id);
   if (!topicBundle) {
     return notFound();

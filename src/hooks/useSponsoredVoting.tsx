@@ -8,7 +8,7 @@ import AgoraAPI from "@/app/lib/agoraAPI";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useGovernorName } from "@/hooks/useGovernorName";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { withMiradorTraceHeaders } from "@/lib/mirador/headers";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 import {

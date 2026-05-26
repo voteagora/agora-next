@@ -15,7 +15,7 @@ import { formatPercentageWithPrecision } from "@/lib/utils";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
 import { ScwPartialDelegationButton } from "@/components/Dialogs/PartialDelegateDialog/ScwPartialDelegationButton";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 
 interface Props {
   delegate: DelegateChunk;

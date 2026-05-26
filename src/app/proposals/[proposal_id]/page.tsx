@@ -106,13 +106,12 @@ async function generateVoterMetadata(
   };
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: {
-  params: { proposal_id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export async function generateMetadata(props: {
+  params: Promise<{ proposal_id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const proposal = await loadProposal(
     params.proposal_id,
     fetchProposalUnstableCache
@@ -185,11 +184,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function Page({
-  params: { proposal_id },
-}: {
-  params: { proposal_id: string };
+export default async function Page(props: {
+  params: Promise<{ proposal_id: string }>;
 }) {
+  const params = await props.params;
+
+  const { proposal_id } = params;
+
   const loadedProposal = await loadProposal(proposal_id, fetchProposal);
 
   const proposalData =

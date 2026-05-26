@@ -7,7 +7,11 @@ const voteValidator = createOptionalNumberValidator(-1, 1, 0);
 export async function GET(
   request: NextRequest,
   route: {
-    params: { roundId: string; impactMetricId: string; commentId: string };
+    params: Promise<{
+      roundId: string;
+      impactMetricId: string;
+      commentId: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -23,7 +27,7 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { roundId, impactMetricId, commentId } = route.params;
+    const { roundId, impactMetricId, commentId } = await route.params;
     try {
       const comments = await fetchImpactMetricCommentVotes({
         commentId: Number(commentId),
@@ -40,7 +44,11 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   route: {
-    params: { roundId: string; impactMetricId: string; commentId: string };
+    params: Promise<{
+      roundId: string;
+      impactMetricId: string;
+      commentId: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -68,7 +76,7 @@ export async function PUT(
   }
 
   return await traceWithUserId(authResponse.userId, async () => {
-    const { commentId } = route.params;
+    const { commentId } = await route.params;
 
     const body = await request.json();
     if (body.vote == undefined) {

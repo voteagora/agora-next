@@ -5,11 +5,11 @@ import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 async function del(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       impactMetricId: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -25,7 +25,8 @@ async function del(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns, impactMetricId } = route.params;
+  const { roundId, ballotCasterAddressOrEns, impactMetricId } =
+    await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

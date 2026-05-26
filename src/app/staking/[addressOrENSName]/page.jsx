@@ -46,7 +46,11 @@ export async function generateMetadata({}) {
   };
 }
 
-export default async function Page({ params: { addressOrENSName } }) {
+export default async function Page(props) {
+  const params = await props.params;
+
+  const { addressOrENSName } = params;
+
   const { ui, token } = Tenant.current();
   if (!ui.toggle("staking").enabled) {
     return <RouteNotSupported />;

@@ -11,9 +11,10 @@ import BadgeDelegateWrapper, {
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
-  { params }: { params: { badgeId: string } },
+  props: { params: Promise<{ badgeId: string }> },
   parent: any
 ) {
+  const params = await props.params;
   const badgeDefinition = await fetchBadgeDefinition(params.badgeId);
 
   if (!badgeDefinition) {
@@ -24,7 +25,7 @@ export async function generateMetadata(
 
   const { ui } = Tenant.current();
   const page = ui.page("delegates");
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
   const title = `${badgeDefinition.name} - Badge Holders`;
   const description =
     badgeDefinition.description ||
@@ -58,13 +59,12 @@ export async function generateMetadata(
   };
 }
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: { badgeId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+export default async function Page(props: {
+  params: Promise<{ badgeId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const badgeDefinition = await fetchBadgeDefinition(params.badgeId);
 
   if (!badgeDefinition) {

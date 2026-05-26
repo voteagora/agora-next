@@ -8,12 +8,16 @@ import Tenant from "@/lib/tenant/tenant";
 import { RouteNotSupported } from "@/components/shared/RouteNotSupported";
 
 interface Props {
-  params: {
+  params: Promise<{
     deposit_id: string;
-  };
+  }>;
 }
 
-export default async function Page({ params: { deposit_id } }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params;
+
+  const { deposit_id } = params;
+
   const { ui } = Tenant.current();
   if (!ui.toggle("staking")) {
     return <RouteNotSupported />;

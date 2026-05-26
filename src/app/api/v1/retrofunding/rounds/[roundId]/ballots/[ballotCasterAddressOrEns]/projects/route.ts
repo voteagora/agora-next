@@ -15,7 +15,9 @@ const ballotPayloadSchema = z.object({
 
 async function post(
   request: NextRequest,
-  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  route: {
+    params: Promise<{ roundId: string; ballotCasterAddressOrEns: string }>;
+  }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { validateAddressScope } = await import("@/app/lib/auth/serverAuth");
@@ -31,7 +33,7 @@ async function post(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns } = route.params;
+  const { roundId, ballotCasterAddressOrEns } = await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse
