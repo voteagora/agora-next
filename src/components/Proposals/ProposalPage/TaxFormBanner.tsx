@@ -147,15 +147,6 @@ function PayeeRow({
       <span>
         <span className="font-medium text-primary">Payee:</span>{" "}
         <span className="font-mono text-secondary">{payee.address}</span>
-        {(payee.paymentType || payee.paymentAmount) && (
-          <span className="text-secondary ml-1">
-            (
-            {[payee.paymentType, payee.paymentAmount]
-              .filter(Boolean)
-              .join(" · ")}
-            )
-          </span>
-        )}
       </span>
 
       <span className="text-line">·</span>
