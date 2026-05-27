@@ -249,11 +249,7 @@ export function DelegateProfileImageWithMetadata({
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
         <div className="relative aspect-square">
-          <ENSAvatar
-            className="rounded-full w-[48px] h-[48px]"
-            ensName={data}
-            size={48}
-          />
+          <ENSAvatar className="rounded-full" ensName={data} size={48} />
         </div>
         <div className="flex flex-col">
           <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
