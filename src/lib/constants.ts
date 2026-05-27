@@ -355,3 +355,7 @@ export const getEASAddress = (chainId: number) => {
   }
   return "0x0000000000000000000000000000000000000000";
 };
+
+export const FILTERED_ENS_PROPOSALS = [
+  "0xb1d1db6955a7eb3644eaf055f97dd5be8eb012a72a5a1b6a4716abda9ade9388",
+];

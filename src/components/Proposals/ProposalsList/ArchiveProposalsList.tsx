@@ -13,7 +13,10 @@ import { useAccount } from "wagmi";
 import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
-import { proposalsFilterOptions } from "@/lib/constants";
+import {
+  FILTERED_ENS_PROPOSALS,
+  proposalsFilterOptions,
+} from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
 import { DaoSlug } from "@prisma/client";
 
@@ -88,7 +91,14 @@ export default function ArchiveProposalsList({
       );
     }
 
-    return proposals
+    const filterEnsExcludedProposals = proposals.filter((proposal) => {
+      if (FILTERED_ENS_PROPOSALS.includes(proposal.id)) {
+        return false;
+      }
+      return true;
+    });
+
+    return filterEnsExcludedProposals
       .filter(
         (proposal) =>
           !proposal.cancel_event &&
