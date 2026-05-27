@@ -75,6 +75,9 @@ const useStandardVoting = ({
 
   const write = useCallback(() => {
     const _standardVote = async () => {
+      setStandardVoteError(false);
+      setStandardVoteErrorDetails(null);
+
       const functionName = !!reason ? "castVoteWithReason" : "castVote";
       const args = !!reason
         ? [BigInt(proposalId), support, reason]

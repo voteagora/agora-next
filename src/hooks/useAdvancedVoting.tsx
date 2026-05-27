@@ -143,6 +143,9 @@ const useAdvancedVoting = ({
     };
 
     const _standardVote = async () => {
+      setStandardVoteError(false);
+      setStandardVoteErrorDetails(null);
+
       const functionName = reason
         ? params
           ? "castVoteWithReasonAndParams"
@@ -272,6 +275,9 @@ const useAdvancedVoting = ({
     };
 
     const _advancedVote = async () => {
+      setAdvancedVoteError(false);
+      setAdvancedVoteErrorDetails(null);
+
       if (!authorityChains || !advancedVP) {
         toast.error("No authority chains or advanced VP found");
         return;

@@ -88,6 +88,9 @@ const useSponsoredVoting = ({
     }
 
     const _sponsoredVote = async () => {
+      setError(undefined);
+      setSponsoredVoteError(false);
+
       let relayTxHash: `0x${string}` | undefined;
       const inputData = encodeFunctionData({
         abi: contracts.governor.abi as any,
