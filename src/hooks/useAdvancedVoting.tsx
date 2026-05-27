@@ -276,7 +276,6 @@ const useAdvancedVoting = ({
         toast.error("No authority chains or advanced VP found");
         return;
       }
-      setAdvancedVoteLoading(true);
       const args = [
         advancedVP,
         authorityChains as any,
@@ -310,6 +309,8 @@ const useAdvancedVoting = ({
         setAdvancedVoteErrorDetails(readinessError as WriteContractErrorType);
         return;
       }
+
+      setAdvancedVoteLoading(true);
 
       try {
         const advancedTx = await advancedVote({
