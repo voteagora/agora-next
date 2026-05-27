@@ -11,7 +11,6 @@ import { PROPOSAL_STATUS } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import {
   addressesMatch,
-  EXECUTION_TRANSACTIONS_KEY,
   extractPayeesFromMetadata,
   getExplorerTxUrl,
   PAYEE_FORM_URL_KEY,
@@ -19,14 +18,6 @@ import {
 } from "@/lib/taxFormUtils";
 
 const TAX_FORM_DEADLINE_DAYS = 15;
-
-type ExecutionTransaction = {
-  id: string;
-  transaction_hash: string;
-  chain_id: number;
-  executed_by: string;
-  executed_at: string;
-};
 
 function useTaxFormDeadline(
   endTime: Date | null,
@@ -80,24 +71,13 @@ function formatTimeLeft(deadline: Date, now: Date) {
 function DeadlineDisplay({
   deadline,
   isExpired,
-  isFormCompleted,
   now,
 }: {
   deadline: Date | null;
   isExpired: boolean;
-  isFormCompleted: boolean;
   now: Date;
 }) {
   if (!deadline) return null;
-
-  if (isFormCompleted) {
-    return (
-      <span className="text-positive inline-flex items-center gap-1">
-        <CheckCircle className="w-3.5 h-3.5" />
-        Complete
-      </span>
-    );
-  }
 
   if (isExpired) {
     return <span className="text-negative font-medium">Passed</span>;
@@ -123,24 +103,14 @@ function PayeeRow({
   deadline,
   isDeadlinePassed,
   now,
-  executionTransactions,
-  isMultiPayee,
+  chainId,
 }: {
   payee: PayeeBannerInfo;
   deadline: Date | null;
   isDeadlinePassed: boolean;
   now: Date;
-  executionTransactions: ExecutionTransaction[];
-  isMultiPayee: boolean;
+  chainId: number;
 }) {
-  const hasTxHash = Boolean(payee.txHash);
-  const matchingTx = payee.txHash
-    ? executionTransactions.find(
-        (tx) =>
-          tx.transaction_hash.toLowerCase() === payee.txHash!.toLowerCase()
-      )
-    : null;
-
   return (
     <div className="flex items-center gap-3 flex-wrap">
       {/* Payee */}
@@ -151,18 +121,20 @@ function PayeeRow({
 
       <span className="text-line">·</span>
 
-      {/* Deadline — stops when this payee's form is complete */}
-      <span>
-        <span className="font-medium text-primary">Deadline:</span>{" "}
-        <DeadlineDisplay
-          deadline={deadline}
-          isExpired={isDeadlinePassed}
-          isFormCompleted={payee.isFormCompleted}
-          now={now}
-        />
-      </span>
-
-      <span className="text-line">·</span>
+      {/* Deadline — hidden once this payee's form is complete */}
+      {!payee.isFormCompleted && (
+        <>
+          <span>
+            <span className="font-medium text-primary">Deadline:</span>{" "}
+            <DeadlineDisplay
+              deadline={deadline}
+              isExpired={isDeadlinePassed}
+              now={now}
+            />
+          </span>
+          <span className="text-line">·</span>
+        </>
+      )}
 
       {/* Tax Form */}
       <span>
@@ -180,33 +152,11 @@ function PayeeRow({
       <span className="text-line">·</span>
 
       {/* Payment */}
-      <span>
+      <span className="inline-flex items-center gap-1">
         <span className="font-medium text-primary">Payment:</span>{" "}
-        {hasTxHash && matchingTx ? (
+        {payee.txHash ? (
           <a
-            href={getExplorerTxUrl(
-              matchingTx.chain_id,
-              matchingTx.transaction_hash
-            )}
-            target="_blank"
-            rel="noreferrer"
-            className="text-positive inline-flex items-center gap-1 hover:underline"
-          >
-            <CheckCircle className="w-3.5 h-3.5" />
-            Paid
-            <ExternalLink className="w-3 h-3" />
-          </a>
-        ) : hasTxHash ? (
-          <span className="text-positive inline-flex items-center gap-1">
-            <CheckCircle className="w-3.5 h-3.5" />
-            Paid
-          </span>
-        ) : !isMultiPayee && executionTransactions.length > 0 ? (
-          <a
-            href={getExplorerTxUrl(
-              executionTransactions[0].chain_id,
-              executionTransactions[0].transaction_hash
-            )}
+            href={getExplorerTxUrl(chainId, payee.txHash)}
             target="_blank"
             rel="noreferrer"
             className="text-positive inline-flex items-center gap-1 hover:underline"
@@ -229,7 +179,8 @@ type Props = {
 
 export function TaxFormBanner({ proposal }: Props) {
   const { address } = useAccount();
-  const { ui } = Tenant.current();
+  const { ui, contracts } = Tenant.current();
+  const chainId = contracts.governor.chain.id;
   const taxFormToggle = ui.toggle("tax-form") ?? ui.toggle("tax-form-banner");
   const isEnabled = taxFormToggle?.enabled ?? false;
   const togglePayeeFormUrl = (
@@ -238,19 +189,15 @@ export function TaxFormBanner({ proposal }: Props) {
       | undefined
   )?.payeeFormUrl;
 
-  const { payees, payeeFormUrl, executionTransactions } = useMemo(() => {
+  const { payees, payeeFormUrl } = useMemo(() => {
     const metadata = proposal.taxFormMetadata ?? {};
     const payees = extractPayeesFromMetadata(metadata);
-
-    const executionTransactions = (metadata[EXECUTION_TRANSACTIONS_KEY] ??
-      []) as ExecutionTransaction[];
 
     return {
       payees,
       payeeFormUrl:
         (metadata[PAYEE_FORM_URL_KEY] as string | undefined) ??
         togglePayeeFormUrl,
-      executionTransactions,
     };
   }, [proposal.taxFormMetadata, togglePayeeFormUrl]);
 
@@ -316,7 +263,6 @@ export function TaxFormBanner({ proposal }: Props) {
   const showSignInPrompt = !isSignedIn && !allFormsDone && !isDeadlinePassed;
 
   const hasSecondRow = showSignInPrompt || showPayeeCTA;
-  const isMultiPayee = payees.length > 1;
 
   return (
     <>
@@ -346,8 +292,7 @@ export function TaxFormBanner({ proposal }: Props) {
                 deadline={deadline}
                 isDeadlinePassed={isDeadlinePassed}
                 now={now}
-                executionTransactions={executionTransactions}
-                isMultiPayee={isMultiPayee}
+                chainId={chainId}
               />
             ))}
 
