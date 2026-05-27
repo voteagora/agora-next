@@ -1,8 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSIWE } from "connectkit";
+import { useSIWE, SIWE_NONCE_QUERY_KEY } from "connectkit";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSignMessage } from "wagmi";
+import { getAddress } from "viem";
 
+import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   closeStoredSiweLoginTrace,
@@ -63,7 +67,9 @@ export function useEnsureSiweSession(params: {
   purpose: SafeOffchainSigningPurpose;
 }) {
   const { address, chainId, purpose } = params;
-  const { signIn, signOut } = useSIWE();
+  const { signOut } = useSIWE();
+  const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
   const openDialog = useOpenDialog();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [walletType, setWalletType] = useState<WalletType>("loading");
@@ -121,6 +127,28 @@ export function useEnsureSiweSession(params: {
       chainId,
     });
   }, [address, chainId, purpose]);
+
+  // Custom sign-in that fetches the nonce directly, bypassing ConnectKit's
+  // pre-fetched nonce state which can be undefined on first render.
+  const doSignIn = useCallback(async () => {
+    if (!address || !chainId) {
+      throw new Error("Wallet not connected");
+    }
+    const nonce = await siweProviderConfig.getNonce();
+    const message = await siweProviderConfig.createMessage({
+      // siwe library requires EIP-55 checksummed address; params.address is lowercased
+      address: getAddress(address),
+      chainId,
+      nonce,
+    });
+    const signature = await signMessageAsync({ message });
+    const success = await siweProviderConfig.verifyMessage({
+      message,
+      signature,
+    });
+    void queryClient.invalidateQueries({ queryKey: [SIWE_NONCE_QUERY_KEY] });
+    return success;
+  }, [address, chainId, signMessageAsync, queryClient]);
 
   const openSafeSiweDialog = useCallback(
     (options?: EnsureSiweSessionOptions) => {
@@ -201,8 +229,8 @@ export function useEnsureSiweSession(params: {
       setIsSigningIn(true);
       try {
         await prepareMiradorSiweLoginTrace();
-        const signInResult = await signIn();
-        if (signInResult === false) {
+        const signInSuccess = await doSignIn();
+        if (!signInSuccess) {
           throw new Error("Sign-in cancelled or failed.");
         }
       } catch (error) {
@@ -241,7 +269,6 @@ export function useEnsureSiweSession(params: {
       openSafeSiweDialog,
       prepareMiradorSiweLoginTrace,
       purpose,
-      signIn,
       walletType,
     ]
   );
