@@ -347,7 +347,11 @@ export function UndelegateDialog({
             </div>
             <div className="flex flex-col relative w-full border border-line rounded-lg">
               <div className="flex flex-row items-center gap-3 p-4 border-b border-line">
-                <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
+                <ENSAvatar
+                  ensName={delegateeEnsName}
+                  className="h-10 w-10"
+                  size={40}
+                />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
