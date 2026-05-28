@@ -19,8 +19,7 @@ export const useProposalVotesChart = ({
 }: Props) => {
   const { ui } = Tenant.current();
   const useArchive =
-    proposalType === "SNAPSHOT" ||
-    (ui.toggle("include-nonivotes")?.enabled ?? false);
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
 
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
