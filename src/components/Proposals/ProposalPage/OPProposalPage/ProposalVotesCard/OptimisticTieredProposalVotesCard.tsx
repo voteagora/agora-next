@@ -371,9 +371,9 @@ const OptimisticTieredProposalVotesCard = ({ proposal }: Props) => {
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const [activeTab, setActiveTab] = useState("results");
   const [isClicked, setIsClicked] = useState<boolean>(false);

@@ -57,9 +57,9 @@ export default function ApprovalVotesPanel({
   )?.enabled;
 
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
     type: "ALL",

@@ -78,27 +78,24 @@ export default function ArchiveProposalsList({
   }
 
   const filteredProposals = React.useMemo(() => {
+    const baseProposals = proposals.filter(
+      (proposal) => !FILTERED_ENS_PROPOSALS.includes(proposal.id)
+    );
+
     if (filter === proposalsFilterOptions.everything.filter) {
-      return proposals.map((proposal) => ({
+      return baseProposals.map((proposal) => ({
         ...proposal,
         kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
     }
 
     if (filter === proposalsFilterOptions.tempChecks.filter) {
-      return proposals.filter((proposal) =>
+      return baseProposals.filter((proposal) =>
         proposal.tags?.includes("tempcheck")
       );
     }
 
-    const filterEnsExcludedProposals = proposals.filter((proposal) => {
-      if (FILTERED_ENS_PROPOSALS.includes(proposal.id)) {
-        return false;
-      }
-      return true;
-    });
-
-    return filterEnsExcludedProposals
+    return baseProposals
       .filter(
         (proposal) =>
           !proposal.cancel_event &&

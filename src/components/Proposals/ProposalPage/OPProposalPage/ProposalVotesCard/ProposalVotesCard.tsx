@@ -30,9 +30,9 @@ const ProposalVotesCard = ({ proposal }: { proposal: Proposal }) => {
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const { ui } = Tenant.current();
   const useArchiveVoteHistory = ui.toggle(
