@@ -13,6 +13,7 @@ import {
 } from "./knownAddresses";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { useInView } from "react-intersection-observer";
+import { useEnsName } from "wagmi";
 import { useOwnerOfAtBlock } from "@/hooks/useOwnerOfAtBlock";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -120,12 +121,21 @@ function SplitRecipientTableRow({
     enabled: inView && !!address,
   });
 
+  // Fallback to on-chain ENS resolution for subnames and other names
+  // the BlockCache service may not index
+  const { data: onChainEnsName } = useEnsName({
+    chainId: 1,
+    address: address as `0x${string}`,
+    query: { enabled: inView && !!address && !ensData?.name },
+  });
+
   const pct =
     totalAllocation > 0n
       ? ((Number(allocation) / Number(totalAllocation)) * 100).toFixed(4)
       : "0.0000";
 
-  const displayName = ensData?.name || address;
+  const resolvedName = ensData?.name || onChainEnsName;
+  const displayName = resolvedName || address;
 
   return (
     <tr ref={ref}>
@@ -134,7 +144,7 @@ function SplitRecipientTableRow({
           href={getBlockScanAddress(address)}
           target="_blank"
           rel="noopener noreferrer"
-          className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+          className={`hover:underline ${resolvedName ? "" : "font-mono"}`}
         >
           {displayName}
         </a>
@@ -213,7 +223,14 @@ function BurnTokenRow({
     enabled: inView && !!owner,
   });
 
-  const ownerDisplay = owner ? ensData?.name || owner : null;
+  const { data: onChainEnsName } = useEnsName({
+    chainId: 1,
+    address: (owner || "0x") as `0x${string}`,
+    query: { enabled: inView && !!owner && !ensData?.name },
+  });
+
+  const resolvedName = ensData?.name || onChainEnsName;
+  const ownerDisplay = owner ? resolvedName || owner : null;
 
   return (
     <div ref={ref} className="text-xs flex items-center">
@@ -225,7 +242,7 @@ function BurnTokenRow({
             href={getBlockScanAddress(owner!)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`hover:underline ${ensData?.name ? "" : "font-mono"}`}
+            className={`hover:underline ${resolvedName ? "" : "font-mono"}`}
           >
             {ownerDisplay}
           </a>
@@ -1275,6 +1292,73 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
           Transfer ownership of {maybeFriendlyAddress(target)} to{" "}
           {maybeFriendlyAddress(newOwner)}.
         </span>
+      );
+    },
+  },
+
+  // recallMany(address[],address[]) — Governance Recall
+  "0x5b145a75": {
+    name: "recallMany",
+    prettyName: "Recall Many",
+    prettyRender: (decodedData, target) => {
+      const arrays: string[][] = [];
+      for (const param of Object.values(decodedData.parameters)) {
+        if (param.type === "address[]" && Array.isArray(param.value)) {
+          arrays.push((param.value as unknown[]).map(String));
+        }
+      }
+
+      const arr0 = arrays[0] ?? [];
+      const arr1 = arrays[1] ?? [];
+      const count = Math.max(arr0.length, arr1.length);
+
+      const renderAddr = (address?: string) => {
+        if (!address) return <span className="text-secondary">Unknown</span>;
+        if (hasFriendlyName(address)) {
+          return (
+            <LabelWithTooltip
+              label={getFriendlyName(address)!}
+              tooltip={address}
+            />
+          );
+        }
+        return <span className="font-mono text-xs">{address}</span>;
+      };
+
+      const allDestsIdentical =
+        arr1.length > 0 &&
+        arr1.every((a) => a.toLowerCase() === arr1[0].toLowerCase());
+
+      const destination = allDestsIdentical ? arr1[0] : undefined;
+
+      return (
+        <div className="text-sm text-primary space-y-2">
+          <div>
+            Recall delegated voting power from{" "}
+            <span className="font-semibold">{count}</span> delegate
+            {count !== 1 ? "s" : ""} on the {maybeFriendlyAddress(target)}{" "}
+            contract
+            {destination ? (
+              <>, returning tokens to {renderAddr(destination)}.</>
+            ) : (
+              <>.</>
+            )}
+          </div>
+          {count > 0 && (
+            <div
+              className={`space-y-1 pl-4 ${count > 10 ? "max-h-64 overflow-y-auto" : ""}`}
+            >
+              {arr0.map((addr, i) => (
+                <div key={i}>
+                  {i + 1}. {renderAddr(addr)}
+                  {!allDestsIdentical && arr1[i] && (
+                    <> → {renderAddr(arr1[i])}</>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       );
     },
   },

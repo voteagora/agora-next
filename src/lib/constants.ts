@@ -455,3 +455,6 @@ export const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
 export const CRITERIA_TOP_CHOICES = 1; // Top N options win
 
 export const BLOCKCACHEURL = "https://blockcache-production.up.railway.app";
+export const FILTERED_ENS_PROPOSALS = [
+  "0xb1d1db6955a7eb3644eaf055f97dd5be8eb012a72a5a1b6a4716abda9ade9388",
+];

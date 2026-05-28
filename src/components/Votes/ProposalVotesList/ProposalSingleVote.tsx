@@ -147,7 +147,13 @@ export function ProposalSingleVote({
     if (!resolveEns) {
       return <AvatarImage alt="Delegate avatar" />;
     }
-    return <ENSAvatar ensName={ensFromBlockCache?.name} className="w-8 h-8" />;
+    return (
+      <ENSAvatar
+        ensName={ensFromBlockCache?.name}
+        className="w-8 h-8"
+        size={32}
+      />
+    );
   };
 
   return (

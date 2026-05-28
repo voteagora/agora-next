@@ -179,11 +179,7 @@ const ProposalTransactionDisplay = ({
     );
   }
 
-  const normalizedLength = Math.min(
-    targets.length,
-    calldatas.length,
-    values.length
-  );
+  const normalizedLength = Math.min(targets.length, values.length);
 
   const simulateTransactions = async () => {
     try {
