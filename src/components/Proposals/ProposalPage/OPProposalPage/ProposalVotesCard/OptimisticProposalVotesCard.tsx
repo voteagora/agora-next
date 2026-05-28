@@ -45,9 +45,9 @@ const OptimisticProposalVotesCard = ({
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
