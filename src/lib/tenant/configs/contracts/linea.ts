@@ -16,15 +16,16 @@ import {
   TIMELOCK_TYPE,
 } from "@/lib/constants";
 import { linea, lineaSepolia } from "viem/chains";
+import { getRpcUrlForChain } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  alchemyId: string;
+  rpcSecret: string;
 }
 
 export const lineaTenantConfig = ({
   isProd,
-  alchemyId,
+  rpcSecret,
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x03A61C68BF297aDffF451426ea8C491bb8F87c65"
@@ -46,19 +47,8 @@ export const lineaTenantConfig = ({
     ? "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7"
     : "0xD9B569a18FDA0B9e9b983eec885E065f032da1F7";
 
-  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
-
-  const provider = usingForkedNode
-    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : isProd
-      ? new JsonRpcProvider(
-          "https://linea-mainnet.g.alchemy.com/v2/${alchemyId}"
-        )
-      : new JsonRpcProvider(
-          "https://linea-sepolia.g.alchemy.com/v2/${alchemyId}"
-        );
-
   const chain = isProd ? linea : lineaSepolia;
+  const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
 
   return {
     token: createTokenContract({

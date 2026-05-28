@@ -16,7 +16,7 @@ import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
-import { getAlchemyId } from "@/lib/alchemyConfig";
+import { getRpcSecret } from "@/lib/rpcConfig";
 
 const BLOCKCACHE_URL = "https://blockcache-production.up.railway.app";
 
@@ -26,10 +26,10 @@ async function fetchTxHashFromBlockcache(
   transactionIndex: number
 ): Promise<string> {
   try {
-    const alchemyKey = getAlchemyId();
+    const rpcSecret = getRpcSecret();
     const response = await fetch(
       `${BLOCKCACHE_URL}/transaction/${chainId}/${blockNumber}/${transactionIndex}`,
-      { headers: { "alchemy-api-key": alchemyKey } }
+      { headers: { "rpc-secret": rpcSecret } }
     );
     if (!response.ok) return "";
     const data = await response.json();
