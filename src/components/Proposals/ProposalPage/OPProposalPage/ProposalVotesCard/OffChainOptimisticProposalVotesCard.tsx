@@ -50,7 +50,7 @@ const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const voteGroups = [
     {
       name: "Chains",
-      againstVotes: proposalResults?.CHAIN?.against || "0",
+      againstVotes: (proposalResults?.CHAIN?.against || "0").toString(),
       votePercentage:
         groupTallies
           .find((g) => g.name === "chains")
@@ -59,7 +59,7 @@ const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     },
     {
       name: "Apps",
-      againstVotes: proposalResults?.APP?.against || "0",
+      againstVotes: (proposalResults?.APP?.against || "0").toString(),
       votePercentage:
         groupTallies
           .find((g) => g.name === "apps")
@@ -68,7 +68,7 @@ const OffChainOptimisticVotesGroup = ({ proposal }: { proposal: Proposal }) => {
     },
     {
       name: "Users",
-      againstVotes: proposalResults?.USER?.against || "0",
+      againstVotes: (proposalResults?.USER?.against || "0").toString(),
       votePercentage:
         groupTallies
           .find((g) => g.name === "users")
@@ -204,7 +204,7 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
                     <VotesBar
                       forVotes={0}
                       againstVotes={totalAgainstVotes}
-                      quorumPercentage={proposalQuorum[0] || 65}
+                      quorumPercentage={proposalQuorum[0] || 20}
                       showVotesPercentage
                     />
                   </div>
@@ -283,11 +283,11 @@ const OffChainOptimisticProposalVotesCard = ({ proposal }: Props) => {
             </>
           )}
         </div>
-        <VoteOnAtlas
-          offchainProposalId={proposal.offchainProposalId || proposal.id}
-          isVotingOpen={proposal.status === "ACTIVE"}
-        />
       </div>
+      <VoteOnAtlas
+        offchainProposalId={proposal.offchainProposalId || proposal.id}
+        isVotingOpen={proposal.status === "ACTIVE"}
+      />
     </>
   );
 };

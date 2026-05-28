@@ -54,7 +54,6 @@ type RangeProposalType = {
 export const TimelineChart = ({ votes, proposal }: Props) => {
   const { data: block } = useLatestBlock({ enabled: true });
   const [chartData, setChartData] = useState<ChartData[] | null>(null);
-
   const isProposalCreatedBeforeUpgrade =
     isProposalCreatedBeforeUpgradeCheck(proposal);
 
@@ -110,6 +109,10 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
         block,
         proposalType: proposal.proposalType ?? undefined,
         governorType: contracts.governorType,
+        startBlock: proposal.startBlock,
+        endBlock: proposal.endBlock,
+        startTime: proposal.startTime,
+        endTime: proposal.endTime,
       });
       const lastPoint = transformedData[transformedData.length - 1];
       const safeLastPoint = lastPoint ?? {
@@ -312,6 +315,31 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
 };
 
 /**
+ * Interpolates a block number to a timestamp using proposal start/end block and time.
+ */
+const interpolateBlockTime = (
+  blockNumber: number | string | bigint,
+  startBlock: bigint | string | null,
+  endBlock: bigint | string | null,
+  startTime: Date | null,
+  endTime: Date | null
+): Date | null => {
+  if (!startBlock || !endBlock || !startTime || !endTime) return null;
+
+  const start = Number(startBlock);
+  const end = Number(endBlock);
+  const block = Number(blockNumber);
+
+  if (end <= start) return null;
+
+  const ratio = Math.max(0, Math.min(1, (block - start) / (end - start)));
+  const startMs = startTime.getTime();
+  const endMs = endTime.getTime();
+
+  return new Date(startMs + ratio * (endMs - startMs));
+};
+
+/**
  * Transforms an array of votes into chart data.
  */
 const transformVotesToChartData = ({
@@ -319,11 +347,19 @@ const transformVotesToChartData = ({
   block,
   proposalType,
   governorType,
+  startBlock,
+  endBlock,
+  startTime,
+  endTime,
 }: {
   votes: ChartVote[];
   block: Block;
   proposalType?: string;
   governorType?: GOVERNOR_TYPE;
+  startBlock?: bigint | string | null;
+  endBlock?: bigint | string | null;
+  startTime?: Date | null;
+  endTime?: Date | null;
 }) => {
   let forCount = 0;
   let abstain = 0;
@@ -337,7 +373,14 @@ const transformVotesToChartData = ({
     if (proposalType === "SNAPSHOT") {
       timestamp = new Date(Number(vote.created) * 1000);
     } else {
-      timestamp = getHumanBlockTime(vote.block_number, block);
+      timestamp =
+        interpolateBlockTime(
+          vote.block_number,
+          startBlock ?? null,
+          endBlock ?? null,
+          startTime ?? null,
+          endTime ?? null
+        ) ?? getHumanBlockTime(vote.block_number, block);
     }
 
     let quorumTotal = forCount + abstain + against;

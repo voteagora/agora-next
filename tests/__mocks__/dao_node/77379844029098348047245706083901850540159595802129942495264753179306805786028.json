@@ -1,0 +1,98 @@
+{
+  "after_end_block": false,
+  "after_start_block": false,
+  "block_number": "137683763",
+  "calldatas": [""],
+  "data_eng_properties": {
+    "hash": "00de21e1b582a94dce5da1190de04b1103e58626f0725cd20b0e3c59e04763a5",
+    "liveness": "live",
+    "source": "dao_node"
+  },
+  "description": "# Season 8: Intent Ratification\n\nIntents are high level strategic goals the entire Collective works towards. All contributions in the Collective should be working towards the Intents.\n\nIn Season 8, we will have one [Intent](https://gov.optimism.io/t/season-8-intent/10009), focused on a core pillar of our Superchain Product Vision: **Interoperability**. This is consistent with our Season 7 Intent, as the Collective remains focused on delivering protocol-native interop and preparing the ecosystem for successful adoption.\n\nIntent: A set of **interoperable** Stage 1 chains doing $100m per month in cross-chain asset transfers\n\nRatification implies support of this strategic goal as the main focus for the Collective during Season 8.\n\nThis proposal is eligible for Special Voting Cycle #39a: <https://gov.optimism.io/t/special-voting-cycle-roundup-39a/10064>\n\nThe proposal is subject to Joint House ratification, as outlined in the [Operating Manual](https://github.com/ethereum-optimism/OPerating-manual/blob/main/manual.md).",
+  "end_block": 137942963,
+  "end_blocktime": 1751484703,
+  "govless_proposal": {
+    "attester": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+    "calculationOptions": 0,
+    "chain_id": "10",
+    "choices": [],
+    "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+    "created_blocktime": 1750966303,
+    "criteria": 99,
+    "criteria_value": 0,
+    "data_eng_properties": {
+      "hash": "b3403bcc74e2b1444d0cfe3892e8884d70454d58b72a1fa01c19c57a483786d7",
+      "liveness": "archived",
+      "source": "eas-atlas"
+    },
+    "end_block": 137942504,
+    "end_blocktime": 1751483785,
+    "expirationTime": 0,
+    "hybrid": true,
+    "id": "48405998251522744502999146161336517858564712459537208322533788779401161220407",
+    "max_approvals": 0,
+    "num_of_votes": 576,
+    "onchain_proposalid": 77379844029098348047245706083901850540159595802129942495264753179306805786028,
+    "outcome": {
+      "APP": {
+        "1": 3
+      },
+      "CHAIN": {
+        "1": 5
+      },
+      "USER": {
+        "0": 9,
+        "1": 537,
+        "2": 22
+      }
+    },
+    "proposal_type": "STANDARD",
+    "proposal_type_id": 5,
+    "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+    "proposer_ens": null,
+    "recipient": "0x0000000000000000",
+    "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+    "revocable": true,
+    "revocationTime": 0,
+    "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+    "start_block": 137683304,
+    "start_blocktime": 1750965385,
+    "tiers": [],
+    "time": 1750966303,
+    "uid": "0xe73cdaca33221711fddfe6c7302b0f1d1d9bf093a9d04643710890d74b865fec"
+  },
+  "hybrid": true,
+  "id": "77379844029098348047245706083901850540159595802129942495264753179306805786028",
+  "lifecycle_stage": "SUCCEEDED",
+  "log_index": 12,
+  "num_of_votes": 19167,
+  "proposal_type_id": 5,
+  "proposal_type_info": {
+    "approval_threshold": 6000,
+    "module": null,
+    "name": "Joint House Standard  - [basic]",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "34810871407579755069545456",
+  "signatures": [""],
+  "start_block": 137683763,
+  "start_blocktime": 1750966303,
+  "targets": ["0x0000000000000000000000000000000000000000"],
+  "timestamp": 1750966303,
+  "title": "Season 8: Intent Ratification",
+  "total_voting_power_at_start": "116036238025265850231818187",
+  "totals": {
+    "no-param": {
+      "0": "1236339060163982872618718",
+      "1": "51160701912226686844288849",
+      "2": "682760771180322714797638"
+    }
+  },
+  "transaction_hash": "0xf982f9c701c81740918af8eebff09a29db07a19437ed614d5c7250b45e62b114",
+  "transaction_index": 5,
+  "values": [0],
+  "voting_module_name": "standard"
+}

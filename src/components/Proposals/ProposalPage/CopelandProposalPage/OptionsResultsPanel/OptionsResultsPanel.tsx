@@ -103,15 +103,39 @@ export default function OptionsResultsPanel({
 
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Filter out extended options to avoid duplicate rows
+  // Filter out extended options to avoid duplicate rows, then sort funded before unfunded
   const filteredResults = React.useMemo(() => {
     if (!proposalResults) return [];
-    return proposalResults.filter((result) => !isExtendedOption(result.option));
-  }, [proposalResults]);
+    const filtered = proposalResults.filter(
+      (result) => !isExtendedOption(result.option)
+    );
+    return filtered.sort((a, b) => {
+      const aExtended = proposalResults.find(
+        (r) =>
+          isExtendedOption(r.option) &&
+          getBaseOptionName(r.option, options) === a.option
+      );
+      const bExtended = proposalResults.find(
+        (r) =>
+          isExtendedOption(r.option) &&
+          getBaseOptionName(r.option, options) === b.option
+      );
+      const aFunded =
+        a.fundingType !== "None" ||
+        (aExtended && aExtended.fundingType !== "None");
+      const bFunded =
+        b.fundingType !== "None" ||
+        (bExtended && bExtended.fundingType !== "None");
+      if (aFunded && !bFunded) return -1;
+      if (!aFunded && bFunded) return 1;
+      return 0;
+    });
+  }, [proposalResults, options]);
 
   return (
     <div
       ref={containerRef}
+      data-testid="proposal-results-panel"
       className="flex flex-col flex-1 overflow-y-auto flex-shrink px-4 mt-1 min-h-0 [&::-webkit-scrollbar]:hidden"
     >
       <Accordion
@@ -250,8 +274,15 @@ const OptionRow = ({
             )}
           >
             <div className="w-full flex justify-between items-center text-xs">
-              <span className="font-semibold text-left truncate w-[100px]">
-                {optionName}
+              <span
+                className={cn(
+                  "font-semibold text-left",
+                  isFunding
+                    ? "truncate w-[100px]"
+                    : "flex-1 min-w-0 pr-2 whitespace-normal break-words"
+                )}
+              >
+                {isFunding ? optionName : result.option}
               </span>
               <div className="flex items-center gap-4">
                 {isFunding ? (
@@ -419,7 +450,12 @@ const OptionRow = ({
                 />
               )}
             </>
-          ) : null}
+          ) : (
+            <OptionRowDetails
+              result={result}
+              isProposalActive={isProposalActive}
+            />
+          )}
         </AccordionContent>
       </div>
     </AccordionItem>
