@@ -237,6 +237,8 @@ export type ArchiveVoteRow = {
   choice?: Array<number> | null; // for Copeland proposal type
   vp?: string | number; // for Copeland proposal type
   ts?: number | string | null;
+  created?: number | string | null; // unix seconds, snapshot archive votes
+
   x?: string | null;
   warpcast?: string | null;
   discord?: string | null;

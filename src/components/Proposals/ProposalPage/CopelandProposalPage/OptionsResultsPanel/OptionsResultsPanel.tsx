@@ -274,8 +274,15 @@ const OptionRow = ({
             )}
           >
             <div className="w-full flex justify-between items-center text-xs">
-              <span className="font-semibold text-left truncate w-[100px]">
-                {optionName}
+              <span
+                className={cn(
+                  "font-semibold text-left",
+                  isFunding
+                    ? "truncate w-[100px]"
+                    : "flex-1 min-w-0 pr-2 whitespace-normal break-words"
+                )}
+              >
+                {isFunding ? optionName : result.option}
               </span>
               <div className="flex items-center gap-4">
                 {isFunding ? (
@@ -443,7 +450,12 @@ const OptionRow = ({
                 />
               )}
             </>
-          ) : null}
+          ) : (
+            <OptionRowDetails
+              result={result}
+              isProposalActive={isProposalActive}
+            />
+          )}
         </AccordionContent>
       </div>
     </AccordionItem>

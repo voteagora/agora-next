@@ -99,8 +99,9 @@ export const PROPOSAL_PAGE_REGISTRY: Partial<
   HYBRID_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
   OFFCHAIN_OPTIMISTIC_TIERED: HybridOptimisticProposalPage,
 
-  // SNAPSHOT is not in the registry — Copeland (the only SNAPSHOT sub-type)
-  // is handled by requiresSpecialHandling() before this registry is consulted.
+  // Snapshot — only Copeland snapshot proposals are rendered in-app; other
+  // snapshot subtypes are linked out to snapshot.box from the list view.
+  SNAPSHOT: CopelandProposalPage,
 };
 
 /**
@@ -144,21 +145,4 @@ export function getProposalPageComponent(
 
   // Default to standard page
   return StandardProposalPage;
-}
-
-/**
- * Check if a proposal type requires special handling (e.g., Copeland).
- */
-export function requiresSpecialHandling(
-  proposal: Proposal
-): ProposalPageComponent | null {
-  // Copeland proposals are a special case of SNAPSHOT
-  if (proposal.proposalType === "SNAPSHOT") {
-    const proposalData = proposal.proposalData as { type?: string };
-    if (proposalData?.type === "copeland") {
-      return CopelandProposalPage;
-    }
-  }
-
-  return null;
 }

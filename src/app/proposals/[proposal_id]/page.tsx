@@ -8,10 +8,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { fetchVotableSupplyUnstableCache } from "@/app/api/common/votableSupply/getVotableSupply";
 import type { Vote } from "@/app/api/common/votes/vote";
 import { cleanString, truncateString } from "@/app/lib/utils/text";
-import {
-  getProposalPageComponent,
-  requiresSpecialHandling,
-} from "@/components/Proposals/ProposalPage/registry";
+import { getProposalPageComponent } from "@/components/Proposals/ProposalPage/registry";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import Tenant from "@/lib/tenant/tenant";
 import { calculateVoteMetadata } from "@/lib/voteUtils";
@@ -204,10 +201,7 @@ export default async function Page({
     redirect(`/proposals/${proposalData.onchainProposalId}`);
   }
 
-  // Check for special handling (e.g., Copeland)
-  const specialComponent = requiresSpecialHandling(loadedProposal);
-  const RenderComponent =
-    specialComponent || getProposalPageComponent(loadedProposal);
+  const RenderComponent = getProposalPageComponent(loadedProposal);
 
   return (
     <div className="flex justify-between mt-12">
