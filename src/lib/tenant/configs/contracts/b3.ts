@@ -7,7 +7,7 @@ import {
 import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
+import { BaseContract, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
@@ -16,15 +16,16 @@ import {
   TIMELOCK_TYPE,
 } from "@/lib/constants";
 import { base } from "viem/chains";
+import { getRpcUrlForChain } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  alchemyId: string;
+  rpcSecret: string;
 }
 
 export const b3TenantConfig = ({
   isProd,
-  alchemyId,
+  rpcSecret,
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0xB3B32F9f8827D4634fE7d973Fa1034Ec9fdDB3B3"
@@ -46,13 +47,8 @@ export const b3TenantConfig = ({
     ? "0x4990CcE6e8CD9596305b83C4860D4C0f3Bf4e8fa"
     : "0x2c349e564037e184Fe787CA4906C53507c70A7E0";
 
-  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
-
-  const provider = usingForkedNode
-    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
-    : new AlchemyProvider("base", alchemyId);
-
   const chain = base;
+  const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
 
   return {
     token: createTokenContract({

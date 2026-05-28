@@ -8,7 +8,7 @@ import {
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
 import { ProposalType } from "../app/proposals/draft/types";
-import { AlchemyProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 import {
   Address,
   hexToBigInt,
@@ -28,7 +28,7 @@ import {
   scroll,
   sepolia,
 } from "viem/chains";
-import { getAlchemyId } from "./alchemyConfig";
+import { getRpcUrl } from "./rpcConfig";
 import { fetchSafeMultisigTransactionStatus } from "./safeTransactionService";
 
 const { token } = Tenant.current();
@@ -491,86 +491,75 @@ export function toNumericChainId(
 }
 
 export const getTransportForChain = (chainId: number) => {
-  const alchemyId = getAlchemyId();
+  if (FORK_NODE_URL) {
+    return http(FORK_NODE_URL);
+  }
+
+  const rpcTransport = () => http(getRpcUrl(chainId));
 
   switch (chainId) {
     // mainnet
     case 1:
-      return http(
-        FORK_NODE_URL || `https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // optimism
     case 10:
-      return http(
-        FORK_NODE_URL || `https://opt-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // optimism sepolia
     case 11155420:
-      return http(
-        FORK_NODE_URL || `https://opt-sepolia.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // base
     case 8453:
-      return http(
-        FORK_NODE_URL || `https://base-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // arbitrum one
     case 42161:
-      return http(
-        FORK_NODE_URL || `https://arb-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // arbitrum sepolia
     case 421614:
-      return http(
-        FORK_NODE_URL || `https://arb-sepolia.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // sepolia
     case 11155111:
-      return http(
-        FORK_NODE_URL || `https://eth-sepolia.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
     // cyber
     case 7560:
       return fallback([
-        http(FORK_NODE_URL || "https://rpc.cyber.co"),
-        http(FORK_NODE_URL || "https://cyber.alt.technology"),
+        http("https://rpc.cyber.co"),
+        http("https://cyber.alt.technology"),
       ]);
 
     // scroll
     case 534_352:
       return fallback([
-        http(
-          FORK_NODE_URL ||
-            `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
-        ),
-        http(FORK_NODE_URL || "https://rpc.scroll.io"),
+        http(getRpcUrl(chainId)),
+        http("https://rpc.scroll.io"),
       ]);
 
     // derive mainnet
     case 957:
-      return http(FORK_NODE_URL || DERIVE_MAINNET_RPC);
+      return http(DERIVE_MAINNET_RPC);
 
     // derive testnet
     case 901:
-      return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
+      return http(DERIVE_TESTNET_RPC);
 
     // linea
     case 59144:
-      return http(
-        FORK_NODE_URL || `https://linea-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
 
     // linea sepolia
     case 59141:
-      return http(
-        FORK_NODE_URL || `https://linea-sepolia.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
 
     // bsc (binance smart chain)
     case 56:
-      return http(
-        FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
-      );
+      return rpcTransport();
+
+    // shape mainnet
+    case 360:
+      return rpcTransport();
+
+    // shape sepolia
+    case 11011:
+      return rpcTransport();
 
     // for each new dao with a new chainId add them here
     default:
@@ -582,7 +571,7 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   async (blockNumber: bigint) => {
     const { contracts } = Tenant.current();
     try {
-      const block = await (contracts.governor.provider as AlchemyProvider).send(
+      const block = await (contracts.governor.provider as JsonRpcProvider).send(
         "eth_getBlockByNumber",
         [`0x${blockNumber.toString(16)}`, false]
       );

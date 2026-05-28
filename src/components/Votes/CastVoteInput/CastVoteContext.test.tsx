@@ -7,7 +7,7 @@ import useStandardVoting from "@/hooks/useStandardVoting";
 import React from "react";
 
 // Mock environment variables for tests
-process.env.NEXT_PUBLIC_ALCHEMY_ID = "test-alchemy-key";
+process.env.NEXT_PUBLIC_RPC_SECRET = "test-rpc-secret";
 process.env.NEXT_PUBLIC_AGORA_ENV = "dev";
 process.env.DATABASE_URL = "dev";
 process.env.READ_WRITE_WEB2_DATABASE_URL_DEV =
@@ -41,8 +41,12 @@ vi.mock("@/app/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/alchemyConfig", () => ({
-  getAlchemyId: () => "test-alchemy-key",
+vi.mock("@/lib/rpcConfig", () => ({
+  getRpcSecret: () => "test-rpc-secret",
+  getRpcUrl: (chainId: number | string) =>
+    `https://edge.goldsky.com/standard/evm/${chainId}?secret=test-rpc-secret`,
+  getRpcUrlForChain: (chainId: number | string) =>
+    `https://edge.goldsky.com/standard/evm/${chainId}?secret=test-rpc-secret`,
 }));
 
 vi.mock("@/lib/pinata", () => ({

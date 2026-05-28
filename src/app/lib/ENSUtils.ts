@@ -1,14 +1,13 @@
 import { truncateAddress } from "@/app/lib/utils/text";
 import { isAddress } from "viem";
-import { AlchemyProvider } from "ethers";
+import { JsonRpcProvider } from "ethers";
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
-import { getAlchemyId } from "@/lib/alchemyConfig";
+import { getRpcUrl } from "@/lib/rpcConfig";
 
 // Lazy initialization to avoid issues in tests
 const getMainnetProvider = () => {
-  const alchemyId = getAlchemyId();
-  return new AlchemyProvider("mainnet", alchemyId);
+  return new JsonRpcProvider(getRpcUrl(1));
 };
 
 export const ensNameToAddress = unstable_cache(

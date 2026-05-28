@@ -10,8 +10,15 @@ if (
     process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
 }
 
-if (!process.env.JSON_RPC_URL && process.env.NEXT_PUBLIC_ALCHEMY_ID) {
-  process.env.JSON_RPC_URL = `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`;
+const rpcSecret =
+  process.env.SERVERSIDE_RPC_SECRET_DEV ||
+  process.env.SERVERSIDE_RPC_SECRET_PROD ||
+  process.env.NEXT_PUBLIC_RPC_SECRET;
+
+if (!process.env.JSON_RPC_URL && rpcSecret) {
+  process.env.JSON_RPC_URL = `https://edge.goldsky.com/standard/evm/10?secret=${encodeURIComponent(
+    rpcSecret
+  )}`;
 }
 
 export default defineConfig({
