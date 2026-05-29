@@ -28,9 +28,9 @@ test.describe("Proposal List Page Scenarios", () => {
 
     // Create proposal button should be visible when authenticated
     const createBtn = page
-      .getByRole("button", { name: /Create Proposal/i })
-      .first()
-      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+      .getByRole("button", { name: /^create proposal$/i })
+      .or(page.getByRole("link", { name: /^create proposal$/i }))
+      .first();
 
     await expect(createBtn).toBeVisible({ timeout: 15000 });
   });
@@ -47,13 +47,15 @@ test.describe("Proposal List Page Scenarios", () => {
     await page.goto("/proposals");
 
     const createBtn = page
-      .getByRole("button", { name: /Create Proposal/i })
-      .first()
-      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+      .getByRole("button", { name: /^create proposal$/i })
+      .or(page.getByRole("link", { name: /^create proposal$/i }))
+      .first();
     await createBtn.click();
 
     // Verify popup interaction for Safe proposals if applicable
-    const popupText = page.getByText(/Create as/i).first();
+    const popupText = page
+      .getByText(/Choose Proposal Flow|Two ways to proceed/i)
+      .first();
     await expect(popupText).toBeVisible({ timeout: 10000 });
   });
 
@@ -69,9 +71,9 @@ test.describe("Proposal List Page Scenarios", () => {
     await page.goto("/proposals");
 
     const createBtn = page
-      .getByRole("button", { name: /Create Proposal/i })
-      .first()
-      .or(page.getByRole("link", { name: /Create Proposal/i }).first());
+      .getByRole("button", { name: /^create proposal$/i })
+      .or(page.getByRole("link", { name: /^create proposal$/i }))
+      .first();
     await createBtn.click();
 
     // Select the direct governance track if available

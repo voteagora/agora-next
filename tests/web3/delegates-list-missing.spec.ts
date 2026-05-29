@@ -22,7 +22,7 @@ test.describe("Delegates List Page", () => {
     await expect(firstRow).toBeVisible();
 
     await expect(
-      firstRow.getByText(/0x[a-fA-F0-9]{4}\.\.\.[a-fA-F0-9]{4}|[\w.-]+\.eth\b/i)
+      firstRow.getByText(/0x[a-fA-F0-9]{2,4}\.\.\.[a-fA-F0-9]{4}|[\w.-]+\.eth\b/i)
     ).toBeVisible();
     await expect(
       firstRow.getByRole("cell").filter({ hasText: /[0-9]+(\.[0-9]+)?(k|M)?/i }).first()

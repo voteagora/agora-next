@@ -31,7 +31,10 @@ test.describe.serial("User Profile Scenarios", () => {
       await page.waitForTimeout(1000);
     }
 
-    const profileLink = page.getByRole("link", { name: "View my profile" });
+    // "View my profile" appears if the user has a statement; otherwise "Create delegate statement"
+    const profileLink = page
+      .getByRole("link", { name: /View my profile|Create delegate statement/i })
+      .first();
     await expect(profileLink).toBeVisible({ timeout: 10000 });
   });
 

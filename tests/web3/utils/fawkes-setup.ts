@@ -1,13 +1,32 @@
 import { Page, BrowserContext, expect } from "@playwright/test";
-import { FawkesClient } from "./fawkesClient";
+import { FawkesClient, createFawkesClient } from "./fawkesClient";
+
+type FawkesClientType = ReturnType<typeof createFawkesClient>;
+
+async function waitForSessionProposal(
+  client: FawkesClientType,
+  maxAttempts = 20,
+  intervalMs = 500
+): Promise<void> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const status = await client.getStatus();
+    const hasPending = (
+      status.pendingRequests as Array<[string, unknown]>
+    ).some(([key]) => key === "session_proposal");
+    if (hasPending) return;
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  }
+  throw new Error("Timed out waiting for Fawkes session proposal");
+}
 
 export async function setupFawkes(
   page: Page,
   context: BrowserContext,
-  options?: { address?: string; mnemonic?: string }
+  options?: { address?: string; mnemonic?: string },
+  client: FawkesClientType = FawkesClient
 ) {
   // 1. Initialize headless wallet (using default single-wallet seed from ENV or FawkesClient default, or impersonated address)
-  await FawkesClient.createWallet(options);
+  await client.createWallet(options);
 
   // 2. Navigate to an initial route to trigger WalletConnect (Delegates is usually a safe default)
   await page.goto("/delegates");
@@ -45,10 +64,10 @@ export async function setupFawkes(
   expect(wcUri).toContain("wc:");
 
   // 5. Connect Fawkes and approve session
-  await FawkesClient.connect(wcUri);
-  await page.waitForTimeout(1500);
+  await client.connect(wcUri);
+  await waitForSessionProposal(client);
 
-  await FawkesClient.approveSession();
+  await client.approveSession();
 
   // 6. Verify successful connection
   const profileDropdown = page.getByTestId("profile-dropdown-button");

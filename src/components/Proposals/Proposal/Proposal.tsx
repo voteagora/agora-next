@@ -65,7 +65,7 @@ export default function Proposal({
           ) : (
             <div className="flex flex-row text-xs text-secondary gap-1">
               {/* Warning: this assumes OP FND is the only proposer. Will need to maintain an array of OP Foundation proposals eventually */}
-              <div>
+              <div className="proposal-author">
                 {proposalText}{" "}
                 <span className="hidden sm:inline">
                   {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (

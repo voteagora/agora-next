@@ -49,7 +49,7 @@ test.describe
     await setupFawkes(page, context);
 
     await page.goto("/delegates");
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
 
     const delegateBtn = page
       .locator('[data-testid="delegate-card"] button', { hasText: "Delegate" })
@@ -57,16 +57,19 @@ test.describe
     await expect(delegateBtn).toBeVisible();
     await delegateBtn.click();
 
-    // Verify modal appeared and user can submit
-    const modalConfirmBtn = page.getByRole("button", {
-      name: "Submit Delegation",
+    // Verify modal appeared (dialog title contains "as your delegate")
+    await expect(page.getByText(/as your delegate/i)).toBeVisible({
+      timeout: 15000,
     });
-    await expect(modalConfirmBtn).toBeVisible({ timeout: 15000 });
+
+    // Find and click the Delegate button inside the modal (last Delegate button in DOM)
+    const modalConfirmBtn = page.getByRole("button", { name: /^Delegate$/i }).first();
+    await expect(modalConfirmBtn).toBeVisible({ timeout: 5000 });
 
     await modalConfirmBtn.click();
     await page.waitForTimeout(2000);
     // Fawkes intercepts the wallet prompt
-    await FawkesClient.confirmTransaction().catch(() => {});
+    await FawkesClient.approveRequest().catch(() => {});
   });
 
   test("DELEGATION-004: Logged-in state allows active delegation via Fawkes on List view", async ({
@@ -85,15 +88,17 @@ test.describe
     await expect(delegateBtn).toBeVisible();
     await delegateBtn.click();
 
-    // Verify modal appeared
-    const modalConfirmBtn = page.getByRole("button", {
-      name: "Submit Delegation",
+    // Verify modal appeared (dialog title contains "as your delegate")
+    await expect(page.getByText(/as your delegate/i)).toBeVisible({
+      timeout: 15000,
     });
-    await expect(modalConfirmBtn).toBeVisible({ timeout: 15000 });
+
+    const modalConfirmBtn = page.getByRole("button", { name: /^Delegate$/i }).first();
+    await expect(modalConfirmBtn).toBeVisible({ timeout: 5000 });
 
     await modalConfirmBtn.click();
     await page.waitForTimeout(2000);
-    await FawkesClient.confirmTransaction().catch(() => {});
+    await FawkesClient.approveRequest().catch(() => {});
   });
 
   test("DELEGATION-005: Logged-in state allows execution from specific delegate profile", async ({
