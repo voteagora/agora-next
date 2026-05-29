@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { HStack, VStack } from "../../Layout/Stack";
-import { formatNumber } from "@/lib/tokenUtils";
 import { formatDistanceToNow } from "date-fns";
 import InfiniteScroll from "react-infinite-scroller";
 import VoteDetailsContainer from "./DelegateVotesDetailsContainer";
@@ -13,6 +12,12 @@ import DelegateVoteIcon from "./DelegateVoteIcon";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import type { Vote } from "@/app/api/common/votes/vote";
 import LazyVotingPower from "./LazyVotingPower";
+import {
+  getProposalModuleAddresses,
+  isApprovalProposalType,
+  isOptimisticProposalType,
+  type ProposalModuleAddresses,
+} from "./proposalTypeUtils";
 
 function shortPropTitle(title: string, proosalId: string) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -28,19 +33,27 @@ function shortPropTitle(title: string, proosalId: string) {
     : title;
 }
 
-function propHeader(vote: Vote) {
+function propHeader(vote: Vote, moduleAddresses: ProposalModuleAddresses) {
   let headerString = "";
   const isTempCheck = (vote as any).isTempCheck === true;
   const noun = isTempCheck ? "temp check" : "proposal";
-  if (vote.proposalType === "STANDARD" || vote.proposalType === "OPTIMISTIC")
-    headerString = `Voted ${vote.support.toLowerCase()} this ${noun} `;
+  const isApproval = isApprovalProposalType(vote.proposalType, moduleAddresses);
 
-  if (vote.proposalType === "APPROVAL")
+  if (
+    vote.proposalType === "STANDARD" ||
+    isOptimisticProposalType(vote.proposalType, moduleAddresses)
+  ) {
+    headerString = `Voted ${vote.support.toLowerCase()} this ${noun} `;
+  }
+
+  if (isApproval) {
     if (!vote.params || vote.params?.length === 0) {
       headerString = `Abstained from voting on this proposal `;
     } else {
       headerString = `Voted on ${vote.params?.length} options in this proposal `;
     }
+  }
+
   headerString += `${formatDistanceToNow(new Date(vote.timestamp ?? 0))} ago`;
   return headerString;
 }
@@ -56,6 +69,7 @@ export default function DelegateVotes({
 }) {
   const [delegateVotes, setDelegateVotes] = useState(initialVotes.data);
   const [meta, setMeta] = useState(initialVotes.meta);
+  const moduleAddresses = useMemo(getProposalModuleAddresses, []);
 
   const fetching = useRef(false);
 
@@ -91,50 +105,57 @@ export default function DelegateVotes({
       element="main"
       className="divide-y divide-line overflow-hidden bg-neutral shadow-newDefault ring-1 ring-line rounded-xl"
     >
-      {delegateVotes.map(
-        (vote) =>
-          vote && (
-            <VoteDetailsContainer
-              key={vote.transactionHash}
-              proposalId={vote.proposalId}
-            >
-              <div>
-                <VStack className="py-4 px-6">
-                  <HStack justifyContent="justify-between" gap={2}>
-                    <VStack>
-                      <span className="text-tertiary text-xs font-medium">
-                        {`${propHeader(vote)} with `}
-                        {vote.easOodaoMetadata ? (
-                          <LazyVotingPower
-                            address={vote.address}
-                            blockNumber={
-                              vote.easOodaoMetadata.createdBlockNumber
-                            }
-                            baseWeight={vote.weight}
-                          />
-                        ) : (
-                          pluralizeVote(BigInt(vote.weight))
-                        )}
-                      </span>
-                      <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
-                        {shortPropTitle(vote.proposalTitle, vote.proposalId)}
-                      </h2>
-                    </VStack>
-                    <DelegateVoteIcon {...vote} />
-                  </HStack>
-                  {(vote.proposalType === "APPROVAL" || vote.reason) && (
-                    <VStack className="space-y-1 mt-2">
-                      {vote.proposalType === "APPROVAL" && (
-                        <ApprovalVoteReason {...vote} />
+      {delegateVotes.map((vote) => {
+        if (!vote) {
+          return null;
+        }
+
+        const isApproval = isApprovalProposalType(
+          vote.proposalType,
+          moduleAddresses
+        );
+
+        return (
+          <VoteDetailsContainer
+            key={vote.transactionHash}
+            proposalId={vote.proposalId}
+          >
+            <div>
+              <VStack className="py-4 px-6">
+                <HStack justifyContent="justify-between" gap={2}>
+                  <VStack>
+                    <span className="text-tertiary text-xs font-medium">
+                      {`${propHeader(vote, moduleAddresses)} with `}
+                      {vote.easOodaoMetadata ? (
+                        <LazyVotingPower
+                          address={vote.address}
+                          blockNumber={vote.easOodaoMetadata.createdBlockNumber}
+                          baseWeight={vote.weight}
+                        />
+                      ) : (
+                        pluralizeVote(BigInt(vote.weight))
                       )}
-                      {vote.reason && <VoteReason reason={vote.reason} />}
-                    </VStack>
-                  )}
-                </VStack>
-              </div>
-            </VoteDetailsContainer>
-          )
-      )}
+                    </span>
+                    <h2 className="px-0 pt-1 overflow-hidden text-base text-primary text-ellipsis">
+                      {shortPropTitle(vote.proposalTitle, vote.proposalId)}
+                    </h2>
+                  </VStack>
+                  <DelegateVoteIcon
+                    {...vote}
+                    moduleAddresses={moduleAddresses}
+                  />
+                </HStack>
+                {(isApproval || vote.reason) && (
+                  <VStack className="space-y-1 mt-2">
+                    {isApproval && <ApprovalVoteReason {...vote} />}
+                    {vote.reason && <VoteReason reason={vote.reason} />}
+                  </VStack>
+                )}
+              </VStack>
+            </div>
+          </VoteDetailsContainer>
+        );
+      })}
     </InfiniteScroll>
   );
 }
