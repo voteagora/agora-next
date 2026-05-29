@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const { generateJwt, getExpiry } = await import("@/app/lib/auth/serverAuth");
 
   try {
-    const { address } = await request.json();
+    const { address, chainId } = await request.json();
 
     if (!address || typeof address !== "string") {
       return NextResponse.json(
@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
 
     const scope = ["reader:public"];
     const ttl = await getExpiry();
-    const jwt = await generateJwt(address, scope, ttl);
+    const jwt = await generateJwt(address, scope, ttl, {
+      address,
+      chainId: `${chainId ?? 1}`,
+      nonce: "e2e-bypass",
+    });
 
     const responseBody = {
       access_token: jwt,
