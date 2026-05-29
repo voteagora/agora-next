@@ -221,6 +221,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "proposals/pretty-view",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },

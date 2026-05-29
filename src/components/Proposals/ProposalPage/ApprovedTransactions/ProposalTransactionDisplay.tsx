@@ -39,7 +39,10 @@ import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
 
-const PrettyButtonDisabled = () => {
+const isPrettyViewEnabled =
+  ui.toggle("proposals/pretty-view")?.enabled ?? false;
+
+const PrettyButtonDisabled = ({ message }: { message?: string }) => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
@@ -54,7 +57,7 @@ const PrettyButtonDisabled = () => {
         </TooltipTrigger>
         <TooltipContent>
           <div className="text-xs">
-            Pretty view is not yet available for this proposal.
+            {message ?? "Pretty view is not yet available for this proposal."}
           </div>
         </TooltipContent>
       </Tooltip>
@@ -127,8 +130,9 @@ const ProposalTransactionDisplay = ({
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   const allActionsSupported = areAllActionsSupported(calldatas);
+  const prettyViewAvailable = isPrettyViewEnabled && allActionsSupported;
   const [viewMode, setViewMode] = useState<"decoded" | "raw" | "pretty">(() =>
-    allActionsSupported ? "pretty" : "decoded"
+    prettyViewAvailable ? "pretty" : "decoded"
   );
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
@@ -316,7 +320,7 @@ const ProposalTransactionDisplay = ({
                   >
                     Raw
                   </button>
-                  {allActionsSupported ? (
+                  {isPrettyViewEnabled && allActionsSupported ? (
                     <button
                       className={`px-2 py-1 text-xs font-semibold ${viewMode === "pretty" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                       onClick={() => setViewMode("pretty")}
@@ -325,7 +329,13 @@ const ProposalTransactionDisplay = ({
                       Pretty
                     </button>
                   ) : (
-                    <PrettyButtonDisabled />
+                    <PrettyButtonDisabled
+                      message={
+                        isPrettyViewEnabled
+                          ? undefined
+                          : "Pretty view is not yet available."
+                      }
+                    />
                   )}
                 </div>
               </div>
@@ -393,7 +403,7 @@ const ProposalTransactionDisplay = ({
                   ))}
                 </div>
               )}
-              {viewMode === "pretty" && (
+              {isPrettyViewEnabled && viewMode === "pretty" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]

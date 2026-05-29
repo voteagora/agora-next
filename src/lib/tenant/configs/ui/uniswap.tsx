@@ -246,6 +246,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "proposals/pretty-view",
+      enabled: true,
+    },
+    {
       name: "staking",
       enabled: false,
     },
