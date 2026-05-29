@@ -60,7 +60,7 @@ export type TenantContracts = {
   timelockType?: TIMELOCK_TYPE;
   supportScopes?: boolean;
   chainForTime?: Chain;
-  providerForTime?: AlchemyProvider;
+  providerForTime?: any;
   supportScopes?: boolean;
   easRecipient?: string;
   proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;

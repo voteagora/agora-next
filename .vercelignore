@@ -1,0 +1,3 @@
+# Test infrastructure — never deploy to production
+tests/
+test-results/

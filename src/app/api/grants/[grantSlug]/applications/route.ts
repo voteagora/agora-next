@@ -10,6 +10,7 @@ import { PermissionService } from "@/server/services/permission.service";
 import { authenticateApiUser } from "@/app/lib/auth/serverAuth";
 import { extractBearerTokenFromHeader } from "@/app/lib/auth/edgeAuth";
 import { verifyJwtAndGetAddress } from "@/app/proposals/draft/actions/siweAuth";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 export const revalidate = 0;
 
@@ -190,7 +191,7 @@ function buildDynamicSchema(grant: any) {
   return z.object(allFields);
 }
 
-export async function POST(
+async function post(
   req: NextRequest,
   { params }: { params: { grantSlug: string } }
 ) {
@@ -473,6 +474,7 @@ export async function POST(
           }
         }
 
+        const { ui } = Tenant.current();
         await sendGrantConfirmationEmail({
           to: email,
           data: {
@@ -485,6 +487,11 @@ export async function POST(
             telegram_handle: telegramHandle,
             support_url:
               process.env.SUPPORT_URL || "https://support.agora.vote",
+          },
+          tenantConfig: {
+            orgName: ui.grantsEmailOrgName,
+            senderName: ui.grantsEmailSenderName,
+            followXHandle: ui.grantsFollowXHandle,
           },
         });
       } catch (emailError) {
@@ -516,3 +523,11 @@ export async function POST(
     );
   }
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.grants.applications.submit",
+  post,
+  {
+    getLabels: (_req, { params }) => ({ grantSlug: params.grantSlug }),
+  }
+);

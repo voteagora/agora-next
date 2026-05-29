@@ -58,6 +58,28 @@ export interface TransformForumTopicsOptions {
 }
 
 /**
+ * ISO instant for topic relative-time UI (e.g. list clock, topic header).
+ * Does not affect list ordering — sort by `createdAt` (or server order) separately.
+ */
+export function forumTopicDisplayTimestamp(
+  createdAt: string,
+  revealTime?: string | Date | null
+): string {
+  if (revealTime == null) return createdAt;
+  if (typeof revealTime === "string") {
+    const trimmed = revealTime.trim();
+    if (!trimmed) return createdAt;
+    const d = new Date(trimmed);
+    return Number.isNaN(d.getTime()) ? createdAt : trimmed;
+  }
+  if (revealTime instanceof Date) {
+    const t = revealTime.getTime();
+    return Number.isNaN(t) ? createdAt : revealTime.toISOString();
+  }
+  return createdAt;
+}
+
+/**
  * Normalize a forum topic title into a URL-safe slug suitable for SEO-friendly paths.
  */
 export function slugifyForumTopicTitle(title: string): string {
@@ -169,6 +191,11 @@ export function transformForumTopics(
       attachments,
       deletedAt: topic.deletedAt,
       deletedBy: topic.deletedBy,
+      revealTime: topic.revealTime
+        ? topic.revealTime instanceof Date
+          ? topic.revealTime.toISOString()
+          : new Date(topic.revealTime).toISOString()
+        : null,
     };
   });
 }

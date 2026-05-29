@@ -1,4 +1,4 @@
-import { VoterTypes } from "@/app/api/common/votes/vote";
+import type { VoterTypes } from "@/app/api/common/votes/vote";
 import { type Chain } from "viem";
 import {
   mainnet,
@@ -9,6 +9,7 @@ import {
   lineaSepolia,
   cyber,
 } from "viem/chains";
+import { TenantNamespace } from "./types";
 
 export const INDEXER_DELAY = 3000;
 
@@ -57,14 +58,19 @@ export const TENANT_NAMESPACES = {
   LINEA: "linea",
   TOWNS: "towns",
   SYNDICATE: "syndicate",
+  OG: "0g",
   DEMO2: "demo2",
   DEMO4: "demo4",
   DEMO3: "demo3",
+  SHAPE: "shape",
 } as const;
 
 // SIWE localStorage keys
 export const LOCAL_STORAGE_SIWE_JWT_KEY = "agora-siwe-jwt";
 export const LOCAL_STORAGE_SIWE_STAGE_KEY = "agora-siwe-stage";
+export const AGORA_SIGN_IN_MESSAGE = "Sign in to Agora with Ethereum";
+export const SIWE_NONCE_TTL_SECONDS = 10 * 60;
+export const SIWE_LOGIN_TTL_SECONDS = 10 * 60;
 
 // EIP-1271 magic value returned by isValidSignature on success
 export const EIP1271_MAGIC_VALUE = "0x1626ba7e";
@@ -203,6 +209,7 @@ export const ISSUES_FILTER_PARAM = "issueFilter";
 export const STAKEHOLDERS_FILTER_PARAM = "stakeholderFilter";
 
 export const OFFCHAIN_THRESHOLDS = { APP: 100, USER: 1000, CHAIN: 15 };
+export const CITIZEN_TYPES = ["USER", "APP", "CHAIN"] as const;
 
 export const HYBRID_VOTE_WEIGHTS = {
   delegates: 0.5,
@@ -242,6 +249,30 @@ export const ADMIN_TYPES: Record<string, string> = {
   super_admin: "SUPER_ADMIN",
 };
 
+export const TENANT_PROPOSAL_SOURCES: Record<
+  TenantNamespace,
+  readonly string[]
+> = {
+  optimism: ["dao-node", "eas-atlas"], // order in these will also determine, which source will be used incase of
+  ens: ["dao-node", "snapshot"],
+  derive: ["snapshot"],
+  etherfi: ["snapshot"],
+  uniswap: ["dao-node"],
+  cyber: ["dao-node"],
+  scroll: ["dao-node"],
+  linea: ["dao-node"],
+  pguild: ["dao-node"],
+  boost: ["dao-node"],
+  xai: ["dao-node"],
+  b3: ["dao-node"],
+  demo: ["dao-node"],
+  syndicate: ["eas-oodao"],
+  towns: ["eas-oodao"],
+  demo2: ["dao-node"],
+  demo4: ["dao-node"],
+  demo3: ["dao-node"],
+};
+
 // EAS Voting Types for governorless voting
 export const EAS_VOTING_TYPES = {
   STANDARD: 0, // for/against/abstain
@@ -271,11 +302,17 @@ const DEFAULT_ARCHIVE_GCS_BUCKET =
     : "https://storage.googleapis.com/cpls-usmr-dev-test-26q1";
 
 export const ARCHIVE_GCS_BUCKET =
-  process.env.NEXT_PUBLIC_ARCHIVE_GCS_BUCKET || DEFAULT_ARCHIVE_GCS_BUCKET;
+  process.env.ARCHIVE_GCS_BUCKET_OVERRIDE ||
+  process.env.NEXT_PUBLIC_ARCHIVE_GCS_BUCKET ||
+  DEFAULT_ARCHIVE_GCS_BUCKET;
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
 };
+
+// =============================================================================
+// Proposal List URL Getters
+// =============================================================================
 
 export const getArchiveSlugAllProposals = (namespace: string): string[] => {
   if (namespace === "optimism") {
@@ -310,24 +347,89 @@ export const getArchiveSnapshotProposals = (namespace: string) => {
   return `${getArchiveSlugGCSbucket(namespace)}/proposal_list/snapshot/raw.ndjson.gz`;
 };
 
+// =============================================================================
+// Single Proposal URL Getters
+// =============================================================================
+
 export const getArchiveSlugForDaoNodeProposal = (
   namespace: string,
   proposalId: string
-) => {
-  return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json`;
+): string => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/dao_node/raw/${proposalId}.json.gz`;
 };
 
 export const getArchiveSlugForEasOodaoProposal = (
   namespace: string,
   proposalId: string
-) => {
-  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json`;
+): string => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-oodao/raw/${proposalId}.json.gz`;
+};
+
+export const getArchiveSlugForEasAtlasProposal = (
+  namespace: string,
+  proposalId: string
+): string => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/eas-atlas/raw/${proposalId}.json.gz`;
+};
+
+export const getArchiveForSnapshotProposal = (
+  namespace: string,
+  proposalId: string
+): string => {
+  return `${getArchiveSlugGCSbucket(namespace)}/proposal/snapshot/raw/${proposalId}.json.gz`;
+};
+
+// =============================================================================
+// Source-based URL Mappings (must be after getter definitions)
+// =============================================================================
+
+/**
+ * Maps source names to their proposal list URL getter functions
+ */
+const SOURCE_TO_LIST_URL: Record<string, (namespace: string) => string> = {
+  dao_node: getArchiveDaoNodeProposals,
+  "dao-node": getArchiveDaoNodeProposals,
+  "eas-atlas": getArchiveEasAtlas,
+  "eas-oodao": getArchiveEasOodaoProposals,
+  snapshot: getArchiveSnapshotProposals,
+};
+
+/**
+ * Maps source names to their single proposal URL getter functions
+ */
+const SOURCE_TO_PROPOSAL_URL: Record<
+  string,
+  (namespace: string, proposalId: string) => string
+> = {
+  dao_node: getArchiveSlugForDaoNodeProposal,
+  "dao-node": getArchiveSlugForDaoNodeProposal,
+  "eas-atlas": getArchiveSlugForEasAtlasProposal,
+  "eas-oodao": getArchiveSlugForEasOodaoProposal,
+  snapshot: getArchiveForSnapshotProposal,
+};
+
+/**
+ * Gets archive URLs for a single proposal based on tenant's sources
+ */
+export const getArchiveUrlsForProposal = (
+  namespace: string,
+  proposalId: string
+): string[] => {
+  const sources = TENANT_PROPOSAL_SOURCES[namespace as TenantNamespace];
+  if (!sources || sources.length === 0) {
+    // Fallback to dao_node for unknown namespaces
+    return [getArchiveSlugForDaoNodeProposal(namespace, proposalId)];
+  }
+
+  return sources
+    .map((source) => SOURCE_TO_PROPOSAL_URL[source]?.(namespace, proposalId))
+    .filter((url): url is string => !!url);
 };
 
 export const getArchiveSlugForProposalVotes = (
   namespace: string,
   proposalId: string
-) => {
+): string => {
   return `${getArchiveSlugGCSbucket(namespace)}/votes/${proposalId}.ndjson.gz`;
 };
 
@@ -353,3 +455,11 @@ export const getEASAddress = (chainId: number) => {
   }
   return "0x0000000000000000000000000000000000000000";
 };
+
+export const CRITERIA_THRESHOLD = 0; // Options must meet a threshold
+export const CRITERIA_TOP_CHOICES = 1; // Top N options win
+
+export const BLOCKCACHEURL = "https://blockcache-production.up.railway.app";
+export const FILTERED_ENS_PROPOSALS = [
+  "0xb1d1db6955a7eb3644eaf055f97dd5be8eb012a72a5a1b6a4716abda9ade9388",
+];

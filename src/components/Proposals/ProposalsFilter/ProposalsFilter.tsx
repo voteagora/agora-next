@@ -53,7 +53,10 @@ export default function ProposalsFilter() {
   return (
     <div className="relative text-primary">
       <Listbox value={selected} onChange={handleChange}>
-        <Listbox.Button className="text-primary w-full sm:w-fit bg-neutral font-medium border-wash rounded-full py-2 px-4 flex items-center">
+        <Listbox.Button
+          data-testid="proposal-filter-dropdown"
+          className="text-primary w-full sm:w-fit bg-neutral font-medium border-wash rounded-full py-2 px-4 flex items-center"
+        >
           {
             (
               options.find((option) => option.filter === selected) ??

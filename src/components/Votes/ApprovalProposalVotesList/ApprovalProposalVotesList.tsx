@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { useAccount } from "wagmi";
-import { type Vote } from "@/app/api/common/votes/vote";
+import type {
+  Vote,
+  VotesSort,
+  VotesSortOrder,
+} from "@/app/api/common/votes/vote";
 import ApprovalProposalSingleVote from "./ApprovalProposalSingleVote";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { useProposalVotes } from "@/hooks/useProposalVotes";
@@ -12,11 +16,18 @@ import { cn } from "@/lib/utils";
 type Props = {
   fetchVotesForProposal: (
     proposalId: string,
-    pagintation: PaginationParams
+    pagintation: PaginationParams,
+    sort?: VotesSort,
+    offchainProposalId?: string,
+    sortOrder?: VotesSortOrder,
+    voterType?: string
   ) => Promise<PaginatedResult<Vote[]>>;
   fetchUserVotes: (proposalId: string, address: string) => Promise<Vote[]>;
   proposalId: string;
   isThresholdCriteria: boolean;
+  sort?: VotesSort;
+  sortOrder?: VotesSortOrder;
+  voterType?: string;
 };
 
 const LIMIT = 20;
@@ -26,12 +37,18 @@ export default function ApprovalProposalVotesList({
   fetchUserVotes,
   proposalId,
   isThresholdCriteria,
+  sort,
+  sortOrder,
+  voterType,
 }: Props) {
   const { data: fetchedVotes, isFetched } = useProposalVotes({
     enabled: true,
     limit: LIMIT,
     offset: 0,
-    proposalId: proposalId,
+    proposalId,
+    sort,
+    sortOrder,
+    voterType,
   });
 
   const fetching = useRef(false);
@@ -47,17 +64,31 @@ export default function ApprovalProposalVotesList({
   const loadMore = async () => {
     if (!fetching.current && meta?.has_next) {
       fetching.current = true;
-      const data = await fetchVotesForProposal(proposalId, {
-        limit: LIMIT,
-        offset: meta.next_offset,
-      });
-      const existingIds = new Set(proposalVotes.map((v) => v.transactionHash));
-      const uniqueVotes = data?.data?.filter(
-        (v) => !existingIds.has(v.transactionHash)
-      );
-      setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
-      setMeta(data.meta);
-      fetching.current = false;
+      try {
+        const data = await fetchVotesForProposal(
+          proposalId,
+          {
+            limit: LIMIT,
+            offset: meta.next_offset,
+          },
+          sort,
+          undefined,
+          sortOrder,
+          voterType
+        );
+        const existingIds = new Set(
+          proposalVotes.map((v) => v.transactionHash)
+        );
+        const uniqueVotes = data?.data?.filter(
+          (v) => !existingIds.has(v.transactionHash)
+        );
+        setPages((prev) => [...prev, { ...data, votes: uniqueVotes }]);
+        setMeta(data.meta);
+      } catch (error) {
+        console.error("Failed to load more approval proposal votes", error);
+      } finally {
+        fetching.current = false;
+      }
     }
   };
 
@@ -91,14 +122,7 @@ export default function ApprovalProposalVotesList({
   }, [connectedAddress, proposalId, fetchUserVotes, fetchUserVoteAndSet]);
 
   return (
-    <div
-      className={cn(
-        "overflow-y-scroll min-h-[36px]",
-        isThresholdCriteria
-          ? "max-h-[calc(100vh-560px)]"
-          : "max-h-[calc(100vh-527px)]"
-      )}
-    >
+    <div className={cn("overflow-y-scroll min-h-[36px]", "flex-1 min-h-0")}>
       <InfiniteScroll
         hasMore={meta?.has_next}
         pageStart={1}

@@ -18,8 +18,11 @@ const DropdownMenuContent = React.forwardRef<
     <DropdownMenuPrimitive.Content
       ref={ref}
       align="end"
-      className="w-[335px] rounded-xl flex flex-col justify-start items-start overflow-hidden bg-white shadow-lg z-50"
-      sideOffset={5}
+      className={cn(
+        "w-[335px] rounded-xl flex flex-col justify-start items-start overflow-hidden bg-white shadow-lg z-50",
+        className
+      )}
+      sideOffset={sideOffset}
       sticky="always"
       collisionPadding={16}
       {...props}

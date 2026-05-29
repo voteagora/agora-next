@@ -221,6 +221,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "proposals/pretty-view",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
@@ -303,6 +307,14 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
       name: "use-archive-for-vote-history",
       enabled: false,
     },
@@ -313,6 +325,32 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     {
       name: "notifications",
       enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        staking: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+        membershipAdmin: true,
+      },
+    },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
     },
   ],
 });

@@ -8,7 +8,7 @@ import {
   calculateHybridOptimisticProposalMetrics,
 } from "./proposalUtils";
 import { getHumanBlockTime } from "./blockTimes";
-import {
+import type {
   SnapshotVote,
   Vote,
   VotePayload,
@@ -679,9 +679,9 @@ export function calculateVoteMetadataMinified({
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
   const adjustedResults = {
-    for: BigInt(results.for),
-    against: BigInt(results.against),
-    abstain: BigInt(results.abstain),
+    for: BigInt(results.for || 0n),
+    against: BigInt(results.against || 0n),
+    abstain: BigInt(results.abstain || 0n),
   };
 
   if (newVote) {

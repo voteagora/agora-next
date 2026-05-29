@@ -3,46 +3,24 @@
 import { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { SnapshotVote, VotesSort } from "@/app/api/common/votes/vote";
-import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import ProposalVotesFilter from "@/components/Proposals/ProposalPage/OPProposalPage/ProposalVotesCard/ProposalVotesFilter";
-import ProposalNonVoterList from "@/components/Votes/ProposalVotesList/ProposalNonVoterList";
 import ArchiveProposalNonVoterList from "@/components/Votes/ProposalVotesList/ArchiveProposalNonVoterList";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import CopelandProposalCriteria from "../CopelandProposalCriteria/CopelandProposalCriteria";
-import CopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/CopelandProposalVotesList";
 import ArchiveCopelandProposalVotesList from "@/components/Votes/CopelandProposalVotesList/ArchiveCopelandProposalVotesList";
 import OptionsResultsPanel from "../OptionsResultsPanel/OptionsResultsPanel";
 import ProposalStatusDetail from "@/components/Proposals/ProposalStatus/ProposalStatusDetail";
 import { Button } from "@/components/ui/button";
 import { Download, Check } from "lucide-react";
-import Tenant from "@/lib/tenant/tenant";
 
 type Props = {
   proposal: Proposal;
-  fetchVotesForProposal: (
-    proposalId: string,
-    pagination?: PaginationParams,
-    sort?: VotesSort
-  ) => Promise<PaginatedResult<SnapshotVote[]>>;
-  fetchUserVotesForProposal: (
-    proposalId: string,
-    address: string | `0x${string}`
-  ) => Promise<SnapshotVote[]>;
 };
 
-export default function CopelandVotesPanel({
-  proposal,
-  fetchVotesForProposal,
-  fetchUserVotesForProposal,
-}: Props) {
+export default function CopelandVotesPanel({ proposal }: Props) {
   const [showVoters, setShowVoters] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isPending, startTransition] = useTransition();
-  const { ui } = Tenant.current();
-  const useArchiveVoteHistory = ui.toggle(
-    "use-archive-for-vote-history"
-  )?.enabled;
   const hasVotes =
     Number(
       (proposal.proposalData as ParsedProposalData["SNAPSHOT"]["kind"]).votes
@@ -84,12 +62,12 @@ export default function CopelandVotesPanel({
 
   return (
     <motion.div
-      className="flex flex-col flex-1"
+      className="flex flex-col flex-1 min-h-0 w-full"
       initial={{ opacity: 1 }}
       animate={{ opacity: isPending ? 0.3 : 1 }}
       transition={{ duration: 0.3, delay: isPending ? 0.3 : 0 }}
     >
-      <div className="flex flex-col gap-1 relative min-h-0 h-full">
+      <div className="flex flex-col gap-1 relative min-h-0 flex-1">
         {/* Tabs */}
         <div className="flex h-12 pt-4 px-4 mb-1">
           {["Results", "Votes"].map((tab, index) => (
@@ -99,6 +77,11 @@ export default function CopelandVotesPanel({
               className="text-base font-semibold pr-4 cursor-pointer"
             >
               <span
+                data-testid={
+                  tab === "Results"
+                    ? "proposal-results-tab"
+                    : "proposal-votes-tab"
+                }
                 className={
                   activeTab === index + 1 ? "text-secondary" : "text-tertiary"
                 }
@@ -151,20 +134,13 @@ export default function CopelandVotesPanel({
                 }}
               />
             </div>
-            {useArchiveVoteHistory ? (
-              showVoters ? (
-                <ArchiveCopelandProposalVotesList proposal={proposal} />
-              ) : (
-                <ArchiveProposalNonVoterList proposal={proposal} />
-              )
-            ) : showVoters ? (
-              <CopelandProposalVotesList
-                fetchVotesForProposal={fetchVotesForProposal}
-                fetchUserVotes={fetchUserVotesForProposal}
-                proposalId={proposal.id}
-              />
+            {showVoters ? (
+              <ArchiveCopelandProposalVotesList proposal={proposal} />
             ) : (
-              <ProposalNonVoterList proposal={proposal} />
+              <ArchiveProposalNonVoterList
+                proposal={proposal}
+                selectedVoterType={{ type: "ALL", value: "All" }}
+              />
             )}
           </>
         )}

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const ballotPayloadSchema = z.object({
   metric_id: z.string(),
@@ -8,7 +9,7 @@ const ballotPayloadSchema = z.object({
   locked: z.boolean(),
 });
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
@@ -50,3 +51,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.impact_metrics",
+  post
+);

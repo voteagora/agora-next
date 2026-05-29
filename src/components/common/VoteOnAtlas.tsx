@@ -7,9 +7,14 @@ const ATLAS_URL =
 
 export const VoteOnAtlas = ({
   offchainProposalId,
+  /** When false (voting ended), link copy prompts to only connect wallet. */
+  isVotingOpen = true,
 }: {
   offchainProposalId?: string;
+  isVotingOpen?: boolean;
 }) => {
+  const linkLabel = isVotingOpen ? "Vote here" : "Connect wallet here";
+
   return (
     <div className="rounded-lg border border-line p-1 bg-neutral">
       <div className="text-center justify-center">
@@ -21,7 +26,7 @@ export const VoteOnAtlas = ({
           target="_blank"
           className="text-secondary text-xs font-bold underline leading-[18px]"
         >
-          Vote here
+          {linkLabel}
         </Link>
       </div>
     </div>

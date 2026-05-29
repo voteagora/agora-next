@@ -1,0 +1,101 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "141357360",
+  "data_eng_properties": {
+    "hash": "synthetic-hybrid-optimistic-tiered-defeated",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [[2000, true]],
+  "description": "# [SYNTHETIC] Hybrid Optimistic Tiered — vetoed\n\nDelegate house and Users house each exceed tier[0]=55%, triggering the 2-of-4 veto rule.",
+  "end_block": 141616560,
+  "end_blocktime": 1758831897,
+  "govless_proposal": {
+    "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "calculationOptions": 0,
+    "chain_id": "10",
+    "choices": [],
+    "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+    "created_blocktime": 1758313523,
+    "criteria": 99,
+    "criteria_value": 0,
+    "data_eng_properties": {
+      "hash": "synthetic-hybrid-optimistic-tiered-defeated-govless",
+      "liveness": "archived",
+      "source": "eas-atlas"
+    },
+    "end_block": 141616567,
+    "end_blocktime": 1758831911,
+    "expirationTime": 0,
+    "hybrid": true,
+    "id": "99000000000000000000000000000000000000000000000000000000000000000000000000112",
+    "max_approvals": 0,
+    "num_of_votes": 870,
+    "onchain_proposalid": 99000000000000000000000000000000000000000000000000000000000000000000000000012,
+    "outcome": {
+      "APP": {
+        "0": 5,
+        "1": 2,
+        "2": 1
+      },
+      "CHAIN": {
+        "0": 1,
+        "1": 1,
+        "2": 0
+      },
+      "USER": {
+        "0": 600,
+        "1": 150,
+        "2": 100
+      }
+    },
+    "proposal_type": "OPTIMISTIC_TIERED",
+    "proposal_type_id": 2,
+    "proposer": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "proposer_ens": null,
+    "recipient": "0x0000000000000000",
+    "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+    "revocable": true,
+    "revocationTime": 0,
+    "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+    "start_block": 141357367,
+    "start_blocktime": 1758313511,
+    "tiers": [55, 45, 35],
+    "time": 1758313523,
+    "uid": "0x0000000000000000000000000000000000000000000000000000000000000112"
+  },
+  "hybrid": true,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000012",
+  "lifecycle_stage": "DEFEATED",
+  "log_index": 1,
+  "num_of_votes": 3200,
+  "proposal_data": "00000000000000000000000000000000000000000000000000000000000007d00000000000000000000000000000000000000000000000000000000000000001",
+  "proposal_type_id": 2,
+  "proposal_type_info": {
+    "approval_threshold": 0,
+    "module": null,
+    "name": "Optimistic",
+    "quorum": 0,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "29048439693532197051157636",
+  "start_block": 141357360,
+  "start_blocktime": 1758313497,
+  "timestamp": 1758313497,
+  "title": "[SYNTHETIC] Hybrid Optimistic Tiered — Vetoed",
+  "total_voting_power_at_start": "96828132311773990170525455",
+  "totals": {
+    "no-param": {
+      "0": "60000000000000000000000000",
+      "1": "1000000000000000000000000",
+      "2": "500000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000012",
+  "transaction_index": 1,
+  "voting_module": "0x8980c97f0e8a3a69831139e51003e65238f1f343",
+  "voting_module_name": "optimistic"
+}

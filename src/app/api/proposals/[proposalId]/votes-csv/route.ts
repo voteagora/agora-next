@@ -1,50 +1,104 @@
-import { NextRequest, NextResponse } from "next/server";
-import { fetchSnapshotVotesForProposal } from "@/app/api/common/votes/getVotes";
+import { NextRequest } from "next/server";
 import { fetchProposalUnstableCache } from "@/app/api/common/proposals/getProposals";
+import { fetchSnapshotVotesForProposal } from "@/app/api/common/votes/getVotes";
+import {
+  fetchProposalFromArchive,
+  fetchRawProposalVotesFromArchive,
+} from "@/lib/archiveUtils";
+import { archiveToProposal } from "@/lib/proposals";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import { Proposal } from "@/app/api/common/proposals/proposal";
+import Tenant from "@/lib/tenant/tenant";
+
+type CsvRow = {
+  address: string;
+  votingPower: string | number;
+  ranking: string;
+};
+
+async function loadProposal(proposalId: string): Promise<Proposal> {
+  const { namespace, token, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
+
+  if (useArchive) {
+    const archiveProposal = await fetchProposalFromArchive(
+      namespace,
+      proposalId
+    );
+
+    if (archiveProposal) {
+      return await archiveToProposal(archiveProposal, {
+        namespace,
+        tokenDecimals: token.decimals ?? 18,
+      });
+    }
+
+    throw new Error("Proposal not found in archive");
+  }
+
+  return await fetchProposalUnstableCache(proposalId);
+}
+
+async function loadVoteRows(
+  proposal: Proposal,
+  proposalId: string
+): Promise<CsvRow[]> {
+  const { namespace, ui } = Tenant.current();
+  const useArchive = ui.toggle("use-archive-for-proposal-details")?.enabled;
+
+  const choices = (
+    proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
+  ).choices;
+
+  if (useArchive) {
+    const archiveVotes = await fetchRawProposalVotesFromArchive({
+      namespace,
+      proposalId,
+    });
+
+    return archiveVotes.map((vote) => ({
+      address: vote.voter,
+      votingPower: vote.vp ?? vote.weight ?? 0,
+      ranking: (vote.choice ?? []).map((rank) => choices[rank - 1]).join(","),
+    }));
+  }
+
+  const snapshotVotes = await fetchSnapshotVotesForProposal({
+    proposalId,
+    pagination: { offset: 0, limit: 100000 },
+  });
+
+  return snapshotVotes.data.map((vote) => {
+    const parsedChoice = vote.choice?.startsWith("[")
+      ? (JSON.parse(vote.choice) as number[])
+      : [];
+
+    return {
+      address: vote.address,
+      votingPower: vote.votingPower,
+      ranking: parsedChoice.map((rank) => choices[rank - 1]).join(","),
+    };
+  });
+}
 
 export async function GET(
   request: NextRequest,
   route: { params: { proposalId: string } }
 ) {
   try {
-    const [proposal, snapshotVotes] = await Promise.all([
-      fetchProposalUnstableCache(route.params.proposalId),
-      fetchSnapshotVotesForProposal({
-        proposalId: route.params.proposalId,
-        pagination: {
-          offset: 0,
-          limit: 100000,
-        },
-      }),
-    ]);
+    const proposalId = route.params.proposalId;
+    const proposal = await loadProposal(proposalId);
+    const rows = await loadVoteRows(proposal, proposalId);
 
-    const choices = (
-      proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
-    ).choices;
-
-    // Create CSV header
     let csvContent = "Voter Address,Voting Power,Choice Ranking\n";
+    for (const row of rows) {
+      csvContent += `${row.address},${row.votingPower},"${row.ranking}"\n`;
+    }
 
-    // Add each vote to the CSV
-    snapshotVotes.data.forEach((vote) => {
-      const parsedChoice = vote.choice?.startsWith("[")
-        ? JSON.parse(vote.choice)
-        : vote.choice;
-
-      // Create a mapping of choice index to option name
-      const ranking = (parsedChoice as number[])
-        .map((rank) => choices[rank - 1])
-        .join(",");
-
-      csvContent += `${vote.address},${vote.votingPower},"${ranking}"\n`;
-    });
-
-    // Return CSV file
     return new Response(csvContent, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename="votes-${route.params.proposalId}-${Date.now()}.csv"`,
+        "Content-Disposition": `attachment; filename="votes-${proposalId}-${Date.now()}.csv"`,
       },
     });
   } catch (e: any) {

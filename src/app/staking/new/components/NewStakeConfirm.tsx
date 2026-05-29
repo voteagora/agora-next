@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import {
   useSimulateContract,
@@ -14,6 +14,13 @@ import { RedirectAfterSuccess } from "@/app/staking/components/RedirectAfterSucc
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useTokenAllowance } from "@/hooks/useTokenAllowance";
 import { PanelSetAllowance } from "@/app/staking/components/PanelSetAllowance";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 interface NewStakeConfirmProps {
   amount: number;
@@ -29,6 +36,7 @@ export const NewStakeConfirm = ({
   refreshPath,
 }: NewStakeConfirmProps) => {
   const { token, contracts } = Tenant.current();
+  const traceRef = useRef<FrontendMiradorTrace>(null);
 
   // Check if a user has allowed the staking contract to spend their tokens
   const { data: allowance, isFetched: isLoadedAllowance } =
@@ -58,8 +66,138 @@ export const NewStakeConfirm = ({
   });
 
   const { data, writeContract: write } = useWriteContract();
-  const { isLoading } = useWaitForTransactionReceipt({ hash: data });
+  const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({
+    hash: data,
+  });
   const isTransactionConfirmed = Boolean(data && !isLoading);
+
+  useEffect(() => {
+    if (isSuccess && traceRef.current) {
+      attachMiradorTransactionArtifacts(traceRef.current, {
+        chainId: contracts.staker!.chain.id,
+        inputData:
+          config?.request &&
+          "data" in config.request &&
+          typeof config.request.data === "string"
+            ? config.request.data
+            : undefined,
+        txHash: data,
+        txDetails: "Stake transaction",
+      });
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "staking_submit_succeeded",
+        eventName: "staking_submit_succeeded",
+        details: {
+          amount: amountToStake.toString(),
+          delegate,
+          transactionHash: data,
+        },
+      });
+      traceRef.current = null;
+      return;
+    }
+
+    if (isError && traceRef.current) {
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "staking_submit_failed",
+        eventName: "staking_submit_failed",
+        details: {
+          amount: amountToStake.toString(),
+          delegate,
+        },
+      });
+      traceRef.current = null;
+    }
+  }, [
+    amountToStake,
+    config?.request,
+    contracts.staker,
+    data,
+    delegate,
+    isError,
+    isSuccess,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (!traceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "staking_submit_unmounted",
+        eventName: "staking_submit_unmounted",
+        details: {
+          amount: amountToStake.toString(),
+          delegate,
+        },
+      });
+      traceRef.current = null;
+    };
+  }, [amountToStake, delegate]);
+
+  const handleStake = () => {
+    if (!config?.request) {
+      return;
+    }
+
+    if (traceRef.current) {
+      void closeFrontendMiradorFlowTrace(traceRef.current, {
+        reason: "staking_submit_restarted",
+        eventName: "staking_submit_restarted",
+        details: {
+          amount: amountToStake.toString(),
+          delegate,
+        },
+      });
+    }
+
+    const trace = startFrontendMiradorFlowTrace({
+      name: "StakingAction",
+      flow: MIRADOR_FLOW.staking,
+      step: "stake_submit",
+      context: {
+        walletAddress: depositor,
+        chainId: contracts.staker!.chain.id,
+      },
+      tags: ["staking", "frontend"],
+      attributes: {
+        action: "stake",
+        amount: amountToStake.toString(),
+        delegate,
+      },
+      startEventName: "staking_submit_started",
+      startEventDetails: {
+        amount: amountToStake.toString(),
+        delegate,
+      },
+    });
+    traceRef.current = trace;
+    attachMiradorTransactionArtifacts(trace, {
+      chainId: contracts.staker!.chain.id,
+      inputData:
+        "data" in config.request && typeof config.request.data === "string"
+          ? config.request.data
+          : undefined,
+    });
+
+    try {
+      write(config.request);
+    } catch (error) {
+      void closeFrontendMiradorFlowTrace(trace, {
+        reason: "staking_submit_failed",
+        eventName: "staking_submit_failed",
+        details: {
+          amount: amountToStake.toString(),
+          delegate,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
+      if (traceRef.current === trace) {
+        traceRef.current = null;
+      }
+    }
+  };
 
   return (
     <div className="rounded-xl border border-line bg-wash w-[354px] p-4 shadow-newDefault">
@@ -96,9 +234,7 @@ export const NewStakeConfirm = ({
               <Button
                 className="w-full"
                 disabled={isLoading || !Boolean(config?.request)}
-                onClick={() => {
-                  write(config!.request);
-                }}
+                onClick={handleStake}
               >
                 {isLoading
                   ? "Staking..."

@@ -185,12 +185,43 @@ If you need help creating transactions / calldata, please see this [video](https
       },
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        governanceAdmin: true,
+      },
+    },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposal-types",
       enabled: false,
     },
     {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
       name: "use-archive-for-vote-history",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "forums",

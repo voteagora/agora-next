@@ -107,7 +107,5 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
-  } finally {
-    await prismaWeb2Client.$disconnect();
   }
 }

@@ -8,6 +8,8 @@ type DraftAuthorizationContext = {
   draft: {
     id: number;
     author_address: string;
+    dao_slug?: string;
+    chain_id?: number;
     proposal_scope?: string | null;
   };
   normalizedAddress: string;
@@ -31,6 +33,8 @@ export async function getDraftAuthorizationContext(params: {
     select: {
       id: true,
       author_address: true,
+      dao_slug: true,
+      chain_id: true,
       ...(includeProposalScope ? { proposal_scope: true } : {}),
     },
   });

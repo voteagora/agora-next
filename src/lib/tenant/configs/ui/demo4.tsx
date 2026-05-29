@@ -401,11 +401,31 @@ export const demo4TenantUIConfig = new TenantUI({
     },
 
     {
-      name: "use-archive-for-proposals",
+      name: "safe-proposal-choice",
 
       enabled: true,
     },
 
+    {
+      name: "safe-tracking",
+
+      enabled: true,
+
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+
+    {
+      name: "use-archive-for-proposals",
+
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
     {
       name: "use-archive-for-proposal-details",
 
@@ -532,7 +552,9 @@ export const demo4TenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6 font-medium">DUNA DISCLOSURES</div>
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+              DUNA DISCLOSURES
+            </div>
 
             <div className="font-medium">
               <p className="mt-2">
@@ -652,7 +674,7 @@ export const demo4TenantUIConfig = new TenantUI({
       enabled: true,
 
       config: {
-        title: "Voting in the Canopy Agora",
+        title: "Canopy Agora Voting",
 
         sections: [
           {

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAlchemyId } from "@/lib/alchemyConfig";
+import { getRpcSecret } from "@/lib/rpcConfig";
+import { BLOCKCACHEURL } from "@/lib/constants";
 
 interface UseBlockCacheWrappedEnsProps {
   address: `0x${string}`;
@@ -19,21 +20,13 @@ const useBlockCacheWrappedEns = ({
 }: UseBlockCacheWrappedEnsProps) => {
   const { data } = useQuery<EnsData>({
     queryKey: ["blockCacheEns", chainId, address],
-    queryFn: async () => {
-      const headers: HeadersInit = {};
-
-      // Add Alchemy API key header if available
-      try {
-        const alchemyId = getAlchemyId();
-        headers["alchemy-api-key"] = alchemyId;
-      } catch (error) {
-        // Key not available, continue without it
-      }
-
+    queryFn: async ({ signal }) => {
+      const rpcSecret = getRpcSecret();
       const response = await fetch(
-        `https://blockcache-production.up.railway.app/ens_avatar/${chainId}/${address}`,
+        `${BLOCKCACHEURL}/ens_avatar/${chainId}/${address}`,
         {
-          headers,
+          headers: { "rpc-secret": rpcSecret },
+          signal,
         }
       );
 

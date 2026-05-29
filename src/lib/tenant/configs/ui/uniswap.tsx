@@ -246,6 +246,10 @@ export const uniswapTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "proposals/pretty-view",
+      enabled: true,
+    },
+    {
       name: "staking",
       enabled: false,
     },
@@ -263,9 +267,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
-        minBalance: "0.1",
+            ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
+        minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },
     },
@@ -275,9 +279,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-            ? "0xc1B333d56Af681F4Db3194F8Dc6cEdF860a8c950"
-            : "0xaA8cdaE56695d3E4e082F28c37209bACd6B09779",
-        minBalance: "0.1",
+            ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
+        minBalance: "0.001",
         minVPToUseGasRelay: "10",
       },
     },
@@ -353,6 +357,32 @@ export const uniswapTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        staking: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+        membershipAdmin: true,
+      },
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposals",
       enabled: false,
     },
@@ -374,7 +404,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "hide-info-tabs",
@@ -386,7 +416,15 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "use-archive-for-vote-history",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
     },
     {
       name: "duna-description",
@@ -420,7 +458,9 @@ export const uniswapTenantUIConfig = new TenantUI({
       config: {
         content: (
           <>
-            <div className="mb-6">DUNI Disclosures</div>
+            <div className="mb-6 text-base font-semibold text-tertiary uppercase tracking-wide">
+              DUNI Disclosures
+            </div>
 
             <div>
               <p className="mt-2">

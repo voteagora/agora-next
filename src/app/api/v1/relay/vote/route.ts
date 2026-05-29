@@ -1,13 +1,36 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { getMiradorTraceContextFromHeaders } from "@/lib/mirador/requestContext";
+import {
+  appendServerTraceEvent,
+  withMiradorTraceStep,
+} from "@/lib/mirador/serverTrace";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { z } = await import("zod");
   const { voteBySignatureApi } = await import("./castVote");
+  const baseTraceContext = getMiradorTraceContextFromHeaders(request);
+  const traceContext = baseTraceContext
+    ? {
+        ...baseTraceContext,
+        flow: baseTraceContext.flow ?? MIRADOR_FLOW.governanceVote,
+      }
+    : undefined;
 
   const authResponse = await authenticateApiUser(request);
 
   if (!authResponse.authenticated) {
+    appendServerTraceEvent({
+      traceContext: withMiradorTraceStep(
+        traceContext,
+        "relay_vote_auth",
+        "api"
+      ),
+      eventName: "relay_vote_auth_failed",
+      details: { reason: authResponse.failReason },
+    });
     return new Response(authResponse.failReason, { status: 401 });
   }
 
@@ -21,16 +44,42 @@ export async function POST(request: NextRequest) {
     });
 
     const parsedBody = voteRequestSchema.parse(body);
+    appendServerTraceEvent({
+      traceContext: withMiradorTraceStep(
+        traceContext,
+        "relay_vote_request_validated",
+        "api"
+      ),
+      eventName: "relay_vote_request_validated",
+      details: {
+        proposalId: parsedBody.proposalId,
+        support: parsedBody.support,
+      },
+    });
 
     const voteTxHash = await voteBySignatureApi({
       signature: parsedBody.signature as `0x${string}`,
       proposalId: parsedBody.proposalId,
       support: parsedBody.support,
+      traceContext,
     });
     return NextResponse.json(voteTxHash);
   } catch (e: any) {
+    appendServerTraceEvent({
+      traceContext: withMiradorTraceStep(
+        traceContext,
+        "relay_vote_request_failed",
+        "api"
+      ),
+      eventName: "relay_vote_request_failed",
+      details: {
+        message: e instanceof Error ? e.message : String(e),
+      },
+    });
     return new Response("Internal server error: " + e.toString(), {
       status: 500,
     });
   }
 }
+
+export const POST = withApiRouteMonitoring("api.v1.relay.vote", post);

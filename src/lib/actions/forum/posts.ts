@@ -30,9 +30,6 @@ import { getIPFSUrl } from "@/lib/pinata";
 import { stripHtmlToText } from "@/app/forums/stripHtml";
 import {
   addRecipientAttributeValue,
-  buildForumPostUrl,
-  buildForumTopicUrl,
-  buildProfileUrl,
   emitCompoundEvent,
   emitDirectEvent,
   formatAddressForNotification,
@@ -170,11 +167,10 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
         `${topic.id}:${normalizedVoter}`,
         {
           dao_name: slug,
+          topic_id: topic.id,
           topic_title: topic.title,
-          topic_url: buildForumTopicUrl(topic.id, topic.title),
           voter_address: normalizedVoter,
           voter_display_name: voterDisplayName,
-          voter_profile_url: buildProfileUrl(normalizedVoter),
         }
       );
     }
@@ -467,12 +463,10 @@ export async function createForumPost(
 
     if (!isNsfw) {
       const preview = buildPreview(validatedData.content);
-      const topicUrl = buildForumTopicUrl(topicId, topic.title);
 
-      // Format address for display (ENS or truncated) and build profile URL
+      // Format address for display (ENS or truncated)
       const authorDisplayName =
         await formatAddressForNotification(normalizedAddress);
-      const authorProfileUrl = buildProfileUrl(normalizedAddress);
 
       const dedupeGroup = "forum_post_created";
       const dedupeKey = `forum_post:${newPost.id}`;
@@ -483,8 +477,6 @@ export async function createForumPost(
         parentPost?.address &&
         parentPost.address.toLowerCase() !== normalizedAddress
       ) {
-        // Link directly to the reply post
-        const postUrl = buildForumPostUrl(topicId, topic.title, newPost.id);
         candidates.push({
           kind: "direct",
           eventType: "forum_reply_to_your_comment",
@@ -492,12 +484,12 @@ export async function createForumPost(
           recipientIds: [parentPost.address],
           data: {
             dao_name: slug,
+            topic_id: topicId,
+            post_id: newPost.id,
             topic_title: topic.title,
-            topic_url: postUrl,
             reply_preview: preview,
             replier_address: normalizedAddress,
             replier_display_name: authorDisplayName,
-            replier_profile_url: authorProfileUrl,
           },
         });
       }
@@ -514,12 +506,11 @@ export async function createForumPost(
           },
           data: {
             dao_name: slug,
+            topic_id: topicId,
             topic_title: topic.title,
-            topic_url: topicUrl,
             comment_preview: preview,
             author_address: normalizedAddress,
             author_display_name: authorDisplayName,
-            author_profile_url: authorProfileUrl,
           },
         },
         {
@@ -532,12 +523,11 @@ export async function createForumPost(
           },
           data: {
             dao_name: slug,
+            topic_id: topicId,
             topic_title: topic.title,
-            topic_url: topicUrl,
             comment_preview: preview,
             author_address: normalizedAddress,
             author_display_name: authorDisplayName,
-            author_profile_url: authorProfileUrl,
           },
         }
       );

@@ -1,0 +1,106 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "138893255",
+  "data_eng_properties": {
+    "hash": "synthetic-hybrid-approval-succeeded-topchoices",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [
+    [
+      [0, [], [], [], "Candidate A"],
+      [0, [], [], [], "Candidate B"],
+      [0, [], [], [], "Candidate C"]
+    ],
+    [3, 0, "0x0000000000000000000000000000000000000000", 0, 0]
+  ],
+  "description": "# [SYNTHETIC] Hybrid Approval — SUCCEEDED via TOP_CHOICES criteria\n\nCriteria = 0 (top-N). Once participation ≥ 30%, SUCCEEDED is automatic regardless of per-option thresholds.",
+  "end_block": 139152455,
+  "end_blocktime": 1753903687,
+  "govless_proposal": {
+    "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "calculationOptions": 0,
+    "chain_id": "10",
+    "choices": ["Candidate A", "Candidate B", "Candidate C"],
+    "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+    "created_blocktime": 1753386147,
+    "criteria": 0,
+    "criteria_value": 0,
+    "data_eng_properties": {
+      "hash": "synthetic-hybrid-approval-topchoices-govless",
+      "liveness": "archived",
+      "source": "eas-atlas"
+    },
+    "end_block": 139152878,
+    "end_blocktime": 1753904533,
+    "expirationTime": 0,
+    "hybrid": true,
+    "id": "99000000000000000000000000000000000000000000000000000000000000000000000000110",
+    "max_approvals": 3,
+    "num_of_votes": 1200,
+    "onchain_proposalid": 99000000000000000000000000000000000000000000000000000000000000000000000000010,
+    "outcome": {
+      "APP": {
+        "0": { "1": 60 },
+        "1": { "1": 55 },
+        "2": { "1": 40 }
+      },
+      "CHAIN": {
+        "0": { "1": 10 },
+        "1": { "1": 8 },
+        "2": { "1": 6 }
+      },
+      "USER": {
+        "0": { "1": 700 },
+        "1": { "1": 600 },
+        "2": { "1": 450 }
+      }
+    },
+    "proposal_type": "APPROVAL",
+    "proposal_type_id": 3,
+    "proposer": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "proposer_ens": null,
+    "recipient": "0x0000000000000000",
+    "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+    "revocable": true,
+    "revocationTime": 0,
+    "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+    "start_block": 138893678,
+    "start_blocktime": 1753386133,
+    "tiers": [],
+    "time": 1753386147,
+    "uid": "0x0000000000000000000000000000000000000000000000000000000000000110"
+  },
+  "hybrid": true,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000010",
+  "lifecycle_stage": "SUCCEEDED",
+  "log_index": 1,
+  "num_of_votes": 5000,
+  "proposal_type_id": 3,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "Default - Approval Voting",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "34810871407579755069545456",
+  "start_block": 138893255,
+  "start_blocktime": 1753385287,
+  "timestamp": 1753385287,
+  "title": "[SYNTHETIC] Hybrid Approval — Top-Choices Succeeded",
+  "total_voting_power_at_start": "116036238025265850231818187",
+  "totals": {
+    "0": { "1": "42000000000000000000000000" },
+    "1": { "1": "40000000000000000000000000" },
+    "2": { "1": "30000000000000000000000000" },
+    "no-param": { "1": "42000000000000000000000000" }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000010",
+  "transaction_index": 1,
+  "voting_module": "0x8060b18290f48fc0bf2149eeb2f3c280bde7674f",
+  "voting_module_name": "approval"
+}

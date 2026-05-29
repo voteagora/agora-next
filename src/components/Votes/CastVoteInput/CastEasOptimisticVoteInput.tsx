@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/tooltip";
 import { parseVoteError } from "@/lib/voteErrorUtils";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
+import { DisabledVoteButton } from "../components/DisabledVoteButton";
 
 interface CastEasOptimisticVoteInputProps {
   proposal: Proposal;
@@ -39,6 +40,15 @@ export default function CastEasOptimisticVoteInput({
 
   const now = new Date();
   const hasNotStarted = proposal.startTime && proposal.startTime > now;
+
+  if (proposal.status !== "ACTIVE") {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
+        <DisabledVoteButton reason="Not open to voting" />
+      </div>
+    );
+  }
+
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">

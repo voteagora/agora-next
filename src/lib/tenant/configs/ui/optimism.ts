@@ -244,6 +244,7 @@ export const optimismTenantUIConfig = new TenantUI({
         allowDraftSharing: true,
         offchainProposalCreator: [
           "0xb8CF6C0425FD799D617351C24fF35B493eD06Cb4", // Jonas's prod EOA
+          "0x648BFC4dB7e43e799a84d0f607aF0b4298F932DB",
         ],
         stages: [
           {
@@ -321,12 +322,40 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
       },
     },
     {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "delegation-encouragement",
       enabled: true,
     },
     {
+      name: "mirador",
+      enabled: true,
+      config: {
+        proposalCreation: true,
+        siweLoginTracing: true,
+        governanceVote: true,
+        governanceDelegation: true,
+        governanceAdmin: true,
+        proposalAttestation: true,
+      },
+    },
+    {
       name: "use-archive-for-proposals",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
     },
     {
       name: "use-daonode-for-proposals",

@@ -8,7 +8,7 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/Button";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   AgoraLoaderSmall,
   LogoLoader,
@@ -20,10 +20,17 @@ import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { DelegateePayload } from "@/app/api/common/delegations/delegation";
 import Tenant from "@/lib/tenant/tenant";
 import { revalidateData } from "./revalidateAction";
-import { formatEther, zeroAddress } from "viem";
+import { encodeFunctionData, formatEther, zeroAddress } from "viem";
 import { useSponsoredDelegation } from "@/hooks/useSponsoredDelegation";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
+import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import {
+  attachMiradorTransactionArtifacts,
+  closeFrontendMiradorFlowTrace,
+  FrontendMiradorTrace,
+  startFrontendMiradorFlowTrace,
+} from "@/lib/mirador/frontendFlowTrace";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -32,6 +39,7 @@ interface UndelegateActionButtonsProps {
   executeDelegate: () => void;
   isError: boolean;
   didFailDelegation: boolean;
+  didFailSponsoredUnelegation: boolean;
   isProcessingDelegation: boolean;
   isProcessingSponsoredUnelegation: boolean;
   didProcessDelegation: boolean;
@@ -48,6 +56,7 @@ const UndelegateActionButtons = ({
   executeDelegate,
   isError,
   didFailDelegation,
+  didFailSponsoredUnelegation,
   isProcessingDelegation,
   isProcessingSponsoredUnelegation,
   didProcessDelegation,
@@ -64,7 +73,7 @@ const UndelegateActionButtons = ({
     );
   }
 
-  if (isError || didFailDelegation) {
+  if (isError || didFailDelegation || didFailSponsoredUnelegation) {
     return (
       <Button disabled={false} onClick={executeDelegate}>
         Undelegation failed - try again
@@ -116,6 +125,7 @@ export function UndelegateDialog({
   ) => Promise<DelegateePayload | null>;
 }) {
   const { ui, contracts, token } = Tenant.current();
+  const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
   const { address: accountAddress } = useAccount();
   const [votingPower, setVotingPower] = useState<string>("");
@@ -150,6 +160,7 @@ export function UndelegateDialog({
     call,
     isFetching: isProcessingSponsoredUnelegation,
     isFetched: didProcessSponsoredUnelegation,
+    isError: didFailSponsoredUnelegation,
     txHash: sponsoredTxnHash,
   } = useSponsoredDelegation({
     address: accountAddress,
@@ -172,7 +183,7 @@ export function UndelegateDialog({
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
   } = useWaitForTransactionReceipt({
-    hash: isGasRelayLive ? sponsoredTxnHash : delegateTxHash,
+    hash: isGasRelayLive ? undefined : delegateTxHash,
   });
 
   const fetchData = useCallback(async () => {
@@ -194,11 +205,51 @@ export function UndelegateDialog({
     if (isGasRelayLive) {
       await call();
     } else {
+      if (delegationTraceRef.current) {
+        void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+          reason: "governance_delegation_restarted",
+          eventName: "governance_delegation_restarted",
+          details: {
+            delegatee: zeroAddress,
+            action: "undelegate",
+          },
+        });
+      }
+      const inputData = encodeFunctionData({
+        abi: contracts.token.abi as any,
+        functionName: "delegate",
+        args: [zeroAddress],
+      });
+      const trace = startFrontendMiradorFlowTrace({
+        name: "GovernanceDelegation",
+        flow: MIRADOR_FLOW.governanceDelegation,
+        step: "undelegation_submit",
+        context: {
+          walletAddress: accountAddress,
+          chainId: contracts.token.chain.id,
+        },
+        tags: ["governance", "delegation", "frontend"],
+        attributes: {
+          delegatee: zeroAddress,
+          delegationAction: "undelegate",
+        },
+        startEventName: "governance_delegation_started",
+        startEventDetails: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+        },
+      });
+      delegationTraceRef.current = trace;
+      attachMiradorTransactionArtifacts(trace, {
+        chainId: contracts.token.chain.id,
+        inputData,
+      });
       write({
         address: contracts.token.address as any,
         abi: contracts.token.abi,
         functionName: "delegate",
         args: [zeroAddress],
+        chainId: contracts.token.chain.id,
       });
     }
   };
@@ -207,8 +258,30 @@ export function UndelegateDialog({
     if (!isReady) {
       fetchData();
     }
+  }, [isReady, fetchData]);
 
+  useEffect(() => {
     if (didProcessDelegation) {
+      if (delegationTraceRef.current) {
+        attachMiradorTransactionArtifacts(delegationTraceRef.current, {
+          chainId: contracts.token.chain.id,
+          txHash: delegateTxHash,
+          txDetails: "Undelegation transaction",
+        });
+        void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+          reason: "governance_delegation_succeeded",
+          eventName: "governance_delegation_succeeded",
+          details: {
+            delegatee: zeroAddress,
+            action: "undelegate",
+            transactionHash: delegateTxHash,
+          },
+        });
+        delegationTraceRef.current = null;
+      }
+    }
+
+    if (didProcessDelegation || didProcessSponsoredUnelegation) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
@@ -218,7 +291,44 @@ export function UndelegateDialog({
       }
       revalidateData();
     }
-  }, [isReady, fetchData, didProcessDelegation, delegate, votingPower]);
+  }, [didProcessDelegation, didProcessSponsoredUnelegation]);
+
+  useEffect(() => {
+    if (!delegationTraceRef.current || isGasRelayLive) {
+      return;
+    }
+
+    if (didFailDelegation || isError) {
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_failed",
+        eventName: "governance_delegation_failed",
+        details: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+          error: "Undelegation transaction failed",
+        },
+      });
+      delegationTraceRef.current = null;
+    }
+  }, [didFailDelegation, isError, isGasRelayLive]);
+
+  useEffect(() => {
+    return () => {
+      if (!delegationTraceRef.current) {
+        return;
+      }
+
+      void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
+        reason: "governance_delegation_unmounted",
+        eventName: "governance_delegation_unmounted",
+        details: {
+          delegatee: zeroAddress,
+          action: "undelegate",
+        },
+      });
+      delegationTraceRef.current = null;
+    };
+  }, []);
 
   if (!isReady) {
     return (
@@ -245,7 +355,11 @@ export function UndelegateDialog({
             </div>
             <div className="flex flex-col relative w-full border border-line rounded-lg">
               <div className="flex flex-row items-center gap-3 p-4 border-b border-line">
-                <ENSAvatar ensName={delegateeEnsName} className="h-10 w-10" />
+                <ENSAvatar
+                  ensName={delegateeEnsName}
+                  className="h-10 w-10"
+                  size={40}
+                />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
                     Currently delegated to
@@ -285,6 +399,7 @@ export function UndelegateDialog({
           executeDelegate={executeDelegate}
           isError={isError}
           didFailDelegation={didFailDelegation}
+          didFailSponsoredUnelegation={didFailSponsoredUnelegation}
           isProcessingDelegation={isProcessingDelegation}
           isProcessingSponsoredUnelegation={isProcessingSponsoredUnelegation}
           didProcessDelegation={didProcessDelegation}

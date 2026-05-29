@@ -73,13 +73,11 @@ export async function createSnapshot({
     throw new Error("address not available");
   }
 
+  const tempCheckBlock = proposal.temp_check_link
+    ? `[Temp Check Discourse link](${proposal.temp_check_link})\n`
+    : "";
   const description =
-    `${
-      proposal.temp_check_link &&
-      "[Temp Check Discourse link](" + proposal.temp_check_link + ")\n"
-    }` +
-    "\n\n ## Description \n" +
-    proposal.abstract;
+    tempCheckBlock + "\n\n ## Description \n" + proposal.abstract;
 
   const blockNumber = await publicClient.getBlockNumber();
   const timestamp = Math.floor(new Date().getTime() / 1000);

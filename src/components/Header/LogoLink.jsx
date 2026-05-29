@@ -6,6 +6,7 @@ import { instrumentSerif } from "@/styles/fonts";
 export default function LogoLink() {
   const { ui, isProd } = Tenant.current();
   const isDUNA = ui.toggle("duna")?.enabled;
+  const showDunaWordmark = Boolean(isDUNA && ui.dunaTitle);
 
   return (
     <Link
@@ -13,7 +14,11 @@ export default function LogoLink() {
       className={`${instrumentSerif.variable} flex flex-row justify-between w-full`}
     >
       <div className="gap-2 h-full flex flex-row items-center w-full">
-        {!isDUNA ? (
+        {showDunaWordmark ? (
+          <span className="font-instrumentSerif text-2xl pl-4">
+            {ui.dunaTitle}
+          </span>
+        ) : (
           <Image
             src={ui.logo}
             alt="logo"
@@ -25,10 +30,6 @@ export default function LogoLink() {
                 : "h-[46px] w-auto"
             }
           />
-        ) : (
-          <span className="font-instrumentSerif text-2xl pl-4">
-            {ui.dunaTitle}
-          </span>
         )}
         {!isProd && (
           <>

@@ -1,6 +1,6 @@
 import { calculateVoteMetadata, Support } from "../voteUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { expect, describe, it, vi } from "vitest";
 
 vi.mock("../tenant/tenant", () => ({
@@ -110,7 +110,7 @@ describe("calculateVoteMetadata", () => {
           against: BigInt(300),
           abstain: BigInt(100),
         },
-        endTime: new Date("2024-03-08T23:59:59Z"),
+        endTime: new Date(2024, 2, 8, 23, 59, 59),
       };
 
       const vote = {

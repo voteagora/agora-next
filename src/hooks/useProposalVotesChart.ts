@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ChartVote } from "@/lib/types";
+import Tenant from "@/lib/tenant/tenant";
+import type { ArchiveVoteRow } from "@/lib/archiveUtils";
 
 const QK = "votesChart";
 const CACHE_TIME = 60000; // 1 minute cache
@@ -15,10 +17,39 @@ export const useProposalVotesChart = ({
   enabled,
   proposalType,
 }: Props) => {
+  const { ui } = Tenant.current();
+  const useArchive =
+    ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
+
   const { data, isFetching, isFetched } = useQuery({
     enabled: enabled,
-    queryKey: [QK, proposalId, proposalType],
+    queryKey: [QK, proposalId, proposalType, useArchive],
     queryFn: async (): Promise<ChartVote[]> => {
+      if (useArchive) {
+        const response = await fetch(`/api/archive/votes/${proposalId}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        const payload = (await response.json()) as {
+          data?: ArchiveVoteRow[];
+        };
+        return (payload.data ?? []).map((vote) => ({
+          voter: vote.voter,
+          support: vote.support ?? "1",
+          weight: String(vote.weight ?? vote.vp ?? "0"),
+          block_number:
+            vote.block_number != null ? String(vote.block_number) : "",
+          created:
+            vote.created != null
+              ? String(vote.created)
+              : vote.ts != null
+                ? String(vote.ts)
+                : undefined,
+        }));
+      }
+
       const response = await fetch(
         `/api/proposals/${proposalId}/chart${proposalType === "SNAPSHOT" ? `?proposalType=${proposalType}` : ""}`
       );

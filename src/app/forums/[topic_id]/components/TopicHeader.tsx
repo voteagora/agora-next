@@ -2,16 +2,18 @@
 
 import React from "react";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+
 import { truncateAddress } from "@/app/lib/utils/text";
 import ENSAvatar from "@/components/shared/ENSAvatar";
+import ENSName from "@/components/shared/ENSName";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
-import { useAccount } from "wagmi";
+import { formatRelative } from "@/components/ForumShared/utils";
+import { ADMIN_TYPES } from "@/lib/constants";
+import { forumTopicDisplayTimestamp } from "@/lib/forumUtils";
 
 import TopicUpvote from "./TopicUpvote";
 import TopicWatch from "./TopicWatch";
-import { formatRelative } from "@/components/ForumShared/utils";
-import { ADMIN_TYPES } from "@/lib/constants";
-import ENSName from "@/components/shared/ENSName";
 
 interface TopicHeaderProps {
   topic: {
@@ -20,6 +22,7 @@ interface TopicHeaderProps {
     address?: string;
     authorName?: string;
     createdAt: string;
+    revealTime?: string | null;
     adminRole?: string | null;
   };
   isAdmin?: boolean;
@@ -100,7 +103,9 @@ export default function TopicHeader({
             </div>
           )}
           <div className="text-xs text-tertiary self-center">
-            {formatRelative(topic.createdAt)}
+            {formatRelative(
+              forumTopicDisplayTimestamp(topic.createdAt, topic.revealTime)
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">

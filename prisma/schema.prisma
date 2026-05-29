@@ -66,6 +66,19 @@ model AddressMetadata {
   @@schema("agora")
 }
 
+model SafeTrackedTransaction {
+  safe_tx_hash String   @id @db.VarChar(66)
+  dao_slug     DaoSlug
+  kind         String
+  safe_address String   @db.VarChar(42)
+  chain_id     Int
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([dao_slug, safe_address, kind, created_at], map: "idx_safe_tracked_transactions_lookup")
+  @@map("safe_tracked_transactions")
+  @@schema("agora")
+}
+
 view Citizens {
   address             String
   dao_slug            DaoSlug
@@ -6074,10 +6087,12 @@ enum DaoSlug {
   LINEA
   TOWNS
   SYNDICATE
-  @@map("dao_slug")
+  ZEROG
   DEMO2
   DEMO4
   DEMO3
+  SHAPE
+  @@map("dao_slug")
   @@schema("config")
 }
 
@@ -6533,5 +6548,23 @@ model ForumRoleChangeAudit {
     @@index([timestamp])
     @@index([daoSlug, timestamp])
     @@map("forum_role_change_audit")
+    @@schema("alltenant")
+}
+
+model DaoFinancialMetrics {
+    id        Int      @id @default(autoincrement())
+    dao_slug  DaoSlug
+    topic_id  Int?
+    year      Int?
+    month     String?
+    data      Json
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+    @@index([dao_slug], name: "idx_dao_financial_metrics_dao_slug")
+    @@index([topic_id], name: "idx_dao_financial_metrics_topic_id")
+    @@index([createdAt(sort: Desc)], name: "idx_dao_financial_metrics_created_at")
+    @@index([dao_slug, year, month], name: "idx_dao_financial_metrics_reporting_period")
+    @@map("dao_financial_metrics")
     @@schema("alltenant")
 }

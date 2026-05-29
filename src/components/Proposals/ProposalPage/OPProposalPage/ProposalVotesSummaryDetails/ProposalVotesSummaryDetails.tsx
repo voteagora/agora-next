@@ -1,6 +1,5 @@
 import Image from "next/image";
 import checkIcon from "@/icons/check.svg";
-import linkIcon from "@/icons/link.svg";
 import ProposalVotesBar from "../ProposalVotesBar/ProposalVotesBar";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
@@ -9,7 +8,6 @@ import {
   ParsedProposalResults,
 } from "@/lib/proposalUtils";
 import { format } from "date-fns";
-import Link from "next/link";
 import { StepperRow } from "@/components/common/StepperRow";
 
 import Tenant from "@/lib/tenant/tenant";
@@ -28,7 +26,7 @@ export const QuorumTooltip = () => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
-        <TooltipTrigger className="ml-1">
+        <TooltipTrigger className="ml-1" data-testid="results-tooltip-trigger">
           <AlertTriangle className="h-4 w-4 text-negative" />
         </TooltipTrigger>
         <TooltipContent className="text-primary text-xs max-w-xs font-semibold">
@@ -77,7 +75,6 @@ export default function ProposalVotesSummaryDetails({
   const { token, namespace } = Tenant.current();
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
-
   const formatTime = (date: Date | null) => {
     return format(new Date(date ?? ""), "h:mma MMMM dd yyyy");
   };
@@ -249,7 +246,8 @@ export default function ProposalVotesSummaryDetails({
             </div>
           </div>
         ) : !hasPendingRanges ? (
-          proposal.approvalThreshold && (
+          proposal.approvalThreshold &&
+          apprThresholdPercent !== 0 && (
             <div className="flex justify-between">
               <div className="flex flex-row gap-1 text-secondary font-semibold text-xs">
                 Threshold
@@ -321,6 +319,9 @@ export default function ProposalVotesSummaryDetails({
               proposal.executedTransactionHash
                 ? getBlockScanUrl(proposal.executedTransactionHash)
                 : undefined
+            }
+            executionInspectorTxHash={
+              proposal.executedTransactionHash ?? undefined
             }
           />
         ) : null}

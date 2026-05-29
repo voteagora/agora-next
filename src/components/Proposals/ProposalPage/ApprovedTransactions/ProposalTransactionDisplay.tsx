@@ -33,11 +33,16 @@ import {
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
+
 import { Button } from "@/components/ui/button";
 
 const { contracts, token, ui } = Tenant.current();
 
-const PrettyButtonDisabled = () => {
+const isPrettyViewEnabled =
+  ui.toggle("proposals/pretty-view")?.enabled ?? false;
+
+const PrettyButtonDisabled = ({ message }: { message?: string }) => {
   return (
     <TooltipProvider delayDuration={300}>
       <Tooltip>
@@ -52,7 +57,7 @@ const PrettyButtonDisabled = () => {
         </TooltipTrigger>
         <TooltipContent>
           <div className="text-xs">
-            Pretty view is not yet available for this proposal.
+            {message ?? "Pretty view is not yet available for this proposal."}
           </div>
         </TooltipContent>
       </Tooltip>
@@ -106,7 +111,6 @@ const ProposalTransactionDisplay = ({
   values,
   descriptions,
   executedTransactionHash,
-  simulationDetails,
   network = "mainnet",
   signatures,
   proposal,
@@ -126,8 +130,9 @@ const ProposalTransactionDisplay = ({
 }) => {
   const [collapsed, setCollapsed] = useState(true);
   const allActionsSupported = areAllActionsSupported(calldatas);
+  const prettyViewAvailable = isPrettyViewEnabled && allActionsSupported;
   const [viewMode, setViewMode] = useState<"decoded" | "raw" | "pretty">(() =>
-    allActionsSupported ? "pretty" : "decoded"
+    prettyViewAvailable ? "pretty" : "decoded"
   );
   const [isSimulating, setIsSimulating] = useState(false);
   const openDialog = useOpenDialog();
@@ -152,14 +157,22 @@ const ProposalTransactionDisplay = ({
           <div className="w-full flex items-center justify-between">
             <span className="text-xs text-tertiary">{actionsLabel}</span>
             {actionsLink && (
-              <a
-                href={getBlockScanUrl(actionsLink)}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="text-tertiary hover:text-primary transition-colors"
-              >
-                <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-              </a>
+              <span className="inline-flex items-center gap-1">
+                <a
+                  href={getBlockScanUrl(actionsLink)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-tertiary hover:text-primary transition-colors"
+                >
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
+                </a>
+                {proposal?.status === "EXECUTED" && (
+                  <ExecutionTxInspectorIconLink
+                    txHash={actionsLink}
+                    iconClassName="h-3 w-3"
+                  />
+                )}
+              </span>
             )}
           </div>
           <div className="text-xs text-tertiary mt-1">
@@ -170,11 +183,7 @@ const ProposalTransactionDisplay = ({
     );
   }
 
-  const normalizedLength = Math.min(
-    targets.length,
-    calldatas.length,
-    values.length
-  );
+  const normalizedLength = Math.min(targets.length, values.length);
 
   const simulateTransactions = async () => {
     try {
@@ -264,14 +273,19 @@ const ProposalTransactionDisplay = ({
                     {actionsLabel}
                   </span>
                   {actionsLink && (
-                    <a
-                      href={getBlockScanUrl(actionsLink)}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      <ArrowTopRightOnSquareIcon className="w-4 h-4" />
-                    </a>
+                    <span className="inline-flex items-center gap-1">
+                      <a
+                        href={getBlockScanUrl(actionsLink)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="text-primary hover:text-primary/80 transition-colors"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+                      </a>
+                      {proposal?.status === "EXECUTED" && (
+                        <ExecutionTxInspectorIconLink txHash={actionsLink} />
+                      )}
+                    </span>
                   )}
                   {TENDERLY_VALID_CHAINS.includes(
                     contracts.governor.chain.id
@@ -306,7 +320,7 @@ const ProposalTransactionDisplay = ({
                   >
                     Raw
                   </button>
-                  {allActionsSupported ? (
+                  {isPrettyViewEnabled && allActionsSupported ? (
                     <button
                       className={`px-2 py-1 text-xs font-semibold ${viewMode === "pretty" ? "text-primary bg-wash rounded-full" : "text-secondary"}`}
                       onClick={() => setViewMode("pretty")}
@@ -315,7 +329,13 @@ const ProposalTransactionDisplay = ({
                       Pretty
                     </button>
                   ) : (
-                    <PrettyButtonDisabled />
+                    <PrettyButtonDisabled
+                      message={
+                        isPrettyViewEnabled
+                          ? undefined
+                          : "Pretty view is not yet available."
+                      }
+                    />
                   )}
                 </div>
               </div>
@@ -362,6 +382,7 @@ const ProposalTransactionDisplay = ({
                       }
                       index={idx}
                       viewMode={viewMode}
+                      proposal={proposal}
                     />
                   ))}
                 </div>
@@ -382,7 +403,7 @@ const ProposalTransactionDisplay = ({
                   ))}
                 </div>
               )}
-              {viewMode === "pretty" && (
+              {isPrettyViewEnabled && viewMode === "pretty" && (
                 <div>
                   {(collapsed
                     ? [targets[0]]
@@ -407,6 +428,7 @@ const ProposalTransactionDisplay = ({
                       }
                       index={idx}
                       viewMode={viewMode}
+                      proposal={proposal}
                     />
                   ))}
                 </div>
@@ -414,21 +436,23 @@ const ProposalTransactionDisplay = ({
             </div>
           </div>
 
-          <div
-            className={cn(
-              "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
-              hasRealActions
-                ? "border border-t-0 border-line rounded-b-lg"
-                : "border-x border-b border-t border-line rounded-b-lg"
-            )}
-            onClick={() => {
-              setCollapsed(!collapsed);
-            }}
-          >
-            {collapsed
-              ? `Expand all actions (${normalizedLength})`
-              : "Collapse actions"}
-          </div>
+          {normalizedLength > 1 && (
+            <div
+              className={cn(
+                "p-4 cursor-pointer text-sm text-tertiary font-medium hover:bg-neutral/10 transition-colors flex justify-center",
+                hasRealActions
+                  ? "border border-t-0 border-line rounded-b-lg"
+                  : "border-x border-b border-t border-line rounded-b-lg"
+              )}
+              onClick={() => {
+                setCollapsed(!collapsed);
+              }}
+            >
+              {collapsed
+                ? `Expand all actions (${normalizedLength})`
+                : "Collapse actions"}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -445,6 +469,7 @@ const TransactionItem = ({
   index,
   signature,
   viewMode = "decoded",
+  proposal,
 }: {
   target: string;
   calldata: `0x${string}`;
@@ -455,6 +480,7 @@ const TransactionItem = ({
   index: number;
   signature?: string;
   viewMode?: "decoded" | "raw" | "pretty";
+  proposal?: Proposal;
 }) => {
   const {
     data: decodedData,
@@ -505,6 +531,7 @@ const TransactionItem = ({
             target={target}
             calldata={calldata}
             isLoading={isLoading}
+            proposal={proposal}
           />
         ) : (
           <>
@@ -539,11 +566,13 @@ const PrettyView = ({
   target,
   calldata,
   isLoading,
+  proposal,
 }: {
   decodedData: unknown;
   target: string;
   calldata: `0x${string}`;
   isLoading: boolean;
+  proposal?: Proposal;
 }) => {
   if (isLoading) {
     return (
@@ -569,11 +598,16 @@ const PrettyView = ({
   }
 
   try {
+    const proposalContext = proposal?.snapshotBlockNumber
+      ? { snapshotBlockNumber: proposal.snapshotBlockNumber }
+      : undefined;
+
     return (
       <>
         {adapter.prettyRender(
           decodedData as Parameters<typeof adapter.prettyRender>[0],
-          target
+          target,
+          proposalContext
         )}
       </>
     );

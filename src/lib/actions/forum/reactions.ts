@@ -13,8 +13,6 @@ import {
 } from "@/lib/votingPowerUtils";
 import { getPublicClient } from "@/lib/viem";
 import {
-  buildForumPostUrl,
-  buildProfileUrl,
   emitDirectEvent,
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
@@ -164,12 +162,12 @@ export async function addForumReaction(
         `${post.id}:${normalizedAddress}:${emoji}`,
         {
           dao_name: slug,
+          topic_id: post.topicId,
+          post_id: post.id,
           topic_title: post.topic?.title ?? "Forum discussion",
-          post_url: buildForumPostUrl(post.topicId, post.topic?.title, post.id),
           reaction_emoji: emoji,
           reactor_address: normalizedAddress,
           reactor_display_name: reactorDisplayName,
-          reactor_profile_url: buildProfileUrl(normalizedAddress),
         }
       );
     }

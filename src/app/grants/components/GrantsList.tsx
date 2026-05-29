@@ -67,7 +67,9 @@ export default function GrantsList() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col bg-neutral border border-line rounded-lg shadow-newDefault overflow-hidden">
+      <div
+        className={`flex flex-col border border-line rounded-lg shadow-newDefault overflow-hidden ${ui.customization?.grantsListBackground ?? "bg-neutral"}`}
+      >
         <div>
           {grants.length === 0 ? (
             <div className="flex flex-row justify-center py-8 text-secondary">

@@ -1,0 +1,176 @@
+name: A/B Visual Regression Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant:
+        description: "Governance tenant to test"
+        required: true
+        default: "optimism"
+        type: choice
+        options:
+          - optimism
+          - uniswap
+          - ens
+          - scroll
+          - cyber
+          - linea
+          - b3
+          - xai
+          - derive
+          - etherfi
+          - syndicate
+          - protocol-guild
+          - towns
+          - boost
+      url_a:
+        description: "URL A — Production baseline"
+        required: true
+        default: "https://vote.optimism.io"
+        type: string
+      url_b:
+        description: "URL B — Preview or staging to compare"
+        required: true
+        type: string
+
+      # ── Route Scopes (checked = included in scan) ──
+      scan_index:
+        description: "🏠 Index / Home page"
+        required: false
+        type: boolean
+        default: true
+      scan_proposals:
+        description: "📋 Proposals listing"
+        required: false
+        type: boolean
+        default: true
+      scan_delegates:
+        description: "👥 Delegates listing"
+        required: false
+        type: boolean
+        default: true
+
+      # ── Optional Filters ──
+      target_proposals:
+        description: "Specific proposal IDs (e.g. 116,adv-55). Leave empty for listing page."
+        required: false
+        type: string
+      scan_all_archive:
+        description: "Deep scan all individual archived proposals (can be slow)"
+        required: false
+        type: boolean
+        default: false
+      use_prod_env:
+        description: "Prod environment. Uncheck for dev."
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  visual-regression:
+    name: "Visual A/B: ${{ inputs.tenant }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Route Scopes
+        id: scopes
+        run: |
+          ROUTES=""
+          if [ "${{ inputs.scan_index }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}index"; fi
+          if [ "${{ inputs.scan_proposals }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}proposals"; fi
+          if [ "${{ inputs.scan_delegates }}" = "true" ]; then ROUTES="${ROUTES:+$ROUTES,}delegates"; fi
+
+          if [ -z "$ROUTES" ]; then
+            echo "⚠️ No routes selected — defaulting to all routes"
+            ROUTES="index,proposals,delegates"
+          fi
+
+          echo "route_scopes=$ROUTES" >> $GITHUB_OUTPUT
+          echo "📍 Route scopes: $ROUTES"
+
+      - name: Write Run Metadata
+        run: |
+          mkdir -p test-results
+          cat > test-results/run_metadata.json << 'METAEOF'
+          {
+            "url_a": "${{ inputs.url_a }}",
+            "url_b": "${{ inputs.url_b }}",
+            "tenant": "${{ inputs.tenant }}",
+            "routes": "${{ steps.scopes.outputs.route_scopes }}",
+            "target_proposals": "${{ inputs.target_proposals }}",
+            "scan_all_archive": "${{ inputs.scan_all_archive }}",
+            "agora_env": "${{ inputs.use_prod_env == true && 'prod' || 'dev' }}"
+          }
+          METAEOF
+          echo "📝 Metadata written"
+
+      - name: Run A/B Regression Engine
+        id: regression
+        continue-on-error: true
+        env:
+          URL_A: ${{ inputs.url_a || 'https://vote.optimism.io' }}
+          URL_B: ${{ inputs.url_b }}
+          TARGET_PROPOSALS: ${{ inputs.target_proposals }}
+          SCAN_ALL_ARCHIVE: ${{ inputs.scan_all_archive }}
+          TARGET_ROUTES: ${{ steps.scopes.outputs.route_scopes }}
+          TENANT_CONTEXT: ${{ inputs.tenant }}
+          NEXT_PUBLIC_AGORA_ENV: ${{ inputs.use_prod_env == true && 'prod' || 'dev' }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: npm run test:ab
+
+      - name: Google Auth
+        if: always()
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        if: always()
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: "silent-turbine-390703"
+
+      - name: Upload Artifacts to GCP Bucket
+        if: always()
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          chmod +x scripts/upload-ab-artifacts.sh
+          ./scripts/upload-ab-artifacts.sh
+
+      - name: Validate A/B Report Output
+        if: always()
+        run: |
+          REPORT_COUNT=$(find test-results/ab-diffs -name report.json -type f 2>/dev/null | wc -l | tr -d ' ')
+          echo "Visual reports generated: ${REPORT_COUNT}"
+
+          if [ "${REPORT_COUNT}" -eq 0 ]; then
+            echo "::error::No A/B report.json files were generated. Check the 'Run A/B Regression Engine' step logs; the dashboard has no visual results to render."
+            exit 1
+          fi
+
+          if [ "${{ steps.regression.outcome }}" != "success" ]; then
+            echo "::error::The A/B regression step failed. Uploaded artifacts may be partial; check the uploaded dashboard for per-route runner errors."
+            exit 1
+          fi

@@ -15,57 +15,59 @@ import { demoTenantConfig } from "./configs/contracts/demo";
 import { lineaTenantConfig } from "./configs/contracts/linea";
 import { townsTenantConfig } from "./configs/contracts/towns";
 import { syndicateTenantConfig } from "./configs/contracts/syndicate";
+import { ogTenantConfig } from "@/lib/tenant/configs/contracts/0g";
 import { demo2TenantConfig } from "./configs/contracts/demo2";
 import { demo4TenantConfig } from "./configs/contracts/demo4";
 import { demo3TenantConfig } from "./configs/contracts/demo3";
+import { shapeTenantConfig } from "./configs/contracts/shape";
 
 export default class TenantContractFactory {
   public static create(
     namespace: TenantNamespace,
     isProd: boolean,
-    alchemyId: string
+    rpcSecret: string
   ): TenantContracts {
     switch (namespace) {
       case TENANT_NAMESPACES.ETHERFI:
-        return etherfiTenantContractConfig({ isProd, alchemyId });
+        return etherfiTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.ENS:
-        return ensTenantContractConfig({ isProd, alchemyId });
+        return ensTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.OPTIMISM:
-        return optimismTenantContractConfig({ isProd, alchemyId });
+        return optimismTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.UNISWAP:
-        return uniswapTenantContractConfig({ isProd, alchemyId });
+        return uniswapTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.CYBER:
-        return cyberTenantConfig({ isProd, alchemyId });
+        return cyberTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.DERIVE:
-        return deriveTenantConfig({ isProd, alchemyId });
+        return deriveTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.SCROLL:
-        return scrollTenantContractConfig({ isProd, alchemyId });
+        return scrollTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.PGUILD:
-        return protocolGuildTenantContractConfig({ isProd, alchemyId });
+        return protocolGuildTenantContractConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.BOOST:
-        return boostTenantConfig({ isProd, alchemyId });
+        return boostTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.XAI:
-        return xaiTenantConfig({ isProd, alchemyId });
+        return xaiTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.B3:
-        return b3TenantConfig({ isProd, alchemyId });
+        return b3TenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.DEMO:
-        return demoTenantConfig({ isProd, alchemyId });
+        return demoTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.LINEA:
-        return lineaTenantConfig({ isProd, alchemyId });
+        return lineaTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.TOWNS:
-        return townsTenantConfig({ isProd, alchemyId });
+        return townsTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.SYNDICATE:
-        return syndicateTenantConfig({ isProd, alchemyId });
-
+        return syndicateTenantConfig({ isProd, rpcSecret });
+      case TENANT_NAMESPACES.OG:
+        return ogTenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.DEMO2:
-        return demo2TenantConfig({ isProd, alchemyId });
-
+        return demo2TenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.DEMO4:
-        return demo4TenantConfig({ isProd, alchemyId });
-
+        return demo4TenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.DEMO3:
-        return demo3TenantConfig({ isProd, alchemyId });
-
+        return demo3TenantConfig({ isProd, rpcSecret });
+      case TENANT_NAMESPACES.SHAPE:
+        return shapeTenantConfig({ isProd, rpcSecret });
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

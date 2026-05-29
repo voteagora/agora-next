@@ -11,7 +11,20 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f": "Uniswap V2 Factory",
   "0x18e433c7bf8a2e1d0197ce5d8f9afada1a771360": "Uniswap V2 FeeToSetter",
   "0x1a9c8182c09f50c8318d769245bea52c32be35bc": "Governance Timelock",
+  "0x408ed6354d4973f66138c91495f2f2fcbd8724c3": "Uniswap Governor",
   "0x000000000000000000000000000000000000dead": "Burn address",
+  "0xf754a7e347f81cfdc70af9fbcce9df3d826360fa": "FranchiserFactory",
+
+  // ─── Uniswap Franchiser Delegates ───
+
+  "0xa37131410a76791f4a0210e91edd554d85afb4d4": "Uniswap Foundation",
+  "0xecc2a9240268bc7a26386ecb49e1befca2706ac9": "Anode",
+  "0xe93d59cc0bcecfd4ac204827ef67c5266079e2b5": "Axia Network",
+  "0x3fb19771947072629c8eee7995a2ef23b72d4c8a": "PGov",
+  "0xb933aee47c438f22de0747d57fc239fe37878dd1": "Wintermute",
+  "0x1855f41b8a86e701e33199de7c25d3e3830698ba": "Keyrock",
+  "0x8787fc2de4de95c53e5e3a4e5459247d9773ea52": "KPK",
+  "0xaac35d953ef23ae2e61a866ab93dea6ec0050bcd": "Atiselsts.eth",
 
   // ─── Protocol Fees (Ethereum Mainnet) ───
 
@@ -31,6 +44,34 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
   "0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41": "ENS Public Resolver",
   "0x3b59c6d0034490093460787566dc5d6ce17f2f9c": "uac.eth",
   "0x8f72fcf695523a6fc7dd97eafdd7a083c386b7b6": "SEAL Safe Harbor Registry",
+
+  // ─── ENS (mainnet) — token, governance, and contracts governance executions usually hit ───
+
+  "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72": "ENS (token)",
+  "0x323a76393544d5ecca80cd6ef2a560c6a395b7e3": "ENS Governor",
+  "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7":
+    "ENS Timelock (wallet.ensdao.eth)",
+
+  "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e": "ENS Registry",
+  "0x57f1887a8bf19b14fc0df6fd9b2ac6fea176e835": "BaseRegistrar (ERC721 .eth)",
+  "0xdaaf96c0f0d2cb03c01295172da9066cb7716f3c": "ENS NameWrapper",
+  "0x253553366da8546fc250f225fe3d25d0c782303b":
+    "ETHRegistrarController (controller.ens.eth)",
+  "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5":
+    "ETHRegistrarController (legacy controller.ens.eth)",
+
+  "0x4f2083f5fbede34c2714affb3105539775f7fe64": "ENS Endowment (Safe)",
+  "0xf20325cf84b72e8bbf8d8984b8f0059b984b390b":
+    "Zodiac Roles modifier (v1, ENS)",
+  "0x703806e61847984346d2d7ddd853049627e50a40":
+    "Zodiac Roles modifier (v2, ENS)",
+  "0x11c76ad590abdffcd980afec9ad951b160f02797":
+    "Milkman (CoW / ENS DAO trades)",
+  "0x000000000000cd17345801aa8147b8d3950260ff":
+    "Karpatkey on-chain post (governance / kit, ERC-2980 style)",
+
+  "0x8fb66f38cf86a3d5e8768f8f1754a24a6c661fb8":
+    "Splits Warehouse (ERC-6909, Splits v2)",
 
   // ─── Bridge Contracts (L1) ───
 
@@ -88,6 +129,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0x1ac1181fc4e4f877963680587aeaa2c90d7ebb95":
     "Celo L1 Cross Domain Messenger",
+  "0xc5c5d157928bdbd2acf6d0777626b6c75a9eaedc": "Celo Optimism Portal",
   "0xafe208a311b21f13ef87e33a90049fc17a7acdec": "Celo V3 Factory",
   "0x79a530c8e2fa8748b7b40dd3629c0520c2ccf03f": "Celo V2 Factory",
   "0x288dc841a52fca2707c6947b3a777c5e56cd87bc": "Celo V4 Pool Manager",
@@ -99,6 +141,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0xf931a81d18b1766d15695ffc7c1920a62b7e710a":
     "Worldchain L1 Cross Domain Messenger",
+  "0xd5ec14a83b7d95be1e2ac12523e2dee12cbeea6c": "Worldchain Optimism Portal",
   "0xcb2436774c3e191c85056d248ef4260ce5f27a9d":
     "Worldchain Cross Chain Account",
   "0x7a5028bda40e7b173c278c5342087826455ea25a": "Worldchain V3 Factory",
@@ -110,17 +153,91 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
 
   "0xdc40a14d9abd6f410226f1e6de71ae03441ca506":
     "Zora L1 Cross Domain Messenger",
+  "0x1a0ad011913a150f69f6a19df447a0cfd9551054": "Zora Bridge",
   "0x36eec182d0b24df3dc23115d64db521a93d5154f": "Zora Cross Chain Account",
   "0x7145f8aeef1f6510e92164038e1b6f8cb2c42cbb": "Zora V3 Factory",
   "0xbfc49b47637a4dc9b7b8de8e71bf41e519103b95": "Zora V3 Open Fee Adapter",
   "0x0f797dc7efaea995bb916f268d919d0a1950ee3c": "Zora V2 Factory",
   "0x4753c137002d802f45302b118e265c41140e73c2": "Zora Token Jar",
+
+  // ─── Protocol Guild (Ethereum Mainnet) ───
+
+  "0x85d6bcc74877a1c6fc66a8cd14369f939663f68f": "Protocol Guild Governor",
+  "0xaac9059248a06233db16fc9c25426365b7afb481": "Protocol Guild Timelock",
+  "0x949f5b6183aa74272ddad7f8f8dc309f8186e858": "Protocol Guild Gov Token",
+  "0xbfc07a8c9615fe62979f02cd0d975caf61ed0d63":
+    "Protocol Guild Proposal Types Configurator",
+  "0x42436bb7bea1e1e2de03f1223e2a3e0557f606e3": "Protocol Guild Proxy Admin",
+  "0xd982477216dadd4c258094b071b49d17b6271d66":
+    "Protocol Guild Split Wallet V2",
+
+  // ─── Protocol Guild Distributed Tokens (Ethereum Mainnet) ───
+  // Verified via Etherscan: symbol(), name(), decimals()
+
+  "0x10dea67478c5f8c5e2d90e5e9b26dbe60c54d800": "TAIKO", // Taiko Token, 18 decimals
+  "0x4d1c297d39c5c1277964d0e3f8aa901493664530": "PUFFER", // PUFFER governance token, 18 decimals
+  "0xca14007eff0db1f8135f4c25b34de49ab0d42766": "STRK", // Starknet Token, 18 decimals
+  "0x5afe3855358e112b5647b952709e6165e1c1eeee": "SAFE", // Safe Token, 18 decimals
+  "0xe485e2f1bab389c08721b291f6b59780fec83fd7": "SHU", // Shutter Token, 18 decimals
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT", // Tether USD, 6 decimals
+  "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb": "ETHFI", // ether.fi governance token, 18 decimals
+  "0xec53bf9167f50cdeb3ae105f56099aaab9061f83": "EIGEN", // EigenLayer Token, 18 decimals
+  "0x14778860e937f509e651192a90589de711fb88a9": "CYBER", // CyberConnect Token, 18 decimals
+  "0xe29797910d413281d2821d5d9a989262c8121cc2": "ELIMU", // elimu.ai Token, 18 decimals
+  "0xd33526068d116ce69f19a9ee46f0bd304f21a51f": "RPL", // Rocket Pool Token, 18 decimals
+  "0x31c8eacbffdd875c74b94b077895bd78cf1e64a3": "RAD", // Radicle Token, 18 decimals
+  "0x1bab804803159ad84b8854581aa53ac72455614e": "SYND", // Syndicate Token, 18 decimals
+  "0xb45ad160634c528cc3d2926d9807104fa3157305": "sDOLA", // Inverse Finance Staked DOLA, 18 decimals
+  "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": "OBOL", // Obol Network Token, 18 decimals
+  "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": "CC", // Wrapped CurrencyCoin, 0 decimals
+  "0xa27ec0006e59f245217ff08cd52a7e8b169e62d2": "AZTEC", // Aztec Network Token, 18 decimals
+
+  // ─── Common ERC-20 Tokens (Ethereum Mainnet) ───
+
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": "WETH", // Wrapped Ether, 18 decimals
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "USDC", // USD Coin, 6 decimals
+  "0x6b175474e89094c44da98b954eedeac495271d0f": "DAI", // Dai Stablecoin, 18 decimals
+  "0x514910771af9ca656af840dff83e8264ecf986ca": "LINK", // Chainlink Token, 18 decimals
+  "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": "AAVE", // Aave Token, 18 decimals
+  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": "WBTC", // Wrapped BTC, 8 decimals
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": "stETH", // Lido Staked Ether, 18 decimals
 };
 
 /** Schema UIDs stored without 0x prefix, lowercase. */
 export const KNOWN_SCHEMAS: Record<string, string> = {
   "504f10498bcdb19d4960412dbade6fa1530b8eed65c319f15cbe20fadafe56bd":
     "DUNI Agreement EAS Schema",
+};
+
+/** Token decimals for accurate amount formatting. */
+export const KNOWN_TOKEN_DECIMALS: Record<string, number> = {
+  // Protocol Guild Distributed Tokens
+  "0x10dea67478c5f8c5e2d90e5e9b26dbe60c54d800": 18, // TAIKO
+  "0x4d1c297d39c5c1277964d0e3f8aa901493664530": 18, // PUFFER
+  "0xca14007eff0db1f8135f4c25b34de49ab0d42766": 18, // STRK
+  "0x5afe3855358e112b5647b952709e6165e1c1eeee": 18, // SAFE
+  "0xe485e2f1bab389c08721b291f6b59780fec83fd7": 18, // SHU
+  "0xdac17f958d2ee523a2206206994597c13d831ec7": 6, // USDT
+  "0xfe0c30065b384f05761f15d0cc899d4f9f9cc0eb": 18, // ETHFI
+  "0xec53bf9167f50cdeb3ae105f56099aaab9061f83": 18, // EIGEN
+  "0x14778860e937f509e651192a90589de711fb88a9": 18, // CYBER
+  "0xe29797910d413281d2821d5d9a989262c8121cc2": 18, // ELIMU
+  "0xd33526068d116ce69f19a9ee46f0bd304f21a51f": 18, // RPL
+  "0x31c8eacbffdd875c74b94b077895bd78cf1e64a3": 18, // RAD
+  "0x1bab804803159ad84b8854581aa53ac72455614e": 18, // SYND
+  "0xb45ad160634c528cc3d2926d9807104fa3157305": 18, // sDOLA
+  "0x0b010000b7624eb9b3dfbc279673c76e9d29d5f7": 18, // OBOL
+  "0x21b7db03d7f51edbd37a6682e43ad9ba0d145890": 0, // CC — non-standard, 0 decimals
+  "0xa27ec0006e59f245217ff08cd52a7e8b169e62d2": 18, // AZTEC
+
+  // Common ERC-20 Tokens
+  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": 18, // WETH
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": 6, // USDC
+  "0x6b175474e89094c44da98b954eedeac495271d0f": 18, // DAI
+  "0x514910771af9ca656af840dff83e8264ecf986ca": 18, // LINK
+  "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9": 18, // AAVE
+  "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599": 8, // WBTC
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84": 18, // stETH
 };
 
 export function getFriendlyName(address: string): string | null {
@@ -137,4 +254,8 @@ export function getSchemaName(schemaUid: string): string | null {
 
 export function hasSchemaName(schemaUid: string): boolean {
   return schemaUid.toLowerCase().replace(/^0x/, "") in KNOWN_SCHEMAS;
+}
+
+export function getTokenDecimals(address: string): number | null {
+  return KNOWN_TOKEN_DECIMALS[address.toLowerCase()] ?? null;
 }

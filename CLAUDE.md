@@ -27,6 +27,10 @@ Keep the order of imports consistent, with the following order:
 - `npm run typecheck` - Run TypeScript type checking
 - `npm test` - Run tests
 
+## Domain Documentation
+
+When working on governance proposals (status, vote calculations, proposal components), consult `docs/PROPOSAL_TYPES.md` and `docs/proposal-types/*.md`. A `proposal-types` skill at `.claude/skills/proposal-types/` provides a navigable summary.
+
 ## Before committing
 
 Always run these commands before committing:

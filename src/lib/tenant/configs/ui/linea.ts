@@ -277,6 +277,26 @@ If you meet the proposal threshold or are the manager of the governor, then you 
       },
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
+      name: "safe-proposal-choice",
+      enabled: true,
+    },
+    {
+      name: "safe-tracking",
+      enabled: true,
+      config: {
+        offchainMessageTracking: true,
+        onchainTransactionTracking: true,
+      },
+    },
+    {
       name: "use-daonode-for-proposal-types",
       enabled: true,
     },

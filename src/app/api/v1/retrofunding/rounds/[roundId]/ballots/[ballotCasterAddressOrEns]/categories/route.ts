@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
 import { z } from "zod";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const ballotPayloadSchema = z.object({
   category_slug: z.string(),
@@ -8,7 +9,7 @@ const ballotPayloadSchema = z.object({
   locked: z.boolean(),
 });
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
 ) {
@@ -63,3 +64,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.categories",
+  post
+);

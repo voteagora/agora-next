@@ -13,7 +13,7 @@ import { calculateVoteMetadata, getVpToDisplay } from "@/lib/voteUtils";
 import { useEnsName, useAccount } from "wagmi";
 import { truncateAddress } from "@/app/lib/utils/text";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { cn } from "@/lib/utils";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import Tenant from "@/lib/tenant/tenant";

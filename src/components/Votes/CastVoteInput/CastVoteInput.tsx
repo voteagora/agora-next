@@ -5,7 +5,7 @@ import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useModal } from "connectkit";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
-import { Vote } from "@/app/api/common/votes/vote";
+import type { Vote } from "@/app/api/common/votes/vote";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
 import {
   checkMissingVoteForDelegate,
@@ -65,6 +65,14 @@ export default function CastVoteInput({
   const votingPower = data?.votingPower;
 
   const { ui } = Tenant.current();
+
+  if (proposal.status !== "ACTIVE") {
+    return (
+      <div className="flex flex-col justify-between py-3 px-3 border-line">
+        <DisabledVoteButton reason="Not open to voting" />
+      </div>
+    );
+  }
 
   if (!isConnected) {
     return (

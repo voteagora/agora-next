@@ -61,9 +61,9 @@ export default async function ForumsPageContent({
         description={description}
         isDuna={categoryTitle === "DUNA"}
       />
-      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 max-w-7xl mx-auto px-4 sm:px-6">
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-6 max-w-[1280px] mx-auto px-4 sm:px-6">
         {/* Mobile: categories (filters) above the list, matching proposals-style layout */}
-        <div className="order-1 w-full min-w-0 lg:order-2 lg:w-80 lg:flex-shrink-0">
+        <div className="order-1 w-full min-w-0 lg:order-2 lg:w-64 lg:flex-shrink-0">
           <ForumsSidebar
             selectedCategoryId={selectedCategoryId}
             categories={categories}
@@ -73,7 +73,7 @@ export default async function ForumsPageContent({
           />
         </div>
 
-        <div className="order-2 min-w-0 flex-1 lg:order-1">
+        <div className="order-2 min-w-0 flex-1 lg:order-1 lg:basis-0">
           <div className="space-y-3">
             {sortedTopics.length === 0 ? (
               <div className="text-center py-12">

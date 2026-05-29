@@ -5,7 +5,6 @@ import {
 } from "@/app/lib/pagination";
 import { prismaWeb3Client } from "@/app/lib/prisma";
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
 import { isAddress } from "viem";
 import { ensNameToAddress } from "@/app/lib/ENSUtils";
 import {
@@ -27,27 +26,6 @@ import {
   getDelegatesFromDaoNode,
   getDelegateVotingPowerFromDaoNode,
 } from "@/app/lib/dao-node/client";
-
-// Create a cached version of getDelegatesFromDaoNode
-const cachedGetDelegatesFromDaoNode = unstable_cache(
-  (args: {
-    sortBy?: string;
-    reverse?: boolean;
-    limit?: number;
-    offset?: number;
-    filters?: {
-      delegator?: `0x${string}`;
-    };
-    withParticipation?: boolean;
-  }) => {
-    return getDelegatesFromDaoNode(args);
-  },
-  ["delegates-dao-node-filters"],
-  {
-    revalidate: 30, // Cache for 30 seconds
-    tags: ["delegates-dao-node-filters"],
-  }
-);
 
 /*
  * Fetches a list of delegates
@@ -124,7 +102,7 @@ async function getDelegates({
         filters?.hasStatement;
       const isWeightedRandomSort = sort === "weighted_random" && seed;
 
-      const daoNodeResult = await cachedGetDelegatesFromDaoNode({
+      const daoNodeResult = await getDelegatesFromDaoNode({
         sortBy: daoNodeSortBy,
         reverse: reverse,
         filters,
@@ -497,6 +475,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -539,6 +518,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -578,6 +558,7 @@ async function getDelegates({
                     ${issuesCondition}
                     ${stakeholdersCondition}
                     ${hasStatementCondition}
+                    ORDER BY s.updated_at_ts DESC, s.created_at_ts DESC
                     LIMIT 1
                   ) sub
                 ) AS statement
@@ -651,6 +632,8 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
     const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
+    const useDaoNodeForVotingPower =
+      ui.toggle("use-daonode-for-voting-power")?.enabled ?? false;
 
     // Eventually want to deprecate voter_stats from this query
     // we are already relying on getVoterStats below
@@ -716,9 +699,10 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
       contracts.token.address
     );
 
-    const daoNodeVotingPowerPromise = includeL3Staking
-      ? getDelegateVotingPowerFromDaoNode(address)
-      : Promise.resolve<string | null>(null);
+    const daoNodeVotingPowerPromise =
+      useDaoNodeForVotingPower || includeL3Staking
+        ? getDelegateVotingPowerFromDaoNode(address)
+        : Promise.resolve<string | null>(null);
 
     const [delegate, votableSupply, quorum, daoNodeVotingPower] =
       await Promise.all([
@@ -812,7 +796,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
     );
 
     // Sanitize statement payload to remove email if it exists
-    let sanitizedStatement = delegate?.statement;
+    let sanitizedStatement =
+      (delegate as any)?.statement ||
+      (daoNodeDelegate as any)?.delegate?.statement;
     if (
       sanitizedStatement &&
       sanitizedStatement.payload &&

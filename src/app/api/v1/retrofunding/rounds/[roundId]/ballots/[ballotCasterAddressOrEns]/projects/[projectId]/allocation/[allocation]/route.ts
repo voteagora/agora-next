@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { traceWithUserId } from "@/app/api/v1/apiUtils";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const allocationParser = z.string(z.number().min(0).max(100)); // number between 0 and 100
 
-export async function POST(
+async function post(
   request: NextRequest,
   route: {
     params: {
@@ -67,3 +68,8 @@ export async function POST(
     }
   });
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.v1.retrofunding.ballots.projects.allocation",
+  post
+);

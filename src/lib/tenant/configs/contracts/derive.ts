@@ -94,13 +94,10 @@ export const deriveTestnet: Chain = defineChain({
 
 interface Props {
   isProd: boolean;
-  alchemyId: string;
+  rpcSecret: string;
 }
 
-export const deriveTenantConfig = ({
-  isProd,
-  alchemyId,
-}: Props): TenantContracts => {
+export const deriveTenantConfig = ({ isProd }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x7499d654422023a407d92e1D83D387d81BC68De1"
     : "0x47b4Ad50177b8e88F774B4E1D09e590d9cb9e386";

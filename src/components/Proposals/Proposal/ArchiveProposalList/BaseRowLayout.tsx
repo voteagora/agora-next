@@ -26,14 +26,16 @@ export function BaseRowLayout({
 }: BaseRowLayoutProps) {
   const { ui } = Tenant.current();
   const isOODao = data.source === "eas-oodao";
-
   const statusProposal = {
     status: data.statusLabel,
     id: data.id,
   } as const;
   return (
     <Link href={data.href}>
-      <div className="border-b border-line items-center flex flex-row bg-neutral">
+      <div
+        data-testid={`proposal-list-item-${data.id}`}
+        className="border-b border-line items-center flex flex-row bg-neutral"
+      >
         {/* Left column: Title and metadata */}
         <div
           className={cn(
@@ -65,7 +67,7 @@ export function BaseRowLayout({
             <div className="text-xs">
               <ProposalTimeStatus {...data.timeStatus} />
             </div>
-            <ProposalStatus proposal={statusProposal} />
+            <ProposalStatus proposal={statusProposal} testIdVariant="desktop" />
           </div>
         </div>
 
@@ -148,7 +150,7 @@ function OODaoBadges({
 
       {/* Mobile status */}
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );
@@ -182,7 +184,7 @@ function StandardHeader({
         </span>
       </div>
       <div className="block sm:hidden">
-        <ProposalStatus proposal={statusProposal} />
+        <ProposalStatus proposal={statusProposal} testIdVariant="mobile" />
       </div>
     </div>
   );

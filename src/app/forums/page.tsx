@@ -29,5 +29,13 @@ export const metadata: Metadata = {
 };
 
 export default async function ForumsPage() {
+  const { ui } = Tenant.current();
+
+  if (!ui.toggle("forums")?.enabled) {
+    return (
+      <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
   return <ForumsPageContent categoryId={null} categoryTitle={null} />;
 }

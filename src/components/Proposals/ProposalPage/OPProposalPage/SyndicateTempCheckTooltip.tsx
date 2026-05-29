@@ -15,7 +15,10 @@ export default function SyndicateTempCheckTooltip({ className }: Props) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="inline-flex items-center">
+          <span
+            className="inline-flex items-center"
+            data-testid="results-tooltip-trigger"
+          >
             <InformationCircleIcon
               className={`h-4 w-4 cursor-pointer text-secondary hover:text-primary ${className || ""}`}
             />
