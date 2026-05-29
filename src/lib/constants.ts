@@ -295,11 +295,16 @@ export type EASApprovalCriteria =
 // Default tiers for optimistic voting (percentages)
 export const EAS_DEFAULT_OPTIMISTIC_TIERS = [20, 20, 20];
 
+// Archive GCS bucket - can be overridden via env var for E2E testing
+const DEFAULT_ARCHIVE_GCS_BUCKET =
+  process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+    ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
+    : "https://storage.googleapis.com/cpls-usmr-dev-test-26q1";
+
 export const ARCHIVE_GCS_BUCKET =
   process.env.ARCHIVE_GCS_BUCKET_OVERRIDE ||
-  (process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
-    ? "https://storage.googleapis.com/cpls-usmr-prd-25q4"
-    : "https://storage.googleapis.com/cpls-usmr-dev-test-26q1");
+  process.env.NEXT_PUBLIC_ARCHIVE_GCS_BUCKET ||
+  DEFAULT_ARCHIVE_GCS_BUCKET;
 
 export const getArchiveSlugGCSbucket = (namespace: string) => {
   return `${ARCHIVE_GCS_BUCKET}/data/${namespace}`;
