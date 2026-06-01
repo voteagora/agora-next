@@ -14,7 +14,7 @@ export async function generateMetadata({}, parent) {
   const page = ui.page("delegates");
   const { title, description, imageTitle, imageDescription } = page.meta;
 
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     imageTitle
   )}&description=${encodeURIComponent(imageDescription)}`;
