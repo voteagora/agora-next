@@ -6,6 +6,9 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 });
 
 const nextConfig = withBundleAnalyzer({
+  // Use a separate build cache when running the E2E test server (PORT=3001)
+  // so it doesn't conflict with the developer's port-3000 dev server.
+  ...(process.env.PORT === "3001" ? { distDir: ".next-test" } : {}),
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },

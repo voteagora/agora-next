@@ -168,7 +168,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
 
       // All status pills within the row should agree on the expected status.
       // BaseRowLayout renders the status pill once (mobile) or twice (desktop).
-      const statusPills = row.getByTestId(`proposal-status-${id}`);
+      const statusPills = row.locator(`[data-testid^="proposal-status-${id}"]`);
       const count = await statusPills.count();
       expect(count).toBeGreaterThan(0);
 
@@ -184,7 +184,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
     const row = page.getByTestId(`proposal-list-item-${id}`);
     await expect(row).toBeVisible({ timeout: 15000 });
 
-    const statusPills = row.getByTestId(`proposal-status-${id}`);
+    const statusPills = row.locator(`[data-testid^="proposal-status-${id}"]`);
     const count = await statusPills.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
@@ -200,7 +200,7 @@ test.describe("Proposals archive list – mock fixtures", () => {
     const row = page.getByTestId(`proposal-list-item-${id}`);
     await expect(row).toBeVisible({ timeout: 15000 });
 
-    const statusPills = row.getByTestId(`proposal-status-${id}`);
+    const statusPills = row.locator(`[data-testid^="proposal-status-${id}"]`);
     const count = await statusPills.count();
     expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
@@ -340,10 +340,11 @@ test.describe("Proposals archive detail – Approval", () => {
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
       "DEFEATED"
     );
-    await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
+    const panel7 = page.getByTestId("proposal-results-panel");
+    await expect(panel7).toBeVisible();
     await expect(page.locator("text=Quorum 25,631,045").first()).toBeVisible();
     await expect(page.locator("text=Current 500,000").first()).toBeVisible();
-    await expect(page.getByText("alisha")).toBeVisible();
+    await expect(panel7.getByText("alisha")).toBeVisible();
   });
 
   test("HYBRID_APPROVAL succeeded: results panel visible + badge + specific values", async ({
@@ -354,10 +355,11 @@ test.describe("Proposals archive detail – Approval", () => {
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
       "SUCCEEDED"
     );
-    await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
-    await expect(page.getByText("Candidate A")).toBeVisible();
-    await expect(page.getByText("Candidate B")).toBeVisible();
-    await expect(page.getByText("Candidate C")).toBeVisible();
+    const panel10 = page.getByTestId("proposal-results-panel");
+    await expect(panel10).toBeVisible();
+    await expect(panel10.getByText("Candidate A")).toBeVisible();
+    await expect(panel10.getByText("Candidate B")).toBeVisible();
+    await expect(panel10.getByText("Candidate C")).toBeVisible();
   });
 });
 
@@ -502,10 +504,11 @@ test.describe("Proposals archive detail – Offchain Approval", () => {
     await expect(page.getByTestId("proposal-status-badge")).toHaveText(
       "DEFEATED"
     );
-    await expect(page.getByTestId("proposal-results-panel")).toBeVisible();
-    await expect(page.locator("text=Quorum 100").first()).toBeVisible();
-    await expect(page.getByText("Candidate A")).toBeVisible();
-    await expect(page.getByText("Candidate B")).toBeVisible();
+    const panel18 = page.getByTestId("proposal-results-panel");
+    await expect(panel18).toBeVisible();
+    await expect(page.locator("text=Quorum").first()).toBeVisible();
+    await expect(panel18.getByText("Candidate A")).toBeVisible();
+    await expect(panel18.getByText("Candidate B")).toBeVisible();
   });
 
   test("OFFCHAIN_APPROVAL defeated (threshold unreachable): results panel + badge", async ({

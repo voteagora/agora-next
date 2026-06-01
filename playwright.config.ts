@@ -14,7 +14,7 @@ export default defineConfig({
   workers: 1,
   globalSetup: "./tests/global-setup.ts",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3001",
     trace: process.env.URL_A && process.env.URL_B ? "off" : "on-first-retry",
     video: process.env.URL_A && process.env.URL_B ? "off" : "on",
     screenshot: process.env.URL_A && process.env.URL_B ? "off" : "on",
@@ -44,8 +44,8 @@ export default defineConfig({
           // ARCHIVE_GCS_BUCKET_OVERRIDE redirects GCS fetches to the local
           // mock server started by globalSetup (tests/global-setup.ts).
           command:
-            "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3000 npm run dev",
-          url: "http://127.0.0.1:3000",
+            "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3001 npm run dev",
+          url: "http://127.0.0.1:3001",
           reuseExistingServer: true,
           timeout: 120 * 1000,
         },

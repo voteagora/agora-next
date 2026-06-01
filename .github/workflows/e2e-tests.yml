@@ -40,7 +40,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: npx playwright test tests/web3 --project=chromium
+        run: npx playwright test --project=chromium
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
