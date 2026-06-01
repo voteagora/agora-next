@@ -25,6 +25,15 @@ import { useHasPermission } from "@/hooks/useRbacPermissions";
 
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(),
+  useSignMessage: () => ({ signMessageAsync: signMessageAsyncMock }),
+}));
+
+vi.mock("@/components/shared/SiweProviderConfig", () => ({
+  siweProviderConfig: {
+    getNonce: vi.fn().mockResolvedValue("testnonce"),
+    createMessage: vi.fn().mockResolvedValue("test siwe message"),
+    verifyMessage: vi.fn().mockResolvedValue(true),
+  },
 }));
 
 vi.mock("connectkit", () => ({
@@ -63,9 +72,11 @@ vi.mock("@/lib/safeOffchainFlow", () => ({
   isSafeOffchainSigningFlowTerminal: vi.fn(() => false),
 }));
 
-const { isSafeOffchainMessageTrackingEnabledMock } = vi.hoisted(() => ({
-  isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
-}));
+const { isSafeOffchainMessageTrackingEnabledMock, signMessageAsyncMock } =
+  vi.hoisted(() => ({
+    isSafeOffchainMessageTrackingEnabledMock: vi.fn(() => true),
+    signMessageAsyncMock: vi.fn(),
+  }));
 
 vi.mock("@/lib/safeFeatures", () => ({
   isSafeOffchainMessageTrackingEnabled:
@@ -191,6 +202,7 @@ describe("NotificationPreferencesClient", () => {
     vi.mocked(isSafeWallet).mockResolvedValue(false);
     signInMock.mockResolvedValue(undefined);
     signOutMock.mockResolvedValue(true);
+    signMessageAsyncMock.mockResolvedValue("0xsignature");
     fetchMock.mockResolvedValue({
       ok: true,
       status: 200,
@@ -221,13 +233,13 @@ describe("NotificationPreferencesClient", () => {
       )
     );
 
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(signMessageAsyncMock).not.toHaveBeenCalled();
   });
 
   it("keeps the direct SIWE flow for EOAs", async () => {
     renderClient();
 
-    await waitFor(() => expect(signInMock).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(signMessageAsyncMock).toHaveBeenCalledTimes(1));
     expect(openDialogMock).not.toHaveBeenCalled();
   });
 
@@ -245,7 +257,7 @@ describe("NotificationPreferencesClient", () => {
       )
     );
 
-    expect(signInMock).not.toHaveBeenCalled();
+    expect(signMessageAsyncMock).not.toHaveBeenCalled();
     expect(openDialogMock).not.toHaveBeenCalled();
   });
 

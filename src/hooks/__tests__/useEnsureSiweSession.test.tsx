@@ -13,7 +13,7 @@ const {
   isSafeWalletMock,
   openDialogMock,
   shouldTrackMiradorSiweLoginMock,
-  signInMock,
+  signMessageAsyncMock,
   signOutMock,
   waitForStoredSiweJwtMock,
 } = vi.hoisted(() => ({
@@ -24,14 +24,30 @@ const {
   isSafeWalletMock: vi.fn(),
   openDialogMock: vi.fn(),
   shouldTrackMiradorSiweLoginMock: vi.fn(() => false),
-  signInMock: vi.fn(),
+  signMessageAsyncMock: vi.fn(),
   signOutMock: vi.fn(),
   waitForStoredSiweJwtMock: vi.fn(),
 }));
 
+vi.mock("wagmi", () => ({
+  useSignMessage: () => ({ signMessageAsync: signMessageAsyncMock }),
+}));
+
+vi.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({ invalidateQueries: vi.fn() }),
+}));
+
+vi.mock("@/components/shared/SiweProviderConfig", () => ({
+  siweProviderConfig: {
+    getNonce: vi.fn().mockResolvedValue("testnonce"),
+    createMessage: vi.fn().mockResolvedValue("test siwe message"),
+    verifyMessage: vi.fn().mockResolvedValue(true),
+  },
+}));
+
 vi.mock("connectkit", () => ({
+  SIWE_NONCE_QUERY_KEY: "siwe-nonce",
   useSIWE: () => ({
-    signIn: signInMock,
     signOut: signOutMock,
   }),
 }));
@@ -75,7 +91,7 @@ describe("useEnsureSiweSession", () => {
     getStoredSiweJwtMock.mockReturnValue(null);
     isSafeOffchainMessageTrackingEnabledMock.mockReturnValue(false);
     isSafeWalletMock.mockResolvedValue(true);
-    signInMock.mockResolvedValue(true);
+    signMessageAsyncMock.mockResolvedValue("0xsignature");
     signOutMock.mockResolvedValue(undefined);
     waitForStoredSiweJwtMock.mockResolvedValue("safe-jwt");
     shouldTrackMiradorSiweLoginMock.mockReturnValue(false);
@@ -98,7 +114,7 @@ describe("useEnsureSiweSession", () => {
     expect(jwt).toBe("safe-jwt");
     expect(clearStoredSafeOffchainSigningStateMock).toHaveBeenCalledTimes(1);
     expect(clearStoredSiweSessionMock).toHaveBeenCalledTimes(1);
-    expect(signInMock).toHaveBeenCalledTimes(1);
+    expect(signMessageAsyncMock).toHaveBeenCalledTimes(1);
     expect(waitForStoredSiweJwtMock).toHaveBeenCalledWith({
       expectedAddress: "0x1234567890123456789012345678901234567890",
     });
