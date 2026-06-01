@@ -1,0 +1,311 @@
+openapi: 3.1.0
+info:
+  title: Agora Governance API
+  description: |-
+    Agora Governance API v2.
+
+    Proposal endpoints in this version are backed by the archive service.
+  version: 2.0.0-alpha
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:3000/api/v2
+    description: Base URL for V2 API
+tags:
+  - name: proposals
+    description: Archive-backed proposal data
+  - name: votes
+    description: Archive-backed vote data
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ArchiveProposal:
+      summary: Archive-backed proposal
+      description: Raw proposal payload from the archive service, enriched with a derived proposal type.
+      type: object
+      required:
+        - id
+        - title
+        - proposer
+        - data_eng_properties
+        - derivedProposalType
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+          description: Archive proposal identifier.
+        title:
+          type: string
+          description: Proposal title.
+        proposer:
+          type: string
+          description: Proposal creator address or identifier.
+        proposer_ens:
+          oneOf:
+            - type: string
+            - type: "null"
+            - type: object
+              additionalProperties: true
+        start_blocktime:
+          type:
+            - integer
+            - "null"
+          description: Proposal voting start time as a Unix timestamp when supplied by the archive.
+        end_blocktime:
+          type:
+            - integer
+            - "null"
+          description: Proposal voting end time as a Unix timestamp when supplied by the archive.
+        start_block:
+          type:
+            - integer
+            - "null"
+          description: Proposal start block when supplied by the archive.
+        end_block:
+          type:
+            - integer
+            - "null"
+          description: Proposal end block when supplied by the archive.
+        lifecycle_stage:
+          type:
+            - string
+            - "null"
+          description: Archive lifecycle stage, when present.
+        data_eng_properties:
+          type: object
+          required:
+            - source
+          additionalProperties: true
+          properties:
+            source:
+              type: string
+              description: Archive source, such as dao_node, eas-atlas, eas-oodao, or snapshot.
+            liveness:
+              type: string
+              enum:
+                - live
+                - archived
+        derivedProposalType:
+          oneOf:
+            - type: string
+            - type: "null"
+          description: Proposal type derived from the archive payload.
+    VoteSupport:
+      type: string
+      enum:
+        - FOR
+        - AGAINST
+        - ABSTAIN
+    ArchiveVote:
+      summary: Archive-backed vote
+      type: object
+      required:
+        - transactionHash
+        - address
+        - support
+        - weight
+        - citizenType
+        - proposalId
+        - proposalType
+        - params
+        - reason
+        - blockNumber
+        - timestamp
+      properties:
+        transactionHash:
+          type:
+            - string
+            - "null"
+          description: Transaction hash for onchain votes, when present.
+        address:
+          type: string
+          description: Voter address.
+        support:
+          oneOf:
+            - $ref: "#/components/schemas/VoteSupport"
+            - type: "null"
+        weight:
+          type: string
+          description: Voting power behind the vote.
+        citizenType:
+          type:
+            - string
+            - "null"
+          description: Citizen house voter type, or null for token house votes.
+        voterMetadata:
+          type:
+            - object
+            - "null"
+          additionalProperties: true
+        proposalId:
+          type: string
+        proposalType:
+          type: string
+        params:
+          type:
+            - array
+            - "null"
+          items:
+            type: integer
+        reason:
+          type:
+            - string
+            - "null"
+        blockNumber:
+          type:
+            - string
+            - "null"
+          description: Vote block number serialized as a string.
+        timestamp:
+          type:
+            - string
+            - "null"
+          format: date-time
+    ArchiveProposalListResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArchiveProposal"
+    ArchiveVoteListResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArchiveVote"
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+  parameters:
+    proposalId:
+      name: proposalId
+      in: path
+      description: Proposal ID to retrieve from the archive.
+      required: true
+      schema:
+        type: string
+paths:
+  /proposals:
+    get:
+      summary: Gets archive-backed proposals
+      description: Retrieves proposals from the archive service.
+      operationId: getV2ArchiveProposals
+      tags:
+        - proposals
+      parameters:
+        - name: filter
+          in: query
+          description: Proposal list filter.
+          required: false
+          schema:
+            type: string
+            enum:
+              - relevant
+              - everything
+              - temp-checks
+            default: relevant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveProposalListResponse"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+  /proposals/{proposalId}:
+    get:
+      summary: Gets an archive-backed proposal
+      description: Retrieves a single proposal from the archive service.
+      operationId: getV2ArchiveProposalById
+      tags:
+        - proposals
+      parameters:
+        - $ref: "#/components/parameters/proposalId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveProposal"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+  /proposals/{proposalId}/votes:
+    get:
+      summary: Gets archive-backed proposal votes
+      description: Retrieves a paginated list of votes for a proposal from the archive service.
+      operationId: getV2ArchiveProposalVotes
+      tags:
+        - proposals
+        - votes
+      parameters:
+        - $ref: "#/components/parameters/proposalId"
+        - name: sort
+          in: query
+          description: Sort votes by voting weight or vote block number.
+          required: false
+          schema:
+            type: string
+            enum:
+              - weight
+              - block_number
+            default: weight
+        - name: sortOrder
+          in: query
+          description: Sort direction.
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArchiveVoteListResponse"
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Proposal not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error

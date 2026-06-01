@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
 
-const API_PREFIX = "/api/v1";
+const API_PREFIXES = ["/api/v1", "/api/v2"] as const;
 const EXCLUDED_ROUTES_FROM_AUTH = [
   "/spec",
   "/auth/nonce",
@@ -65,6 +65,12 @@ function setCorsHeaders(request: NextRequest, response: Response) {
   return response;
 }
 
+function getApiPrefix(path: string) {
+  return API_PREFIXES.find(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`)
+  );
+}
+
 /*
   Middleware function to run on matching routes for config.matcher.
 
@@ -86,15 +92,17 @@ export async function middleware(request: NextRequest) {
     return setOptionsCorsHeaders(request);
   }
 
-  if (path.startsWith(API_PREFIX)) {
+  const apiPrefix = getApiPrefix(path);
+
+  if (apiPrefix) {
     // validate bearer token for all api routes except excluded routes
     if (
       !EXCLUDED_ROUTES_FROM_AUTH.some((route) =>
-        path.startsWith(`${API_PREFIX}${route}`)
+        path.startsWith(`${apiPrefix}${route}`)
       )
     ) {
       const isDraftShareRequest =
-        path.startsWith(`${API_PREFIX}/drafts/`) &&
+        path.startsWith(`${apiPrefix}/drafts/`) &&
         request.nextUrl.searchParams.has("share");
 
       if (!isDraftShareRequest) {
@@ -117,5 +125,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/api/v1/:path*"],
+  matcher: ["/", "/api/v1/:path*", "/api/v2/:path*"],
 };
