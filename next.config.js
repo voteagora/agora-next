@@ -76,6 +76,11 @@ const nextConfig = withBundleAnalyzer({
       __dirname,
       "src/lib/shims/SwaggerUI.tsx"
     );
+    // Point the shim at the real package's resolved entry so its internal
+    // require() does not match the exact-match alias above and recurse into
+    // the shim itself (which would yield an incomplete module object).
+    config.resolve.alias["swagger-ui-react-impl$"] =
+      require.resolve("swagger-ui-react");
     config.resolve.alias["@react-native-async-storage/async-storage$"] =
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
     return config;

@@ -1,8 +1,11 @@
 import React, { type CSSProperties, type ReactNode } from "react";
 
-// Avoid resolving to this shim by importing from the package entry via require.
-const RawSwaggerUI: React.ComponentType<any> =
-  require("swagger-ui-react").default ?? require("swagger-ui-react");
+// Require the real package via the "swagger-ui-react-impl" alias (configured in
+// next.config.js). Requiring "swagger-ui-react" here would match the exact
+// alias that points back at this shim, creating a circular reference whose
+// half-initialized module object reaches React as an invalid element type.
+const rawModule = require("swagger-ui-react-impl");
+const RawSwaggerUI: React.ComponentType<any> = rawModule.default ?? rawModule;
 
 export type SwaggerUIProps = {
   url?: string;
