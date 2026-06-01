@@ -39,7 +39,6 @@ export default function ProposalDescription({
     : proposal.description?.replace(/\n\n ## Description \n/, "");
 
   const title = proposal.markdowntitle;
-
   const shortTitle = proposalsWithBadFormatting.includes(proposal.id)
     ? title.split("-")[0].split("(")[0]
     : title;
@@ -68,25 +67,8 @@ export default function ProposalDescription({
   const tagBgClass = tagBackground ? "" : "bg-black/10";
   const useArchiveForProposals =
     ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
-  const archiveMetadata = useArchiveForProposals
-    ? ((
-        proposal as unknown as {
-          archiveMetadata?: {
-            proposalTypeName?: string;
-            proposalTypeTag?: string;
-            source?: string;
-            proposerEns?: string;
-            defaultProposalTypeRanges?: {
-              min_quorum_pct: number;
-              max_quorum_pct: number;
-              min_approval_threshold_pct: number;
-              max_approval_threshold_pct: number;
-            };
-          };
-        }
-      ).archiveMetadata ?? null)
-    : null;
-
+  const archiveMetadata = proposal.archiveMetadata;
+  const useIsEasOOProposal = ui.toggle("has-eas-oodao")?.enabled ?? false;
   const proposerBadge = archiveMetadata?.proposerEns ? (
     archiveMetadata.proposerEns
   ) : (
@@ -102,7 +84,7 @@ export default function ProposalDescription({
     <div
       className={`flex flex-col gap-4 sm:max-w-[48rem] w-full md:min-w-[20rem] lg:min-w-[32rem] xl:min-w-[48rem] max-w-[calc(100vw-2rem)]`}
     >
-      {archiveMetadata && (
+      {useIsEasOOProposal && (
         <div className="inline-flex justify-start items-center gap-2 flex-wrap">
           {typeBadgeLabel && (
             <div

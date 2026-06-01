@@ -67,6 +67,7 @@ export default function HybridOptionsResultsPanel({
 
   return (
     <div
+      data-testid="proposal-results-panel"
       className={cn(
         "flex flex-col flex-1 overflow-y-auto flex-shrink p-4 min-h-0",
         className

@@ -7,13 +7,14 @@ import { z } from "zod";
 import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-preferences/auth";
 import { ensureNotificationRecipient } from "@/app/api/v1/notification-preferences/recipient";
 import { notificationCenterClient } from "@/lib/notification-center/client";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
 const BodySchema = z.object({
   channel: z.enum(["discord", "slack"]),
   url: z.string().url(),
 });
 
-export async function POST(request: NextRequest) {
+async function post(request: NextRequest) {
   const auth = await requireNotificationPreferencesAuth(request);
   if (!auth.ok) return auth.response;
 
@@ -60,3 +61,8 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.notification_preferences.channels.webhook.update",
+  post
+);

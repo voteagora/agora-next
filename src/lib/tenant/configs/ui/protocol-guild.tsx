@@ -221,6 +221,10 @@ export const protocolGuildTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "proposals/pretty-view",
+      enabled: true,
+    },
+    {
       name: "info",
       enabled: true,
     },
@@ -300,6 +304,14 @@ export const protocolGuildTenantUIConfig = new TenantUI({
     },
     {
       name: "use-daonode-for-proposal-types",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
       enabled: true,
     },
     {

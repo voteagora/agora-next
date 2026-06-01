@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { resolveENSTextRecords, resolveEFPStats } from "../ENSUtils";
 
 // Mock environment variables for tests
-process.env.NEXT_PUBLIC_ALCHEMY_ID = "test-alchemy-key";
+process.env.NEXT_PUBLIC_RPC_SECRET = "test-rpc-secret";
 process.env.NEXT_PUBLIC_AGORA_ENV = "dev";
 
 vi.mock("ethers", () => {
@@ -17,7 +17,7 @@ vi.mock("ethers", () => {
   };
 
   return {
-    AlchemyProvider: vi.fn().mockImplementation(() => ({
+    JsonRpcProvider: vi.fn().mockImplementation(() => ({
       getResolver: mockGetResolver,
       lookupAddress: mockLookupAddress,
     })),

@@ -13,7 +13,10 @@ import { useAccount } from "wagmi";
 import { ArchiveProposalRow } from "../Proposal/ArchiveProposalList";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 import { useSearchParams } from "next/navigation";
-import { proposalsFilterOptions } from "@/lib/constants";
+import {
+  FILTERED_ENS_PROPOSALS,
+  proposalsFilterOptions,
+} from "@/lib/constants";
 import { UpdatedButton } from "@/components/Button";
 import { DaoSlug } from "@prisma/client";
 
@@ -52,7 +55,7 @@ export default function ArchiveProposalsList({
   } | null;
 }) {
   const { address } = useAccount();
-  const { token, namespace } = Tenant.current();
+  const { token } = Tenant.current();
   const searchParams = useSearchParams();
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
@@ -75,20 +78,24 @@ export default function ArchiveProposalsList({
   }
 
   const filteredProposals = React.useMemo(() => {
+    const baseProposals = proposals.filter(
+      (proposal) => !FILTERED_ENS_PROPOSALS.includes(proposal.id)
+    );
+
     if (filter === proposalsFilterOptions.everything.filter) {
-      return proposals.map((proposal) => ({
+      return baseProposals.map((proposal) => ({
         ...proposal,
         kwargs: normalizeProposalKwargs(proposal.kwargs),
       }));
     }
 
     if (filter === proposalsFilterOptions.tempChecks.filter) {
-      return proposals.filter((proposal) =>
+      return baseProposals.filter((proposal) =>
         proposal.tags?.includes("tempcheck")
       );
     }
 
-    return proposals
+    return baseProposals
       .filter(
         (proposal) =>
           !proposal.cancel_event &&
@@ -105,7 +112,13 @@ export default function ArchiveProposalsList({
     return [...filteredProposals].sort((a, b) => {
       const aBlock = Number(a.start_blocktime) || 0;
       const bBlock = Number(b.start_blocktime) || 0;
-      return bBlock - aBlock;
+      if (bBlock !== aBlock) {
+        return bBlock - aBlock;
+      }
+
+      const aLogIndex = Number(a.log_index) || 0;
+      const bLogIndex = Number(b.log_index) || 0;
+      return bLogIndex - aLogIndex;
     });
   }, [filteredProposals]);
 

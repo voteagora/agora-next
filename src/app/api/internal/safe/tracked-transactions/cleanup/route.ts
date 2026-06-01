@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { deleteExpiredSafeTrackedTransactions } from "@/lib/safeTrackedTransactions.server";
+import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 
-export async function POST(request: Request) {
+async function post(request: Request) {
   try {
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
@@ -30,3 +31,8 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export const POST = withApiRouteMonitoring(
+  "api.internal.safe.tracked_transactions.cleanup",
+  post
+);

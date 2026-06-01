@@ -328,8 +328,16 @@ If you need help creating transactions / calldata, please see this [video](https
       enabled: false,
     },
     {
+      name: "use-archive-for-proposals",
+      enabled: true,
+    },
+    {
+      name: "use-archive-for-proposal-details",
+      enabled: true,
+    },
+    {
       name: "use-archive-for-vote-history",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "forums",

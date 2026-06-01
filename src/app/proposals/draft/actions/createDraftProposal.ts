@@ -13,6 +13,7 @@ import {
   getStageIndexForTenant,
 } from "@/app/proposals/draft/utils/stages";
 import { requireDraftEditAccess } from "./draftAuthorization";
+import { withServerActionMonitoring } from "@/lib/apiMonitoring";
 
 const formDataByType = (
   data: z.output<typeof DraftProposalSchema>,
@@ -138,98 +139,104 @@ export async function onSubmitAction(
     creatorAddress: string;
   } & AuthParams
 ): Promise<FormState> {
-  const authResult = await verifyAuth(
-    {
-      jwt: data.jwt,
-      message: data.message,
-      signature: data.signature,
-      address: data.creatorAddress as `0x${string}`,
-    },
-    data.creatorAddress as `0x${string}`
-  );
-  if (!authResult.success) {
-    return { ok: false, message: authResult.error };
-  }
+  return withServerActionMonitoring(
+    "server_action.proposals.draft.create",
+    async () => {
+      const authResult = await verifyAuth(
+        {
+          jwt: data.jwt,
+          message: data.message,
+          signature: data.signature,
+          address: data.creatorAddress as `0x${string}`,
+        },
+        data.creatorAddress as `0x${string}`
+      );
+      if (!authResult.success) {
+        return { ok: false, message: authResult.error };
+      }
 
-  const draftAccess = await requireDraftEditAccess({
-    draftProposalId: data.draftProposalId,
-    address: authResult.address,
-  });
-  if (!draftAccess.ok) {
-    return { ok: false, message: draftAccess.message };
-  }
+      const draftAccess = await requireDraftEditAccess({
+        draftProposalId: data.draftProposalId,
+        address: authResult.address,
+      });
+      if (!draftAccess.ok) {
+        return { ok: false, message: draftAccess.message };
+      }
 
-  const parsed = DraftProposalSchema.safeParse(data);
+      const parsed = DraftProposalSchema.safeParse(data);
 
-  if (!parsed.success) {
-    return {
-      ok: false,
-      message: `Invalid form data: ${parsed.error.errors
-        .map((e) => e.message)
-        .join(", ")}`,
-    };
-  }
+      if (!parsed.success) {
+        return {
+          ok: false,
+          message: `Invalid form data: ${parsed.error.errors
+            .map((e) => e.message)
+            .join(", ")}`,
+        };
+      }
 
-  const currentIndex = getStageIndexForTenant("DRAFTING") as number;
+      const currentIndex = getStageIndexForTenant("DRAFTING") as number;
 
-  try {
-    const nextStage = getStageByIndex(currentIndex + 1);
+      try {
+        const nextStage = getStageByIndex(currentIndex + 1);
 
-    const baseformData = {
-      stage: nextStage?.stage,
-      title: sanitizeContent(parsed.data.title),
-      abstract: sanitizeContent(parsed.data.abstract),
-      voting_module_type: parsed.data.type,
-      proposal_type: parsed.data.proposalConfigType,
-      proposal_scope: parsed.data.proposal_scope,
-      calculation_options: parsed.data.calculationOptions,
-      tiers: parsed.data.tiers,
-    };
+        const baseformData = {
+          stage: nextStage?.stage,
+          title: sanitizeContent(parsed.data.title),
+          abstract: sanitizeContent(parsed.data.abstract),
+          voting_module_type: parsed.data.type,
+          proposal_type: parsed.data.proposalConfigType,
+          proposal_scope: parsed.data.proposal_scope,
+          calculation_options: parsed.data.calculationOptions,
+          tiers: parsed.data.tiers,
+        };
 
-    const updateDraft = prismaWeb2Client.proposalDraft.update({
-      where: {
-        id: data.draftProposalId,
-      },
-      data: {
-        ...baseformData,
-        ...formDataByType(parsed.data, data.draftProposalId),
-      },
-    });
-
-    const additionalDatabaseWrites = [];
-
-    if ("transactions" in data && data.transactions.length > 0) {
-      const transactionLink = `https://tdly.co/shared/simulation/${data.transactions[0].simulation_id}`;
-      const updateTransactionSimulationChecklist =
-        prismaWeb2Client.proposalChecklist.create({
+        const updateDraft = prismaWeb2Client.proposalDraft.update({
+          where: {
+            id: data.draftProposalId,
+          },
           data: {
-            title: "Transactions simulated",
-            completed_by: data.creatorAddress,
-            link: transactionLink,
-            proposal: {
-              connect: {
-                id: data.draftProposalId,
-              },
-            },
+            ...baseformData,
+            ...formDataByType(parsed.data, data.draftProposalId),
           },
         });
 
-      additionalDatabaseWrites.push(updateTransactionSimulationChecklist);
-    }
+        const additionalDatabaseWrites = [];
 
-    await prismaWeb2Client.$transaction([
-      updateDraft,
-      ...additionalDatabaseWrites,
-    ]);
+        if ("transactions" in data && data.transactions.length > 0) {
+          const transactionLink = `https://tdly.co/shared/simulation/${data.transactions[0].simulation_id}`;
+          const updateTransactionSimulationChecklist =
+            prismaWeb2Client.proposalChecklist.create({
+              data: {
+                title: "Transactions simulated",
+                completed_by: data.creatorAddress,
+                link: transactionLink,
+                proposal: {
+                  connect: {
+                    id: data.draftProposalId,
+                  },
+                },
+              },
+            });
 
-    return {
-      ok: true,
-      message: "Success!",
-    };
-  } catch (error: any) {
-    return {
-      ok: false,
-      message: error.message,
-    };
-  }
+          additionalDatabaseWrites.push(updateTransactionSimulationChecklist);
+        }
+
+        await prismaWeb2Client.$transaction([
+          updateDraft,
+          ...additionalDatabaseWrites,
+        ]);
+
+        return {
+          ok: true,
+          message: "Success!",
+        };
+      } catch (error: any) {
+        return {
+          ok: false,
+          message: error.message,
+        };
+      }
+    },
+    { labels: { draftProposalId: data.draftProposalId } }
+  );
 }

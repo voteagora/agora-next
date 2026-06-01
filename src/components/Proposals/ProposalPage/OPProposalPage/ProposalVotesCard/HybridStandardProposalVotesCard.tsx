@@ -30,9 +30,9 @@ const HybridStandardProposalVotesCard = ({
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const [activeTab, setTab] = useState("results");
   const [showVoters, setShowVoters] = useState(true);
@@ -161,11 +161,11 @@ const HybridStandardProposalVotesCard = ({
             </>
           )}
         </div>
-        <VoteOnAtlas
-          offchainProposalId={proposal.offchainProposalId || proposal.id}
-          isVotingOpen={proposal.status === "ACTIVE"}
-        />
       </div>
+      <VoteOnAtlas
+        offchainProposalId={proposal.offchainProposalId || proposal.id}
+        isVotingOpen={proposal.status === "ACTIVE"}
+      />
     </>
   );
 };

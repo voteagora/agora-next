@@ -19,24 +19,24 @@ export type SortParams = {
 
 const sortOptions: SortParams[] = [
   {
-    sortKey: "block_number",
-    sortOrder: "desc",
-    label: "Most Recent",
-  },
-  {
-    sortKey: "block_number",
-    sortOrder: "asc",
-    label: "Oldest",
-  },
-  {
     sortKey: "weight",
     sortOrder: "desc",
     label: "Most Voting Power",
   },
   {
+    sortKey: "block_number",
+    sortOrder: "desc",
+    label: "Most Recent",
+  },
+  {
     sortKey: "weight",
     sortOrder: "asc",
     label: "Least Voting Power",
+  },
+  {
+    sortKey: "block_number",
+    sortOrder: "asc",
+    label: "Oldest",
   },
 ];
 

@@ -6,6 +6,7 @@ import { formatEther } from "viem";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
 import { getBlockScanUrl } from "@/lib/utils";
+import Tenant from "@/lib/tenant/tenant";
 import { getActionsLink } from "./ProposalTransactionDisplay";
 
 function getTransactionsLabel(status) {
@@ -34,10 +35,11 @@ export default function ApprovedTransactions({
       : setDisplayedOptions(1);
   };
 
+  const { ui } = Tenant.current();
+
   if (proposalData.options.length === 0) {
     return null;
   }
-
   const isNoProposedTransactions =
     (proposalType === "STANDARD" &&
       proposalData.options[0].calldatas[0] === "0x") ||

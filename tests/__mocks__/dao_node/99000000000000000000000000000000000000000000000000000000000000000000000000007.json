@@ -1,0 +1,55 @@
+{
+  "after_end_block": true,
+  "after_start_block": true,
+  "block_number": "142523823",
+  "data_eng_properties": {
+    "hash": "synthetic-approval-defeated-quorum",
+    "liveness": "archived",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [
+    [[0, [], [], [], "alisha"]],
+    [
+      1,
+      1,
+      "0x0000000000000000000000000000000000000000",
+      "1000000000000000000",
+      0
+    ]
+  ],
+  "description": "# [SYNTHETIC] Approval — quorum not met (single nominee)\n\nToo few voters participated to clear quorum.",
+  "end_block": 142783023,
+  "end_blocktime": 1761164823,
+  "hybrid": false,
+  "id": "99000000000000000000000000000000000000000000000000000000000000000000000000007",
+  "lifecycle_stage": "DEFEATED",
+  "log_index": 1,
+  "num_of_votes": 7,
+  "proposal_type_id": 3,
+  "proposal_type_info": {
+    "approval_threshold": 5100,
+    "module": null,
+    "name": "Default - Approval Voting",
+    "quorum": 3000,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "25631045241056631270605358",
+  "start_block": 142523823,
+  "start_blocktime": 1760646423,
+  "timestamp": 1760646423,
+  "title": "[SYNTHETIC] Approval — Quorum Not Met",
+  "total_voting_power_at_start": "85436817470188770902017861",
+  "totals": {
+    "0": {
+      "1": "500000000000000000000000"
+    },
+    "no-param": {
+      "1": "500000000000000000000000"
+    }
+  },
+  "transaction_hash": "0x0000000000000000000000000000000000000000000000000000000000000007",
+  "transaction_index": 1,
+  "voting_module": "0x8060b18290f48fc0bf2149eeb2f3c280bde7674f",
+  "voting_module_name": "approval"
+}

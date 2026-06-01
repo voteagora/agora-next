@@ -45,9 +45,9 @@ const OptimisticProposalVotesCard = ({
     value: "All",
   });
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const { token, ui } = Tenant.current();
   const [isClicked, setIsClicked] = useState<boolean>(false);
@@ -129,7 +129,12 @@ const OptimisticProposalVotesCard = ({
           </HStack>
         </button>
         <div>
-          <div className="py-0 px-4 font-semibold mb-2">Voting activity</div>
+          <div
+            data-testid="proposal-voting-activity-title"
+            className="py-0 px-4 font-semibold mb-2"
+          >
+            Voting activity
+          </div>
           <div className="pt-4 px-4 rounded-md shrink-0 text-xs border border-line mx-4 shadow-newDefault flex flex-col gap-1">
             {proposal.status === "CANCELLED" ? (
               <p className="text-red-negative font-bold">
@@ -138,6 +143,7 @@ const OptimisticProposalVotesCard = ({
             ) : (
               <div>
                 <p
+                  data-testid="proposal-optimistic-summary-title"
                   className={
                     status === "approved"
                       ? "text-positive font-bold"
@@ -147,7 +153,10 @@ const OptimisticProposalVotesCard = ({
                   This proposal is optimistically {status}
                 </p>
 
-                <p className="mt-1 font-normal text-secondary">
+                <p
+                  data-testid="proposal-optimistic-summary-description"
+                  className="mt-1 font-normal text-secondary"
+                >
                   This proposal will automatically pass unless{" "}
                   {disapprovalThreshold}% of the votable supply of{" "}
                   {token.symbol} is against. Currently {againstRelativeAmount}%

@@ -23,12 +23,11 @@ export default function ProposalTitle({
     proposalData
   );
   const { ui } = Tenant.current();
-  const useArchiveForProposals =
-    ui.toggle("use-archive-for-proposals")?.enabled ?? false;
+  const useIsEasOOProposal = ui.toggle("has-eas-oodao")?.enabled ?? false;
 
   return (
     <div className="flex-col items-start">
-      {!useArchiveForProposals && (
+      {!useIsEasOOProposal && (
         <div className="text-xs font-semibold text-secondary flex items-center">
           {proposalText} by
           {Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM ? (
@@ -55,7 +54,12 @@ export default function ProposalTitle({
           </a>
         </div>
       )}
-      <h2 className="font-black text-2xl text-primary">{title}</h2>
+      <h2
+        data-testid="proposal-title"
+        className="font-black text-2xl text-primary"
+      >
+        {title}
+      </h2>
     </div>
   );
 }

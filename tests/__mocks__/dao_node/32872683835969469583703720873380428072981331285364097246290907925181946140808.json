@@ -1,0 +1,94 @@
+{
+  "after_end_block": false,
+  "after_start_block": false,
+  "block_number": "141357360",
+  "data_eng_properties": {
+    "hash": "620d3002e08e3d26314176a8b8aee55602f6b3becdf81db93ad619da08688ac4",
+    "liveness": "live",
+    "source": "dao_node"
+  },
+  "decoded_proposal_data": [[2000, true]],
+  "description": "# Maintenance Upgrade: 16a\n\nUpgrade 16a is a maintenance release that replaces [Upgrade 16](https://vote.optimism.io/proposals/42233809968417684816035432917226202543057967150073565253597304573923844823222), primarily aimed at temporarily removing the interop withdrawal-proving code introduced in U16 but never activated on mainnet, following partner feedback. While this specific code has been withdrawn, all [interop-related code](https://github.com/ethereum-optimism/optimism/blob/c9be74f2b0a119a16f3a87d6a4f0c15a86f448bc/packages/contracts-bedrock/src/L1/OptimismPortalInterop.sol) remains in the Optimism Monorepo, and the commitment to delivering interop in a future upgrade is unchanged. In addition, U16a introduces system-level feature toggles through the [SystemConfig contract](https://github.com/ethereum-optimism/optimism/blob/c9be74f2b0a119a16f3a87d6a4f0c15a86f448bc/packages/contracts-bedrock/src/L1/SystemConfig.sol#L499-L518), enabling the OP Stack to evolve more iteratively and allowing for greater feature customization across different chains. Beyond these adjustments, the upgrade does not introduce any other significant changes.\n\nThis is an optimistic approval. You should only cast a vote if you want to veto this maintenance upgrade. You can read more about this proposal type in our\u00a0[operating manual](https://github.com/ethereum-optimism/OPerating-manual/blob/main/manual.md).\n\nYou can read about Maintenance Upgrade 16a in its entirety [here](https://gov.optimism.io/t/maintenance-upgrade-proposal-u16a/10288).",
+  "end_block": 141616560,
+  "end_blocktime": 1758831897,
+  "govless_proposal": {
+    "attester": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "calculationOptions": 0,
+    "chain_id": "10",
+    "choices": [],
+    "contract": "0xcdf27f107725988f2261ce2256bdfcde8b382b10",
+    "created_blocktime": 1758313523,
+    "criteria": 99,
+    "criteria_value": 0,
+    "data_eng_properties": {
+      "hash": "f624a0b29d27ab10330f39158758d4ae9f5e7d17189db09ca2919614a34bd22d",
+      "liveness": "archived",
+      "source": "eas-atlas"
+    },
+    "end_block": 141616567,
+    "end_blocktime": 1758831911,
+    "expirationTime": 0,
+    "hybrid": true,
+    "id": "5434490809633408749910234742906885757078131497989209672789678220584951747865",
+    "max_approvals": 0,
+    "num_of_votes": 265,
+    "onchain_proposalid": 32872683835969469583703720873380428072981331285364097246290907925181946140808,
+    "outcome": {
+      "APP": {
+        "2": 1
+      },
+      "CHAIN": {
+        "2": 1
+      },
+      "USER": {
+        "0": 59,
+        "2": 204
+      }
+    },
+    "proposal_type": "OPTIMISTIC_TIERED",
+    "proposal_type_id": 2,
+    "proposer": "0xa7f8ad892f3e6f25bb042c8ad7a220e74acebad8",
+    "proposer_ens": null,
+    "recipient": "0x0000000000000000",
+    "refUID": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "resolver": "0x2d69e3fa434898999faefe0edbc8a714c4a0fe0f",
+    "revocable": true,
+    "revocationTime": 0,
+    "schema": "0xfc5b3c0472d09ac39f0cb9055869e70c4c59413041e3fd317f357789389971e4",
+    "start_block": 141357367,
+    "start_blocktime": 1758313511,
+    "tiers": [1100, 1400, 1700],
+    "time": 1758313523,
+    "uid": "0x42247c00390396ad0d598e3ec39bc349c6a3f17fe44bcf574707a904960c127e"
+  },
+  "hybrid": true,
+  "id": "32872683835969469583703720873380428072981331285364097246290907925181946140808",
+  "lifecycle_stage": "SUCCEEDED",
+  "log_index": 1,
+  "num_of_votes": 3291,
+  "proposal_data": "00000000000000000000000000000000000000000000000000000000000007d00000000000000000000000000000000000000000000000000000000000000001",
+  "proposal_type_id": 2,
+  "proposal_type_info": {
+    "approval_threshold": 0,
+    "module": null,
+    "name": "Optimistic",
+    "quorum": 0,
+    "scopes": []
+  },
+  "proposer": "0xe4553b743e74da3424ac51f8c1e586fd43ae226f",
+  "quorum": "29048439693532197051157636",
+  "start_block": 141357360,
+  "start_blocktime": 1758313497,
+  "timestamp": 1758313497,
+  "title": "Maintenance Upgrade: 16a",
+  "total_voting_power_at_start": "96828132311773990170525455",
+  "totals": {
+    "no-param": {
+      "0": "681353012042797422962615"
+    }
+  },
+  "transaction_hash": "0x5441857eb9aff324e541bc672cac80ab086aca5603a080ab2849cfa4e7d27113",
+  "transaction_index": 4,
+  "voting_module": "0x8980c97f0e8a3a69831139e51003e65238f1f343",
+  "voting_module_name": "optimistic"
+}

@@ -30,7 +30,6 @@ type RangeProposalType = {
 
 export default function ProposalVotesSummary({ proposal }: Props) {
   const [showDetails, setShowDetails] = useState(false);
-
   const results =
     proposal.proposalResults as ParsedProposalResults["STANDARD"]["kind"];
 
@@ -78,7 +77,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
         <div className="flex flex-col rounded-md font-bold shrink-0 text-xs border border-line mx-4 shadow-newDefault">
           <HoverCardTrigger className="w-full cursor-pointer flex flex-col gap-2 px-4 pt-2">
             <div className="flex flex-row justify-between mt-2">
-              <div className="text-positive">
+              <div data-testid="proposal-votes-for" className="text-positive">
                 FOR -{" "}
                 <TokenAmountDecorated
                   amount={results.for}
@@ -86,7 +85,10 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                   specialFormatting
                 />
               </div>
-              <div className="text-negative">
+              <div
+                data-testid="proposal-votes-against"
+                className="text-negative"
+              >
                 AGAINST -{" "}
                 <TokenAmountDecorated
                   amount={results.against}
@@ -107,7 +109,7 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                     </div>
                   ) : !hasPendingRanges ? (
                     proposal.quorum && (
-                      <div>
+                      <div data-testid="proposal-votes-quorum">
                         Quorum{" "}
                         <TokenAmountDecorated
                           amount={proposal.quorum}
@@ -131,8 +133,9 @@ export default function ProposalVotesSummary({ proposal }: Props) {
                       <p>{`Threshold ${minApprovalThreshold}% – ${maxApprovalThreshold}%`}</p>
                     </div>
                   ) : !hasPendingRanges ? (
-                    proposal.approvalThreshold && (
-                      <div>
+                    proposal.approvalThreshold &&
+                    Number(proposal.approvalThreshold) !== 0 && (
+                      <div data-testid="proposal-votes-threshold">
                         <p>{`Threshold ${
                           Number(proposal.approvalThreshold) / 100
                         }%`}</p>

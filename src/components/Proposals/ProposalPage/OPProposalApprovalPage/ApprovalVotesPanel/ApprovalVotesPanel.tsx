@@ -57,9 +57,9 @@ export default function ApprovalVotesPanel({
   )?.enabled;
 
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
     type: "ALL",
@@ -129,6 +129,11 @@ export default function ApprovalVotesPanel({
               className="text-base font-semibold pr-4 cursor-pointer"
             >
               <span
+                data-testid={
+                  tab === "Results"
+                    ? "proposal-results-tab"
+                    : "proposal-votes-tab"
+                }
                 className={
                   activeTab === index + 1 ? "text-secondary" : "text-tertiary"
                 }

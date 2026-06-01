@@ -40,9 +40,9 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
     "use-archive-for-vote-history"
   )?.enabled;
   const [sortOption, setSortOption] = useState<SortParams>({
-    sortKey: "block_number",
+    sortKey: "weight",
     sortOrder: "desc",
-    label: "Most Recent",
+    label: "Most Voting Power",
   });
   const [selectedVoterType, setSelectedVoterType] = useState<VoterTypes>({
     type: "ALL",
@@ -191,11 +191,11 @@ export default function HybridApprovalVotesPanel({ proposal }: Props) {
             </>
           )}
         </div>
-        <VoteOnAtlas
-          offchainProposalId={proposal.offchainProposalId || proposal.id}
-          isVotingOpen={proposal.status === "ACTIVE"}
-        />
       </div>
+      <VoteOnAtlas
+        offchainProposalId={proposal.offchainProposalId || proposal.id}
+        isVotingOpen={proposal.status === "ACTIVE"}
+      />
     </>
   );
 }

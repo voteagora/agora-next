@@ -108,6 +108,7 @@ function extractSnapshotDisplayData(
       proposalStatus: statusLabel,
       proposalStartTime: startTime ? new Date(Number(startTime) * 1000) : null,
       proposalEndTime: endTime ? new Date(Number(endTime) * 1000) : null,
+      proposalCreatedTime: null,
       proposalCancelledTime: null,
       proposalExecutedTime: null,
     },
