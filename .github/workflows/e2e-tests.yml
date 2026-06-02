@@ -23,6 +23,7 @@ jobs:
       NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
       UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      NEXT_PUBLIC_RPC_SECRET: ${{ secrets.NEXT_PUBLIC_RPC_SECRET }}
 
     steps:
       - uses: actions/checkout@v4
