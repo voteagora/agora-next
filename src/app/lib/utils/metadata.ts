@@ -14,8 +14,8 @@ type BuildPageMetadataParams = {
  * Get the base URL for the current request
  * Used for metadataBase in Next.js metadata generation
  */
-export function getMetadataBaseUrl(): URL {
-  const headerList = headers();
+export async function getMetadataBaseUrl(): Promise<URL> {
+  const headerList = await headers();
   const forwardedHost = headerList.get("x-forwarded-host");
   const host = forwardedHost || headerList.get("host") || "localhost:3000";
   const protoHeader = headerList.get("x-forwarded-proto");
@@ -25,15 +25,15 @@ export function getMetadataBaseUrl(): URL {
   return new URL(`${protocol}://${host}`);
 }
 
-export function buildPageMetadata({
+export async function buildPageMetadata({
   title,
   description,
   path,
   imageTitle = title,
   imageDescription = description,
   robots,
-}: BuildPageMetadataParams): Metadata {
-  const metadataBase = getMetadataBaseUrl();
+}: BuildPageMetadataParams): Promise<Metadata> {
+  const metadataBase = await getMetadataBaseUrl();
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     imageTitle
   )}&description=${encodeURIComponent(imageDescription)}`;

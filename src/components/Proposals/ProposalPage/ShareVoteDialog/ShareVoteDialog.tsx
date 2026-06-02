@@ -16,7 +16,7 @@ import { useLatestBlock } from "@/hooks/useLatestBlock";
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types";
 
 function generateVoteBars(
   forPercentage: number,

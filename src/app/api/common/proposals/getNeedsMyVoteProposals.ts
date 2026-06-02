@@ -26,10 +26,12 @@ async function getNeedsMyVoteProposalsFromArchive(address: string) {
     "use-timestamp-for-proposals"
   )?.enabled;
 
-  const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-    ?.enabled
-    ? contracts.providerForTime?.getBlock("latest")
-    : contracts.token.provider.getBlock("latest");
+  const providerForLatestBlock =
+    ui.toggle("use-l1-block-number")?.enabled && contracts.providerForTime
+      ? contracts.providerForTime
+      : contracts.token.provider;
+  const latestBlockPromise: Promise<Block | null> =
+    providerForLatestBlock.getBlock("latest");
 
   const [archiveResult, latestBlock] = await Promise.all([
     fetchProposalsFromArchive(
@@ -118,10 +120,12 @@ async function getNeedsMyVoteProposals(address: string) {
       "use-timestamp-for-proposals"
     )?.enabled;
 
-    const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-      ?.enabled
-      ? contracts.providerForTime?.getBlock("latest")
-      : contracts.token.provider.getBlock("latest");
+    const providerForLatestBlock =
+      ui.toggle("use-l1-block-number")?.enabled && contracts.providerForTime
+        ? contracts.providerForTime
+        : contracts.token.provider;
+    const latestBlockPromise: Promise<Block | null> =
+      providerForLatestBlock.getBlock("latest");
 
     const [latestBlock, votableSupply] = await Promise.all([
       latestBlockPromise,

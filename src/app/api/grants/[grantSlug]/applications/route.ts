@@ -193,9 +193,9 @@ function buildDynamicSchema(grant: any) {
 
 async function post(
   req: NextRequest,
-  { params }: { params: { grantSlug: string } }
+  { params }: { params: Promise<{ grantSlug: string }> }
 ) {
-  const { grantSlug } = params;
+  const { grantSlug } = await params;
 
   try {
     const authResponse = await authenticateApiUser(req);
@@ -528,6 +528,8 @@ export const POST = withApiRouteMonitoring(
   "api.grants.applications.submit",
   post,
   {
-    getLabels: (_req, { params }) => ({ grantSlug: params.grantSlug }),
+    getLabels: async (_req, { params }) => ({
+      grantSlug: (await params).grantSlug,
+    }),
   }
 );

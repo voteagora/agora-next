@@ -40,7 +40,7 @@ export const fetchDelegate = async (address: string) => {
   }
 };
 
-export const fetchVoterStats = unstable_cache(
+const cachedFetchVoterStats = unstable_cache(
   async (address: string, blockNumberOrTimestamp?: number) => {
     return apiFetchVoterStats(address, blockNumberOrTimestamp);
   },
@@ -53,7 +53,14 @@ export const fetchVoterStats = unstable_cache(
   }
 );
 
-export const fetchDelegateStatement = unstable_cache(
+export async function fetchVoterStats(
+  address: string,
+  blockNumberOrTimestamp?: number
+) {
+  return cachedFetchVoterStats(address, blockNumberOrTimestamp);
+}
+
+const cachedFetchDelegateStatement = unstable_cache(
   async (address: string) => {
     return apiFetchDelegateStatement(address);
   },
@@ -65,6 +72,10 @@ export const fetchDelegateStatement = unstable_cache(
     tags: ["delegateStatement"],
   }
 );
+
+export async function fetchDelegateStatement(address: string) {
+  return cachedFetchDelegateStatement(address);
+}
 
 // Pass address of the connected wallet
 export async function fetchVotingPowerForSubdelegation(
@@ -168,7 +179,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
-  revalidateTag(`delegate-${delegateAddress}`);
+  revalidateTag(`delegate-${delegateAddress}`, { expire: 0 });
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 

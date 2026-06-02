@@ -764,11 +764,12 @@ async function getVotesForProposal({
         );
       };
 
-      const latestBlockPromise: Promise<Block> = ui.toggle(
-        "use-l1-block-number"
-      )?.enabled
-        ? contracts.providerForTime?.getBlock("latest")
-        : contracts.token.provider.getBlock("latest");
+      const providerForLatestBlock =
+        ui.toggle("use-l1-block-number")?.enabled && contracts.providerForTime
+          ? contracts.providerForTime
+          : contracts.token.provider;
+      const latestBlockPromise: Promise<Block | null> =
+        providerForLatestBlock.getBlock("latest");
 
       const [{ meta, data: votes }, latestBlock] = await Promise.all([
         doInSpan({ name: "getVotesForProposal" }, async () =>

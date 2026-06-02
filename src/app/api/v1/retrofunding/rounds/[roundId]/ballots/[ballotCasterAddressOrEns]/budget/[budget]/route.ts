@@ -8,11 +8,11 @@ const budgetParser = z.string(z.number().min(2000000).max(8000000)); // number b
 async function post(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       budget: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -29,7 +29,7 @@ async function post(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns } = route.params;
+  const { roundId, ballotCasterAddressOrEns } = await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse
@@ -50,7 +50,7 @@ async function post(
       }
 
       const ballot = await updateBallotBudget(
-        Number(budgetParser.parse(route.params.budget)),
+        Number(budgetParser.parse((await route.params).budget)),
         Number(roundId),
         categoryScope,
         ballotCasterAddressOrEns

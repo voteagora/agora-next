@@ -1,0 +1,3 @@
+{
+  "buildCommand": "npx prisma generate && yarn generate-typechain && next build --webpack"
+}

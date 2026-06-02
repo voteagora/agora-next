@@ -18,7 +18,7 @@ const sortOrderValidator = createOptionalStringValidator(
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const authResponse = await authenticateApiUser(request);
@@ -32,8 +32,9 @@ export async function GET(
       const params = request.nextUrl.searchParams;
       const sort = sortValidator.parse(params.get("sort"));
       const sortOrder = sortOrderValidator.parse(params.get("sortOrder"));
+      const { proposalId } = await route.params;
       const votes = await getArchiveProposalVotes({
-        proposalId: route.params.proposalId,
+        proposalId,
         sort,
         sortOrder,
       });

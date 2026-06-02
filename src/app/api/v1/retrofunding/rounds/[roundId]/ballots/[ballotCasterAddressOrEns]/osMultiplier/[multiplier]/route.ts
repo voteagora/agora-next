@@ -5,11 +5,11 @@ import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
 async function post(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       multiplier: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -30,7 +30,7 @@ async function post(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns, multiplier } = route.params;
+  const { roundId, ballotCasterAddressOrEns, multiplier } = await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

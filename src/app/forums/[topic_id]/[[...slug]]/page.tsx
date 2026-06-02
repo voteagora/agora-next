@@ -38,13 +38,13 @@ import { hasMarkdownHeadings } from "../components/markdownHeadings";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     topic_id: string;
     slug?: string[];
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     post?: string;
-  };
+  }>;
 }
 
 type TopicBundle = {
@@ -53,8 +53,8 @@ type TopicBundle = {
   transformed: ForumTopic;
 };
 
-function getRequestBaseUrl(): string {
-  const headerList = headers();
+async function getRequestBaseUrl(): Promise<string> {
+  const headerList = await headers();
   const forwardedHost = headerList.get("x-forwarded-host");
   const host = forwardedHost || headerList.get("host") || "localhost:3000";
   const protoHeader = headerList.get("x-forwarded-proto");
@@ -122,10 +122,9 @@ function findPostById(posts: ForumPost[], postId: number): ForumPost | null {
   return posts.find((post) => post.id === postId) || null;
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const topicBundle = await loadTopic(params.topic_id);
   if (!topicBundle) {
     return {};
@@ -150,7 +149,7 @@ export async function generateMetadata({
     };
   }
 
-  const baseUrl = getRequestBaseUrl();
+  const baseUrl = await getRequestBaseUrl();
   const canonicalPath = buildForumTopicPath(topicId, transformed.title);
 
   const postId = extractPostId(searchParams?.post);
@@ -226,7 +225,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function ForumTopicPage({ params }: PageProps) {
+export default async function ForumTopicPage(props: PageProps) {
+  const params = await props.params;
   const { ui } = Tenant.current();
 
   if (!ui.toggle("forums")?.enabled) {

@@ -8,7 +8,10 @@ import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 export const maxDuration = 120;
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
+}) {
+  const params = await props.params;
   const { brandName } = Tenant.current();
 
   return buildPageMetadata({
@@ -22,13 +25,12 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   });
 }
 
-export default async function DraftProposalPage({
-  params,
-  searchParams,
-}: {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+export default async function DraftProposalPage(props: {
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { ui } = Tenant.current();
   const proposalLifecycleToggle = ui.toggle("proposal-lifecycle");
   const config = proposalLifecycleToggle?.config as PLMConfig;

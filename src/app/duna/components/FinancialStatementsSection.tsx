@@ -76,15 +76,25 @@ export default function FinancialStatementsSection({
     "delete"
   );
 
+  const getActionId = (statement: FinancialStatement) => {
+    if (actionTarget === "topic") {
+      return statement.topicId ?? null;
+    }
+
+    return statement.id;
+  };
+
   const handleDeleteStatement = async (
     statement: FinancialStatement,
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
-    const actionId =
-      actionTarget === "topic"
-        ? (statement.topicId ?? statement.id)
-        : statement.id;
+    const actionId = getActionId(statement);
+
+    if (actionId === null) {
+      console.error("Cannot delete financial statement without a topic id");
+      return;
+    }
 
     openDialog({
       type: "CONFIRM",
@@ -120,10 +130,12 @@ export default function FinancialStatementsSection({
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
-    const actionId =
-      actionTarget === "topic"
-        ? (statement.topicId ?? statement.id)
-        : statement.id;
+    const actionId = getActionId(statement);
+
+    if (actionId === null) {
+      console.error("Cannot archive financial statement without a topic id");
+      return;
+    }
 
     openDialog({
       type: "CONFIRM",

@@ -1,15 +1,19 @@
-import { BaseContract } from "ethers";
+import { AbstractProvider, BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
 import { ITokenContract } from "@/lib/contracts/common/interfaces/ITokenContract";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
+import { IVotableSupplyOracleContract } from "@/lib/contracts/common/interfaces/IVotableSupplyOracleContract";
 import {
+  DELEGATION_MODEL,
+  GOVERNOR_TYPE,
   PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TENANT_NAMESPACES,
+  TIMELOCK_TYPE,
 } from "./constants";
 import { TenantContract } from "@/lib/tenant/tenantContract";
-import { DelegateChunk } from "@/app/staking/components/delegates/DelegateCardList";
+import type { Delegation } from "@/app/api/common/delegations/delegation";
 import { Chain } from "viem/chains";
 export type MetricTimeSeriesValue = {
   day: string;
@@ -60,8 +64,7 @@ export type TenantContracts = {
   timelockType?: TIMELOCK_TYPE;
   supportScopes?: boolean;
   chainForTime?: Chain;
-  providerForTime?: any;
-  supportScopes?: boolean;
+  providerForTime?: AbstractProvider;
   easRecipient?: string;
   proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;
 };
@@ -129,6 +132,10 @@ export enum ANALYTICS_EVENT_NAMES {
   CREATE_OFFCHAIN_PROPOSAL = "CREATE_OFFCHAIN_PROPOSAL",
 }
 
+type AnalyticsDelegation = Omit<Delegation, "transaction_hash"> & {
+  transaction_hash?: string;
+};
+
 export type AnalyticsEvent =
   | {
       event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE;
@@ -163,7 +170,7 @@ export type AnalyticsEvent =
   | {
       event_name: ANALYTICS_EVENT_NAMES.ADVANCED_DELEGATE;
       event_data: {
-        delegatees: DelegateChunk[];
+        delegatees: AnalyticsDelegation[];
         delegator: `0x${string}`;
         transaction_hash: string;
       };
@@ -180,7 +187,7 @@ export type AnalyticsEvent =
       event_name: ANALYTICS_EVENT_NAMES.PARTIAL_DELEGATION;
       event_data: {
         transaction_hash: string;
-        delegatees: DelegateChunk[];
+        delegatees: AnalyticsDelegation[];
         delegator: `0x${string}`;
         is_scw: boolean;
       };

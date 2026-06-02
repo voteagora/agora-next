@@ -188,10 +188,16 @@ async function getContractAbi(
   }
 }
 
-export const cachedGetContractAbi = unstable_cache(
+const cachedContractAbi = unstable_cache(
   getContractAbi,
   ["contract-abi", "etherscan-v2"],
   {
     revalidate: 86400,
   }
 );
+
+export async function cachedGetContractAbi(
+  ...args: Parameters<typeof getContractAbi>
+) {
+  return cachedContractAbi(...args);
+}

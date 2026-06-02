@@ -51,11 +51,10 @@ async function loadCategory(categoryIdParam: string) {
   };
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: CategoryPageParams;
+export async function generateMetadata(props: {
+  params: Promise<CategoryPageParams>;
 }): Promise<Metadata> {
+  const params = await props.params;
   const categoryBundle = await loadCategory(params.categoryId);
   if (!categoryBundle) {
     return {};
@@ -88,11 +87,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function ForumsCategoryPage({
-  params,
-}: {
-  params: CategoryPageParams;
+export default async function ForumsCategoryPage(props: {
+  params: Promise<CategoryPageParams>;
 }) {
+  const params = await props.params;
   const { ui } = Tenant.current();
 
   if (!ui.toggle("forums")?.enabled) {

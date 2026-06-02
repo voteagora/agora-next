@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,9 +16,16 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "typeRoots": ["./src/app/types", "./node_modules/@types"],
-    "types": ["node", "react", "react-dom"],
+    "jsx": "react-jsx",
+    "typeRoots": [
+      "./src/app/types",
+      "./node_modules/@types"
+    ],
+    "types": [
+      "node",
+      "react",
+      "react-dom"
+    ],
     "incremental": true,
     "plugins": [
       {
@@ -22,12 +33,24 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "*.svg": ["./tests/mockMedia.ts"],
-      "*.png": ["./tests/mockMedia.ts"],
-      "*.jpg": ["./tests/mockMedia.ts"],
-      "react-infinite-scroller": ["./src/lib/shims/InfiniteScroll"],
-      "swagger-ui-react": ["./src/lib/shims/SwaggerUI"],
+      "@/*": [
+        "./src/*"
+      ],
+      "*.svg": [
+        "./tests/mockMedia.ts"
+      ],
+      "*.png": [
+        "./tests/mockMedia.ts"
+      ],
+      "*.jpg": [
+        "./tests/mockMedia.ts"
+      ],
+      "react-infinite-scroller": [
+        "./src/lib/shims/InfiniteScroll"
+      ],
+      "swagger-ui-react": [
+        "./src/lib/shims/SwaggerUI"
+      ],
       "@react-native-async-storage/async-storage": [
         "./src/lib/shims/asyncStorage"
       ]
@@ -40,7 +63,10 @@
     "**/*.jsx",
     "**/*.js",
     ".next/types/**/*.ts",
-    "setupTests.ts"
+    "setupTests.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

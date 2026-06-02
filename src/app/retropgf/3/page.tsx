@@ -34,15 +34,14 @@ export async function generateMetadata() {
   };
 }
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: {
+export default async function Page(props: {
+  searchParams: Promise<{
     search?: string;
     category?: keyof typeof retroPGFCategories;
     orderBy?: keyof typeof retroPGFSort;
-  };
+  }>;
 }) {
+  const searchParams = await props.searchParams;
   const { ui } = Tenant.current();
 
   if (!ui.toggle("retropgf")) {

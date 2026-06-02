@@ -9,7 +9,7 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import Tenant from "@/lib/tenant/tenant";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { trackEvent } from "@/lib/analytics";
 
 interface Props {

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { proposalId: string } }
+  props: { params: Promise<{ proposalId: string }> }
 ) {
+  const params = await props.params;
   const { getVotesChart } = await import("@/app/api/proposals/getVotesChart");
   const { getSnapshotVotesChart } = await import(
     "@/app/api/proposals/getVotesChart"

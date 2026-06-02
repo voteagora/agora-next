@@ -4,7 +4,7 @@ import { getArchiveProposal } from "../archiveService";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const authResponse = await authenticateApiUser(request);
@@ -15,7 +15,8 @@ export async function GET(
 
   return traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const proposal = await getArchiveProposal(route.params.proposalId);
+      const { proposalId } = await route.params;
+      const proposal = await getArchiveProposal(proposalId);
 
       if (!proposal) {
         return NextResponse.json(

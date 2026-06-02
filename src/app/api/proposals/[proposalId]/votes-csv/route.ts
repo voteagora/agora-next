@@ -83,10 +83,10 @@ async function loadVoteRows(
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
   try {
-    const proposalId = route.params.proposalId;
+    const proposalId = (await route.params).proposalId;
     const proposal = await loadProposal(proposalId);
     const rows = await loadVoteRows(proposal, proposalId);
 
@@ -98,7 +98,7 @@ export async function GET(
     return new Response(csvContent, {
       headers: {
         "Content-Type": "text/csv",
-        "Content-Disposition": `attachment; filename="votes-${proposalId}-${Date.now()}.csv"`,
+        "Content-Disposition": `attachment; filename="votes-${(await route.params).proposalId}-${Date.now()}.csv"`,
       },
     });
   } catch (e: any) {

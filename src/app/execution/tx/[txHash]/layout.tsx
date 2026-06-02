@@ -2,12 +2,13 @@ import { ExecutionTxShell } from "@/components/Execution/ExecutionTxShell";
 
 export const dynamic = "force-dynamic";
 
-export default function ExecutionTxLayout({
-  children,
-  params,
-}: {
+export default async function ExecutionTxLayout(props: {
   children: React.ReactNode;
-  params: { txHash: string };
+  params: Promise<{ txHash: string }>;
 }) {
+  const params = await props.params;
+
+  const { children } = props;
+
   return <ExecutionTxShell txHash={params.txHash}>{children}</ExecutionTxShell>;
 }

@@ -4,7 +4,7 @@ import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";

@@ -19,7 +19,7 @@ export async function generateMetadata({}) {
 
   const title = page?.meta?.title ?? "Financials";
   const description = page?.meta?.description ?? "";
-  const metadataBase = getMetadataBaseUrl();
+  const metadataBase = await getMetadataBaseUrl();
 
   const preview = `/api/images/og/generic?title=${encodeURIComponent(
     title

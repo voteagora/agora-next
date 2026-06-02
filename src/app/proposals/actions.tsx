@@ -23,7 +23,7 @@ export async function fetchProposalsCount() {
   });
 }
 
-export const fetchVotersWhoHaveNotVotedForProposal = (
+export const fetchVotersWhoHaveNotVotedForProposal = async (
   proposalId: string,
   pagination?: PaginationParams,
   offchainProposalId?: string,
@@ -40,7 +40,7 @@ export const fetchVotersWhoHaveNotVotedForProposal = (
     sortOrder,
   });
 
-export const fetchProposalVotes = (
+export const fetchProposalVotes = async (
   proposalId: string,
   pagination?: PaginationParams,
   sort?: VotesSort,
@@ -57,7 +57,7 @@ export const fetchProposalVotes = (
     voterType,
   });
 
-export const fetchSnapshotProposalVotes = (
+export const fetchSnapshotProposalVotes = async (
   proposalId: string,
   pagination?: PaginationParams
 ) =>
@@ -66,7 +66,7 @@ export const fetchSnapshotProposalVotes = (
     pagination,
   });
 
-export const fetchUserVotesForProposal = (
+export const fetchUserVotesForProposal = async (
   proposalId: string,
   address: string | `0x${string}`
 ) =>
