@@ -432,7 +432,7 @@ We will be building a publicly accessible API soon, but for now, to keep things 
 
 Most of this data comes in the form as views, or materialized views in our Postgres database that we call via Prisma and then fetch the results to the page and cascade that state down to the components.
 
-NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can recieve that data from server components to add any interactivity you want.
+NextJS has some peculiar data access patterns given the mix of server-side and client-side components, that we are still getting used to. When in doubt, have a look at the `<ProposalsList />` component the `src/app/page.jsx` to see the fetching model in action. The general rule in NextJS is that you primary "server" component should do the fetching to keep it fast and use the cache in the best way possible, and then your client components can receive that data from server components to add any interactivity you want.
 
 #### Data fetching
 
