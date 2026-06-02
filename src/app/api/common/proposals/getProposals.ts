@@ -443,14 +443,13 @@ async function getProposal(proposalId: string) {
     }
 
     const latestBlock = await latestBlockPromise;
-    if (!latestBlock) {
-      throw new Error("Could not get latest block");
-    }
 
-    const isPending = isTimeStampBasedTenant
-      ? !isTimestampBasedProposal(baseProposal) ||
-        Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
-      : Number(getStartBlock(baseProposal)) > latestBlock.number;
+    const isPending =
+      !latestBlock ||
+      (isTimeStampBasedTenant
+        ? !isTimestampBasedProposal(baseProposal) ||
+          Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
+        : Number(getStartBlock(baseProposal)) > latestBlock.number);
 
     const quorum = isPending
       ? null

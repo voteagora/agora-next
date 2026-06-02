@@ -1,4 +1,4 @@
-import { AlchemyProvider, BaseContract } from "ethers";
+import { AbstractProvider, BaseContract } from "ethers";
 import { IAlligatorContract } from "@/lib/contracts/common/interfaces/IAlligatorContract";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { IStaker } from "@/lib/contracts/common/interfaces/IStaker";
@@ -64,7 +64,7 @@ export type TenantContracts = {
   timelockType?: TIMELOCK_TYPE;
   supportScopes?: boolean;
   chainForTime?: Chain;
-  providerForTime?: AlchemyProvider;
+  providerForTime?: AbstractProvider;
   easRecipient?: string;
   proposalTypesConfiguratorFactory?: PROPOSAL_TYPES_CONFIGURATOR_FACTORY;
 };
