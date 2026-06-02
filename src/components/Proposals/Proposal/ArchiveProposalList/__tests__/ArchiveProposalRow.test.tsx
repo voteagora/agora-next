@@ -54,13 +54,9 @@ vi.mock("@/components/shared/ENSName", () => ({
   ),
 }));
 
-vi.mock(
-  "@/components/Proposals/Proposal/ProposalTimeStatus",
-  () => ({
-    default: () => <span data-testid="time-status" />,
-  }),
-  { virtual: true }
-);
+vi.mock("@/components/Proposals/Proposal/ProposalTimeStatus", () => ({
+  default: () => <span data-testid="time-status" />,
+}));
 
 // ── Component under test ─────────────────────────────────────────────────────
 

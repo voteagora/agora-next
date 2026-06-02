@@ -268,9 +268,11 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   demo: ["dao-node"],
   syndicate: ["eas-oodao"],
   towns: ["eas-oodao"],
+  "0g": [],
   demo2: ["dao-node"],
   demo4: ["dao-node"],
   demo3: ["dao-node"],
+  shape: [],
 };
 
 // EAS Voting Types for governorless voting

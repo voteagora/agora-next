@@ -18,12 +18,14 @@ const TocContext = createContext<{ onHeadingClick?: TocHeadingClickHandler }>(
 function TocInlineMarkdown({ text }: { text: string }) {
   return (
     <ReactMarkdown
-      components={{
-        p: ({ children }) => <>{children}</>,
-        a: ({ children }) => (
-          <span className="underline text-inherit">{children}</span>
-        ),
-      }}
+      components={
+        {
+          p: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+          a: ({ children }: { children?: React.ReactNode }) => (
+            <span className="underline text-inherit">{children}</span>
+          ),
+        } as any
+      }
     >
       {text}
     </ReactMarkdown>

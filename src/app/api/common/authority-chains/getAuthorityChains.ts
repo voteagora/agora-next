@@ -42,11 +42,11 @@ async function getAuthorityChains({
     blockNumber
   )) as AuthorityChainsSnaps[];
 
-  const latestBlockNumberPromise: Promise<number> = ui.toggle(
-    "use-l1-block-number"
-  )?.enabled
-    ? contracts.providerForTime?.getBlockNumber()
-    : contracts.token.provider.getBlockNumber();
+  const providerForLatestBlock =
+    ui.toggle("use-l1-block-number")?.enabled && contracts.providerForTime
+      ? contracts.providerForTime
+      : contracts.token.provider;
+  const latestBlockNumberPromise = providerForLatestBlock.getBlockNumber();
 
   const [chains, latestBlockNumber] = await Promise.all([
     chainsQuery,

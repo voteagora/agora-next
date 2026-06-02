@@ -87,11 +87,7 @@ export function ExecutionEventsView({ txHash }: { txHash: string }) {
   if (isLoading) {
     return (
       <div>
-        <ExecutionPageIntro
-          eyebrow={PAGE.pageEyebrow}
-          title={PAGE.pageTitle}
-          lead={PAGE.lead}
-        />
+        <ExecutionPageIntro eyebrow={PAGE.pageEyebrow} title={PAGE.pageTitle} />
         <div className="overflow-hidden rounded-2xl border border-line bg-cardBackground shadow-sm">
           <ExecutionInlineSpinner message="Loading event logs…" />
         </div>
@@ -115,11 +111,7 @@ export function ExecutionEventsView({ txHash }: { txHash: string }) {
 
   return (
     <div>
-      <ExecutionPageIntro
-        eyebrow={PAGE.pageEyebrow}
-        title={PAGE.pageTitle}
-        lead={PAGE.lead}
-      />
+      <ExecutionPageIntro eyebrow={PAGE.pageEyebrow} title={PAGE.pageTitle} />
 
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <Badge variant="secondary">{logs.length} events</Badge>

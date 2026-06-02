@@ -374,10 +374,12 @@ async function getProposal(proposalId: string) {
   return withMetrics("getProposal", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
-    const latestBlockPromise: Promise<Block> = ui.toggle("use-l1-block-number")
-      ?.enabled
-      ? contracts.providerForTime?.getBlock("latest")
-      : contracts.token.provider.getBlock("latest");
+    const providerForLatestBlock =
+      ui.toggle("use-l1-block-number")?.enabled && contracts.providerForTime
+        ? contracts.providerForTime
+        : contracts.token.provider;
+    const latestBlockPromise: Promise<Block | null> =
+      providerForLatestBlock.getBlock("latest");
 
     const isTimeStampBasedTenant = ui.toggle(
       "use-timestamp-for-proposals"
@@ -441,13 +443,14 @@ async function getProposal(proposalId: string) {
     }
 
     const latestBlock = await latestBlockPromise;
+    if (!latestBlock) {
+      throw new Error("Could not get latest block");
+    }
 
-    const isPending =
-      (isTimeStampBasedTenant
-        ? !isTimestampBasedProposal(baseProposal) ||
-          Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
-        : Number(getStartBlock(baseProposal)) > latestBlock.number) ||
-      !latestBlock;
+    const isPending = isTimeStampBasedTenant
+      ? !isTimestampBasedProposal(baseProposal) ||
+        Number(getStartTimestamp(baseProposal)) > latestBlock.timestamp
+      : Number(getStartBlock(baseProposal)) > latestBlock.number;
 
     const quorum = isPending
       ? null

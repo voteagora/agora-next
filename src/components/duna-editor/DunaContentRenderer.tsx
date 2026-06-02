@@ -106,27 +106,23 @@ function parseContentWithEmbeds(htmlContent: string): React.ReactNode {
     ]);
 
     if (voidElements.has(element.tagName)) {
-      const Tag = element.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+      const tagName = element.tagName.toLowerCase();
       const attributes = Object.fromEntries(
         Array.from(element.attributes).map((attr) => [attr.name, attr.value])
       );
-      return <Tag key={key} {...attributes} />;
+      return React.createElement(tagName, { key, ...attributes });
     }
 
     const children = Array.from(element.childNodes).map((child, index) =>
       processNode(child, `${key}-${index}`)
     );
 
-    const Tag = element.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+    const tagName = element.tagName.toLowerCase();
     const attributes = Object.fromEntries(
       Array.from(element.attributes).map((attr) => [attr.name, attr.value])
     );
 
-    return (
-      <Tag key={key} {...attributes}>
-        {children}
-      </Tag>
-    );
+    return React.createElement(tagName, { key, ...attributes }, children);
   };
 
   const elements = Array.from(doc.body.childNodes).map((node, index) =>

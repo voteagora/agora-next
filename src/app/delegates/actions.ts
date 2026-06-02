@@ -179,7 +179,7 @@ export const fetchConnectedDelegate = async (address: string) => {
 export const revalidateDelegateAddressPage = async (
   delegateAddress: string
 ) => {
-  revalidateTag(`delegate-${delegateAddress}`);
+  revalidateTag(`delegate-${delegateAddress}`, { expire: 0 });
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
 

@@ -73,6 +73,10 @@ export const FawkesClient = {
     return data;
   },
 
+  async confirmTransaction(requestId?: string) {
+    return this.approveRequest(requestId);
+  },
+
   /**
    * Rejects a transaction / signature request on a FIFO basis.
    */
