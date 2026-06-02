@@ -29,6 +29,7 @@ interface FinancialStatementsSectionProps {
   statements: FinancialStatement[];
   onStatementClick: (statement: FinancialStatement) => void;
   title: string;
+  actionTarget?: "attachment" | "topic";
 }
 
 function formatStatementDate(dateStr: string): string {
@@ -48,17 +49,21 @@ export default function FinancialStatementsSection({
   statements,
   onStatementClick,
   title,
+  actionTarget = "attachment",
 }: FinancialStatementsSectionProps) {
   const [localStatements, setLocalStatements] = useState<FinancialStatement[]>(
     statements || []
   );
 
   const { address } = useAccount();
-  const { deleteAttachment, archiveAttachment } = useForum();
+  const { deleteAttachment, archiveAttachment, deleteTopic, archiveTopic } =
+    useForum();
   const openDialog = useOpenDialog();
   const requireLogin = useRequireLogin();
   const stableDeleteAttachment = useStableCallback(deleteAttachment);
   const stableArchiveAttachment = useStableCallback(archiveAttachment);
+  const stableDeleteTopic = useStableCallback(deleteTopic);
+  const stableArchiveTopic = useStableCallback(archiveTopic);
 
   const { hasPermission: canArchiveFilings } = useHasPermission(
     "duna_filings",
@@ -71,34 +76,38 @@ export default function FinancialStatementsSection({
     "delete"
   );
 
-  const handleDeleteAttachment = async (
-    attachmentId: number,
+  const handleDeleteStatement = async (
+    statement: FinancialStatement,
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
+    const actionId =
+      actionTarget === "topic"
+        ? (statement.topicId ?? statement.id)
+        : statement.id;
+
     openDialog({
       type: "CONFIRM",
       params: {
-        title: "Delete Attachment",
-        message: "Are you sure you want to delete this attachment?",
+        title:
+          actionTarget === "topic" ? "Delete Statement" : "Delete Attachment",
+        message:
+          actionTarget === "topic"
+            ? "Are you sure you want to delete this statement?"
+            : "Are you sure you want to delete this attachment?",
         onConfirm: async () => {
           const loggedInAddress = await requireLogin();
           if (!loggedInAddress) {
             return;
           }
 
-          const isAuthor =
-            localStatements
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
-          const success = await stableDeleteAttachment(
-            attachmentId,
-            "category",
-            isAuthor
-          );
+          const success =
+            actionTarget === "topic"
+              ? await stableDeleteTopic(actionId)
+              : await stableDeleteAttachment(actionId, "category");
           if (success) {
             setLocalStatements((prev) =>
-              prev.filter((doc) => doc.id !== attachmentId)
+              prev.filter((doc) => doc.id !== statement.id)
             );
           }
         },
@@ -106,16 +115,25 @@ export default function FinancialStatementsSection({
     });
   };
 
-  const handleArchiveAttachment = async (
-    attachmentId: number,
+  const handleArchiveStatement = async (
+    statement: FinancialStatement,
     e: React.MouseEvent
   ) => {
     e.stopPropagation();
+    const actionId =
+      actionTarget === "topic"
+        ? (statement.topicId ?? statement.id)
+        : statement.id;
+
     openDialog({
       type: "CONFIRM",
       params: {
-        title: "Archive Attachment",
-        message: "Are you sure you want to archive this attachment?",
+        title:
+          actionTarget === "topic" ? "Archive Statement" : "Archive Attachment",
+        message:
+          actionTarget === "topic"
+            ? "Are you sure you want to archive this statement?"
+            : "Are you sure you want to archive this attachment?",
         onConfirm: async () => {
           const loggedInAddress = await requireLogin();
           if (!loggedInAddress) {
@@ -123,17 +141,15 @@ export default function FinancialStatementsSection({
           }
 
           const isAuthor =
-            localStatements
-              .find((doc) => doc.id === attachmentId)
-              ?.uploadedBy?.toLowerCase() === loggedInAddress.toLowerCase();
-          const success = await stableArchiveAttachment(
-            attachmentId,
-            "category",
-            isAuthor
-          );
+            statement.uploadedBy?.toLowerCase() ===
+            loggedInAddress.toLowerCase();
+          const success =
+            actionTarget === "topic"
+              ? await stableArchiveTopic(actionId, isAuthor)
+              : await stableArchiveAttachment(actionId, "category");
           if (success) {
             setLocalStatements((prev) =>
-              prev.filter((doc) => doc.id !== attachmentId)
+              prev.filter((doc) => doc.id !== statement.id)
             );
           }
         },
@@ -216,7 +232,7 @@ export default function FinancialStatementsSection({
                 )}
                 {canArchive && !statement.archived && (
                   <button
-                    onClick={(e) => handleArchiveAttachment(statement.id, e)}
+                    onClick={(e) => handleArchiveStatement(statement, e)}
                     className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-primary"
                     title="Archive"
                     aria-label="Archive statement"
@@ -226,7 +242,7 @@ export default function FinancialStatementsSection({
                 )}
                 {canDelete && (
                   <button
-                    onClick={(e) => handleDeleteAttachment(statement.id, e)}
+                    onClick={(e) => handleDeleteStatement(statement, e)}
                     className="p-1.5 rounded-full hover:bg-wash transition-colors text-tertiary hover:text-red-600"
                     title="Delete"
                     aria-label="Delete statement"
