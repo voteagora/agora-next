@@ -14,7 +14,11 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { getIPFSUrl } from "@/lib/pinata";
 import { logForumAuditAction } from "./admin";
-import { requirePermission, checkPermission } from "@/lib/rbac";
+import {
+  requirePermission,
+  checkPermission,
+  checkAnyPermission,
+} from "@/lib/rbac";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import type { DaoSlug } from "@prisma/client";
 import { createAttachmentsFromContent } from "../attachmentInternal";
@@ -89,6 +93,7 @@ export async function getForumTopics({
       dao_slug: slug,
       archived: false,
       isNsfw: false,
+      deletedAt: null,
       OR: [
         {
           revealTime: null,
@@ -640,25 +645,73 @@ export async function softDeleteForumTopic(
   try {
     const validatedData = softDeleteTopicSchema.parse(data);
 
-    await requirePermission({
-      address: validatedData.address,
-      message: validatedData.message,
-      signature: validatedData.signature,
-      jwt: validatedData.jwt,
-      daoSlug: slug as any,
-      module: "forums",
-      resource: "topics",
-      action: "archive",
-    });
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
 
-    await prismaWeb2Client.forumTopic.update({
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+
+    const normalizedAddress = authResult.address.toLowerCase();
+
+    const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: {
         id: validatedData.topicId,
         dao_slug: slug,
       },
+      select: {
+        id: true,
+        address: true,
+        isFinancialStatement: true,
+        category: {
+          select: {
+            isDuna: true,
+          },
+        },
+      },
+    });
+
+    if (!topic) {
+      return { success: false, error: "Topic not found" };
+    }
+
+    const isDunaFinancialStatement =
+      topic.isFinancialStatement && topic.category?.isDuna;
+    const hasDeletePermission = isDunaFinancialStatement
+      ? await checkAnyPermission(normalizedAddress, slug as DaoSlug, [
+          {
+            module: "duna_filings",
+            resource: "filings",
+            action: "delete",
+          },
+          { module: "forums", resource: "topics", action: "archive" },
+        ])
+      : await checkPermission(
+          normalizedAddress,
+          slug as DaoSlug,
+          "forums",
+          "topics",
+          "archive"
+        );
+
+    if (!hasDeletePermission) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    await prismaWeb2Client.forumTopic.update({
+      where: {
+        id: topic.id,
+        dao_slug: slug,
+      },
       data: {
         deletedAt: new Date(),
-        deletedBy: validatedData.address,
+        deletedBy: normalizedAddress,
       },
     });
 
@@ -767,16 +820,20 @@ export async function archiveForumTopic(
   try {
     const validatedData = archiveTopicSchema.parse(data);
 
-    await requirePermission({
-      address: validatedData.address,
-      message: validatedData.message,
-      signature: validatedData.signature,
-      jwt: validatedData.jwt,
-      daoSlug: slug as any,
-      module: "forums",
-      resource: "topics",
-      action: "archive",
-    });
+    const authResult = await verifyAuth(
+      {
+        message: validatedData.message,
+        signature: validatedData.signature as `0x${string}` | undefined,
+        jwt: validatedData.jwt,
+      },
+      validatedData.address as `0x${string}`
+    );
+
+    if (!authResult.success) {
+      return { success: false, error: authResult.error };
+    }
+
+    const normalizedAddress = authResult.address.toLowerCase();
 
     const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: {
@@ -786,11 +843,46 @@ export async function archiveForumTopic(
       select: {
         id: true,
         address: true,
+        isFinancialStatement: true,
+        category: {
+          select: {
+            isDuna: true,
+          },
+        },
       },
     });
 
     if (!topic) {
       return { success: false, error: "Topic not found" };
+    }
+
+    const isAuthor = topic.address.toLowerCase() === normalizedAddress;
+    const isDunaFinancialStatement =
+      topic.isFinancialStatement && topic.category?.isDuna;
+    const hasArchivePermission = isDunaFinancialStatement
+      ? await checkAnyPermission(normalizedAddress, slug as DaoSlug, [
+          {
+            module: "duna_filings",
+            resource: "filings",
+            action: "archive",
+          },
+          {
+            module: "duna_filings",
+            resource: "filings",
+            action: "delete",
+          },
+          { module: "forums", resource: "topics", action: "archive" },
+        ])
+      : await checkPermission(
+          normalizedAddress,
+          slug as DaoSlug,
+          "forums",
+          "topics",
+          "archive"
+        );
+
+    if (!((isDunaFinancialStatement && isAuthor) || hasArchivePermission)) {
+      return { success: false, error: "Unauthorized" };
     }
 
     await prismaWeb2Client.forumTopic.update({
@@ -803,10 +895,10 @@ export async function archiveForumTopic(
       },
     });
 
-    if (topic.address.toLowerCase() !== validatedData.address.toLowerCase()) {
+    if (!isAuthor) {
       await logForumAuditAction(
         slug,
-        validatedData.address,
+        normalizedAddress,
         "ARCHIVE_TOPIC",
         "topic",
         validatedData.topicId

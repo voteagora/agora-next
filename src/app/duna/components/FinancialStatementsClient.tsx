@@ -42,6 +42,7 @@ export default function FinancialStatementsClient({
       statements={statements}
       onStatementClick={handleStatementClick}
       title={title}
+      actionTarget="topic"
     />
   );
 }
