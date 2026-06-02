@@ -97,6 +97,7 @@ export default function Navbar() {
           target={hasProposalsHref ? "_blank" : "_self"}
           isActive={activeNavItem === "proposals"}
           onClick={() => handleNavClick("proposals")}
+          data-testid="nav-proposals"
         >
           Proposals
         </HeaderLink>
@@ -110,6 +111,7 @@ export default function Navbar() {
           href="/coming-soon"
           isActive={activeNavItem === "coming-soon"}
           onClick={() => handleNavClick("coming-soon")}
+          data-testid="nav-coming-soon"
         >
           Governance
         </HeaderLink>
@@ -123,6 +125,7 @@ export default function Navbar() {
           href="/forums"
           isActive={activeNavItem === "forums"}
           onClick={() => handleNavClick("forums")}
+          data-testid="nav-forums"
         >
           Discussions
         </HeaderLink>
@@ -135,6 +138,7 @@ export default function Navbar() {
           href="/delegates"
           isActive={activeNavItem === "delegates"}
           onClick={() => handleNavClick("delegates")}
+          data-testid="nav-delegates"
         >
           Voters
         </HeaderLink>
@@ -148,6 +152,7 @@ export default function Navbar() {
           href={isConnected && address ? `/staking/${address}` : "/staking"}
           isActive={activeNavItem === "staking"}
           onClick={() => handleNavClick("staking")}
+          data-testid="nav-staking"
         >
           Staking
         </HeaderLink>
@@ -161,6 +166,7 @@ export default function Navbar() {
           href="/retropgf/3/summary"
           isActive={activeNavItem === "retropgf"}
           onClick={() => handleNavClick("retropgf")}
+          data-testid="nav-retropgf"
         >
           RetroPGF
         </HeaderLink>
@@ -174,6 +180,7 @@ export default function Navbar() {
           href="/grants"
           isActive={activeNavItem === "grants"}
           onClick={() => handleNavClick("grants")}
+          data-testid="nav-grants"
         >
           Grants
         </HeaderLink>
@@ -187,6 +194,7 @@ export default function Navbar() {
           href="/info"
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
+          data-testid="nav-info"
         >
           {hasDuna ? "About" : "Info"}
         </HeaderLink>

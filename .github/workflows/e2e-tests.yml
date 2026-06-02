@@ -1,0 +1,52 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NEXT_PUBLIC_AGORA_API_KEY: ${{ secrets.NEXT_PUBLIC_AGORA_API_KEY }}
+      NEXT_PUBLIC_AGORA_ENV: ${{ secrets.NEXT_PUBLIC_AGORA_ENV }}
+      NEXT_PUBLIC_AGORA_INSTANCE_NAME: ${{ secrets.NEXT_PUBLIC_AGORA_INSTANCE_NAME }}
+      NEXT_PUBLIC_AGORA_BASE_URL: ${{ secrets.NEXT_PUBLIC_AGORA_BASE_URL }}
+      NEXT_PUBLIC_AGORA_INSTANCE_TOKEN: ${{ secrets.NEXT_PUBLIC_AGORA_INSTANCE_TOKEN }}
+      NEXT_PUBLIC_ALCHEMY_ID: ${{ secrets.NEXT_PUBLIC_ALCHEMY_ID }}
+      SERVERSIDE_ALCHEMY_ID_PROD: ${{ secrets.SERVERSIDE_ALCHEMY_ID_PROD }}
+      NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      NEXT_PUBLIC_RPC_SECRET: ${{ secrets.NEXT_PUBLIC_RPC_SECRET }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test --project=chromium
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

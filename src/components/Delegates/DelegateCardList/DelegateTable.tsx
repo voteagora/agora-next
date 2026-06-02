@@ -108,9 +108,10 @@ export default function DelegateTable({
       <div className="relative">
         <DelegatesPageInfoBanner />
         <div
+          data-testid="delegates-list-container"
           className={`overflow-hidden shadow ring-1 ring-black/5 sm:rounded-lg ${isBannerVisible ? "-mt-4" : "mt-6"} relative z-10`}
         >
-          <Table className="min-w-full">
+          <Table className="min-w-full" data-testid="delegates-list-view">
             <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
               <TableRow className="bg-tertiary/5">
                 <TableHead className="h-10 text-secondary">Name</TableHead>

@@ -2,25 +2,6 @@ import { defineConfig, devices } from "@playwright/test";
 import { loadEnvConfig } from "@next/env";
 loadEnvConfig(process.cwd());
 
-if (
-  !process.env.WALLET_CONNECT_PROJECT_ID &&
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
-) {
-  process.env.WALLET_CONNECT_PROJECT_ID =
-    process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-}
-
-const rpcSecret =
-  process.env.SERVERSIDE_RPC_SECRET_DEV ||
-  process.env.SERVERSIDE_RPC_SECRET_PROD ||
-  process.env.NEXT_PUBLIC_RPC_SECRET;
-
-if (!process.env.JSON_RPC_URL && rpcSecret) {
-  process.env.JSON_RPC_URL = `https://edge.goldsky.com/standard/evm/10?secret=${encodeURIComponent(
-    rpcSecret
-  )}`;
-}
-
 export default defineConfig({
   testDir: "./tests",
   timeout: 120000,
@@ -33,7 +14,7 @@ export default defineConfig({
   workers: 1,
   globalSetup: "./tests/global-setup.ts",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3001",
     trace: process.env.URL_A && process.env.URL_B ? "off" : "on-first-retry",
     video: process.env.URL_A && process.env.URL_B ? "off" : "on",
     screenshot: process.env.URL_A && process.env.URL_B ? "off" : "on",
@@ -47,29 +28,25 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
+      testIgnore: ["**/ab-runner/**"],
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "ab",
+      testDir: "./tests/ab-runner",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
   webServer:
     process.env.URL_A && process.env.URL_B
       ? undefined
-      : [
-          {
-            // ARCHIVE_GCS_BUCKET_OVERRIDE redirects GCS fetches to the local
-            // mock server started by globalSetup (tests/global-setup.ts).
-            command:
-              "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3000 npm run dev",
-            url: "http://127.0.0.1:3000",
-            reuseExistingServer: true,
-            timeout: 120 * 1000,
-          },
-          {
-            command: "node node_modules/fawkes-wallet/src/server.js",
-            url: "http://127.0.0.1:4000/wallet/status",
-            reuseExistingServer: true,
-            timeout: 120 * 1000,
-            stdout: "pipe",
-            stderr: "pipe",
-          },
-        ],
+      : {
+          // ARCHIVE_GCS_BUCKET_OVERRIDE redirects GCS fetches to the local
+          // mock server started by globalSetup (tests/global-setup.ts).
+          command:
+            "ARCHIVE_GCS_BUCKET_OVERRIDE=http://localhost:9191 PORT=3001 npm run dev",
+          url: "http://127.0.0.1:3001",
+          reuseExistingServer: true,
+          timeout: 120 * 1000,
+        },
 });

@@ -171,7 +171,7 @@ function StandardHeader({
   const { ui, namespace } = Tenant.current();
   return (
     <div className="flex flex-row text-xs text-secondary gap-1">
-      <div>
+      <div className="proposal-author">
         {data.proposalTypeName}{" "}
         <span className="hidden sm:inline">
           {namespace === TENANT_NAMESPACES.OPTIMISM ? (

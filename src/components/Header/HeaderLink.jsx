@@ -3,7 +3,7 @@ import Link from "next/link";
 import Tenant from "@/lib/tenant/tenant";
 
 export const HeaderLink = forwardRef(
-  ({ className, children, href, target, isActive, onClick }, ref) => {
+  ({ className, children, href, target, isActive, onClick, ...rest }, ref) => {
     const { ui } = Tenant.current();
 
     const activeClass = isActive
@@ -31,6 +31,7 @@ export const HeaderLink = forwardRef(
               }
             : {}
         }
+        {...rest}
       >
         {children}
       </Link>

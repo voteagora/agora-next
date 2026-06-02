@@ -28,7 +28,10 @@ export function VotingPowerInfoTooltip({
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={`inline-flex items-center ml-1 ${className || ""}`}>
+          <span
+            data-testid="vp-tooltip"
+            className={`inline-flex items-center ml-1 ${className || ""}`}
+          >
             <InfoOutlineIcon className={iconClassName} fill="#737373" />
           </span>
         </TooltipTrigger>

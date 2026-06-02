@@ -1,4 +1,9 @@
 import { Page, Locator } from "@playwright/test";
+import {
+  DelegatesLayout,
+  delegatesPath,
+  getDefaultDelegatesLayout,
+} from "../utils/delegatesLayout";
 
 export class DelegatesPage {
   readonly page: Page;
@@ -19,13 +24,10 @@ export class DelegatesPage {
   constructor(page: Page) {
     this.page = page;
 
-    // Selectors usually mapped to data-testid or strong structural classes in Agora
     this.gridViewContainer = page.locator(
-      '[data-testid="delegates-grid-view"], .grid'
+      '[data-testid="delegates-grid-container"], [data-testid="delegates-grid-view"], .delegates-grid-view'
     );
-    this.listViewContainer = page.locator(
-      '[data-testid="delegates-list-view"], table'
-    );
+    this.listViewContainer = page.getByTestId("delegates-list-container");
     this.delegateCards = page.locator('[data-testid="delegate-card"]');
     this.delegateRows = page.locator('[data-testid="delegate-row"]');
 
@@ -34,7 +36,7 @@ export class DelegatesPage {
     this.participationColumn = page.locator('text="Participation"');
 
     this.filterDropdownButton = page.locator('[data-testid="filter-dropdown"]');
-    this.searchInput = page.locator('input[placeholder*="Search"]');
+    this.searchInput = page.getByPlaceholder(/Exact ENS or address/i);
 
     this.infoBanner = page.locator('[data-testid="delegates-info-banner"]');
     this.encouragementBanner = page.locator(
@@ -42,13 +44,19 @@ export class DelegatesPage {
     );
   }
 
-  async goto(showDialog = false) {
+  /** Navigate to /delegates; layout defaults to the tenant's configured view. */
+  async goto(showDialog = false, layout?: DelegatesLayout) {
     if (!showDialog) {
       await this.page.addInitScript(() => {
         window.sessionStorage.setItem("agora-delegation-dialog-shown", "true");
       });
     }
-    await this.page.goto("/delegates");
+    await this.page.goto(delegatesPath(layout));
+    await this.page.waitForLoadState("domcontentloaded");
+  }
+
+  getDefaultLayout(): DelegatesLayout {
+    return getDefaultDelegatesLayout();
   }
 
   async openFilter() {

@@ -2,6 +2,7 @@ import "../../tests/mockMediaLoader.js";
 import { test, expect } from "@playwright/test";
 import Tenant from "../../src/lib/tenant/tenant";
 import { DelegatesPage } from "./pages/DelegatesPage";
+import { getDefaultDelegatesLayout } from "./utils/delegatesLayout";
 
 test.describe("Delegates List Page Scenarios", () => {
   let delegatesPage: DelegatesPage;
@@ -12,6 +13,7 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-001: /delegates page returns a list of delegates in grid view", async () => {
+    await delegatesPage.goto(false, "grid");
     await expect(delegatesPage.delegateCards.first()).toBeVisible({
       timeout: 15000,
     });
@@ -19,33 +21,37 @@ test.describe("Delegates List Page Scenarios", () => {
   });
 
   test("DEL-LIST-002: /delegates page returns a list of delegates in list view", async () => {
-    const { ui } = Tenant.current();
-    if (!ui.toggle("delegates-layout-list")?.enabled)
-      test.skip(true, "Tenant disabled this feature");
+    await delegatesPage.goto(false, "list");
+    await expect(delegatesPage.delegateRows.first()).toBeVisible({
+      timeout: 15000,
+    });
     await expect(delegatesPage.listViewContainer).toBeVisible();
   });
 
   test("DEL-LIST-003: when in grid view, delegate card information is displayed", async () => {
+    await delegatesPage.goto(false, "grid");
     const card = delegatesPage.delegateCards.first();
-    await expect(card).toBeVisible();
+    await expect(card).toBeVisible({ timeout: 15000 });
     await expect(card).toContainText(Tenant.current().token.symbol, {
       ignoreCase: true,
-    }); // Basic structural check
+    });
   });
 
   test("DEL-LIST-004: when in grid view, delegate card shows participation rate", async () => {
     const { ui } = Tenant.current();
     if (!ui.toggle("show-participation")?.enabled)
       test.skip(true, "Tenant disabled this feature");
+    await delegatesPage.goto(false, "grid");
     const card = delegatesPage.delegateCards.first();
-    await expect(card).toContainText("%"); // The participation is formatted with percentage
+    await expect(card).toBeVisible({ timeout: 15000 });
+    await expect(card).toContainText("%");
   });
 
   test("DEL-LIST-007: delegate row shows 7D change of VP", async ({ page }) => {
     const { ui } = Tenant.current();
     if (ui.toggle("hide-7d-change")?.enabled)
       test.skip(true, "Tenant disabled this feature");
-    await page.goto("/delegates?layout=list");
+    await delegatesPage.goto(false, "list");
     await expect(page.locator('text="7d Change"').first()).toBeVisible();
   });
 
@@ -56,11 +62,12 @@ test.describe("Delegates List Page Scenarios", () => {
     await expect(delegatesPage.infoBanner).toBeVisible();
   });
 
-  test("DEL-LIST-012: VP info tooltip on grid view", async () => {
+  test("DEL-LIST-012: VP info tooltip on delegates list", async () => {
     const { ui } = Tenant.current();
     if (!ui.toggle("voting-power-info-tooltip")?.enabled)
       test.skip(true, "Tenant disabled this feature");
-    // Hovering over the voting power text or info icon should trigger it
+    // Tooltip is rendered in the list table header, not grid cards.
+    await delegatesPage.goto(false, "list");
     await expect(delegatesPage.vpInfoTooltip).toBeVisible();
   });
 
@@ -69,7 +76,6 @@ test.describe("Delegates List Page Scenarios", () => {
     if (!ui.toggle("delegation-encouragement")?.enabled)
       test.skip(true, "Tenant disabled this feature");
 
-    // Create a pristine page for this test to avoid the addInitScript from beforeEach
     const pristinePage = await context.newPage();
     const pristineDelegatesPage = new DelegatesPage(pristinePage);
     await pristineDelegatesPage.goto(true);
@@ -83,7 +89,6 @@ test.describe("Delegates List Page Scenarios", () => {
   test("DEL-LIST-014: delegate list can be sorted by Random, Most/Least voting power, etc", async ({
     page,
   }) => {
-    // Check that sort dropdown has the options
     await page.locator('[data-testid="sort-dropdown"]').click();
     await expect(page.getByText("Most voting power")).toBeVisible();
     await expect(page.getByText("Least voting power")).toBeVisible();
@@ -108,9 +113,7 @@ test.describe("Delegates List Page Scenarios", () => {
     await expect(page.getByText("Has statement").first()).toBeVisible();
   });
 
-  test("DEL-LIST-017: delegate filter includes My Delegate(s) if user is logged in", async ({
-    page,
-  }) => {
+  test("DEL-LIST-017: delegate filter includes My Delegate(s) if user is logged in", async () => {
     // We expect this filter to exist if auth state is overridden
   });
 
@@ -152,5 +155,22 @@ test.describe("Delegates List Page Scenarios", () => {
       test.skip(true, "Tenant disabled this feature");
     await delegatesPage.openFilter();
     await expect(page.locator('text="Stakeholders"')).toBeVisible();
+  });
+
+  test("DEL-LIST-default: /delegates loads tenant default layout with delegates", async () => {
+    const layout = getDefaultDelegatesLayout();
+    if (layout === "list") {
+      await expect(delegatesPage.delegateRows.first()).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(delegatesPage.listViewContainer).toBeVisible();
+      await expect(delegatesPage.delegateCards).toHaveCount(0);
+    } else {
+      await expect(delegatesPage.delegateCards.first()).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(delegatesPage.gridViewContainer).toBeVisible();
+      await expect(delegatesPage.delegateRows).toHaveCount(0);
+    }
   });
 });
