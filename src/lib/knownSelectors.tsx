@@ -87,19 +87,31 @@ function LabelWithTooltip({
 
 /**
  * Render an address as a bold friendly name (with tooltip) or a raw monospace address.
+ * Optional chainId is appended to the tooltip for cross-chain context (display-only).
  */
-function maybeFriendlyAddress(address?: string) {
+function maybeFriendlyAddress(address?: string, chainId?: number) {
   if (!address) {
     return <span className="text-secondary">Unknown</span>;
   }
 
+  const tooltip =
+    chainId != null ? `${address} (destination chain id: ${chainId})` : address;
+
   if (hasFriendlyName(address)) {
     return (
-      <LabelWithTooltip label={getFriendlyName(address)!} tooltip={address} />
+      <LabelWithTooltip label={getFriendlyName(address)!} tooltip={tooltip} />
     );
   }
 
   return <span className="font-mono text-xs">{address}</span>;
+}
+
+function DestinationChainLine({ label }: { label: string }) {
+  return (
+    <div>
+      Destination: <span className="font-semibold">{label}</span>
+    </div>
+  );
 }
 
 /**
@@ -349,6 +361,135 @@ function findContentHash(
 // Calldata parsing helpers (for cross-chain bridge decoding)
 // ────────────────────────────────────────────────────────────────────────────
 
+/** Wormhole chain IDs — wormhole-foundation/wormhole-sdk-ts core/base/src/constants/chains.ts */
+const WORMHOLE_CHAIN_NAMES: Record<number, string> = {
+  1: "Solana",
+  2: "Ethereum",
+  3: "Terra",
+  4: "BSC",
+  5: "Polygon",
+  6: "Avalanche",
+  7: "Oasis",
+  8: "Algorand",
+  9: "Aurora",
+  10: "Fantom",
+  11: "Karura",
+  12: "Acala",
+  13: "Klaytn",
+  14: "Celo",
+  15: "Near",
+  16: "Moonbeam",
+  17: "Neon",
+  18: "Terra2",
+  19: "Injective",
+  20: "Osmosis",
+  21: "Sui",
+  22: "Aptos",
+  23: "Arbitrum",
+  24: "Optimism",
+  25: "Gnosis",
+  26: "Pythnet",
+  28: "XPLA",
+  29: "Bitcoin",
+  30: "Base",
+  32: "Sei",
+  34: "Rootstock",
+  35: "Scroll",
+  36: "Mantle",
+  37: "Blast",
+  38: "Linea",
+  39: "Berachain",
+  40: "Seievm",
+  44: "Unichain",
+  45: "Worldchain",
+  46: "Ink",
+  47: "HyperEVM",
+  48: "Monad",
+  50: "Mezo",
+  51: "Fogo",
+  52: "Sonic",
+  53: "Converge",
+  55: "Plume",
+  57: "XRPLEVM",
+  58: "Plasma",
+};
+
+type BridgeDestination = { name: string; chainId: number };
+
+/** L1 Cross Domain Messenger address → destination (OP Stack). */
+const L1_MESSENGER_DESTINATIONS: Record<string, BridgeDestination> = {
+  "0x25ace71c97b33cc4729cf772ae268934f7ab5fa1": {
+    name: "OP Mainnet",
+    chainId: 10,
+  },
+  "0x866e82a600a1414e583f7f13623f1ac5d58b0afa": { name: "Base", chainId: 8453 },
+  "0x1ac1181fc4e4f877963680587aeaa2c90d7ebb95": {
+    name: "Celo",
+    chainId: 42220,
+  },
+  "0xf931a81d18b1766d15695ffc7c1920a62b7e710a": {
+    name: "Worldchain",
+    chainId: 480,
+  },
+  "0xdc40a14d9abd6f410226f1e6de71ae03441ca506": {
+    name: "Zora",
+    chainId: 7777777,
+  },
+};
+
+/** Optimism Portal address → destination (OP Stack depositTransaction). */
+const OPTIMISM_PORTAL_DESTINATIONS: Record<string, BridgeDestination> = {
+  "0x88e529a6ccd302c948689cd5156c83d4614fae92": {
+    name: "Soneium",
+    chainId: 1868,
+  },
+  "0x64057ad1ddac804d0d26a7275b193d9daca19993": {
+    name: "X Layer",
+    chainId: 196,
+  },
+  "0xc5c5d157928bdbd2acf6d0777626b6c75a9eaedc": {
+    name: "Celo",
+    chainId: 42220,
+  },
+  "0xd5ec14a83b7d95be1e2ac12523e2dee12cbeea6c": {
+    name: "Worldchain",
+    chainId: 480,
+  },
+};
+
+const ARBITRUM_DESTINATION: BridgeDestination = {
+  name: "Arbitrum",
+  chainId: 42161,
+};
+
+const POLYGON_DESTINATION: BridgeDestination = {
+  name: "Polygon",
+  chainId: 137,
+};
+
+function lookupBridgeDestination(
+  target: string | undefined,
+  map: Record<string, BridgeDestination>
+): BridgeDestination | null {
+  if (!target) return null;
+  return map[target.toLowerCase()] ?? null;
+}
+
+function parseUint16ChainId(value: string | undefined): number | undefined {
+  if (value == null || value === "") return undefined;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function formatWormholeDestination(
+  destChainId: string | undefined
+): string | null {
+  const id = parseUint16ChainId(destChainId);
+  if (id == null) return null;
+  const name = WORMHOLE_CHAIN_NAMES[id];
+  return name ?? `Wormhole chain ${id}`;
+}
+
 function extractSelector(calldata: string): string | null {
   if (!calldata || calldata === "0x") return null;
   const normalized = calldata.toLowerCase();
@@ -406,17 +547,22 @@ function parseInnerCall(innerHex: string): {
 function InnerCallLine({
   innerCall,
   targetAddress,
+  destinationChainId,
 }: {
   innerCall: { functionName: string; prettyName: string; address: string };
   targetAddress?: string;
+  destinationChainId?: number;
 }) {
   return (
     <div className="space-y-1">
       {targetAddress && (
-        <div>Target: {maybeFriendlyAddress(targetAddress)}</div>
+        <div>
+          Target: {maybeFriendlyAddress(targetAddress, destinationChainId)}
+        </div>
       )}
       <div>
-        {innerCall.prettyName}: {maybeFriendlyAddress(innerCall.address)}
+        {innerCall.prettyName}:{" "}
+        {maybeFriendlyAddress(innerCall.address, destinationChainId)}
       </div>
     </div>
   );
@@ -824,16 +970,21 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       const l2Target = collectByType(decodedData.parameters, "address")[0];
       const innerCalldata = collectByType(decodedData.parameters, "bytes")[0];
       const innerCall = innerCalldata ? parseInnerCall(innerCalldata) : null;
+      const destination = lookupBridgeDestination(
+        target,
+        OPTIMISM_PORTAL_DESTINATIONS
+      );
 
       return (
         <div className="text-sm text-primary space-y-2">
+          {destination && <DestinationChainLine label={destination.name} />}
           <div>
             Call{" "}
             <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
               depositTransaction
             </code>{" "}
             on the {maybeFriendlyAddress(target)} contract targeting{" "}
-            {maybeFriendlyAddress(l2Target)}
+            {maybeFriendlyAddress(l2Target, destination?.chainId)}
             {innerCall ? (
               <>
                 {" "}
@@ -849,7 +1000,10 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
           </div>
           {innerCall && (
             <div className="pl-4">
-              <InnerCallLine innerCall={innerCall} />
+              <InnerCallLine
+                innerCall={innerCall}
+                destinationChainId={destination?.chainId}
+              />
             </div>
           )}
         </div>
@@ -874,16 +1028,21 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       const innerCall = forwardResult
         ? parseInnerCall(forwardResult.innerCalldata)
         : null;
+      const destination = lookupBridgeDestination(
+        target,
+        L1_MESSENGER_DESTINATIONS
+      );
 
       return (
         <div className="text-sm text-primary space-y-2">
+          {destination && <DestinationChainLine label={destination.name} />}
           <div>
             Call{" "}
             <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
               sendMessage
             </code>{" "}
             on the {maybeFriendlyAddress(target)} contract targeting the{" "}
-            {maybeFriendlyAddress(crossChainAccount)}
+            {maybeFriendlyAddress(crossChainAccount, destination?.chainId)}
             {innerCall && forwardResult ? (
               <>
                 {" "}
@@ -891,8 +1050,12 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
                 <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
                   {innerCall.functionName}
                 </code>{" "}
-                on {maybeFriendlyAddress(forwardResult.target)} with the
-                following parameter:
+                on{" "}
+                {maybeFriendlyAddress(
+                  forwardResult.target,
+                  destination?.chainId
+                )}{" "}
+                with the following parameter:
               </>
             ) : (
               <>.</>
@@ -900,7 +1063,10 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
           </div>
           {innerCall && (
             <div className="pl-4">
-              <InnerCallLine innerCall={innerCall} />
+              <InnerCallLine
+                innerCall={innerCall}
+                destinationChainId={destination?.chainId}
+              />
             </div>
           )}
         </div>
@@ -919,13 +1085,14 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
 
       return (
         <div className="text-sm text-primary space-y-2">
+          <DestinationChainLine label={ARBITRUM_DESTINATION.name} />
           <div>
             Call{" "}
             <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
               createRetryableTicket
             </code>{" "}
             on the {maybeFriendlyAddress(target)} contract targeting{" "}
-            {maybeFriendlyAddress(l2Target)}
+            {maybeFriendlyAddress(l2Target, ARBITRUM_DESTINATION.chainId)}
             {innerCall ? (
               <>
                 {" "}
@@ -941,7 +1108,10 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
           </div>
           {innerCall && (
             <div className="pl-4">
-              <InnerCallLine innerCall={innerCall} />
+              <InnerCallLine
+                innerCall={innerCall}
+                destinationChainId={ARBITRUM_DESTINATION.chainId}
+              />
             </div>
           )}
         </div>
@@ -958,13 +1128,15 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
 
       return (
         <div className="text-sm text-primary space-y-2">
+          <DestinationChainLine label={POLYGON_DESTINATION.name} />
           <div>
             Call{" "}
             <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
               sendMessageToChild
             </code>{" "}
             on the {maybeFriendlyAddress(target)} contract targeting{" "}
-            {maybeFriendlyAddress(childReceiver)} with encoded message data.
+            {maybeFriendlyAddress(childReceiver, POLYGON_DESTINATION.chainId)}{" "}
+            with encoded message data.
           </div>
         </div>
       );
@@ -976,6 +1148,9 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
     name: "sendMessage",
     prettyName: "Send Wormhole Message",
     prettyRender: (decodedData, target) => {
+      const destChainIdRaw = collectByType(decodedData.parameters, "uint16")[0];
+      const destinationChainId = parseUint16ChainId(destChainIdRaw);
+      const destinationLabel = formatWormholeDestination(destChainIdRaw);
       const targetAddresses = collectArrayByType(
         decodedData.parameters,
         "address[]"
@@ -999,6 +1174,9 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
 
       return (
         <div className="text-sm text-primary space-y-2">
+          {destinationLabel && (
+            <DestinationChainLine label={destinationLabel} />
+          )}
           <div>
             Call{" "}
             <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-sm">
@@ -1018,6 +1196,7 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
                   <InnerCallLine
                     innerCall={item.call}
                     targetAddress={item.target}
+                    destinationChainId={destinationChainId}
                   />
                 </div>
               ))}
