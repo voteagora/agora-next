@@ -35,19 +35,31 @@ export const useProposalVotesChart = ({
         const payload = (await response.json()) as {
           data?: ArchiveVoteRow[];
         };
-        return (payload.data ?? []).map((vote) => ({
-          voter: vote.voter,
-          support: vote.support ?? "1",
-          weight: String(vote.weight ?? vote.vp ?? "0"),
-          block_number:
-            vote.block_number != null ? String(vote.block_number) : "",
-          created:
-            vote.created != null
-              ? String(vote.created)
-              : vote.ts != null
-                ? String(vote.ts)
-                : undefined,
-        }));
+        const isSnapshot = proposalType === "SNAPSHOT";
+
+        return (payload.data ?? [])
+          .map((vote) => ({
+            voter: vote.voter,
+            support: vote.support ?? "1",
+            weight: String(vote.weight ?? vote.vp ?? "0"),
+            block_number:
+              vote.block_number != null ? String(vote.block_number) : "",
+            created:
+              vote.created != null
+                ? String(vote.created)
+                : vote.ts != null
+                  ? String(vote.ts)
+                  : undefined,
+          }))
+          .sort((a, b) => {
+            const aKey = isSnapshot
+              ? Number(a.created ?? 0)
+              : Number(a.block_number || 0);
+            const bKey = isSnapshot
+              ? Number(b.created ?? 0)
+              : Number(b.block_number || 0);
+            return aKey - bKey;
+          });
       }
 
       const response = await fetch(
