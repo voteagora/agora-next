@@ -20,7 +20,7 @@ import {
 
 interface Props {
   isProd: boolean;
-  rpcSecret: string;
+  alchemyId: string;
 }
 
 export const cyber = /*#__PURE__*/ defineChain({
@@ -53,7 +53,10 @@ export const cyber = /*#__PURE__*/ defineChain({
   testnet: false,
 });
 
-export const cyberTenantConfig = ({ isProd }: Props): TenantContracts => {
+export const cyberTenantConfig = ({
+  isProd,
+  alchemyId,
+}: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x522d3a9c2bc14ce1c4d210ed41ab239fded02f2b"
     : "0x8dfC3B23EE4ca0b8C4af1e4EC7F72D2efbAB70E3";

@@ -8,7 +8,7 @@ import {
   DERIVE_TESTNET_RPC,
 } from "@/lib/tenant/configs/contracts/derive";
 import { ProposalType } from "../app/proposals/draft/types";
-import { JsonRpcProvider } from "ethers";
+import { AlchemyProvider } from "ethers";
 import {
   Address,
   hexToBigInt,
@@ -28,7 +28,7 @@ import {
   scroll,
   sepolia,
 } from "viem/chains";
-import { getRpcUrl } from "./rpcConfig";
+import { getAlchemyId } from "./alchemyConfig";
 import { fetchSafeMultisigTransactionStatus } from "./safeTransactionService";
 
 const { token } = Tenant.current();
@@ -492,75 +492,98 @@ export function toNumericChainId(
 }
 
 export const getTransportForChain = (chainId: number) => {
-  if (FORK_NODE_URL) {
-    return http(FORK_NODE_URL);
-  }
-
-  const rpcTransport = () => http(getRpcUrl(chainId));
+  const alchemyId = getAlchemyId();
 
   switch (chainId) {
     // mainnet
     case 1:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://eth-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
     // optimism
     case 10:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://opt-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
     // optimism sepolia
     case 11155420:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://opt-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
     // base
     case 8453:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://base-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
     // arbitrum one
     case 42161:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://arb-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
     // arbitrum sepolia
     case 421614:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://arb-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
     // sepolia
     case 11155111:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://eth-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
     // cyber
     case 7560:
       return fallback([
-        http("https://rpc.cyber.co"),
-        http("https://cyber.alt.technology"),
+        http(FORK_NODE_URL || "https://rpc.cyber.co"),
+        http(FORK_NODE_URL || "https://cyber.alt.technology"),
       ]);
 
     // scroll
     case 534_352:
       return fallback([
-        http(getRpcUrl(chainId)),
-        http("https://rpc.scroll.io"),
+        http(
+          FORK_NODE_URL ||
+            `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
+        ),
+        http(FORK_NODE_URL || "https://rpc.scroll.io"),
       ]);
 
     // derive mainnet
     case 957:
-      return http(DERIVE_MAINNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_MAINNET_RPC);
 
     // derive testnet
     case 901:
-      return http(DERIVE_TESTNET_RPC);
+      return http(FORK_NODE_URL || DERIVE_TESTNET_RPC);
 
     // linea
     case 59144:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://linea-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
 
     // linea sepolia
     case 59141:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://linea-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
 
     // bsc (binance smart chain)
     case 56:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://bnb-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
 
     // shape mainnet
     case 360:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+      );
 
     // shape sepolia
     case 11011:
-      return rpcTransport();
+      return http(
+        FORK_NODE_URL || `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
+      );
 
     // for each new dao with a new chainId add them here
     default:
@@ -572,7 +595,7 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   async (blockNumber: bigint) => {
     const { contracts } = Tenant.current();
     try {
-      const block = await (contracts.governor.provider as JsonRpcProvider).send(
+      const block = await (contracts.governor.provider as AlchemyProvider).send(
         "eth_getBlockByNumber",
         [`0x${blockNumber.toString(16)}`, false]
       );

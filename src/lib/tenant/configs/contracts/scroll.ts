@@ -17,16 +17,15 @@ import {
   PROPOSAL_TYPES_CONFIGURATOR_FACTORY,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { getRpcUrl } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  rpcSecret: string;
+  alchemyId: string;
 }
 
 export const scrollTenantContractConfig = ({
   isProd,
-  rpcSecret,
+  alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0xd29687c813D741E2F938F4aC377128810E217b1b"
@@ -48,23 +47,28 @@ export const scrollTenantContractConfig = ({
     ? "0x79D83D1518e2eAA64cdc0631df01b06e2762CC14"
     : "0xE27B7b6DB440b27249b49E3C0A686B82c36A0D7e";
 
-  const forkNodeUrl = process.env.NEXT_PUBLIC_FORK_NODE_URL;
-  const provider = forkNodeUrl
-    ? new JsonRpcProvider(forkNodeUrl)
-    : new FallbackProvider([
-        {
-          provider: new JsonRpcProvider(getRpcUrl(scroll.id, rpcSecret)),
-          priority: 1,
-          stallTimeout: 10,
-          weight: 1,
-        },
-        {
-          provider: new JsonRpcProvider(`https://rpc.scroll.io/`),
-          priority: 2,
-          stallTimeout: 10,
-          weight: 1,
-        },
-      ]);
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const liveNetProvider = new FallbackProvider([
+    {
+      provider: new JsonRpcProvider(
+        `https://scroll-mainnet.g.alchemy.com/v2/${alchemyId}`
+      ),
+      priority: 1,
+      stallTimeout: 10,
+      weight: 1,
+    },
+    {
+      provider: new JsonRpcProvider(`https://rpc.scroll.io/`),
+      priority: 2,
+      stallTimeout: 10,
+      weight: 1,
+    },
+  ]);
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : liveNetProvider;
 
   return {
     token: createTokenContract({

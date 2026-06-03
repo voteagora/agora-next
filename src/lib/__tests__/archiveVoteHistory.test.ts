@@ -14,7 +14,7 @@ import type { ArchiveNonVoterRow, ArchiveVoteRow } from "../archiveUtils";
 vi.hoisted(() => {
   process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME = "optimism";
   process.env.NEXT_PUBLIC_AGORA_ENV = "prod";
-  process.env.NEXT_PUBLIC_RPC_SECRET = "test";
+  process.env.NEXT_PUBLIC_ALCHEMY_ID = "test";
 });
 
 const makeNonVoter = (

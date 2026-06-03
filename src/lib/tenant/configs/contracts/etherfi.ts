@@ -6,29 +6,35 @@ import { TenantContract } from "@/lib/tenant/tenantContract";
 import { TenantContracts } from "@/lib/types";
 import { mainnet, sepolia } from "viem/chains";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
-import { JsonRpcProvider } from "ethers";
+import { AlchemyProvider, JsonRpcProvider } from "ethers";
 import { createTokenContract } from "@/lib/tokenUtils";
 import {
   DELEGATION_MODEL,
   GOVERNOR_TYPE,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { getRpcUrlForChain } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  rpcSecret: string;
+  alchemyId: string;
 }
 
 export const etherfiTenantContractConfig = ({
   isProd,
-  rpcSecret,
+  alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB";
   const GOVERNOR = TOKEN;
 
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("mainnet", alchemyId)
+      : new AlchemyProvider("sepolia", alchemyId);
+
   const chain = isProd ? mainnet : sepolia;
-  const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
 
   return {
     token: createTokenContract({

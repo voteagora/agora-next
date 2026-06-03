@@ -45,34 +45,32 @@ This project uses various environment variables for configuration. Below is a co
 - **Example**: `NEXT_PUBLIC_AGORA_ENV=prod`
 - **Note**: Also available as `AGORA_ENV` in some legacy components
 
-#### **NEXT_PUBLIC_RPC_SECRET**
+#### **NEXT_PUBLIC_ALCHEMY_ID**
 
-- **Purpose**: RPC secret for client-side blockchain RPC access (browser)
+- **Purpose**: Alchemy API key for client-side blockchain RPC access (browser)
 - **Required**: YES (unless using `NEXT_PUBLIC_FORK_NODE_URL`)
 - **Usage**: Used for client-side chain interactions (wagmi, Web3Provider, hooks)
-- **Blockcache**: Sent as the `rpc-secret` header for Blockcache requests
-- **RPC format**: `https://edge.goldsky.com/standard/evm/{chainId}?secret={secret}`
-- **Security**: Public but sensitive - restrict provider usage where possible
+- **Security**: Public but sensitive - **MUST be domain-whitelisted** in Alchemy dashboard
 - **Fallback**: Can be overridden by `NEXT_PUBLIC_FORK_NODE_URL` for local development
-- **Example**: `NEXT_PUBLIC_RPC_SECRET=your_client_rpc_secret`
+- **Example**: `NEXT_PUBLIC_ALCHEMY_ID=your_client_alchemy_api_key`
 
-#### **SERVERSIDE_RPC_SECRET_DEV**
+#### **SERVERSIDE_ALCHEMY_ID_DEV**
 
-- **Purpose**: RPC secret for server-side blockchain RPC access in development (Node.js)
-- **Required**: RECOMMENDED for development (falls back to `NEXT_PUBLIC_RPC_SECRET` if not set)
-- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=dev` via `getRpcSecret()` helper
+- **Purpose**: Alchemy API key for server-side blockchain RPC access in development (Node.js)
+- **Required**: RECOMMENDED for development (falls back to `NEXT_PUBLIC_ALCHEMY_ID` if not set)
+- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=dev` via `getAlchemyId()` helper
 - **Security**: Private - never exposed to browser, no domain restrictions needed
-- **Example**: `SERVERSIDE_RPC_SECRET_DEV=your_dev_server_rpc_secret`
+- **Example**: `SERVERSIDE_ALCHEMY_ID_DEV=your_dev_server_alchemy_api_key`
 
-#### **SERVERSIDE_RPC_SECRET_PROD**
+#### **SERVERSIDE_ALCHEMY_ID_PROD**
 
-- **Purpose**: RPC secret for server-side blockchain RPC access in production (Node.js)
-- **Required**: RECOMMENDED for production (falls back to `NEXT_PUBLIC_RPC_SECRET` if not set)
-- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=prod` via `getRpcSecret()` helper
+- **Purpose**: Alchemy API key for server-side blockchain RPC access in production (Node.js)
+- **Required**: RECOMMENDED for production (falls back to `NEXT_PUBLIC_ALCHEMY_ID` if not set)
+- **Usage**: Automatically used when `NEXT_PUBLIC_AGORA_ENV=prod` via `getAlchemyId()` helper
 - **Security**: Private - never exposed to browser, no domain restrictions needed
-- **Why separate?**: Prevents leaked client credentials from being used for server-side operations
+- **Why separate?**: Prevents leaked client keys from being used for server-side operations
 - **Auto-detection**: Code automatically uses the right key based on execution context and environment
-- **Example**: `SERVERSIDE_RPC_SECRET_PROD=your_prod_server_rpc_secret`
+- **Example**: `SERVERSIDE_ALCHEMY_ID_PROD=your_prod_server_alchemy_api_key`
 
 ### 📊 Database Configuration
 
@@ -142,7 +140,7 @@ This project uses various environment variables for configuration. Below is a co
 
 - **Purpose**: Override RPC endpoint for development/testing
 - **Required**: NO
-- **Usage**: Takes precedence over the configured RPC provider when set
+- **Usage**: Takes precedence over Alchemy when set
 - **Use cases**:
   - Local Anvil/Hardhat forks
   - Testing contract interactions
@@ -383,7 +381,7 @@ NEXT_PUBLIC_AGORA_INSTANCE_TOKEN=ENS
 NEXT_PUBLIC_AGORA_ENV=dev
 
 # API Keys
-NEXT_PUBLIC_RPC_SECRET=your_rpc_secret
+NEXT_PUBLIC_ALCHEMY_ID=your_alchemy_key
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id
 NEXT_PUBLIC_AGORA_API_KEY=your_agora_api_key
 

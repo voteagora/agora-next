@@ -5,16 +5,15 @@ import { BaseContract, JsonRpcProvider } from "ethers";
 import { shape, shapeSepolia } from "viem/chains";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { ERC20__factory } from "@/lib/contracts/generated";
-import { getRpcUrlForChain } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  rpcSecret: string;
+  alchemyId: string;
 }
 
 export const shapeTenantConfig = ({
   isProd,
-  rpcSecret,
+  alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0x360aAC543A23dbcefA8049d4C4d8B18dA1CCa360" // Shape mainnet (prod)
@@ -25,8 +24,18 @@ export const shapeTenantConfig = ({
   const DUMMY_TIMELOCK = "0x0000000000000000000000000000000000000003";
   const DUMMY_TYPES = "0x0000000000000000000000000000000000000004";
 
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new JsonRpcProvider(
+          `https://shape-mainnet.g.alchemy.com/v2/${alchemyId}`
+        )
+      : new JsonRpcProvider(
+          `https://shape-sepolia.g.alchemy.com/v2/${alchemyId}`
+        );
   const chain = isProd ? shape : shapeSepolia;
-  const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
 
   return {
     token: createTokenContract({

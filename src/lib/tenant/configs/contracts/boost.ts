@@ -9,23 +9,22 @@ import { TenantContracts } from "@/lib/types";
 import { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
 import { createTokenContract } from "@/lib/tokenUtils";
 import { optimism, optimismSepolia } from "viem/chains";
-import { BaseContract, JsonRpcProvider } from "ethers";
+import { AlchemyProvider, BaseContract, JsonRpcProvider } from "ethers";
 import { ITimelockContract } from "@/lib/contracts/common/interfaces/ITimelockContract";
 import {
   DELEGATION_MODEL,
   GOVERNOR_TYPE,
   TIMELOCK_TYPE,
 } from "@/lib/constants";
-import { getRpcUrlForChain } from "@/lib/rpcConfig";
 
 interface Props {
   isProd: boolean;
-  rpcSecret: string;
+  alchemyId: string;
 }
 
 export const boostTenantConfig = ({
   isProd,
-  rpcSecret,
+  alchemyId,
 }: Props): TenantContracts => {
   const TOKEN = isProd
     ? "0xcDdf69F9d290F591896DD1A27cbb32E4935D47b6"
@@ -48,8 +47,15 @@ export const boostTenantConfig = ({
     ? "0x0cabe65b0adc1634f56ea66a36abb70f2d4232c5"
     : "0x7af51c3ed3b691a58a7ab2cd5876a33751d3bc6f";
 
+  const usingForkedNode = process.env.NEXT_PUBLIC_FORK_NODE_URL !== undefined;
+
+  const provider = usingForkedNode
+    ? new JsonRpcProvider(process.env.NEXT_PUBLIC_FORK_NODE_URL)
+    : isProd
+      ? new AlchemyProvider("optimism", alchemyId)
+      : new AlchemyProvider("optimism-sepolia", alchemyId);
+
   const chain = isProd ? optimism : optimismSepolia;
-  const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
 
   return {
     token: createTokenContract({

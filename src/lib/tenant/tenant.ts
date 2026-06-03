@@ -9,7 +9,7 @@ import TenantSlugFactory from "@/lib/tenant/tenantSlugFactory";
 import TenantUIFactory from "@/lib/tenant/tenantUIFactory";
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import { type DaoSlug } from "@prisma/client";
-import { getRpcSecret } from "@/lib/rpcConfig";
+import { getAlchemyId } from "@/lib/alchemyConfig";
 
 export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   ens: "ENS",
@@ -36,13 +36,10 @@ export default class Tenant {
     this._namespace = process.env
       .NEXT_PUBLIC_AGORA_INSTANCE_NAME as TenantNamespace;
     this._isProd = process.env.NEXT_PUBLIC_AGORA_ENV === "prod";
-    const rpcSecret = process.env.NEXT_PUBLIC_FORK_NODE_URL
-      ? ""
-      : getRpcSecret();
     this._contracts = TenantContractFactory.create(
       this._namespace,
       this._isProd,
-      rpcSecret
+      getAlchemyId()
     );
     this._slug = TenantSlugFactory.create(this._namespace);
     this._token = TenantTokenFactory.create(this._namespace);
