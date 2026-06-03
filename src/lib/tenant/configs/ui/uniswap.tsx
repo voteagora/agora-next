@@ -404,7 +404,7 @@ export const uniswapTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: true,
+      enabled: false,
     },
     {
       name: "hide-info-tabs",
