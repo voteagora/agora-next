@@ -148,7 +148,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
   if (!chartData || !block) return <ChartSkeleton />;
 
   return (
-    <div className="relative">
+    <div className="relative [&_.recharts-wrapper]:overflow-visible">
       <ResponsiveContainer width="100%" height={230}>
         <AreaChart data={chartData}>
           <CartesianGrid
@@ -408,7 +408,7 @@ const tickFormatter = (timeStr: string, index: number) => {
   const date = new Date(timeStr);
   const formattedDate = format(date, "MM/dd h:mm a");
 
-  const metaText = index === 0 ? "(vote begins)" : "(vote end)";
+  const metaText = index === 0 ? "(vote begins)" : "(vote ends)";
   return `${formattedDate} ${metaText}`;
 };
 
@@ -432,12 +432,19 @@ const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
 
 const customizedXTick = (props: any) => {
   const { index, x, y, payload, tickFormatter, className } = props;
+  const isStart = index === 0;
   return (
-    <g transform={`translate(${index === 0 ? x : x + 15},${y})`}>
-      <text x={0} y={0} dy={10} fill="#AFAFAF" className={className}>
-        <tspan textAnchor={"middle"} x="0">
-          {tickFormatter(payload.value, index)}
-        </tspan>
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        dx={isStart ? 4 : 0}
+        fill="#AFAFAF"
+        className={className}
+        textAnchor="middle"
+      >
+        {tickFormatter(payload.value, index)}
       </text>
     </g>
   );
