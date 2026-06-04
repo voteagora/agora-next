@@ -25,7 +25,11 @@ import React, { useState } from "react";
 import { formatUnits } from "viem";
 import { sanitizeContent } from "@/lib/sanitizationUtils";
 import { toast } from "react-hot-toast";
-import { areAllActionsSupported, getAdapter } from "@/lib/knownSelectors";
+import {
+  areAllActionsSupported,
+  getAdapter,
+  prettyViewRequiresDecodedData,
+} from "@/lib/knownSelectors";
 import {
   checkExistingProposal,
   checkNewProposal,
@@ -589,7 +593,7 @@ const PrettyView = ({
     );
   }
 
-  if (!decodedData) {
+  if (!decodedData && prettyViewRequiresDecodedData(calldata)) {
     return (
       <div className="text-sm text-secondary">
         Unable to decode transaction data.
@@ -602,14 +606,13 @@ const PrettyView = ({
       ? { snapshotBlockNumber: proposal.snapshotBlockNumber }
       : undefined;
 
+    const decodedForRender = (decodedData ?? {
+      function: adapter.name,
+      parameters: {},
+    }) as Parameters<typeof adapter.prettyRender>[0];
+
     return (
-      <>
-        {adapter.prettyRender(
-          decodedData as Parameters<typeof adapter.prettyRender>[0],
-          target,
-          proposalContext
-        )}
-      </>
+      <>{adapter.prettyRender(decodedForRender, target, proposalContext)}</>
     );
   } catch {
     return (
