@@ -30,6 +30,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface UndelegateActionButtonsProps {
@@ -186,6 +187,14 @@ export function UndelegateDialog({
     hash: isGasRelayLive ? undefined : delegateTxHash,
   });
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef: delegationTraceRef,
+    txHash: delegateTxHash,
+    chainId: contracts.token.chain.id,
+    details: "Submitted undelegation transaction",
+    enabled: !isGasRelayLive,
+  });
+
   const fetchData = useCallback(async () => {
     setIsReady(false);
     if (!accountAddress) return;
@@ -263,11 +272,6 @@ export function UndelegateDialog({
   useEffect(() => {
     if (didProcessDelegation) {
       if (delegationTraceRef.current) {
-        attachMiradorTransactionArtifacts(delegationTraceRef.current, {
-          chainId: contracts.token.chain.id,
-          txHash: delegateTxHash,
-          txDetails: "Undelegation transaction",
-        });
         void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
           reason: "governance_delegation_succeeded",
           eventName: "governance_delegation_succeeded",

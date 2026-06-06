@@ -102,8 +102,9 @@ export const OffchainCancel = ({ proposal }: Props) => {
       attachMiradorTransactionArtifacts(trace, {
         chainId: attestationChainId ?? chain.id,
         inputData: txInputData,
-        txHash,
-        txDetails: "Offchain proposal cancellation attestation transaction",
+        submittedTxHash: txHash,
+        submittedTxDetails:
+          "Submitted offchain proposal cancellation attestation transaction",
       });
       const traceContext = getFrontendMiradorTraceContext(trace, {
         flow: MIRADOR_FLOW.proposalAttestation,
@@ -141,8 +142,9 @@ export const OffchainCancel = ({ proposal }: Props) => {
       attachMiradorTransactionArtifacts(trace, {
         chainId: failedTxContext.chainId ?? chain?.id,
         inputData: failedTxContext.txInputData,
-        txHash: failedTxContext.txHash,
-        txDetails: "Offchain proposal cancellation attestation transaction",
+        submittedTxHash: failedTxContext.txHash,
+        submittedTxDetails:
+          "Failed offchain proposal cancellation attestation transaction",
       });
       void closeFrontendMiradorFlowTrace(trace, {
         reason: "proposal_attestation_failed",

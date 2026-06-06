@@ -174,10 +174,10 @@ export const useSponsoredDelegation = ({ address, delegate }: Props) => {
 
       attachMiradorTransactionArtifacts(trace, {
         chainId: contracts.token.chain.id,
-        txHash: relayTxHash,
-        txDetails: isUndelegation
-          ? "Sponsored undelegation transaction"
-          : "Sponsored delegation transaction",
+        submittedTxHash: relayTxHash,
+        submittedTxDetails: isUndelegation
+          ? "Submitted sponsored undelegation transaction"
+          : "Submitted sponsored delegation transaction",
       });
 
       addMiradorEvent(trace, "governance_delegation_submitted", {

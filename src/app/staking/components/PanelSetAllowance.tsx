@@ -17,6 +17,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface PanelSetAllowanceProps {
@@ -43,20 +44,16 @@ export const PanelSetAllowance = ({ amount }: PanelSetAllowanceProps) => {
       hash: data,
     });
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef,
+    txHash: data,
+    chainId: contracts.token.chain.id,
+    details: "Submitted token allowance approval transaction",
+  });
+
   useEffect(() => {
     if (didUpdateAllowance) {
       if (traceRef.current) {
-        attachMiradorTransactionArtifacts(traceRef.current, {
-          chainId: contracts.token.chain.id,
-          inputData:
-            config?.request &&
-            "data" in config.request &&
-            typeof config.request.data === "string"
-              ? config.request.data
-              : undefined,
-          txHash: data,
-          txDetails: "Token allowance approval transaction",
-        });
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "staking_allowance_succeeded",
           eventName: "staking_allowance_succeeded",

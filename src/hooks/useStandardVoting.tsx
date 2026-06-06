@@ -117,25 +117,33 @@ const useStandardVoting = ({
           chainId: contracts.governor.chain.id,
         });
 
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.governor.chain.id,
+          submittedTxHash: directTx,
+          submittedTxDetails: "Submitted governance vote transaction",
+        });
+
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: directTx,
             address: address as `0x${string}`,
           });
 
-        if (status === "success") {
+        if (transactionHash && transactionHash !== directTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.governor.chain.id,
-            inputData,
             submittedTxHash: directTx,
-            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
-            submittedTxDetails:
-              directTx !== transactionHash
-                ? "Submitted Safe governance vote transaction"
-                : "Submitted governance vote transaction",
+            submittedTxType: "safe",
+            submittedTxDetails: "Submitted Safe governance vote transaction",
             txHash: transactionHash,
-            txDetails: "Governance vote transaction",
+            txDetails:
+              status === "success"
+                ? "Governance vote transaction"
+                : "Reverted governance vote transaction",
           });
+        }
+
+        if (status === "success") {
           setStandardTxHash(transactionHash);
 
           await trackEvent({
