@@ -39,6 +39,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 export function DelegateDialog({
@@ -160,17 +161,20 @@ export function DelegateDialog({
     }
   }, [didProcessDelegation, didProcessSponsoredDelegation]);
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef: delegationTraceRef,
+    txHash: directDelegationTxHash,
+    chainId: contracts.token.chain.id,
+    details: "Submitted delegation transaction",
+    enabled: !isGasRelayLive,
+  });
+
   useEffect(() => {
     if (isGasRelayLive || !delegationTraceRef.current) {
       return;
     }
 
     if (didProcessDelegation) {
-      attachMiradorTransactionArtifacts(delegationTraceRef.current, {
-        chainId: contracts.token.chain.id,
-        txHash: directDelegationTxHash,
-        txDetails: "Delegation transaction",
-      });
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_succeeded",
         eventName: "governance_delegation_succeeded",
@@ -189,6 +193,7 @@ export function DelegateDialog({
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
+          transactionHash: directDelegationTxHash,
           error: "Delegation transaction failed",
         },
       });
@@ -287,8 +292,6 @@ export function DelegateDialog({
             "data" in request && typeof request.data === "string"
               ? request.data
               : inputData,
-          txHash,
-          txDetails: "Delegation transaction",
         });
         setLocalDelegateTxHash(txHash);
       } catch (error) {

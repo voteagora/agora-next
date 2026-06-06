@@ -15,6 +15,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface Props {
@@ -37,14 +38,16 @@ export const BravoGovCancel = ({ proposal }: Props) => {
       hash: data,
     });
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef,
+    txHash: data,
+    chainId: contracts.governor.chain.id,
+    details: "Submitted cancel governance proposal transaction",
+  });
+
   useEffect(() => {
     if (isSuccess) {
       if (traceRef.current) {
-        attachMiradorTransactionArtifacts(traceRef.current, {
-          chainId: contracts.governor.chain.id,
-          txHash: data,
-          txDetails: "Cancel governance proposal transaction",
-        });
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "governance_admin_succeeded",
           eventName: "governance_admin_succeeded",

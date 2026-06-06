@@ -165,24 +165,30 @@ const useAdvancedVoting = ({
           args: args as any,
           chainId: contracts.governor.chain.id,
         });
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.governor.chain.id,
+          submittedTxHash: directTx,
+          submittedTxDetails: "Submitted governance vote transaction",
+        });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: directTx,
             address: address as `0x${string}`,
           });
-        if (status === "success") {
+        if (transactionHash && transactionHash !== directTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.governor.chain.id,
-            inputData,
             submittedTxHash: directTx,
-            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
-            submittedTxDetails:
-              directTx !== transactionHash
-                ? "Submitted Safe governance vote transaction"
-                : "Submitted governance vote transaction",
+            submittedTxType: "safe",
+            submittedTxDetails: "Submitted Safe governance vote transaction",
             txHash: transactionHash,
-            txDetails: "Governance vote transaction",
+            txDetails:
+              status === "success"
+                ? "Governance vote transaction"
+                : "Reverted governance vote transaction",
           });
+        }
+        if (status === "success") {
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
@@ -277,24 +283,31 @@ const useAdvancedVoting = ({
           args: args as any,
           chainId: contracts.alligator?.chain.id,
         });
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.alligator?.chain.id,
+          submittedTxHash: advancedTx,
+          submittedTxDetails: "Submitted advanced governance vote transaction",
+        });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
             hash: advancedTx,
             address: address as `0x${string}`,
           });
-        if (status === "success") {
+        if (transactionHash && transactionHash !== advancedTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.alligator?.chain.id,
-            inputData,
             submittedTxHash: advancedTx,
-            submittedTxType: advancedTx !== transactionHash ? "safe" : "tx",
+            submittedTxType: "safe",
             submittedTxDetails:
-              advancedTx !== transactionHash
-                ? "Submitted Safe advanced governance vote transaction"
-                : "Submitted advanced governance vote transaction",
+              "Submitted Safe advanced governance vote transaction",
             txHash: transactionHash,
-            txDetails: "Advanced governance vote transaction",
+            txDetails:
+              status === "success"
+                ? "Advanced governance vote transaction"
+                : "Reverted advanced governance vote transaction",
           });
+        }
+        if (status === "success") {
           await trackEvent({
             event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
             event_data: {

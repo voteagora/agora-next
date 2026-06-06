@@ -28,6 +28,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface DepositProps {
@@ -53,15 +54,17 @@ export const Deposit = ({ deposit, refreshPath }: DepositProps) => {
   const { isLoading: isProcessingWithdrawal, isFetched: didProcessWithdrawal } =
     useWaitForTransactionReceipt({ hash: data });
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef,
+    txHash: data,
+    chainId: contracts.staker!.chain.id,
+    details: "Submitted withdraw stake transaction",
+  });
+
   useEffect(() => {
     // Refresh route and invalidate cache if withdrawal was processed
     if (didProcessWithdrawal) {
       if (traceRef.current) {
-        attachMiradorTransactionArtifacts(traceRef.current, {
-          chainId: contracts.staker!.chain.id,
-          txHash: data,
-          txDetails: "Withdraw stake transaction",
-        });
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "staking_withdraw_succeeded",
           eventName: "staking_withdraw_succeeded",

@@ -115,8 +115,8 @@ export function useEASV2() {
       attachMiradorTransactionArtifacts(trace, {
         chainId: result.chainId ?? chainId,
         inputData: result.txInputData,
-        txHash: getMiradorResultTxHash(result),
-        txDetails,
+        submittedTxHash: getMiradorResultTxHash(result),
+        submittedTxDetails: `Submitted ${txDetails.toLowerCase()}`,
       });
       void closeFrontendMiradorFlowTrace(trace, {
         reason: successEventName,
@@ -134,8 +134,8 @@ export function useEASV2() {
       attachMiradorTransactionArtifacts(trace, {
         chainId: failedTxContext.chainId ?? chainId,
         inputData: failedTxContext.txInputData,
-        txHash: failedTxContext.txHash,
-        txDetails,
+        submittedTxHash: failedTxContext.txHash,
+        submittedTxDetails: `Failed ${txDetails.toLowerCase()}`,
       });
       void closeFrontendMiradorFlowTrace(trace, {
         reason: failureEventName,

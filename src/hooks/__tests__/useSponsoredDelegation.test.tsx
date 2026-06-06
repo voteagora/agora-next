@@ -177,9 +177,9 @@ describe("useSponsoredDelegation", () => {
     expect(attachMiradorTransactionArtifactsMock).toHaveBeenCalledWith(
       { traceId: "trace-id" },
       expect.objectContaining({
-        txHash:
+        submittedTxHash:
           "0x000000000000000000000000000000000000000000000000000000000000000a",
-        txDetails: "Sponsored delegation transaction",
+        submittedTxDetails: "Submitted sponsored delegation transaction",
       })
     );
     expect(result.current.isFetched).toBe(true);

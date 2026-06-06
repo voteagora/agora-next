@@ -22,6 +22,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface EditDepositConfirmProps {
@@ -71,19 +72,15 @@ export const EditDepositConfirm = ({
   });
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef,
+    txHash: data,
+    chainId: contracts.staker!.chain.id,
+    details: "Submitted stake more transaction",
+  });
+
   useEffect(() => {
     if (isSuccess && traceRef.current) {
-      attachMiradorTransactionArtifacts(traceRef.current, {
-        chainId: contracts.staker!.chain.id,
-        inputData:
-          config?.request &&
-          "data" in config.request &&
-          typeof config.request.data === "string"
-            ? config.request.data
-            : undefined,
-        txHash: data,
-        txDetails: "Stake more transaction",
-      });
       void closeFrontendMiradorFlowTrace(traceRef.current, {
         reason: "staking_submit_succeeded",
         eventName: "staking_submit_succeeded",
