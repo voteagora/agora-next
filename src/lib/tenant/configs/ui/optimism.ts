@@ -98,7 +98,7 @@ export const optimismTenantUIConfig = new TenantUI({
     {
       name: "bugs",
       title: "Report bugs & feedback",
-      url: "https://app.deform.cc/form/7180b273-7662-4f96-9e66-1eae240a52bc",
+      url: "/feedback",
     },
     {
       name: "governance-forum",
