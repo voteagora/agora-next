@@ -192,7 +192,7 @@ export const ensTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "email-subscriptions",
+      name: "notifications",
       enabled: true,
     },
     {

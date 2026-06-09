@@ -24,7 +24,6 @@ const formSchema = z.object({
   daoSlug: z.string(),
   discord: z.string(),
   delegateStatement: z.string(),
-  email: z.string(),
   twitter: z.string(),
   warpcast: z.string(),
   scwAddress: z.string().optional(),
@@ -63,19 +62,6 @@ const formSchema = z.object({
       })
       .strict()
   ),
-  notificationPreferences: z.object({
-    last_updated: z.string().optional(),
-    wants_proposal_created_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-    wants_proposal_ending_soon_email: z.union([
-      z.literal("prompt"),
-      z.literal("prompted"),
-      z.boolean(),
-    ]),
-  }),
 });
 
 export default function CurrentDelegateStatement() {
@@ -110,7 +96,6 @@ export default function CurrentDelegateStatement() {
       delegateStatement:
         (delegateStatement?.payload as { delegateStatement?: string })
           ?.delegateStatement || "",
-      email: "",
       twitter: delegateStatement?.twitter || "",
       warpcast: delegateStatement?.warpcast || "",
       scwAddress: delegateStatement?.scw_address || "",
@@ -164,14 +149,6 @@ export default function CurrentDelegateStatement() {
       leastValuableProposals:
         (delegateStatement?.payload as { leastValuableProposals?: object[] })
           ?.leastValuableProposals || [],
-      notificationPreferences: (delegateStatement?.notification_preferences as {
-        wants_proposal_created_email: "prompt" | "prompted" | boolean;
-        wants_proposal_ending_soon_email: "prompt" | "prompted" | boolean;
-      }) || {
-        wants_proposal_created_email: "prompt",
-        wants_proposal_ending_soon_email: "prompt",
-      },
-      last_updated: new Date().toISOString(),
     };
   };
 
