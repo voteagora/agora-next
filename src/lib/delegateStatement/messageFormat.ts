@@ -9,13 +9,11 @@ export function createDelegateStatementMessage(
   additionalData: {
     daoSlug: string;
     discord: string;
-    email: string;
     twitter: string;
     warpcast: string;
     topIssues: Array<{ type: string; value: string }>;
     topStakeholders: Array<{ type: string; value: string }>;
     scwAddress?: string;
-    notificationPreferences: any;
   }
 ): string {
   const messageBody = {
@@ -24,13 +22,11 @@ export function createDelegateStatementMessage(
     daoSlug: additionalData.daoSlug,
     discord: additionalData.discord,
     delegateStatement: formValues.delegateStatement,
-    email: additionalData.email,
     twitter: additionalData.twitter,
     warpcast: additionalData.warpcast,
     topIssues: additionalData.topIssues,
     topStakeholders: additionalData.topStakeholders,
     scwAddress: additionalData.scwAddress,
-    notificationPreferences: additionalData.notificationPreferences,
   };
 
   // Use consistent formatting with tab indentation

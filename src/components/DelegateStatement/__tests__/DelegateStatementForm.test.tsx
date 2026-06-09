@@ -23,7 +23,6 @@ const defaultValues: DelegateStatementFormValues = {
   daoSlug: "UNI",
   discord: "",
   delegateStatement: "Delegate statement body",
-  email: "",
   twitter: "",
   warpcast: "",
   scwAddress: "",
@@ -37,10 +36,6 @@ const defaultValues: DelegateStatementFormValues = {
   openToSponsoringProposals: null,
   mostValuableProposals: [],
   leastValuableProposals: [],
-  notificationPreferences: {
-    wants_proposal_created_email: "prompt",
-    wants_proposal_ending_soon_email: "prompt",
-  },
 };
 
 vi.mock("next/navigation", () => ({

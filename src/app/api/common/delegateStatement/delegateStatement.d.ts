@@ -10,7 +10,6 @@ export type DelegateStatement = {
   warpcast: string | null;
   discord: string | null;
   scw_address: string | null;
-  notification_preferences: any;
   endorsed: boolean;
   createdAt: Date | null;
   updatedAt: Date | null;
