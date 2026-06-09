@@ -24,9 +24,7 @@ import { createDelegateStatement } from "@/app/api/common/delegateStatement/crea
 import type { DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
-import { fetchUpdateNotificationPreferencesForAddress } from "@/app/api/common/notifications/updateNotificationPreferencesForAddress";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
-import { requireAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
 import { prismaWeb3Client } from "@/app/lib/prisma";
@@ -182,21 +180,6 @@ export const revalidateDelegateAddressPage = async (
   revalidateTag(`delegate-${delegateAddress}`, { expire: 0 });
   revalidatePath(`/delegates/${delegateAddress}`, "page");
 };
-
-export async function updateNotificationPreferencesForAddress(
-  address: `0x${string}`,
-  email: string,
-  options: {
-    wants_proposal_created_email: "prompt" | "prompted" | true | false;
-    wants_proposal_ending_soon_email: "prompt" | "prompted" | true | false;
-  },
-  auth: AuthParams
-) {
-  // Verify authentication (throws on failure)
-  await requireAuth(auth, address);
-
-  return fetchUpdateNotificationPreferencesForAddress(address, email, options);
-}
 
 export const fetchDelegateStats = async (address: string) => {
   return getDelegateDataFromDaoNode(address);

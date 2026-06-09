@@ -233,7 +233,7 @@ export const optimismTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "email-subscriptions",
+      name: "notifications",
       enabled: true,
     },
     {

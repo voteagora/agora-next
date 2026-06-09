@@ -23,8 +23,7 @@ export async function createDelegateStatement({
   scwAddress?: string;
   auth: DelegateStatementAuthPayload;
 }) {
-  const { twitter, warpcast, discord, email, notificationPreferences } =
-    delegateStatement;
+  const { twitter, warpcast, discord } = delegateStatement;
   const { slug } = Tenant.current();
   const normalizedAddress = address.toLowerCase();
 
@@ -47,16 +46,7 @@ export async function createDelegateStatement({
     warpcast,
     discord,
     scw_address: scwAddress?.toLowerCase(),
-    notification_preferences: {
-      ...notificationPreferences,
-      last_updated: new Date().toISOString(),
-    },
   };
-
-  // Only include email if it's not empty
-  if (email && email.trim() !== "") {
-    data.email = email;
-  }
 
   return prismaWeb2Client.delegateStatements.upsert({
     where: {

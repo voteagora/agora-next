@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero/Hero";
 import Tenant from "@/lib/tenant/tenant";
-import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import townsStaticProposals from "@/assets/tenant/towns_static_proposals.svg";
 import syndicateStaticProposals from "@/assets/tenant/syndicate_static_proposals.svg";
 import { TENANT_NAMESPACES } from "@/lib/constants";
@@ -23,7 +22,6 @@ export default async function ComingSoonPage() {
     return <div>Route not supported for namespace</div>;
   }
 
-  const supportsNotifications = ui.toggle("email-subscriptions")?.enabled;
   // Choose asset and text based on current tenant namespace
   const isTowns = namespace === TENANT_NAMESPACES.TOWNS;
   const proposalsImage = isTowns
@@ -33,7 +31,6 @@ export default async function ComingSoonPage() {
 
   return (
     <div className="flex flex-col">
-      {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="coming-soon" />
 
       {/* Proposals Section */}

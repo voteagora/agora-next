@@ -14,7 +14,6 @@ import { proposalsFilterOptions } from "@/lib/constants";
 import Tenant from "@/lib/tenant/tenant";
 import { DraftsTabsWrapper } from "@/components/Proposals/DraftsTabsWrapper";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
-import SubscribeDialogLauncher from "@/components/Notifications/SubscribeDialogRootLauncher";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
 
@@ -51,9 +50,6 @@ export default async function ProposalsHome() {
 
   const plmEnabled = hasToggle
     ? ui.toggle("proposal-lifecycle")?.enabled
-    : false;
-  const supportsNotifications = hasToggle
-    ? ui.toggle("email-subscriptions")?.enabled
     : false;
   const useArchiveForProposals = hasToggle
     ? ui.toggle("use-archive-for-proposals")?.enabled
@@ -127,7 +123,6 @@ export default async function ProposalsHome() {
 
   return (
     <div className="flex flex-col">
-      {supportsNotifications && <SubscribeDialogLauncher />}
       <Hero page="proposals" />
       <DraftsTabsWrapper
         plmEnabled={!!plmEnabled}

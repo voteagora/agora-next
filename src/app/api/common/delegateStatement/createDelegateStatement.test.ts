@@ -16,7 +16,6 @@ const delegateStatement = {
   daoSlug: "UNI",
   discord: "delegate-discord",
   delegateStatement: "Delegate statement body",
-  email: "delegate@example.com",
   twitter: "delegate-twitter",
   warpcast: "delegate-warpcast",
   scwAddress: "",
@@ -30,10 +29,6 @@ const delegateStatement = {
   openToSponsoringProposals: null,
   mostValuableProposals: [],
   leastValuableProposals: [],
-  notificationPreferences: {
-    wants_proposal_created_email: "prompt" as const,
-    wants_proposal_ending_soon_email: "prompt" as const,
-  },
 };
 
 vi.mock("@/app/lib/prisma", () => ({
@@ -95,8 +90,12 @@ describe("createDelegateStatement", () => {
       })
     );
 
-    const createPayload = upsertMock.mock.calls[0][0].create.payload;
+    const createData = upsertMock.mock.calls[0][0].create;
+    const createPayload = createData.payload;
+    expect(createData).not.toHaveProperty("email");
+    expect(createData).not.toHaveProperty("notification_preferences");
     expect(createPayload).not.toHaveProperty("email");
+    expect(createPayload).not.toHaveProperty("notificationPreferences");
   });
 
   it("rejects SIWE JWTs that do not resolve to the submitting address", async () => {
