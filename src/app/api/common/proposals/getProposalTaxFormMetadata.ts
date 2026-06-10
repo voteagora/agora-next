@@ -1,11 +1,8 @@
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { checkCowrieVerification } from "@/lib/cowrie";
 import {
-  COWRIE_VERIFICATION_COMPLETED_KEY,
   EXECUTION_TRANSACTIONS_KEY,
-  extractPayeeFromMetadata,
-  FORM_COMPLETED_KEY,
-  normalizeBoolean,
+  extractPayeesFromMetadata,
 } from "@/lib/taxFormUtils";
 import Tenant from "@/lib/tenant/tenant";
 
@@ -96,20 +93,25 @@ export async function fetchProposalTaxFormMetadata(
     return metadata;
   }
 
-  const { payeeAddress } = extractPayeeFromMetadata(metadata);
-  if (!payeeAddress) {
+  // Check Cowrie verification for each payee independently
+  const payees = extractPayeesFromMetadata(metadata);
+  if (payees.length === 0) {
     return metadata;
   }
 
-  const verificationCompleted = await checkCowrieVerification(payeeAddress);
-  if (verificationCompleted === null) {
-    return metadata;
-  }
+  const cowrieResults = await Promise.all(
+    payees.map(async (payee) => {
+      const result = await checkCowrieVerification(payee.address);
+      return { index: payee.index, result };
+    })
+  );
 
-  metadata[COWRIE_VERIFICATION_COMPLETED_KEY] = verificationCompleted;
-  if (verificationCompleted) {
-    metadata[FORM_COMPLETED_KEY] =
-      normalizeBoolean(metadata[FORM_COMPLETED_KEY]) || verificationCompleted;
+  for (const { index, result } of cowrieResults) {
+    if (result === null) continue;
+    metadata[`cowrie_verification_completed_${index}`] = result;
+    if (result) {
+      metadata[`form_completed_${index}`] = true;
+    }
   }
 
   return metadata;
