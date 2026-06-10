@@ -3,6 +3,89 @@ import { ProposalPayload } from "../proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { fetchVotableSupplyUnstableCache } from "../votableSupply/getVotableSupply";
+import type { IGovernorContract } from "@/lib/contracts/common/interfaces/IGovernorContract";
+
+type CurrentQuorumFunction = NonNullable<IGovernorContract["quorum"]>;
+
+const CURRENT_QUORUM_MAX_LOOKBACK_BLOCKS = 6;
+const RETRIABLE_CURRENT_QUORUM_ERROR_PATTERNS = [
+  "block not yet mined",
+  "header not found",
+  "unknown block",
+  "could not find block",
+  "cannot find block",
+  "block not found",
+  "after last accepted block",
+  "greater than latest block",
+];
+
+function collectErrorMessages(error: unknown): string[] {
+  if (typeof error === "string") {
+    return [error];
+  }
+
+  if (!error || typeof error !== "object") {
+    return [];
+  }
+
+  const messages: string[] = [];
+
+  if (error instanceof Error) {
+    messages.push(error.message);
+  }
+
+  const errorRecord = error as Record<string, unknown>;
+  for (const key of ["reason", "shortMessage", "message", "code"]) {
+    const value = errorRecord[key];
+    if (typeof value === "string") {
+      messages.push(value);
+    }
+  }
+
+  for (const key of ["error", "info"]) {
+    const nested = errorRecord[key];
+    if (nested && nested !== error) {
+      messages.push(...collectErrorMessages(nested));
+    }
+  }
+
+  return messages;
+}
+
+export function isRetriableCurrentQuorumError(error: unknown) {
+  const message = collectErrorMessages(error).join(" ").toLowerCase();
+  return RETRIABLE_CURRENT_QUORUM_ERROR_PATTERNS.some((pattern) =>
+    message.includes(pattern)
+  );
+}
+
+export async function getCurrentQuorumWithRetries(
+  quorum: CurrentQuorumFunction,
+  latestBlockNumber: number
+) {
+  let lastError: unknown;
+
+  for (let lag = 1; lag <= CURRENT_QUORUM_MAX_LOOKBACK_BLOCKS; lag++) {
+    const quorumBlockNumber = latestBlockNumber - lag;
+
+    if (quorumBlockNumber < 0) {
+      break;
+    }
+
+    try {
+      return await quorum(quorumBlockNumber, {
+        blockTag: quorumBlockNumber + 1,
+      });
+    } catch (error) {
+      if (!isRetriableCurrentQuorumError(error)) {
+        throw error;
+      }
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
 
 async function getQuorumForProposal(proposal: ProposalPayload) {
   const { namespace, contracts } = Tenant.current();
@@ -95,8 +178,10 @@ async function getCurrentQuorum() {
       if (!latestBlockNumber) {
         return null;
       }
-      // latest - 1 because latest block might not be mined yet
-      return contracts.governor.contract.quorum!(latestBlockNumber - 1);
+      return getCurrentQuorumWithRetries(
+        contracts.governor.contract.quorum!,
+        latestBlockNumber
+      );
     }
   }
 }
