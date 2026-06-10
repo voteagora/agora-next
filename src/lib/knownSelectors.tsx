@@ -350,11 +350,20 @@ function findContentHash(
 // ────────────────────────────────────────────────────────────────────────────
 
 function extractSelector(calldata: string): string | null {
-  if (!calldata || calldata === "0x") return null;
-  const normalized = calldata.toLowerCase();
-  const start = normalized.startsWith("0x") ? 2 : 0;
-  if (normalized.length < start + 8) return null;
-  return `0x${normalized.slice(start, start + 8)}`;
+  if (isEmptyCalldata(calldata)) return null;
+  const normalized = calldata.trim().replace(/^"|"$/g, "").toLowerCase();
+  const hexBody = normalized.replace(/^0x[^0-9a-f]*/, "");
+  if (hexBody.length < 8) return null;
+  return `0x${hexBody.slice(0, 8)}`;
+}
+
+/** Bare ETH send: empty calldata, "0x", or malformed "0x," with no hex body. */
+export function isEmptyCalldata(calldata: string): boolean {
+  if (!calldata) return true;
+  const trimmed = calldata.trim().replace(/^"|"$/g, "").trim();
+  if (trimmed === "" || trimmed === "0x") return true;
+  const hexBody = trimmed.toLowerCase().replace(/^0x[^0-9a-f]*/, "");
+  return hexBody.length === 0;
 }
 
 /** Extract a 20-byte address from a right-padded 32-byte ABI word. */
@@ -1362,13 +1371,87 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
       );
     },
   },
+
+  // ── ENS (verified selectors) ──
+
+  // sweep(address) — ENS Token: sweep unclaimed airdrop tokens to dest
+  "0x01681a62": {
+    name: "sweep",
+    prettyName: "Sweep Unclaimed Tokens",
+    prettyRender: (decodedData, target) => {
+      const dest = collectByType(decodedData.parameters, "address")[0];
+      return (
+        <span className="text-sm text-primary">
+          Sweep unclaimed tokens from {maybeFriendlyAddress(target)} to{" "}
+          {maybeFriendlyAddress(dest)}.
+        </span>
+      );
+    },
+  },
+
+  // withdraw() — ETHRegistrarController fee withdrawal (NOT WETH withdraw(uint256))
+  "0x3ccfd60b": {
+    name: "withdraw",
+    prettyName: "Withdraw Registration Fees",
+    prettyRender: (_decodedData, target) => (
+      <span className="text-sm text-primary">
+        Withdraw accumulated registration fees from{" "}
+        {maybeFriendlyAddress(target)}.
+      </span>
+    ),
+  },
+
+  // deposit() — WETH9.deposit() payable (NOT ERC4626 deposit(uint256))
+  "0xd0e30db0": {
+    name: "deposit",
+    prettyName: "Wrap ETH",
+    prettyRender: (_decodedData, target) => (
+      <span className="text-sm text-primary">
+        Wrap ETH via {maybeFriendlyAddress(target)}.
+      </span>
+    ),
+  },
+
+  // Non-decodable junk calldata (selector collision; not empty calldata)
+  "0x00000000": {
+    name: "burnedJunkData",
+    prettyName: "Burned Junk Data",
+    prettyRender: () => (
+      <span className="text-sm text-primary">
+        This proposal&apos;s call data does nothing.
+      </span>
+    ),
+  },
 };
+
+const EMPTY_ETH_SEND_ADAPTER: SelectorAdapter = {
+  name: "ethSend",
+  prettyName: "Send ETH",
+  prettyRender: (decodedData, target) => {
+    const amount = decodedData
+      ? collectByType(decodedData.parameters, "uint256")[0]
+      : undefined;
+
+    return (
+      <span className="text-sm text-primary">
+        Send {amount ? formatNumber(BigInt(amount), 18) : "0"} ETH to{" "}
+        {maybeFriendlyAddress(target)}.
+      </span>
+    );
+  },
+};
+
+function adapterRequiresDecodedData(calldata: string): boolean {
+  if (isEmptyCalldata(calldata)) return false;
+  return extractSelector(calldata) !== "0x00000000";
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // Public API
 // ────────────────────────────────────────────────────────────────────────────
 
 export function isSelectorSupported(calldata: string): boolean {
+  if (isEmptyCalldata(calldata)) return true;
   const selector = extractSelector(calldata);
   if (!selector) return false;
   return selector in KNOWN_SELECTORS;
@@ -1380,7 +1463,12 @@ export function areAllActionsSupported(calldatas: string[]): boolean {
 }
 
 export function getAdapter(calldata: string): SelectorAdapter | null {
+  if (isEmptyCalldata(calldata)) return EMPTY_ETH_SEND_ADAPTER;
   const selector = extractSelector(calldata);
   if (!selector) return null;
   return KNOWN_SELECTORS[selector] ?? null;
+}
+
+export function prettyViewRequiresDecodedData(calldata: string): boolean {
+  return adapterRequiresDecodedData(calldata);
 }
