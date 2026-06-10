@@ -147,29 +147,18 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
 
   if (!chartData || !block) return <ChartSkeleton />;
 
+  const yAxisWidth = 54;
+
   return (
     <div className="relative [&_.recharts-wrapper]:overflow-visible">
-      <ResponsiveContainer width="100%" height={230}>
+      <ResponsiveContainer width="100%" height={210}>
         <AreaChart data={chartData}>
           <CartesianGrid
             vertical={false}
             strokeDasharray={"3 3"}
             stroke={rgbStringToHex(ui.customization?.tertiary)}
           />
-          <XAxis
-            dataKey="timestamp"
-            axisLine={false}
-            tickLine={false}
-            interval="preserveStartEnd"
-            ticks={[
-              (proposal.startTime as unknown as string) || "",
-              (proposal.endTime as unknown as string) || "",
-            ]}
-            tickFormatter={tickFormatter}
-            tick={customizedXTick}
-            className="text-xs font-inter font-semibold text-primary/30"
-            fill={rgbStringToHex(ui.customization?.tertiary)}
-          />
+          <XAxis dataKey="timestamp" hide />
 
           <YAxis
             className="text-xs font-inter font-semibold fill:text-primary/30 fill"
@@ -179,7 +168,7 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
             }
             tickLine={false}
             axisLine={false}
-            width={54}
+            width={yAxisWidth}
             tickMargin={4}
             tickCount={6}
             interval={0}
@@ -274,6 +263,8 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           )}
 
           <Tooltip
+            allowEscapeViewBox={{ x: true, y: true }}
+            wrapperStyle={{ zIndex: 10, outline: "none" }}
             content={
               <CustomTooltip
                 quorum={isProposalCreatedBeforeUpgrade ? null : proposal.quorum}
@@ -310,6 +301,19 @@ export const TimelineChart = ({ votes, proposal }: Props) => {
           />
         </AreaChart>
       </ResponsiveContainer>
+      <div
+        className="flex justify-between gap-2 text-xs font-inter font-semibold text-primary/30"
+        style={{ paddingLeft: yAxisWidth }}
+      >
+        <div className="text-left leading-snug">
+          <div>{formatAxisTime(proposal.startTime)}</div>
+          <div>(vote begins)</div>
+        </div>
+        <div className="text-right leading-snug">
+          <div>{formatAxisTime(proposal.endTime)}</div>
+          <div>(vote ends)</div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -403,14 +407,8 @@ const transformVotesToChartData = ({
   });
 };
 
-const tickFormatter = (timeStr: string, index: number) => {
-  if (!timeStr) return "";
-  const date = new Date(timeStr);
-  const formattedDate = format(date, "MM/dd h:mm a");
-
-  const metaText = index === 0 ? "(vote begins)" : "(vote ends)";
-  return `${formattedDate} ${metaText}`;
-};
+const formatAxisTime = (time: Date | null | undefined) =>
+  time ? format(time, "MM/dd h:mm a") : "";
 
 const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
   if (value <= 10) {
@@ -430,30 +428,31 @@ const yTickFormatter = (value: any, _: number, isSnapshot = false) => {
   );
 };
 
-const customizedXTick = (props: any) => {
-  const { index, x, y, payload, tickFormatter, className } = props;
-  const isStart = index === 0;
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={10}
-        dx={isStart ? 4 : 0}
-        fill="#AFAFAF"
-        className={className}
-        textAnchor="middle"
-      >
-        {tickFormatter(payload.value, index)}
-      </text>
-    </g>
-  );
+const TOOLTIP_WIDTH = 168;
+
+const getTooltipOffsetX = (
+  coordinate?: { x: number; y: number },
+  viewBox?: { x: number; y: number; width: number; height: number }
+) => {
+  if (!coordinate || !viewBox) return 8;
+
+  if (coordinate.x + TOOLTIP_WIDTH > viewBox.width) {
+    return -(TOOLTIP_WIDTH + 8);
+  }
+
+  if (coordinate.x < 8) {
+    return 8;
+  }
+
+  return 8;
 };
 
 const CustomTooltip = ({
   active,
   payload,
   label,
+  coordinate,
+  viewBox,
   quorum,
   minQuorumPct,
   maxQuorumPct,
@@ -493,7 +492,12 @@ const CustomTooltip = ({
       minQuorumPct !== maxQuorumPct;
 
     return (
-      <div className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault">
+      <div
+        className="bg-neutral p-3 border border-line rounded-lg shadow-newDefault max-w-[calc(100vw-2rem)]"
+        style={{
+          transform: `translateX(${getTooltipOffsetX(coordinate, viewBox)}px)`,
+        }}
+      >
         <p className="text-xs font-semibold mb-2 text-primary">
           {formatFullDate(new Date(label))}
         </p>
