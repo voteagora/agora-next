@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Client as MiradorWebClient,
-  Web3Plugin,
-} from "@miradorlabs/web-sdk/dist/index.esm.js";
+import { Client as MiradorWebClient, Web3Plugin } from "@miradorlabs/web-sdk";
 
 let miradorClient: MiradorWebClient | null = null;
 let configuredApiKey: string | null = null;

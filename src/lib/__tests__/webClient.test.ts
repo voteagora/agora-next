@@ -10,7 +10,7 @@ const { clientCtorMock, web3PluginMock } = vi.hoisted(() => ({
   web3PluginMock: vi.fn(() => ({ name: "web3" })),
 }));
 
-vi.mock("@miradorlabs/web-sdk/dist/index.esm.js", () => ({
+vi.mock("@miradorlabs/web-sdk", () => ({
   Client: clientCtorMock,
   Web3Plugin: web3PluginMock,
 }));

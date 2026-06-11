@@ -1,6 +1,6 @@
 "use client";
 
-import type { Trace } from "@miradorlabs/web-sdk/dist/index.esm.js";
+import type { Trace } from "@miradorlabs/web-sdk";
 
 import { MiradorFlow, MiradorTraceContext } from "./types";
 
