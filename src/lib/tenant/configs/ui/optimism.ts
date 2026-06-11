@@ -1,27 +1,34 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import optimismLogo from "@/assets/tenant/optimism_logo.svg";
+import civicLogo from "@/assets/tenant/civic_logo.png";
+import civicDelegate from "@/assets/tenant/civic_delegate.svg";
 import optimismHero from "@/assets/tenant/optimism_hero.svg";
 import successImage from "@/assets/tenant/optimism_success.svg";
 import pendingImage from "@/assets/tenant/optimism_pending.svg";
-import delegateImage from "@/assets/tenant/optimism_delegate.svg";
 import infoPageCard01 from "@/assets/tenant/optimism_info_1.png";
 import infoPageCard02 from "@/assets/tenant/optimism_info_2.png";
 import infoPageCard03 from "@/assets/tenant/optimism_info_3.png";
 import infoPageCard04 from "@/assets/tenant/optimism_info_4.png";
 import { ProposalGatingType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
-import TenantTokenFactory from "@/lib/tenant/tenantTokenFactory";
-import { TENANT_NAMESPACES } from "@/lib/constants";
+
+// CIVIC demo branding — revert before shipping
+const civicToken = {
+  name: "CIVIC Voting Power",
+  symbol: "CVP",
+  decimals: 0,
+  address: "0x4200000000000000000000000000000000000042",
+};
 
 export const optimismTenantUIConfig = new TenantUI({
-  title: "Optimism Agora",
-  logo: optimismLogo,
-  tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.OPTIMISM)],
+  title: "CIVIC Governance",
+  logo: civicLogo,
+  logoSize: "46px",
+  tokens: [civicToken],
 
   assets: {
     success: successImage,
     pending: pendingImage,
-    delegate: delegateImage,
+    delegate: civicDelegate,
   },
 
   customization: {
@@ -66,7 +73,7 @@ export const optimismTenantUIConfig = new TenantUI({
   ],
 
   organization: {
-    title: "Optimism Foundation",
+    title: "Center for Civilians in Conflict",
   },
 
   links: [
@@ -120,42 +127,42 @@ export const optimismTenantUIConfig = new TenantUI({
   pages: [
     {
       route: "/",
-      title: "Agora is the home of Optimism voters",
+      title: "CIVIC community governance",
       description:
-        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+        "Members vote on priorities for civilian protection policy, advocacy, and field programs across conflict zones.",
       hero: optimismHero,
       meta: {
-        title: "Optimism Agora",
-        description: "Home of Optimism governance",
-        imageTitle: "Optimism Agora",
-        imageDescription: "Home of Optimism governance",
+        title: "CIVIC Governance",
+        description: "Community governance for civilian protection",
+        imageTitle: "CIVIC Governance",
+        imageDescription: "Community governance for civilian protection",
       },
     },
     {
       route: "proposals",
-      title: "Agora is the home of Optimism voters",
+      title: "CIVIC community governance",
       description:
-        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+        "Members vote on priorities for civilian protection policy, advocacy, and field programs across conflict zones.",
       hero: optimismHero,
       meta: {
-        title: "Optimism Agora",
-        description: "Home of Optimism governance",
-        imageTitle: "Optimism Agora",
-        imageDescription: "Home of Optimism governance",
+        title: "CIVIC Governance",
+        description: "Community governance for civilian protection",
+        imageTitle: "CIVIC Governance",
+        imageDescription: "Community governance for civilian protection",
       },
     },
     {
       route: "delegates",
-      title: "Agora is the home of Optimism voters",
+      title: "CIVIC community members",
       description:
-        "OP Delegates are the stewards of the Optimism Token House, appointed by token holders to make governance decisions on their behalf.",
+        "One person, one vote. Every member holds equal voting power to shape CIVIC's humanitarian priorities.",
       hero: optimismHero,
       meta: {
-        title: "Voter on Agora",
-        description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        title: "CIVIC Governance — Members",
+        description: "Community members shaping civilian protection priorities",
+        imageTitle: "CIVIC Governance — Members",
         imageDescription:
-          "Delegate your voting power to a trusted representative",
+          "Community members shaping civilian protection priorities",
       },
     },
     {
@@ -200,6 +207,10 @@ export const optimismTenantUIConfig = new TenantUI({
   ],
 
   toggles: [
+    {
+      name: "hide-hero",
+      enabled: true,
+    },
     {
       name: "admin",
       enabled: true,
