@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/server/db";
 import { type DaoSlug } from "@prisma/client";
+import {
+  getCivicDemoFinancialMetrics,
+  isCivicDemoEnabled,
+} from "@/mocks/civicDemoFinancials";
 
 type FinancialMetricRow = Awaited<
   ReturnType<typeof db.daoFinancialMetrics.findMany>
@@ -57,6 +61,10 @@ export async function GET(request: NextRequest) {
       { error: "daoSlug parameter is required" },
       { status: 400 }
     );
+  }
+
+  if (isCivicDemoEnabled()) {
+    return NextResponse.json(getCivicDemoFinancialMetrics());
   }
 
   try {

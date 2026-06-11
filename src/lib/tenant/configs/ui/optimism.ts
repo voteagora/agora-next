@@ -166,6 +166,19 @@ export const optimismTenantUIConfig = new TenantUI({
       },
     },
     {
+      route: "financials",
+      title: "CIVIC financial transparency",
+      description:
+        "Annual reports, audited financials, and organizational updates from the Center for Civilians in Conflict.",
+      hero: optimismHero,
+      meta: {
+        title: "CIVIC Governance — Financials",
+        description: "Financial transparency for CIVIC community governance",
+        imageTitle: "CIVIC Governance — Financials",
+        imageDescription: "Financial transparency for CIVIC community governance",
+      },
+    },
+    {
       route: "info",
       title: "Welcome to the Optimism Collective",
       description:
@@ -395,6 +408,17 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     {
       name: "forums",
       enabled: false,
+    },
+    {
+      name: "duna",
+      enabled: true,
+    },
+    {
+      name: "duna/financial-statements",
+      enabled: true,
+      config: {
+        title: "CIVIC Annual Reports & Updates",
+      },
     },
   ],
 });

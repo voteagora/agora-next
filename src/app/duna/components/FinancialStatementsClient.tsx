@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import FinancialStatementsSection from "./FinancialStatementsSection";
 import { buildForumArticlePath } from "@/lib/forumUtils";
+import { useRouter } from "next/navigation";
 
 interface FinancialStatement {
   id: number;
@@ -30,6 +30,11 @@ export default function FinancialStatementsClient({
   const router = useRouter();
 
   const handleStatementClick = (statement: FinancialStatement) => {
+    if (statement.url) {
+      window.open(statement.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (statement.topicId && statement.topicTitle) {
       router.push(
         buildForumArticlePath(statement.topicId, statement.topicTitle)

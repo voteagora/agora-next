@@ -26,6 +26,8 @@ import {
   getDelegatesFromDaoNode,
   getDelegateVotingPowerFromDaoNode,
 } from "@/app/lib/dao-node/client";
+import { getCivicDemoDelegates } from "@/mocks/civicDemoDelegates";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 /*
  * Fetches a list of delegates
@@ -59,6 +61,18 @@ async function getDelegates({
   return withMetrics(
     "getDelegates",
     async () => {
+      if (isCivicDemoEnabled()) {
+        const data = getCivicDemoDelegates();
+        return {
+          meta: {
+            has_next: false,
+            total_returned: data.length,
+            next_offset: data.length,
+          },
+          data,
+        };
+      }
+
       let daoNodeSortBy: string = "VP"; // Default to voting power
       let reverse = true;
 

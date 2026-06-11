@@ -50,7 +50,6 @@ function baseProposal(id: string, overrides: Partial<Proposal>): Proposal {
     proposalType: "STANDARD",
     status: "ACTIVE",
     markdowntitle: "",
-    proposalData: { options: [] },
     ...overrides,
   };
 }

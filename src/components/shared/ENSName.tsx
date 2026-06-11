@@ -5,6 +5,7 @@ import { useEnsName } from "wagmi";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { Copy } from "lucide-react";
 import { truncateAddress } from "@/app/lib/utils/text";
+import { getCivicDemoDisplayName } from "@/mocks/civicDemoDelegates";
 import {
   Tooltip,
   TooltipContent,
@@ -24,8 +25,10 @@ export default function ENSName({
   truncate = true,
   includeCtoC = false,
 }: ENSNameProps) {
+  const civicDisplayName = getCivicDemoDisplayName(address);
   const [ensName, setEnsName] = useState(
-    truncate ? truncateAddress(address || "") : address || ""
+    civicDisplayName ||
+      (truncate ? truncateAddress(address || "") : address || "")
   );
   const [isInCopiedState, setIsInCopiedState] = useState(false);
 
@@ -35,10 +38,13 @@ export default function ENSName({
   });
 
   useEffect(() => {
-    if (data) {
-      setEnsName(data); // Set ENS name if available
+    const demoName = getCivicDemoDisplayName(address);
+    if (demoName) {
+      setEnsName(demoName);
+    } else if (data) {
+      setEnsName(data);
     } else {
-      setEnsName(truncate ? truncateAddress(address) : address); // Fallback
+      setEnsName(truncate ? truncateAddress(address) : address);
     }
   }, [data, address, truncate]);
 
@@ -58,7 +64,7 @@ export default function ENSName({
     ? ensName || truncateAddress(address)
     : ensName || address;
 
-  const fullText = data || address;
+  const fullText = civicDisplayName || data || address;
 
   const copyToClipboard = (e: React.MouseEvent) => {
     e.preventDefault();
