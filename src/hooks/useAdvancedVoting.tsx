@@ -5,7 +5,7 @@ import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
-import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { isSafeWallet, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
 import { encodeFunctionData } from "viem";
@@ -158,6 +158,9 @@ const useAdvancedVoting = ({
       });
 
       try {
+        const isSafeSubmitterPromise = address
+          ? isSafeWallet(address as `0x${string}`, contracts.governor.chain.id)
+          : Promise.resolve(false);
         const directTx = await standardVote({
           address: contracts.governor.address as `0x${string}`,
           abi: contracts.governor.abi,
@@ -165,10 +168,14 @@ const useAdvancedVoting = ({
           args: args as any,
           chainId: contracts.governor.chain.id,
         });
+        const submittedAsSafe = await isSafeSubmitterPromise;
         attachMiradorTransactionArtifacts(trace, {
           chainId: contracts.governor.chain.id,
           submittedTxHash: directTx,
-          submittedTxDetails: "Submitted governance vote transaction",
+          submittedTxType: submittedAsSafe ? "safe" : "tx",
+          submittedTxDetails: submittedAsSafe
+            ? "Submitted Safe governance vote transaction"
+            : "Submitted governance vote transaction",
         });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
@@ -178,9 +185,16 @@ const useAdvancedVoting = ({
         if (transactionHash && transactionHash !== directTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.governor.chain.id,
-            submittedTxHash: directTx,
-            submittedTxType: "safe",
-            submittedTxDetails: "Submitted Safe governance vote transaction",
+            // The submitted hint is re-attached here only when submission-time
+            // detection mistyped it as "tx" (no client-side dedup in the SDK).
+            ...(submittedAsSafe
+              ? {}
+              : {
+                  submittedTxHash: directTx,
+                  submittedTxType: "safe" as const,
+                  submittedTxDetails:
+                    "Submitted Safe governance vote transaction",
+                }),
             txHash: transactionHash,
             txDetails:
               status === "success"
@@ -276,6 +290,12 @@ const useAdvancedVoting = ({
       });
 
       try {
+        const isSafeSubmitterPromise = address
+          ? isSafeWallet(
+              address as `0x${string}`,
+              contracts.alligator?.chain.id
+            )
+          : Promise.resolve(false);
         const advancedTx = await advancedVote({
           address: contracts.alligator!.address as `0x${string}`,
           abi: contracts.alligator!.abi,
@@ -283,10 +303,14 @@ const useAdvancedVoting = ({
           args: args as any,
           chainId: contracts.alligator?.chain.id,
         });
+        const submittedAsSafe = await isSafeSubmitterPromise;
         attachMiradorTransactionArtifacts(trace, {
           chainId: contracts.alligator?.chain.id,
           submittedTxHash: advancedTx,
-          submittedTxDetails: "Submitted advanced governance vote transaction",
+          submittedTxType: submittedAsSafe ? "safe" : "tx",
+          submittedTxDetails: submittedAsSafe
+            ? "Submitted Safe advanced governance vote transaction"
+            : "Submitted advanced governance vote transaction",
         });
         const { status, transactionHash } =
           await wrappedWaitForTransactionReceipt({
@@ -296,10 +320,16 @@ const useAdvancedVoting = ({
         if (transactionHash && transactionHash !== advancedTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.alligator?.chain.id,
-            submittedTxHash: advancedTx,
-            submittedTxType: "safe",
-            submittedTxDetails:
-              "Submitted Safe advanced governance vote transaction",
+            // The submitted hint is re-attached here only when submission-time
+            // detection mistyped it as "tx" (no client-side dedup in the SDK).
+            ...(submittedAsSafe
+              ? {}
+              : {
+                  submittedTxHash: advancedTx,
+                  submittedTxType: "safe" as const,
+                  submittedTxDetails:
+                    "Submitted Safe advanced governance vote transaction",
+                }),
             txHash: transactionHash,
             txDetails:
               status === "success"

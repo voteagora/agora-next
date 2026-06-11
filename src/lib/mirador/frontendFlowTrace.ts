@@ -1,6 +1,8 @@
 "use client";
 
 import { RefObject, useEffect, useRef } from "react";
+import { useAccount } from "wagmi";
+import { isSafeWallet } from "@/lib/utils";
 import { buildFrontendTraceContext } from "./clientTraceContext";
 import { getMiradorChainNameFromChainId } from "./chains";
 import { isMiradorFlowTracingEnabled } from "./config";
@@ -170,6 +172,7 @@ export function useAttachMiradorSubmittedTxHash({
   details: string;
   enabled?: boolean;
 }) {
+  const { address } = useAccount();
   const attachedHashRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
@@ -181,13 +184,30 @@ export function useAttachMiradorSubmittedTxHash({
     ) {
       return;
     }
-    attachMiradorTransactionArtifacts(traceRef.current, {
-      chainId,
-      submittedTxHash: txHash,
-      submittedTxDetails: details,
-    });
     attachedHashRef.current = txHash;
-  }, [chainId, details, enabled, traceRef, txHash]);
+
+    // For Safe wallets the submitted hash is a safeTxHash, which must be
+    // hinted via the safe namespace — a plain tx hint would never resolve
+    // on-chain. isSafeWallet is TTL-cached; undeployed/counterfactual Safes
+    // still fall back to "tx" (pending Mirador gateway-side handling).
+    void (async () => {
+      const isSafe = address
+        ? await isSafeWallet(
+            address,
+            typeof chainId === "number" ? chainId : undefined
+          )
+        : false;
+      if (!traceRef.current) {
+        return;
+      }
+      attachMiradorTransactionArtifacts(traceRef.current, {
+        chainId,
+        submittedTxHash: txHash,
+        submittedTxType: isSafe ? "safe" : "tx",
+        submittedTxDetails: details,
+      });
+    })();
+  }, [address, chainId, details, enabled, traceRef, txHash]);
 }
 
 export async function closeFrontendMiradorFlowTrace(
