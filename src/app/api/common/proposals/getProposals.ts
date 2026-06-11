@@ -39,6 +39,10 @@ import {
   getProposalTypesFromDaoNode,
 } from "@/app/lib/dao-node/client";
 import { fetchProposalTaxFormMetadata } from "./getProposalTaxFormMetadata";
+import {
+  getCivicDemoProposals,
+  isCivicDemoEnabled,
+} from "@/mocks/civicDemoProposals";
 
 // Helper function to fetch proposals from DAO Node
 async function fetchProposalsFromDaoNode(
@@ -304,6 +308,18 @@ export async function getProposals({
   return withMetrics(
     "getProposals",
     async () => {
+      if (isCivicDemoEnabled()) {
+        const data = getCivicDemoProposals();
+        return {
+          meta: {
+            has_next: false,
+            total_returned: data.length,
+            next_offset: data.length,
+          },
+          data,
+        };
+      }
+
       try {
         const { namespace, contracts, ui } = Tenant.current();
         const useDaoNode =

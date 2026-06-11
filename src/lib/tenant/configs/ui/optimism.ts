@@ -14,7 +14,7 @@ import { ProposalStage as PrismaProposalStage } from "@prisma/client";
 // CIVIC demo branding — revert before shipping
 const civicToken = {
   name: "CIVIC Voting Power",
-  symbol: "CVP",
+  symbol: "CIVIC",
   decimals: 0,
   address: "0x4200000000000000000000000000000000000042",
 };

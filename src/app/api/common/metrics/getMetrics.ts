@@ -3,8 +3,16 @@ import { cache } from "react";
 import { IMembershipContract } from "@/lib/contracts/common/interfaces/IMembershipContract";
 import { getPublicClient } from "@/lib/viem";
 import { fetchVotableSupply } from "@/app/api/common/votableSupply/getVotableSupply";
+import {
+  getCivicDemoMetrics,
+  isCivicDemoEnabled,
+} from "@/mocks/civicDemoProposals";
 
 async function getMetrics() {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoMetrics();
+  }
+
   const { namespace, contracts, ui } = Tenant.current();
   try {
     const getTotalSupply = async () => {

@@ -16,6 +16,7 @@ import { DraftsTabsWrapper } from "@/components/Proposals/DraftsTabsWrapper";
 import { PaginatedResult, PaginationParams } from "@/app/lib/pagination";
 import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
 import { ArchiveListProposal } from "@/lib/types/archiveProposal";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 async function fetchProposals(
   filter: string,
@@ -51,9 +52,9 @@ export default async function ProposalsHome() {
   const plmEnabled = hasToggle
     ? ui.toggle("proposal-lifecycle")?.enabled
     : false;
-  const useArchiveForProposals = hasToggle
-    ? ui.toggle("use-archive-for-proposals")?.enabled
-    : false;
+  const useArchiveForProposals =
+    !isCivicDemoEnabled() &&
+    (hasToggle ? ui.toggle("use-archive-for-proposals")?.enabled : false);
 
   const emptyPaginated = () => ({
     meta: { has_next: false, total_returned: 0, next_offset: 0 },

@@ -7,6 +7,14 @@ export default class TenantTokenFactory {
   public static create(namespace: TenantNamespace): TenantToken {
     switch (namespace) {
       case TENANT_NAMESPACES.OPTIMISM:
+        if (process.env.NEXT_PUBLIC_CIVIC_DEMO === "true") {
+          return {
+            name: "CIVIC Voting Power",
+            symbol: "CIVIC",
+            decimals: 0,
+            address: "0x4200000000000000000000000000000000000042",
+          };
+        }
         return {
           name: "Optimism",
           symbol: "OP",
