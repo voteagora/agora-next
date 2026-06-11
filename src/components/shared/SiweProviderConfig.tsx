@@ -12,6 +12,7 @@ import {
   notifyStoredSiweSessionChanged,
 } from "@/lib/siweSession";
 import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import { getSafeMessageHintDetails } from "@/lib/mirador/safeMessageHint";
 import {
   closeStoredProposalCreationTrace,
   getProposalCreationTraceHeaders,
@@ -260,31 +261,6 @@ async function closeMiradorSiweTrace(params: {
   }
 }
 
-function getSafeMessageHintDetails(params: {
-  traceKind: "proposal" | "surface" | "none";
-  tracePurpose?:
-    | "proposal_draft"
-    | "notification_preferences"
-    | "delegate_statement";
-}) {
-  if (
-    params.traceKind === "proposal" ||
-    params.tracePurpose === "proposal_draft"
-  ) {
-    return "Create proposal SIWE";
-  }
-
-  if (params.tracePurpose === "notification_preferences") {
-    return "Notification preferences SIWE";
-  }
-
-  if (params.tracePurpose === "delegate_statement") {
-    return "Delegate statement SIWE";
-  }
-
-  return undefined;
-}
-
 export const siweProviderConfig: SIWEConfig = {
   getNonce: async () => {
     const safeSiweFlowState = getActiveSafeSiweFlowState();
@@ -437,8 +413,11 @@ export const siweProviderConfig: SIWEConfig = {
             safeMessageHash,
             miradorChain,
             getSafeMessageHintDetails({
-              traceKind: activeTrace.kind,
-              tracePurpose: activeTrace.purpose,
+              purpose:
+                activeTrace.kind === "proposal"
+                  ? "proposal_draft"
+                  : activeTrace.purpose,
+              signingKind: "siwe",
             })
           );
         }

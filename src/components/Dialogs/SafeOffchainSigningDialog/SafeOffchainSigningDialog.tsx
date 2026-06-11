@@ -29,6 +29,12 @@ import {
 import { useSafeMessageStatus } from "@/hooks/useSafeMessageStatus";
 import { useSafeOwnersAndThreshold } from "@/hooks/useSafeOwnersAndThreshold";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
+import { getMiradorChainNameFromChainId } from "@/lib/mirador/chains";
+import {
+  getSafeMessageHintDetails,
+  resolveTraceForSafeMessageHint,
+} from "@/lib/mirador/safeMessageHint";
+import { addMiradorSafeMsgHint } from "@/lib/mirador/webTrace";
 import {
   SAFE_OFFCHAIN_PROPOSAL_FLOW_TIMEOUT_MS,
   SafeOffchainSigningKind,
@@ -880,6 +886,23 @@ function useSafeOffchainSigningFlow({
         messageHash: safeMessageHash,
         message,
       });
+      try {
+        const miradorChain = getMiradorChainNameFromChainId(activeChainId);
+        if (miradorChain) {
+          addMiradorSafeMsgHint(
+            resolveTraceForSafeMessageHint({
+              purpose,
+              walletAddress: safeAddress,
+              chainId: activeChainId,
+            }),
+            safeMessageHash,
+            miradorChain,
+            getSafeMessageHintDetails({ purpose, signingKind })
+          );
+        }
+      } catch {
+        // Observability must never break the signing flow.
+      }
       logSafeClientDebug({
         event: "safe_raw_message_created",
         purpose,
