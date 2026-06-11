@@ -2,7 +2,6 @@
 
 import { RefObject, useEffect, useRef } from "react";
 import { useAccount } from "wagmi";
-import { isSafeWallet } from "@/lib/utils";
 import { buildFrontendTraceContext } from "./clientTraceContext";
 import { getMiradorChainNameFromChainId } from "./chains";
 import { isMiradorFlowTracingEnabled } from "./config";
@@ -190,7 +189,10 @@ export function useAttachMiradorSubmittedTxHash({
     // hinted via the safe namespace — a plain tx hint would never resolve
     // on-chain. isSafeWallet is TTL-cached; undeployed/counterfactual Safes
     // still fall back to "tx" (pending Mirador gateway-side handling).
+    // Imported lazily: @/lib/utils reads tenant env at module scope, which
+    // must not become a load-time requirement of every trace-helper import.
     void (async () => {
+      const { isSafeWallet } = await import("@/lib/utils");
       const isSafe = address
         ? await isSafeWallet(
             address,
