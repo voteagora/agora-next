@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
 
 const {
+  addMiradorAttributesMock,
   addMiradorEventMock,
   addMiradorSafeTxHintMock,
   addMiradorTxHintMock,
@@ -11,6 +12,7 @@ const {
   isMiradorFlowTracingEnabledMock,
   startMiradorTraceMock,
 } = vi.hoisted(() => ({
+  addMiradorAttributesMock: vi.fn(),
   addMiradorEventMock: vi.fn(),
   addMiradorSafeTxHintMock: vi.fn(),
   addMiradorTxHintMock: vi.fn(),
@@ -33,6 +35,7 @@ vi.mock("@/lib/mirador/config", () => ({
 }));
 
 vi.mock("@/lib/mirador/webTrace", () => ({
+  addMiradorAttributes: addMiradorAttributesMock,
   addMiradorEvent: addMiradorEventMock,
   addMiradorSafeTxHint: addMiradorSafeTxHintMock,
   addMiradorTxHint: addMiradorTxHintMock,
@@ -139,6 +142,75 @@ describe("frontendFlowTrace", () => {
       trace,
       "governance_vote_succeeded"
     );
+  });
+
+  describe("duration stamping", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const startTrace = () => {
+      const trace = { id: "trace" };
+      startMiradorTraceMock.mockReturnValue(trace);
+      startFrontendMiradorFlowTrace({
+        name: "GovernanceVote",
+        flow: MIRADOR_FLOW.governanceVote,
+        step: "standard_vote_submit",
+      });
+      return trace;
+    };
+
+    it("stamps duration_ms on the close event and as an attribute", async () => {
+      vi.useFakeTimers();
+      const trace = startTrace();
+
+      vi.advanceTimersByTime(1234);
+      await closeFrontendMiradorFlowTrace(trace as any, {
+        reason: "governance_vote_succeeded",
+        eventName: "governance_vote_succeeded",
+        details: { proposalId: "31" },
+      });
+
+      expect(addMiradorAttributesMock).toHaveBeenCalledWith(trace, {
+        duration_ms: 1234,
+      });
+      expect(addMiradorEventMock).toHaveBeenCalledWith(
+        trace,
+        "governance_vote_succeeded",
+        { proposalId: "31", duration_ms: 1234 }
+      );
+    });
+
+    it("attaches the duration attribute even without a close event", async () => {
+      vi.useFakeTimers();
+      const trace = startTrace();
+      addMiradorEventMock.mockClear();
+
+      vi.advanceTimersByTime(500);
+      await closeFrontendMiradorFlowTrace(trace as any, {
+        reason: "governance_vote_cancelled",
+      });
+
+      expect(addMiradorAttributesMock).toHaveBeenCalledWith(trace, {
+        duration_ms: 500,
+      });
+      expect(addMiradorEventMock).not.toHaveBeenCalled();
+    });
+
+    it("does not stamp traces it did not start", async () => {
+      await closeFrontendMiradorFlowTrace({ id: "foreign" } as any, {
+        reason: "governance_vote_succeeded",
+        eventName: "governance_vote_succeeded",
+        details: { proposalId: "31" },
+      });
+
+      expect(addMiradorAttributesMock).not.toHaveBeenCalled();
+      expect(addMiradorEventMock).toHaveBeenCalledWith(
+        { id: "foreign" },
+        "governance_vote_succeeded",
+        { proposalId: "31" }
+      );
+    });
   });
 
   describe("attachMiradorTransactionArtifacts", () => {

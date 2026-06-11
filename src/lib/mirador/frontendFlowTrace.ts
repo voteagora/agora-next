@@ -8,6 +8,7 @@ import { isMiradorFlowTracingEnabled } from "./config";
 import { getMiradorFlowTags } from "./tags";
 import { MiradorAttributeMap, MiradorFlow, MiradorTraceContext } from "./types";
 import {
+  addMiradorAttributes,
   addMiradorEvent,
   addMiradorSafeTxHint,
   addMiradorTxHint,
@@ -17,6 +18,8 @@ import {
 } from "./webTrace";
 
 export type FrontendMiradorTrace = ReturnType<typeof startMiradorTrace>;
+
+const frontendTraceStartTimes = new WeakMap<object, number>();
 
 type StartFrontendMiradorFlowTraceOptions = {
   name: string;
@@ -69,6 +72,10 @@ export function startFrontendMiradorFlowTrace({
     tags: getMiradorFlowTags(flow, tags),
     attributes,
   });
+
+  if (trace) {
+    frontendTraceStartTimes.set(trace, Date.now());
+  }
 
   if (trace && startEventName) {
     addMiradorEvent(trace, startEventName, startEventDetails);
@@ -228,8 +235,17 @@ export async function closeFrontendMiradorFlowTrace(
     return;
   }
 
+  const startedAt = frontendTraceStartTimes.get(trace);
+  let closeDetails = details;
+  if (typeof startedAt === "number") {
+    const duration_ms = Date.now() - startedAt;
+    frontendTraceStartTimes.delete(trace);
+    addMiradorAttributes(trace, { duration_ms });
+    closeDetails = { ...details, duration_ms };
+  }
+
   if (eventName) {
-    addMiradorEvent(trace, eventName, details);
+    addMiradorEvent(trace, eventName, closeDetails);
   }
 
   await closeMiradorTrace(trace, reason);
