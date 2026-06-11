@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
         : undefined,
       eventName: "siwe_verify_failed",
       details: { message: "Internal server error" },
+      error: e,
     });
     return new Response("Internal server error", { status: 500 });
   }

@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
         : undefined,
       eventName: "siwe_nonce_failed",
       details: { message: e?.toString?.() ?? "Unknown error" },
+      error: e,
     });
     return new Response("Internal server error: " + e.toString(), {
       status: 500,

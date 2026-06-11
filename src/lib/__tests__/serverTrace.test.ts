@@ -183,4 +183,88 @@ describe("serverTrace", () => {
 
     expect(getMiradorServerClientMock).not.toHaveBeenCalled();
   });
+
+  describe("error stack traces", () => {
+    const buildTrace = () => ({
+      addAttributes: vi.fn(),
+      addTags: vi.fn(),
+      addExistingStackTrace: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      web3: {
+        evm: {},
+        safe: {},
+      },
+      flush: vi.fn(),
+    });
+
+    it("attaches the caught error's raw stack to the event", () => {
+      const trace = buildTrace();
+      getMiradorServerClientMock.mockReturnValue({
+        trace: vi.fn(() => trace),
+      });
+      const caught = new Error("relay write reverted");
+
+      appendServerTraceEvent({
+        traceContext: { traceId: "trace-id", flow: "governance_vote" },
+        eventName: "relay_vote_submission_failed",
+        error: caught,
+      });
+
+      expect(trace.addExistingStackTrace).toHaveBeenCalledWith(
+        { frames: [], raw: caught.stack },
+        "relay_vote_submission_failed",
+        { name: "Error", message: "relay write reverted" }
+      );
+      expect(trace.flush).toHaveBeenCalledTimes(1);
+    });
+
+    it("skips stack attachment for non-Error values and stackless errors", () => {
+      const trace = buildTrace();
+      getMiradorServerClientMock.mockReturnValue({
+        trace: vi.fn(() => trace),
+      });
+
+      appendServerTraceEvent({
+        traceContext: { traceId: "trace-id", flow: "governance_vote" },
+        eventName: "relay_vote_submission_failed",
+        error: "not an error object",
+      });
+
+      const stackless = new Error("no stack");
+      stackless.stack = undefined;
+      appendServerTraceEvent({
+        traceContext: { traceId: "trace-id", flow: "governance_vote" },
+        eventName: "relay_vote_submission_failed",
+        error: stackless,
+      });
+
+      appendServerTraceEvent({
+        traceContext: { traceId: "trace-id", flow: "governance_vote" },
+        eventName: "relay_vote_submission_failed",
+      });
+
+      expect(trace.addExistingStackTrace).not.toHaveBeenCalled();
+      expect(trace.flush).toHaveBeenCalledTimes(3);
+    });
+
+    it("still flushes when stack attachment throws", () => {
+      const trace = buildTrace();
+      trace.addExistingStackTrace.mockImplementation(() => {
+        throw new Error("sdk exploded");
+      });
+      getMiradorServerClientMock.mockReturnValue({
+        trace: vi.fn(() => trace),
+      });
+
+      appendServerTraceEvent({
+        traceContext: { traceId: "trace-id", flow: "governance_vote" },
+        eventName: "relay_vote_submission_failed",
+        error: new Error("boom"),
+      });
+
+      expect(trace.flush).toHaveBeenCalledTimes(1);
+    });
+  });
 });

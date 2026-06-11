@@ -141,6 +141,7 @@ export async function createOffchainProposal({
         : undefined,
       eventName: "offchain_proposal_record_failed",
       details: { message: error.message },
+      error,
     });
     throw new Error("Failed to create off-chain proposal: " + error.message);
   }
@@ -212,6 +213,7 @@ export async function cancelOffchainProposal({
         : undefined,
       eventName: "offchain_proposal_cancel_record_failed",
       details: { proposalId, message: error.message },
+      error,
     });
     if (error.code === "P2025") {
       throw new Error(`Off-chain proposal with ID ${proposalId} not found`);

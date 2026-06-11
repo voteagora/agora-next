@@ -77,6 +77,7 @@ async function post(request: NextRequest) {
       details: {
         message: e instanceof Error ? e.message : String(e),
       },
+      error: e,
     });
     return new Response("Internal server error: " + e.toString(), {
       status: 500,
