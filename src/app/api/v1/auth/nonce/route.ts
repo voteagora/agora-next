@@ -1,4 +1,5 @@
-// export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 import { NextResponse, type NextRequest } from "next/server";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
@@ -19,7 +20,10 @@ export async function GET(request: NextRequest) {
         : undefined,
       eventName: "siwe_nonce_generated",
     });
-    return NextResponse.json({ nonce });
+    return NextResponse.json(
+      { nonce },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (e: any) {
     appendServerTraceEvent({
       traceContext: traceContext
