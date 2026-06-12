@@ -2,7 +2,7 @@ import { MissingVote } from "@/lib/voteUtils";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
-import { trackEvent } from "@/lib/analytics";
+import { trackEventFireAndForget } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { isSafeWallet, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
@@ -14,6 +14,8 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 const useStandardVoting = ({
   proposalId,
@@ -29,7 +31,12 @@ const useStandardVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const {
+    address,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const {
     writeContractAsync: standardVote,
     isError: _standardVoteError,
@@ -68,7 +75,9 @@ const useStandardVoting = ({
 
   const write = useCallback(() => {
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
+      setStandardVoteError(false);
+      setStandardVoteErrorDetails(null);
+
       const functionName = !!reason ? "castVoteWithReason" : "castVote";
       const args = !!reason
         ? [BigInt(proposalId), support, reason]
@@ -94,6 +103,12 @@ const useStandardVoting = ({
           hasReason: Boolean(reason),
           hasParams: Boolean(params),
           missingVote,
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.governor.chain.id,
+          }),
         },
         startEventName: "governance_vote_started",
         startEventDetails: {
@@ -107,6 +122,22 @@ const useStandardVoting = ({
         chainId: contracts.governor.chain.id,
         inputData,
       });
+
+      const readinessError = checkWalletReadinessOrCloseTrace({
+        connector,
+        status: accountStatus,
+        trace,
+        traceRef,
+        proposalId,
+        voteKind: "standard",
+      });
+      if (readinessError) {
+        setStandardVoteError(true);
+        setStandardVoteErrorDetails(readinessError as WriteContractErrorType);
+        return;
+      }
+
+      setStandardVoteLoading(true);
 
       try {
         const isSafeSubmitterPromise = address
@@ -160,7 +191,7 @@ const useStandardVoting = ({
         if (status === "success") {
           setStandardTxHash(transactionHash);
 
-          await trackEvent({
+          trackEventFireAndForget({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
               proposal_id: proposalId,
@@ -230,6 +261,9 @@ const useStandardVoting = ({
     void vote();
   }, [
     address,
+    accountChainId,
+    accountStatus,
+    connector,
     contracts.governor.abi,
     contracts.governor.address,
     contracts.governor.chain.id,
