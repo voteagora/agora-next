@@ -131,6 +131,7 @@ export async function POST(request: NextRequest) {
         : undefined,
       eventName: "proposal_draft_create_failed",
       details: { reason: "internal_server_error" },
+      error: e,
     });
     return NextResponse.json(
       { message: "Internal server error" },

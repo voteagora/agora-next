@@ -228,6 +228,7 @@ export async function onSubmitAction(
             reason: "draft_update_failed",
             message: error instanceof Error ? error.message : "Unknown error",
           },
+          error,
         });
         return {
           ok: false,

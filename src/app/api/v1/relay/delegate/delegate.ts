@@ -111,6 +111,7 @@ export async function delegateBySignatureApi({
         message: error instanceof Error ? error.message : String(error),
       },
       txInputData: requestData,
+      error,
     });
     throw error;
   }

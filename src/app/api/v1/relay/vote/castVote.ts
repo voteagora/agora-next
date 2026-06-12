@@ -98,6 +98,7 @@ export async function voteBySignatureApi({
         message: error instanceof Error ? error.message : String(error),
       },
       txInputData: requestData,
+      error,
     });
     throw error;
   }

@@ -46,6 +46,7 @@ type AppendServerTraceEventArgs = {
   safeMessageHints?: MiradorSafeMessageHint[];
   safeTxHints?: MiradorSafeTxHint[];
   txInputData?: string | string[];
+  error?: unknown;
 };
 
 const MIRADOR_SERVER_DEFAULT_TRACE_NAME = "AgoraServerTrace";
@@ -159,6 +160,7 @@ export async function appendServerTraceEvent({
   safeMessageHints,
   safeTxHints,
   txInputData,
+  error,
 }: AppendServerTraceEventArgs): Promise<void> {
   const traceId = traceContext?.traceId;
 
@@ -212,6 +214,27 @@ export async function appendServerTraceEvent({
     const severity = inferEventSeverity(eventName);
     trace[severity](eventName, toEventDetails(details));
 
+    if (error instanceof Error && error.stack) {
+      try {
+        // Raw V8 stack only; the SDK accepts an empty frames array.
+        trace.addExistingStackTrace(
+          { frames: [], raw: error.stack },
+          eventName,
+          {
+            name: error.name,
+            message: error.message,
+          }
+        );
+      } catch (stackTraceError) {
+        // The flush below must still run when stack attachment fails.
+        console.error("Failed to attach Mirador stack trace", {
+          traceId,
+          eventName,
+          error: stackTraceError,
+        });
+      }
+    }
+
     const web3Trace = trace as MiradorServerTraceWithWeb3;
 
     for (const inputData of normalizeTxInputData(txInputData)) {
@@ -236,11 +259,11 @@ export async function appendServerTraceEvent({
 
     // Mirador's server SDK enqueues the flush and returns immediately.
     trace.flush();
-  } catch (error) {
+  } catch (appendError) {
     console.error("Failed to append Mirador server trace event", {
       traceId,
       eventName,
-      error,
+      error: appendError,
     });
   }
 }
