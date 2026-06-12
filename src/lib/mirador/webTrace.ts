@@ -1,9 +1,6 @@
 "use client";
 
-import type {
-  Trace,
-  Web3Methods,
-} from "@miradorlabs/web-sdk/dist/index.esm.js";
+import type { Trace, Web3Methods } from "@miradorlabs/web-sdk";
 
 import { normalizeMiradorAttributePayload } from "./attributeNormalization";
 import {
