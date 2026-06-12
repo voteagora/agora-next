@@ -18,6 +18,7 @@ import {
   closeFrontendMiradorFlowTrace,
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
+  useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 
 interface EditDelegateConfirmProps {
@@ -49,19 +50,15 @@ export const EditDelegateConfirm = ({
   });
   const isTransactionConfirmed = Boolean(data && !isLoading);
 
+  useAttachMiradorSubmittedTxHash({
+    traceRef,
+    txHash: data,
+    chainId: contracts.staker!.chain.id,
+    details: "Submitted alter delegate transaction",
+  });
+
   useEffect(() => {
     if (isSuccess && traceRef.current) {
-      attachMiradorTransactionArtifacts(traceRef.current, {
-        chainId: contracts.staker!.chain.id,
-        inputData:
-          config?.request &&
-          "data" in config.request &&
-          typeof config.request.data === "string"
-            ? config.request.data
-            : undefined,
-        txHash: data,
-        txDetails: "Alter delegate transaction",
-      });
       void closeFrontendMiradorFlowTrace(traceRef.current, {
         reason: "staking_submit_succeeded",
         eventName: "staking_submit_succeeded",

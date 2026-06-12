@@ -49,11 +49,6 @@ const AdminMembershipPage = () => {
     const trackedMemberAddress = activeMemberAddressRef.current ?? address;
 
     if (isSuccess) {
-      attachMiradorTransactionArtifacts(traceRef.current, {
-        chainId: tenant.contracts.token.chain.id,
-        txHash,
-        txDetails: "Membership safeMint transaction",
-      });
       void closeFrontendMiradorFlowTrace(traceRef.current, {
         reason: "membership_admin_succeeded",
         eventName: "membership_admin_succeeded",
@@ -160,9 +155,8 @@ const AdminMembershipPage = () => {
       });
       attachMiradorTransactionArtifacts(trace, {
         chainId: tenant.contracts.token.chain.id,
-        inputData,
-        txHash: hash,
-        txDetails: "Membership safeMint transaction",
+        submittedTxHash: hash,
+        submittedTxDetails: "Submitted membership safeMint transaction",
       });
       setTxHash(hash);
     } catch (submitError) {

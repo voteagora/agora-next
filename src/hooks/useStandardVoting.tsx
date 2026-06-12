@@ -4,7 +4,7 @@ import { useAccount, useWriteContract } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
-import { wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { isSafeWallet, wrappedWaitForTransactionReceipt } from "@/lib/utils";
 import { WriteContractErrorType } from "wagmi/actions";
 import { encodeFunctionData } from "viem";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
@@ -109,12 +109,25 @@ const useStandardVoting = ({
       });
 
       try {
+        const isSafeSubmitterPromise = address
+          ? isSafeWallet(address as `0x${string}`, contracts.governor.chain.id)
+          : Promise.resolve(false);
         const directTx = await standardVote({
           address: contracts.governor.address as `0x${string}`,
           abi: contracts.governor.abi,
           functionName,
           args: args as any,
           chainId: contracts.governor.chain.id,
+        });
+        const submittedAsSafe = await isSafeSubmitterPromise;
+
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.governor.chain.id,
+          submittedTxHash: directTx,
+          submittedTxType: submittedAsSafe ? "safe" : "tx",
+          submittedTxDetails: submittedAsSafe
+            ? "Submitted Safe governance vote transaction"
+            : "Submitted governance vote transaction",
         });
 
         const { status, transactionHash } =
@@ -123,19 +136,28 @@ const useStandardVoting = ({
             address: address as `0x${string}`,
           });
 
-        if (status === "success") {
+        if (transactionHash && transactionHash !== directTx) {
           attachMiradorTransactionArtifacts(trace, {
             chainId: contracts.governor.chain.id,
-            inputData,
-            submittedTxHash: directTx,
-            submittedTxType: directTx !== transactionHash ? "safe" : "tx",
-            submittedTxDetails:
-              directTx !== transactionHash
-                ? "Submitted Safe governance vote transaction"
-                : "Submitted governance vote transaction",
+            // The submitted hint is re-attached here only when submission-time
+            // detection mistyped it as "tx" (no client-side dedup in the SDK).
+            ...(submittedAsSafe
+              ? {}
+              : {
+                  submittedTxHash: directTx,
+                  submittedTxType: "safe" as const,
+                  submittedTxDetails:
+                    "Submitted Safe governance vote transaction",
+                }),
             txHash: transactionHash,
-            txDetails: "Governance vote transaction",
+            txDetails:
+              status === "success"
+                ? "Governance vote transaction"
+                : "Reverted governance vote transaction",
           });
+        }
+
+        if (status === "success") {
           setStandardTxHash(transactionHash);
 
           await trackEvent({

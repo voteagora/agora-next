@@ -94,11 +94,6 @@ export const UpdateVotableSupplyOracle = ({
   useEffect(() => {
     if (isTxConfirmed) {
       if (traceRef.current) {
-        attachMiradorTransactionArtifacts(traceRef.current, {
-          chainId,
-          txHash,
-          txDetails: "Update votable supply oracle transaction",
-        });
         void closeFrontendMiradorFlowTrace(traceRef.current, {
           reason: "governance_admin_succeeded",
           eventName: "governance_admin_succeeded",
@@ -187,9 +182,9 @@ export const UpdateVotableSupplyOracle = ({
       setTxHash(hash);
       attachMiradorTransactionArtifacts(trace, {
         chainId,
-        inputData,
-        txHash: hash,
-        txDetails: "Update votable supply oracle transaction",
+        submittedTxHash: hash,
+        submittedTxDetails:
+          "Submitted update votable supply oracle transaction",
       });
     } catch (err) {
       console.error("Error updating votable supply:", err);

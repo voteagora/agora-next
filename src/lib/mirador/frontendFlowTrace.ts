@@ -1,5 +1,7 @@
 "use client";
 
+import { RefObject, useEffect, useRef } from "react";
+import { useAccount } from "wagmi";
 import { buildFrontendTraceContext } from "./clientTraceContext";
 import { getMiradorChainNameFromChainId } from "./chains";
 import { isMiradorFlowTracingEnabled } from "./config";
@@ -111,14 +113,20 @@ export function attachMiradorTransactionArtifacts(
     return;
   }
 
-  addMiradorTxInputData(trace, inputData);
+  if (inputData) {
+    addMiradorTxInputData(trace, inputData);
+  }
 
   const miradorChain = getMiradorChainNameFromChainId(chainId);
   if (!miradorChain) {
     return;
   }
 
-  if (submittedTxHash && txHash && submittedTxHash !== txHash) {
+  // Attach the submitted hash whenever it is known and distinct from the
+  // resolved on-chain hash. Calling this at submission time (with `txHash`
+  // absent) lets Mirador begin watching the tx from mempool instead of only
+  // correlating it after the receipt resolves.
+  if (submittedTxHash && submittedTxHash !== txHash) {
     if (submittedTxType === "safe") {
       addMiradorSafeTxHint(
         trace,
@@ -136,10 +144,72 @@ export function attachMiradorTransactionArtifacts(
     }
   }
 
-  const resolvedTxHash = txHash ?? submittedTxHash;
-  if (resolvedTxHash) {
-    addMiradorTxHint(trace, resolvedTxHash, miradorChain, txDetails);
+  if (txHash) {
+    addMiradorTxHint(trace, txHash, miradorChain, txDetails);
   }
+}
+
+/**
+ * Watches a wagmi-style transaction hash and attaches it to the active trace
+ * as a submitted tx hint the moment it becomes defined. This lets Mirador
+ * start watching the tx from mempool — independent of receipt outcome — so
+ * reverted and dropped transactions remain observable.
+ *
+ * Idempotent against repeated renders: the same hash is attached at most once
+ * per component instance.
+ */
+export function useAttachMiradorSubmittedTxHash({
+  traceRef,
+  txHash,
+  chainId,
+  details,
+  enabled = true,
+}: {
+  traceRef: RefObject<FrontendMiradorTrace>;
+  txHash: string | null | undefined;
+  chainId?: number | string;
+  details: string;
+  enabled?: boolean;
+}) {
+  const { address } = useAccount();
+  const attachedHashRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (
+      !enabled ||
+      !traceRef.current ||
+      !txHash ||
+      attachedHashRef.current === txHash
+    ) {
+      return;
+    }
+    attachedHashRef.current = txHash;
+
+    // For Safe wallets the submitted hash is a safeTxHash, which must be
+    // hinted via the safe namespace — a plain tx hint would never resolve
+    // on-chain. isSafeWallet is TTL-cached; undeployed/counterfactual Safes
+    // still fall back to "tx" (pending Mirador gateway-side handling).
+    // Imported lazily: @/lib/utils reads tenant env at module scope, which
+    // must not become a load-time requirement of every trace-helper import.
+    void (async () => {
+      const { isSafeWallet } = await import("@/lib/utils");
+      const isSafe = address
+        ? await isSafeWallet(
+            address,
+            typeof chainId === "number" ? chainId : undefined
+          )
+        : false;
+      if (!traceRef.current) {
+        return;
+      }
+      attachMiradorTransactionArtifacts(traceRef.current, {
+        chainId,
+        submittedTxHash: txHash,
+        submittedTxType: isSafe ? "safe" : "tx",
+        submittedTxDetails: details,
+      });
+    })();
+  }, [address, chainId, details, enabled, traceRef, txHash]);
 }
 
 export async function closeFrontendMiradorFlowTrace(

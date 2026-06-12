@@ -106,11 +106,14 @@ export const useScwVoting = ({
         setIsError(false);
         setIsSuccess(true);
         setTxnHash(txn.hash);
+        // txn.hash is a userOperation hash, not an on-chain tx hash; the SDK
+        // has no userOp hint type yet, so this is best-effort correlation
+        // (open question with Mirador).
         attachMiradorTransactionArtifacts(trace, {
           chainId: contracts.governor.chain.id,
-          inputData: data,
-          txHash: txn.hash,
-          txDetails: "Smart account governance vote transaction",
+          submittedTxHash: txn.hash,
+          submittedTxDetails:
+            "Submitted smart account governance vote user operation",
         });
         void closeFrontendMiradorFlowTrace(trace, {
           reason: "governance_vote_succeeded",

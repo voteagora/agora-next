@@ -157,18 +157,17 @@ const useSponsoredVoting = ({
           )
         );
         const voteTxHash = await response.json();
+        attachMiradorTransactionArtifacts(trace, {
+          chainId: contracts.governor.chain.id,
+          submittedTxHash: voteTxHash,
+          submittedTxDetails: "Submitted sponsored governance vote transaction",
+        });
         const { status } = await waitForTransactionReceipt(config, {
           hash: voteTxHash,
           chainId: contracts.governor.chain.id,
         });
 
         if (status === "success") {
-          attachMiradorTransactionArtifacts(trace, {
-            chainId: contracts.governor.chain.id,
-            inputData,
-            txHash: voteTxHash,
-            txDetails: "Sponsored governance vote transaction",
-          });
           setSponsoredVoteTxHash(voteTxHash);
           setSponsoredVoteSuccess(true);
           await trackEvent({
