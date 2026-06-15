@@ -53,7 +53,7 @@ export default async function ProposalsHome() {
     ? ui.toggle("proposal-lifecycle")?.enabled
     : false;
   const useArchiveForProposals =
-    !isCivicDemoEnabled() &&
+    isCivicDemoEnabled() ||
     (hasToggle ? ui.toggle("use-archive-for-proposals")?.enabled : false);
 
   const emptyPaginated = () => ({

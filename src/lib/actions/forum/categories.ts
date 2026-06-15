@@ -3,10 +3,16 @@
 import { handlePrismaError } from "./shared";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
+import { getCivicDemoForumCategories } from "@/mocks/civicDemoForums";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 const { slug } = Tenant.current();
 
 export async function getForumCategories() {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumCategories();
+  }
+
   try {
     const categories = await prismaWeb2Client.forumCategory.findMany({
       where: {

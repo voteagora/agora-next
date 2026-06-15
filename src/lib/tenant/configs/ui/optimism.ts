@@ -166,6 +166,19 @@ export const optimismTenantUIConfig = new TenantUI({
       },
     },
     {
+      route: "forums",
+      title: "CIVIC community discussions",
+      description:
+        "Member discussions on civilian protection priorities, field updates, and governance.",
+      hero: optimismHero,
+      meta: {
+        title: "CIVIC Governance — Discussions",
+        description: "Community forum for CIVIC governance pilot",
+        imageTitle: "CIVIC Governance — Discussions",
+        imageDescription: "Community forum for CIVIC governance pilot",
+      },
+    },
+    {
       route: "financials",
       title: "CIVIC financial transparency",
       description:
@@ -175,7 +188,8 @@ export const optimismTenantUIConfig = new TenantUI({
         title: "CIVIC Governance — Financials",
         description: "Financial transparency for CIVIC community governance",
         imageTitle: "CIVIC Governance — Financials",
-        imageDescription: "Financial transparency for CIVIC community governance",
+        imageDescription:
+          "Financial transparency for CIVIC community governance",
       },
     },
     {
@@ -407,7 +421,15 @@ If you're using the OP Foundation multisig, you can queue several proposals at o
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
+    },
+    {
+      name: "has-eas-oodao",
+      enabled: true,
+    },
+    {
+      name: "easv2-govlessvoting",
+      enabled: true,
     },
     {
       name: "duna",

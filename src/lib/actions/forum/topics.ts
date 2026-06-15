@@ -33,6 +33,14 @@ import {
   emitBroadcastEvent,
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
+import {
+  getCivicDemoForumData,
+  getCivicDemoForumTopic,
+  getCivicDemoForumTopicsCount,
+  getCivicDemoForumTopicsByUser,
+  getCivicDemoUncategorizedTopicsCount,
+} from "@/mocks/civicDemoForums";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 const { slug } = Tenant.current();
 
 async function deleteOwnedForumTopic(topicId: number, address: string) {
@@ -188,6 +196,10 @@ export async function getForumTopics({
 }
 
 export async function getForumTopic(topicId: number) {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumTopic(topicId);
+  }
+
   try {
     const whereClause: any = {
       id: topicId,
@@ -309,6 +321,10 @@ export async function getForumTopicsByUser(
   address: string,
   pagination: { limit: number; offset: number }
 ) {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumTopicsByUser(address, pagination);
+  }
+
   try {
     const { limit, offset } = pagination;
     const now = new Date();
@@ -920,6 +936,10 @@ interface ForumDataOptions {
 }
 
 export const getForumTopicsCount = async () => {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumTopicsCount();
+  }
+
   try {
     const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
@@ -964,6 +984,10 @@ export const getForumTopicsCount = async () => {
 };
 
 export const getUncategorizedTopicsCount = async () => {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoUncategorizedTopicsCount();
+  }
+
   try {
     const now = new Date();
     const count = await prismaWeb2Client.forumTopic.count({
@@ -1014,6 +1038,12 @@ export const getForumData = async ({
   limit = 20,
   offset = 0,
 }: ForumDataOptions = {}) => {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumData({
+      categoryId: categoryId !== undefined ? categoryId : undefined,
+    });
+  }
+
   try {
     const now = new Date();
     const whereClause: any = {

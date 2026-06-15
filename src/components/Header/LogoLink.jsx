@@ -23,9 +23,7 @@ export default function LogoLink() {
             src={ui.logo}
             alt="logo"
             width={
-              typeof ui.logo === "object" && ui.logo.width
-                ? ui.logo.width
-                : 200
+              typeof ui.logo === "object" && ui.logo.width ? ui.logo.width : 200
             }
             height={
               typeof ui.logo === "object" && ui.logo.height

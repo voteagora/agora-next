@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 interface ForumAdminBadgeProps {
   className?: string;
@@ -22,10 +23,18 @@ export default function ForumAdminBadge({
 }: ForumAdminBadgeProps) {
   const normalizedType = (type || "").toUpperCase();
   const isDunaCategory = forumCategory === "DUNA";
+  const isCivicExec =
+    isCivicDemoEnabled() &&
+    (normalizedType === "CIVIC_EXEC" || normalizedType === "ADMIN");
   const isDunaAdmin =
-    normalizedType === "DUNA_ADMIN" ||
-    (isDunaCategory && normalizedType === "SUPER_ADMIN");
-  const displayLabel = isDunaAdmin ? "DUNA Official" : "Admin";
+    !isCivicDemoEnabled() &&
+    (normalizedType === "DUNA_ADMIN" ||
+      (isDunaCategory && normalizedType === "SUPER_ADMIN"));
+  const displayLabel = isCivicExec
+    ? "CIVIC Exec"
+    : isDunaAdmin
+      ? "DUNA Official"
+      : "Admin";
 
   return (
     <TooltipProvider>
@@ -40,10 +49,12 @@ export default function ForumAdminBadge({
               className,
               isDunaAdmin
                 ? "border border-primary text-primary bg-primary"
-                : "text-[#3868c7]"
+                : isCivicExec
+                  ? "border border-primary text-primary bg-primary"
+                  : "text-[#3868c7]"
             )}
           >
-            {isDunaAdmin ? (
+            {isDunaAdmin || isCivicExec ? (
               <Star className="w-4 h-4 fill-neutral" strokeWidth={2} />
             ) : (
               <BadgeCheck

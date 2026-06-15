@@ -1,6 +1,11 @@
 "use client";
 
 import ENSAvatar from "../../shared/ENSAvatar";
+import AvatarImage from "../../shared/AvatarImage";
+import {
+  getCivicDemoAvatar,
+  getCivicDemoLocation,
+} from "@/mocks/civicDemoDelegates";
 import CopyableHumanAddress from "../../shared/CopyableHumanAddress";
 import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
@@ -17,6 +22,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import { getForumAdminBadgeType } from "@/lib/forumAdminDisplay";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 import { UIEndorsedConfig } from "@/lib/tenant/tenantUI";
 import ENSName from "@/components/shared/ENSName";
 import { CollapsibleText } from "@/components/shared/CollapsibleText";
@@ -73,6 +80,7 @@ export function DelegateProfileImage({
     chainId: 1,
     address: address as `0x${string}`,
   });
+  const civicAvatar = getCivicDemoAvatar(address);
 
   useEffect(() => {
     /**
@@ -105,7 +113,19 @@ export function DelegateProfileImage({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
-        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
+        {civicAvatar ? (
+          <AvatarImage
+            src={civicAvatar}
+            alt={address}
+            className="rounded-full w-[44px] h-[44px]"
+            size={44}
+          />
+        ) : (
+          <ENSAvatar
+            className="rounded-full w-[44px] h-[44px]"
+            ensName={data}
+          />
+        )}
       </div>
 
       <div className="flex flex-col min-w-0">
@@ -199,6 +219,9 @@ export function DelegateProfileImageWithMetadata({
     chainId: 1,
     address: address as `0x${string}`,
   });
+  const civicAvatar = getCivicDemoAvatar(address);
+  const civicLocation = getCivicDemoLocation(address);
+  const displayLocation = location ?? civicLocation;
 
   useEffect(() => {
     /**
@@ -230,6 +253,13 @@ export function DelegateProfileImageWithMetadata({
 
   const renderAdminBadges = () => {
     if (!forumAdminRole) return null;
+    if (isCivicDemoEnabled()) {
+      return (
+        <div className="flex flex-row gap-1 items-center">
+          <ForumAdminBadge type={getForumAdminBadgeType(forumAdminRole)} />
+        </div>
+      );
+    }
     if (forumAdminRole === "super_admin") {
       return (
         <div className="flex flex-row gap-1 items-center">
@@ -249,7 +279,16 @@ export function DelegateProfileImageWithMetadata({
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
         <div className="relative aspect-square">
-          <ENSAvatar className="rounded-full" ensName={data} size={48} />
+          {civicAvatar ? (
+            <AvatarImage
+              src={civicAvatar}
+              alt={address}
+              className="rounded-full"
+              size={48}
+            />
+          ) : (
+            <ENSAvatar className="rounded-full" ensName={data} size={48} />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
@@ -288,8 +327,8 @@ export function DelegateProfileImageWithMetadata({
               </TooltipProvider>
             )}
           </div>
-          {!!location && (
-            <div className="text-sm text-secondary">{location}</div>
+          {!!displayLocation && (
+            <div className="text-sm text-secondary">{displayLocation}</div>
           )}
           {!!followersCount && !!followingCount && (
             <div className="text-xs text-primary font-medium">

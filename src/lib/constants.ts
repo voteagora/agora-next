@@ -244,6 +244,7 @@ export const VOTER_TYPES: VoterTypes[] = [
 ];
 
 export const ADMIN_TYPES: Record<string, string> = {
+  civic_exec: "CIVIC_EXEC",
   duna_admin: "DUNA_ADMIN",
   admin: "ADMIN",
   super_admin: "SUPER_ADMIN",

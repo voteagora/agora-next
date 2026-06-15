@@ -26,7 +26,10 @@ import {
   getDelegatesFromDaoNode,
   getDelegateVotingPowerFromDaoNode,
 } from "@/app/lib/dao-node/client";
-import { getCivicDemoDelegates } from "@/mocks/civicDemoDelegates";
+import {
+  getCivicDemoDelegates,
+  getCivicDemoDelegateProfile,
+} from "@/mocks/civicDemoDelegates";
 import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 /*
@@ -641,10 +644,18 @@ async function getDelegates({
 
 async function getDelegate(addressOrENSName: string): Promise<Delegate> {
   return withMetrics("getDelegate", async () => {
-    const { namespace, contracts, slug, ui } = Tenant.current();
     const address = isAddress(addressOrENSName)
       ? addressOrENSName.toLowerCase()
       : await ensNameToAddress(addressOrENSName);
+
+    if (isCivicDemoEnabled()) {
+      const civicProfile = getCivicDemoDelegateProfile(address);
+      if (civicProfile) {
+        return civicProfile;
+      }
+    }
+
+    const { namespace, contracts, slug, ui } = Tenant.current();
     const includeL3Staking = ui.toggle("include-nonivotes")?.enabled ?? false;
     const useDaoNodeForVotingPower =
       ui.toggle("use-daonode-for-voting-power")?.enabled ?? false;

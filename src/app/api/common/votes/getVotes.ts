@@ -30,6 +30,11 @@ import {
   fetchRawProposalNonVotersFromArchive,
 } from "@/lib/archiveUtils";
 import { buildCplsSnapshotNonVotersResult } from "./cplsNonVoters";
+import {
+  getCivicDemoDelegateVotes,
+  isCivicDemoDelegateAddress,
+} from "@/mocks/civicDemoDelegates";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 const getVotesForDelegate = ({
   addressOrENSName,
@@ -49,6 +54,10 @@ async function getVotesForDelegateForAddress({
   address: string;
   pagination?: PaginationParams;
 }) {
+  if (isCivicDemoEnabled() && isCivicDemoDelegateAddress(address)) {
+    return getCivicDemoDelegateVotes(address);
+  }
+
   return withMetrics("getVotesForDelegateForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 

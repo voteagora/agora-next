@@ -7,7 +7,10 @@ import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath, buildForumArticlePath } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
-import { ADMIN_TYPES } from "@/lib/constants";
+import {
+  ForumAuthorName,
+  getForumAdminBadgeType,
+} from "@/lib/forumAdminDisplay";
 import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -15,7 +18,6 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import ENSName from "@/components/shared/ENSName";
 
 const { ui } = Tenant.current();
 
@@ -127,7 +129,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
             {isAuthorAdmin && (
               <ForumAdminBadge
                 className="absolute -bottom-1 -right-1"
-                type={adminRole ? ADMIN_TYPES[adminRole] : "Admin"}
+                type={getForumAdminBadgeType(adminRole)}
               />
             )}
           </div>
@@ -157,11 +159,10 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isAuthorAdmin ? (
-                <span className="text-primary">Cowrie</span>
-              ) : (
-                <ENSName address={topic.address} />
-              )}
+              <ForumAuthorName
+                address={topic.address}
+                isAdmin={isAuthorAdmin}
+              />
             </p>
           </div>
 

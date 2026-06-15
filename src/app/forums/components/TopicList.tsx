@@ -11,7 +11,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import ENSName from "@/components/shared/ENSName";
 import { MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import {
@@ -19,7 +18,10 @@ import {
   forumTopicDisplayTimestamp,
 } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
-import { ADMIN_TYPES } from "@/lib/constants";
+import {
+  ForumAuthorName,
+  getForumAdminBadgeType,
+} from "@/lib/forumAdminDisplay";
 import { useForum } from "@/hooks/useForum";
 import useRequireLogin from "@/hooks/useRequireLogin";
 import { rgbStringToHex } from "@/app/lib/utils/color";
@@ -220,7 +222,7 @@ function TopicCard({
             {isAuthorAdmin && (
               <ForumAdminBadge
                 className="absolute -bottom-1 -right-1"
-                type={adminRole ? ADMIN_TYPES[adminRole] : "Admin"}
+                type={getForumAdminBadgeType(adminRole)}
               />
             )}
           </div>
@@ -251,11 +253,10 @@ function TopicCard({
 
             <p className="mt-1 max-w-full break-words text-sm leading-relaxed text-secondary line-clamp-1 overflow-hidden">
               By:{" "}
-              {isAuthorAdmin ? (
-                <span className="text-primary">Cowrie</span>
-              ) : (
-                <ENSName address={topic.address || ""} />
-              )}
+              <ForumAuthorName
+                address={topic.address || ""}
+                isAdmin={isAuthorAdmin}
+              />
             </p>
           </div>
 

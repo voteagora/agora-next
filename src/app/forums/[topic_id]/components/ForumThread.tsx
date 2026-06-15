@@ -45,11 +45,18 @@ export default function ForumThread({
   React.useEffect(() => setComments(initialComments), [initialComments]);
 
   const bgStyle =
-    namespace === TENANT_NAMESPACES.SYNDICATE
+    namespace === TENANT_NAMESPACES.SYNDICATE ||
+    namespace === TENANT_NAMESPACES.OG ||
+    namespace === TENANT_NAMESPACES.SHAPE
       ? "bg-white"
       : "bg-buttonBackground";
-  // text-primary adapts per tenant: dark for light themes (Shape, Syndicate), white for dark themes (Towns)
-  const textStyle = "text-primary";
+  const textStyle =
+    namespace === TENANT_NAMESPACES.SYNDICATE ||
+    namespace === TENANT_NAMESPACES.TOWNS ||
+    namespace === TENANT_NAMESPACES.OG ||
+    namespace === TENANT_NAMESPACES.SHAPE
+      ? "text-primary"
+      : "text-neutral";
 
   const onReply = async (commentId: number) => {
     if (!(await requireLogin())) {

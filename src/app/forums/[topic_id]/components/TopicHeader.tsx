@@ -6,10 +6,12 @@ import { useAccount } from "wagmi";
 
 import { truncateAddress } from "@/app/lib/utils/text";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import ENSName from "@/components/shared/ENSName";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { ADMIN_TYPES } from "@/lib/constants";
+import {
+  ForumAuthorName,
+  getForumAdminBadgeType,
+} from "@/lib/forumAdminDisplay";
 import { forumTopicDisplayTimestamp } from "@/lib/forumUtils";
 
 import TopicUpvote from "./TopicUpvote";
@@ -58,11 +60,10 @@ export default function TopicHeader({
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <span className="font-medium text-sm text-primary hover:underline">
-                  {isAdmin ? (
-                    "Cowrie"
-                  ) : (
-                    <ENSName address={topic.address || ""} />
-                  )}
+                  <ForumAuthorName
+                    address={topic.address || ""}
+                    isAdmin={isAdmin}
+                  />
                 </span>
                 {isOwnTopic && (
                   <span className="text-xs text-tertiary font-normal">
@@ -72,7 +73,7 @@ export default function TopicHeader({
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
-                    type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                    type={getForumAdminBadgeType(adminLabel)}
                   />
                 )}
               </div>
@@ -82,11 +83,10 @@ export default function TopicHeader({
               <ENSAvatar ensName={topic.address} size={20} />
               <div className="flex items-center gap-1">
                 <div className="font-medium text-sm">
-                  {isAdmin ? (
-                    "Cowrie"
-                  ) : (
-                    <ENSName address={topic.address || ""} />
-                  )}
+                  <ForumAuthorName
+                    address={topic.address || ""}
+                    isAdmin={isAdmin}
+                  />
                 </div>
                 {isOwnTopic && (
                   <span className="text-xs text-tertiary font-normal">
@@ -96,7 +96,7 @@ export default function TopicHeader({
                 {isAdmin && (
                   <ForumAdminBadge
                     className="text-[9px]"
-                    type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                    type={getForumAdminBadgeType(adminLabel)}
                   />
                 )}
               </div>

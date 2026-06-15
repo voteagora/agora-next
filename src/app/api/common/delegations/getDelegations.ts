@@ -13,6 +13,12 @@ import {
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { Prisma } from "@prisma/client";
 import { findAdvancedDelegatee, findDelagatee } from "@/lib/prismaUtils";
+import {
+  getCivicDemoDelegatees,
+  getCivicDemoDelegators,
+  isCivicDemoDelegateAddress,
+} from "@/mocks/civicDemoDelegates";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 import { DELEGATION_MODEL } from "@/lib/constants";
 import { withMetrics } from "@/lib/metricWrapper";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
@@ -51,6 +57,10 @@ async function getCurrentDelegateesForAddress({
 }: {
   address: string;
 }): Promise<Delegation[]> {
+  if (isCivicDemoEnabled() && isCivicDemoDelegateAddress(address)) {
+    return getCivicDemoDelegatees(address);
+  }
+
   return withMetrics("getCurrentDelegateesForAddress", async () => {
     const { namespace, contracts, ui } = Tenant.current();
 
@@ -168,6 +178,10 @@ async function getCurrentDelegatorsForAddress({
   address: string;
   pagination?: PaginationParams;
 }): Promise<PaginatedResult<Delegation[]>> {
+  if (isCivicDemoEnabled() && isCivicDemoDelegateAddress(address)) {
+    return getCivicDemoDelegators(address);
+  }
+
   return withMetrics("getCurrentDelegatorsForAddress", async () => {
     const { namespace, contracts } = Tenant.current();
 

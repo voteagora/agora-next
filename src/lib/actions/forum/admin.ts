@@ -4,12 +4,18 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { checkPermission, isSuperAdmin } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
+import { getCivicDemoForumAdmins } from "@/mocks/civicDemoForums";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 
 /**
  * Get forum admins using RBAC system
  * Returns users with active roles in the current DAO
  */
 export async function getForumAdmins() {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumAdmins();
+  }
+
   try {
     const { slug } = Tenant.current();
 

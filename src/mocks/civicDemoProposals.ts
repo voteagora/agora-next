@@ -1,7 +1,28 @@
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { ParsedProposalData } from "@/lib/proposalUtils";
+import {
+  MEDIATION_GOV_DESCRIPTION,
+  MEDIATION_GOV_TITLE,
+  MEDIATION_TEMP_CHECK_DESCRIPTION,
+  MEDIATION_TEMP_CHECK_TITLE,
+} from "@/mocks/civicDemoMediationFlow";
+import {
+  ARTIST_CHOICES,
+  ARTIST_VOTE_DESCRIPTION,
+  ARTIST_VOTE_TITLE,
+  buildApprovalProposalData,
+  INITIATIVE_CHOICES,
+  INITIATIVE_VOTE_DESCRIPTION,
+  INITIATIVE_VOTE_TITLE,
+} from "@/mocks/civicDemoSupporterParticipation";
 
-const PROPOSER = "0x0000000000000000000000000000000000000001";
+const SARAH = "0x0000000000000000000000000000000000000001";
+const JAMES = "0x0000000000000000000000000000000000000002";
+const MARIA = "0x0000000000000000000000000000000000000003";
+const AISHA = "0x0000000000000000000000000000000000000005";
+const MICHAEL = "0x0000000000000000000000000000000000000006";
+const ELENA = "0x0000000000000000000000000000000000000007";
+const MARIO = "0x0000000000000000000000000000000000000008";
 const CVP_DECIMALS = 0;
 
 function voteResults(forVotes: number, against: number, abstain: number) {
@@ -21,11 +42,15 @@ function daysAgo(days: number) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 }
 
-function baseProposal(id: string, overrides: Partial<Proposal>): Proposal {
+function baseProposal(
+  id: string,
+  proposer: string,
+  overrides: Partial<Proposal>
+): Proposal {
   const now = new Date();
   return {
     id,
-    proposer: PROPOSER,
+    proposer,
     snapshotBlockNumber: 0,
     createdTime: now,
     startTime: daysAgo(3),
@@ -56,7 +81,7 @@ function baseProposal(id: string, overrides: Partial<Proposal>): Proposal {
 
 export function getCivicDemoProposals(): Proposal[] {
   return [
-    baseProposal("civic-demo-1", {
+    baseProposal("civic-demo-1", SARAH, {
       markdowntitle:
         "Q3 2026 Civilian Protection Fund Allocation: Ukraine and Yemen Priority",
       proposalType: "SNAPSHOT",
@@ -83,7 +108,7 @@ export function getCivicDemoProposals(): Proposal[] {
       } as ParsedProposalData["SNAPSHOT"]["kind"],
       proposalResults: voteResults(38, 4, 19),
     }),
-    baseProposal("civic-demo-2", {
+    baseProposal("civic-demo-2", MARIA, {
       markdowntitle:
         "Community Reporting Framework for Urban Warfare Documentation",
       proposalType: "STANDARD",
@@ -92,7 +117,7 @@ export function getCivicDemoProposals(): Proposal[] {
       endTime: daysFromNow(8),
       proposalResults: voteResults(42, 6, 11),
     }),
-    baseProposal("civic-demo-3", {
+    baseProposal("civic-demo-3", ELENA, {
       markdowntitle:
         'Partner Artist Collaboration: "Voices from Conflict Zones" Exhibition',
       proposalType: "APPROVAL",
@@ -136,16 +161,15 @@ export function getCivicDemoProposals(): Proposal[] {
         },
       } as ParsedProposalData["APPROVAL"]["kind"],
     }),
-    baseProposal("civic-demo-4", {
-      markdowntitle:
-        "Emergency Response Fund: Rapid Deployment Authorization",
+    baseProposal("civic-demo-4", MICHAEL, {
+      markdowntitle: "Emergency Response Fund: Rapid Deployment Authorization",
       proposalType: "STANDARD",
       status: "SUCCEEDED",
       startTime: daysAgo(30),
       endTime: daysAgo(16),
       proposalResults: voteResults(45, 3, 12),
     }),
-    baseProposal("civic-demo-5", {
+    baseProposal("civic-demo-5", JAMES, {
       markdowntitle:
         "Annual Impact Report 2025: Publication and Distribution Approach",
       proposalType: "STANDARD",
@@ -154,7 +178,7 @@ export function getCivicDemoProposals(): Proposal[] {
       endTime: daysAgo(31),
       proposalResults: voteResults(52, 2, 9),
     }),
-    baseProposal("civic-demo-6", {
+    baseProposal("civic-demo-6", ELENA, {
       markdowntitle:
         "Matching Fund Campaign: Sahel Civilian Protection Initiative",
       proposalType: "SNAPSHOT",
@@ -180,16 +204,45 @@ export function getCivicDemoProposals(): Proposal[] {
       } as ParsedProposalData["SNAPSHOT"]["kind"],
       proposalResults: voteResults(48, 5, 10),
     }),
-    baseProposal("civic-demo-7", {
-      markdowntitle:
-        "Temp Check: Should CIVIC explore local mediation support programs?",
+    baseProposal("civic-demo-7", JAMES, {
+      markdowntitle: MEDIATION_TEMP_CHECK_TITLE,
+      description: MEDIATION_TEMP_CHECK_DESCRIPTION,
+      proposalType: "STANDARD",
+      status: "SUCCEEDED",
+      startTime: daysAgo(5),
+      endTime: daysAgo(1),
+      proposalResults: voteResults(48, 6, 12),
+    }),
+    baseProposal("civic-demo-example-a", MARIO, {
+      markdowntitle: INITIATIVE_VOTE_TITLE,
+      description: INITIATIVE_VOTE_DESCRIPTION,
+      proposalType: "APPROVAL",
+      status: "ACTIVE",
+      startTime: daysAgo(0),
+      endTime: daysFromNow(10),
+      proposalResults: voteResults(31, 4, 8),
+      proposalData: buildApprovalProposalData(INITIATIVE_CHOICES),
+    }),
+    baseProposal("civic-demo-example-b", ELENA, {
+      markdowntitle: ARTIST_VOTE_TITLE,
+      description: ARTIST_VOTE_DESCRIPTION,
+      proposalType: "APPROVAL",
+      status: "ACTIVE",
+      startTime: daysAgo(0),
+      endTime: daysFromNow(12),
+      proposalResults: voteResults(28, 3, 6),
+      proposalData: buildApprovalProposalData(ARTIST_CHOICES),
+    }),
+    baseProposal("civic-demo-gov-1", JAMES, {
+      markdowntitle: MEDIATION_GOV_TITLE,
+      description: MEDIATION_GOV_DESCRIPTION,
       proposalType: "STANDARD",
       status: "ACTIVE",
-      startTime: daysAgo(1),
-      endTime: daysFromNow(4),
-      proposalResults: voteResults(29, 8, 15),
+      startTime: daysAgo(0),
+      endTime: daysFromNow(10),
+      proposalResults: voteResults(22, 3, 8),
     }),
-    baseProposal("civic-demo-8", {
+    baseProposal("civic-demo-8", AISHA, {
       markdowntitle:
         "Temp Check: Community interest in quarterly town halls with field teams",
       proposalType: "STANDARD",

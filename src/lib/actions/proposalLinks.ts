@@ -4,6 +4,11 @@ import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { createProposalLinksInternal } from "./proposalLinksInternal";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
+import {
+  getCivicDemoForumTopicTempChecks,
+  getCivicDemoProposalLinks,
+} from "@/mocks/civicDemoProposalLinks";
 
 interface CreateDiscussionProposalLinkParams {
   proposalId: string;
@@ -99,6 +104,11 @@ export async function getProposalLinks({
       };
     }
 
+    if (isCivicDemoEnabled()) {
+      const links = getCivicDemoProposalLinks({ sourceId, targetId });
+      return { success: true, links };
+    }
+
     const where: any = {};
     if (sourceId) where.sourceId = sourceId;
     if (targetId) where.targetId = targetId;
@@ -114,6 +124,13 @@ export async function getProposalLinks({
 
 export async function getForumTopicTempChecks(topicId: string) {
   try {
+    if (isCivicDemoEnabled()) {
+      return {
+        success: true,
+        tempChecks: getCivicDemoForumTopicTempChecks(topicId),
+      };
+    }
+
     const links = await prismaWeb2Client.proposalLinks.findMany({
       where: {
         sourceId: topicId,

@@ -6,6 +6,10 @@ import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import CategoryList from "./CategoryList";
+import {
+  getForumSidebarAdminBadgeType,
+  getForumSidebarAdminLabel,
+} from "@/lib/forumAdminDisplayUtils";
 
 const { namespace } = Tenant.current();
 
@@ -117,13 +121,13 @@ export default function ForumsSidebar({
             </div>
           )}
         </div>
-        {/* Official DUNA Admin Badge */}
+        {/* Forum admin badge legend */}
         <div className="mt-4 pt-4 border-t border-border">
           <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
             <div className="flex items-center gap-2 text-sm">
-              <ForumAdminBadge type="ADMIN" />
+              <ForumAdminBadge type={getForumSidebarAdminBadgeType()} />
               <span className="text-primary font-medium">
-                Official DUNA Admin
+                {getForumSidebarAdminLabel()}
               </span>
             </div>
           </div>

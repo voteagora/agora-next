@@ -13,6 +13,8 @@ import { verifyAuth } from "@/lib/auth/authHelpers";
 import Tenant from "@/lib/tenant/tenant";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { logForumAuditAction } from "./admin";
+import { getCivicDemoForumPostsByUser } from "@/mocks/civicDemoForums";
+import { isCivicDemoEnabled } from "@/mocks/civicDemoProposals";
 import { requirePermission, checkPermission } from "@/lib/rbac";
 import type { DaoSlug } from "@prisma/client";
 import { createAttachmentsFromContent } from "../attachmentInternal";
@@ -883,6 +885,10 @@ export async function getForumPostsByUser(
   address: string,
   pagination: { limit: number; offset: number }
 ) {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoForumPostsByUser(address, pagination);
+  }
+
   try {
     const { limit, offset } = pagination;
     const now = new Date();

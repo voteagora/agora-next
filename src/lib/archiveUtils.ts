@@ -6,6 +6,15 @@ import {
   getArchiveSlugForProposalNonVoters,
   getArchiveSlugForProposalVotes,
 } from "./constants";
+import {
+  getCivicDemoArchiveProposal,
+  getCivicDemoArchiveProposalsResult,
+  isCivicDemoEnabled,
+} from "@/mocks/civicDemoArchiveProposals";
+import {
+  getCivicDemoArchiveNonVoters,
+  getCivicDemoArchiveVotes,
+} from "@/mocks/civicDemoArchiveVotes";
 
 const withCacheBust = (url: string) => {
   const now = Math.floor(Date.now() / 1000);
@@ -131,6 +140,10 @@ export async function fetchProposalsFromArchive(
   namespace: string,
   filter: string
 ): Promise<PaginatedResult<ArchiveListProposal[]>> {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoArchiveProposalsResult(filter);
+  }
+
   try {
     const archiveUrls = getArchiveSlugAllProposals(namespace);
     const proposalBuckets = await Promise.all(
@@ -198,6 +211,10 @@ export const fetchProposalFromArchive = async (
   namespace: string,
   proposalId: string
 ): Promise<ArchiveListProposal | null> => {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoArchiveProposal(proposalId);
+  }
+
   try {
     const archiveUrls = getArchiveUrlsForProposal(namespace, proposalId);
     // Fetch from all configured sources in parallel as gzipped JSON
@@ -271,6 +288,10 @@ export async function fetchRawProposalVotesFromArchive({
   namespace: string;
   proposalId: string;
 }): Promise<ArchiveVoteRow[]> {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoArchiveVotes(proposalId);
+  }
+
   try {
     return await fetchArchiveNdjson<ArchiveVoteRow>(
       getArchiveSlugForProposalVotes(namespace, proposalId)
@@ -310,6 +331,10 @@ export async function fetchRawProposalNonVotersFromArchive({
   namespace: string;
   proposalId: string;
 }): Promise<ArchiveNonVoterRow[]> {
+  if (isCivicDemoEnabled()) {
+    return getCivicDemoArchiveNonVoters(proposalId);
+  }
+
   try {
     return await fetchArchiveNdjson<ArchiveNonVoterRow>(
       getArchiveSlugForProposalNonVoters(namespace, proposalId)

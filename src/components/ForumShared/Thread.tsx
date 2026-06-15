@@ -21,7 +21,10 @@ import SoftDeletedContent from "@/components/Forum/SoftDeletedContent";
 import EmojiReactions from "@/components/Forum/EmojiReactions";
 import { cn } from "@/lib/utils";
 import { formatRelative } from "@/components/ForumShared/utils";
-import { ADMIN_TYPES } from "@/lib/constants";
+import {
+  ForumAuthorName,
+  getForumAdminBadgeType,
+} from "@/lib/forumAdminDisplay";
 import PostAttachments from "@/app/forums/[topic_id]/components/PostAttachments";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
@@ -265,7 +268,10 @@ const CommentItem = ({
                   className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
                   {isAuthorAdmin ? (
-                    "Cowrie"
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      isAdmin={isAuthorAdmin}
+                    />
                   ) : (
                     <ENSName address={comment.author || ""} />
                   )}
@@ -273,7 +279,10 @@ const CommentItem = ({
               ) : (
                 <span className="text-sm font-medium text-primary">
                   {isAuthorAdmin ? (
-                    "Cowrie"
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      isAdmin={isAuthorAdmin}
+                    />
                   ) : (
                     <ENSName address={comment.author || ""} />
                   )}
@@ -282,7 +291,7 @@ const CommentItem = ({
               {isAuthorAdmin && (
                 <ForumAdminBadge
                   className="text-[9px]"
-                  type={adminLabel ? ADMIN_TYPES[adminLabel] : "Admin"}
+                  type={getForumAdminBadgeType(adminLabel)}
                 />
               )}
               {isOwnComment && (
