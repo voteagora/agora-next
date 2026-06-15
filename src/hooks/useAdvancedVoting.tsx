@@ -6,6 +6,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { trackEventFireAndForget } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { isSafeWallet, wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { getWalletErrorDiagnostics } from "@/lib/wallet/errors";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
 import { encodeFunctionData } from "viem";
@@ -284,6 +285,7 @@ const useAdvancedVoting = ({
             proposalId,
             voteKind: "standard",
             error: error instanceof Error ? error.message : String(error),
+            ...getWalletErrorDiagnostics(error),
           },
         });
         if (traceRef.current === trace) {
@@ -437,6 +439,7 @@ const useAdvancedVoting = ({
             proposalId,
             voteKind: "advanced",
             error: error instanceof Error ? error.message : String(error),
+            ...getWalletErrorDiagnostics(error),
           },
         });
         if (traceRef.current === trace) {

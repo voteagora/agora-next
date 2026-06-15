@@ -19,6 +19,16 @@ const USER_CANCELLATION_MESSAGE_PATTERNS = [
   "exited_update_flow",
 ];
 
+// Failures in the user's wallet-to-chain transport (WalletConnect relay, the
+// wallet's own RPC, the in-app bridge) — not our outage. Kept visible as warn
+// so they don't page like a real backend error. Patterns are deliberately
+// specific to the viem/WalletConnect wording to avoid catching real failures.
+const WALLET_TRANSPORT_ERROR_PATTERNS = [
+  "failed to publish payload",
+  "rpc endpoint returned http client error",
+  "details: invalid id",
+];
+
 function collectDetailValues(value: unknown, values: string[], depth = 0) {
   if (value == null || depth > 4) {
     return;
@@ -102,12 +112,28 @@ export function isUserCancellationDetails(details?: unknown): boolean {
   });
 }
 
+export function isWalletTransportError(details?: unknown): boolean {
+  const values: string[] = [];
+  collectDetailValues(details, values);
+
+  return values.some((value) => {
+    const normalized = value.trim().toLowerCase();
+    return WALLET_TRANSPORT_ERROR_PATTERNS.some((pattern) =>
+      normalized.includes(pattern)
+    );
+  });
+}
+
 export function inferMiradorEventSeverity(
   eventName: string,
   details?: unknown
 ): MiradorEventSeverity {
   if (isUserCancellationDetails(details)) {
     return "info";
+  }
+
+  if (isWalletTransportError(details)) {
+    return "warn";
   }
 
   if (eventName.endsWith("_failed") || eventName.endsWith("_error")) {

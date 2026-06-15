@@ -33,7 +33,10 @@ import {
   useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
-import { getWalletErrorMessage } from "@/lib/wallet/errors";
+import {
+  getWalletErrorDiagnostics,
+  getWalletErrorMessage,
+} from "@/lib/wallet/errors";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -333,6 +336,7 @@ export function UndelegateDialog({
             delegationError,
             "Undelegation transaction failed"
           ),
+          ...getWalletErrorDiagnostics(delegationError),
         },
       });
       delegationTraceRef.current = null;

@@ -21,6 +21,7 @@ import {
 import { addMiradorEvent } from "@/lib/mirador/webTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
 import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
+import { getWalletErrorDiagnostics } from "@/lib/wallet/errors";
 
 const types = {
   Ballot: [
@@ -299,6 +300,7 @@ const useSponsoredVoting = ({
             voteKind: "sponsored",
             transactionHash: relayTxHash,
             error: nextError.message,
+            ...getWalletErrorDiagnostics(error),
           },
         });
         if (traceRef.current === trace) {

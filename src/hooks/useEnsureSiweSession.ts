@@ -38,6 +38,16 @@ type EnsureSiweSessionOptions = {
   onSafeClosed?: (reason: SafeFlowClosedReason) => void;
 };
 
+// doSignIn() resolving false means the user dismissed the sign-in prompt, not a
+// real failure — genuine nonce/verify errors throw earlier with their own
+// events. This sentinel lets the catch close the trace as cancelled, not failed.
+class SiweSignInDismissedError extends Error {
+  constructor() {
+    super("Sign-in cancelled.");
+    this.name = "SiweSignInDismissedError";
+  }
+}
+
 function getSiweLoginCloseOptions(reason: SafeFlowClosedReason) {
   switch (reason) {
     case "expired":
@@ -231,18 +241,28 @@ export function useEnsureSiweSession(params: {
         await prepareMiradorSiweLoginTrace();
         const signInSuccess = await doSignIn();
         if (!signInSuccess) {
-          throw new Error("Sign-in cancelled or failed.");
+          throw new SiweSignInDismissedError();
         }
       } catch (error) {
         if (shouldTrackMiradorSiweLogin(purpose)) {
-          await closeStoredSiweLoginTrace({
-            eventName: "siwe_login_failed",
-            details: {
-              message:
-                error instanceof Error ? error.message : "Sign-in cancelled.",
-            },
-            reason: "siwe_login_failed",
-          });
+          await closeStoredSiweLoginTrace(
+            error instanceof SiweSignInDismissedError
+              ? {
+                  eventName: "siwe_login_cancelled",
+                  details: { reason: "sign_in_dismissed" },
+                  reason: "siwe_login_cancelled",
+                }
+              : {
+                  eventName: "siwe_login_failed",
+                  details: {
+                    message:
+                      error instanceof Error
+                        ? error.message
+                        : "Sign-in cancelled.",
+                  },
+                  reason: "siwe_login_failed",
+                }
+          );
         }
         if (error instanceof Error) {
           throw error;
