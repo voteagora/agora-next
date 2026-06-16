@@ -43,11 +43,60 @@ class AgoraAPI {
     });
 
     if (!res.ok) {
-      throw new Error(res.statusText);
+      throw await createAgoraApiError(res);
     }
 
     return res;
   }
+}
+
+async function createAgoraApiError(response) {
+  const responseBody = await readResponseBody(response);
+  const responseMessage = getResponseMessage(responseBody);
+  const fallbackMessage =
+    response.statusText || `Request failed with status ${response.status}`;
+  const error = new Error(responseMessage || fallbackMessage);
+
+  error.status = response.status;
+  error.statusText = response.statusText;
+  error.body = responseBody;
+
+  return error;
+}
+
+async function readResponseBody(response) {
+  try {
+    return await response.text();
+  } catch (_) {
+    return "";
+  }
+}
+
+function getResponseMessage(responseBody) {
+  const trimmedBody = responseBody.trim();
+
+  if (!trimmedBody) {
+    return "";
+  }
+
+  try {
+    const parsedBody = JSON.parse(trimmedBody);
+
+    if (typeof parsedBody === "string") {
+      return parsedBody;
+    }
+
+    if (parsedBody && typeof parsedBody === "object") {
+      return (
+        parsedBody.error ||
+        parsedBody.message ||
+        parsedBody.reason ||
+        trimmedBody
+      );
+    }
+  } catch (_) {}
+
+  return trimmedBody;
 }
 
 export default AgoraAPI;

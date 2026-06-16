@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+  addMiradorEvent,
   addMiradorSafeMsgHint,
   addMiradorSafeTxHint,
   addMiradorTxInputData,
@@ -9,6 +10,97 @@ import {
 } from "@/lib/mirador/webTrace";
 
 describe("webTrace", () => {
+  it("uses error severity for failed events", () => {
+    const trace = {
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+
+    addMiradorEvent(trace as any, "vote_submission_failed", {
+      error: "network timeout",
+    });
+
+    expect(trace.error).toHaveBeenCalledWith("vote_submission_failed", {
+      error: "network timeout",
+    });
+    expect(trace.info).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
+  it("uses info severity when a failed event is user rejection", () => {
+    const trace = {
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+    const details = {
+      error:
+        "User rejected the request. MetaMask Tx Signature: User denied transaction signature.",
+    };
+
+    addMiradorEvent(trace as any, "vote_submission_failed", details);
+
+    expect(trace.info).toHaveBeenCalledWith("vote_submission_failed", details);
+    expect(trace.error).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
+  it("uses info severity for wallet cancellation error codes", () => {
+    const trace = {
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+    const details = {
+      error: {
+        code: 4001,
+        message: "User rejected the request.",
+      },
+    };
+
+    addMiradorEvent(trace as any, "wallet_signature_failed", details);
+
+    expect(trace.info).toHaveBeenCalledWith("wallet_signature_failed", details);
+    expect(trace.error).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
+  it("uses info severity for nested wallet error objects", () => {
+    const trace = {
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+    const walletError = Object.assign(new Error("User rejected the request."), {
+      code: 4001,
+    });
+    const details = { error: walletError };
+
+    addMiradorEvent(trace as any, "wallet_signature_failed", details);
+
+    expect(trace.info).toHaveBeenCalledWith("wallet_signature_failed", details);
+    expect(trace.error).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
+  it("uses info severity for exited wallet link flows", () => {
+    const trace = {
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    };
+    const details = {
+      errorCode: "exited_link_flow",
+    };
+
+    addMiradorEvent(trace as any, "wallet_link_failed", details);
+
+    expect(trace.info).toHaveBeenCalledWith("wallet_link_failed", details);
+    expect(trace.error).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
   it("returns the trace id synchronously from the v2 SDK", () => {
     const trace = {
       getTraceId: vi.fn(() => "trace-id"),

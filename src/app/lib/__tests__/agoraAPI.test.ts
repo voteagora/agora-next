@@ -16,6 +16,7 @@ describe("AgoraAPI.post", () => {
       "fetch",
       vi.fn(async () => ({
         ok: true,
+        text: vi.fn().mockResolvedValue(""),
       }))
     );
   });
@@ -46,5 +47,35 @@ describe("AgoraAPI.post", () => {
       "Bearer test-api-key"
     );
     expect(requestInit.headers.get("Content-Type")).toBe("application/json");
+  });
+
+  it("throws the response body message when a POST fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: false,
+        status: 409,
+        statusText: "",
+        text: vi.fn().mockResolvedValue(
+          JSON.stringify({
+            error: "You have already voted on this proposal",
+            code: "VOTER_ALREADY_VOTED",
+          })
+        ),
+      }))
+    );
+
+    const api = new AgoraAPI();
+
+    await expect(
+      api.post("/relay/vote", "v1", { ok: false })
+    ).rejects.toMatchObject({
+      message: "You have already voted on this proposal",
+      status: 409,
+      body: JSON.stringify({
+        error: "You have already voted on this proposal",
+        code: "VOTER_ALREADY_VOTED",
+      }),
+    });
   });
 });

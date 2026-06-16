@@ -32,6 +32,12 @@ import {
   startFrontendMiradorFlowTrace,
   useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import {
+  getWalletErrorDiagnostics,
+  getWalletErrorMessage,
+} from "@/lib/wallet/errors";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 interface UndelegateActionButtonsProps {
   isDisabledInTenant: boolean;
@@ -128,10 +134,17 @@ export function UndelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
-  const { address: accountAddress } = useAccount();
+  const {
+    address: accountAddress,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const [votingPower, setVotingPower] = useState<string>("");
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [walletReadinessError, setWalletReadinessError] =
+    useState<Error | null>(null);
   const { setRefetchDelegate } = useConnectButtonContext();
   const sameDelegatee =
     delegate.address.toLowerCase() === accountAddress?.toLowerCase();
@@ -177,12 +190,14 @@ export function UndelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
+    error: writeError,
   } = useWriteContract();
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
+    error: receiptError,
   } = useWaitForTransactionReceipt({
     hash: isGasRelayLive ? undefined : delegateTxHash,
   });
@@ -211,6 +226,7 @@ export function UndelegateDialog({
   }, [fetchBalanceForDirectDelegation, accountAddress, fetchDirectDelegatee]);
 
   const executeDelegate = async () => {
+    setWalletReadinessError(null);
     if (isGasRelayLive) {
       await call();
     } else {
@@ -241,6 +257,12 @@ export function UndelegateDialog({
         attributes: {
           delegatee: zeroAddress,
           delegationAction: "undelegate",
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.token.chain.id,
+          }),
         },
         startEventName: "governance_delegation_started",
         startEventDetails: {
@@ -253,6 +275,21 @@ export function UndelegateDialog({
         chainId: contracts.token.chain.id,
         inputData,
       });
+
+      const readinessError = checkWalletReadinessOrCloseTrace({
+        connector,
+        status: accountStatus,
+        trace,
+        traceRef: delegationTraceRef,
+        reason: "governance_delegation_failed",
+        eventName: "governance_delegation_failed",
+        details: { delegatee: zeroAddress, action: "undelegate" },
+      });
+      if (readinessError) {
+        setWalletReadinessError(readinessError);
+        return;
+      }
+
       write({
         address: contracts.token.address as any,
         abi: contracts.token.abi,
@@ -303,18 +340,27 @@ export function UndelegateDialog({
     }
 
     if (didFailDelegation || isError) {
+      const delegationError = writeError ?? receiptError;
+      if (!delegationError) {
+        return;
+      }
+
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {
           delegatee: zeroAddress,
           action: "undelegate",
-          error: "Undelegation transaction failed",
+          error: getWalletErrorMessage(
+            delegationError,
+            "Undelegation transaction failed"
+          ),
+          ...getWalletErrorDiagnostics(delegationError),
         },
       });
       delegationTraceRef.current = null;
     }
-  }, [didFailDelegation, isError, isGasRelayLive]);
+  }, [didFailDelegation, isError, isGasRelayLive, receiptError, writeError]);
 
   useEffect(() => {
     return () => {
@@ -401,7 +447,7 @@ export function UndelegateDialog({
           tokenSymbol={token.symbol}
           sameDelegatee={sameDelegatee}
           executeDelegate={executeDelegate}
-          isError={isError}
+          isError={isError || !!walletReadinessError}
           didFailDelegation={didFailDelegation}
           didFailSponsoredUnelegation={didFailSponsoredUnelegation}
           isProcessingDelegation={isProcessingDelegation}

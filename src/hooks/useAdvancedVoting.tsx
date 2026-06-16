@@ -3,9 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { track } from "@vercel/analytics";
 import Tenant from "@/lib/tenant/tenant";
-import { trackEvent } from "@/lib/analytics";
+import { trackEventFireAndForget } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { isSafeWallet, wrappedWaitForTransactionReceipt } from "@/lib/utils";
+import { getWalletErrorDiagnostics } from "@/lib/wallet/errors";
 import toast from "react-hot-toast";
 import { WriteContractErrorType } from "wagmi/actions";
 import { encodeFunctionData } from "viem";
@@ -16,6 +17,8 @@ import {
   FrontendMiradorTrace,
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 const useAdvancedVoting = ({
   proposalId,
@@ -35,7 +38,12 @@ const useAdvancedVoting = ({
   missingVote: MissingVote;
 }) => {
   const { contracts } = Tenant.current();
-  const { address } = useAccount();
+  const {
+    address,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
   const {
     writeContractAsync: advancedVote,
     isError: _advancedVoteError,
@@ -113,6 +121,12 @@ const useAdvancedVoting = ({
           hasParams: Boolean(params),
           missingVote,
           hasAdvancedVp: advancedVP !== null,
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: chainId,
+          }),
         },
         startEventName: "governance_vote_started",
         startEventDetails: {
@@ -130,7 +144,9 @@ const useAdvancedVoting = ({
     };
 
     const _standardVote = async () => {
-      setStandardVoteLoading(true);
+      setStandardVoteError(false);
+      setStandardVoteErrorDetails(null);
+
       const functionName = reason
         ? params
           ? "castVoteWithReasonAndParams"
@@ -156,6 +172,23 @@ const useAdvancedVoting = ({
         chainId: contracts.governor.chain.id,
         inputData,
       });
+
+      const readinessError = checkWalletReadinessOrCloseTrace({
+        connector,
+        status: accountStatus,
+        trace,
+        traceRef,
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "standard" },
+      });
+      if (readinessError) {
+        setStandardVoteError(true);
+        setStandardVoteErrorDetails(readinessError as WriteContractErrorType);
+        return;
+      }
+
+      setStandardVoteLoading(true);
 
       try {
         const isSafeSubmitterPromise = address
@@ -203,7 +236,7 @@ const useAdvancedVoting = ({
           });
         }
         if (status === "success") {
-          await trackEvent({
+          trackEventFireAndForget({
             event_name: ANALYTICS_EVENT_NAMES.STANDARD_VOTE,
             event_data: {
               proposal_id: proposalId,
@@ -253,6 +286,7 @@ const useAdvancedVoting = ({
             proposalId,
             voteKind: "standard",
             error: error instanceof Error ? error.message : String(error),
+            ...getWalletErrorDiagnostics(error),
           },
         });
         if (traceRef.current === trace) {
@@ -264,11 +298,13 @@ const useAdvancedVoting = ({
     };
 
     const _advancedVote = async () => {
+      setAdvancedVoteError(false);
+      setAdvancedVoteErrorDetails(null);
+
       if (!authorityChains || !advancedVP) {
         toast.error("No authority chains or advanced VP found");
         return;
       }
-      setAdvancedVoteLoading(true);
       const args = [
         advancedVP,
         authorityChains as any,
@@ -288,6 +324,23 @@ const useAdvancedVoting = ({
         chainId: contracts.alligator?.chain.id,
         inputData,
       });
+
+      const readinessError = checkWalletReadinessOrCloseTrace({
+        connector,
+        status: accountStatus,
+        trace,
+        traceRef,
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "advanced" },
+      });
+      if (readinessError) {
+        setAdvancedVoteError(true);
+        setAdvancedVoteErrorDetails(readinessError as WriteContractErrorType);
+        return;
+      }
+
+      setAdvancedVoteLoading(true);
 
       try {
         const isSafeSubmitterPromise = address
@@ -338,7 +391,7 @@ const useAdvancedVoting = ({
           });
         }
         if (status === "success") {
-          await trackEvent({
+          trackEventFireAndForget({
             event_name: ANALYTICS_EVENT_NAMES.ADVANCED_VOTE,
             event_data: {
               proposal_id: proposalId,
@@ -388,6 +441,7 @@ const useAdvancedVoting = ({
             proposalId,
             voteKind: "advanced",
             error: error instanceof Error ? error.message : String(error),
+            ...getWalletErrorDiagnostics(error),
           },
         });
         if (traceRef.current === trace) {
@@ -441,9 +495,12 @@ const useAdvancedVoting = ({
     void vote();
   }, [
     address,
+    accountChainId,
+    accountStatus,
     advancedVP,
     advancedVote,
     authorityChains,
+    connector,
     contracts.alligator,
     contracts.governor.abi,
     contracts.governor.address,

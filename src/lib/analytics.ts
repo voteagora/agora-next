@@ -81,3 +81,11 @@ analyticsManager.addService(new DatabaseAnalytics());
 
 export const trackEvent = (event: AnalyticsEvent) =>
   analyticsManager.trackEvent(event);
+
+export function trackEventFireAndForget(
+  ...args: Parameters<typeof trackEvent>
+) {
+  void trackEvent(...args).catch((error) => {
+    console.error("Analytics tracking failed", error);
+  });
+}

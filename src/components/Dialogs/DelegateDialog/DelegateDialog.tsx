@@ -34,6 +34,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { MIRADOR_FLOW } from "@/lib/mirador/constants";
+import { isUserCancellationDetails } from "@/lib/mirador/eventSeverity";
 import {
   attachMiradorTransactionArtifacts,
   closeFrontendMiradorFlowTrace,
@@ -41,6 +42,12 @@ import {
   startFrontendMiradorFlowTrace,
   useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
+import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import {
+  getWalletErrorDiagnostics,
+  getWalletErrorMessage,
+} from "@/lib/wallet/errors";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 export function DelegateDialog({
   delegate,
@@ -59,7 +66,12 @@ export function DelegateDialog({
   const { ui, contracts, token } = Tenant.current();
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
-  const { address: accountAddress } = useAccount();
+  const {
+    address: accountAddress,
+    chainId: accountChainId,
+    connector,
+    status: accountStatus,
+  } = useAccount();
 
   const { data: tokenBalance } = useTokenBalance(accountAddress);
   const [delegatee, setDelegatee] = useState<DelegateePayload | null>(null);
@@ -111,17 +123,21 @@ export function DelegateDialog({
     isError,
     writeContract: write,
     data: delegateTxHash,
+    error: writeError,
   } = useWriteContract();
 
   const [localDelegateTxHash, setLocalDelegateTxHash] = useState<
     `0x${string}` | undefined
   >(undefined);
+  const [walletReadinessError, setWalletReadinessError] =
+    useState<Error | null>(null);
   const directDelegationTxHash = localDelegateTxHash ?? delegateTxHash;
 
   const {
     isLoading: isProcessingDelegation,
     isSuccess: didProcessDelegation,
     isError: didFailDelegation,
+    error: receiptError,
   } = useWaitForTransactionReceipt({
     hash: isGasRelayLive ? undefined : (localDelegateTxHash ?? delegateTxHash),
   });
@@ -188,13 +204,22 @@ export function DelegateDialog({
     }
 
     if (didFailDelegation || isError) {
+      const delegationError = writeError ?? receiptError;
+      if (!delegationError) {
+        return;
+      }
+
       void closeFrontendMiradorFlowTrace(delegationTraceRef.current, {
         reason: "governance_delegation_failed",
         eventName: "governance_delegation_failed",
         details: {
           delegatee: delegate.address,
           transactionHash: directDelegationTxHash,
-          error: "Delegation transaction failed",
+          error: getWalletErrorMessage(
+            delegationError,
+            "Delegation transaction failed"
+          ),
+          ...getWalletErrorDiagnostics(delegationError),
         },
       });
       delegationTraceRef.current = null;
@@ -207,6 +232,8 @@ export function DelegateDialog({
     directDelegationTxHash,
     isError,
     isGasRelayLive,
+    receiptError,
+    writeError,
   ]);
 
   useEffect(() => {
@@ -227,6 +254,7 @@ export function DelegateDialog({
   }, [delegate.address]);
 
   async function executeDelegate() {
+    setWalletReadinessError(null);
     if (isGasRelayLive) {
       await call();
     } else {
@@ -256,6 +284,12 @@ export function DelegateDialog({
         attributes: {
           delegatee: delegate.address,
           delegationAction: "delegate",
+          ...getWalletTraceAttributes({
+            accountChainId,
+            accountStatus,
+            connector,
+            targetChainId: contracts.token.chain.id,
+          }),
         },
         startEventName: "governance_delegation_started",
         startEventDetails: {
@@ -296,6 +330,39 @@ export function DelegateDialog({
         setLocalDelegateTxHash(txHash);
       } catch (error) {
         console.error("delegate via viem failed", error);
+        if (isUserCancellationDetails(error)) {
+          void closeFrontendMiradorFlowTrace(trace, {
+            reason: "governance_delegation_failed",
+            eventName: "governance_delegation_failed",
+            details: {
+              delegatee: delegate.address,
+              error: getWalletErrorMessage(
+                error,
+                "Delegation transaction failed"
+              ),
+              ...getWalletErrorDiagnostics(error),
+            },
+          });
+          if (delegationTraceRef.current === trace) {
+            delegationTraceRef.current = null;
+          }
+          return;
+        }
+
+        const readinessError = checkWalletReadinessOrCloseTrace({
+          connector,
+          status: accountStatus,
+          trace,
+          traceRef: delegationTraceRef,
+          reason: "governance_delegation_failed",
+          eventName: "governance_delegation_failed",
+          details: { delegatee: delegate.address, action: "delegate" },
+        });
+        if (readinessError) {
+          setWalletReadinessError(readinessError);
+          return;
+        }
+
         // Fallback to wagmi write (may still fail under Safe CAIP-2)
         try {
           write({
@@ -343,7 +410,12 @@ export function DelegateDialog({
       );
     }
 
-    if (isError || didFailDelegation || didFailSponsoredDelegation) {
+    if (
+      isError ||
+      didFailDelegation ||
+      didFailSponsoredDelegation ||
+      !!walletReadinessError
+    ) {
       return (
         <Button disabled={false} onClick={executeDelegate}>
           Delegation failed - try again

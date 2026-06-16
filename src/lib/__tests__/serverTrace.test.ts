@@ -173,6 +173,42 @@ describe("serverTrace", () => {
     expect(trace.info).not.toHaveBeenCalled();
   });
 
+  it("uses info severity for user-rejected failed events", () => {
+    const trace = {
+      addAttributes: vi.fn(),
+      addTags: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      web3: {
+        evm: {},
+        safe: {},
+      },
+      flush: vi.fn(),
+    };
+    const client = {
+      trace: vi.fn(() => trace),
+    };
+
+    getMiradorServerClientMock.mockReturnValue(client);
+
+    appendServerTraceEvent({
+      traceContext: { traceId: "trace-id", flow: "proposal_creation" },
+      eventName: "proposal_publish_failed",
+      details: {
+        error:
+          "User rejected the request. MetaMask Tx Signature: User denied transaction signature.",
+      },
+    });
+
+    expect(trace.info).toHaveBeenCalledWith(
+      "proposal_publish_failed",
+      '{"error":"User rejected the request. MetaMask Tx Signature: User denied transaction signature."}'
+    );
+    expect(trace.error).not.toHaveBeenCalled();
+    expect(trace.warn).not.toHaveBeenCalled();
+  });
+
   it("skips appending events for disabled flows", () => {
     isMiradorFlowTracingEnabledMock.mockReturnValue(false);
 
