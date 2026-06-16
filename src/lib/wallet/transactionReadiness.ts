@@ -50,23 +50,25 @@ export function checkWalletReadinessOrCloseTrace({
   status,
   trace,
   traceRef,
-  proposalId,
-  voteKind,
+  reason,
+  eventName,
+  details,
 }: {
   connector?: WalletConnectorLike;
   status: WalletConnectionStatus;
   trace: FrontendMiradorTrace;
   traceRef: MutableRefObject<FrontendMiradorTrace | null>;
-  proposalId: string;
-  voteKind: string;
+  reason: string;
+  eventName: string;
+  details?: Record<string, unknown>;
 }): Error | null {
   const error = getWalletTransactionReadinessError({ connector, status });
   if (!error) return null;
 
   void closeFrontendMiradorFlowTrace(trace, {
-    reason: "governance_vote_failed",
-    eventName: "governance_vote_failed",
-    details: { proposalId, voteKind, error: error.message },
+    reason,
+    eventName,
+    details: { ...details, error: error.message },
   });
   if (traceRef.current === trace) {
     traceRef.current = null;

@@ -178,8 +178,9 @@ const useAdvancedVoting = ({
         status: accountStatus,
         trace,
         traceRef,
-        proposalId,
-        voteKind: "standard",
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "standard" },
       });
       if (readinessError) {
         setStandardVoteError(true);
@@ -329,8 +330,9 @@ const useAdvancedVoting = ({
         status: accountStatus,
         trace,
         traceRef,
-        proposalId,
-        voteKind: "advanced",
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "advanced" },
       });
       if (readinessError) {
         setAdvancedVoteError(true);

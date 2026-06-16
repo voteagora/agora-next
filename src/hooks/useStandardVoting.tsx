@@ -129,8 +129,9 @@ const useStandardVoting = ({
         status: accountStatus,
         trace,
         traceRef,
-        proposalId,
-        voteKind: "standard",
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "standard" },
       });
       if (readinessError) {
         setStandardVoteError(true);

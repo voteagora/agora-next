@@ -136,8 +136,9 @@ const useSponsoredVoting = ({
         status: accountStatus,
         trace,
         traceRef,
-        proposalId,
-        voteKind: "sponsored",
+        reason: "governance_vote_failed",
+        eventName: "governance_vote_failed",
+        details: { proposalId, voteKind: "sponsored" },
       });
       if (readinessError) {
         setError(readinessError);

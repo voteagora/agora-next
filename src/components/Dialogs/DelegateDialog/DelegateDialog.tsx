@@ -47,6 +47,7 @@ import {
   getWalletErrorDiagnostics,
   getWalletErrorMessage,
 } from "@/lib/wallet/errors";
+import { checkWalletReadinessOrCloseTrace } from "@/lib/wallet/transactionReadiness";
 
 export function DelegateDialog({
   delegate,
@@ -128,6 +129,8 @@ export function DelegateDialog({
   const [localDelegateTxHash, setLocalDelegateTxHash] = useState<
     `0x${string}` | undefined
   >(undefined);
+  const [walletReadinessError, setWalletReadinessError] =
+    useState<Error | null>(null);
   const directDelegationTxHash = localDelegateTxHash ?? delegateTxHash;
 
   const {
@@ -251,6 +254,7 @@ export function DelegateDialog({
   }, [delegate.address]);
 
   async function executeDelegate() {
+    setWalletReadinessError(null);
     if (isGasRelayLive) {
       await call();
     } else {
@@ -345,6 +349,20 @@ export function DelegateDialog({
           return;
         }
 
+        const readinessError = checkWalletReadinessOrCloseTrace({
+          connector,
+          status: accountStatus,
+          trace,
+          traceRef: delegationTraceRef,
+          reason: "governance_delegation_failed",
+          eventName: "governance_delegation_failed",
+          details: { delegatee: delegate.address, action: "delegate" },
+        });
+        if (readinessError) {
+          setWalletReadinessError(readinessError);
+          return;
+        }
+
         // Fallback to wagmi write (may still fail under Safe CAIP-2)
         try {
           write({
@@ -392,7 +410,12 @@ export function DelegateDialog({
       );
     }
 
-    if (isError || didFailDelegation || didFailSponsoredDelegation) {
+    if (
+      isError ||
+      didFailDelegation ||
+      didFailSponsoredDelegation ||
+      !!walletReadinessError
+    ) {
       return (
         <Button disabled={false} onClick={executeDelegate}>
           Delegation failed - try again
