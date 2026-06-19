@@ -177,6 +177,15 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };
+            case TENANT_NAMESPACES.CIVIC:
+        return {
+          name: "CIVIC",
+          symbol: "CIVIC",
+          decimals: 1,
+          address: isProd
+            ? "0x234653cfb2ff6d0771fb6c615f5a61af1a9518c7"
+            : "0x0000000000000000000000000000000000000000",
+        };
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }
