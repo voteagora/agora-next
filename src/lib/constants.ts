@@ -263,6 +263,7 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   scroll: ["dao-node"],
   linea: ["dao-node"],
   pguild: ["dao-node"],
+  civic: ["dao-node"],
   boost: ["dao-node"],
   xai: ["dao-node"],
   b3: ["dao-node"],

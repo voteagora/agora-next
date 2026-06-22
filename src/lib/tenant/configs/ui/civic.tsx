@@ -1,5 +1,5 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
-import pguildLogo from "@/assets/tenant/pguild_logo.svg";
+import civicLogo from "@/assets/tenant/civic_logo.png";
 import pguildHero from "@/assets/tenant/pguild_hero.svg";
 import pguildInfo1 from "@/assets/tenant/pguild_info_1.svg";
 import pguildInfo2 from "@/assets/tenant/pguild_info_2.svg";
@@ -18,7 +18,10 @@ import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 export const civicTenantUIConfig = new TenantUI({
   title: "CIVIC",
-  logo: pguildLogo,
+  logo: civicLogo,
+  logoSize: "52px",
+  // CIVIC brand colors: Red #FF0D05, Teal #003246
+  documentColors: ["#FF0D05", "#003246", "#FFFFFF", "#1A1A1A"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.CIVIC)],
 
   assets: {
@@ -28,16 +31,28 @@ export const civicTenantUIConfig = new TenantUI({
   },
 
   customization: {
-    primary: "0 0 0",
+    // Text colors
+    primary: "26 26 26", // Near-black for readability
     secondary: "64 64 64",
     tertiary: "115 115 115",
-    neutral: "255 255 255",
-    wash: "250 250 250",
-    line: "229 229 229",
+    // Backgrounds
+    neutral: "255 255 255", // White main background
+    wash: "250 250 250", // Light grey wash
+    line: "229 229 229", // Border color
+    // Status colors
     positive: "97 209 97",
-    negative: "226 54 54",
-    brandPrimary: "0 0 0",
-    brandSecondary: "255 255 255",
+    negative: "255 13 5", // CIVIC Red for errors
+    // Brand colors
+    brandPrimary: "255 13 5", // CIVIC Red #FF0D05
+    brandSecondary: "255 255 255", // White
+    // Layout backgrounds
+    headerBackground: "255 255 255", // White header
+    footerBackground: "255 255 255", // White footer
+    infoSectionBackground: "255 255 255", // White info sections
+    infoTabBackground: "#FFFFFF",
+    buttonBackground: "#FAFAFA",
+    // Font
+    font: "font-inter",
     tokenAmountFont: "font-chivoMono",
   },
 
@@ -107,25 +122,25 @@ export const civicTenantUIConfig = new TenantUI({
         {
           name: "Website",
           title: "Website",
-          url: "https://www.protocolguild.org/",
+          url: "https://civiliansinconflict.org/",
           image: pguildInfo1,
         },
         {
-          name: "Documentation",
-          title: "Documentation",
-          url: "https://protocol-guild.readthedocs.io/",
+          name: "Approach",
+          title: "Approach",
+          url: "https://civiliansinconflict.org/approach/",
           image: pguildInfo2,
         },
         {
-          name: "Dune",
-          title: "Dune",
-          url: "https://dune.com/protocolguild/protocol-guild",
+          name: "About CIVIC",
+          title: "About CIVIC",
+          url: "https://civiliansinconflict.org/about-us/",
           image: pguildInfo3,
         },
         {
-          name: "Other links",
-          title: "Other links",
-          url: "https://linktr.ee/protocolguild",
+          name: "History",
+          title: "History",
+          url: "https://civiliansinconflict.org/our-history/",
           image: pguildInfo4,
         },
       ],
@@ -136,7 +151,7 @@ export const civicTenantUIConfig = new TenantUI({
       hero: pguildHero,
       description: (
         <>
-          CIVIC's Agora DAO includes{" "}
+          CIVIC&apos;s Agora DAO includes{" "}
           <a
             href="https://protocol-guild.readthedocs.io/en/latest/01-membership.html"
             target="_blank"

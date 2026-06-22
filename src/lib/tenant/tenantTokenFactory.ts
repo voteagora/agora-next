@@ -177,7 +177,7 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };
-            case TENANT_NAMESPACES.CIVIC:
+      case TENANT_NAMESPACES.CIVIC:
         return {
           name: "CIVIC",
           symbol: "CIVIC",

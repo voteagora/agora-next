@@ -77,7 +77,10 @@ export const civicTenantConfig = ({
       abi: ProposalTypesConfiguratorScopes__factory.abi,
       address: TYPES,
       chain,
-      contract: ProposalTypesConfiguratorScopes__factory.connect(TYPES, provider),
+      contract: ProposalTypesConfiguratorScopes__factory.connect(
+        TYPES,
+        provider
+      ),
       provider,
     }),
 

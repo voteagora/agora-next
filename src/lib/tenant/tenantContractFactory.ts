@@ -69,7 +69,7 @@ export default class TenantContractFactory {
         return demo3TenantConfig({ isProd, rpcSecret });
       case TENANT_NAMESPACES.SHAPE:
         return shapeTenantConfig({ isProd, rpcSecret });
-            case TENANT_NAMESPACES.CIVIC:
+      case TENANT_NAMESPACES.CIVIC:
         return civicTenantConfig({ isProd, rpcSecret });
 
       default:

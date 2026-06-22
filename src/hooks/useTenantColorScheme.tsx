@@ -25,6 +25,14 @@ const infoColor = {
       endcolor: "#FFFFFF",
     },
   },
+  civic: {
+    primary: "#FF0D05", // CIVIC Red
+    primaryRGB: "rgba(255, 13, 5, 1)",
+    gradient: {
+      startColor: "rgba(255, 13, 5, 0.6)",
+      endcolor: "#FFFFFF",
+    },
+  },
 };
 
 const useTenantColorScheme = () => {
