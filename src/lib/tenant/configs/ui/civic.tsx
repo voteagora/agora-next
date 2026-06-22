@@ -1,11 +1,10 @@
 import { TenantUI } from "@/lib/tenant/tenantUI";
 import civicLogo from "@/assets/tenant/civic_logo.png";
-import pguildHero from "@/assets/tenant/pguild_hero.svg";
-import pguildInfo1 from "@/assets/tenant/pguild_info_1.svg";
-import pguildInfo2 from "@/assets/tenant/pguild_info_2.svg";
-import pguildInfo3 from "@/assets/tenant/pguild_info_3.svg";
-import pguildInfo4 from "@/assets/tenant/pguild_info_4.svg";
-import pguildSuccess from "@/assets/tenant/pguild_success.svg";
+import civicHero from "@/assets/tenant/civic_hero.svg";
+import civicInfo1 from "@/assets/tenant/civic_info_1.svg";
+import civicInfo2 from "@/assets/tenant/civic_info_2.svg";
+import civicInfo3 from "@/assets/tenant/civic_info_3.svg";
+import civicInfo4 from "@/assets/tenant/civic_info_4.svg";
 import delegateAvatar from "@/assets/icons/delegateAvatar.svg";
 import { ProposalGatingType, ProposalType } from "@/app/proposals/draft/types";
 import { ProposalStage as PrismaProposalStage } from "@prisma/client";
@@ -25,8 +24,8 @@ export const civicTenantUIConfig = new TenantUI({
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.CIVIC)],
 
   assets: {
-    success: pguildSuccess,
-    pending: pguildHero,
+    success: civicHero,
+    pending: civicHero,
     delegate: delegateAvatar,
   },
 
@@ -54,6 +53,8 @@ export const civicTenantUIConfig = new TenantUI({
     // Font
     font: "font-inter",
     tokenAmountFont: "font-chivoMono",
+    // Hero image
+    customHeroImageSize: "h-auto w-auto",
   },
 
   organization: {
@@ -71,13 +72,13 @@ export const civicTenantUIConfig = new TenantUI({
     {
       route: "/",
       title: "CIVIC Governance",
-      hero: pguildHero,
+      hero: civicHero,
       description:
-        "CIVIC is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
+        "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
-        title: "CIVIC Agora",
+        title: "CIVIC Governance",
         description: "Home of CIVIC Governance",
-        imageTitle: "CIVIC Agora",
+        imageTitle: "CIVIC Governance",
         imageDescription: "Home of CIVIC Governance",
       },
     },
@@ -85,23 +86,23 @@ export const civicTenantUIConfig = new TenantUI({
       route: "proposals",
       title: "CIVIC Governance",
       description:
-        "CIVIC is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
+        "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
-        title: "CIVIC Agora",
-        description: "Home of CIVIC Governance",
-        imageTitle: "CIVIC Agora",
-        imageDescription: "Home of CIVIC Governance",
+        title: "CIVIC Proposals",
+        description: "View and vote on CIVIC governance proposals",
+        imageTitle: "CIVIC Proposals",
+        imageDescription: "View and vote on CIVIC governance proposals",
       },
     },
     {
       route: "delegates",
-      title: "CIVIC Governance",
+      title: "CIVIC Voters",
       description:
-        "CIVIC is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
+        "CIVIC members participate in governance through voting and delegation. Delegate your voting power to a trusted representative.",
       meta: {
-        title: "Voter on Agora",
+        title: "CIVIC Voters",
         description: "Delegate your voting power to a trusted representative",
-        imageTitle: "Voter on Agora",
+        imageTitle: "CIVIC Voters",
         imageDescription:
           "Delegate your voting power to a trusted representative",
       },
@@ -110,77 +111,55 @@ export const civicTenantUIConfig = new TenantUI({
       route: "info",
       title: "CIVIC Governance",
       description:
-        "CIVIC is the leading independent organization dedicated to sustainable funding for Ethereum’s core protocol development. Our mission is to secure Ethereum’s future by funding core contributors.",
-      hero: pguildHero,
+        "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
+      hero: civicHero,
       meta: {
-        title: "Info of Agora",
-        description: "Welcome to CIVIC",
-        imageTitle: "Info of Agora",
-        imageDescription: "Welcome to CIVIC",
+        title: "About CIVIC Governance",
+        description: "Learn about CIVIC governance",
+        imageTitle: "About CIVIC Governance",
+        imageDescription: "Learn about CIVIC governance",
       },
       links: [
         {
           name: "Website",
           title: "Website",
           url: "https://civiliansinconflict.org/",
-          image: pguildInfo1,
+          image: civicInfo1,
         },
         {
-          name: "Approach",
-          title: "Approach",
-          url: "https://civiliansinconflict.org/approach/",
-          image: pguildInfo2,
+          name: "Donate",
+          title: "Donate",
+          url: "https://civiliansinconflict.org/give/",
+          image: civicInfo2,
         },
         {
-          name: "About CIVIC",
-          title: "About CIVIC",
-          url: "https://civiliansinconflict.org/about-us/",
-          image: pguildInfo3,
+          name: "Governance",
+          title: "Governance",
+          url: "/",
+          image: civicInfo3,
         },
         {
-          name: "History",
-          title: "History",
-          url: "https://civiliansinconflict.org/our-history/",
-          image: pguildInfo4,
+          name: "NFT Claim",
+          title: "NFT Claim",
+          url: "/claim",
+          image: civicInfo4,
         },
       ],
     },
     {
       route: "info/about",
       title: "About CIVIC",
-      hero: pguildHero,
+      hero: civicHero,
       description: (
         <>
-          CIVIC&apos;s Agora DAO includes{" "}
-          <a
-            href="https://protocol-guild.readthedocs.io/en/latest/01-membership.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-primary"
-          >
-            all Guild members
-          </a>
-          , with one person one vote, including vote delegation. The DAO is used
-          to ratify changes to the membership on a quarterly basis. It does not
-          keep track of{" "}
-          <a
-            href="https://protocol-guild.readthedocs.io/en/latest/01-membership.html#split-share"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-primary"
-          >
-            member weights
-          </a>
-          , nor does it hold any{" "}
-          <a
-            href="https://protocol-guild.readthedocs.io/en/latest/02-onchain-architecture.html#vesting-contract"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-primary"
-          >
-            funds
-          </a>
-          .
+          Center for Civilians in Conflict (CIVIC) promotes the protection of
+          civilians in armed conflict across Africa, Europe, the Middle East,
+          and through peacekeeping operations worldwide. CIVIC engages directly
+          with armed actors, governments, and international institutions to
+          develop practical guidance and policies that reduce civilian harm.
+          This governance platform enables community members to vote on
+          proposals, delegate voting power, and help shape CIVIC&apos;s
+          strategic direction.
         </>
       ),
       sectionTitle: "How it works",
@@ -189,19 +168,15 @@ export const civicTenantUIConfig = new TenantUI({
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000" />,
           title: "Voting power",
           description:
-            "All CIVIC members are given one voting share, which they must delegate to themselves or other members.",
+            "CIVIC members hold governance NFTs that grant voting rights. Each member has equal voting power in governance decisions.",
         },
         {
           icon: (
             <NotificationIcon className="w-[24px] h-[24px]" stroke="#000" />
           ),
-          title: "Proposal cadence",
-          description: (
-            <>
-              Membership updates are batched onchain on a quarterly basis to
-              minimize governance overhead.
-            </>
-          ),
+          title: "Proposals",
+          description:
+            "Proposals are submitted and voted on by the community. Members can vote directly or delegate to representatives they trust.",
         },
         {
           icon: (
@@ -210,18 +185,18 @@ export const civicTenantUIConfig = new TenantUI({
               stroke="#000"
             />
           ),
-          title: "Proposal thresholds",
+          title: "Thresholds",
           description:
-            "Membership updates require a quorum of 33% and an approval threshold of 51% to pass.",
+            "Governance decisions require a quorum and approval threshold to pass, ensuring broad community consensus.",
         },
       ],
       meta: {
         title: "About CIVIC",
         description:
-          "The CIVIC is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the CIVIC Pledge, the CIVIC's mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+          "Center for Civilians in Conflict (CIVIC) is an international organization dedicated to promoting the protection of civilians caught in conflict.",
         imageTitle: "About CIVIC",
         imageDescription:
-          "The CIVIC is a collective funding mechanism for +180 Ethereum L1 R&D maintainers 🌿. Supported by donors who have taken the CIVIC Pledge, the CIVIC's mission is to make contributing to Ethereum L1 R&D economically rational on a risk-adjusted basis, while avoiding capture.",
+          "Center for Civilians in Conflict (CIVIC) is an international organization dedicated to promoting the protection of civilians caught in conflict.",
       },
     },
   ],
@@ -335,7 +310,7 @@ export const civicTenantUIConfig = new TenantUI({
     },
     {
       name: "forums",
-      enabled: false,
+      enabled: true,
     },
     {
       name: "notifications",
