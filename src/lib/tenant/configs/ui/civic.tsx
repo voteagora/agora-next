@@ -346,5 +346,9 @@ export const civicTenantUIConfig = new TenantUI({
       name: "footer/hide-changelog",
       enabled: true,
     },
+    {
+      name: "hide-governor-settings",
+      enabled: true,
+    },
   ],
 });
