@@ -77,9 +77,9 @@ export const civicTenantUIConfig = new TenantUI({
         "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
         title: "CIVIC Governance",
-        description: "Home of CIVIC Governance",
+        description: "Home of CIVIC community engagement",
         imageTitle: "CIVIC Governance",
-        imageDescription: "Home of CIVIC Governance",
+        imageDescription: "Home of CIVIC community engagement",
       },
     },
     {
@@ -89,16 +89,16 @@ export const civicTenantUIConfig = new TenantUI({
         "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
         title: "CIVIC Proposals",
-        description: "View and vote on CIVIC governance proposals",
+        description: "View and vote on CIVIC community proposals",
         imageTitle: "CIVIC Proposals",
-        imageDescription: "View and vote on CIVIC governance proposals",
+        imageDescription: "View and vote on CIVIC community proposals",
       },
     },
     {
       route: "delegates",
       title: "CIVIC Voters",
       description:
-        "CIVIC members participate in governance through voting and delegation. Delegate your voting power to a trusted representative.",
+        "CIVIC supporters participate in community decisions through voting and delegation. Delegate your voting power to a trusted representative.",
       meta: {
         title: "CIVIC Voters",
         description: "Delegate your voting power to a trusted representative",
@@ -115,9 +115,9 @@ export const civicTenantUIConfig = new TenantUI({
       hero: civicHero,
       meta: {
         title: "About CIVIC Governance",
-        description: "Learn about CIVIC governance",
+        description: "Learn about CIVIC community engagement",
         imageTitle: "About CIVIC Governance",
-        imageDescription: "Learn about CIVIC governance",
+        imageDescription: "Learn about CIVIC community engagement",
       },
       links: [
         {
@@ -133,8 +133,8 @@ export const civicTenantUIConfig = new TenantUI({
           image: civicInfo2,
         },
         {
-          name: "Governance",
-          title: "Governance",
+          name: "Community",
+          title: "Community",
           url: "/",
           image: civicInfo3,
         },
@@ -157,8 +157,8 @@ export const civicTenantUIConfig = new TenantUI({
           and through peacekeeping operations worldwide. CIVIC engages directly
           with armed actors, governments, and international institutions to
           develop practical guidance and policies that reduce civilian harm.
-          This governance platform enables community members to vote on
-          proposals, delegate voting power, and help shape CIVIC&apos;s
+          This community engagement platform enables supporters to provide input
+          on proposals, delegate voting power, and help shape CIVIC&apos;s
           strategic direction.
         </>
       ),
@@ -168,7 +168,7 @@ export const civicTenantUIConfig = new TenantUI({
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000" />,
           title: "Voting power",
           description:
-            "CIVIC members hold governance NFTs that grant voting rights. Each member has equal voting power in governance decisions.",
+            "CIVIC supporters can claim a free Supporter NFT that grants voting rights. Each member has equal voting power in all decisions.",
         },
         {
           icon: (
@@ -176,7 +176,7 @@ export const civicTenantUIConfig = new TenantUI({
           ),
           title: "Proposals",
           description:
-            "Proposals are submitted and voted on by the community. Members can vote directly or delegate to representatives they trust.",
+            "Proposals are submitted for community input. Members can vote directly or delegate to representatives they trust.",
         },
         {
           icon: (
@@ -187,7 +187,7 @@ export const civicTenantUIConfig = new TenantUI({
           ),
           title: "Thresholds",
           description:
-            "Governance decisions require a quorum and approval threshold to pass, ensuring broad community consensus.",
+            "Community decisions require a quorum and approval threshold to pass, ensuring broad consensus.",
         },
       ],
       meta: {
