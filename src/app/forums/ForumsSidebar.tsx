@@ -7,7 +7,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import CategoryList from "./CategoryList";
 
-const { namespace } = Tenant.current();
+const { namespace, ui } = Tenant.current();
 
 interface ForumsSidebarProps {
   selectedCategoryId?: number | null;
@@ -117,8 +117,8 @@ export default function ForumsSidebar({
             </div>
           )}
         </div>
-        {/* Official DUNA Admin Badge - hidden for CIVIC tenant */}
-        {namespace !== TENANT_NAMESPACES.CIVIC && (
+        {/* Official DUNA Admin Badge - only shown when DUNA is enabled */}
+        {ui.toggle("duna")?.enabled && (
           <div className="mt-4 pt-4 border-t border-border">
             <div className="bg-wash border border-line rounded-lg shadow-sm p-3">
               <div className="flex items-center gap-2 text-sm">

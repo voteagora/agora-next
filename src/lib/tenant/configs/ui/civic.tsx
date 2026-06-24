@@ -342,5 +342,9 @@ export const civicTenantUIConfig = new TenantUI({
         onchainTransactionTracking: true,
       },
     },
+    {
+      name: "footer/hide-changelog",
+      enabled: true,
+    },
   ],
 });
