@@ -350,5 +350,9 @@ export const civicTenantUIConfig = new TenantUI({
       name: "hide-governor-settings",
       enabled: true,
     },
+    {
+      name: "footer/community-engagement-tagline",
+      enabled: true,
+    },
   ],
 });
