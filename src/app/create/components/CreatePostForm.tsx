@@ -76,9 +76,10 @@ export function CreatePostForm({
   const { address } = useAccount();
   const tenant = Tenant.current();
   const { ui } = tenant;
+  const copy = ui.copy;
   const isDarkTenant = ui.theme === "dark";
   const tenantName = tenant.brandName || ui.organization?.title || ui.title;
-  const titlePlaceholder = `Add new appchain to ${tenantName}`;
+  const titlePlaceholder = copy.create.titlePlaceholder(tenantName);
   const submitClassName = isDarkTenant
     ? "bg-wash border border-line text-primary hover:bg-hoverBackground"
     : "bg-black text-white hover:bg-gray-800";
@@ -165,20 +166,20 @@ export function CreatePostForm({
                   {canCreateTempCheck ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
-                      You can create temp checks
+                      {copy.create.tempCheckPermissionGranted}
                     </span>
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
                       {!address
-                        ? "Wallet not connected"
-                        : "Insufficient voting power"}
+                        ? copy.create.noWallet
+                        : copy.create.insufficientVotingPower}
                     </span>
                   )}
                   <div className="text-xs mt-1">
                     {!address
-                      ? "Connect your wallet to check permissions"
-                      : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                      ? copy.create.connectWalletPermission
+                      : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} ${copy.nouns.votingPower}`}
                   </div>
                 </div>
               )}
@@ -193,25 +194,24 @@ export function CreatePostForm({
                   ) : !relatedTempChecks?.length ? (
                     <span className="text-secondary flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
-                      Select a successful temp check to continue
+                      {copy.create.selectSuccessfulTempCheck}
                     </span>
                   ) : canCreateGovernanceProposal ? (
                     <span className="text-green-600 flex items-center gap-1">
                       <CheckIcon className="h-4 w-4" />
-                      You are authorized to create proposal
+                      {copy.create.governanceProposalPermissionGranted}
                     </span>
                   ) : (
                     <span className="text-red-600 flex items-center gap-1">
                       <XMarkIcon className="h-4 w-4" />
-                      Only admins or temp check authors can create governance
-                      proposals
+                      {copy.create.onlyAdminsOrAuthorsCanCreateProposal}
                     </span>
                   )}
                   {!hasTownsNFT && relatedTempChecks?.length > 0 && (
                     <div className="text-xs mt-1">
                       {relatedTempChecks.some((tc) => tc.status === "SUCCEEDED")
-                        ? "You are the author of this temp check"
-                        : "Referenced temp check must be approved"}
+                        ? copy.create.tempCheckAuthorConfirmation
+                        : copy.create.tempCheckMustBeApproved}
                     </div>
                   )}
                 </div>
@@ -235,10 +235,10 @@ export function CreatePostForm({
                 className={submitClassName}
               >
                 {isSubmitting
-                  ? "Creating..."
+                  ? copy.create.creating
                   : postType === "tempcheck"
-                    ? "Create temp check"
-                    : "Create Proposal"}
+                    ? copy.create.createTempCheckButton
+                    : copy.create.createProposalButton}
               </Button>
             </div>
           </div>

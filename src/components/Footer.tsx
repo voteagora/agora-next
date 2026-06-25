@@ -3,10 +3,7 @@ import Tenant from "@/lib/tenant/tenant";
 
 const Footer: React.FC = () => {
   const { ui } = Tenant.current();
-  const footerTagline = ui.toggle("footer/community-engagement-tagline")
-    ?.enabled
-    ? ", the onchain community engagement company"
-    : ", the onchain governance company";
+  const footerTagline = ui.copy.footer.tagline;
 
   return (
     <footer className="text-secondary gap-1 flex w-full justify-center text-sm pt-4 pb-16 px-4">

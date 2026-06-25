@@ -17,6 +17,7 @@ import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 export const civicTenantUIConfig = new TenantUI({
   title: "CIVIC",
+  copyMode: "ngo",
   logo: civicLogo,
   logoSize: "52px",
   // CIVIC brand colors: Red #FF0D05, Teal #003246

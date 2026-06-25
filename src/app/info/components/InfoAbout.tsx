@@ -8,6 +8,7 @@ import { NotificationIcon } from "@/icons/NotificationIcon";
 import { CheckCircleBrokenIcon } from "@/icons/CheckCircleBrokenIcon";
 
 const { ui } = Tenant.current();
+const copy = ui.copy;
 
 const defaultTabs = [
   {
@@ -20,9 +21,8 @@ const defaultTabs = [
         }
       />
     ),
-    title: "Delegate voting power",
-    description:
-      "The community is governed by its token holders, represented by trusted delegates.",
+    title: copy.info.defaultTabs.delegateTitle,
+    description: copy.info.defaultTabs.delegateDescription,
   },
   {
     icon: (
@@ -34,9 +34,8 @@ const defaultTabs = [
         }
       />
     ),
-    title: "Browse proposals",
-    description:
-      "Governance decisions are initiated as proposals, providing insights into the priorities of the community.",
+    title: copy.info.defaultTabs.proposalsTitle,
+    description: copy.info.defaultTabs.proposalsDescription,
   },
   {
     icon: (
@@ -48,9 +47,8 @@ const defaultTabs = [
         }
       />
     ),
-    title: "Vote on proposals",
-    description:
-      "Proposals that advance to a vote are accepted or rejected by the community’s delegates.",
+    title: copy.info.defaultTabs.voteTitle,
+    description: copy.info.defaultTabs.voteDescription,
   },
 ];
 

@@ -112,6 +112,7 @@ export const ProfileDropDownContent = ({
   const hasSiweSession = !!jwt;
 
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const filteredDelegations = useMemo(() => {
     return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
   }, [delegatees]);
@@ -143,7 +144,9 @@ export const ProfileDropDownContent = ({
       <div className="flex flex-col p-6 border-b border-line">
         <PanelRow
           title={
-            filteredDelegations?.length > 1 ? "My Delegates" : "My Delegate"
+            filteredDelegations?.length > 1
+              ? copy.delegates.profile.myRepresentatives
+              : copy.delegates.profile.myRepresentative
           }
           detail={
             <div className="flex flex-col gap-4">

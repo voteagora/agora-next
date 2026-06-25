@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
   const [activeNavItem, setActiveNavItem] = useState(null);
   const navRef = useRef(null);
@@ -98,7 +99,7 @@ export default function Navbar() {
           isActive={activeNavItem === "proposals"}
           onClick={() => handleNavClick("proposals")}
         >
-          Proposals
+          {copy.nav.proposals}
         </HeaderLink>
       )}
 
@@ -111,7 +112,7 @@ export default function Navbar() {
           isActive={activeNavItem === "coming-soon"}
           onClick={() => handleNavClick("coming-soon")}
         >
-          Governance
+          {copy.nav.governance}
         </HeaderLink>
       )}
 
@@ -124,7 +125,7 @@ export default function Navbar() {
           isActive={activeNavItem === "forums"}
           onClick={() => handleNavClick("forums")}
         >
-          Discussions
+          {copy.nav.discussions}
         </HeaderLink>
       )}
       {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
@@ -136,7 +137,7 @@ export default function Navbar() {
           isActive={activeNavItem === "delegates"}
           onClick={() => handleNavClick("delegates")}
         >
-          Voters
+          {copy.nav.delegates}
         </HeaderLink>
       )}
 
@@ -175,7 +176,7 @@ export default function Navbar() {
           isActive={activeNavItem === "grants"}
           onClick={() => handleNavClick("grants")}
         >
-          Grants
+          {copy.nav.grants}
         </HeaderLink>
       )}
 
@@ -188,7 +189,7 @@ export default function Navbar() {
           isActive={activeNavItem === "info"}
           onClick={() => handleNavClick("info")}
         >
-          {hasDuna ? "About" : "Info"}
+          {hasDuna ? copy.nav.about : copy.nav.info}
         </HeaderLink>
       )}
 
@@ -201,7 +202,7 @@ export default function Navbar() {
           isActive={activeNavItem === "financials"}
           onClick={() => handleNavClick("financials")}
         >
-          Financials
+          {copy.nav.financials}
         </HeaderLink>
       )}
     </div>

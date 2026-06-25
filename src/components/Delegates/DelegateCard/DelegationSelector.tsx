@@ -24,7 +24,8 @@ export function DelegationSelector({
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
 
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
+  const copy = ui.copy;
   const hasAlligator = contracts?.alligator;
 
   // gets the delegatees for the connected account
@@ -78,7 +79,9 @@ export function DelegationSelector({
                 show?.();
               }}
             >
-              {isConnectedAccountDelegate ? "Undelegate" : "Delegate"}
+              {isConnectedAccountDelegate
+                ? copy.delegates.delegation.undelegateAction
+                : copy.delegates.delegation.action}
             </UpdatedButton>
           )}
         </ConnectKitButton.Custom>

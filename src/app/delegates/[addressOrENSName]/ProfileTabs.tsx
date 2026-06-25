@@ -2,6 +2,7 @@
 
 import { useQueryState } from "nuqs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Tenant from "@/lib/tenant/tenant";
 
 const TAB_PARAM = "tab";
 
@@ -12,6 +13,8 @@ export function ProfileTabs({
   initialTab: string;
   children: React.ReactNode;
 }) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [activeTab, setTab] = useQueryState(TAB_PARAM, {
     defaultValue: initialTab,
     history: "push",
@@ -26,13 +29,13 @@ export function ProfileTabs({
     >
       <TabsList className="mb-8">
         <TabsTrigger value="statement" variant="underlined">
-          Statement
+          {copy.delegates.profile.statementTab}
         </TabsTrigger>
         <TabsTrigger value="participation" variant="underlined">
-          Participation
+          {copy.delegates.profile.participationTab}
         </TabsTrigger>
         <TabsTrigger value="delegations" variant="underlined">
-          Delegations
+          {copy.delegates.profile.delegationsTab}
         </TabsTrigger>
       </TabsList>
       {children}

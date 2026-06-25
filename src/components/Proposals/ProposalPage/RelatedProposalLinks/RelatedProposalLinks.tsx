@@ -11,27 +11,33 @@ import {
 import { useProposalLinksWithDetails } from "@/hooks/useProposalLinksWithDetails";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath } from "@/lib/forumUtils";
+import Tenant from "@/lib/tenant/tenant";
+import type { TenantCopy } from "@/lib/tenant/tenantCopy";
 
 interface RelatedProposalLinksProps {
   proposalId: string;
 }
 
-function getHeaderText(type: string, relationship: "source" | "target") {
+function getHeaderText(
+  type: string,
+  relationship: "source" | "target",
+  copy: TenantCopy
+) {
   if (type === "forum_topic") {
     return relationship === "target"
-      ? "Related Discussion"
-      : "Referenced in Discussion";
+      ? copy.forums.relatedDiscussion
+      : copy.forums.referencedInDiscussion;
   }
 
   if (type === "tempcheck") {
     return relationship === "target"
-      ? "Related Temp check"
-      : "Referenced in Temp check";
+      ? copy.forums.relatedTempCheck
+      : copy.forums.referencedInTempCheck;
   }
 
   return relationship === "target"
-    ? "Related Proposal"
-    : "Referenced in Proposal";
+    ? copy.forums.relatedProposal
+    : copy.forums.referencedInProposal;
 }
 
 function getIcon(type: string) {
@@ -61,7 +67,9 @@ function RelatedLinkCard({
     };
   };
 }) {
-  const headerText = getHeaderText(link.type, link.relationship);
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+  const headerText = getHeaderText(link.type, link.relationship, copy);
   const isTempCheck = link.type === "tempcheck";
   const isForumTopic = link.type === "forum_topic";
   const Icon = getIcon(link.type);
@@ -114,7 +122,7 @@ function RelatedLinkCard({
               {isTempCheck && (
                 <div className="inline-flex items-center gap-1.5 bg-wash px-2 py-1 rounded">
                   <span className="text-red-500">🌡️</span>
-                  <span>Temp Check</span>
+                  <span>{copy.forums.relatedTempCheck}</span>
                 </div>
               )}
             </div>

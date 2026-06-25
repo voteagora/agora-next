@@ -22,6 +22,7 @@ interface MobileNavMenuProps {
 export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const pathname = usePathname() || "";
   const { ui, token, contracts } = Tenant.current();
+  const copy = ui.copy;
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
   const { votableSupply, totalSupply, isLoading } = useDAOMetrics();
@@ -87,7 +88,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasProposals
       ? [
           {
-            name: "Proposals",
+            name: copy.nav.proposals,
             href: hasProposalsHref
               ? ui.page("proposals")?.href || "/proposals"
               : "/proposals",
@@ -99,7 +100,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasDelegates
       ? [
           {
-            name: "Voters",
+            name: copy.nav.delegates,
             href: "/delegates",
             target: "_self",
             isActive: pathname.includes("delegates"),
@@ -129,7 +130,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasGrants
       ? [
           {
-            name: "Grants",
+            name: copy.nav.grants,
             href: "/grants",
             target: "_self",
             isActive: pathname.includes("grants"),
@@ -139,7 +140,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasInfo
       ? [
           {
-            name: hasDuna ? "About" : "Info",
+            name: hasDuna ? copy.nav.about : copy.nav.info,
             href: "/info",
             target: "_self",
             isActive: pathname.includes("info"),
@@ -149,7 +150,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasDuna
       ? [
           {
-            name: "Financials",
+            name: copy.nav.financials,
             href: "/financials",
             target: "_self",
             isActive: pathname.includes("financials"),
@@ -159,7 +160,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasComingSoon
       ? [
           {
-            name: "Governance",
+            name: copy.nav.governance,
             href: "/coming-soon",
             target: "_self",
             isActive: pathname.includes("coming-soon"),
@@ -169,7 +170,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
     ...(hasForums
       ? [
           {
-            name: "Discussions",
+            name: copy.nav.discussions,
             href: "/forums",
             target: "_self",
             isActive: pathname.includes("forums"),
@@ -179,7 +180,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   ];
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} side="left" title="Menu">
+    <Drawer isOpen={isOpen} onClose={onClose} side="left" title={copy.nav.menu}>
       <div className="flex flex-col h-full">
         <div className="pl-4 pr-6 py-8 flex flex-col justify-start items-start text-primary">
           {navItems.map((item) => (
@@ -338,7 +339,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
               height={21}
             />
             <div className="justify-start text-primary font-normal text-sm">
-              Onchain Governance
+              {copy.footer.shortTagline}
             </div>
           </div>
         </div>

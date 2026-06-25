@@ -64,6 +64,7 @@ export function DelegateDialog({
   const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const [isReady, setIsReady] = useState(false);
   const { ui, contracts, token } = Tenant.current();
+  const copy = ui.copy;
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const {
@@ -397,7 +398,7 @@ export function DelegateDialog({
     if (isDisabledInTenant) {
       return (
         <Button disabled={true}>
-          {token.symbol} delegation is disabled at this time
+          {copy.delegates.delegation.disabled(token.symbol)}
         </Button>
       );
     }
@@ -405,7 +406,7 @@ export function DelegateDialog({
     if (sameDelegatee) {
       return (
         <ShadcnButton variant="outline" className="cursor-not-allowed">
-          You cannot delegate to the same address again
+          {copy.delegates.delegation.sameAddress}
         </ShadcnButton>
       );
     }
@@ -418,20 +419,22 @@ export function DelegateDialog({
     ) {
       return (
         <Button disabled={false} onClick={executeDelegate}>
-          Delegation failed - try again
+          {copy.delegates.delegation.failed}
         </Button>
       );
     }
 
     if (isProcessingDelegation || isProcessingSponsoredDelegation) {
-      return <Button disabled={true}>Submitting your delegation...</Button>;
+      return (
+        <Button disabled={true}>{copy.delegates.delegation.submitting}</Button>
+      );
     }
 
     if (didProcessDelegation || didProcessSponsoredDelegation) {
       return (
         <div>
           <Button className="w-full" disabled={false}>
-            Delegation completed!
+            {copy.delegates.delegation.completed}
           </Button>
           <BlockScanUrls
             hash1={isGasRelayLive ? sponsoredTxnHash : directDelegationTxHash}
@@ -440,7 +443,11 @@ export function DelegateDialog({
       );
     }
 
-    return <ShadcnButton onClick={executeDelegate}>Delegate</ShadcnButton>;
+    return (
+      <ShadcnButton onClick={executeDelegate}>
+        {copy.delegates.delegation.action}
+      </ShadcnButton>
+    );
   };
 
   useEffect(() => {
@@ -480,7 +487,7 @@ export function DelegateDialog({
           <div className="flex flex-col gap-3 items-center py-3 w-full text-tertiary text-xs">
             <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center w-full py-8 px-2">
               <div className="flex flex-row items-center gap-1">
-                Your total delegatable votes
+                {copy.delegates.delegation.totalDelegatableVotes}
               </div>
               <AdvancedDelegationDisplayAmount
                 amount={
@@ -497,7 +504,7 @@ export function DelegateDialog({
                 />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Currently delegated to
+                    {copy.delegates.delegation.currentDelegate}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegatee.delegatee} />
@@ -515,7 +522,7 @@ export function DelegateDialog({
                 />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Delegating to
+                    {copy.delegates.delegation.delegatingTo}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />
@@ -527,18 +534,19 @@ export function DelegateDialog({
         ) : (
           <div className="flex flex-col gap-4">
             <p className="text-xl font-bold text-left text-primary">
-              Set <ENSName address={delegate.address} /> as your delegate
+              Set <ENSName address={delegate.address} /> as your{" "}
+              {copy.nouns.representative}
             </p>
             <div className="text-secondary">
               <ENSName address={delegate.address} /> will be able to vote with
-              any token owned by your address
+              the voting power owned by your address
             </div>
             <div className="flex flex-col relative border border-line rounded-lg">
               <div className="flex flex-row items-center gap-3 p-2 border-b border-line">
                 <ENSAvatar ensName={""} className="h-10 w-10" size={40} />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Currently delegated to
+                    {copy.delegates.delegation.currentDelegate}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <p>N/A</p>
@@ -557,7 +565,7 @@ export function DelegateDialog({
 
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Delegating to
+                    {copy.delegates.delegation.delegatingTo}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegate.address} />

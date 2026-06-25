@@ -46,6 +46,7 @@ const CreateProposalDraftButton = ({
   const { chain } = useAccount();
   const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const protocolLevelCreateProposalButtonCheck = (
     ui.toggle("proposal-lifecycle")?.config as PLMConfig
   )?.protocolLevelCreateProposalButtonCheck;
@@ -277,7 +278,7 @@ const CreateProposalDraftButton = ({
         await createDraftProposal();
       }}
     >
-      Create proposal
+      {copy.proposals.createButton}
     </UpdatedButton>
   );
 };

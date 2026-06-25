@@ -29,6 +29,7 @@ export default function DelegateCard({
   // Display SCW if exists
   const hasSCWAddress = Boolean(delegate.statement?.scw_address);
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const useNeutral =
     ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
@@ -60,18 +61,18 @@ export default function DelegateCard({
               <PanelRow
                 title={
                   <span className="inline-flex items-center">
-                    Voting power
+                    {copy.delegates.table.votingPower}
                     <VotingPowerInfoTooltip />
                   </span>
                 }
                 detail={formatNumber(delegate.votingPower.total)}
               />
               <PanelRow
-                title="Delegated addresses"
+                title={copy.delegates.table.delegators}
                 detail={delegate.numOfDelegators.toString()}
               />
               <PanelRow
-                title="Proposals created"
+                title={`${copy.proposals.tabTitle} created`}
                 detail={`${delegate.proposalsCreated}`}
               />
               <PanelRow
