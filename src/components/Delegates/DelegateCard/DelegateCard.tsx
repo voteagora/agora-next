@@ -43,6 +43,8 @@ export default function DelegateCard({
           <DelegateProfileImageWithMetadata
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
+            username={delegate.statement?.username}
+            avatar={delegate.statement?.avatar}
             votingPower={delegate.votingPower.total}
             copyable={true}
             description={description}

@@ -461,6 +461,9 @@ async function getDelegates({
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
+                      address,
+                      username,
+                      avatar,
                       signature,
                       payload,
                       twitter,
@@ -504,6 +507,9 @@ async function getDelegates({
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
+                      address,
+                      username,
+                      avatar,
                       signature,
                       payload,
                       twitter,
@@ -544,6 +550,9 @@ async function getDelegates({
                 (SELECT row_to_json(sub)
                   FROM (
                     SELECT
+                      address,
+                      username,
+                      avatar,
                       signature,
                       payload,
                       twitter,
@@ -675,6 +684,9 @@ async function getDelegate(addressOrENSName: string): Promise<Delegate> {
             (SELECT row_to_json(sub) as statement
             FROM (
               SELECT
+                address,
+                username,
+                avatar,
                 signature,
                 payload,
                 twitter,

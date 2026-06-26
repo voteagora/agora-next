@@ -113,6 +113,8 @@ interface MappedDelegate {
   };
   statement: {
     address: string;
+    username: string | null;
+    avatar: string | null;
     payload: {
       delegateStatement: string;
       topIssues: { type: string; value: string }[];

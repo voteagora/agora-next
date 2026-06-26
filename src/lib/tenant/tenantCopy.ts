@@ -210,6 +210,7 @@ export type TenantCopy = {
       submitting: string;
       completed: string;
       action: string;
+      selfAction: string;
       setRepresentative: (representative: string) => string;
       canVoteWithTokens: (representative: string) => string;
       totalDelegatableVotes: string;
@@ -240,6 +241,9 @@ export type TenantCopy = {
       additionalVotesSuffix: string;
       encourageTitle: string;
       encourageDescription: string;
+      circularDelegationSelfTarget: string;
+      circularDelegationDelegatorTarget: string;
+      circularDelegationUnsupported: (target: string) => string;
     };
     statement: {
       requiredToVote: string;
@@ -560,6 +564,7 @@ const daoCopy: TenantCopy = {
       submitting: "Submitting your delegation...",
       completed: "Delegation completed!",
       action: "Delegate",
+      selfAction: "Delegate to self",
       setRepresentative: (representative) =>
         `Set ${representative} as your delegate`,
       canVoteWithTokens: (representative) =>
@@ -599,6 +604,10 @@ const daoCopy: TenantCopy = {
       encourageTitle: "Governance starts with you!",
       encourageDescription:
         "Your tokens matter - connect your wallet to delegate your voting power and shape the future of the collective.",
+      circularDelegationSelfTarget: "yourself",
+      circularDelegationDelegatorTarget: "your direct or indirect delegator",
+      circularDelegationUnsupported: (target) =>
+        `Delegating back to ${target} is not supported`,
     },
     statement: {
       requiredToVote:
@@ -868,6 +877,7 @@ const ngoCopy: TenantCopy = {
       submitting: "Submitting your representative assignment...",
       completed: "Representative assignment completed!",
       action: "Assign representative",
+      selfAction: "Assign yourself",
       setRepresentative: (representative) =>
         `Set ${representative} as your representative`,
       canVoteWithTokens: (representative) =>
@@ -906,6 +916,11 @@ const ngoCopy: TenantCopy = {
       encourageTitle: "Community voting starts with you!",
       encourageDescription:
         "Your supporter tokens matter - connect your wallet to assign representation and help shape the future of the community.",
+      circularDelegationSelfTarget: "yourself",
+      circularDelegationDelegatorTarget:
+        "your direct or indirect representative",
+      circularDelegationUnsupported: (target) =>
+        `Assigning representation back to ${target} is not supported`,
     },
     statement: {
       requiredToVote:
@@ -921,11 +936,7 @@ const ngoCopy: TenantCopy = {
       principlesRequired:
         "You must agree with the organization principles to continue",
       title: "Voter statement",
-      defaultPlaceholder: `A brief intro to yourself:
-
-A message to the supporter community:
-
-Forum username:`,
+      defaultPlaceholder: `A brief intro to yourself:`,
     },
     profile: {
       myRepresentative: "My Representative",

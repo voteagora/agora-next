@@ -11,7 +11,7 @@ export default function DelegateStatementInputGroup({
   title,
 }: {
   form: UseFormReturn<DelegateStatementFormValues>;
-  name: "discord" | "twitter" | "warpcast";
+  name: "discord" | "twitter" | "warpcast" | "username" | "avatar";
   placeholder: string;
   title: string;
 }) {

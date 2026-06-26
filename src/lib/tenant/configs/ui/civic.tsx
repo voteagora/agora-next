@@ -228,6 +228,18 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "delegates/profile-metadata",
+      enabled: true,
+    },
+    {
+      name: "delegates/hide-discord-input",
+      enabled: true,
+    },
+    {
+      name: "delegates/hide-warpcast-input",
+      enabled: true,
+    },
+    {
       name: "snapshotVotes",
       enabled: false,
     },
