@@ -5,6 +5,7 @@ import {
   fetchProposalFromArchive,
   fetchRawProposalVotesFromArchive,
 } from "@/lib/archiveUtils";
+import { normalizeArchiveVoteParams } from "@/lib/archiveVoteHistory";
 import { archiveToProposal } from "@/lib/proposals";
 import { ParsedProposalData } from "@/lib/proposalUtils";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -59,7 +60,9 @@ async function loadVoteRows(
     return archiveVotes.map((vote) => ({
       address: vote.voter,
       votingPower: vote.vp ?? vote.weight ?? 0,
-      ranking: (vote.choice ?? []).map((rank) => choices[rank - 1]).join(","),
+      ranking: (normalizeArchiveVoteParams(vote.choice ?? vote.params) ?? [])
+        .map((rank) => choices[rank - 1])
+        .join(","),
     }));
   }
 

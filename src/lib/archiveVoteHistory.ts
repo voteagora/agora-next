@@ -95,6 +95,63 @@ function parseNullableBigInt(
   }
 }
 
+function parseArchiveVoteParamIndex(value: unknown) {
+  if (typeof value === "string" && !/^\d+$/.test(value.trim())) {
+    return null;
+  }
+
+  const parsed =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim()
+        ? Number(value)
+        : null;
+
+  return parsed !== null && Number.isInteger(parsed) ? parsed : null;
+}
+
+export function isEncryptedArchiveVoteChoice(value: unknown) {
+  return (
+    typeof value === "string" &&
+    /^0x[0-9a-f]+$/i.test(value.trim()) &&
+    value.trim().length > 10
+  );
+}
+
+export function normalizeArchiveVoteParams(value: unknown): number[] | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map(parseArchiveVoteParamIndex)
+      .filter((param): param is number => param !== null);
+  }
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return null;
+    }
+
+    if (trimmedValue.startsWith("[") || trimmedValue.startsWith("{")) {
+      try {
+        return normalizeArchiveVoteParams(JSON.parse(trimmedValue));
+      } catch {
+        return null;
+      }
+    }
+
+    if (trimmedValue.includes(",")) {
+      return normalizeArchiveVoteParams(trimmedValue.split(","));
+    }
+  }
+
+  const singleParam = parseArchiveVoteParamIndex(value);
+  return singleParam === null ? null : [singleParam];
+}
+
 function getTokenScale(tokenDecimals = DEFAULT_ARCHIVE_TOKEN_DECIMALS) {
   return 10n ** BigInt(Math.max(0, Math.trunc(tokenDecimals)));
 }
@@ -439,9 +496,13 @@ export function transformArchiveVoteRows(
     const vp = row.weight !== undefined ? String(row.weight) : undefined;
     const vpForCopelanProposalType =
       row.vp !== undefined ? String(row.vp) : undefined;
+    const rawParams =
+      proposalType === "SNAPSHOT"
+        ? (row.choice ?? row.params)
+        : (row.params ?? row.choice);
 
     acc.push({
-      transactionHash: row.transaction_hash ?? null,
+      transactionHash: row.transaction_hash ?? row.id ?? null,
       address,
       support,
       weight: vp || vpForCopelanProposalType || "0",
@@ -457,7 +518,7 @@ export function transformArchiveVoteRows(
       proposalId,
       proposalType,
       reason: row.reason ?? null,
-      params: row.params || row.choice || null,
+      params: normalizeArchiveVoteParams(rawParams),
       blockNumber: parseNullableBigInt(row.block_number),
       timestamp: row.ts ? new Date(Number(row.ts)) : null,
     });

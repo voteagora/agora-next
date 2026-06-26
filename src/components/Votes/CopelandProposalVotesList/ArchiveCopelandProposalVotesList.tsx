@@ -45,7 +45,8 @@ export default function ArchiveCopelandProposalVotesList({
   const normalizedVotes = useMemo(() => {
     return votes.map((vote): SnapshotVote => {
       // For Copeland votes, params contains the ranked choices
-      const choiceLabels = vote.params?.map((idx) => choices[idx - 1]) ?? [];
+      const rankedChoiceIndexes = Array.isArray(vote.params) ? vote.params : [];
+      const choiceLabels = rankedChoiceIndexes.map((idx) => choices[idx - 1]);
 
       return {
         id: vote.transactionHash || `${vote.address}-${vote.blockNumber}`,
