@@ -7,8 +7,10 @@ import {
 import { formatNumber, getBlockScanAddress } from "@/lib/utils";
 import {
   getFriendlyName,
+  getRoleName,
   getSchemaName,
   hasFriendlyName,
+  hasRoleName,
   hasSchemaName,
 } from "./knownAddresses";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
@@ -819,6 +821,59 @@ export const KNOWN_SELECTORS: Record<string, SelectorAdapter> = {
             </div>
           )}
         </div>
+      );
+    },
+  },
+
+  // ── Access Control ──
+
+  // grantRole(bytes32,address)
+  "0x2f2ff15d": {
+    name: "grantRole",
+    prettyName: "Grant Role",
+    prettyRender: (decodedData, target) => {
+      const role = collectByType(decodedData.parameters, "bytes32")[0];
+      const account = collectByType(decodedData.parameters, "address")[0];
+      const roleName = role ? getRoleName(role) : null;
+
+      return (
+        <span className="text-sm text-primary">
+          Grant{" "}
+          {roleName ? (
+            <LabelWithTooltip label={roleName} tooltip={role} />
+          ) : (
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-xs">
+              {role?.slice(0, 10)}...
+            </code>
+          )}{" "}
+          to {maybeFriendlyAddress(account)} on {maybeFriendlyAddress(target)}.
+        </span>
+      );
+    },
+  },
+
+  // revokeRole(bytes32,address)
+  "0xd547741f": {
+    name: "revokeRole",
+    prettyName: "Revoke Role",
+    prettyRender: (decodedData, target) => {
+      const role = collectByType(decodedData.parameters, "bytes32")[0];
+      const account = collectByType(decodedData.parameters, "address")[0];
+      const roleName = role ? getRoleName(role) : null;
+
+      return (
+        <span className="text-sm text-primary">
+          Revoke{" "}
+          {roleName ? (
+            <LabelWithTooltip label={roleName} tooltip={role} />
+          ) : (
+            <code className="bg-neutral px-1.5 py-0.5 rounded font-mono text-xs">
+              {role?.slice(0, 10)}...
+            </code>
+          )}{" "}
+          from {maybeFriendlyAddress(account)} on {maybeFriendlyAddress(target)}
+          .
+        </span>
       );
     },
   },
