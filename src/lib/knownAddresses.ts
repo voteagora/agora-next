@@ -61,6 +61,7 @@ export const KNOWN_ADDRESSES: Record<string, string> = {
     "ETHRegistrarController (legacy controller.ens.eth)",
 
   "0x4f2083f5fbede34c2714affb3105539775f7fe64": "ENS Endowment (Safe)",
+  "0xdededd439ecf711e61f5aecef631579dba2c65db": "ENS Security Council (Term 2)",
   "0xf20325cf84b72e8bbf8d8984b8f0059b984b390b":
     "Zodiac Roles modifier (v1, ENS)",
   "0x703806e61847984346d2d7ddd853049627e50a40":
@@ -258,4 +259,35 @@ export function hasSchemaName(schemaUid: string): boolean {
 
 export function getTokenDecimals(address: string): number | null {
   return KNOWN_TOKEN_DECIMALS[address.toLowerCase()] ?? null;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Known Access Control Roles (bytes32 hashes)
+// ────────────────────────────────────────────────────────────────────────────
+
+export const KNOWN_ROLES: Record<string, string> = {
+  // Standard OpenZeppelin AccessControl / TimelockController roles
+  // DEFAULT_ADMIN_ROLE is bytes32(0) in OZ AccessControl
+  "0x0000000000000000000000000000000000000000000000000000000000000000":
+    "DEFAULT_ADMIN_ROLE",
+  // keccak256("CANCELLER_ROLE")
+  "0xfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783":
+    "CANCELLER_ROLE",
+  // keccak256("EXECUTOR_ROLE")
+  "0xd8aa0f3194971a2a116679f7c2090f6939c8d4e01a2a8d7e41d55e5351469e63":
+    "EXECUTOR_ROLE",
+  // keccak256("PROPOSER_ROLE")
+  "0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1":
+    "PROPOSER_ROLE",
+  // keccak256("TIMELOCK_ADMIN_ROLE")
+  "0x5f58e3a2316349923ce3780f8d587db2d72378aed66a8261c916544fa6846ca5":
+    "TIMELOCK_ADMIN_ROLE",
+};
+
+export function getRoleName(roleHash: string): string | null {
+  return KNOWN_ROLES[roleHash.toLowerCase()] ?? null;
+}
+
+export function hasRoleName(roleHash: string): boolean {
+  return roleHash.toLowerCase() in KNOWN_ROLES;
 }
