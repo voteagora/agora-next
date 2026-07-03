@@ -63,13 +63,9 @@ function isEmbeddedPrivyWalletClient(walletClientType?: string) {
   return walletClientType === "privy" || walletClientType === "privy-v2";
 }
 
-function hasEmbeddedPrivyWallet(user: User | null) {
+function hasLinkedWallet(user: User | null) {
   return (
-    user?.linkedAccounts.some(
-      (account) =>
-        account.type === "wallet" &&
-        isEmbeddedPrivyWalletClient(account.walletClientType)
-    ) ?? false
+    user?.linkedAccounts.some((account) => account.type === "wallet") ?? false
   );
 }
 
@@ -99,7 +95,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     onSuccess: () => toast.success("Signed out"),
   });
   const { createWallet } = useCreateWallet();
-  const embeddedPrivyWalletExists = hasEmbeddedPrivyWallet(user);
+  const linkedWalletExists = hasLinkedWallet(user);
 
   const getPreferredWallet = useCallback(
     () =>
@@ -141,9 +137,9 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
         toast.error("Your wallet is still loading. Please try again shortly.");
         return;
       }
-      if (embeddedPrivyWalletExists) {
+      if (linkedWalletExists) {
         toast.error(
-          "Your wallet is still syncing. Please refresh and try again."
+          "Your wallet connection is still syncing. Please refresh and try again."
         );
         return;
       }
@@ -154,8 +150,8 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
   }, [
     activateWallet,
     createMissingWallet,
-    embeddedPrivyWalletExists,
     getPreferredWallet,
+    linkedWalletExists,
     walletsReady,
   ]);
 
