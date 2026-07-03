@@ -11,17 +11,14 @@ import { useDisconnect } from "wagmi";
 
 type ConnectModalContextValue = {
   openConnectModal: () => void;
-  // connectkit-useModal-compatible, so call sites can swap the import only
-  setOpen: (open: boolean) => void;
-  open: boolean;
+  isOpen: boolean;
   disconnect: () => void;
   isConnecting: boolean;
 };
 
 export const ConnectModalContext = createContext<ConnectModalContextValue>({
   openConnectModal: () => {},
-  setOpen: () => {},
-  open: false,
+  isOpen: false,
   disconnect: () => {},
   isConnecting: false,
 });
@@ -34,8 +31,7 @@ export function ConnectKitModalBridge({ children }: PropsWithChildren) {
   const value = useMemo(
     () => ({
       openConnectModal: () => setOpen(true),
-      setOpen,
-      open,
+      isOpen: open,
       disconnect: () => disconnect(),
       isConnecting: false,
     }),

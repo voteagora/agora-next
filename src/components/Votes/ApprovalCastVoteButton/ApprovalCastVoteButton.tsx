@@ -128,7 +128,7 @@ function VoteButton({
   proposal: Proposal;
 }) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
 
   const missingVote = checkMissingVoteForDelegate(
     delegateVotes ?? [],
@@ -155,7 +155,7 @@ function VoteButton({
 
   if (!isConnected) {
     return (
-      <Button variant={"outline"} onClick={() => setOpen(true)}>
+      <Button variant={"outline"} onClick={() => openConnectModal()}>
         Connect wallet to vote
       </Button>
     );

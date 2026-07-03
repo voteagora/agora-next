@@ -2,10 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { Button } from "@/components/ui/button";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
+import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
 import type {
   ChannelType,
   PreferenceState,
@@ -13,16 +18,11 @@ import type {
   PreferencesResponse,
   Recipient,
 } from "@/lib/notification-center/types";
-import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ContactInformationSection, {
   renderStatusIcon,
 } from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
-import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 const CHANNEL_ORDER: ChannelType[] = [
   "email",
@@ -44,7 +44,7 @@ type ChannelStatusInfo = {
 
 export default function NotificationPreferencesClient() {
   const { address, isConnected } = useAccount();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const queryClient = useQueryClient();
   const openDialog = useOpenDialog();
   const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(
@@ -644,7 +644,7 @@ export default function NotificationPreferencesClient() {
             Connect your wallet to manage notification settings.
           </p>
         </div>
-        <Button className="w-fit" onClick={() => setOpen(true)}>
+        <Button className="w-fit" onClick={() => openConnectModal()}>
           Connect wallet
         </Button>
       </main>

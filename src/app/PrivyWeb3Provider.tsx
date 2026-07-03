@@ -9,16 +9,17 @@ import {
   useRef,
   useState,
 } from "react";
-import { type Chain } from "viem";
 import { mainnet } from "wagmi/chains";
 import {
   PrivyProvider,
+  useCreateWallet,
   usePrivy,
   useLogin,
   useLogout,
   useModalStatus,
   useWallets,
   type PrivyClientConfig,
+  type User,
 } from "@privy-io/react-auth";
 import {
   WagmiProvider,
@@ -27,55 +28,60 @@ import {
 } from "@privy-io/wagmi";
 import { useAccount, useDisconnect } from "wagmi";
 import { SIWEProvider } from "connectkit";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { hashFn } from "@wagmi/core/query";
-import toast, { Toaster } from "react-hot-toast";
+import { QueryClientProvider } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { inter } from "@/styles/fonts";
 import Footer from "@/components/Footer";
-import { PageContainer } from "@/components/Layout/PageContainer";
-import AgoraProvider from "@/contexts/AgoraContext";
-import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
 import { MiradorProvider } from "@/components/providers/MiradorProvider";
 import { ConnectModalContext } from "@/components/providers/ConnectModalContext";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import { shouldEnableMiradorWebClient } from "@/lib/mirador/config";
-import Tenant from "@/lib/tenant/tenant";
-import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import type { UIPrivyConfig } from "@/lib/tenant/tenantUI";
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { queryKeyHashFn: hashFn } },
-});
-
-const { contracts, ui } = Tenant.current();
-const shouldHideAgoraBranding = ui.hideAgoraBranding;
-const tokenChainId = toNumericChainId(contracts.token.chain.id);
-const normalizedTokenChain = {
-  ...contracts.token.chain,
-  id: tokenChainId,
-} as Chain;
+import {
+  AgoraAppShell,
+  normalizedTokenChain,
+  queryClient,
+  sharedTransports,
+  shouldHideAgoraBranding,
+} from "./web3ProviderShared";
 
 const wagmiConfig = createConfig({
   chains: [normalizedTokenChain, mainnet],
-  transports: {
-    [mainnet.id]: getTransportForChain(mainnet.id)!,
-    [tokenChainId]: getTransportForChain(tokenChainId)!,
-  },
+  transports: sharedTransports,
   ssr: true,
   // don't auto-discover injected wallets (e.g. Rabby) so Privy leads with the
   // email/social flow instead of jumping straight into the extension
   multiInjectedProviderDiscovery: false,
 });
 
+function shouldSuppressPrivyError(error: unknown) {
+  return String(error).includes("exited");
+}
+
+function isEmbeddedPrivyWalletClient(walletClientType?: string) {
+  return walletClientType === "privy" || walletClientType === "privy-v2";
+}
+
+function hasEmbeddedPrivyWallet(user: User | null) {
+  return (
+    user?.linkedAccounts.some(
+      (account) =>
+        account.type === "wallet" &&
+        isEmbeddedPrivyWalletClient(account.walletClientType)
+    ) ?? false
+  );
+}
+
 function PrivyConnectModalBridge({ children }: PropsWithChildren) {
-  const { authenticated, ready } = usePrivy();
-  const { wallets } = useWallets();
+  const { authenticated, ready, user } = usePrivy();
+  const { wallets, ready: walletsReady } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
   const { isConnected } = useAccount();
   const { disconnect: wagmiDisconnect } = useDisconnect();
   const { isOpen } = useModalStatus();
   const [authing, setAuthing] = useState(false);
+  const [creatingWallet, setCreatingWallet] = useState(false);
   const [syncTimedOut, setSyncTimedOut] = useState(false);
   const activatedAddressRef = useRef<string | null>(null);
 
@@ -84,7 +90,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     onError: (error) => {
       setAuthing(false);
       // Privy fires onError when the user closes the modal — not a real failure
-      if (!String(error).includes("exited")) {
+      if (!shouldSuppressPrivyError(error)) {
         toast.error("Couldn't sign in. Please try again.");
       }
     },
@@ -92,13 +98,66 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
   const { logout } = useLogout({
     onSuccess: () => toast.success("Signed out"),
   });
+  const { createWallet } = useCreateWallet();
+  const embeddedPrivyWalletExists = hasEmbeddedPrivyWallet(user);
+
+  const getPreferredWallet = useCallback(
+    () =>
+      wallets.find((w) => isEmbeddedPrivyWalletClient(w.walletClientType)) ??
+      wallets[0],
+    [wallets]
+  );
+
+  const activateWallet = useCallback(
+    async (wallet: (typeof wallets)[number]) => {
+      try {
+        await setActiveWallet(wallet);
+      } catch (error) {
+        activatedAddressRef.current = null;
+        console.error("Failed to connect Privy wallet", error);
+        toast.error("Couldn't connect your wallet. Please try again.");
+      }
+    },
+    [setActiveWallet]
+  );
+
+  const createMissingWallet = useCallback(() => {
+    if (creatingWallet) return;
+    setCreatingWallet(true);
+    void createWallet()
+      .catch((error) => {
+        console.error("Failed to create Privy wallet", error);
+        if (!shouldSuppressPrivyError(error)) {
+          toast.error("Couldn't create your wallet. Please try again.");
+        }
+      })
+      .finally(() => setCreatingWallet(false));
+  }, [createWallet, creatingWallet]);
 
   const connectActiveWallet = useCallback(() => {
-    const wallet =
-      wallets.find((w) => w.walletClientType === "privy") ?? wallets[0];
-    if (!wallet) return;
-    void setActiveWallet(wallet).catch(() => {});
-  }, [wallets, setActiveWallet]);
+    const wallet = getPreferredWallet();
+    if (!wallet) {
+      if (!walletsReady) {
+        toast.error("Your wallet is still loading. Please try again shortly.");
+        return;
+      }
+      if (embeddedPrivyWalletExists) {
+        toast.error(
+          "Your wallet is still syncing. Please refresh and try again."
+        );
+        return;
+      }
+      createMissingWallet();
+      return;
+    }
+    void activateWallet(wallet);
+  }, [
+    activateWallet,
+    createMissingWallet,
+    embeddedPrivyWalletExists,
+    getPreferredWallet,
+    walletsReady,
+  ]);
 
   // Privy auth state and the wagmi connector are separate: once the user is
   // authenticated, connect their wallet to wagmi so useAccount() reports it.
@@ -107,13 +166,12 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
       activatedAddressRef.current = null;
       return;
     }
-    const wallet =
-      wallets.find((w) => w.walletClientType === "privy") ?? wallets[0];
+    const wallet = getPreferredWallet();
     if (wallet && activatedAddressRef.current !== wallet.address) {
       activatedAddressRef.current = wallet.address;
-      void setActiveWallet(wallet).catch(() => {});
+      void activateWallet(wallet);
     }
-  }, [ready, authenticated, wallets, setActiveWallet]);
+  }, [ready, authenticated, getPreferredWallet, activateWallet]);
 
   // Fallback: if the embedded wallet never syncs to wagmi (authenticated but
   // isConnected stays false), stop the connecting spinner after a generous
@@ -130,7 +188,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
 
   const value = useMemo(() => {
     const open = () => {
-      if (authing) return;
+      if (authing || creatingWallet) return;
       if (!authenticated) {
         setAuthing(true);
         login();
@@ -141,21 +199,22 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     };
     return {
       openConnectModal: open,
-      setOpen: (shouldOpen: boolean) => {
-        if (shouldOpen) open();
-      },
-      open: isOpen,
+      isOpen,
       // logout() ends the Privy session; disconnect() drops the wagmi connector
       // so it doesn't linger as "connected" until a page reload
       disconnect: () => {
         wagmiDisconnect();
         void logout();
       },
-      isConnecting: authing || (authenticated && !isConnected && !syncTimedOut),
+      isConnecting:
+        authing ||
+        creatingWallet ||
+        (authenticated && !isConnected && !syncTimedOut),
     };
   }, [
     authing,
     authenticated,
+    creatingWallet,
     isConnected,
     syncTimedOut,
     login,
@@ -211,12 +270,7 @@ const PrivyWeb3Provider: FC<
                 enabled={siweProviderConfig.enabled}
               >
                 <PrivyConnectModalBridge>
-                  <ConnectButtonProvider>
-                    <PageContainer>
-                      <Toaster />
-                      <AgoraProvider>{children}</AgoraProvider>
-                    </PageContainer>
-                  </ConnectButtonProvider>
+                  <AgoraAppShell>{children}</AgoraAppShell>
                   {!shouldHideAgoraBranding && <Footer />}
                   <SpeedInsights />
                 </PrivyConnectModalBridge>

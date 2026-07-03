@@ -9,20 +9,19 @@ import {
 } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import NotificationPreferencesClient from "../NotificationPreferencesClient";
 import { useAccount } from "wagmi";
 import { useSIWE } from "connectkit";
-import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 import {
   clearStoredSiweSession,
   getStoredSiweJwt,
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
+import NotificationPreferencesClient from "../NotificationPreferencesClient";
 
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(),
@@ -112,7 +111,7 @@ vi.mock("../PreferencesMatrix", () => ({
 const openDialogMock = vi.fn();
 const signInMock = vi.fn();
 const signOutMock = vi.fn();
-const setOpenMock = vi.fn();
+const openConnectModalMock = vi.fn();
 const fetchMock = vi.fn();
 const address = "0x1234567890123456789012345678901234567890" as const;
 
@@ -173,9 +172,10 @@ describe("NotificationPreferencesClient", () => {
       status: "connected",
     } as unknown as ReturnType<typeof useAccount>);
     vi.mocked(useConnectModal).mockReturnValue({
-      open: false,
-      setOpen: setOpenMock,
-      openConnectModal: vi.fn(),
+      isOpen: false,
+      openConnectModal: openConnectModalMock,
+      disconnect: vi.fn(),
+      isConnecting: false,
     });
     vi.mocked(useSIWE).mockReturnValue({
       signIn: signInMock,

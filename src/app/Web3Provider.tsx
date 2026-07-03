@@ -2,8 +2,7 @@
 
 import { FC, PropsWithChildren } from "react";
 import dynamic from "next/dynamic";
-import { createConfig, WagmiProvider, type Transport } from "wagmi";
-import { inter } from "@/styles/fonts";
+import { createConfig, WagmiProvider } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import {
   coinbaseWallet,
@@ -11,30 +10,24 @@ import {
   safe,
   walletConnect,
 } from "wagmi/connectors";
-import Footer from "@/components/Footer";
-import { PageContainer } from "@/components/Layout/PageContainer";
 import { ConnectKitProvider, getDefaultConfig, SIWEProvider } from "connectkit";
-import AgoraProvider from "@/contexts/AgoraContext";
-import ConnectButtonProvider from "@/contexts/ConnectButtonContext";
-import { Toaster } from "react-hot-toast";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
-import Tenant from "@/lib/tenant/tenant";
-import { getTransportForChain, toNumericChainId } from "@/lib/utils";
-import { hashFn } from "@wagmi/core/query";
-import { MiradorProvider } from "@/components/providers/MiradorProvider";
+import { QueryClientProvider } from "@tanstack/react-query";
+import Footer from "@/components/Footer";
 import { ConnectKitModalBridge } from "@/components/providers/ConnectModalContext";
+import { MiradorProvider } from "@/components/providers/MiradorProvider";
+import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import { shouldEnableMiradorWebClient } from "@/lib/mirador/config";
 import type { UIPrivyConfig } from "@/lib/tenant/tenantUI";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      queryKeyHashFn: hashFn,
-    },
-  },
-});
+import { inter } from "@/styles/fonts";
+import {
+  AgoraAppShell,
+  normalizedTokenChain,
+  queryClient,
+  sharedTransports,
+  shouldHideAgoraBranding,
+  web3Ui,
+} from "./web3ProviderShared";
 
 const metadata = {
   name: "Agora Next",
@@ -46,21 +39,14 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
-const { contracts, ui } = Tenant.current();
-const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
 const PrivyWeb3Provider = dynamic(() => import("./PrivyWeb3Provider"));
 
-const privyToggle = ui.toggle("privy-login");
+const privyToggle = web3Ui.toggle("privy-login");
 const privyConfig =
   privyToggle?.enabled && (privyToggle.config as UIPrivyConfig)?.appId
     ? (privyToggle.config as UIPrivyConfig)
     : undefined;
-
-// Force a numeric id (handles cases like "eip155:11155420")
-const tokenChainId = toNumericChainId(contracts.token.chain.id);
-
-const normalizedTokenChain = { ...contracts.token.chain, id: tokenChainId };
 
 function getConnectors() {
   const isSafeIframe =
@@ -102,10 +88,7 @@ export const config =
         ...getDefaultConfig({
           walletConnectProjectId: projectId,
           chains: [normalizedTokenChain, mainnet],
-          transports: {
-            [mainnet.id]: getTransportForChain(mainnet.id)!,
-            [tokenChainId]: getTransportForChain(tokenChainId)!,
-          },
+          transports: sharedTransports,
           appName: metadata.name,
           appDescription: metadata.description,
           appUrl: metadata.url,
@@ -117,10 +100,7 @@ export const config =
     : createConfig({
         ssr: true,
         chains: [normalizedTokenChain, mainnet],
-        transports: {
-          [mainnet.id]: getTransportForChain(mainnet.id)!,
-          [tokenChainId]: getTransportForChain(tokenChainId)!,
-        },
+        transports: sharedTransports,
       });
 
 const Web3Provider: FC<
@@ -159,12 +139,7 @@ const Web3Provider: FC<
 
                 {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
                 <ConnectKitModalBridge>
-                  <ConnectButtonProvider>
-                    <PageContainer>
-                      <Toaster />
-                      <AgoraProvider>{children}</AgoraProvider>
-                    </PageContainer>
-                  </ConnectButtonProvider>
+                  <AgoraAppShell>{children}</AgoraAppShell>
                 </ConnectKitModalBridge>
                 {!shouldHideAgoraBranding && <Footer />}
                 <SpeedInsights />

@@ -43,6 +43,7 @@ import {
   useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { getActiveWindowEthereumProvider } from "@/lib/wallet/activeInjectedProvider";
 import {
   getWalletErrorDiagnostics,
   getWalletErrorMessage,
@@ -81,7 +82,6 @@ export function DelegateDialog({
 
   // Gas relay settings
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
-  const isPrivyEnabled = ui.toggle("privy-login")?.enabled === true;
   const gasRelayConfig = ui.toggle("sponsoredDelegate")
     ?.config as UIGasRelayConfig;
 
@@ -306,18 +306,14 @@ export function DelegateDialog({
       });
 
       try {
-        if (
-          !isPrivyEnabled &&
-          typeof window !== "undefined" &&
-          window.ethereum
-        ) {
+        const activeWindowEthereumProvider =
+          await getActiveWindowEthereumProvider(connector);
+        if (activeWindowEthereumProvider) {
           // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
-          // (skipped for Privy tenants: window.ethereum is an injected extension
-          // like Rabby, NOT the Privy embedded wallet — use the wagmi path below)
           const publicClient = getPublicClient(contracts.token.chain);
           const walletClient = createWalletClient({
             chain: contracts.token.chain,
-            transport: custom(window.ethereum),
+            transport: custom(activeWindowEthereumProvider),
           });
 
           const { request } = await publicClient.simulateContract({
@@ -338,7 +334,7 @@ export function DelegateDialog({
           });
           setLocalDelegateTxHash(txHash);
         } else {
-          // Privy/embedded wallet has no window.ethereum: use the wagmi write path
+          // Embedded/non-window wallets use the active wagmi connector.
           write({
             address: contracts.token.address as any,
             abi: contracts.token.abi,

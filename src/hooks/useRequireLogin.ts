@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useAccount } from "wagmi";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 
 /**
  * Ensures the user is logged in before continuing. If not logged in, triggers the
@@ -8,7 +8,7 @@ import { useAccount } from "wagmi";
  */
 const useRequireLogin = () => {
   const { isConnected, address, isConnecting } = useAccount();
-  const { setOpen, open } = useModal();
+  const { openConnectModal, isOpen } = useModal();
   const resolversRef = useRef<Array<(value: string | null) => void>>([]);
 
   const resolveAll = useCallback((value: string | null) => {
@@ -26,10 +26,10 @@ const useRequireLogin = () => {
   }, [isConnected, address, resolveAll]);
 
   useEffect(() => {
-    if (open === false && !isConnected && !isConnecting) {
+    if (!isOpen && !isConnected && !isConnecting) {
       resolveAll(null);
     }
-  }, [open, isConnected, resolveAll, isConnecting]);
+  }, [isOpen, isConnected, resolveAll, isConnecting]);
 
   useEffect(() => {
     return () => {
@@ -46,11 +46,11 @@ const useRequireLogin = () => {
     // Not connected or no address yet, open modal and wait
     return new Promise<string | null>((resolve) => {
       resolversRef.current.push(resolve);
-      if (!open) {
-        setOpen(true);
+      if (!isOpen) {
+        openConnectModal();
       }
     });
-  }, [isConnected, address, setOpen, open]);
+  }, [isConnected, address, openConnectModal, isOpen]);
 };
 
 export default useRequireLogin;

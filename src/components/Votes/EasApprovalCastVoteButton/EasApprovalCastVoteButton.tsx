@@ -95,7 +95,7 @@ function VoteButton({
   votes: Vote[] | null;
 }) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
 
   if (hasVoted) {
     return (
@@ -113,7 +113,7 @@ function VoteButton({
 
   if (!isConnected) {
     return (
-      <Button variant={"outline"} onClick={() => setOpen(true)}>
+      <Button variant={"outline"} onClick={() => openConnectModal()}>
         Connect wallet to vote
       </Button>
     );
