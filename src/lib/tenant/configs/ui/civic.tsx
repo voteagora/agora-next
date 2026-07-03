@@ -228,6 +228,40 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "privy-login",
+      enabled: true,
+      config: {
+        appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID_CIVIC ?? "",
+        loginMethods: ["email", "google", "wallet"],
+      },
+    },
+    {
+      name: "sponsoredVote",
+      enabled: true,
+      config: {
+        sponsorAddress:
+          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+            ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
+        minBalance: "0.001",
+        // ponytail: 0 so every member uses the relayer and never falls to the
+        // window.ethereum direct path; raise if sponsor-gas griefing appears
+        minVPToUseGasRelay: "0",
+      },
+    },
+    {
+      name: "sponsoredDelegate",
+      enabled: true,
+      config: {
+        sponsorAddress:
+          process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
+            ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
+            : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
+        minBalance: "0.001",
+        minVPToUseGasRelay: "0",
+      },
+    },
+    {
       name: "snapshotVotes",
       enabled: false,
     },
@@ -332,7 +366,7 @@ export const civicTenantUIConfig = new TenantUI({
       },
     },
     {
-      name: "safe-proposal-choice",
+      name: "direct-onchain-proposal",
       enabled: true,
     },
     {
