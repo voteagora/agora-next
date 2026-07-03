@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, PropsWithChildren } from "react";
+import dynamic from "next/dynamic";
 import { createConfig, WagmiProvider, type Transport } from "wagmi";
 import { inter } from "@/styles/fonts";
 import { mainnet } from "wagmi/chains";
@@ -23,7 +24,9 @@ import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain, toNumericChainId } from "@/lib/utils";
 import { hashFn } from "@wagmi/core/query";
 import { MiradorProvider } from "@/components/providers/MiradorProvider";
+import { ConnectKitModalBridge } from "@/components/providers/ConnectModalContext";
 import { shouldEnableMiradorWebClient } from "@/lib/mirador/config";
+import type { UIPrivyConfig } from "@/lib/tenant/tenantUI";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +48,14 @@ const metadata = {
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!;
 const { contracts, ui } = Tenant.current();
 const shouldHideAgoraBranding = ui.hideAgoraBranding;
+
+const PrivyWeb3Provider = dynamic(() => import("./PrivyWeb3Provider"));
+
+const privyToggle = ui.toggle("privy-login");
+const privyConfig =
+  privyToggle?.enabled && (privyToggle.config as UIPrivyConfig)?.appId
+    ? (privyToggle.config as UIPrivyConfig)
+    : undefined;
 
 // Force a numeric id (handles cases like "eip155:11155420")
 const tokenChainId = toNumericChainId(contracts.token.chain.id);
@@ -117,6 +128,17 @@ const Web3Provider: FC<
     miradorWebApiKey?: string;
   }>
 > = ({ children, miradorWebApiKey }) => {
+  if (privyConfig) {
+    return (
+      <PrivyWeb3Provider
+        privyConfig={privyConfig}
+        miradorWebApiKey={miradorWebApiKey}
+      >
+        {children}
+      </PrivyWeb3Provider>
+    );
+  }
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
@@ -136,12 +158,14 @@ const Web3Provider: FC<
                 {/* {namespace === TENANT_NAMESPACES.OPTIMISM && <BetaBanner />} */}
 
                 {/* ConnectButtonProvider should be above PageContainer where DialogProvider is since the context is called from this Dialogs  */}
-                <ConnectButtonProvider>
-                  <PageContainer>
-                    <Toaster />
-                    <AgoraProvider>{children}</AgoraProvider>
-                  </PageContainer>
-                </ConnectButtonProvider>
+                <ConnectKitModalBridge>
+                  <ConnectButtonProvider>
+                    <PageContainer>
+                      <Toaster />
+                      <AgoraProvider>{children}</AgoraProvider>
+                    </PageContainer>
+                  </ConnectButtonProvider>
+                </ConnectKitModalBridge>
                 {!shouldHideAgoraBranding && <Footer />}
                 <SpeedInsights />
               </body>
