@@ -244,8 +244,7 @@ export const civicTenantUIConfig = new TenantUI({
             ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
             : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
         minBalance: "0.001",
-        // ponytail: 0 so every member uses the relayer and never falls to the
-        // window.ethereum direct path; raise if sponsor-gas griefing appears
+        // 0 so every membership holder qualifies (embedded wallets hold no ETH)
         minVPToUseGasRelay: "0",
       },
     },
