@@ -2,10 +2,10 @@
 
 import { useAccount, useEnsName } from "wagmi";
 import { mainnet } from "wagmi/chains";
-import { WalletIcon } from "@/icons/walletIcon";
-import { MobileProfileDropDown } from "./MobileProfileDropDown";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useConnectModal } from "@/components/providers/ConnectModalContext";
+import { WalletIcon } from "@/icons/walletIcon";
+import { MobileProfileDropDown } from "./MobileProfileDropDown";
 
 export function MobileConnectButton() {
   const { address, isConnected } = useAccount();
