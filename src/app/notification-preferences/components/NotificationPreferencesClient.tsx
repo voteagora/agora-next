@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";

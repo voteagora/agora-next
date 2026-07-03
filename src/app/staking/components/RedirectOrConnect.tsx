@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 
 export const RedirectOrConnect = () => {
   const { setOpen } = useModal();

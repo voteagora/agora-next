@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { PaperClipIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
-import { ConnectKitButton } from "connectkit";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { DunaEditor } from "@/components/duna-editor";
 import { useForumCategories } from "@/hooks/useForumCategories";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
@@ -58,6 +58,7 @@ export default function ComposerModal({
   categoryLabel = "Category",
 }: ComposerModalProps) {
   const { isConnected, address } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const { categories } = useForumCategories();
   const { getAuthenticationData } = useProposalActionAuth();
   const [title, setTitle] = useState("");
@@ -174,28 +175,24 @@ export default function ComposerModal({
 
         {!isConnected ? (
           <div className="text-center py-8 flex items-center justify-center">
-            <ConnectKitButton.Custom>
-              {({ show }) => (
-                <Button
-                  onClick={() => show?.()}
-                  className="text-primary border border-line hover:bg-hoverBackground text-sm bg-neutral"
-                  style={{
-                    display: "flex",
-                    height: "36px",
-                    padding: "12px 20px",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px",
-                    flexShrink: 0,
-                    borderRadius: "8px",
-                    boxShadow:
-                      "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
-                  }}
-                >
-                  Connect your wallet to continue
-                </Button>
-              )}
-            </ConnectKitButton.Custom>
+            <Button
+              onClick={() => openConnectModal()}
+              className="text-primary border border-line hover:bg-hoverBackground text-sm bg-neutral"
+              style={{
+                display: "flex",
+                height: "36px",
+                padding: "12px 20px",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "8px",
+                flexShrink: 0,
+                borderRadius: "8px",
+                boxShadow:
+                  "0 4px 12px 0 rgba(0, 0, 0, 0.02), 0 2px 2px 0 rgba(0, 0, 0, 0.03)",
+              }}
+            >
+              Connect your wallet to continue
+            </Button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">

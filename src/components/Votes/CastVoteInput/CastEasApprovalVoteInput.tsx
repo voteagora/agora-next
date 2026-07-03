@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { Proposal } from "@/app/api/common/proposals/proposal";

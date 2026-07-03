@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import { useDisconnect } from "wagmi";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { shortAddress } from "@/lib/utils";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { CubeIcon } from "@/icons/CubeIcon";
@@ -97,7 +97,7 @@ export const ProfileDropDownContent = ({
   ensName,
   handleCloseDrawer,
 }: Props) => {
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useConnectModal();
   const {
     address,
     isFetching,

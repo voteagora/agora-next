@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useAccount } from "wagmi";
 
 /**

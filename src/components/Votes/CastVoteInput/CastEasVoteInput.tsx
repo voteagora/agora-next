@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";

@@ -12,7 +12,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import NotificationPreferencesClient from "../NotificationPreferencesClient";
 import { useAccount } from "wagmi";
-import { useModal, useSIWE } from "connectkit";
+import { useSIWE } from "connectkit";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import {
   clearStoredSiweSession,
@@ -39,6 +40,10 @@ vi.mock("@/components/shared/SiweProviderConfig", () => ({
 vi.mock("connectkit", () => ({
   useModal: vi.fn(),
   useSIWE: vi.fn(),
+}));
+
+vi.mock("@/components/providers/ConnectModalContext", () => ({
+  useConnectModal: vi.fn(),
 }));
 
 vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
@@ -167,15 +172,11 @@ describe("NotificationPreferencesClient", () => {
       isReconnecting: false,
       status: "connected",
     } as unknown as ReturnType<typeof useAccount>);
-    vi.mocked(useModal).mockReturnValue({
+    vi.mocked(useConnectModal).mockReturnValue({
       open: false,
       setOpen: setOpenMock,
-      openAbout: vi.fn(),
-      openOnboarding: vi.fn(),
-      openProfile: vi.fn(),
-      openSwitchNetworks: vi.fn(),
-      openSIWE: vi.fn(),
-    } as unknown as ReturnType<typeof useModal>);
+      openConnectModal: vi.fn(),
+    });
     vi.mocked(useSIWE).mockReturnValue({
       signIn: signInMock,
       signOut: signOutMock,
