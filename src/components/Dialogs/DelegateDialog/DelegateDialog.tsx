@@ -81,6 +81,7 @@ export function DelegateDialog({
 
   // Gas relay settings
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+  const isPrivyEnabled = ui.toggle("privy-login")?.enabled === true;
   const gasRelayConfig = ui.toggle("sponsoredDelegate")
     ?.config as UIGasRelayConfig;
 
@@ -305,30 +306,47 @@ export function DelegateDialog({
       });
 
       try {
-        // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
-        const publicClient = getPublicClient(contracts.token.chain);
-        const walletClient = createWalletClient({
-          chain: contracts.token.chain,
-          transport: custom(window.ethereum!),
-        });
+        if (
+          !isPrivyEnabled &&
+          typeof window !== "undefined" &&
+          window.ethereum
+        ) {
+          // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
+          // (skipped for Privy tenants: window.ethereum is an injected extension
+          // like Rabby, NOT the Privy embedded wallet — use the wagmi path below)
+          const publicClient = getPublicClient(contracts.token.chain);
+          const walletClient = createWalletClient({
+            chain: contracts.token.chain,
+            transport: custom(window.ethereum),
+          });
 
-        const { request } = await publicClient.simulateContract({
-          address: contracts.token.address as `0x${string}`,
-          abi: contracts.token.abi,
-          functionName: "delegate",
-          args: [delegate.address as `0x${string}`],
-          account: accountAddress as `0x${string}`,
-        });
+          const { request } = await publicClient.simulateContract({
+            address: contracts.token.address as `0x${string}`,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as `0x${string}`],
+            account: accountAddress as `0x${string}`,
+          });
 
-        const txHash = await walletClient.writeContract(request);
-        attachMiradorTransactionArtifacts(trace, {
-          chainId: contracts.token.chain.id,
-          inputData:
-            "data" in request && typeof request.data === "string"
-              ? request.data
-              : inputData,
-        });
-        setLocalDelegateTxHash(txHash);
+          const txHash = await walletClient.writeContract(request);
+          attachMiradorTransactionArtifacts(trace, {
+            chainId: contracts.token.chain.id,
+            inputData:
+              "data" in request && typeof request.data === "string"
+                ? request.data
+                : inputData,
+          });
+          setLocalDelegateTxHash(txHash);
+        } else {
+          // Privy/embedded wallet has no window.ethereum: use the wagmi write path
+          write({
+            address: contracts.token.address as any,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as any],
+            chainId: contracts.token.chain.id,
+          });
+        }
       } catch (error) {
         console.error("delegate via viem failed", error);
         if (isUserCancellationDetails(error)) {
