@@ -82,6 +82,7 @@ export function DelegateDialog({
 
   // Gas relay settings
   const isGasRelayEnabled = ui.toggle("sponsoredDelegate")?.enabled === true;
+  const isPrivyEnabled = ui.toggle("privy-login")?.enabled === true;
   const gasRelayConfig = ui.toggle("sponsoredDelegate")
     ?.config as UIGasRelayConfig;
 
