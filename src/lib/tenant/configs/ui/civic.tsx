@@ -164,6 +164,11 @@ export const civicTenantUIConfig = new TenantUI({
         </>
       ),
       sectionTitle: "How it works",
+      collaborationSection: {
+        title: "About Our Collaboration",
+        content:
+          "CIVIC and Agora are joining forces to redefine community engagement and pave the way for a true implementation of blockchain Philanthropy. Agora has availed its expertise and know how to interact with the Web3 community through a unique and ideal platform. Through this pilot project, CIVIC aims to test several assumptions and determine how Web3 mechanisms can create deeper, more durable humanitarian participation than traditional donation models. We call on the Web3 community to make this pilot project a success, and a landmark to conceive future community engagement.",
+      },
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000" />,

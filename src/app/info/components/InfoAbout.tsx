@@ -149,6 +149,16 @@ const InfoAbout = () => {
             </p>
           </div>
         )}
+        {page.collaborationSection && (
+          <div className="p-6 border-t border-line">
+            <div className="text-lg font-bold text-primary">
+              {page.collaborationSection.title}
+            </div>
+            <p className="text-secondary mt-3">
+              {page.collaborationSection.content}
+            </p>
+          </div>
+        )}
         {!ui.toggle("hide-info-tabs")?.enabled && (
           <div className="p-6 rounded-b-xl border-t border-line bg-infoSectionBackground">
             <div className="flex lg:flex-row flex-col gap-6 flex-wrap sm:flex-nowrap mb-4">
