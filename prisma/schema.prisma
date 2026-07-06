@@ -19,6 +19,8 @@ enum stage_status {
 
 model DelegateStatements {
   address                  String
+  username                 String?
+  avatar                   String?
   dao_slug                 DaoSlug
   signature                String
   payload                  Json

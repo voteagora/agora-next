@@ -20,8 +20,8 @@ export const civicTenantUIConfig = new TenantUI({
   copyMode: "ngo",
   logo: civicLogo,
   logoSize: "52px",
-  // CIVIC brand colors: Red #FF0D05, Teal #003246
-  documentColors: ["#FF0D05", "#003246", "#FFFFFF", "#1A1A1A"],
+  // CIVIC brand colors: Red #E10600 (Pantone 2347), Teal #003246
+  documentColors: ["#E10600", "#003246", "#FFFFFF", "#1A1A1A"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.CIVIC)],
 
   assets: {
@@ -41,9 +41,9 @@ export const civicTenantUIConfig = new TenantUI({
     line: "229 229 229", // Border color
     // Status colors
     positive: "97 209 97",
-    negative: "255 13 5", // CIVIC Red for errors
+    negative: "225 6 0", // CIVIC Red for errors
     // Brand colors
-    brandPrimary: "255 13 5", // CIVIC Red #FF0D05
+    brandPrimary: "225 6 0", // CIVIC Red #E10600
     brandSecondary: "255 255 255", // White
     // Layout backgrounds
     headerBackground: "255 255 255", // White header
@@ -164,6 +164,11 @@ export const civicTenantUIConfig = new TenantUI({
         </>
       ),
       sectionTitle: "How it works",
+      collaborationSection: {
+        title: "About Our Collaboration",
+        content:
+          "CIVIC and Agora are joining forces to redefine community engagement and pave the way for a true implementation of blockchain Philanthropy. Agora has availed its expertise and know how to interact with the Web3 community through a unique and ideal platform. Through this pilot project, CIVIC aims to test several assumptions and determine how Web3 mechanisms can create deeper, more durable humanitarian participation than traditional donation models. We call on the Web3 community to make this pilot project a success, and a landmark to conceive future community engagement.",
+      },
       tabs: [
         {
           icon: <CoinsIcon className="w-[24px] h-[24px]" stroke="#000" />,
@@ -259,6 +264,18 @@ export const civicTenantUIConfig = new TenantUI({
         minBalance: "0.001",
         minVPToUseGasRelay: "0",
       },
+    },
+    {
+      name: "delegates/profile-metadata",
+      enabled: true,
+    },
+    {
+      name: "delegates/hide-discord-input",
+      enabled: true,
+    },
+    {
+      name: "delegates/hide-warpcast-input",
+      enabled: true,
     },
     {
       name: "snapshotVotes",

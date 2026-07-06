@@ -1,7 +1,7 @@
-import { DelegateStatements } from "@prisma/client";
-
 export type DelegateStatement = {
   address: string;
+  username: string | null;
+  avatar: string | null;
   dao_slug: string;
   message_hash: string;
   signature: string;

@@ -141,6 +141,10 @@ type UIPage = {
     title: string;
     description: string | React.ReactNode;
   }>;
+  collaborationSection?: {
+    title: string;
+    content: string;
+  };
   meta: {
     title: string;
     description: string;

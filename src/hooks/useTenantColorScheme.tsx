@@ -26,10 +26,10 @@ const infoColor = {
     },
   },
   civic: {
-    primary: "#FF0D05", // CIVIC Red
-    primaryRGB: "rgba(255, 13, 5, 1)",
+    primary: "#E10600", // CIVIC Red (Pantone 2347)
+    primaryRGB: "rgba(225, 6, 0, 1)",
     gradient: {
-      startColor: "rgba(255, 13, 5, 0.6)",
+      startColor: "rgba(225, 6, 0, 0.6)",
       endcolor: "#FFFFFF",
     },
   },

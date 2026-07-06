@@ -50,7 +50,7 @@ async function getVotesForDelegateForAddress({
   pagination?: PaginationParams;
 }) {
   return withMetrics("getVotesForDelegateForAddress", async () => {
-    const { namespace, contracts, ui } = Tenant.current();
+    const { namespace, contracts, slug, ui } = Tenant.current();
 
     let eventsViewName;
 
@@ -73,7 +73,8 @@ async function getVotesForDelegateForAddress({
               params,
               description,
               proposal_data,
-              proposal_type
+              proposal_type,
+              statement_voter_metadata as voter_metadata
             FROM (
               SELECT * FROM (
               SELECT
@@ -112,6 +113,19 @@ async function getVotesForDelegateForAddress({
               ) t
               GROUP BY 2,3,4,8
               ) av
+              LEFT JOIN LATERAL (
+                SELECT json_build_object(
+                  'name', ds.username,
+                  'image', ds.avatar,
+                  'type', 'delegate_statement'
+                ) as statement_voter_metadata
+                FROM agora.delegate_statements ds
+                WHERE ds.address = av.voter
+                  AND ds.dao_slug = '${slug}'::config.dao_slug
+                  AND (ds.username IS NOT NULL OR ds.avatar IS NOT NULL)
+                ORDER BY ds.updated_at_ts DESC, ds.created_at_ts DESC
+                LIMIT 1
+              ) ds ON TRUE
               LEFT JOIN LATERAL (
                 SELECT
                   proposals.description,
@@ -534,18 +548,38 @@ async function getVotersWhoHaveNotVotedForProposal({
             del.voter_metadata_text,
             ds.twitter,
             ds.discord,
-            ds.warpcast
+            ds.warpcast,
+            ds.username,
+            ds.avatar
           FROM delegates_who_havent_votes del 
-          LEFT JOIN agora.delegate_statements ds ON 
-            del.delegate = ds.address
-            AND ds.dao_slug = 'OP'
+          LEFT JOIN LATERAL (
+            SELECT
+              twitter,
+              discord,
+              warpcast,
+              username,
+              avatar
+            FROM agora.delegate_statements ds
+            WHERE ds.address = del.delegate
+              AND ds.dao_slug = '${slug}'::config.dao_slug
+            ORDER BY ds.updated_at_ts DESC, ds.created_at_ts DESC
+            LIMIT 1
+          ) ds ON TRUE
           ORDER BY del.delegate, ${sort === "block_number" ? "del.delegate" : "del.voting_power"} ${sortOrder === "asc" ? "ASC" : "DESC"}
         )
         SELECT 
           delegate, 
           voting_power, 
           citizen_type, 
-          voter_metadata_text::json as "voterMetadata",
+          CASE
+            WHEN voter_metadata_text IS NOT NULL THEN voter_metadata_text::json
+            WHEN username IS NOT NULL OR avatar IS NOT NULL THEN json_build_object(
+              'name', username,
+              'image', avatar,
+              'type', 'delegate_statement'
+            )
+            ELSE NULL
+          END as "voterMetadata",
           twitter,
           discord,
           warpcast
@@ -641,7 +675,7 @@ async function getVotesForProposal({
   return withMetrics(
     "getVotesForProposal",
     async () => {
-      const { namespace, contracts, ui } = Tenant.current();
+      const { namespace, contracts, slug, ui } = Tenant.current();
 
       let eventsViewName;
 
@@ -685,7 +719,7 @@ async function getVotesForProposal({
             block_number,
             params,
             citizen_type,
-            voter_metadata,
+            COALESCE(voter_metadata, statement_voter_metadata) as voter_metadata,
             description,
             proposal_data,
             proposal_type
@@ -735,6 +769,19 @@ async function getVotesForProposal({
             ${voterType !== "ALL" && voterType ? `WHERE ${voterType === "TH" ? "citizen_type IS NULL" : getCitizenTypeFilter(voterType)}` : ""}
             GROUP BY 2,3,4,8,9
             ) av
+            LEFT JOIN LATERAL (
+              SELECT json_build_object(
+                'name', ds.username,
+                'image', ds.avatar,
+                'type', 'delegate_statement'
+              ) as statement_voter_metadata
+              FROM agora.delegate_statements ds
+              WHERE ds.address = av.voter
+                AND ds.dao_slug = '${slug}'::config.dao_slug
+                AND (ds.username IS NOT NULL OR ds.avatar IS NOT NULL)
+              ORDER BY ds.updated_at_ts DESC, ds.created_at_ts DESC
+              LIMIT 1
+            ) ds ON TRUE
             LEFT JOIN LATERAL (
               SELECT
                 proposals.description,
@@ -843,23 +890,41 @@ async function getUserVotesForProposal({
   address: string;
 }) {
   return withMetrics("getUserVotesForProposal", async () => {
-    const { namespace, contracts, ui } = Tenant.current();
+    const { namespace, contracts, slug, ui } = Tenant.current();
     const queryFunciton = prismaWeb3Client.$queryRawUnsafe<VotePayload[]>(
       `
       SELECT
-        STRING_AGG(transaction_hash,'|') as transaction_hash,
-        proposal_id,
-        proposal_type,
-        proposal_data,
-        voter,
-        support,
-        SUM(weight::numeric) as weight,
-        STRING_AGG(distinct reason, '\n --------- \n') as reason,
-        MAX(block_number) as block_number,
-        params
-      FROM ${namespace + ".votes"}
-      WHERE proposal_id = $1AND voter = $2
-      GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
+        grouped_votes.*,
+        statement.statement_voter_metadata as voter_metadata
+      FROM (
+        SELECT
+          STRING_AGG(transaction_hash,'|') as transaction_hash,
+          proposal_id,
+          proposal_type,
+          proposal_data,
+          voter,
+          support,
+          SUM(weight::numeric) as weight,
+          STRING_AGG(distinct reason, '\n --------- \n') as reason,
+          MAX(block_number) as block_number,
+          params
+        FROM ${namespace + ".votes"}
+        WHERE proposal_id = $1 AND voter = $2
+        GROUP BY proposal_id, proposal_type, proposal_data, voter, support, params
+      ) grouped_votes
+      LEFT JOIN LATERAL (
+        SELECT json_build_object(
+          'name', ds.username,
+          'image', ds.avatar,
+          'type', 'delegate_statement'
+        ) as statement_voter_metadata
+        FROM agora.delegate_statements ds
+        WHERE ds.address = grouped_votes.voter
+          AND ds.dao_slug = '${slug}'::config.dao_slug
+          AND (ds.username IS NOT NULL OR ds.avatar IS NOT NULL)
+        ORDER BY ds.updated_at_ts DESC, ds.created_at_ts DESC
+        LIMIT 1
+      ) statement ON TRUE
       `,
       proposalId,
       address.toLowerCase()

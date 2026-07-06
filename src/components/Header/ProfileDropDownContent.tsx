@@ -14,6 +14,7 @@ import { useProfileData } from "@/hooks/useProfileData";
 import { SiweStatusBadge } from "./SiweStatusBadge";
 
 import ENSAvatar from "../shared/ENSAvatar";
+import AvatarImage from "../shared/AvatarImage";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
@@ -113,6 +114,8 @@ export const ProfileDropDownContent = ({
   } = useProfileData();
   const { jwt, ensureSession, isSigningIn } = useSiweJwt();
   const hasSiweSession = !!jwt;
+  const profileUsername = delegate?.statement?.username?.trim();
+  const profileAvatar = delegate?.statement?.avatar;
 
   const { ui } = Tenant.current();
   const copy = ui.copy;
@@ -185,13 +188,23 @@ export const ProfileDropDownContent = ({
               isFetching && "animate-pulse"
             }`}
           >
-            <ENSAvatar ensName={ensName} size={60} />
+            {profileAvatar ? (
+              <AvatarImage
+                src={profileAvatar}
+                alt={`${profileUsername || address} avatar`}
+                size={60}
+              />
+            ) : (
+              <ENSAvatar ensName={ensName} size={60} />
+            )}
             <SiweStatusBadge className="w-5 h-5" />
           </div>
           <div className="flex flex-col flex-1">
-            {ensName ? (
+            {profileUsername || ensName ? (
               <>
-                <span className="text-primary font-bold">{ensName}</span>
+                <span className="text-primary font-bold">
+                  {profileUsername || ensName}
+                </span>
                 <span className="text-xs text-secondary">
                   {shortAddress(address!)}
                 </span>

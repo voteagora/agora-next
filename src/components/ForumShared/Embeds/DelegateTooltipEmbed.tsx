@@ -11,6 +11,8 @@ import { formatNumber } from "@/lib/tokenUtils";
 
 type DelegateEmbedData = {
   address: string;
+  username?: string;
+  avatar?: string;
   votingPower: string;
   votingPowerRaw?: string;
   delegatorsCount: number;
@@ -87,6 +89,8 @@ export default function DelegateTooltipEmbed({
         <div className="flex flex-col items-stretch p-7 gap-4 [&_a]:no-underline [&_a]:hover:no-underline">
           <DelegateProfileImageWithMetadata
             address={data.address}
+            username={data.username}
+            avatar={data.avatar}
             votingPower={votingPowerRaw.toString()}
             endorsed={false}
             description={sanitizedStatement}
