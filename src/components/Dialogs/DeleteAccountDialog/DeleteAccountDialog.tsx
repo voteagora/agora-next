@@ -5,6 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import toast from "react-hot-toast";
 import { UpdatedButton } from "@/components/Button";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { useSiweJwt } from "@/hooks/useSiweJwt";
 
@@ -95,9 +96,8 @@ export function DeleteAccountDialog({
         >
           Type <strong>{CONFIRMATION_WORD}</strong> to confirm
         </label>
-        <input
+        <Input
           id="delete-account-confirm"
-          className="border border-line rounded-md px-3 py-2 text-primary bg-neutral"
           value={confirmation}
           onChange={(event) => setConfirmation(event.target.value)}
           autoComplete="off"
@@ -106,10 +106,13 @@ export function DeleteAccountDialog({
       <div className="flex flex-col gap-3">
         <UpdatedButton
           onClick={handleDelete}
-          type="destructive"
+          type={
+            confirmation === CONFIRMATION_WORD && !isDeleting
+              ? "destructive"
+              : "disabled"
+          }
           isLoading={isDeleting}
           disabled={confirmation !== CONFIRMATION_WORD || isDeleting}
-          className="border-red-200 hover:border-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Delete my account
         </UpdatedButton>
