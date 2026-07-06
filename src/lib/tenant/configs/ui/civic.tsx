@@ -20,8 +20,8 @@ export const civicTenantUIConfig = new TenantUI({
   copyMode: "ngo",
   logo: civicLogo,
   logoSize: "52px",
-  // CIVIC brand colors: Red #FF0D05, Teal #003246
-  documentColors: ["#FF0D05", "#003246", "#FFFFFF", "#1A1A1A"],
+  // CIVIC brand colors: Red #E10600 (Pantone 2347), Teal #003246
+  documentColors: ["#E10600", "#003246", "#FFFFFF", "#1A1A1A"],
   tokens: [TenantTokenFactory.create(TENANT_NAMESPACES.CIVIC)],
 
   assets: {
@@ -41,9 +41,9 @@ export const civicTenantUIConfig = new TenantUI({
     line: "229 229 229", // Border color
     // Status colors
     positive: "97 209 97",
-    negative: "255 13 5", // CIVIC Red for errors
+    negative: "225 6 0", // CIVIC Red for errors
     // Brand colors
-    brandPrimary: "255 13 5", // CIVIC Red #FF0D05
+    brandPrimary: "225 6 0", // CIVIC Red #E10600
     brandSecondary: "255 255 255", // White
     // Layout backgrounds
     headerBackground: "255 255 255", // White header
