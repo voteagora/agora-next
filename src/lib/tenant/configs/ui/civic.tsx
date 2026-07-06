@@ -377,6 +377,10 @@ export const civicTenantUIConfig = new TenantUI({
       },
     },
     {
+      name: "delete-account",
+      enabled: true,
+    },
+    {
       name: "footer/hide-changelog",
       enabled: true,
     },
