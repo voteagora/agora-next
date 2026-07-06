@@ -14,7 +14,9 @@ import type { UIPrivyConfig } from "@/lib/tenant/tenantUI";
 const ETH_ADDRESS_REGEX = /^0x[a-fA-F0-9]{40}$/;
 const PRIVY_API_URL = "https://auth.privy.io/api/v1";
 
-async function deletePrivyUser(privyAccessToken: string) {
+class PrivyAccountMismatchError extends Error {}
+
+async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
   const { ui } = Tenant.current();
   const appId = (ui.toggle("privy-login")?.config as UIPrivyConfig | undefined)
     ?.appId;
@@ -23,8 +25,6 @@ async function deletePrivyUser(privyAccessToken: string) {
     throw new Error("Privy server credentials not configured");
   }
 
-  // The access token only proves the caller owns the Privy account being
-  // deleted — its subject (DID) is the account we delete, nothing else.
   const jwks = createRemoteJWKSet(
     new URL(`${PRIVY_API_URL}/apps/${appId}/jwks.json`)
   );
@@ -36,16 +36,42 @@ async function deletePrivyUser(privyAccessToken: string) {
     throw new Error("Privy token missing subject");
   }
 
-  const response = await fetch(
-    `${PRIVY_API_URL}/users/${encodeURIComponent(payload.sub)}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${appId}:${appSecret}`).toString("base64")}`,
-        "privy-app-id": appId,
-      },
-    }
+  const authHeaders = {
+    Authorization: `Basic ${Buffer.from(`${appId}:${appSecret}`).toString("base64")}`,
+    "privy-app-id": appId,
+  };
+  const userUrl = `${PRIVY_API_URL}/users/${encodeURIComponent(payload.sub)}`;
+
+  // The token proves the caller holds this Privy session, but the endpoint's
+  // contract is "delete MY account": the Privy user must be the same identity
+  // as the SIWE-authenticated address, or we'd delete mismatched accounts.
+  const userResponse = await fetch(userUrl, { headers: authHeaders });
+  if (userResponse.status === 404) {
+    return;
+  }
+  if (!userResponse.ok) {
+    throw new Error(
+      `Privy user lookup failed with status ${userResponse.status}`
+    );
+  }
+  const privyUser = await userResponse.json();
+  const linkedAccounts: Array<{ type?: string; address?: string }> =
+    privyUser?.linked_accounts ?? [];
+  const ownsSiweAddress = linkedAccounts.some(
+    (account) =>
+      account.type === "wallet" &&
+      account.address?.toLowerCase() === siweAddress
   );
+  if (!ownsSiweAddress) {
+    throw new PrivyAccountMismatchError(
+      "Privy user is not linked to the authenticated address"
+    );
+  }
+
+  const response = await fetch(userUrl, {
+    method: "DELETE",
+    headers: authHeaders,
+  });
   if (!response.ok && response.status !== 404) {
     throw new Error(
       `Privy user deletion failed with status ${response.status}`
@@ -85,8 +111,11 @@ async function del(request: NextRequest) {
 
   if (privyAccessToken) {
     try {
-      await deletePrivyUser(privyAccessToken);
+      await deletePrivyUser(privyAccessToken, address);
     } catch (error) {
+      if (error instanceof PrivyAccountMismatchError) {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      }
       console.error("Failed to delete Privy user", error);
       return NextResponse.json(
         { message: "Failed to delete Privy account" },
