@@ -1,9 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
+import Image from "next/image";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { format, formatDistanceToNow } from "date-fns";
+import { formatEther } from "viem";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import type { Vote } from "@/app/api/common/votes/vote";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
@@ -22,22 +26,18 @@ import CastVoteContextProvider, {
 import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
-import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import shareIcon from "@/icons/share.svg";
-import { format, formatDistanceToNow } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
@@ -50,7 +50,7 @@ export default function CastVoteInput({
   isOptimistic = false,
 }: Props) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
   const { data, isSuccess, isPending } = useFetchAllForVoting({
@@ -78,7 +78,7 @@ export default function CastVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <Button className="w-full" onClick={() => setOpen(true)}>
+        <Button className="w-full" onClick={() => openConnectModal()}>
           {copy.voting.connectWallet}
         </Button>
       </div>

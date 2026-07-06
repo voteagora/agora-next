@@ -5,7 +5,7 @@ import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { UpdatedButton } from "@/components/Button";
-import { ConnectKitButton } from "connectkit";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { DELEGATION_MODEL } from "@/lib/constants";
@@ -23,6 +23,7 @@ export function DelegationSelector({
 }) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   const { contracts, ui } = Tenant.current();
   const copy = ui.copy;
@@ -69,22 +70,18 @@ export function DelegationSelector({
       {isConnected && address ? (
         delegationButton()
       ) : (
-        <ConnectKitButton.Custom>
-          {({ show }) => (
-            <UpdatedButton
-              type="secondary"
-              onClick={(e: SyntheticEvent) => {
-                e.preventDefault();
-                e.stopPropagation();
-                show?.();
-              }}
-            >
-              {isConnectedAccountDelegate
-                ? copy.delegates.delegation.undelegateAction
-                : copy.delegates.delegation.action}
-            </UpdatedButton>
-          )}
-        </ConnectKitButton.Custom>
+        <UpdatedButton
+          type="secondary"
+          onClick={(e: SyntheticEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openConnectModal();
+          }}
+        >
+          {isConnectedAccountDelegate
+            ? copy.delegates.delegation.undelegateAction
+            : copy.delegates.delegation.action}
+        </UpdatedButton>
       )}
     </div>
   );

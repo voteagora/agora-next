@@ -1,7 +1,7 @@
 "use client";
 
 import { UpdatedButton } from "@/components/Button";
-import { ConnectKitButton } from "connectkit";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 
 export function SiweAccessCard({
@@ -19,6 +19,7 @@ export function SiweAccessCard({
   isSwitching: boolean;
   hasAddress: boolean;
 }) {
+  const { openConnectModal } = useConnectModal();
   const needsSiwe = (error || "").toLowerCase().includes("not authenticated");
   return (
     <div className="bg-wash border border-line rounded-2xl shadow-newDefault p-6">
@@ -37,18 +38,9 @@ export function SiweAccessCard({
       <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
         {!hasAddress ? (
           <div className="sm:w-auto">
-            <ConnectKitButton.Custom>
-              {({ show }) => (
-                <UpdatedButton
-                  type="primary"
-                  onClick={() => {
-                    if (typeof show === "function") show();
-                  }}
-                >
-                  Connect wallet
-                </UpdatedButton>
-              )}
-            </ConnectKitButton.Custom>
+            <UpdatedButton type="primary" onClick={() => openConnectModal()}>
+              Connect wallet
+            </UpdatedButton>
           </div>
         ) : (
           <UpdatedButton

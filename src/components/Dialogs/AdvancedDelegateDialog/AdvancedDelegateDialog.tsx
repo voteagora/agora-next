@@ -1,8 +1,5 @@
 "use client";
 
-import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
-import SubdelegationToRow from "./SubdelegationRow";
-import useAdvancedDelegation from "./useAdvancedDelegation";
 import {
   Dispatch,
   SetStateAction,
@@ -10,30 +7,33 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useParams } from "next/navigation";
 import { useAccount } from "wagmi";
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
+import { formatEther, formatUnits } from "viem";
+import { Delegation } from "@/app/api/common/delegations/delegation";
+import { fetchDelegate } from "@/app/delegates/actions";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { config } from "@/app/Web3Provider";
+import { Button } from "@/components/ui/button";
 import {
   AgoraLoaderSmall,
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatEther, formatUnits } from "viem";
-import { SuccessView } from "./SuccessView";
-import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
-import { Button } from "@/components/ui/button";
-import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
-import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
-import { useModal } from "connectkit";
-import { useParams } from "next/navigation";
-import { resolveENSName } from "@/app/lib/ENSUtils";
-import { fetchDelegate } from "@/app/delegates/actions";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import Tenant from "@/lib/tenant/tenant";
-import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
+import { SuccessView } from "./SuccessView";
+import SubdelegationToRow from "./SubdelegationRow";
+import useAdvancedDelegation from "./useAdvancedDelegation";
+import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -64,7 +64,7 @@ export function AdvancedDelegateDialog({
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
   const { ui, slug } = Tenant.current();
   const copy = ui.copy;
@@ -286,7 +286,7 @@ export function AdvancedDelegateDialog({
                     </Button>
                   )
                 ) : (
-                  <Button className="mt-3" onClick={() => setOpen(true)}>
+                  <Button className="mt-3" onClick={() => openConnectModal()}>
                     {copy.delegates.delegation.connectWalletAction}
                   </Button>
                 )}

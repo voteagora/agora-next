@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { CheckCircleIcon } from "@heroicons/react/20/solid";
 import { useEASV2 } from "@/hooks/useEASV2";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -31,7 +31,7 @@ export default function CastEasApprovalVoteInput({
   maxApprovals,
 }: CastEasApprovalVoteInputProps) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const { address } = useAccount();
   const { hasVoted, isLoading } = useUserVotes({
     proposalId: proposal.id,
@@ -53,7 +53,7 @@ export default function CastEasApprovalVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <Button className="w-full" onClick={() => setOpen(true)}>
+        <Button className="w-full" onClick={() => openConnectModal()}>
           Connect wallet to vote
         </Button>
       </div>

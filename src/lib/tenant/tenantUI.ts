@@ -12,7 +12,7 @@ import {
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig;
+  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig | UIPrivyConfig;
 };
 
 export type UIEndorsedConfig = {
@@ -29,6 +29,11 @@ export type UIGasRelayConfig = {
   minBalance: string;
   sponsorAddress: `0x${string}`;
   minVPToUseGasRelay: string;
+};
+
+export type UIPrivyConfig = {
+  appId: string;
+  loginMethods?: string[];
 };
 
 export type UIMiradorConfig = {

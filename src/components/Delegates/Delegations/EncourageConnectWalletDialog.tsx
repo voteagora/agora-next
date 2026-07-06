@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ConnectKitButton } from "connectkit";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
 import Tenant from "@/lib/tenant/tenant";
@@ -10,6 +10,7 @@ export const EncourageConnectWalletDialog = ({
   closeDialog: () => void;
 }) => {
   const { address } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const copy = Tenant.current().ui.copy;
 
   useEffect(() => {
@@ -27,19 +28,15 @@ export const EncourageConnectWalletDialog = ({
           {copy.delegates.delegation.encourageDescription}
         </div>
       </div>
-      <ConnectKitButton.Custom>
-        {({ show }) => (
-          <Button
-            className="w-full px-[20px] py-3 font-medium text-[16px] leading-[24px]"
-            onClick={() => {
-              show?.();
-              closeDialog();
-            }}
-          >
-            {copy.voting.connectWallet}
-          </Button>
-        )}
-      </ConnectKitButton.Custom>
+      <Button
+        className="w-full px-[20px] py-3 font-medium text-[16px] leading-[24px]"
+        onClick={() => {
+          openConnectModal();
+          closeDialog();
+        }}
+      >
+        {copy.voting.connectWallet}
+      </Button>
     </div>
   );
 };

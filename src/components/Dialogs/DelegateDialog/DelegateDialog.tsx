@@ -43,6 +43,7 @@ import {
   useAttachMiradorSubmittedTxHash,
 } from "@/lib/mirador/frontendFlowTrace";
 import { getWalletTraceAttributes } from "@/lib/mirador/walletTraceAttributes";
+import { getActiveWindowEthereumProvider } from "@/lib/wallet/activeInjectedProvider";
 import {
   getWalletErrorDiagnostics,
   getWalletErrorMessage,
@@ -305,30 +306,43 @@ export function DelegateDialog({
       });
 
       try {
-        // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
-        const publicClient = getPublicClient(contracts.token.chain);
-        const walletClient = createWalletClient({
-          chain: contracts.token.chain,
-          transport: custom(window.ethereum!),
-        });
+        const activeWindowEthereumProvider =
+          await getActiveWindowEthereumProvider(connector);
+        if (activeWindowEthereumProvider) {
+          // Bypass wagmi to avoid CAIP-2 chain id leakage from Safe provider
+          const publicClient = getPublicClient(contracts.token.chain);
+          const walletClient = createWalletClient({
+            chain: contracts.token.chain,
+            transport: custom(activeWindowEthereumProvider),
+          });
 
-        const { request } = await publicClient.simulateContract({
-          address: contracts.token.address as `0x${string}`,
-          abi: contracts.token.abi,
-          functionName: "delegate",
-          args: [delegate.address as `0x${string}`],
-          account: accountAddress as `0x${string}`,
-        });
+          const { request } = await publicClient.simulateContract({
+            address: contracts.token.address as `0x${string}`,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as `0x${string}`],
+            account: accountAddress as `0x${string}`,
+          });
 
-        const txHash = await walletClient.writeContract(request);
-        attachMiradorTransactionArtifacts(trace, {
-          chainId: contracts.token.chain.id,
-          inputData:
-            "data" in request && typeof request.data === "string"
-              ? request.data
-              : inputData,
-        });
-        setLocalDelegateTxHash(txHash);
+          const txHash = await walletClient.writeContract(request);
+          attachMiradorTransactionArtifacts(trace, {
+            chainId: contracts.token.chain.id,
+            inputData:
+              "data" in request && typeof request.data === "string"
+                ? request.data
+                : inputData,
+          });
+          setLocalDelegateTxHash(txHash);
+        } else {
+          // Embedded/non-window wallets use the active wagmi connector.
+          write({
+            address: contracts.token.address as any,
+            abi: contracts.token.abi,
+            functionName: "delegate",
+            args: [delegate.address as any],
+            chainId: contracts.token.chain.id,
+          });
+        }
       } catch (error) {
         console.error("delegate via viem failed", error);
         if (isUserCancellationDetails(error)) {

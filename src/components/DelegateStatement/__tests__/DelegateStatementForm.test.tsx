@@ -129,17 +129,23 @@ vi.mock("@/components/Delegates/DelegateCard/DelegateCard", () => ({
   default: () => <div>DelegateCard</div>,
 }));
 
-vi.mock("@/lib/tenant/tenant", () => ({
-  default: {
-    current: () => ({
-      ui: {
-        governanceIssues: [],
-        governanceStakeholders: [],
-      },
-      contracts: {},
-    }),
-  },
-}));
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          governanceIssues: [],
+          governanceStakeholders: [],
+        },
+        contracts: {},
+      }),
+    },
+  };
+});
 
 vi.mock("react-hook-form", async () => {
   const actual =

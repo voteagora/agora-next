@@ -63,19 +63,25 @@ vi.mock("@/components/ui/dropdown-menu", () => ({
 }));
 
 // Mock Tenant
-vi.mock("@/lib/tenant/tenant", () => ({
-  __esModule: true,
-  default: {
-    current: () => ({
-      ui: {
-        customization: {
-          primary: "rgb(0, 0, 0)",
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    __esModule: true,
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          customization: {
+            primary: "rgb(0, 0, 0)",
+          },
+          toggle: vi.fn(() => ({ enabled: false })),
         },
-        toggle: vi.fn(() => ({ enabled: false })),
-      },
-    }),
-  },
-}));
+      }),
+    },
+  };
+});
 
 describe("DelegatesSortFilter", () => {
   beforeEach(() => {
