@@ -186,6 +186,7 @@ export default class TenantTokenFactory {
             ? "0x44b685edf24ff97fba0103ec7e365923a3b65f0b"
             : "0x0000000000000000000000000000000000000000",
         };
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

@@ -144,6 +144,7 @@ type UIPage = {
   collaborationSection?: {
     title: string;
     content: string;
+    contactEmail?: string;
   };
   meta: {
     title: string;

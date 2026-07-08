@@ -157,6 +157,17 @@ const InfoAbout = () => {
             <p className="text-secondary mt-3">
               {page.collaborationSection.content}
             </p>
+            {page.collaborationSection.contactEmail && (
+              <p className="text-secondary mt-3">
+                For questions or to request removal of your data, please contact{" "}
+                <a
+                  href={`mailto:${page.collaborationSection.contactEmail}`}
+                  className="text-brandPrimary hover:underline"
+                >
+                  {page.collaborationSection.contactEmail}
+                </a>
+              </p>
+            )}
           </div>
         )}
         {!ui.toggle("hide-info-tabs")?.enabled && (
