@@ -128,9 +128,11 @@ const CommentItem = ({
     ? adminAddressSet.has(authorAddress)
     : false;
   const adminLabel = adminRole || undefined;
-  const profileHref = comment.author
-    ? `/delegates/${encodeURIComponent(comment.author)}`
-    : null;
+  const isDeletedUser = !!comment.isAuthorDeleted;
+  const profileHref =
+    comment.author && !isDeletedUser
+      ? `/delegates/${encodeURIComponent(comment.author)}`
+      : null;
   const profileLabel = comment.author
     ? `View profile for ${comment.author}`
     : "View profile";
@@ -246,7 +248,10 @@ const CommentItem = ({
               <ENSAvatar ensName={comment.author} size={avatarSize} />
             </Link>
           ) : (
-            <ENSAvatar ensName={comment.author} size={avatarSize} />
+            <ENSAvatar
+              ensName={isDeletedUser ? undefined : comment.author}
+              size={avatarSize}
+            />
           )}
         </div>
         {hasReplies && forForums && (
@@ -272,7 +277,9 @@ const CommentItem = ({
                 </Link>
               ) : (
                 <span className="text-sm font-medium text-primary">
-                  {isAuthorAdmin ? (
+                  {isDeletedUser ? (
+                    "(deleted user)"
+                  ) : isAuthorAdmin ? (
                     "Cowrie"
                   ) : (
                     <ENSName address={comment.author || ""} />

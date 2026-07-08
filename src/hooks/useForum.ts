@@ -205,6 +205,7 @@ export const useForum = () => {
           id: topic.id,
           title: topic.title,
           author: topic.address,
+          isAuthorDeleted: topic.isAuthorDeleted,
           content: topic.posts?.[0]?.content || "",
           createdAt: (topic.createdAt instanceof Date
             ? topic.createdAt
@@ -214,6 +215,7 @@ export const useForum = () => {
             topic.posts?.slice(1).map((post: any) => ({
               id: post.id,
               author: post.address,
+              isAuthorDeleted: post.isAuthorDeleted,
               content: post.content,
               createdAt: (post.createdAt instanceof Date
                 ? post.createdAt

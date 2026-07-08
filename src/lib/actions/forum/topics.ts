@@ -35,6 +35,22 @@ import {
 } from "@/lib/notification-center/emitter";
 const { slug } = Tenant.current();
 
+async function getDeletedAccountSet(
+  addresses: (string | null | undefined)[]
+): Promise<Set<string>> {
+  const unique = [
+    ...new Set(addresses.map((a) => (a || "").toLowerCase())),
+  ].filter(Boolean);
+  if (unique.length === 0) {
+    return new Set();
+  }
+  const rows = await prismaWeb2Client.deletedAccounts.findMany({
+    where: { dao_slug: slug, address: { in: unique } },
+    select: { address: true },
+  });
+  return new Set(rows.map((row) => row.address));
+}
+
 async function deleteOwnedForumTopic(topicId: number, address: string) {
   const normalizedAddress = address.toLowerCase();
   const topic = await prismaWeb2Client.forumTopic.findFirst({
@@ -167,12 +183,21 @@ export async function getForumTopics({
       return out;
     };
 
+    const deletedAccounts = await getDeletedAccountSet(
+      topics.flatMap((topic: any) => [
+        topic.address,
+        ...topic.posts.map((p: any) => p.address),
+      ])
+    );
+
     return {
       success: true,
       data: topics.map((topic: any) => ({
         ...topic,
+        isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
         posts: topic.posts.map((p: any) => ({
           ...p,
+          isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
           reactionsByEmoji: groupByEmojiAddresses(p.reactions),
         })),
         topicReactionsByEmoji: groupByEmojiAddresses(
@@ -260,8 +285,14 @@ export async function getForumTopic(topicId: number) {
       return out;
     };
 
+    const deletedAccounts = await getDeletedAccountSet([
+      (topic as any).address,
+      ...(topic as any).posts.map((p: any) => p.address),
+    ]);
+
     const mappedPosts = (topic as any).posts.map((p: any) => ({
       ...p,
+      isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
       reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       attachments: (p.attachments || []).map((att: any) => ({
         id: att.id,
@@ -293,6 +324,9 @@ export async function getForumTopic(topicId: number) {
       success: true,
       data: {
         ...topic,
+        isAuthorDeleted: deletedAccounts.has(
+          (topic as any).address?.toLowerCase()
+        ),
         posts: mappedPosts,
         topicReactionsByEmoji: groupByEmojiAddresses(
           (topic as any).posts?.[0]?.reactions
@@ -1247,8 +1281,13 @@ export const getForumData = async ({
       adminRolesObj[address] = role;
     });
 
+    const deletedAccounts = await getDeletedAccountSet(
+      topics.map((topic) => topic.address)
+    );
+
     const processedTopics = topics.map((topic) => ({
       ...topic,
+      isAuthorDeleted: deletedAccounts.has(topic.address.toLowerCase()),
       createdAt: topic.createdAt.toISOString(),
       revealTime: topic.revealTime
         ? (topic.revealTime instanceof Date

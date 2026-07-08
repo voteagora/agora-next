@@ -28,19 +28,19 @@ export const civicTenantConfig = ({
   rpcSecret,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x234653cfb2ff6d0771fb6c615f5a61af1a9518c7"
+    ? "0x44b685edf24ff97fba0103ec7e365923a3b65f0b"
     : "0x0000000000000000000000000000000000000000";
 
   const GOVERNOR = isProd
-    ? "0xd796754d50983797788aa3bf5faf3f03f48e3d79"
+    ? "0x01015e27514ba64e3f2e8655c7cd5be08d2f40cc"
     : "0x0000000000000000000000000000000000000000";
 
   const TIMELOCK = isProd
-    ? "0x6d592fc5a41ee3bb25683832e52a2facef71cd81"
+    ? "0x495177b4b20aa4f429445684bfabc3534b5a2db1"
     : "0x0000000000000000000000000000000000000000";
 
   const TYPES = isProd
-    ? "0xd528e273857020722de4b5284de4379b78782f8a"
+    ? "0xfa5b3da3530d2353f0003e249b2c2aea8fcea534"
     : "0x0000000000000000000000000000000000000000";
 
   const TREASURY = [TIMELOCK];

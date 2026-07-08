@@ -5,6 +5,8 @@ const toggleMock = vi.fn();
 const validateBearerTokenMock = vi.fn();
 const deleteManyMock = vi.fn();
 const deleteChannelMock = vi.fn();
+const burnMock = vi.fn();
+const upsertDeletedAccountMock = vi.fn();
 
 vi.mock("@/lib/tenant/tenant", () => ({
   default: {
@@ -22,7 +24,12 @@ vi.mock("@/app/lib/auth/edgeAuth", () => ({
 vi.mock("@/app/lib/prisma", () => ({
   prismaWeb2Client: {
     delegateStatements: { deleteMany: deleteManyMock },
+    deletedAccounts: { upsert: upsertDeletedAccountMock },
   },
+}));
+
+vi.mock("./burnMembershipNft", () => ({
+  burnMembershipNfts: burnMock,
 }));
 
 vi.mock("@/lib/notification-center/client", () => ({
@@ -54,6 +61,8 @@ describe("DELETE /api/v1/account", () => {
     });
     deleteManyMock.mockResolvedValue({ count: 1 });
     deleteChannelMock.mockResolvedValue(undefined);
+    burnMock.mockResolvedValue(undefined);
+    upsertDeletedAccountMock.mockResolvedValue({});
   });
 
   it("returns 403 when the delete-account toggle is disabled", async () => {
@@ -93,5 +102,37 @@ describe("DELETE /api/v1/account", () => {
     const { DELETE } = await import("./route");
     const response = await DELETE(makeRequest({}));
     expect(response.status).toBe(200);
+  });
+
+  it("burns the membership NFT for the authenticated address", async () => {
+    const { DELETE } = await import("./route");
+    const response = await DELETE(makeRequest({}));
+    expect(response.status).toBe(200);
+    expect(burnMock).toHaveBeenCalledWith(ADDRESS.toLowerCase());
+  });
+
+  it("aborts deletion when the NFT burn fails", async () => {
+    burnMock.mockRejectedValue(new Error("burn reverted"));
+    const { DELETE } = await import("./route");
+    const response = await DELETE(makeRequest({}));
+    expect(response.status).toBe(500);
+    expect(deleteManyMock).not.toHaveBeenCalled();
+    expect(upsertDeletedAccountMock).not.toHaveBeenCalled();
+  });
+
+  it("records the deleted account", async () => {
+    const { DELETE } = await import("./route");
+    const response = await DELETE(makeRequest({}));
+    expect(response.status).toBe(200);
+    expect(upsertDeletedAccountMock).toHaveBeenCalledWith({
+      where: {
+        dao_slug_address: {
+          dao_slug: "CIVIC",
+          address: ADDRESS.toLowerCase(),
+        },
+      },
+      update: {},
+      create: { dao_slug: "CIVIC", address: ADDRESS.toLowerCase() },
+    });
   });
 });

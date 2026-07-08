@@ -45,6 +45,16 @@ model DelegateStatements {
   @@schema("agora")
 }
 
+model DeletedAccounts {
+  address   String
+  dao_slug  DaoSlug
+  deletedAt DateTime @default(now()) @map("deleted_at")
+
+  @@id([dao_slug, address])
+  @@map("deleted_accounts")
+  @@schema("agora")
+}
+
 model Contracts {
   address       String        @id
   chain         Chain?

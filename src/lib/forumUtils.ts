@@ -22,6 +22,7 @@ export interface ForumTopic {
   attachments: ForumAttachment[];
   deletedAt?: string | null;
   deletedBy?: string | null;
+  isAuthorDeleted?: boolean;
   isNsfw?: boolean;
   isFinancialStatement?: boolean;
   revealTime?: string | null;
@@ -37,6 +38,7 @@ export interface ForumPost {
   attachments?: ForumAttachment[];
   deletedAt?: string | null;
   deletedBy?: string | null;
+  isAuthorDeleted?: boolean;
   isNsfw?: boolean;
   reactionsByEmoji?: Record<string, string[]>;
 }
@@ -178,6 +180,7 @@ export function transformForumTopics(
         attachments: post.attachments || [],
         deletedAt: post.deletedAt,
         deletedBy: post.deletedBy,
+        isAuthorDeleted: post.isAuthorDeleted,
         reactionsByEmoji: post.reactionsByEmoji,
       })) || [];
 
@@ -191,6 +194,7 @@ export function transformForumTopics(
       attachments,
       deletedAt: topic.deletedAt,
       deletedBy: topic.deletedBy,
+      isAuthorDeleted: topic.isAuthorDeleted,
       revealTime: topic.revealTime
         ? topic.revealTime instanceof Date
           ? topic.revealTime.toISOString()
