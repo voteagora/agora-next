@@ -22,13 +22,15 @@ const useDelayedLoader = (delayMs = 200) => {
 
 export default function AgoraLoader() {
   const shouldShow = useDelayedLoader();
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
 
   if (!shouldShow) return null;
 
   return (
     <div className="flex flex-col justify-center items-center h-[calc(100vh-268px)]">
       <Image
-        src={logo}
+        src={isDarkTenant ? logoLight : logo}
         alt="loading"
         width={24}
         height={24}
@@ -40,13 +42,15 @@ export default function AgoraLoader() {
 
 export function AgoraLoaderSmall() {
   const shouldShow = useDelayedLoader();
+  const { ui } = Tenant.current();
+  const isDarkTenant = ui.theme === "dark";
 
   if (!shouldShow) return null;
 
   return (
     <div className="flex flex-col justify-center items-center w-full h-full">
       <Image
-        src={logo}
+        src={isDarkTenant ? logoLight : logo}
         alt="loading"
         width={48}
         height={48}
