@@ -5,6 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
+import { burnMembershipNfts } from "./burnMembershipNft";
 import { prismaWeb2Client } from "@/app/lib/prisma";
 import { notificationCenterClient } from "@/lib/notification-center/client";
 import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
@@ -109,6 +110,18 @@ async function del(request: NextRequest) {
     // no body: external-wallet users have no Privy account to delete
   }
 
+  // Burn first: if a later step fails, the retry finds a zero balance and
+  // skips, so an account is never deleted while its NFT still exists.
+  try {
+    await burnMembershipNfts(address as `0x${string}`);
+  } catch (error) {
+    console.error("Failed to burn membership NFT", error);
+    return NextResponse.json(
+      { message: "Failed to burn membership NFT" },
+      { status: 500 }
+    );
+  }
+
   if (privyAccessToken) {
     try {
       await deletePrivyUser(privyAccessToken, address);
@@ -129,6 +142,12 @@ async function del(request: NextRequest) {
       dao_slug: slug,
       address: { equals: address, mode: "insensitive" },
     },
+  });
+
+  await prismaWeb2Client.deletedAccounts.upsert({
+    where: { dao_slug_address: { dao_slug: slug, address } },
+    update: {},
+    create: { dao_slug: slug, address },
   });
 
   try {
