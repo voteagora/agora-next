@@ -42,13 +42,12 @@ export function RelatedItemsDialog({
     [
       "relative p-3 border rounded-lg transition-all overflow-hidden",
       selected
-        ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
+        ? "bg-positive/10 border-positive/30 cursor-not-allowed opacity-60"
         : isDarkTenant
           ? "bg-wash border-line cursor-pointer hover:bg-hoverBackground"
           : "cursor-pointer bg-white hover:bg-gray-50 hover:border-gray-300 border-gray-200",
     ].join(" ");
-  const titleClass =
-    "font-medium text-sm leading-tight mb-1 pr-20 break-words text-primary";
+  const titleClass = "font-medium text-sm leading-tight mb-1 pr-20 break-words text-primary";
   const metaClass = isDarkTenant
     ? "flex items-center gap-3 text-xs text-secondary flex-wrap"
     : "flex items-center gap-3 text-xs text-gray-500 flex-wrap";
