@@ -42,7 +42,7 @@ export function RelatedItemsDialog({
     [
       "relative p-3 border rounded-lg transition-all overflow-hidden",
       selected
-        ? "bg-green-50 border-green-200 cursor-not-allowed opacity-60"
+        ? "bg-positive/10 border-positive/30 cursor-not-allowed opacity-60"
         : isDarkTenant
           ? "bg-wash border-line cursor-pointer hover:bg-hoverBackground"
           : "cursor-pointer bg-white hover:bg-gray-50 hover:border-gray-300 border-gray-200",

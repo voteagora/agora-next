@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useEditor, EditorContent } from "@tiptap/react";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -115,8 +116,8 @@ const LinkDialog = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30">
       <div
         className={`rounded-lg shadow-lg p-4 w-80 max-w-[90vw] ${
           isDarkTenant ? "bg-wash border border-line" : "bg-white"
@@ -164,7 +165,8 @@ const LinkDialog = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
