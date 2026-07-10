@@ -45,25 +45,16 @@ const MonoLabel = ({
 );
 
 const SectionHeader = ({
-  numeral,
   title,
   rightLabel,
 }: {
-  numeral: string;
   title: string;
   rightLabel?: string;
 }) => (
   <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-8">
-    <div className="flex items-center gap-3">
-      <span
-        className={`${mono} flex h-6 w-6 flex-shrink-0 items-center justify-center bg-brandPrimary text-[11px] font-medium text-white`}
-      >
-        {numeral}
-      </span>
-      <h2 className={`${serif} text-2xl sm:text-3xl leading-none text-primary`}>
-        {title}
-      </h2>
-    </div>
+    <h2 className="text-xl font-black leading-tight text-primary sm:text-2xl">
+      {title}
+    </h2>
     {rightLabel && (
       <MonoLabel className="hidden text-tertiary sm:block">
         {rightLabel}
@@ -119,9 +110,7 @@ const CivicInfoPage = () => {
             >
               CIVIC <span className="italic">Voice</span>
             </h1>
-            <p
-              className={`${serif} mt-6 max-w-md text-2xl sm:text-3xl leading-tight text-secondary`}
-            >
+            <p className="mt-6 max-w-md text-lg leading-snug text-secondary sm:text-xl">
               This community engagement platform enables supporters to provide
               input on proposals, delegate voting power, and help shape
               CIVIC&apos;s strategic direction.
@@ -147,9 +136,7 @@ const CivicInfoPage = () => {
                 <MonoLabel className="text-tertiary transition-colors group-hover:text-brandPrimary">
                   {String(index + 1).padStart(2, "0")}
                 </MonoLabel>
-                <span
-                  className={`${serif} text-2xl text-primary transition-transform duration-200 group-hover:translate-x-0.5`}
-                >
+                <span className="text-lg font-semibold text-primary transition-transform duration-200 group-hover:translate-x-0.5">
                   {link.title}
                 </span>
               </span>
@@ -163,17 +150,12 @@ const CivicInfoPage = () => {
 
       {/* ABOUT CIVIC */}
       <section>
-        <SectionHeader numeral="I" title="About CIVIC" />
+        <SectionHeader title="About CIVIC" />
         <div className="border-t border-line p-6 sm:p-8">
           <div className="text-base leading-relaxed text-secondary sm:columns-2 sm:gap-10">
             <p>
-              <span
-                className={`${serif} float-left mr-2 mt-1 text-6xl leading-[0.7] text-brandPrimary`}
-              >
-                C
-              </span>
-              enter for Civilians in Conflict (CIVIC) promotes the protection of
-              civilians in armed conflict across Africa, Europe, the Middle
+              Center for Civilians in Conflict (CIVIC) promotes the protection
+              of civilians in armed conflict across Africa, Europe, the Middle
               East, and through peacekeeping operations worldwide.
             </p>
             <p className="mt-4 sm:mt-0">
@@ -212,7 +194,7 @@ const CivicInfoPage = () => {
 
       {/* COLLABORATION */}
       <section>
-        <SectionHeader numeral="II" title="About Our Collaboration" />
+        <SectionHeader title="About Our Collaboration" />
         <div className="border-t border-line p-6 sm:p-8">
           <div className="text-base leading-relaxed text-secondary sm:columns-2 sm:gap-10">
             <p>
@@ -251,7 +233,6 @@ const CivicInfoPage = () => {
       {/* PARTICIPATION */}
       <section>
         <SectionHeader
-          numeral="III"
           title="How participation works"
           rightLabel="One Person, One Vote"
         />
@@ -261,9 +242,7 @@ const CivicInfoPage = () => {
               <MonoLabel className="text-tertiary">
                 {String(index + 1).padStart(2, "0")}
               </MonoLabel>
-              <h3
-                className={`${serif} mt-4 text-3xl leading-none text-primary`}
-              >
+              <h3 className="mt-4 text-xl font-semibold leading-tight text-primary">
                 {item.title}
               </h3>
               <MonoLabel className="mt-3 text-brandPrimary">
