@@ -226,6 +226,11 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      // Renders the bespoke CIVIC editorial/magazine info page (civic-only)
+      name: "info/civic-magazine",
+      enabled: true,
+    },
+    {
       name: "delegates",
       enabled: true,
     },
@@ -408,6 +413,14 @@ export const civicTenantUIConfig = new TenantUI({
     },
     {
       name: "footer/community-engagement-tagline",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-total-supply",
+      enabled: true,
+    },
+    {
+      name: "footer/hide-votable-supply",
       enabled: true,
     },
   ],
