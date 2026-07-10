@@ -51,7 +51,7 @@ const SectionHeader = ({
   title: string;
   rightLabel?: string;
 }) => (
-  <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-8">
+  <div className="flex items-baseline justify-between gap-4">
     <h2 className="text-xl font-black leading-tight text-primary sm:text-2xl">
       {title}
     </h2>
@@ -79,48 +79,38 @@ const CivicInfoPage = () => {
   const contactEmail = aboutPage?.collaborationSection?.contactEmail;
 
   return (
-    <div className="mt-6 sm:mt-8 border border-line bg-cardBackground text-primary divide-y divide-line">
+    <div className="mt-6 flex flex-col gap-10 text-primary sm:mt-8 sm:gap-12">
       {/* HERO */}
-      <section>
-        <div
-          className={`${mono} flex items-center justify-between gap-4 bg-primary px-4 py-2 text-[9px] sm:text-[11px] uppercase tracking-[0.15em] text-neutral`}
-        >
-          <span className="truncate">Recognize. Prevent. Protect. Amend.</span>
-          <span className="hidden flex-shrink-0 sm:inline">
-            One Person. One Vote
-          </span>
+      <section className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-12">
+        <div className="relative min-h-[280px] overflow-hidden rounded-2xl sm:min-h-[360px] lg:min-h-[420px]">
+          <Image
+            src={civicHero}
+            alt="Center for Civilians in Conflict"
+            fill
+            className="object-cover"
+            priority
+          />
+          <Caption>Photo: Usman Hanif</Caption>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 divide-y divide-line lg:divide-y-0 lg:divide-x lg:divide-line">
-          <div className="relative min-h-[260px] sm:min-h-[320px] lg:min-h-[400px]">
-            <Image
-              src={civicHero}
-              alt="Center for Civilians in Conflict"
-              fill
-              className="object-cover"
-              priority
-            />
-            <Caption>Photo: Usman Hanif</Caption>
-          </div>
-          <div className="flex flex-col p-6 sm:p-8 lg:p-10">
-            <MonoLabel className="text-brandPrimary">
-              Community Engagement Platform
-            </MonoLabel>
-            <h1
-              className={`${serif} mt-4 text-6xl sm:text-7xl lg:text-8xl leading-[0.9] text-primary`}
-            >
-              CIVIC <span className="italic">Voice</span>
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-snug text-secondary sm:text-xl">
-              This community engagement platform enables supporters to provide
-              input on proposals, delegate voting power, and help shape
-              CIVIC&apos;s strategic direction.
-            </p>
-          </div>
+        <div className="flex flex-col">
+          <MonoLabel className="text-brandPrimary">
+            Community Engagement Platform
+          </MonoLabel>
+          <h1
+            className={`${serif} mt-4 text-6xl leading-[0.9] text-primary sm:text-7xl lg:text-8xl`}
+          >
+            CIVIC <span className="italic">Voice</span>
+          </h1>
+          <p className="mt-6 max-w-md text-lg leading-snug text-secondary sm:text-xl">
+            This community engagement platform enables supporters to provide
+            input on proposals, delegate voting power, and help shape
+            CIVIC&apos;s strategic direction.
+          </p>
         </div>
       </section>
 
       {/* NAV LINKS */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y divide-line lg:divide-y-0">
+      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {links.map((link, index) => {
           const isExternal = link.url.startsWith("http");
           return (
@@ -129,7 +119,7 @@ const CivicInfoPage = () => {
               href={link.url}
               target={isExternal ? "_blank" : undefined}
               rel={isExternal ? "noreferrer noopener" : undefined}
-              className="group relative flex items-center justify-between gap-3 overflow-hidden px-5 py-7 transition-colors duration-200 hover:bg-wash"
+              className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl bg-wash px-5 py-6 transition-all duration-200 hover:shadow-newDefault"
             >
               <span className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-brandPrimary transition-transform duration-300 ease-out group-hover:scale-x-100" />
               <span className="flex items-baseline gap-3">
@@ -151,34 +141,30 @@ const CivicInfoPage = () => {
       {/* ABOUT CIVIC */}
       <section>
         <SectionHeader title="About CIVIC" />
-        <div className="border-t border-line p-6 sm:p-8">
-          <div className="text-base leading-relaxed text-secondary sm:columns-2 sm:gap-10">
-            <p>
-              Center for Civilians in Conflict (CIVIC) promotes the protection
-              of civilians in armed conflict across Africa, Europe, the Middle
-              East, and through peacekeeping operations worldwide.
-            </p>
-            <p className="mt-4 sm:mt-0">
-              CIVIC engages directly with armed actors, governments, and
-              international institutions to develop practical guidance and
-              policies that reduce civilian harm.
-            </p>
-          </div>
+        <div className="mt-5 text-base leading-relaxed text-secondary">
+          <p>
+            Center for Civilians in Conflict (CIVIC) promotes the protection of
+            civilians in armed conflict across Africa, Europe, the Middle East,
+            and through peacekeeping operations worldwide. CIVIC engages
+            directly with armed actors, governments, and international
+            institutions to develop practical guidance and policies that reduce
+            civilian harm.
+          </p>
         </div>
       </section>
 
       {/* BANNER */}
-      <section className="relative min-h-[240px] sm:min-h-[300px]">
+      <section className="relative min-h-[240px] overflow-hidden rounded-2xl sm:min-h-[320px]">
         <Image
           src={civicInfo1}
           alt="Center for Civilians in Conflict"
           fill
-          className="object-cover"
+          className="object-cover object-top"
         />
         <div className="absolute inset-0 bg-primary/40" />
         <div className="absolute inset-0 flex flex-col justify-center p-6 sm:p-10">
           <h2
-            className={`${serif} text-4xl sm:text-6xl leading-[1.05] text-white`}
+            className={`${serif} text-4xl leading-[1.05] text-white sm:text-6xl`}
           >
             Recognize. Prevent.
             <br />
@@ -195,38 +181,32 @@ const CivicInfoPage = () => {
       {/* COLLABORATION */}
       <section>
         <SectionHeader title="About Our Collaboration" />
-        <div className="border-t border-line p-6 sm:p-8">
-          <div className="text-base leading-relaxed text-secondary sm:columns-2 sm:gap-10">
-            <p>
-              Agora and CIVIC are joining forces to redefine community
-              engagement and pave the way for a true implementation of
-              blockchain philanthropy. Agora has availed its expertise and
-              know-how to interact with the Web3 community through a unique and
-              ideal platform.
-            </p>
-            <p className="mt-4">
-              Through this pilot project, CIVIC aims to test several assumptions
-              and determine how Web3 mechanisms can create deeper, more durable
-              humanitarian participation than traditional donation models.
-            </p>
-            <p className="mt-4">
-              We call on the Web3 community to make this pilot project a
-              success, and a landmark to conceive future community engagement.
-            </p>
-          </div>
+        <div className="mt-5 text-base leading-relaxed text-secondary">
+          <p>
+            Agora and CIVIC are joining forces to redefine community engagement
+            and pave the way for a true implementation of blockchain
+            philanthropy. Agora has availed its expertise and know-how to
+            interact with the Web3 community through a unique and ideal
+            platform. Through this pilot project, CIVIC aims to test several
+            assumptions and determine how Web3 mechanisms can create deeper,
+            more durable humanitarian participation than traditional donation
+            models.
+          </p>
+          <p className="mt-4">
+            We call on the Web3 community to make this pilot project a success,
+            and a landmark to conceive future community engagement.
+          </p>
         </div>
         {contactEmail && (
-          <div className="border-t border-line px-6 py-5 sm:px-8">
-            <MonoLabel className="text-tertiary">
-              For questions or to request removal of your data, please contact{" "}
-              <a
-                href={`mailto:${contactEmail}`}
-                className="text-brandPrimary hover:underline"
-              >
-                {contactEmail.toUpperCase()}
-              </a>
-            </MonoLabel>
-          </div>
+          <MonoLabel className="mt-8 block text-tertiary">
+            For questions or to request removal of your data, please contact{" "}
+            <a
+              href={`mailto:${contactEmail}`}
+              className="text-brandPrimary hover:underline"
+            >
+              {contactEmail.toUpperCase()}
+            </a>
+          </MonoLabel>
         )}
       </section>
 
@@ -236,9 +216,12 @@ const CivicInfoPage = () => {
           title="How participation works"
           rightLabel="One Person, One Vote"
         />
-        <div className="grid grid-cols-1 border-t border-line lg:grid-cols-3 divide-y divide-line lg:divide-y-0 lg:divide-x lg:divide-line">
+        <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-10">
           {participation.map((item, index) => (
-            <div key={item.title} className="flex flex-col p-6 sm:p-8">
+            <div
+              key={item.title}
+              className="flex flex-col rounded-xl bg-wash p-6"
+            >
               <MonoLabel className="text-tertiary">
                 {String(index + 1).padStart(2, "0")}
               </MonoLabel>
