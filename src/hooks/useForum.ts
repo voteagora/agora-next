@@ -43,6 +43,7 @@ import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import type { SurveyDefinitionInput } from "@/lib/actions/forum/surveys";
 import {
   FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,
   FORUM_SUBSCRIPTIONS_TYPED_DATA_DOMAIN,
@@ -65,6 +66,7 @@ interface CreateTopicData {
   content: string;
   categoryId?: number;
   attachment?: File;
+  survey?: SurveyDefinitionInput;
 }
 
 interface CreatePostData {
@@ -267,6 +269,7 @@ export const useForum = () => {
           categoryId: data.categoryId,
           address: currentAddress,
           jwt: authData.jwt,
+          survey: data.survey,
         });
 
         if (!result.success) {

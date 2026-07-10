@@ -959,7 +959,7 @@ const ngoCopy: TenantCopy = {
       noVotingPowerTitle: "This profile has no voting power",
       noVotingPowerDescription:
         "Our records show that this voter currently holds no voting weight. Any statements or votes posted from this profile do not influence proposal outcomes. Profiles like this are sometimes used for signaling or scams; please review with appropriate context.",
-      editMyProfile: "Edit my profile",
+      editMyProfile: "Edit profile",
       notFound: "Can't find that voter.",
       activeTitle: "Active voter",
       inactiveTitle: "Inactive voter",

@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea", "towns", "demo2", "demo4", "demo3", "civic"]
+  schemas  = ["agora", "alltenant", "boost", "config", "cyber", "derive", "ens", "etherfi", "optimism", "pguild", "retro_funding", "snapshot", "scroll", "syndicate", "uniswap", "xai", "b3", "demo", "linea", "towns", "demo2", "demo4", "demo3", "civic"]
 }
 
 enum stage_status {
@@ -1216,7 +1216,7 @@ view uniswapDelegateChangedEvents {
 
 model ProposalDraft {
   id                       Int                        @id @default(autoincrement())
-  uuid                     String                     @unique @db.Uuid @default(uuid())
+  uuid                     String                     @unique @default(uuid()) @db.Uuid
   temp_check_link          String
   proposal_type            String?                    @db.VarChar(50)
   voting_module_type       String?                    @db.VarChar(50)
@@ -1948,16 +1948,16 @@ view syndicate_delegates_wrapper {
 view syndicate_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain                String[]
-  rules                Json?
-  allowance            Decimal? @db.Decimal
-  subdelegated_share   Decimal? @db.Decimal
-  subdelegated_amount  Decimal? @db.Decimal
-  balance              Decimal? @db.Decimal
-  block_number         BigInt?
-  proxy                String?
-  contract             String?  @db.VarChar
-  ordinal              Decimal? @db.Decimal
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -2237,16 +2237,16 @@ view towns_delegates_wrapper {
 view towns_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain                String[]
-  rules                Json?
-  allowance            Decimal? @db.Decimal
-  subdelegated_share   Decimal? @db.Decimal
-  subdelegated_amount  Decimal? @db.Decimal
-  balance              Decimal? @db.Decimal
-  block_number         BigInt?
-  proxy                String?
-  contract             String?  @db.VarChar
-  ordinal              Decimal? @db.Decimal
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -2526,16 +2526,16 @@ view demo2_delegates_wrapper {
 view demo2_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain                String[]
-  rules                Json?
-  allowance            Decimal? @db.Decimal
-  subdelegated_share   Decimal? @db.Decimal
-  subdelegated_amount  Decimal? @db.Decimal
-  balance              Decimal? @db.Decimal
-  block_number         BigInt?
-  proxy                String?
-  contract             String?  @db.VarChar
-  ordinal              Decimal? @db.Decimal
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -2815,16 +2815,16 @@ view demo3_delegates_wrapper {
 view demo3_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain                String[]
-  rules                Json?
-  allowance            Decimal? @db.Decimal
-  subdelegated_share   Decimal? @db.Decimal
-  subdelegated_amount  Decimal? @db.Decimal
-  balance              Decimal? @db.Decimal
-  block_number         BigInt?
-  proxy                String?
-  contract             String?  @db.VarChar
-  ordinal              Decimal? @db.Decimal
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -3104,16 +3104,16 @@ view demo4_delegates_wrapper {
 view demo4_advanced_voting_power_raw_snaps {
   chain_str           String?
   delegate            String?
-  chain                String[]
-  rules                Json?
-  allowance            Decimal? @db.Decimal
-  subdelegated_share   Decimal? @db.Decimal
-  subdelegated_amount  Decimal? @db.Decimal
-  balance              Decimal? @db.Decimal
-  block_number         BigInt?
-  proxy                String?
-  contract             String?  @db.VarChar
-  ordinal              Decimal? @db.Decimal
+  chain               String[]
+  rules               Json?
+  allowance           Decimal? @db.Decimal
+  subdelegated_share  Decimal? @db.Decimal
+  subdelegated_amount Decimal? @db.Decimal
+  balance             Decimal? @db.Decimal
+  block_number        BigInt?
+  proxy               String?
+  contract            String?  @db.VarChar
+  ordinal             Decimal? @db.Decimal
 
   @@map("advanced_voting_power_raw_snaps")
   @@ignore
@@ -6412,8 +6412,9 @@ enum DaoSlug {
   DEMO4
   DEMO3
   SHAPE
-  @@map("dao_slug")
   CIVIC
+
+  @@map("dao_slug")
   @@schema("config")
 }
 
@@ -6561,6 +6562,7 @@ model ForumTopic {
   posts                ForumPost[]
   subscriptions        ForumTopicSubscription[]
   viewStats            ForumTopicViewStats[]
+  survey               ForumSurvey?
 
   @@index([dao_slug])
   @@index([dao_slug, categoryId])
@@ -6568,23 +6570,140 @@ model ForumTopic {
   @@schema("alltenant")
 }
 
+enum ForumSurveyKind {
+  poll
+  survey
+
+  @@map("forum_survey_kind")
+  @@schema("alltenant")
+}
+
+enum ForumSurveyQuestionType {
+  single_choice
+  multiple_choice
+  free_text
+
+  @@map("forum_survey_question_type")
+  @@schema("alltenant")
+}
+
+model ForumSurvey {
+  id        Int                   @id @default(autoincrement())
+  dao_slug  DaoSlug
+  topicId   Int                   @unique @map("topic_id")
+  topic     ForumTopic            @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  key       String?               @map("stable_key")
+  kind      ForumSurveyKind       @default(survey)
+  closesAt  DateTime?             @map("closes_at")
+  closedAt  DateTime?             @map("closed_at")
+  closedBy  String?               @map("closed_by")
+  createdAt DateTime              @default(now()) @map("created_at")
+  questions ForumSurveyQuestion[]
+  responses ForumSurveyResponse[]
+
+  @@unique([dao_slug, key])
+  @@index([dao_slug])
+  @@index([dao_slug, topicId])
+  @@map("forum_surveys")
+  @@schema("alltenant")
+}
+
+model ForumSurveyQuestion {
+  id            Int                     @id @default(autoincrement())
+  dao_slug      DaoSlug
+  surveyId      Int                     @map("survey_id")
+  survey        ForumSurvey             @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  prompt        String
+  type          ForumSurveyQuestionType
+  required      Boolean                 @default(true)
+  maxSelections Int?                    @map("max_selections")
+  position      Int
+  options       ForumSurveyOption[]
+  answers       ForumSurveyAnswer[]
+
+  @@unique([surveyId, position])
+  @@index([dao_slug, surveyId])
+  @@map("forum_survey_questions")
+  @@schema("alltenant")
+}
+
+model ForumSurveyOption {
+  id              Int                       @id @default(autoincrement())
+  dao_slug        DaoSlug
+  questionId      Int                       @map("question_id")
+  question        ForumSurveyQuestion       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  label           String
+  position        Int
+  selectedAnswers ForumSurveyAnswerOption[]
+
+  @@unique([questionId, position])
+  @@index([dao_slug, questionId])
+  @@map("forum_survey_options")
+  @@schema("alltenant")
+}
+
+model ForumSurveyResponse {
+  id        Int                 @id @default(autoincrement())
+  dao_slug  DaoSlug
+  surveyId  Int                 @map("survey_id")
+  survey    ForumSurvey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  address   String
+  createdAt DateTime            @default(now()) @map("created_at")
+  answers   ForumSurveyAnswer[]
+
+  @@unique([dao_slug, surveyId, address])
+  @@index([dao_slug, surveyId])
+  @@map("forum_survey_responses")
+  @@schema("alltenant")
+}
+
+model ForumSurveyAnswer {
+  id              Int                       @id @default(autoincrement())
+  dao_slug        DaoSlug
+  responseId      Int                       @map("response_id")
+  response        ForumSurveyResponse       @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  questionId      Int                       @map("question_id")
+  question        ForumSurveyQuestion       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text            String?
+  selectedOptions ForumSurveyAnswerOption[]
+
+  @@unique([responseId, questionId])
+  @@index([dao_slug, questionId])
+  @@map("forum_survey_answers")
+  @@schema("alltenant")
+}
+
+model ForumSurveyAnswerOption {
+  dao_slug  DaoSlug
+  answerId  Int               @map("answer_id")
+  answer    ForumSurveyAnswer @relation(fields: [answerId], references: [id], onDelete: Cascade)
+  optionId  Int               @map("option_id")
+  option    ForumSurveyOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  @@id([dao_slug, answerId, optionId])
+  @@index([dao_slug, optionId])
+  @@map("forum_survey_answer_options")
+  @@schema("alltenant")
+}
+
 model ForumPost {
-  id             Int                   @id @default(autoincrement())
-  dao_slug       DaoSlug
-  topicId        Int                   @map("topic_id")
-  topic          ForumTopic            @relation(fields: [topicId], references: [id])
-  address        String
-  parentPostId   Int?                  @map("parent_post_id")
-  parentPost     ForumPost?            @relation("PostToPost", fields: [parentPostId], references: [id])
-  replies        ForumPost[]           @relation("PostToPost")
-  content        String
-  deletedAt      DateTime?             @map("deleted_at")
-  deletedBy      String?               @map("deleted_by")
-  isNsfw         Boolean               @default(false) @map("is_nsfw")
-  createdAt      DateTime              @default(now()) @map("created_at")
-  votes          ForumPostVote[]
-  reactions      ForumPostReaction[]
-  attachments    ForumPostAttachment[]
+  id           Int                   @id @default(autoincrement())
+  dao_slug     DaoSlug
+  topicId      Int                   @map("topic_id")
+  topic        ForumTopic            @relation(fields: [topicId], references: [id])
+  address      String
+  parentPostId Int?                  @map("parent_post_id")
+  parentPost   ForumPost?            @relation("PostToPost", fields: [parentPostId], references: [id])
+  replies      ForumPost[]           @relation("PostToPost")
+  content      String
+  deletedAt    DateTime?             @map("deleted_at")
+  deletedBy    String?               @map("deleted_by")
+  isNsfw       Boolean               @default(false) @map("is_nsfw")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  votes        ForumPostVote[]
+  reactions    ForumPostReaction[]
+  attachments  ForumPostAttachment[]
 
   @@index([dao_slug])
   @@index([dao_slug, topicId])
@@ -6632,7 +6751,7 @@ model ForumPostAttachment {
   fileSize             BigInt?   @map("file_size")
   address              String?
   archived             Boolean   @default(false) @map("archived")
-  isFinancialStatement Boolean  @default(false) @map("is_financial_statement")
+  isFinancialStatement Boolean   @default(false) @map("is_financial_statement")
   revealTime           DateTime? @map("reveal_time")
   expirationTime       DateTime? @map("expiration_time")
   createdAt            DateTime  @default(now()) @map("created_at")
@@ -6662,7 +6781,6 @@ model ForumCategoryAttachment {
   @@map("forum_category_attachments")
   @@schema("alltenant")
 }
-
 
 model ForumTopicSubscription {
   dao_slug  DaoSlug
@@ -6710,10 +6828,10 @@ model ForumAuditLog {
 
 model ForumTopicViewStats {
   dao_slug    DaoSlug
-  topicId     Int       @map("topic_id")
+  topicId     Int        @map("topic_id")
   topic       ForumTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  views       Int       @default(0)
-  lastUpdated DateTime  @default(now()) @map("last_updated")
+  views       Int        @default(0)
+  lastUpdated DateTime   @default(now()) @map("last_updated")
 
   @@id([dao_slug, topicId])
   @@map("forum_topic_view_stats")
@@ -6733,15 +6851,15 @@ model ProposalLinks {
 }
 
 model ProposalExecutionTransaction {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenant          String
-  proposal_id     String    @map("proposal_id")
-  transaction_hash String    @map("transaction_hash")
-  chain_id        Int       @map("chain_id")
-  executed_by     String    @map("executed_by")
-  executed_at     DateTime  @map("executed_at")
-  created_at      DateTime  @default(now()) @map("created_at")
-  updated_at      DateTime  @default(now()) @map("updated_at")
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant           String
+  proposal_id      String   @map("proposal_id")
+  transaction_hash String   @map("transaction_hash")
+  chain_id         Int      @map("chain_id")
+  executed_by      String   @map("executed_by")
+  executed_at      DateTime @map("executed_at")
+  created_at       DateTime @default(now()) @map("created_at")
+  updated_at       DateTime @default(now()) @map("updated_at")
 
   @@unique([tenant, proposal_id, transaction_hash])
   @@index([tenant, proposal_id])
@@ -6772,120 +6890,120 @@ model ProposalMetadataKv {
 // =============================================================================
 
 model ForumRole {
-    id          Int      @id @default(autoincrement())
-    daoSlug     DaoSlug? @map("dao_slug") // NULL for system roles, required for custom roles
-    name        String
-    slug        String
-    description String?
-    isSystem    Boolean  @default(false) @map("is_system")
-    isDefault   Boolean  @default(false) @map("is_default")
-    createdAt   DateTime @default(now()) @map("created_at")
-    updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  daoSlug     DaoSlug? @map("dao_slug") // NULL for system roles, required for custom roles
+  name        String
+  slug        String
+  description String?
+  isSystem    Boolean  @default(false) @map("is_system")
+  isDefault   Boolean  @default(false) @map("is_default")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
 
-    // Relations
-    rolePermissions ForumRolePermission[]
-    userRoles       ForumUserRole[]
+  // Relations
+  rolePermissions ForumRolePermission[]
+  userRoles       ForumUserRole[]
 
-    // System roles have unique slug globally, custom roles unique per DAO
-    @@unique([daoSlug, slug])
-    @@index([daoSlug])
-    @@index([isSystem])
-    @@map("forum_roles")
-    @@schema("alltenant")
+  // System roles have unique slug globally, custom roles unique per DAO
+  @@unique([daoSlug, slug])
+  @@index([daoSlug])
+  @@index([isSystem])
+  @@map("forum_roles")
+  @@schema("alltenant")
 }
 
 model Permission {
-    id          Int      @id @default(autoincrement())
-    module      String
-    resource    String
-    action      String
-    description String?
-    createdAt   DateTime @default(now()) @map("created_at")
+  id          Int      @id @default(autoincrement())
+  module      String
+  resource    String
+  action      String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
 
-    // Relations
-    rolePermissions ForumRolePermission[]
+  // Relations
+  rolePermissions ForumRolePermission[]
 
-    @@unique([module, resource, action])
-    @@index([module])
-    @@map("permissions")
-    @@schema("alltenant")
+  @@unique([module, resource, action])
+  @@index([module])
+  @@map("permissions")
+  @@schema("alltenant")
 }
 
 model ForumRolePermission {
-    id           Int      @id @default(autoincrement())
-    roleId       Int      @map("role_id")
-    permissionId Int      @map("permission_id")
-    createdAt    DateTime @default(now()) @map("created_at")
+  id           Int      @id @default(autoincrement())
+  roleId       Int      @map("role_id")
+  permissionId Int      @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at")
 
-    // Relations
-    role       ForumRole   @relation(fields: [roleId], references: [id], onDelete: Cascade)
-    permission Permission  @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  // Relations
+  role       ForumRole  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-    @@unique([roleId, permissionId])
-    @@index([roleId])
-    @@index([permissionId])
-    @@map("forum_role_permissions")
-    @@schema("alltenant")
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("forum_role_permissions")
+  @@schema("alltenant")
 }
 
 model ForumUserRole {
-    id         Int       @id @default(autoincrement())
-    daoSlug    DaoSlug?  @map("dao_slug") // NULL for system-wide roles (e.g., Super Admin)
-    address    String
-    name       String?   // Optional user name
-    roleId     Int       @map("role_id")
-    grantedBy  String    @map("granted_by")
-    grantedAt  DateTime  @default(now()) @map("granted_at")
-    revokedAt  DateTime? @map("revoked_at")
-    revokedBy  String?   @map("revoked_by")
-    isActive   Boolean   @default(true) @map("is_active")
+  id        Int       @id @default(autoincrement())
+  daoSlug   DaoSlug?  @map("dao_slug") // NULL for system-wide roles (e.g., Super Admin)
+  address   String
+  name      String? // Optional user name
+  roleId    Int       @map("role_id")
+  grantedBy String    @map("granted_by")
+  grantedAt DateTime  @default(now()) @map("granted_at")
+  revokedAt DateTime? @map("revoked_at")
+  revokedBy String?   @map("revoked_by")
+  isActive  Boolean   @default(true) @map("is_active")
 
-    // Relations
-    role ForumRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  // Relations
+  role ForumRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
-    @@unique([daoSlug, address, roleId])
-    @@index([daoSlug, address])
-    @@index([roleId])
-    @@index([isActive])
-    @@map("forum_user_roles")
-    @@schema("alltenant")
+  @@unique([daoSlug, address, roleId])
+  @@index([daoSlug, address])
+  @@index([roleId])
+  @@index([isActive])
+  @@map("forum_user_roles")
+  @@schema("alltenant")
 }
 
 model ForumRoleChangeAudit {
-    id                Int      @id @default(autoincrement())
-    daoSlug           DaoSlug? @map("dao_slug") // NULL for system-wide operations
-    action            String
-    actor             String
-    targetUser        String?  @map("target_user")
-    roleId            Int?     @map("role_id")
-    roleName          String?  @map("role_name")
-    permissionChanges Json?    @map("permission_changes")
-    context           Json?
-    timestamp         DateTime @default(now())
+  id                Int      @id @default(autoincrement())
+  daoSlug           DaoSlug? @map("dao_slug") // NULL for system-wide operations
+  action            String
+  actor             String
+  targetUser        String?  @map("target_user")
+  roleId            Int?     @map("role_id")
+  roleName          String?  @map("role_name")
+  permissionChanges Json?    @map("permission_changes")
+  context           Json?
+  timestamp         DateTime @default(now())
 
-    @@index([daoSlug])
-    @@index([actor])
-    @@index([targetUser])
-    @@index([timestamp])
-    @@index([daoSlug, timestamp])
-    @@map("forum_role_change_audit")
-    @@schema("alltenant")
+  @@index([daoSlug])
+  @@index([actor])
+  @@index([targetUser])
+  @@index([timestamp])
+  @@index([daoSlug, timestamp])
+  @@map("forum_role_change_audit")
+  @@schema("alltenant")
 }
 
 model DaoFinancialMetrics {
-    id        Int      @id @default(autoincrement())
-    dao_slug  DaoSlug
-    topic_id  Int?
-    year      Int?
-    month     String?
-    data      Json
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id        Int      @id @default(autoincrement())
+  dao_slug  DaoSlug
+  topic_id  Int?
+  year      Int?
+  month     String?
+  data      Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
-    @@index([dao_slug], name: "idx_dao_financial_metrics_dao_slug")
-    @@index([topic_id], name: "idx_dao_financial_metrics_topic_id")
-    @@index([createdAt(sort: Desc)], name: "idx_dao_financial_metrics_created_at")
-    @@index([dao_slug, year, month], name: "idx_dao_financial_metrics_reporting_period")
-    @@map("dao_financial_metrics")
-    @@schema("alltenant")
+  @@index([dao_slug], name: "idx_dao_financial_metrics_dao_slug")
+  @@index([topic_id], name: "idx_dao_financial_metrics_topic_id")
+  @@index([createdAt(sort: Desc)], name: "idx_dao_financial_metrics_created_at")
+  @@index([dao_slug, year, month], name: "idx_dao_financial_metrics_reporting_period")
+  @@map("dao_financial_metrics")
+  @@schema("alltenant")
 }

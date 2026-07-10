@@ -181,7 +181,9 @@ export default class TenantTokenFactory {
         return {
           name: "CIVIC",
           symbol: "CIVIC",
-          decimals: 1,
+          // The Supporter Pass is an ERC-721. Its balance and voting units are
+          // whole tokens, so forum eligibility must not apply ERC-20 scaling.
+          decimals: 0,
           address: isProd
             ? "0x44b685edf24ff97fba0103ec7e365923a3b65f0b"
             : "0x0000000000000000000000000000000000000000",

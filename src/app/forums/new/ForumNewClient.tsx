@@ -25,6 +25,12 @@ import { useAccount } from "wagmi";
 import { uploadToIPFSOnly } from "@/lib/actions/attachment";
 import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import {
+  ForumSurveyBuilder,
+  validateSurveyDefinition,
+} from "@/components/Forum/ForumSurveyBuilder";
+import type { SurveyDefinitionInput } from "@/lib/actions/forum/surveys";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 export interface FormData {
   title: string;
@@ -57,6 +63,7 @@ export default function ForumNewClient({
   const { getAuthenticationData } = useProposalActionAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVPModal, setShowVPModal] = useState(false);
+  const [survey, setSurvey] = useState<SurveyDefinitionInput | null>(null);
 
   const form = useForm<FormData>({
     defaultValues: initialFormData,
@@ -74,8 +81,9 @@ export default function ForumNewClient({
   const title = watch("title");
   const description = watch("description");
   const categoryId = watch("categoryId");
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
   const copy = ui.copy;
+  const surveysEnabled = ui.toggle("forums/surveys")?.enabled === true;
   const isDarkTenant = ui.theme === "dark";
   const selectClassName = [
     "w-full mt-2 px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-ring",
@@ -122,12 +130,28 @@ export default function ForumNewClient({
       return;
     }
 
+    const surveyErrors = validateSurveyDefinition(survey);
+    if (surveyErrors.length > 0) {
+      toast.error(surveyErrors[0]);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const created = await createTopic({
         title: data.title.trim(),
         content: data.description.trim(),
         categoryId: data.categoryId,
+        survey: survey
+          ? {
+              ...survey,
+              questions: survey.questions.map((question) => ({
+                ...question,
+                prompt: question.prompt.trim(),
+                options: question.options?.map((option) => option.trim()),
+              })),
+            }
+          : undefined,
       });
 
       if (created?.id) {
@@ -286,6 +310,14 @@ export default function ForumNewClient({
                   onImageUpload={handleImageUpload}
                 />
 
+                {surveysEnabled && (
+                  <ForumSurveyBuilder
+                    value={survey}
+                    onChange={setSurvey}
+                    disabled={isSubmitting}
+                  />
+                )}
+
                 <div className="flex items-center justify-between pt-6 border-t">
                   <div className="text-sm text-gray-500">
                     {vpCheck.canProceed ? (
@@ -319,7 +351,10 @@ export default function ForumNewClient({
                     <Button
                       onClick={handleSubmit}
                       disabled={
-                        isSubmitting || !title?.trim() || !description?.trim()
+                        isSubmitting ||
+                        !title?.trim() ||
+                        !description?.trim() ||
+                        validateSurveyDefinition(survey).length > 0
                       }
                       className="bg-black text-white hover:bg-gray-800"
                     >

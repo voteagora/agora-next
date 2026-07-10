@@ -1,3 +1,5 @@
+import type { ForumSurveySummaryDto } from "@/lib/actions/forum/surveyTypes";
+
 export interface ForumAttachment {
   id: number;
   fileName: string;
@@ -16,6 +18,7 @@ export interface ForumTopic {
   id: number;
   title: string;
   author: string;
+  authorDisplayName?: string | null;
   content: string;
   createdAt: string;
   comments: ForumPost[];
@@ -27,11 +30,13 @@ export interface ForumTopic {
   isFinancialStatement?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
+  survey?: ForumSurveySummaryDto | null;
 }
 
 export interface ForumPost {
   id: number;
   author: string;
+  authorDisplayName?: string | null;
   content: string;
   createdAt: string;
   parentId?: number;
@@ -174,6 +179,7 @@ export function transformForumTopics(
       topic.posts?.slice(1).map((post: any) => ({
         id: post.id,
         author: post.address,
+        authorDisplayName: post.authorDisplayName ?? null,
         content: post.content,
         createdAt: post.createdAt,
         parentId: post.parentPostId || undefined,
@@ -188,6 +194,7 @@ export function transformForumTopics(
       id: topic.id,
       title: topic.title,
       author: topic.address,
+      authorDisplayName: topic.authorDisplayName ?? null,
       content: topic.posts?.[0]?.content || "",
       createdAt: topic.createdAt,
       comments,
@@ -200,6 +207,7 @@ export function transformForumTopics(
           ? topic.revealTime.toISOString()
           : new Date(topic.revealTime).toISOString()
         : null,
+      survey: topic.survey ?? null,
     };
   });
 }

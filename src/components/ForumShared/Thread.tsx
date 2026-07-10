@@ -3,9 +3,9 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import ENSName from "@/components/shared/ENSName";
 import { ForumPost } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
@@ -272,17 +272,23 @@ const CommentItem = ({
                   {isAuthorAdmin ? (
                     "Cowrie"
                   ) : (
-                    <ENSName address={comment.author || ""} />
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      displayName={comment.authorDisplayName}
+                      isDeleted={isDeletedUser}
+                    />
                   )}
                 </Link>
               ) : (
                 <span className="text-sm font-medium text-primary">
-                  {isDeletedUser ? (
-                    "(deleted user)"
-                  ) : isAuthorAdmin ? (
+                  {isAuthorAdmin ? (
                     "Cowrie"
                   ) : (
-                    <ENSName address={comment.author || ""} />
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      displayName={comment.authorDisplayName}
+                      isDeleted={isDeletedUser}
+                    />
                   )}
                 </span>
               )}

@@ -370,6 +370,10 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "forums/surveys",
+      enabled: true,
+    },
+    {
       name: "notifications",
       enabled: true,
     },

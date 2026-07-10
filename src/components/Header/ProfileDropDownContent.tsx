@@ -270,7 +270,10 @@ export const ProfileDropDownContent = ({
       <div className="self-stretch flex flex-col font-medium">
         <div className="py-8 px-6 flex gap-4 flex-col border-b border-line">
           <PanelRow
-            title={ui.tacticalStrings?.myBalance || "My token balance"}
+            title={
+              ui.tacticalStrings?.myBalance ||
+              (ui.isNgo ? "My Supporter Pass" : "My token balance")
+            }
             detail={
               <RowSkeletonWrapper isLoading={isFetching}>
                 <TokenAmountDecorated amount={tokenBalance || BigInt(0)} />
@@ -280,7 +283,7 @@ export const ProfileDropDownContent = ({
           <PanelRow
             title={
               <span className="inline-flex items-center">
-                My voting power
+                {ui.isNgo ? "My vote" : "My voting power"}
                 <VotingPowerInfoTooltip />
               </span>
             }
@@ -312,7 +315,7 @@ export const ProfileDropDownContent = ({
                 className="self-stretch h-12 pl-4 text-secondary flex items-center hover:bg-neutral hover:rounded-md"
                 onClick={handleCloseDrawer}
               >
-                Create delegate statement
+                {ui.isNgo ? "Set up your profile" : "Create delegate statement"}
               </Link>
             ) : (
               <>
@@ -328,7 +331,9 @@ export const ProfileDropDownContent = ({
                   onClick={handleCloseDrawer}
                   className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
                 >
-                  Edit delegate statement
+                  {ui.isNgo
+                    ? copy.delegates.profile.editMyProfile
+                    : "Edit delegate statement"}
                 </Link>
               </>
             )}
@@ -338,7 +343,9 @@ export const ProfileDropDownContent = ({
                 onClick={handleCloseDrawer}
                 className="self-stretch h-12 pl-4 flex text-secondary items-center hover:bg-neutral hover:font-bold hover:rounded-md"
               >
-                Sign to manage notifications
+                {ui.isNgo
+                  ? "Notification settings"
+                  : "Sign to manage notifications"}
               </Link>
             )}
           </div>
@@ -363,7 +370,13 @@ export const ProfileDropDownContent = ({
               }}
             />
             <span className="text-primary">
-              {isSigningIn ? "Signing in…" : "Sign in with Ethereum"}
+              {isSigningIn
+                ? ui.isNgo
+                  ? "Verifying…"
+                  : "Signing in…"
+                : ui.isNgo
+                  ? "Verify your account"
+                  : "Sign in with Ethereum"}
             </span>
           </div>
         )}

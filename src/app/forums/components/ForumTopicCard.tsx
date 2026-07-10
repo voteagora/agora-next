@@ -3,9 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { MessageCircle, Clock, ChevronUp } from "lucide-react";
+import { BarChart3, MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath, buildForumArticlePath } from "@/lib/forumUtils";
+import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
 import { useForum } from "@/hooks/useForum";
@@ -15,7 +16,6 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import ENSName from "@/components/shared/ENSName";
 
 const { ui } = Tenant.current();
 
@@ -141,6 +141,15 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
                 <h3 className="text-base font-semibold text-primary truncate group-hover:underline">
                   {topic.title}
                 </h3>
+                {topic.survey && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-wash px-2 py-0.5 text-[11px] font-semibold text-secondary">
+                    <BarChart3 className="h-3 w-3" />
+                    {topic.survey.kind === "poll" ? "Poll" : "Survey"}
+                    <span aria-hidden="true">·</span>
+                    {topic.survey.responseCount ?? 0}
+                    <span className="sr-only"> responses</span>
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold text-secondary">
                 {/* Replies */}
@@ -158,12 +167,14 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isDeletedUser ? (
-                <span className="text-primary">(deleted user)</span>
-              ) : isAuthorAdmin ? (
+              {isAuthorAdmin ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
-                <ENSName address={topic.address} />
+                <ForumAuthorName
+                  address={topic.address}
+                  displayName={topic.authorDisplayName}
+                  isDeleted={isDeletedUser}
+                />
               )}
             </p>
           </div>
