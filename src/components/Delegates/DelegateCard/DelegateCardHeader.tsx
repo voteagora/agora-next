@@ -34,6 +34,8 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     return null;
   }
 
+  const hidePendingActivity = ui.isNgo;
+
   const delegateStats = delegateResponse.delegate;
   const numRecentVotes = delegateStats.participation[0];
   const numRecentProposals = delegateStats.participation[1];
@@ -42,13 +44,17 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
   let votesCount = numRecentVotes;
   let totalProposals = numRecentProposals;
   if (useArchiveForProposals) {
-    if (!archiveParticipation) return <PendingActivityHeader />;
+    if (!archiveParticipation) {
+      return hidePendingActivity ? null : <PendingActivityHeader />;
+    }
     votesCount = archiveParticipation.participated;
     totalProposals = archiveParticipation.totalProposals;
   }
 
   const eligible = totalProposals >= 10;
-  if (!eligible) return <PendingActivityHeader />;
+  if (!eligible) {
+    return hidePendingActivity ? null : <PendingActivityHeader />;
+  }
 
   const participationRate = votesCount / totalProposals;
   const participationString = Math.floor(participationRate * 100);

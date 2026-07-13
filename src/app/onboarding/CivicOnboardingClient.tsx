@@ -607,8 +607,11 @@ export default function CivicOnboardingClient() {
               : "Your profile is ready. Head to the community to get started."}
           </p>
           {selectedLabel ? (
-            <div className="mt-8 rounded-xl border border-line bg-wash px-4 py-3 text-sm font-medium text-primary">
-              {selectedLabel}
+            <div className="mt-8 rounded-xl border border-line bg-wash px-4 py-4">
+              <p className="text-sm font-semibold text-primary">
+                {question?.prompt ?? CIVIC_FEATURED_SURVEY_TITLE}
+              </p>
+              <p className="mt-2 text-sm text-secondary">{selectedLabel}</p>
             </div>
           ) : null}
           <Button

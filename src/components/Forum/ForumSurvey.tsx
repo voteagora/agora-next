@@ -5,7 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { BarChart3, CheckCircle2, Clock3, Loader2, Lock } from "lucide-react";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
-import ENSName from "@/components/shared/ENSName";
+import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -258,15 +258,11 @@ function SurveyResults({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-primary">
-                    {response.isDeleted ? (
-                      "Removed account"
-                    ) : response.displayName ? (
-                      response.displayName
-                    ) : response.address ? (
-                      <ENSName address={response.address} />
-                    ) : (
-                      "Someone in the community"
-                    )}
+                    <ForumAuthorName
+                      address={response.address}
+                      displayName={response.displayName}
+                      isDeleted={response.isDeleted}
+                    />
                   </p>
                   <time className="text-xs text-tertiary">
                     {formatDeadline(response.createdAt)}
@@ -408,9 +404,6 @@ export function ForumSurvey({
   const canClose = isOpen && isLocalStaffViewer;
 
   const deadline = formatDeadline(survey.closesAt);
-  const responseLabel = `${survey.responseCount} ${
-    survey.responseCount === 1 ? "response" : "responses"
-  }`;
 
   const validationError = useMemo(
     () => validateAnswers(survey, answers),
@@ -549,7 +542,6 @@ export function ForumSurvey({
                 ? "One question · pick one"
                 : `${survey.questions.length} question${survey.questions.length === 1 ? "" : "s"}`}
             </span>
-            <span className="text-xs text-tertiary">{responseLabel}</span>
           </div>
           <h2
             id={`forum-survey-${survey.id}-title`}
@@ -559,6 +551,16 @@ export function ForumSurvey({
               ? (survey.questions[0]?.prompt ?? "Community poll")
               : "Community survey"}
           </h2>
+          <p className="mt-2 text-sm font-semibold text-primary">
+            {survey.responseCount}{" "}
+            {survey.kind === "poll"
+              ? survey.responseCount === 1
+                ? "vote"
+                : "votes"
+              : survey.responseCount === 1
+                ? "response"
+                : "responses"}
+          </p>
           <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-secondary">
             <span className="inline-flex items-center gap-1">
               {isOpen ? (
@@ -824,7 +826,9 @@ export function ForumSurvey({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {survey.kind === "poll" ? "Close this poll?" : "Close this survey?"}
+              {survey.kind === "poll"
+                ? "Close this poll?"
+                : "Close this survey?"}
             </DialogTitle>
             <DialogDescription>
               Closing can’t be undone. No new responses, and results become

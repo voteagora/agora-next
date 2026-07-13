@@ -88,6 +88,7 @@ export default function ForumThread({
         {
           id: newPost.id,
           author: newPost.author,
+          authorDisplayName: newPost.authorDisplayName,
           content: newPost.content,
           createdAt: newPost.createdAt,
           parentId: newPost.parentId,
@@ -168,6 +169,7 @@ export default function ForumThread({
           {
             id: newPost.id,
             author: newPost.author,
+            authorDisplayName: newPost.authorDisplayName,
             content: newPost.content,
             createdAt: newPost.createdAt,
             parentId: undefined,

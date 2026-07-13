@@ -553,11 +553,24 @@ export async function createForumPost(
       addRecipientAttributeValue(normalizedAddress, "engaged_topics", topicId);
     }
 
+    const createdUsername = (
+      await prismaWeb2Client.delegateStatements.findFirst({
+        where: {
+          dao_slug: slug,
+          address: { equals: normalizedAddress, mode: "insensitive" },
+          username: { not: null },
+        },
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+        select: { username: true },
+      })
+    )?.username?.trim();
+
     return {
       success: true as const,
       data: {
         id: newPost.id,
         address: newPost.address,
+        authorDisplayName: createdUsername || null,
         content: newPost.content,
         createdAt: newPost.createdAt.toISOString(),
         parentPostId: newPost.parentPostId,

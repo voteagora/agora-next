@@ -307,7 +307,11 @@ export default async function ForumTopicPage(props: PageProps) {
     id: transformed.id,
     title: transformed.title,
     address: authorAddress,
-    authorName: truncateAddress(authorAddress) || authorAddress,
+    authorName:
+      transformed.authorDisplayName ||
+      truncateAddress(authorAddress) ||
+      authorAddress,
+    authorDisplayName: transformed.authorDisplayName ?? null,
     createdAt: createdAtIso,
     revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,

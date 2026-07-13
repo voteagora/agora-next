@@ -488,11 +488,24 @@ export async function getForumTopicsByUser(
       return out;
     };
 
+    const authorAddresses = data.flatMap((topic: any) => [
+      topic.address,
+      ...topic.posts.map((p: any) => p.address),
+    ]);
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet(authorAddresses),
+      getDisplayNameMap(authorAddresses),
+    ]);
+
     const processedTopics = data.map((topic: any) => ({
       ...topic,
       survey: mapForumSurveySummary(topic.survey),
+      isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
+      authorDisplayName: displayNames.get(topic.address?.toLowerCase()) ?? null,
       posts: topic.posts.map((p: any) => ({
         ...p,
+        isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
+        authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
         reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       })),
       topicReactionsByEmoji: groupByEmojiAddresses(topic.posts?.[0]?.reactions),
@@ -773,6 +786,10 @@ export async function createForumTopic(
       );
     }
 
+    const createdDisplayNames = await getDisplayNameMap([normalizedAddress]);
+    const createdAuthorDisplayName =
+      createdDisplayNames.get(normalizedAddress) ?? null;
+
     return {
       success: true as const,
       data: {
@@ -780,12 +797,14 @@ export async function createForumTopic(
           id: newTopic.id,
           title: newTopic.title,
           address: newTopic.address,
+          authorDisplayName: createdAuthorDisplayName,
           createdAt: newTopic.createdAt.toISOString(),
         },
         post: {
           id: newPost.id,
           content: newPost.content,
           address: newPost.address,
+          authorDisplayName: createdAuthorDisplayName,
           createdAt: newPost.createdAt.toISOString(),
         },
         survey: newSurvey
@@ -1461,14 +1480,17 @@ export const getForumData = async ({
       adminRolesObj[address] = role;
     });
 
-    const deletedAccounts = await getDeletedAccountSet(
-      topics.map((topic) => topic.address)
-    );
+    const topicAddresses = topics.map((topic) => topic.address);
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet(topicAddresses),
+      getDisplayNameMap(topicAddresses),
+    ]);
 
     const processedTopics = topics.map((topic) => ({
       ...topic,
       survey: mapForumSurveySummary((topic as any).survey),
       isAuthorDeleted: deletedAccounts.has(topic.address.toLowerCase()),
+      authorDisplayName: displayNames.get(topic.address.toLowerCase()) ?? null,
       createdAt: topic.createdAt.toISOString(),
       revealTime: topic.revealTime
         ? (topic.revealTime instanceof Date

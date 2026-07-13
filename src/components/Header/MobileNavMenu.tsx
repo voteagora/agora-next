@@ -42,7 +42,8 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
   const hasProposalsHref = ui.page("proposals")?.href !== undefined;
 
   const delegatesToggle = ui.toggle("delegates");
-  const hasDelegates = delegatesToggle !== undefined && delegatesToggle.enabled;
+  const hasDelegates =
+    delegatesToggle !== undefined && delegatesToggle.enabled && !ui.isNgo;
 
   const stakingToggle = ui.toggle("staking");
   const hasStaking = stakingToggle !== undefined && stakingToggle.enabled;

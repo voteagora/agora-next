@@ -46,8 +46,20 @@ vi.mock("@/hooks/useProposalActionAuth", () => ({
   }),
 }));
 
-vi.mock("@/components/shared/ENSName", () => ({
-  default: ({ address }: { address: string }) => <span>{address}</span>,
+vi.mock("@/components/Forum/ForumAuthorName", () => ({
+  default: ({
+    address,
+    displayName,
+    isDeleted,
+  }: {
+    address?: string | null;
+    displayName?: string | null;
+    isDeleted?: boolean;
+  }) => (
+    <span>
+      {isDeleted ? "Removed account" : displayName || address || "Someone"}
+    </span>
+  ),
 }));
 
 vi.mock("react-hot-toast", () => ({

@@ -292,12 +292,15 @@ async function loadVisibleResponses(
         displayNames.set(address, "Removed account");
         return;
       }
-      displayNames.set(
-        address,
-        usernames.get(address) ??
-          (await reverseResolveENSName(address)) ??
-          address
-      );
+      const username = usernames.get(address)?.trim();
+      if (username) {
+        displayNames.set(address, username);
+        return;
+      }
+      const ens = await reverseResolveENSName(address);
+      if (ens) {
+        displayNames.set(address, ens);
+      }
     })
   );
 
@@ -311,7 +314,7 @@ async function loadVisibleResponses(
       return {
         ...mapResponse(row),
         address: isDeleted ? null : address,
-        displayName: displayNames.get(address) ?? address,
+        displayName: displayNames.get(address) ?? null,
         isDeleted,
       };
     }),

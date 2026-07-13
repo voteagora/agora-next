@@ -145,18 +145,20 @@ export default function Navbar() {
           {copy.nav.discussions}
         </HeaderLink>
       )}
-      {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.delegates = el;
-          }}
-          href="/delegates"
-          isActive={activeNavItem === "delegates"}
-          onClick={() => handleNavClick("delegates")}
-        >
-          {copy.nav.delegates}
-        </HeaderLink>
-      )}
+      {ui.toggle("delegates") &&
+        ui.toggle("delegates").enabled &&
+        !ui.isNgo && (
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.delegates = el;
+            }}
+            href="/delegates"
+            isActive={activeNavItem === "delegates"}
+            onClick={() => handleNavClick("delegates")}
+          >
+            {copy.nav.delegates}
+          </HeaderLink>
+        )}
 
       {ui.toggle("staking") && ui.toggle("staking").enabled && (
         <HeaderLink

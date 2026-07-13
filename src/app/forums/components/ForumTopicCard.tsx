@@ -145,13 +145,24 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-wash px-2 py-0.5 text-[11px] font-semibold text-secondary">
                     <BarChart3 className="h-3 w-3" />
                     {topic.survey.kind === "poll" ? "Poll" : "Survey"}
-                    <span aria-hidden="true">·</span>
-                    {topic.survey.responseCount ?? 0}
-                    <span className="sr-only"> responses</span>
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold text-secondary">
+                {topic.survey && (
+                  <div
+                    className="inline-flex items-center gap-1.5"
+                    title={topic.survey.kind === "poll" ? "Votes" : "Responses"}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" strokeWidth={1.7} />
+                    <span className="tabular-nums">
+                      {topic.survey.responseCount ?? 0}
+                    </span>
+                    <span className="sr-only">
+                      {topic.survey.kind === "poll" ? "votes" : "responses"}
+                    </span>
+                  </div>
+                )}
                 {/* Replies */}
                 <div className="inline-flex items-center gap-1.5">
                   <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.7} />
@@ -167,7 +178,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isAuthorAdmin ? (
+              {isAuthorAdmin && !ui.isNgo ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
                 <ForumAuthorName

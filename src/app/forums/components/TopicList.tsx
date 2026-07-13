@@ -43,6 +43,7 @@ interface Topic {
   title: string;
   address?: string;
   authorDisplayName?: string | null;
+  isAuthorDeleted?: boolean;
   createdAt: string;
   revealTime?: string | null;
   postsCount?: number;
@@ -246,13 +247,27 @@ function TopicCard({
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-wash px-2 py-0.5 text-[11px] font-semibold text-secondary">
                     <BarChart3 className="h-3 w-3" />
                     {topic.survey.kind === "poll" ? "Poll" : "Survey"}
-                    <span aria-hidden="true">·</span>
-                    {topic.survey.responseCount ?? 0}
-                    <span className="sr-only"> responses</span>
                   </span>
                 )}
               </div>
               <div className="flex shrink-0 items-center gap-2 pl-4 text-xs font-semibold text-secondary lg:w-60 lg:pl-5">
+                {topic.survey && (
+                  <div
+                    className="flex w-12 shrink-0 items-center justify-start gap-1 whitespace-nowrap"
+                    title={topic.survey.kind === "poll" ? "Votes" : "Responses"}
+                  >
+                    <BarChart3
+                      className="w-3.5 h-3.5 shrink-0"
+                      strokeWidth={1.7}
+                    />
+                    <span className="tabular-nums">
+                      {topic.survey.responseCount ?? 0}
+                    </span>
+                    <span className="sr-only">
+                      {topic.survey.kind === "poll" ? "votes" : "responses"}
+                    </span>
+                  </div>
+                )}
                 <div className="flex w-12 shrink-0 items-center justify-start gap-1 whitespace-nowrap">
                   <MessageCircle
                     className="w-3.5 h-3.5 shrink-0"
@@ -271,12 +286,13 @@ function TopicCard({
 
             <p className="mt-1 max-w-full break-words text-sm leading-relaxed text-secondary line-clamp-1 overflow-hidden">
               By:{" "}
-              {isAuthorAdmin ? (
+              {isAuthorAdmin && !ui.isNgo ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
                 <ForumAuthorName
                   address={topic.address || ""}
                   displayName={topic.authorDisplayName}
+                  isDeleted={!!topic.isAuthorDeleted}
                 />
               )}
             </p>

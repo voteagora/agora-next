@@ -28,6 +28,7 @@ import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import toast from "react-hot-toast";
 import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import Tenant from "@/lib/tenant/tenant";
 
 export interface ThreadProps {
   comments: ForumPost[];
@@ -85,6 +86,7 @@ const CommentItem = ({
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
+  const { ui } = Tenant.current();
   const { deletePost, restorePost } = useForum();
   const openDialog = useOpenDialog();
   const { isAdmin, canManageTopics } = useForumAdmin(categoryId || undefined);
@@ -269,7 +271,7 @@ const CommentItem = ({
                   aria-label={profileLabel}
                   className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
-                  {isAuthorAdmin ? (
+                  {isAuthorAdmin && !ui.isNgo ? (
                     "Cowrie"
                   ) : (
                     <ForumAuthorName
@@ -281,7 +283,7 @@ const CommentItem = ({
                 </Link>
               ) : (
                 <span className="text-sm font-medium text-primary">
-                  {isAuthorAdmin ? (
+                  {isAuthorAdmin && !ui.isNgo ? (
                     "Cowrie"
                   ) : (
                     <ForumAuthorName

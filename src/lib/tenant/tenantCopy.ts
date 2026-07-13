@@ -924,7 +924,7 @@ const ngoCopy: TenantCopy = {
     },
     statement: {
       requiredToVote:
-        "Voting requires a voter statement. Set yours now to participate.",
+        "Voting requires a representative statement. Set yours now to participate.",
       setupButton: "Set up statement",
       submitProfile: "Submit voter profile",
       submitError:
@@ -935,7 +935,7 @@ const ngoCopy: TenantCopy = {
         "You must agree with the code of conduct to continue",
       principlesRequired:
         "You must agree with the organization principles to continue",
-      title: "Voter statement",
+      title: "Representative statement",
       defaultPlaceholder: `A brief intro to yourself:`,
     },
     profile: {
@@ -979,7 +979,7 @@ const ngoCopy: TenantCopy = {
       "Any changes to your holdings after launch will not affect voting on this proposal.",
     submittedDescription:
       "It might take up to a minute for the changes to be reflected. Thank you for participating.",
-    noStatementInline: "You do not have a voter statement.",
+    noStatementInline: "You do not have a representative statement.",
     noStatementLink: "Please set one up to vote.",
   },
   permissions: {
