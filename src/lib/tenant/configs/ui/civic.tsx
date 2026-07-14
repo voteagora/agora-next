@@ -415,13 +415,5 @@ export const civicTenantUIConfig = new TenantUI({
       name: "footer/community-engagement-tagline",
       enabled: true,
     },
-    {
-      name: "footer/hide-total-supply",
-      enabled: true,
-    },
-    {
-      name: "footer/hide-votable-supply",
-      enabled: true,
-    },
   ],
 });

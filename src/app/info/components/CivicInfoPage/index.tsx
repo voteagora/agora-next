@@ -126,7 +126,7 @@ const CivicInfoPage = () => {
                 <MonoLabel className="text-tertiary transition-colors group-hover:text-brandPrimary">
                   {String(index + 1).padStart(2, "0")}
                 </MonoLabel>
-                <span className="text-lg font-semibold text-primary transition-transform duration-200 group-hover:translate-x-0.5">
+                <span className="text-lg font-medium text-primary transition-transform duration-200 group-hover:translate-x-0.5">
                   {link.title}
                 </span>
               </span>
