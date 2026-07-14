@@ -74,9 +74,7 @@ const Caption = ({ children }: { children: React.ReactNode }) => (
 const CivicInfoPage = () => {
   const { ui } = Tenant.current();
   const infoPage = ui.page("info");
-  const aboutPage = ui.page("info/about");
   const links = infoPage?.links ?? [];
-  const contactEmail = aboutPage?.collaborationSection?.contactEmail;
 
   return (
     <div className="mt-6 flex flex-col gap-10 text-primary sm:mt-8 sm:gap-12">
@@ -197,17 +195,6 @@ const CivicInfoPage = () => {
             and a landmark to conceive future community engagement.
           </p>
         </div>
-        {contactEmail && (
-          <MonoLabel className="mt-8 block text-tertiary">
-            For questions or to request removal of your data, please contact{" "}
-            <a
-              href={`mailto:${contactEmail}`}
-              className="text-brandPrimary hover:underline"
-            >
-              {contactEmail.toUpperCase()}
-            </a>
-          </MonoLabel>
-        )}
       </section>
 
       {/* PARTICIPATION */}
@@ -237,6 +224,32 @@ const CivicInfoPage = () => {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* PRIVACY & DATA */}
+      <section>
+        <SectionHeader title="Privacy & Data" />
+        <p className="mt-5 text-base leading-relaxed text-secondary">
+          The Center for Civilians in Conflict respects the privacy of its
+          supporters and does not sell or share your information with other
+          organizations or third parties. You can unsubscribe from notifications
+          in the profile section of the app, and delete your CIVIC Supporter
+          Pass account at any time from within the application or by contacting{" "}
+          <a
+            href="mailto:giving@civiliansinconflict.org"
+            className="text-brandPrimary hover:underline"
+          >
+            giving@civiliansinconflict.org
+          </a>
+          . Please note the only data written to the blockchain is public key
+          and vote information — this is anonymized and cannot be deleted.
+        </p>
+        <Link
+          href="/info/privacy"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brandPrimary transition-colors hover:underline"
+        >
+          Read our full Privacy Policy →
+        </Link>
       </section>
     </div>
   );
