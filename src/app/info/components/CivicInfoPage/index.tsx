@@ -65,7 +65,7 @@ const SectionHeader = ({
 
 const Caption = ({ children }: { children: React.ReactNode }) => (
   <span
-    className={`${mono} absolute bottom-3 left-3 right-3 text-[9px] sm:text-[10px] uppercase tracking-[0.12em] text-white/90 drop-shadow`}
+    className={`${mono} absolute bottom-3 left-3 right-3 text-[8px] sm:text-[9px] uppercase tracking-[0.12em] text-white/90 drop-shadow`}
   >
     {children}
   </span>
@@ -170,9 +170,11 @@ const CivicInfoPage = () => {
           </h2>
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-          <MonoLabel className="text-white/90 drop-shadow">
+          <span
+            className={`${mono} text-[8px] uppercase tracking-[0.12em] text-white/90 drop-shadow sm:text-[9px]`}
+          >
             Photo: Hajer Naili
-          </MonoLabel>
+          </span>
         </div>
       </section>
 
