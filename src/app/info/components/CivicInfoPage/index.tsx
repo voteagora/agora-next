@@ -230,19 +230,18 @@ const CivicInfoPage = () => {
       <section>
         <SectionHeader title="Privacy & Data" />
         <p className="mt-5 text-base leading-relaxed text-secondary">
-          The Center for Civilians in Conflict respects the privacy of its
-          supporters and does not sell or share your information with other
-          organizations or third parties. You can unsubscribe from notifications
-          in the profile section of the app, and delete your CIVIC Supporter
-          Pass account at any time from within the application or by contacting{" "}
+          CIVIC and Agora do not sell or share your personal information with
+          other organizations or third parties. You can unsubscribe from
+          notifications in your profile settings, and delete your Supporter Pass
+          account and personal data anytime in the app or by contacting{" "}
           <a
             href="mailto:giving@civiliansinconflict.org"
             className="text-brandPrimary hover:underline"
           >
             giving@civiliansinconflict.org
           </a>
-          . Please note the only data written to the blockchain is public key
-          and vote information — this is anonymized and cannot be deleted.
+          . The only data written to the blockchain is public key and vote
+          information, which is anonymized and cannot be deleted.
         </p>
         <Link
           href="/info/privacy"
