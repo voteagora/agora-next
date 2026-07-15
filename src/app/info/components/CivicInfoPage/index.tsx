@@ -199,6 +199,18 @@ const CivicInfoPage = () => {
         </div>
       </section>
 
+      {/* ABOUT AGORA */}
+      <section>
+        <SectionHeader title="About Agora" />
+        <p className="mt-5 text-base leading-relaxed text-secondary">
+          Agora builds the infrastructure that powers onchain governance for
+          leading communities and protocols. Our platform makes it simple to
+          delegate voting power, create and vote on proposals, and coordinate
+          decisions transparently — bringing the tools of modern governance to
+          CIVIC&apos;s Supporter community.
+        </p>
+      </section>
+
       {/* PARTICIPATION */}
       <section>
         <SectionHeader
