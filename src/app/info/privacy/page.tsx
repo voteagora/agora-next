@@ -21,7 +21,7 @@ export async function generateMetadata() {
 export default function Page() {
   const { ui } = Tenant.current();
 
-  if (!ui.toggle("info/civic-magazine")?.enabled) {
+  if (!ui.toggle("civic")?.enabled) {
     return (
       <div className="text-primary">Route not supported for namespace</div>
     );

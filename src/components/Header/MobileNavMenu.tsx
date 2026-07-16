@@ -52,6 +52,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
 
   const infoToggle = ui.toggle("info");
   const hasInfo = infoToggle !== undefined && infoToggle.enabled;
+  const infoFirst = Boolean(ui.toggle("civic")?.enabled);
 
   const dunaToggle = ui.toggle("duna");
   const hasDuna = dunaToggle !== undefined && dunaToggle.enabled;
@@ -84,7 +85,19 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
       return luminance > 200;
     })();
 
+  const infoNavItem = hasInfo
+    ? [
+        {
+          name: hasDuna ? copy.nav.about : copy.nav.info,
+          href: "/info",
+          target: "_self",
+          isActive: pathname.includes("info"),
+        },
+      ]
+    : [];
+
   const navItems = [
+    ...(infoFirst ? infoNavItem : []),
     ...(hasProposals
       ? [
           {
@@ -137,16 +150,7 @@ export function MobileNavMenu({ isOpen, onClose }: MobileNavMenuProps) {
           },
         ]
       : []),
-    ...(hasInfo
-      ? [
-          {
-            name: hasDuna ? copy.nav.about : copy.nav.info,
-            href: "/info",
-            target: "_self",
-            isActive: pathname.includes("info"),
-          },
-        ]
-      : []),
+    ...(infoFirst ? [] : infoNavItem),
     ...(hasDuna
       ? [
           {

@@ -226,8 +226,8 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      // Renders the bespoke CIVIC editorial/magazine info page (civic-only)
-      name: "info/civic-magazine",
+      // Renders the bespoke CIVIC info page and civic-specific UI (civic-only)
+      name: "civic",
       enabled: true,
     },
     {

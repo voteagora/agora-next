@@ -21,6 +21,8 @@ export default function Navbar() {
   const hasComingSoon =
     ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
   const hasDuna = ui.toggle("duna") && ui.toggle("duna").enabled;
+  const hasInfo = ui.toggle("info") && ui.toggle("info").enabled;
+  const infoFirst = Boolean(ui.toggle("civic")?.enabled);
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -58,6 +60,19 @@ export default function Navbar() {
     }
   }, [pathname]);
 
+  const infoLink = hasInfo && (
+    <HeaderLink
+      ref={(el) => {
+        linkRefs.current.info = el;
+      }}
+      href="/info"
+      isActive={activeNavItem === "info"}
+      onClick={() => handleNavClick("info")}
+    >
+      {hasDuna ? copy.nav.about : copy.nav.info}
+    </HeaderLink>
+  );
+
   // Update the active indicator position when activeNavItem changes
   useEffect(() => {
     if (activeNavItem && linkRefs.current[activeNavItem]) {
@@ -88,6 +103,8 @@ export default function Navbar() {
           }}
         />
       )}
+
+      {infoFirst && infoLink}
 
       {hasProposals && (
         <HeaderLink
@@ -180,18 +197,7 @@ export default function Navbar() {
         </HeaderLink>
       )}
 
-      {ui.toggle("info") && ui.toggle("info").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.info = el;
-          }}
-          href="/info"
-          isActive={activeNavItem === "info"}
-          onClick={() => handleNavClick("info")}
-        >
-          {hasDuna ? copy.nav.about : copy.nav.info}
-        </HeaderLink>
-      )}
+      {!infoFirst && infoLink}
 
       {hasDuna && (
         <HeaderLink

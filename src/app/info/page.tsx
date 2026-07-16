@@ -68,8 +68,8 @@ export default async function Page() {
     );
   }
 
-  // Bespoke editorial/magazine info page (currently CIVIC-only)
-  if (ui.toggle("info/civic-magazine")?.enabled) {
+  // Bespoke CIVIC-only info page
+  if (ui.toggle("civic")?.enabled) {
     return (
       <div className="flex flex-col">
         <CivicInfoPage />

@@ -56,9 +56,8 @@ export default async function Home() {
     return <ComingSoonPage />;
   }
 
-  // For tenants with the bespoke info page (currently CIVIC), use it as the
-  // landing page.
-  if (ui.toggle("info/civic-magazine")?.enabled) {
+  // For CIVIC, use the bespoke info page as the landing page.
+  if (ui.toggle("civic")?.enabled) {
     redirect("/info");
   }
 
