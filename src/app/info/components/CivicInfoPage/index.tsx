@@ -5,6 +5,7 @@ import Tenant from "@/lib/tenant/tenant";
 import { chivoMono, instrumentSerif } from "@/styles/fonts";
 import civicHero from "@/assets/tenant/civic_hero.svg";
 import civicInfo1 from "@/assets/tenant/civic_info_1.svg";
+import civicInfoLogo from "@/assets/tenant/civic_info.svg";
 
 const mono = chivoMono.className;
 const serif = instrumentSerif.className;
@@ -94,12 +95,15 @@ const CivicInfoPage = () => {
           <MonoLabel className="text-brandPrimary">
             Community Engagement Platform
           </MonoLabel>
-          <h1
-            className={`${serif} mt-4 text-6xl leading-[0.9] text-primary sm:text-7xl lg:text-8xl`}
-          >
-            CIVIC <span className="italic">Voice</span>
+          <h1 className="mt-4 w-56 sm:w-72">
+            <Image
+              src={civicInfoLogo}
+              alt="CIVIC Voice"
+              className="h-auto w-full"
+              priority
+            />
           </h1>
-          <p className="mt-6 max-w-md text-lg leading-snug text-secondary sm:text-xl">
+          <p className="mt-6 max-w-md text-base leading-snug text-secondary sm:text-lg">
             This community engagement platform enables supporters to provide
             input on proposals, delegate voting power, and help shape
             CIVIC&apos;s strategic direction.
