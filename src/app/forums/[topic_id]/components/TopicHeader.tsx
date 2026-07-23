@@ -24,6 +24,7 @@ interface TopicHeaderProps {
     createdAt: string;
     revealTime?: string | null;
     adminRole?: string | null;
+    isAuthorDeleted?: boolean;
   };
   isAdmin?: boolean;
 }
@@ -33,9 +34,11 @@ export default function TopicHeader({
   isAdmin = false,
 }: TopicHeaderProps) {
   const { address } = useAccount();
-  const profileHref = topic.address
-    ? `/delegates/${encodeURIComponent(topic.address)}`
-    : null;
+  const isDeletedUser = !!topic.isAuthorDeleted;
+  const profileHref =
+    topic.address && !isDeletedUser
+      ? `/delegates/${encodeURIComponent(topic.address)}`
+      : null;
   const profileLabel = topic.address
     ? `View profile for ${topic.address}`
     : "View profile";
@@ -79,10 +82,15 @@ export default function TopicHeader({
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <ENSAvatar ensName={topic.address} size={20} />
+              <ENSAvatar
+                ensName={isDeletedUser ? undefined : topic.address}
+                size={20}
+              />
               <div className="flex items-center gap-1">
                 <div className="font-medium text-sm">
-                  {isAdmin ? (
+                  {isDeletedUser ? (
+                    "(deleted user)"
+                  ) : isAdmin ? (
                     "Cowrie"
                   ) : (
                     <ENSName address={topic.address || ""} />

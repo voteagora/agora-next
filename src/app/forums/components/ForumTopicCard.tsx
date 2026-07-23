@@ -104,6 +104,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
   const adminRole = admins[authorAddress] || null;
   const isAuthorAdmin = authorAddress in admins;
+  const isDeletedUser = !!(topic as any).isAuthorDeleted;
 
   const isFinancialStatement = (topic as any).isFinancialStatement ?? false;
   const topicPath = isFinancialStatement
@@ -120,7 +121,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
           {/* Avatar */}
           <div className="flex-shrink-0 relative self-center">
             <ENSAvatar
-              ensName={topic.address}
+              ensName={isDeletedUser ? undefined : topic.address}
               className="w-[42px] h-[42px]"
               size={42}
             />
@@ -157,7 +158,9 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isAuthorAdmin ? (
+              {isDeletedUser ? (
+                <span className="text-primary">(deleted user)</span>
+              ) : isAuthorAdmin ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
                 <ENSName address={topic.address} />

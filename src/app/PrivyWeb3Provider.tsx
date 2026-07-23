@@ -177,7 +177,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
       setSyncTimedOut(false);
       return;
     }
-    // ponytail: 30s is deliberately generous; a normal sync is sub-second
+    // 30s is deliberately generous; a normal sync is sub-second
     const timer = setTimeout(() => setSyncTimedOut(true), 30_000);
     return () => clearTimeout(timer);
   }, [authenticated, isConnected]);

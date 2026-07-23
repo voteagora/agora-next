@@ -305,6 +305,7 @@ export default async function ForumTopicPage(props: PageProps) {
     createdAt: createdAtIso,
     revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,
+    isAuthorDeleted: transformed.isAuthorDeleted,
   };
 
   const rootPost = topicData.posts?.[0];

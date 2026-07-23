@@ -73,11 +73,14 @@ export function DeleteAccountDialog({
           This action is <strong>irreversible</strong>. Your profile, delegate
           statement, and contact email will be permanently deleted.
         </p>
+        <p className="text-negative font-medium">
+          Your membership NFT will be permanently burned when your account is
+          deleted. This cannot be undone.
+        </p>
         {hasEmbeddedWallet && (
           <p className="text-negative font-medium">
             Your managed wallet will be deleted along with your account. Access
-            to it — and to anything it holds, including your membership NFT —
-            will be permanently lost.
+            to it — and to anything else it holds — will be permanently lost.
           </p>
         )}
         <p>
