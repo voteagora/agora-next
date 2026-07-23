@@ -11,6 +11,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumTopicTempChecks } from "@/lib/actions/proposalLinks";
 
 const { namespace, ui } = Tenant.current();
+const copy = ui.copy;
 
 interface TopicContext {
   id: number;
@@ -97,7 +98,9 @@ export default function NewTopicButton({
     namespace === TENANT_NAMESPACES.OG ||
     namespace === TENANT_NAMESPACES.SHAPE
       ? "bg-white"
-      : "bg-buttonBackground";
+      : namespace === TENANT_NAMESPACES.CIVIC
+        ? "bg-primary"
+        : "bg-buttonBackground";
   const textStyle =
     namespace === TENANT_NAMESPACES.SYNDICATE ||
     namespace === TENANT_NAMESPACES.TOWNS ||
@@ -112,7 +115,7 @@ export default function NewTopicButton({
         <div className="flex gap-2">
           {!topicContext.isTempCheck && (
             <Button onClick={handleCreateTempCheck} size="lg">
-              Create temp check
+              {copy.create.createTempCheckButton}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           )}
@@ -145,7 +148,7 @@ export default function NewTopicButton({
           ? "+ Discuss DUNA"
           : isEASV2Enabled
             ? "+ Create"
-            : "+ New Topic"}
+            : copy.forums.newTopicButton}
       </Button>
 
       {existingTempCheckId && (

@@ -33,9 +33,9 @@ export function ProposalSingleNonVoter({
     warpcast: string | null;
     citizen_type: string | null;
     voterMetadata: {
-      name: string;
-      image: string;
-      type: string;
+      name?: string | null;
+      image?: string | null;
+      type?: string | null;
     } | null;
     votingPowerSource?: "cpls_snapshot";
   };

@@ -5,6 +5,7 @@ import ChartGovernanceRequiredDelegates from "@/app/info/components/ChartGoverna
 import ChartGovernanceVotableSupply from "@/app/info/components/ChartGovernanceVotableSupply";
 import ChartGovernanceTopDelegates from "@/app/info/components/ChartGovernanceTopDelegates";
 import ChartGovernanceActiveDelegates from "@/app/info/components/ChartGovernanceActiveDelegates";
+import Tenant from "@/lib/tenant/tenant";
 
 interface TabProps {
   value: string;
@@ -33,32 +34,35 @@ const GovernanceCharts = ({
   getVotes,
   getDelegates,
 }: GovernanceChartsProps) => {
+  const copy = Tenant.current().ui.copy;
   const tabs = [
     {
       value: "top-delegates",
-      title: "Top Delegates",
+      title: copy.info.governanceCharts.topRepresentatives,
     },
     {
       value: "active-delegates",
-      title: "Active Delegates",
+      title: copy.info.governanceCharts.activeRepresentatives,
     },
     {
       value: "avg-voters",
-      title: "Proposal Voters",
+      title: copy.info.governanceCharts.proposalVoters,
     },
     {
       value: "delegates-needed",
-      title: "Delegates needed",
+      title: copy.info.governanceCharts.representativesNeeded,
     },
     {
       value: "total-votable-supply",
-      title: "Total votable supply",
+      title: copy.info.governanceCharts.totalVotableSupply,
     },
   ];
 
   return (
     <div className="my-10">
-      <h3 className="text-2xl font-black text-black">Governance</h3>
+      <h3 className="text-2xl font-black text-black">
+        {copy.info.governanceCharts.title}
+      </h3>
       <Tabs className="mt-4 border rounded-lg" defaultValue="top-delegates">
         <TabsList className="grid grid-cols-2 sm:grid-cols-5 !gap-0 w-full h-fit">
           {tabs.map((tab) => (

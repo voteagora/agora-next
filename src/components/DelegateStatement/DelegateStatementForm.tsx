@@ -27,6 +27,7 @@ export default function DelegateStatementForm({
 }) {
   const router = useRouter();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { address, chain } = useAccount();
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { ensureSiweSession, isSigningIn: isSiweSigningIn } =
@@ -77,9 +78,7 @@ export default function DelegateStatementForm({
       });
 
       if (!response) {
-        throw new Error(
-          "There was an error submitting your delegate profile, please try again."
-        );
+        throw new Error(copy.delegates.statement.submitError);
       }
 
       setSaveSuccess(true);
@@ -173,8 +172,7 @@ export default function DelegateStatementForm({
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
                 <span className="text-sm text-primary">
-                  Tip: you can always come back and edit your profile at any
-                  time.
+                  {copy.delegates.statement.editTip}
                 </span>
 
                 <Button
@@ -183,16 +181,16 @@ export default function DelegateStatementForm({
                   disabled={!canSubmit}
                   type="submit"
                 >
-                  Submit delegate profile
+                  {copy.delegates.statement.submitProfile}
                 </Button>
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
-                    You must agree with the code of conduct to continue
+                    {copy.delegates.statement.codeOfConductRequired}
                   </span>
                 )}
                 {form.formState.isSubmitted && !agreeDaoPrinciples && (
                   <span className="text-red-700 text-sm">
-                    You must agree with the DAO principles to continue
+                    {copy.delegates.statement.principlesRequired}
                   </span>
                 )}
                 {submissionError && (

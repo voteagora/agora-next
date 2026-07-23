@@ -84,7 +84,7 @@ export default class TenantUIFactory {
       case TENANT_NAMESPACES.SHAPE:
         return shapeTenantUIConfig;
 
-            case TENANT_NAMESPACES.CIVIC:
+      case TENANT_NAMESPACES.CIVIC:
         return civicTenantUIConfig;
       default:
         throw new Error(`Invalid namespace: ${namespace}`);

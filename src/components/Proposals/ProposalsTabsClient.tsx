@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useQueryState } from "nuqs";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import Tenant from "@/lib/tenant/tenant";
 
 const TAB_PARAM = "view";
 
@@ -19,6 +20,8 @@ export function ProposalsTabsClient({
   draftCount: number;
   sponsorshipCount: number;
 }) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [activeTab, setTab] = useQueryState(TAB_PARAM, {
     defaultValue: "proposals",
     history: "push",
@@ -44,16 +47,16 @@ export function ProposalsTabsClient({
       {hasAnyContent && (
         <TabsList className="mb-8">
           <TabsTrigger value="proposals" variant="underlined">
-            Proposals
+            {copy.proposals.tabTitle}
           </TabsTrigger>
           {draftCount > 0 && (
             <TabsTrigger value="drafts" variant="underlined">
-              Drafts
+              {copy.proposals.draftsTabTitle}
             </TabsTrigger>
           )}
           {sponsorshipCount > 0 && (
             <TabsTrigger value="sponsorship" variant="underlined">
-              Sponsorship Requests
+              {copy.proposals.sponsorshipRequestsTabTitle}
             </TabsTrigger>
           )}
         </TabsList>

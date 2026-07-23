@@ -31,6 +31,8 @@ async function getDelegateStatementForAddress({
       orderBy: [{ updated_at_ts: "desc" }, { created_at_ts: "desc" }],
       select: {
         address: true,
+        username: true,
+        avatar: true,
         dao_slug: true,
         message_hash: true,
         signature: true,
@@ -89,6 +91,8 @@ export async function getDelegateStatementsForAddresses({
           ],
           select: {
             address: true,
+            username: true,
+            avatar: true,
             dao_slug: true,
             message_hash: true,
             signature: true,

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import Tenant from "@/lib/tenant/tenant";
 
 interface ExistingTempCheckModalProps {
   isOpen: boolean;
@@ -22,6 +23,9 @@ export function ExistingTempCheckModal({
   onViewTempCheck,
   onCreateNew,
 }: ExistingTempCheckModalProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -34,19 +38,18 @@ export function ExistingTempCheckModal({
             <span className="sr-only">Close</span>
           </button>
           <DialogTitle className="text-xl font-bold text-primary">
-            Existing Temp Check Found
+            {copy.forums.existingTempCheckTitle}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           <p className="text-secondary">
-            There is already a temp check for this discussion. Do you want to
-            see that one, or create a new one?
+            {copy.forums.existingTempCheckDescription}
           </p>
 
           <div className="flex flex-col gap-3">
             <Button onClick={onViewTempCheck} size="lg" className="w-full">
-              View Temp Check
+              {copy.forums.viewTempCheck}
             </Button>
             <Button
               onClick={onCreateNew}
@@ -54,7 +57,7 @@ export function ExistingTempCheckModal({
               variant="outline"
               className="w-full"
             >
-              Create a New One
+              {copy.forums.createNewTempCheck}
             </Button>
           </div>
         </div>

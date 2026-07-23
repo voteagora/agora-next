@@ -3,11 +3,16 @@ import { icons } from "@/icons/icons";
 import { PLMConfig } from "@/app/proposals/draft/types";
 import { TenantToken } from "../types";
 import React, { ReactNode } from "react";
+import {
+  getTenantCopy,
+  TenantCopy,
+  TenantCopyMode,
+} from "@/lib/tenant/tenantCopy";
 
 type UIToggle = {
   name: string;
   enabled: boolean;
-  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig;
+  config?: UIConfig | UIEndorsedConfig | UIGasRelayConfig | UIPrivyConfig;
 };
 
 export type UIEndorsedConfig = {
@@ -24,6 +29,11 @@ export type UIGasRelayConfig = {
   minBalance: string;
   sponsorAddress: `0x${string}`;
   minVPToUseGasRelay: string;
+};
+
+export type UIPrivyConfig = {
+  appId: string;
+  loginMethods?: string[];
 };
 
 export type UIMiradorConfig = {
@@ -131,6 +141,11 @@ type UIPage = {
     title: string;
     description: string | React.ReactNode;
   }>;
+  collaborationSection?: {
+    title: string;
+    content: string;
+    contactEmail?: string;
+  };
   meta: {
     title: string;
     description: string;
@@ -236,6 +251,7 @@ type TenantUIParams = {
   tacticalStrings?: {
     myBalance?: string;
   };
+  copyMode?: TenantCopyMode;
   dunaDisclaimers?: string;
   documentColors?: string[];
 };
@@ -313,6 +329,8 @@ export class TenantUI {
   private _tacticalStrings?: {
     myBalance?: string;
   };
+  private _copyMode: TenantCopyMode;
+  private _copy: TenantCopy;
   private _dunaDisclaimers?: string;
   private _documentColors?: string[];
 
@@ -342,6 +360,7 @@ export class TenantUI {
     theme,
     tokens,
     dunaTitle,
+    copyMode,
   }: TenantUIParams) {
     this._assets = assets;
     this._customization = customization;
@@ -368,6 +387,8 @@ export class TenantUI {
     this._theme = theme ?? "light";
     this._tokens = tokens;
     this._dunaTitle = dunaTitle;
+    this._copyMode = copyMode ?? "dao";
+    this._copy = getTenantCopy(this._copyMode);
   }
 
   public get assets(): UIAssets {
@@ -533,6 +554,18 @@ export class TenantUI {
       }
     | undefined {
     return this._tacticalStrings;
+  }
+
+  public get copyMode(): TenantCopyMode {
+    return this._copyMode;
+  }
+
+  public get isNgo(): boolean {
+    return this._copyMode === "ngo";
+  }
+
+  public get copy(): TenantCopy {
+    return this._copy;
   }
 
   public get dunaDisclaimers(): string | undefined {

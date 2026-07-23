@@ -75,6 +75,7 @@ export default function ForumNewClient({
   const description = watch("description");
   const categoryId = watch("categoryId");
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const isDarkTenant = ui.theme === "dark";
   const selectClassName = [
     "w-full mt-2 px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-ring",
@@ -151,13 +152,13 @@ export default function ForumNewClient({
           }
         }
 
-        toast.success("Forum topic created successfully! Redirecting...");
+        toast.success(copy.forums.createSuccessToast);
         router.push(buildForumTopicPath(created.id, created.title));
       }
     } catch (error) {
       console.error("Failed to create topic:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create topic"
+        error instanceof Error ? error.message : copy.forums.createFailureToast
       );
     } finally {
       setIsSubmitting(false);
@@ -168,7 +169,7 @@ export default function ForumNewClient({
     <FormProvider {...form}>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-8">Create new topic</h1>
+          <h1 className="text-2xl font-bold mb-8">{copy.forums.createTitle}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -187,8 +188,8 @@ export default function ForumNewClient({
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-semibold text-secondary">
                             {relatedProposal.type === "tempcheck"
-                              ? "Related Temp check"
-                              : "Related Proposal"}
+                              ? copy.forums.relatedTempCheck
+                              : copy.forums.relatedProposal}
                           </span>
                           <ExternalLink className="w-3.5 h-3.5 text-secondary" />
                         </div>
@@ -237,7 +238,7 @@ export default function ForumNewClient({
                   <Input
                     id="title"
                     {...register("title", { required: "Title is required" })}
-                    placeholder="Topic title"
+                    placeholder={copy.forums.topicTitlePlaceholder}
                     className="mt-2"
                   />
                   {errors.title && (
@@ -266,7 +267,7 @@ export default function ForumNewClient({
                     className={selectClassName}
                     disabled={isSubmitting}
                   >
-                    <option value="">No category</option>
+                    <option value="">{copy.forums.noCategory}</option>
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -279,7 +280,7 @@ export default function ForumNewClient({
                   control={control}
                   name="description"
                   label="Body"
-                  placeholder="Write your discussion…"
+                  placeholder={copy.forums.bodyPlaceholder}
                   required
                   disabled={isSubmitting}
                   onImageUpload={handleImageUpload}
@@ -290,20 +291,20 @@ export default function ForumNewClient({
                     {vpCheck.canProceed ? (
                       <span className="text-green-600 flex items-center gap-1">
                         <CheckIcon className="h-4 w-4" />
-                        Topic creation permission
+                        {copy.forums.topicCreationPermission}
                       </span>
                     ) : (
                       <span className="text-red-600 flex items-center gap-1">
                         <XMarkIcon className="h-4 w-4" />
                         {!address
-                          ? "Wallet not connected"
-                          : "Insufficient voting power"}
+                          ? copy.create.noWallet
+                          : copy.create.insufficientVotingPower}
                       </span>
                     )}
                     <div className="text-xs mt-1">
                       {!address
-                        ? "Connect your wallet to check permissions"
-                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} voting power`}
+                        ? copy.create.connectWalletPermission
+                        : `${currentVP.toLocaleString()} / ${requiredVP.toLocaleString()} ${copy.nouns.votingPower}`}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -322,7 +323,9 @@ export default function ForumNewClient({
                       }
                       className="bg-black text-white hover:bg-gray-800"
                     >
-                      {isSubmitting ? "Creating..." : "Create topic"}
+                      {isSubmitting
+                        ? copy.create.creating
+                        : copy.forums.createButton}
                     </Button>
                   </div>
                 </div>

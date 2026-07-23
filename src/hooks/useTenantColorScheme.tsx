@@ -25,6 +25,14 @@ const infoColor = {
       endcolor: "#FFFFFF",
     },
   },
+  civic: {
+    primary: "#E10600", // CIVIC Red (Pantone 2347)
+    primaryRGB: "rgba(225, 6, 0, 1)",
+    gradient: {
+      startColor: "rgba(225, 6, 0, 0.6)",
+      endcolor: "#FFFFFF",
+    },
+  },
 };
 
 const useTenantColorScheme = () => {

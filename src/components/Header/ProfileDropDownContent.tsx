@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from "react";
-import { useDisconnect } from "wagmi";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import { shortAddress } from "@/lib/utils";
 import { rgbStringToHex } from "@/app/lib/utils/color";
 import { CubeIcon } from "@/icons/CubeIcon";
@@ -14,6 +14,7 @@ import { useProfileData } from "@/hooks/useProfileData";
 import { SiweStatusBadge } from "./SiweStatusBadge";
 
 import ENSAvatar from "../shared/ENSAvatar";
+import AvatarImage from "../shared/AvatarImage";
 import TokenAmountDecorated from "../shared/TokenAmountDecorated";
 import { PanelRow } from "../Delegates/DelegateCard/DelegateCard";
 import Link from "next/link";
@@ -27,6 +28,8 @@ import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 import { useSiweJwt } from "@/hooks/useSiweJwt";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -97,7 +100,8 @@ export const ProfileDropDownContent = ({
   ensName,
   handleCloseDrawer,
 }: Props) => {
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useConnectModal();
+  const openDialog = useOpenDialog();
   const {
     address,
     isFetching,
@@ -110,8 +114,11 @@ export const ProfileDropDownContent = ({
   } = useProfileData();
   const { jwt, ensureSession, isSigningIn } = useSiweJwt();
   const hasSiweSession = !!jwt;
+  const profileUsername = delegate?.statement?.username?.trim();
+  const profileAvatar = delegate?.statement?.avatar;
 
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const filteredDelegations = useMemo(() => {
     return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
   }, [delegatees]);
@@ -143,7 +150,9 @@ export const ProfileDropDownContent = ({
       <div className="flex flex-col p-6 border-b border-line">
         <PanelRow
           title={
-            filteredDelegations?.length > 1 ? "My Delegates" : "My Delegate"
+            filteredDelegations?.length > 1
+              ? copy.delegates.profile.myRepresentatives
+              : copy.delegates.profile.myRepresentative
           }
           detail={
             <div className="flex flex-col gap-4">
@@ -179,13 +188,23 @@ export const ProfileDropDownContent = ({
               isFetching && "animate-pulse"
             }`}
           >
-            <ENSAvatar ensName={ensName} size={60} />
+            {profileAvatar ? (
+              <AvatarImage
+                src={profileAvatar}
+                alt={`${profileUsername || address} avatar`}
+                size={60}
+              />
+            ) : (
+              <ENSAvatar ensName={ensName} size={60} />
+            )}
             <SiweStatusBadge className="w-5 h-5" />
           </div>
           <div className="flex flex-col flex-1">
-            {ensName ? (
+            {profileUsername || ensName ? (
               <>
-                <span className="text-primary font-bold">{ensName}</span>
+                <span className="text-primary font-bold">
+                  {profileUsername || ensName}
+                </span>
                 <span className="text-xs text-secondary">
                   {shortAddress(address!)}
                 </span>
@@ -361,6 +380,18 @@ export const ProfileDropDownContent = ({
           />
           <span className="text-primary">Logout</span>
         </div>
+        {ui.toggle("delete-account")?.enabled && (
+          <div
+            onClick={() => {
+              handleCloseDrawer();
+              openDialog({ type: "DELETE_ACCOUNT", params: {} });
+            }}
+            className="cursor-pointer flex font-bold"
+          >
+            <TrashIcon className="w-4 h-4 mr-[10px] self-center text-negative" />
+            <span className="text-negative">Delete my account</span>
+          </div>
+        )}
       </div>
     </>
   );
