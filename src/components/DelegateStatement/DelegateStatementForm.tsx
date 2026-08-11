@@ -19,6 +19,8 @@ import { useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { type DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { TrashIcon } from "@heroicons/react/20/solid";
 
 export default function DelegateStatementForm({
   form,
@@ -29,6 +31,8 @@ export default function DelegateStatementForm({
   const { ui } = Tenant.current();
   const copy = ui.copy;
   const { address, chain } = useAccount();
+  const openDialog = useOpenDialog();
+  const isDeleteAccountEnabled = ui.toggle("delete-account")?.enabled;
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { ensureSiweSession, isSigningIn: isSiweSigningIn } =
     useEnsureSiweSession({
@@ -202,6 +206,27 @@ export default function DelegateStatementForm({
             </form>
           </Form>
         </div>
+
+        {isDeleteAccountEnabled && (
+          <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault mt-6 p-6">
+            <h3 className="text-lg font-semibold text-primary mb-2">
+              Danger zone
+            </h3>
+            <p className="text-sm text-secondary mb-4">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <Button
+              variant="outline"
+              type="button"
+              className="w-fit border-negative text-negative hover:bg-negative/10"
+              onClick={() => openDialog({ type: "DELETE_ACCOUNT", params: {} })}
+            >
+              <TrashIcon className="w-4 h-4 mr-2" />
+              Delete my account
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
