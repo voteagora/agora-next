@@ -2,10 +2,12 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { ExistingTempCheckModal } from "./ExistingTempCheckModal";
 import useRequireLogin from "@/hooks/useRequireLogin";
+import { useForumPermissions } from "@/hooks/useForumPermissions";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumTopicTempChecks } from "@/lib/actions/proposalLinks";
@@ -39,8 +41,17 @@ export default function NewTopicButton({
   >(null);
   const requireLogin = useRequireLogin();
   const router = useRouter();
+  const { isConnected } = useAccount();
+  const { canCreateTopic, isLoading: permissionsLoading } =
+    useForumPermissions();
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+
+  // Hide button for connected users who don't have permission to create topics
+  // Non-connected users still see the button (they'll be prompted to login)
+  if (isConnected && !permissionsLoading && !canCreateTopic) {
+    return null;
+  }
 
   const handleClick = async () => {
     const loggedIn = await requireLogin();
