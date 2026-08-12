@@ -483,10 +483,10 @@ async function getProposalTypes() {
       return [];
     }
 
-    let types = [];
+    let types: any[] = [];
 
     const typesFromApi = await getProposalTypesFromDaoNode();
-    if (typesFromApi) {
+    if (typesFromApi && Object.keys(typesFromApi.proposal_types || {}).length > 0) {
       const parsedTypes = Object.entries(typesFromApi.proposal_types)
         ?.filter(([proposalTypeId, type]: any) => !!type.name)
         ?.map(([proposalTypeId, type]: any) => ({
@@ -498,7 +498,10 @@ async function getProposalTypes() {
           module: type.module,
         }));
       types = parsedTypes;
-    } else {
+    }
+
+    // Fall back to database if DAO Node didn't return valid types
+    if (types.length === 0) {
       const contractExists =
         configuratorContract.address !==
         "0x0000000000000000000000000000000000000000";
