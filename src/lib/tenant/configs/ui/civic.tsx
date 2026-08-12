@@ -328,6 +328,16 @@ export const civicTenantUIConfig = new TenantUI({
             prodAddress: null,
             testnetAddress: null,
           },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5",
+            testnetAddress: "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5",
+          },
+          {
+            type: ProposalType?.OPTIMISTIC,
+            prodAddress: "0x559b7c8C9474b3A100B7759dAe5482b9510962dd",
+            testnetAddress: "0x559b7c8C9474b3A100B7759dAe5482b9510962dd",
+          },
         ],
         copy: {
           helperText: `
