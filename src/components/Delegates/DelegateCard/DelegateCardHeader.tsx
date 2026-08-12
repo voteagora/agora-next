@@ -5,6 +5,7 @@ import {
   useDelegateStats,
   useArchiveParticipation,
 } from "@/hooks/useVoterStats";
+import { getParticipationSource } from "@/lib/participation";
 import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
@@ -12,43 +13,51 @@ interface Props {
 }
 
 export const DelegateCardHeader = ({ delegate }: Props) => {
+  const { namespace, ui } = Tenant.current();
+  const participationSource = getParticipationSource(namespace, {
+    hasEasOodao: ui.toggle("has-eas-oodao")?.enabled ?? false,
+  });
+  const useArchiveParticipationSource =
+    participationSource === "archive-eas-oodao";
+  const useDaoNodeParticipationSource = participationSource === "dao-node";
+
   const { data: delegateResponse, error: delegateStatsError } =
     useDelegateStats({
       address: delegate.address,
+      enabled: useDaoNodeParticipationSource,
     });
 
-  const { ui } = Tenant.current();
   const showParticipation = ui.toggle("show-participation")?.enabled || false;
-  const useArchiveForProposals =
-    ui.toggle("use-archive-for-proposal-details")?.enabled || false;
 
   // Always call archive hook to keep hook order stable across renders
   const { data: archiveParticipation } = useArchiveParticipation({
     address: delegate.address,
-    enabled: useArchiveForProposals,
+    enabled: useArchiveParticipationSource,
   });
 
-  const showHeader = showParticipation || useArchiveForProposals;
+  const showHeader = showParticipation || useArchiveParticipationSource;
 
-  if (!delegateResponse || delegateStatsError || !showHeader) {
+  if (!showHeader) {
     return null;
   }
 
   const hidePendingActivity = ui.isNgo;
-
-  const delegateStats = delegateResponse.delegate;
-  const numRecentVotes = delegateStats.participation[0];
-  const numRecentProposals = delegateStats.participation[1];
-
-  // Minimal change: optionally override counts for archive tenants
-  let votesCount = numRecentVotes;
-  let totalProposals = numRecentProposals;
-  if (useArchiveForProposals) {
+  let votesCount: number;
+  let totalProposals: number;
+  if (useArchiveParticipationSource) {
     if (!archiveParticipation) {
       return hidePendingActivity ? null : <PendingActivityHeader />;
     }
     votesCount = archiveParticipation.participated;
     totalProposals = archiveParticipation.totalProposals;
+  } else {
+    if (!delegateResponse || delegateStatsError) {
+      return null;
+    }
+
+    const delegateStats = delegateResponse.delegate;
+    votesCount = delegateStats.participation[0];
+    totalProposals = delegateStats.participation[1];
   }
 
   const eligible = totalProposals >= 10;

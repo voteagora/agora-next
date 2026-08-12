@@ -7,6 +7,10 @@ import {
   fetchProposalFromArchive,
   fetchRawProposalVotesFromArchive,
 } from "@/lib/archiveUtils";
+import {
+  isEncryptedArchiveVoteChoice,
+  normalizeArchiveVoteParams,
+} from "@/lib/archiveVoteHistory";
 import { archiveToProposal } from "@/lib/proposals";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { SnapshotVote } from "@/app/api/common/votes/vote";
@@ -103,11 +107,31 @@ export async function GET(
       fetchRawProposalVotesFromArchive({ namespace, proposalId }),
     ]);
 
-    const votes: SnapshotVote[] = rawVotes.map((row) => ({
-      id: row.transaction_hash ?? `${row.voter}-${row.block_number}`,
+    const decodedRows = rawVotes.map((row) => {
+      const rawChoice = row.choice ?? row.params;
+      return {
+        row,
+        choice: normalizeArchiveVoteParams(rawChoice),
+        isEncrypted: isEncryptedArchiveVoteChoice(rawChoice),
+      };
+    });
+
+    if (decodedRows.some((row) => row.isEncrypted)) {
+      return NextResponse.json({
+        results: [],
+        unavailableReason: "encrypted_choices",
+      });
+    }
+
+    const votes: SnapshotVote[] = decodedRows.map(({ row, choice }) => ({
+      id: row.transaction_hash ?? row.id ?? `${row.voter}-${row.block_number}`,
       address: row.voter.toLowerCase(),
-      createdAt: row.ts ? new Date(Number(row.ts) * 1000) : new Date(),
-      choice: JSON.stringify(row.choice ?? []),
+      createdAt: row.ts
+        ? new Date(Number(row.ts) * 1000)
+        : row.created
+          ? new Date(Number(row.created) * 1000)
+          : new Date(),
+      choice: JSON.stringify(choice ?? []),
       votingPower: Number(row.vp ?? row.weight ?? 0),
       title: "",
       reason: row.reason ?? "",

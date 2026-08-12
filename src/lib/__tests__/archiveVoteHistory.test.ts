@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   buildArchiveNonVotersResult,
   canArchiveVotesSortByTime,
+  isEncryptedArchiveVoteChoice,
   processArchiveNonVoters,
   processArchiveVotes,
   transformArchiveNonVoterRows,
@@ -94,6 +95,59 @@ describe("archive vote-history row transforms", () => {
           image: "ipfs://avatar",
           type: "",
         },
+        weight: "42",
+      }),
+    ]);
+  });
+
+  it("normalizes archive Snapshot choices when params is not an array", () => {
+    const rows: ArchiveVoteRow[] = [
+      {
+        voter: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        params: { vote_type: "ranked-choice" },
+        choice: "[3,1,2]",
+        vp: "42",
+      },
+    ];
+
+    expect(
+      transformArchiveVoteRows(rows, {
+        parseSupport: () => "FOR",
+        proposalId: "7",
+        proposalType: "SNAPSHOT",
+        startBlock: 1n,
+      })
+    ).toEqual([
+      expect.objectContaining({
+        address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        params: [3, 1, 2],
+        weight: "42",
+      }),
+    ]);
+  });
+
+  it("does not decode encrypted Snapshot choices as ranked-choice params", () => {
+    const encryptedChoice = `0x${"ab".repeat(96)}`;
+    const rows: ArchiveVoteRow[] = [
+      {
+        voter: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        choice: encryptedChoice,
+        vp: "42",
+      },
+    ];
+
+    expect(isEncryptedArchiveVoteChoice(encryptedChoice)).toBe(true);
+    expect(
+      transformArchiveVoteRows(rows, {
+        parseSupport: () => "FOR",
+        proposalId: "7",
+        proposalType: "SNAPSHOT",
+        startBlock: 1n,
+      })
+    ).toEqual([
+      expect.objectContaining({
+        address: "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        params: null,
         weight: "42",
       }),
     ]);

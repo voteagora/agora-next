@@ -61,7 +61,7 @@ export interface ForumSurveyQuestionDto {
 export interface ForumSurveyRespondentDto {
   id: number;
   address: string | null;
-  displayName: string;
+  displayName: string | null;
   isDeleted: boolean;
   createdAt: string;
   answers: ForumSurveyAnswerDto[];

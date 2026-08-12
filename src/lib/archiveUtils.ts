@@ -224,7 +224,14 @@ export const fetchProposalFromArchive = async (
   }
 };
 
+export type ArchiveVoteChoice =
+  | Array<number | string>
+  | string
+  | number
+  | Record<string, unknown>;
+
 export type ArchiveVoteRow = {
+  id?: string | null;
   citizen_type?: string | null;
   transaction_hash?: string | null;
   block_number?: bigint | number | string | null;
@@ -233,11 +240,12 @@ export type ArchiveVoteRow = {
   support?: string | null;
   weight?: string | number;
   reason?: string | null;
-  params?: Array<number> | null;
-  choice?: Array<number> | null; // for Copeland proposal type
+  params?: ArchiveVoteChoice | null;
+  choice?: ArchiveVoteChoice | null; // for Copeland proposal type
   vp?: string | number; // for Copeland proposal type
   ts?: number | string | null;
   created?: number | string | null; // unix seconds, snapshot archive votes
+  app?: string | null;
 
   x?: string | null;
   warpcast?: string | null;

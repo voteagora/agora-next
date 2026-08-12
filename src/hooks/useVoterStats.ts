@@ -15,6 +15,7 @@ const CACHE_TIME = 180000; // 3 minute cache
 
 interface Props {
   address?: string | `0x${string}` | undefined;
+  enabled?: boolean;
 }
 
 export const useVoterStats = ({
@@ -51,9 +52,10 @@ export const useVoterStats = ({
 
 export const useDelegateStats = ({
   address,
+  enabled = true,
 }: Props): UseQueryResult<DelegateResponse | null, Error> => {
   return useQuery({
-    enabled: !!address,
+    enabled: !!address && enabled,
     queryKey: [DELEGATE_STATS_QK, address],
     queryFn: async () => {
       return await fetchDelegateStats(address!);

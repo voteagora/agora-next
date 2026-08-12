@@ -94,9 +94,13 @@ export default function OptionsResultsPanel({
   proposal: Proposal;
 }) {
   const isProposalActive = proposal.status === "ACTIVE";
-  const { data: proposalResults, isFetching } = useCalculateCopelandResult({
-    proposalId: proposal.id,
-  });
+  const { data: proposalResultsResponse, isFetching } =
+    useCalculateCopelandResult({
+      proposalId: proposal.id,
+    });
+  const proposalResults = proposalResultsResponse?.results ?? [];
+  const areResultsUnavailable =
+    proposalResultsResponse?.unavailableReason === "encrypted_choices";
   const options = (
     proposal.proposalData as unknown as ParsedProposalData["SNAPSHOT"]["kind"]
   ).choices;
@@ -163,7 +167,11 @@ export default function OptionsResultsPanel({
       >
         {isFetching ? (
           <div className="text-center text-sm text-tertiary">Loading...</div>
-        ) : proposalResults && proposalResults.length > 0 ? (
+        ) : areResultsUnavailable ? (
+          <div className="text-center text-sm text-tertiary">
+            Results unavailable until votes are revealed.
+          </div>
+        ) : proposalResults.length > 0 ? (
           <div>
             {filteredResults.map((result, index) => {
               // Find corresponding extended option if it exists

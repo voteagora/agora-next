@@ -25,9 +25,16 @@ import type { DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth"
 import Tenant from "@/lib/tenant/tenant";
 import { PaginationParams } from "../lib/pagination";
 import { getDelegateDataFromDaoNode } from "@/app/lib/dao-node/client";
-import { fetchProposalsFromArchive } from "@/lib/archiveUtils";
+import {
+  fetchProposalsFromArchive,
+  fetchRawProposalNonVotersFromArchive,
+  fetchRawProposalVotesFromArchive,
+} from "@/lib/archiveUtils";
 import { proposalsFilterOptions } from "@/lib/constants";
-import { prismaWeb3Client } from "@/app/lib/prisma";
+import {
+  getParticipationSource,
+  isEligibleArchiveParticipationProposal,
+} from "@/lib/participation";
 
 export const fetchDelegate = async (address: string) => {
   try {
@@ -191,11 +198,17 @@ export const fetchArchiveParticipation = async (address: string) => {
   const useArchive =
     ui.toggle("use-archive-for-proposal-details")?.enabled ?? false;
 
-  if (!useArchive) {
+  if (
+    !useArchive ||
+    getParticipationSource(namespace, {
+      hasEasOodao: ui.toggle("has-eas-oodao")?.enabled ?? false,
+    }) !== "archive-eas-oodao"
+  ) {
     return null;
   }
 
-  // Pull archive proposals then consider only the 10 most recent by created_time/created_block_number
+  // Pull archive proposals then consider only the 10 most recent eligible
+  // oodao proposals by created_time/created_block_number.
   const archiveList = await fetchProposalsFromArchive(
     namespace,
     proposalsFilterOptions.everything.filter
@@ -203,6 +216,7 @@ export const fetchArchiveParticipation = async (address: string) => {
 
   const proposals = archiveList?.data ?? [];
   const recentProposals = [...proposals]
+    .filter(isEligibleArchiveParticipationProposal)
     // Keep proposals that have a numeric created time (direct or via created_event)
     .filter((p) => {
       const createdTs =
@@ -244,39 +258,40 @@ export const fetchArchiveParticipation = async (address: string) => {
     return { participated: 0, totalProposals: 0, rate: 0 };
   }
 
-  const proposalIds = recentProposals.map((p) => String(p.id));
+  const normalizedAddress = address.toLowerCase();
+  const participation = await Promise.all(
+    recentProposals.map(async (proposal) => {
+      const proposalId = String(proposal.id);
+      const [votes, nonVoters] = await Promise.all([
+        fetchRawProposalVotesFromArchive({ namespace, proposalId }),
+        fetchRawProposalNonVotersFromArchive({ namespace, proposalId }),
+      ]);
 
-  // Count proposals among the recent ones that this delegate voted on
-  // Using CTE to filter by voter and contract first (most selective), then proposal ID
-  const { contracts } = Tenant.current();
-  const rows = await prismaWeb3Client.$queryRawUnsafe<
-    {
-      count: number;
-    }[]
-  >(
-    `
-      WITH filtered_votes AS (
-        SELECT proposal_id
-        FROM ${namespace}.votes
-        WHERE voter = $1
-          AND contract = $2
-        GROUP BY proposal_id
-      )
-      SELECT COUNT(*)::int AS count
-      FROM filtered_votes
-      WHERE proposal_id = ANY($3::text[])
-    `,
-    address.toLowerCase(),
-    contracts.governor.address.toLowerCase(),
-    proposalIds
+      const voted = votes.some(
+        (vote) => vote.voter?.toLowerCase() === normalizedAddress
+      );
+      const eligible =
+        voted ||
+        nonVoters.some(
+          (nonVoter) => nonVoter.addr?.toLowerCase() === normalizedAddress
+        );
+
+      return { eligible, voted };
+    })
   );
 
-  const participated = rows?.[0]?.count ?? 0;
-  const rate = totalProposals > 0 ? participated / totalProposals : 0;
+  const eligibleParticipation = participation.filter(
+    ({ eligible }) => eligible
+  );
+  const participated = eligibleParticipation.filter(
+    ({ voted }) => voted
+  ).length;
+  const eligibleProposals = eligibleParticipation.length;
+  const rate = eligibleProposals > 0 ? participated / eligibleProposals : 0;
 
   return {
     participated,
-    totalProposals,
+    totalProposals: eligibleProposals,
     rate,
   };
 };
