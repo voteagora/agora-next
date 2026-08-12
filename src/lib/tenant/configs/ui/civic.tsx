@@ -49,8 +49,8 @@ export const civicTenantUIConfig = new TenantUI({
     headerBackground: "255 255 255", // White header
     footerBackground: "255 255 255", // White footer
     infoSectionBackground: "255 255 255", // White info sections
-    infoTabBackground: "#FFFFFF",
-    buttonBackground: "#FAFAFA",
+    infoTabBackground: "255 255 255",
+    buttonBackground: "250 250 250",
     // Font
     font: "font-inter",
     tokenAmountFont: "font-chivoMono",
