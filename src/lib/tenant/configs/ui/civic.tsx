@@ -85,7 +85,7 @@ export const civicTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "CIVIC Governance",
+      title: "CIVIC Voices",
       description:
         "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
