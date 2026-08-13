@@ -28,8 +28,8 @@ export const civicTenantConfig = ({
   rpcSecret,
 }: Props): TenantContracts => {
   const TOKEN = isProd
-    ? "0x2d0886464a7175a6d7b10aaa6942c49232bd8d1f"
-    : "0x2d0886464a7175a6d7b10aaa6942c49232bd8d1f";
+    ? "0x96eC758070205846946261Ef75f6ad3c66d770A3"
+    : "0x96eC758070205846946261Ef75f6ad3c66d770A3";
 
   const GOVERNOR = isProd
     ? "0x01015e27514ba64e3f2e8655c7cd5be08d2f40cc"
