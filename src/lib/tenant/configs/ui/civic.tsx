@@ -136,13 +136,13 @@ export const civicTenantUIConfig = new TenantUI({
         {
           name: "Community",
           title: "Community",
-          url: "/",
+          url: "https://engage.civiliansinconflict.org/",
           image: civicInfo3,
         },
         {
           name: "NFT Claim",
           title: "NFT Claim",
-          url: "/claim",
+          url: "https://participate.civiliansinconflict.org/",
           image: civicInfo4,
         },
       ],
