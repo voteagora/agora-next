@@ -136,7 +136,7 @@ export const civicTenantUIConfig = new TenantUI({
         {
           name: "Community",
           title: "Community",
-          url: "https://engage.civiliansinconflict.org/",
+          url: "https://engage.civiliansinconflict.org/forums",
           image: civicInfo3,
         },
         {
