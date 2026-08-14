@@ -49,8 +49,8 @@ export const civicTenantUIConfig = new TenantUI({
     headerBackground: "255 255 255", // White header
     footerBackground: "255 255 255", // White footer
     infoSectionBackground: "255 255 255", // White info sections
-    infoTabBackground: "#FFFFFF",
-    buttonBackground: "#FAFAFA",
+    infoTabBackground: "255 255 255",
+    buttonBackground: "250 250 250",
     // Font
     font: "font-inter",
     tokenAmountFont: "font-chivoMono",
@@ -85,7 +85,7 @@ export const civicTenantUIConfig = new TenantUI({
     },
     {
       route: "proposals",
-      title: "CIVIC Governance",
+      title: "CIVIC Voices",
       description:
         "CIVIC works globally to improve protection for civilians caught in armed conflict, engaging with armed actors, governments, and international institutions.",
       meta: {
@@ -136,13 +136,13 @@ export const civicTenantUIConfig = new TenantUI({
         {
           name: "Community",
           title: "Community",
-          url: "/",
+          url: "https://engage.civiliansinconflict.org/forums",
           image: civicInfo3,
         },
         {
           name: "NFT Claim",
           title: "NFT Claim",
-          url: "/claim",
+          url: "https://participate.civiliansinconflict.org/",
           image: civicInfo4,
         },
       ],
@@ -327,6 +327,16 @@ export const civicTenantUIConfig = new TenantUI({
             type: ProposalType?.BASIC,
             prodAddress: null,
             testnetAddress: null,
+          },
+          {
+            type: ProposalType?.APPROVAL,
+            prodAddress: "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5",
+            testnetAddress: "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5",
+          },
+          {
+            type: ProposalType?.OPTIMISTIC,
+            prodAddress: "0x559b7c8C9474b3A100B7759dAe5482b9510962dd",
+            testnetAddress: "0x559b7c8C9474b3A100B7759dAe5482b9510962dd",
           },
         ],
         copy: {

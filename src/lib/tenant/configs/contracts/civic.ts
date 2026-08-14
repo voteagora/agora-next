@@ -43,6 +43,10 @@ export const civicTenantConfig = ({
     ? "0xfa5b3da3530d2353f0003e249b2c2aea8fcea534"
     : "0x0000000000000000000000000000000000000000";
 
+  const APPROVAL_MODULE = isProd
+    ? "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5"
+    : "0xaAD4A4f8a78449C811bd91fCE54f644e669277b5";
+
   const TREASURY = [TIMELOCK];
   const chain = isProd ? base : baseSepolia;
   const provider = new JsonRpcProvider(getRpcUrlForChain(chain.id, rpcSecret));
@@ -85,6 +89,7 @@ export const civicTenantConfig = ({
     }),
 
     treasury: TREASURY,
+    governorApprovalModule: APPROVAL_MODULE,
     delegationModel: DELEGATION_MODEL.FULL,
     governorType: GOVERNOR_TYPE.AGORA,
     timelockType:
