@@ -4,12 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { usePrivy } from "@privy-io/react-auth";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { Button } from "@/components/ui/button";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { useSiweJwt } from "@/hooks/useSiweJwt";
+import Tenant from "@/lib/tenant/tenant";
 import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
 import type {
   ChannelType,
@@ -56,6 +58,15 @@ export default function NotificationPreferencesClient() {
   );
   const pushState = usePushNotifications();
   const { isSubscribed: isPushSubscribed } = pushState;
+
+  // Get Privy email if tenant uses Privy login (e.g., CIVIC)
+  const { ui } = Tenant.current();
+  const isPrivyEnabled = ui.toggle("privy-login")?.enabled;
+  const { user: privyUser } = usePrivy();
+  const privyEmail =
+    isPrivyEnabled && typeof privyUser?.email?.address === "string"
+      ? privyUser.email.address
+      : "";
 
   // Check if user has grants admin permission
   const { hasPermission: isGrantsAdmin } = useHasPermission(
@@ -791,6 +802,7 @@ export default function NotificationPreferencesClient() {
 
           <ContactInformationSection
             email={recipient?.channels?.email?.address ?? ""}
+            suggestedEmail={privyEmail}
             discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
             slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
             emailStatus={channelStatus.email}

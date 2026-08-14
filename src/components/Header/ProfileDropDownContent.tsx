@@ -28,8 +28,6 @@ import { DelegateToSelf } from "../Delegates/Delegations/DelegateToSelf";
 import { ZERO_ADDRESS } from "@/lib/constants";
 import { VotingPowerInfoTooltip } from "@/components/shared/VotingPowerInfoTooltip";
 import { useSiweJwt } from "@/hooks/useSiweJwt";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
-import { TrashIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -101,7 +99,6 @@ export const ProfileDropDownContent = ({
   handleCloseDrawer,
 }: Props) => {
   const { disconnect } = useConnectModal();
-  const openDialog = useOpenDialog();
   const {
     address,
     isFetching,
@@ -393,18 +390,6 @@ export const ProfileDropDownContent = ({
           />
           <span className="text-primary">Logout</span>
         </div>
-        {ui.toggle("delete-account")?.enabled && (
-          <div
-            onClick={() => {
-              handleCloseDrawer();
-              openDialog({ type: "DELETE_ACCOUNT", params: {} });
-            }}
-            className="cursor-pointer flex font-bold"
-          >
-            <TrashIcon className="w-4 h-4 mr-[10px] self-center text-negative" />
-            <span className="text-negative">Delete my account</span>
-          </div>
-        )}
       </div>
     </>
   );

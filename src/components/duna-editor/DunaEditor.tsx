@@ -467,9 +467,14 @@ export default function DunaEditor({
         className
       )}
       style={{
-        backgroundColor: ui.customization?.cardBackground
-          ? `rgb(${ui.customization.cardBackground})`
-          : "white",
+        backgroundColor:
+          variant === "comment"
+            ? ui.customization?.wash
+              ? `rgb(${ui.customization.wash})`
+              : "#FAFAFA"
+            : ui.customization?.cardBackground
+              ? `rgb(${ui.customization.cardBackground})`
+              : "white",
         borderColor: ui.customization?.cardBorder
           ? `rgb(${ui.customization.cardBorder})`
           : "",
