@@ -185,8 +185,8 @@ export default class TenantTokenFactory {
           // whole tokens, so forum eligibility must not apply ERC-20 scaling.
           decimals: 0,
           address: isProd
-            ? "0x96eC758070205846946261Ef75f6ad3c66d770A3"
-            : "0x96eC758070205846946261Ef75f6ad3c66d770A3",
+            ? "0x2d0886464a7175a6d7b10aaa6942c49232bd8d1f"
+            : "0x2d0886464a7175a6d7b10aaa6942c49232bd8d1f",
         };
 
       default:
