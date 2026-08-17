@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
@@ -67,6 +67,9 @@ export default function NotificationPreferencesClient() {
     isPrivyEnabled && typeof privyUser?.email?.address === "string"
       ? privyUser.email.address
       : "";
+
+  // Track whether we've attempted auto-connect for Privy email
+  const autoConnectAttemptedRef = useRef(false);
 
   // Check if user has grants admin permission
   const { hasPermission: isGrantsAdmin } = useHasPermission(
@@ -653,6 +656,65 @@ export default function NotificationPreferencesClient() {
       queryClient.invalidateQueries({ queryKey });
     },
   });
+
+  // Auto-connect Privy email when user has verified email but no stored email
+  useEffect(() => {
+    if (autoConnectAttemptedRef.current) return;
+    if (isLoading || !data) return;
+    if (!privyEmail) return;
+    if (!siweJwt) return;
+    if (recipient?.channels?.email) return;
+    if (updateEmailMutation.isPending) return;
+
+    autoConnectAttemptedRef.current = true;
+
+    const autoConnect = async () => {
+      try {
+        await updateEmailMutation.mutateAsync({
+          email: privyEmail,
+          privyVerified: true,
+        });
+
+        // Auto-enable email notifications for proposal events
+        const proposalEventTypes = (data.eventTypes ?? []).filter(
+          (et) => et.category === "proposals" && et.enabled !== false
+        );
+        for (const eventType of proposalEventTypes) {
+          try {
+            await authedFetchJson(
+              "/api/v1/notification-preferences/preferences/set",
+              {
+                method: "POST",
+                json: {
+                  eventType: eventType.event_type,
+                  channel: "email",
+                  state: "on",
+                },
+              }
+            );
+          } catch {
+            // Best-effort
+          }
+        }
+        queryClient.invalidateQueries({ queryKey });
+      } catch {
+        // Silently fail auto-connect; user can still manually connect
+        autoConnectAttemptedRef.current = false;
+      }
+    };
+
+    void autoConnect();
+  }, [
+    isLoading,
+    data,
+    privyEmail,
+    siweJwt,
+    recipient?.channels?.email,
+    updateEmailMutation,
+    authedFetchJson,
+    queryClient,
+    queryKey,
+  ]);
 
   if (!isConnected) {
     return (
