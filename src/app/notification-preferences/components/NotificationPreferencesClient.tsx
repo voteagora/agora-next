@@ -314,16 +314,22 @@ export default function NotificationPreferencesClient() {
   };
 
   const updateEmailMutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async ({
+      email,
+      privyVerified,
+    }: {
+      email: string;
+      privyVerified?: boolean;
+    }) => {
       return await authedFetchJson(
         "/api/v1/notification-preferences/channels/email",
         {
           method: "POST",
-          json: { email },
+          json: { email, privyVerified },
         }
       );
     },
-    onMutate: async (email) => {
+    onMutate: async ({ email, privyVerified }) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<NotificationSettings>(queryKey);
 
@@ -334,14 +340,14 @@ export default function NotificationPreferencesClient() {
           email: {
             type: "email",
             address: email,
-            verified: false,
+            verified: privyVerified === true,
           },
         },
       }));
 
       return { previous };
     },
-    onError: (error, _email, context) => {
+    onError: (error, _vars, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
@@ -351,8 +357,12 @@ export default function NotificationPreferencesClient() {
           : "Failed to update email.";
       toast.error(message);
     },
-    onSuccess: () => {
-      toast.success("Email updated.");
+    onSuccess: (_data, { privyVerified }) => {
+      if (privyVerified) {
+        toast.success("Email connected and verified.");
+      } else {
+        toast.success("Email updated.");
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -759,6 +769,45 @@ export default function NotificationPreferencesClient() {
 
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
+  // Wrapper to handle Privy-verified email connection with auto-enable notifications
+  const handleUpdateEmail = async (email: string) => {
+    const isPrivyVerified =
+      isPrivyEnabled &&
+      privyEmail.length > 0 &&
+      email.toLowerCase() === privyEmail.toLowerCase();
+
+    await updateEmailMutation.mutateAsync({
+      email,
+      privyVerified: isPrivyVerified,
+    });
+
+    // For Privy-verified emails, auto-enable email notifications for proposal events
+    if (isPrivyVerified) {
+      const proposalEventTypes = rawEventTypes.filter(
+        (et) => et.category === "proposals" && et.enabled !== false
+      );
+      for (const eventType of proposalEventTypes) {
+        try {
+          await authedFetchJson(
+            "/api/v1/notification-preferences/preferences/set",
+            {
+              method: "POST",
+              json: {
+                eventType: eventType.event_type,
+                channel: "email",
+                state: "on",
+              },
+            }
+          );
+        } catch {
+          // Best-effort: continue even if some fail
+        }
+      }
+      // Invalidate to refetch updated preferences
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+
   return (
     <main className="mx-auto flex max-w-screen-xl flex-col gap-8 px-4 pb-16 pt-12 lg:px-0">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -820,7 +869,7 @@ export default function NotificationPreferencesClient() {
               onStartLinking: telegramLinkMutation.mutateAsync,
               onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
             }}
-            onUpdateEmail={updateEmailMutation.mutateAsync}
+            onUpdateEmail={handleUpdateEmail}
             onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
             onUpdateSlack={handleSlackSave}
             onSendVerification={emailVerificationMutation.mutateAsync}

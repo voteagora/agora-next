@@ -486,7 +486,10 @@ async function getProposalTypes() {
     let types: any[] = [];
 
     const typesFromApi = await getProposalTypesFromDaoNode();
-    if (typesFromApi && Object.keys(typesFromApi.proposal_types || {}).length > 0) {
+    if (
+      typesFromApi &&
+      Object.keys(typesFromApi.proposal_types || {}).length > 0
+    ) {
       const parsedTypes = Object.entries(typesFromApi.proposal_types)
         ?.filter(([proposalTypeId, type]: any) => !!type.name)
         ?.map(([proposalTypeId, type]: any) => ({

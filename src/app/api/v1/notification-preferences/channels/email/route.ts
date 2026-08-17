@@ -8,9 +8,11 @@ import { requireNotificationPreferencesAuth } from "@/app/api/v1/notification-pr
 import { ensureNotificationRecipient } from "@/app/api/v1/notification-preferences/recipient";
 import { notificationCenterClient } from "@/lib/notification-center/client";
 import { withApiRouteMonitoring } from "@/lib/apiMonitoring";
+import Tenant from "@/lib/tenant/tenant";
 
 const BodySchema = z.object({
   email: z.string().email(),
+  privyVerified: z.boolean().optional(),
 });
 
 async function post(request: NextRequest) {
@@ -32,6 +34,10 @@ async function post(request: NextRequest) {
     );
   }
 
+  const { ui } = Tenant.current();
+  const isPrivyEnabled = ui.toggle("privy-login")?.enabled === true;
+  const verified = isPrivyEnabled && parsed.data.privyVerified === true;
+
   try {
     await ensureNotificationRecipient(auth.recipientId);
     const response = await notificationCenterClient.updateChannel(
@@ -40,7 +46,7 @@ async function post(request: NextRequest) {
       {
         type: "email",
         address: parsed.data.email,
-        verified: false,
+        verified,
       }
     );
     return NextResponse.json(response);
