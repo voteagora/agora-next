@@ -14,7 +14,6 @@
     "generate-apikey": "tsx src/scripts/generateApiKey.mjs",
     "generate-jwt": "tsx src/scripts/generateJwt.ts",
     "init-forum-index": "tsx src/scripts/initializeForumIndex.ts",
-    "civic:set-proposal-types": "tsx src/scripts/setCivicProposalTypes.ts",
     "check-prettier": "prettier --check src/",
     "prettier-src": "prettier -w src/",
     "test": "vitest",
