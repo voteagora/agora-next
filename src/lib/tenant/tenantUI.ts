@@ -24,6 +24,7 @@ export type UIEndorsedConfig = {
 
 export type UIGasRelayConfig = {
   signature?: {
+    name?: string;
     version?: string;
   };
   minBalance: string;

@@ -250,6 +250,9 @@ export const civicTenantUIConfig = new TenantUI({
       name: "sponsoredVote",
       enabled: true,
       config: {
+        signature: {
+          version: "1",
+        },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
@@ -263,6 +266,10 @@ export const civicTenantUIConfig = new TenantUI({
       name: "sponsoredDelegate",
       enabled: true,
       config: {
+        signature: {
+          name: "Protocol Guild Membership",
+          version: "1",
+        },
         sponsorAddress:
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x9b4B7Bd2c83B4116c2F08D2B01aE56FA55e761E1"
