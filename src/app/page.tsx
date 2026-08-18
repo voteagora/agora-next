@@ -1,6 +1,5 @@
 // export const dynamic = 'force-dynamic'; // this line is uncommented for e2e tests
 
-import { redirect } from "next/navigation";
 import Tenant from "@/lib/tenant/tenant";
 import ProposalsHome from "@/components/Proposals/ProposalsHome";
 import ComingSoonPage from "@/app/coming-soon/page";
@@ -54,11 +53,6 @@ export default async function Home() {
 
   if (comingSoonEnabled) {
     return <ComingSoonPage />;
-  }
-
-  // For CIVIC, use the bespoke info page as the landing page.
-  if (ui.toggle("civic")?.enabled) {
-    redirect("/info");
   }
 
   return <ProposalsHome />;
