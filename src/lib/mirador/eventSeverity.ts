@@ -15,6 +15,8 @@ const USER_CANCELLATION_MESSAGE_PATTERNS = [
   "denied message signature",
   "rejected the request",
   "rejected signature",
+  "scan cancelled",
+  "scan canceled",
   "exited_link_flow",
   "exited_update_flow",
 ];
@@ -27,6 +29,27 @@ const WALLET_TRANSPORT_ERROR_PATTERNS = [
   "failed to publish payload",
   "rpc endpoint returned http client error",
   "details: invalid id",
+];
+
+const SIWE_WALLET_OUTCOME_PATTERNS = [
+  "cannot read properties of undefined (reading 'includes')",
+  "request expired. please try again",
+];
+
+const GOVERNANCE_WALLET_OUTCOME_PATTERNS = [
+  "connect your wallet before submitting this transaction",
+  "wallet connection is still reconnecting",
+  "wallet connection is still initializing",
+  "rpc endpoint returned too many errors",
+  "the device must be opened first",
+  "extension context invalidated",
+];
+
+const STANDARD_VOTE_OUTCOME_PATTERNS = [
+  "nonce too low",
+  "vote already cast",
+  "voter already voted",
+  "insufficient funds for gas",
 ];
 
 function collectDetailValues(value: unknown, values: string[], depth = 0) {
@@ -124,6 +147,40 @@ export function isWalletTransportError(details?: unknown): boolean {
   });
 }
 
+function hasDetailPattern(details: unknown, patterns: string[]) {
+  const values: string[] = [];
+  collectDetailValues(details, values);
+  return values.some((value) => {
+    const normalized = value.trim().toLowerCase();
+    return patterns.some((pattern) => normalized.includes(pattern));
+  });
+}
+
+function isExpectedWalletOutcome(eventName: string, details?: unknown) {
+  if (eventName === "siwe_login_failed") {
+    return hasDetailPattern(details, SIWE_WALLET_OUTCOME_PATTERNS);
+  }
+
+  if (
+    eventName !== "governance_vote_failed" &&
+    eventName !== "governance_delegation_failed"
+  ) {
+    return false;
+  }
+
+  if (hasDetailPattern(details, GOVERNANCE_WALLET_OUTCOME_PATTERNS)) {
+    return true;
+  }
+
+  return (
+    eventName === "governance_vote_failed" &&
+    typeof details === "object" &&
+    details !== null &&
+    (details as Record<string, unknown>).voteKind === "standard" &&
+    hasDetailPattern(details, STANDARD_VOTE_OUTCOME_PATTERNS)
+  );
+}
+
 export function inferMiradorEventSeverity(
   eventName: string,
   details?: unknown
@@ -133,6 +190,10 @@ export function inferMiradorEventSeverity(
   }
 
   if (isWalletTransportError(details)) {
+    return "warn";
+  }
+
+  if (isExpectedWalletOutcome(eventName, details)) {
     return "warn";
   }
 
