@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { SurveyDefinitionInput } from "@/lib/actions/forum/surveys";
 import { validateSurveyDefinition } from "./ForumSurveyBuilder";
+
+vi.mock("@/lib/tenant/tenant", () => ({
+  default: { current: () => ({}) },
+}));
 
 describe("validateSurveyDefinition", () => {
   it("accepts a valid poll", () => {

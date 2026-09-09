@@ -23,6 +23,10 @@ import {
 import { isSafeWallet } from "@/lib/utils";
 import NotificationPreferencesClient from "../NotificationPreferencesClient";
 
+vi.mock("@/lib/tenant/tenant", () => ({
+  default: { current: () => ({ ui: { toggle: () => undefined } }) },
+}));
+
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(),
   useSignMessage: () => ({ signMessageAsync: signMessageAsyncMock }),

@@ -44,6 +44,10 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
+  useOpenDialog: () => vi.fn(),
+}));
+
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(() => ({
     address: "0x1234567890123456789012345678901234567890",
@@ -138,6 +142,7 @@ vi.mock("@/lib/tenant/tenant", async () => {
       current: () => ({
         ui: {
           copy: getTenantCopy("dao"),
+          toggle: () => undefined,
           governanceIssues: [],
           governanceStakeholders: [],
         },
