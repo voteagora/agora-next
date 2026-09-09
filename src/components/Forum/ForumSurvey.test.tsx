@@ -21,6 +21,10 @@ const mocks = vi.hoisted(() => ({
   getAuthenticationData: vi.fn(),
 }));
 
+vi.mock("@/lib/tenant/tenant", () => ({
+  default: { current: () => ({}) },
+}));
+
 vi.mock("@privy-io/react-auth", () => ({
   usePrivy: () => ({
     authenticated: mocks.authenticated,

@@ -1,4 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/tenant/tenant", () => ({
+  default: { current: () => ({}) },
+}));
+
+vi.mock("@/app/lib/dao-node/server-client", () => ({
+  getDelegateVotingPowerFromDaoNode: vi.fn(),
+}));
 
 import { formatVotingPower, formatVotingPowerString } from "./votingPowerUtils";
 
