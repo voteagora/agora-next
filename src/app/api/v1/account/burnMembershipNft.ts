@@ -1,6 +1,3 @@
-import Tenant from "@/lib/tenant/tenant";
-import { getTransportForChain } from "@/lib/utils";
-import { getPublicClient } from "@/lib/viem";
 import {
   BaseError,
   ContractFunctionRevertedError,
@@ -12,6 +9,9 @@ import {
   zeroAddress,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import Tenant from "@/lib/tenant/tenant";
+import { getTransportForChain } from "@/lib/utils";
+import { getPublicClient } from "@/lib/viem";
 
 // The generated Membership__factory ABI is stale vs. the deployed contract
 // (it has safeMint(address); the chain has mint(address[])), so the calls we
@@ -59,8 +59,8 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
     );
   }
 
-  // The token is not enumerable. Search recent transfers first and confirm
-  // ownership at the same block as the balance, skipping previously burned ids.
+  // Not enumerable: ids only exist in Transfer logs. Reads share one block so
+  // the balance and the ownership checks cannot disagree.
   // ponytail: history scans grow with token age; use indexed ids if they outgrow the request timeout.
   const ownedIds: bigint[] = [];
   const seenIds = new Set<bigint>();
