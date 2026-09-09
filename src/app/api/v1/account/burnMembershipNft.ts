@@ -2,6 +2,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { getTransportForChain } from "@/lib/utils";
 import { getPublicClient } from "@/lib/viem";
 import {
+  BaseError,
+  ContractFunctionRevertedError,
   createWalletClient,
   isAddressEqual,
   isHex,
@@ -18,11 +20,15 @@ const membershipAbi = parseAbi([
   "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function burn(uint256 tokenId)",
+  "error NonexistentToken(uint256 tokenId)",
 ]);
 
 const transferEvent = parseAbiItem(
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 );
+
+const DEPLOYMENT_BLOCK = 48_296_940n; // Civic membership token on Base
+const LOG_BLOCK_RANGE = 10_000n; // Goldsky's supported query range
 
 export async function burnMembershipNfts(owner: `0x${string}`) {
   const { contracts } = Tenant.current();
@@ -33,12 +39,14 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
 
   const tokenAddress = token.address as `0x${string}`;
   const publicClient = getPublicClient();
+  const blockNumber = await publicClient.getBlockNumber();
 
   const balance = await publicClient.readContract({
     address: tokenAddress,
     abi: membershipAbi,
     functionName: "balanceOf",
     args: [owner],
+    blockNumber,
   });
   if (balance === 0n) {
     return;
@@ -51,42 +59,62 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
     );
   }
 
-  // The contract is not enumerable, so token ids are recovered from mint
-  // transfers and confirmed with ownerOf (which reverts for burned ids).
-  const logs = await publicClient.getLogs({
-    address: tokenAddress,
-    event: transferEvent,
-    args: { to: owner },
-    // Civic token deploy block on Base; anchoring here keeps the scan
-    // window small. Chunk the range if the RPC ever caps it.
-    fromBlock: 48297405n,
-    toBlock: "latest",
-  });
-  const candidateIds = [
-    ...new Set(logs.map((log) => log.args.tokenId).filter(Boolean)),
-  ] as bigint[];
-
+  // The token is not enumerable. Search recent transfers first and confirm
+  // ownership at the same block as the balance, skipping previously burned ids.
+  // ponytail: history scans grow with token age; use indexed ids if they outgrow the request timeout.
   const ownedIds: bigint[] = [];
-  for (const tokenId of candidateIds) {
-    try {
-      const currentOwner = await publicClient.readContract({
-        address: tokenAddress,
-        abi: membershipAbi,
-        functionName: "ownerOf",
-        args: [tokenId],
-      });
-      if (isAddressEqual(currentOwner, owner)) {
-        ownedIds.push(tokenId);
+  const seenIds = new Set<bigint>();
+  let toBlock = blockNumber;
+  while (toBlock >= DEPLOYMENT_BLOCK && BigInt(ownedIds.length) < balance) {
+    const start = toBlock - LOG_BLOCK_RANGE + 1n;
+    const fromBlock = start < DEPLOYMENT_BLOCK ? DEPLOYMENT_BLOCK : start;
+    const logs = await publicClient.getLogs({
+      address: tokenAddress,
+      event: transferEvent,
+      args: { to: owner },
+      fromBlock,
+      toBlock,
+    });
+
+    for (const {
+      args: { tokenId },
+    } of logs) {
+      if (tokenId === undefined || seenIds.has(tokenId)) continue;
+      seenIds.add(tokenId);
+      try {
+        const currentOwner = await publicClient.readContract({
+          address: tokenAddress,
+          abi: membershipAbi,
+          functionName: "ownerOf",
+          args: [tokenId],
+          blockNumber,
+        });
+        if (isAddressEqual(currentOwner, owner)) {
+          ownedIds.push(tokenId);
+        }
+      } catch (error) {
+        if (
+          error instanceof BaseError &&
+          error.walk(
+            (cause) =>
+              cause instanceof ContractFunctionRevertedError &&
+              cause.data?.errorName === "NonexistentToken"
+          )
+        ) {
+          continue;
+        }
+        throw error;
       }
-    } catch {
-      // burned or invalid id
+      if (BigInt(ownedIds.length) === balance) {
+        break;
+      }
     }
-    if (BigInt(ownedIds.length) === balance) {
-      break;
-    }
+    toBlock = fromBlock - 1n;
   }
-  if (ownedIds.length === 0) {
-    return;
+  if (BigInt(ownedIds.length) !== balance) {
+    throw new Error(
+      `Could not find all membership NFTs (found ${ownedIds.length}, expected ${balance})`
+    );
   }
 
   const account = privateKeyToAccount(burnerKey);
@@ -111,5 +139,15 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
         `Membership NFT burn reverted (tokenId ${tokenId}, tx ${hash})`
       );
     }
+  }
+
+  const remainingBalance = await publicClient.readContract({
+    address: tokenAddress,
+    abi: membershipAbi,
+    functionName: "balanceOf",
+    args: [owner],
+  });
+  if (remainingBalance !== 0n) {
+    throw new Error("Membership NFT balance is not zero after burning");
   }
 }
