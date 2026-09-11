@@ -242,7 +242,7 @@ export const civicTenantUIConfig = new TenantUI({
       name: "privy-login",
       enabled: true,
       config: {
-        appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID_CIVIC ?? "",
+        appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID ?? "",
         loginMethods: ["email", "google", "wallet"],
       },
     },
