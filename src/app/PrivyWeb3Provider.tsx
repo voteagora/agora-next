@@ -103,7 +103,10 @@ function hasEmbeddedWallet(user: User | null) {
   );
 }
 
-function PrivyConnectModalBridge({ children }: PropsWithChildren) {
+function PrivyConnectModalBridge({
+  children,
+  privyAppId,
+}: PropsWithChildren<{ privyAppId: string }>) {
   const { authenticated, ready, user } = usePrivy();
   const { wallets, ready: walletsReady } = useWallets();
   const { setActiveWallet } = useSetActiveWallet();
@@ -211,6 +214,30 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ---- diagnostics: which Privy app produced this user/wallet ---------------
+  // Embedded wallets are scoped to a Privy app: the same email on two app IDs
+  // is two different Privy users with two different wallets.
+  useEffect(() => {
+    console.log({
+      privyAppId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+      privyAppIdCivic: process.env.NEXT_PUBLIC_PRIVY_APP_ID_CIVIC,
+      privyClientId: process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID,
+      privyAppIdInUse: privyAppId,
+      userId: user?.id,
+      linkedAccounts: user?.linkedAccounts,
+      wallets,
+    });
+    privyDebugLog("privy_app_identity", {
+      privyAppId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
+      privyAppIdCivic: process.env.NEXT_PUBLIC_PRIVY_APP_ID_CIVIC,
+      privyClientId: process.env.NEXT_PUBLIC_PRIVY_CLIENT_ID,
+      privyAppIdInUse: privyAppId,
+      userId: user?.id,
+      linkedAccounts: user?.linkedAccounts,
+      wallets: wallets.map(summarizePrivyWallet),
+    });
+  }, [privyAppId, user, wallets]);
 
   // ---- diagnostics: Privy auth state ----------------------------------------
   useEffect(() => {
@@ -698,7 +725,7 @@ const PrivyWeb3Provider: FC<
                 {...siweProviderConfig}
                 enabled={siweProviderConfig.enabled}
               >
-                <PrivyConnectModalBridge>
+                <PrivyConnectModalBridge privyAppId={privyConfig.appId}>
                   <AgoraAppShell>{children}</AgoraAppShell>
                   {!shouldHideAgoraBranding && <Footer />}
                   <SpeedInsights />
