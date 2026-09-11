@@ -6,12 +6,20 @@ import { TenantNamespace } from "@/lib/types";
 
 export const runtime = "edge";
 
+function resolveAvatarUrl(url: string | null) {
+  if (!url) return null;
+  if (url.startsWith("ipfs://")) {
+    return `https://ipfs.io/ipfs/${url.replace("ipfs://", "")}`;
+  }
+  return url;
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const address = searchParams.get("address") || "voter.eth";
 
-  const avatar = searchParams.get("avatar") || null;
+  const avatar = resolveAvatarUrl(searchParams.get("avatar"));
   const votes = searchParams.get("votes") || null;
   const description = searchParams.get("description") || "";
   const statement = searchParams.has("statement")

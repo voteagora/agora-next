@@ -44,6 +44,10 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
+  useOpenDialog: () => vi.fn(),
+}));
+
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(() => ({
     address: "0x1234567890123456789012345678901234567890",
@@ -129,17 +133,24 @@ vi.mock("@/components/Delegates/DelegateCard/DelegateCard", () => ({
   default: () => <div>DelegateCard</div>,
 }));
 
-vi.mock("@/lib/tenant/tenant", () => ({
-  default: {
-    current: () => ({
-      ui: {
-        governanceIssues: [],
-        governanceStakeholders: [],
-      },
-      contracts: {},
-    }),
-  },
-}));
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          toggle: () => undefined,
+          governanceIssues: [],
+          governanceStakeholders: [],
+        },
+        contracts: {},
+      }),
+    },
+  };
+});
 
 vi.mock("react-hook-form", async () => {
   const actual =

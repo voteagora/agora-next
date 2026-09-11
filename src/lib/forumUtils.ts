@@ -1,3 +1,5 @@
+import type { ForumSurveySummaryDto } from "@/lib/actions/forum/surveyTypes";
+
 export interface ForumAttachment {
   id: number;
   fileName: string;
@@ -16,27 +18,32 @@ export interface ForumTopic {
   id: number;
   title: string;
   author: string;
+  authorDisplayName?: string | null;
   content: string;
   createdAt: string;
   comments: ForumPost[];
   attachments: ForumAttachment[];
   deletedAt?: string | null;
   deletedBy?: string | null;
+  isAuthorDeleted?: boolean;
   isNsfw?: boolean;
   isFinancialStatement?: boolean;
   revealTime?: string | null;
   expirationTime?: string | null;
+  survey?: ForumSurveySummaryDto | null;
 }
 
 export interface ForumPost {
   id: number;
   author: string;
+  authorDisplayName?: string | null;
   content: string;
   createdAt: string;
   parentId?: number;
   attachments?: ForumAttachment[];
   deletedAt?: string | null;
   deletedBy?: string | null;
+  isAuthorDeleted?: boolean;
   isNsfw?: boolean;
   reactionsByEmoji?: Record<string, string[]>;
 }
@@ -172,12 +179,14 @@ export function transformForumTopics(
       topic.posts?.slice(1).map((post: any) => ({
         id: post.id,
         author: post.address,
+        authorDisplayName: post.authorDisplayName ?? null,
         content: post.content,
         createdAt: post.createdAt,
         parentId: post.parentPostId || undefined,
         attachments: post.attachments || [],
         deletedAt: post.deletedAt,
         deletedBy: post.deletedBy,
+        isAuthorDeleted: post.isAuthorDeleted,
         reactionsByEmoji: post.reactionsByEmoji,
       })) || [];
 
@@ -185,17 +194,20 @@ export function transformForumTopics(
       id: topic.id,
       title: topic.title,
       author: topic.address,
+      authorDisplayName: topic.authorDisplayName ?? null,
       content: topic.posts?.[0]?.content || "",
       createdAt: topic.createdAt,
       comments,
       attachments,
       deletedAt: topic.deletedAt,
       deletedBy: topic.deletedBy,
+      isAuthorDeleted: topic.isAuthorDeleted,
       revealTime: topic.revealTime
         ? topic.revealTime instanceof Date
           ? topic.revealTime.toISOString()
           : new Date(topic.revealTime).toISOString()
         : null,
+      survey: topic.survey ?? null,
     };
   });
 }

@@ -33,6 +33,8 @@ import RelatedProposalLinks from "@/components/Proposals/ProposalPage/RelatedPro
 import FinancialStatementLayout from "../components/FinancialStatementLayout";
 import ForumDiscussAction from "../components/ForumDiscussAction";
 import { hasMarkdownHeadings } from "../components/markdownHeadings";
+import { getForumSurveyByTopic } from "@/lib/actions/forum/surveys";
+import { ForumSurvey } from "@/components/Forum/ForumSurvey";
 
 // Force dynamic rendering - forum topics and posts change frequently
 export const dynamic = "force-dynamic";
@@ -227,7 +229,8 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
 export default async function ForumTopicPage(props: PageProps) {
   const params = await props.params;
-  const { ui } = Tenant.current();
+  const { ui, namespace } = Tenant.current();
+  const surveysEnabled = ui.toggle("forums/surveys")?.enabled === true;
 
   if (!ui.toggle("forums")?.enabled) {
     return (
@@ -253,6 +256,11 @@ export default async function ForumTopicPage(props: PageProps) {
   }
 
   const { topicId, topicData, transformed } = topicBundle;
+  const surveyResult = surveysEnabled
+    ? await getForumSurveyByTopic(topicId)
+    : null;
+  const initialSurvey =
+    surveyResult?.success && surveyResult.data ? surveyResult.data : null;
   const canonicalSlug = buildForumTopicSlug(transformed.title);
   const slugParam = params.slug?.[0] ?? "";
 
@@ -272,8 +280,6 @@ export default async function ForumTopicPage(props: PageProps) {
   const authorAddress = transformed.author || "";
   const createdAtIso = new Date(topicData.createdAt).toISOString();
   const categoryName = topicData.category?.name || null;
-  const { namespace } = Tenant.current();
-
   const adminRolesMap = adminsResult?.success
     ? adminsResult.data.reduce((map, admin) => {
         const normalizedAddress = (admin.address || "").toLowerCase();
@@ -301,10 +307,15 @@ export default async function ForumTopicPage(props: PageProps) {
     id: transformed.id,
     title: transformed.title,
     address: authorAddress,
-    authorName: truncateAddress(authorAddress) || authorAddress,
+    authorName:
+      transformed.authorDisplayName ||
+      truncateAddress(authorAddress) ||
+      authorAddress,
+    authorDisplayName: transformed.authorDisplayName ?? null,
     createdAt: createdAtIso,
     revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,
+    isAuthorDeleted: transformed.isAuthorDeleted,
   };
 
   const rootPost = topicData.posts?.[0];
@@ -453,6 +464,17 @@ export default async function ForumTopicPage(props: PageProps) {
                 <div className="my-4">
                   <RelatedProposalLinks proposalId={topicId.toString()} />
                 </div>
+
+                {initialSurvey && (
+                  <div className="my-6">
+                    <ForumSurvey
+                      topicId={topicId}
+                      initialSurvey={initialSurvey}
+                      topicAuthor={authorAddress}
+                      adminDirectory={adminDirectory}
+                    />
+                  </div>
+                )}
 
                 <div className="flex flex-wrap items-center gap-3 lg:gap-6 text-xs font-semibold text-tertiary border-b pb-2">
                   {rootPostId && (

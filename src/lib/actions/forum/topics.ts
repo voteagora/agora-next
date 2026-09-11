@@ -33,7 +33,78 @@ import {
   emitBroadcastEvent,
   formatAddressForNotification,
 } from "@/lib/notification-center/emitter";
+import { createForumSurveyForTopic } from "./surveyService";
+import { isForumSurveysEnabled } from "./surveyFeature";
 const { slug } = Tenant.current();
+
+const surveySummaryInclude = {
+  select: {
+    id: true,
+    kind: true,
+    closesAt: true,
+    closedAt: true,
+    _count: { select: { responses: true } },
+  },
+} as const;
+
+function mapForumSurveySummary(survey: any) {
+  if (!survey) return null;
+  const isOpen =
+    !survey.closedAt && (!survey.closesAt || survey.closesAt > new Date());
+  return {
+    id: survey.id,
+    kind: survey.kind,
+    status: isOpen ? ("open" as const) : ("closed" as const),
+    isOpen,
+    responseCount: survey._count.responses,
+  };
+}
+
+async function getDeletedAccountSet(
+  addresses: (string | null | undefined)[]
+): Promise<Set<string>> {
+  const unique = [
+    ...new Set(addresses.map((a) => (a || "").toLowerCase())),
+  ].filter(Boolean);
+  if (unique.length === 0) {
+    return new Set();
+  }
+  const rows = await prismaWeb2Client.deletedAccounts.findMany({
+    where: { dao_slug: slug, address: { in: unique } },
+    select: { address: true },
+  });
+  return new Set(rows.map((row) => row.address));
+}
+
+async function getDisplayNameMap(
+  addresses: (string | null | undefined)[]
+): Promise<Map<string, string>> {
+  const unique = [
+    ...new Set(addresses.map((a) => (a || "").toLowerCase())),
+  ].filter(Boolean);
+  const displayNames = new Map<string, string>();
+  if (unique.length === 0) return displayNames;
+
+  const statements = await prismaWeb2Client.delegateStatements.findMany({
+    where: {
+      dao_slug: slug,
+      address: { in: unique, mode: "insensitive" },
+      username: { not: null },
+    },
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+    select: { address: true, username: true },
+  });
+
+  for (const statement of statements) {
+    const normalized = statement.address.toLowerCase();
+    const username = statement.username?.trim();
+    if (username && !displayNames.has(normalized)) {
+      displayNames.set(normalized, username);
+    }
+  }
+
+  return displayNames;
+}
 
 async function deleteOwnedForumTopic(topicId: number, address: string) {
   const normalizedAddress = address.toLowerCase();
@@ -127,6 +198,7 @@ export async function getForumTopics({
     const topics = await prismaWeb2Client.forumTopic.findMany({
       where: whereClause,
       include: {
+        ...(isForumSurveysEnabled() ? { survey: surveySummaryInclude } : {}),
         category: {
           select: {
             name: true,
@@ -167,12 +239,27 @@ export async function getForumTopics({
       return out;
     };
 
+    const authorAddresses = topics.flatMap((topic: any) => [
+      topic.address,
+      ...topic.posts.map((p: any) => p.address),
+    ]);
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet(authorAddresses),
+      getDisplayNameMap(authorAddresses),
+    ]);
+
     return {
       success: true,
       data: topics.map((topic: any) => ({
         ...topic,
+        survey: mapForumSurveySummary(topic.survey),
+        isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
+        authorDisplayName:
+          displayNames.get(topic.address?.toLowerCase()) ?? null,
         posts: topic.posts.map((p: any) => ({
           ...p,
+          isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
+          authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
           reactionsByEmoji: groupByEmojiAddresses(p.reactions),
         })),
         topicReactionsByEmoji: groupByEmojiAddresses(
@@ -219,6 +306,7 @@ export async function getForumTopic(topicId: number) {
     const topic = await prismaWeb2Client.forumTopic.findFirst({
       where: whereClause,
       include: {
+        ...(isForumSurveysEnabled() ? { survey: surveySummaryInclude } : {}),
         category: {
           select: {
             name: true,
@@ -260,8 +348,21 @@ export async function getForumTopic(topicId: number) {
       return out;
     };
 
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet([
+        (topic as any).address,
+        ...(topic as any).posts.map((p: any) => p.address),
+      ]),
+      getDisplayNameMap([
+        (topic as any).address,
+        ...(topic as any).posts.map((p: any) => p.address),
+      ]),
+    ]);
+
     const mappedPosts = (topic as any).posts.map((p: any) => ({
       ...p,
+      isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
+      authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
       reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       attachments: (p.attachments || []).map((att: any) => ({
         id: att.id,
@@ -293,6 +394,12 @@ export async function getForumTopic(topicId: number) {
       success: true,
       data: {
         ...topic,
+        authorDisplayName:
+          displayNames.get((topic as any).address?.toLowerCase()) ?? null,
+        survey: mapForumSurveySummary((topic as any).survey),
+        isAuthorDeleted: deletedAccounts.has(
+          (topic as any).address?.toLowerCase()
+        ),
         posts: mappedPosts,
         topicReactionsByEmoji: groupByEmojiAddresses(
           (topic as any).posts?.[0]?.reactions
@@ -337,6 +444,7 @@ export async function getForumTopicsByUser(
         ],
       },
       include: {
+        ...(isForumSurveysEnabled() ? { survey: surveySummaryInclude } : {}),
         category: {
           select: {
             name: true,
@@ -380,10 +488,24 @@ export async function getForumTopicsByUser(
       return out;
     };
 
+    const authorAddresses = data.flatMap((topic: any) => [
+      topic.address,
+      ...topic.posts.map((p: any) => p.address),
+    ]);
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet(authorAddresses),
+      getDisplayNameMap(authorAddresses),
+    ]);
+
     const processedTopics = data.map((topic: any) => ({
       ...topic,
+      survey: mapForumSurveySummary(topic.survey),
+      isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
+      authorDisplayName: displayNames.get(topic.address?.toLowerCase()) ?? null,
       posts: topic.posts.map((p: any) => ({
         ...p,
+        isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
+        authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
         reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       })),
       topicReactionsByEmoji: groupByEmojiAddresses(topic.posts?.[0]?.reactions),
@@ -437,11 +559,74 @@ export async function createForumTopic(
 
     const normalizedAddress = authResult.address.toLowerCase();
 
+    if (validatedData.survey && !isForumSurveysEnabled()) {
+      return {
+        success: false,
+        error: "Forum surveys are not enabled for this tenant",
+      };
+    }
+
+    if (validatedData.survey?.key) {
+      return {
+        success: false,
+        error: "Stable survey keys can only be assigned by the seed process",
+      };
+    }
+
+    if (
+      validatedData.survey?.closesAt &&
+      validatedData.survey.closesAt <= new Date()
+    ) {
+      return { success: false, error: "Survey deadline must be in the future" };
+    }
+
+    if (validatedData.categoryId != null) {
+      const category = await prismaWeb2Client.forumCategory.findFirst({
+        where: { id: validatedData.categoryId, dao_slug: slug },
+        select: { adminOnlyTopics: true },
+      });
+      if (!category) {
+        return { success: false, error: "Category not found" };
+      }
+      if (category.adminOnlyTopics && !hasTopicPermission) {
+        return {
+          success: false,
+          error: "Only forum staff can create topics in this category",
+        };
+      }
+    }
+
     // Only check voting power if user doesn't have RBAC permission
     if (!hasTopicPermission) {
       try {
         const tenant = Tenant.current();
         const client = getPublicClient();
+
+        if (validatedData.survey) {
+          let directBalance: bigint;
+          try {
+            directBalance = BigInt(
+              (await client.readContract({
+                abi: tenant.contracts.token.abi,
+                address: tenant.contracts.token.address as `0x${string}`,
+                functionName: "balanceOf",
+                args: [normalizedAddress],
+              })) as bigint
+            );
+          } catch (error) {
+            console.error("Failed to verify CIVIC survey membership", error);
+            return {
+              success: false,
+              error: "CIVIC membership verification is temporarily unavailable",
+            };
+          }
+          if (directBalance <= 0n) {
+            return {
+              success: false,
+              error: "A CIVIC Supporter Pass is required to create a survey",
+            };
+          }
+        }
 
         // Fetch voting power directly from contract
         const votingPowerBigInt = await fetchVotingPowerFromContract(
@@ -454,7 +639,10 @@ export async function createForumTopic(
         );
 
         // Convert to number for comparison
-        const currentVP = formatVotingPower(votingPowerBigInt);
+        const currentVP = formatVotingPower(
+          votingPowerBigInt,
+          tenant.token.decimals
+        );
         const vpCheck = await canCreateTopic(currentVP, slug);
 
         if (!vpCheck.allowed) {
@@ -465,6 +653,12 @@ export async function createForumTopic(
         }
       } catch (vpError) {
         console.error("Failed to check voting power:", vpError);
+        if (validatedData.survey) {
+          return {
+            success: false,
+            error: "CIVIC membership verification is temporarily unavailable",
+          };
+        }
         // Continue if VP check fails - don't block legitimate users
       }
     }
@@ -472,32 +666,55 @@ export async function createForumTopic(
     // Moderate content automatically
     let isNsfw = false;
     try {
-      const combinedText = `${validatedData.title}\n\n${validatedData.content}`;
+      const surveyText = validatedData.survey?.questions
+        .flatMap((question) => [question.prompt, ...question.options])
+        .join("\n");
+      const combinedText = [
+        validatedData.title,
+        validatedData.content,
+        surveyText,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
       const moderation = await moderateTextContent(combinedText);
       isNsfw = isContentNSFW(moderation);
     } catch (moderationError) {
       console.error("Content moderation failed:", moderationError);
     }
 
-    const newTopic = await prismaWeb2Client.forumTopic.create({
-      data: {
-        title: validatedData.title,
-        address: validatedData.address,
-        dao_slug: slug,
-        categoryId: validatedData.categoryId || null,
-        isNsfw,
-      },
-    });
+    const { newTopic, newPost, newSurvey } =
+      await prismaWeb2Client.$transaction(async (tx) => {
+        const newTopic = await tx.forumTopic.create({
+          data: {
+            title: validatedData.title,
+            address: normalizedAddress,
+            dao_slug: slug,
+            categoryId: validatedData.categoryId || null,
+            isNsfw,
+          },
+        });
 
-    const newPost = await prismaWeb2Client.forumPost.create({
-      data: {
-        content: validatedData.content,
-        address: validatedData.address,
-        topicId: newTopic.id,
-        dao_slug: slug,
-        isNsfw,
-      },
-    });
+        const newPost = await tx.forumPost.create({
+          data: {
+            content: validatedData.content,
+            address: normalizedAddress,
+            topicId: newTopic.id,
+            dao_slug: slug,
+            isNsfw,
+          },
+        });
+
+        const newSurvey = validatedData.survey
+          ? await createForumSurveyForTopic(
+              tx,
+              slug as DaoSlug,
+              newTopic.id,
+              validatedData.survey
+            )
+          : null;
+
+        return { newTopic, newPost, newSurvey };
+      });
 
     // Create attachment records for any IPFS images in the content
     try {
@@ -569,6 +786,10 @@ export async function createForumTopic(
       );
     }
 
+    const createdDisplayNames = await getDisplayNameMap([normalizedAddress]);
+    const createdAuthorDisplayName =
+      createdDisplayNames.get(normalizedAddress) ?? null;
+
     return {
       success: true as const,
       data: {
@@ -576,14 +797,25 @@ export async function createForumTopic(
           id: newTopic.id,
           title: newTopic.title,
           address: newTopic.address,
+          authorDisplayName: createdAuthorDisplayName,
           createdAt: newTopic.createdAt.toISOString(),
         },
         post: {
           id: newPost.id,
           content: newPost.content,
           address: newPost.address,
+          authorDisplayName: createdAuthorDisplayName,
           createdAt: newPost.createdAt.toISOString(),
         },
+        survey: newSurvey
+          ? {
+              id: newSurvey.id,
+              kind: newSurvey.kind,
+              responseCount: 0,
+              status: "open" as const,
+              isOpen: true,
+            }
+          : null,
       },
     };
   } catch (error) {
@@ -1105,6 +1337,7 @@ export const getForumData = async ({
       prismaWeb2Client.forumTopic.findMany({
         where: whereClause,
         include: {
+          ...(isForumSurveysEnabled() ? { survey: surveySummaryInclude } : {}),
           category: {
             select: {
               name: true,
@@ -1247,8 +1480,17 @@ export const getForumData = async ({
       adminRolesObj[address] = role;
     });
 
+    const topicAddresses = topics.map((topic) => topic.address);
+    const [deletedAccounts, displayNames] = await Promise.all([
+      getDeletedAccountSet(topicAddresses),
+      getDisplayNameMap(topicAddresses),
+    ]);
+
     const processedTopics = topics.map((topic) => ({
       ...topic,
+      survey: mapForumSurveySummary((topic as any).survey),
+      isAuthorDeleted: deletedAccounts.has(topic.address.toLowerCase()),
+      authorDisplayName: displayNames.get(topic.address.toLowerCase()) ?? null,
       createdAt: topic.createdAt.toISOString(),
       revealTime: topic.revealTime
         ? (topic.revealTime instanceof Date

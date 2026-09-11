@@ -49,6 +49,8 @@ const DelegateCard = ({
               <DelegateProfileImage
                 endorsed={delegate.statement?.endorsed}
                 address={delegate.address}
+                username={delegate.statement?.username}
+                avatar={delegate.statement?.avatar}
                 votingPower={delegate.votingPower.total}
                 participation={delegate.participation}
                 showParticipation={showParticipation}

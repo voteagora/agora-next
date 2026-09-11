@@ -98,6 +98,19 @@ describe("DelegateProfileImageWithMetadata", () => {
     expect(endorsedIcon).toBeInTheDocument();
   });
 
+  it("prefers statement username and avatar when provided", () => {
+    render(
+      <DelegateProfileImageWithMetadata
+        {...defaultProps}
+        username="Profile Alice"
+        avatar="ipfs://alice"
+      />
+    );
+
+    expect(screen.getByText("Profile Alice")).toBeInTheDocument();
+    expect(screen.getByAltText("Profile Alice avatar")).toBeInTheDocument();
+  });
+
   it("does not render location when not provided", () => {
     const propsWithoutLocation = { ...defaultProps, location: undefined };
     render(<DelegateProfileImageWithMetadata {...propsWithoutLocation} />);

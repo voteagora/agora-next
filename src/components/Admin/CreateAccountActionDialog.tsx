@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Fragment, useState } from "react";
 import toast from "react-hot-toast";
 import Tenant from "@/lib/tenant/tenant";
-import { useDisconnect, useWriteContract } from "wagmi";
+import { useWriteContract } from "wagmi";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
 import BlockScanUrls from "@/components/shared/BlockScanUrl";
 
 export function CreateAccountActionDialog({
@@ -24,7 +25,7 @@ export function CreateAccountActionDialog({
   // Get contract to make calls against
   const govContract = contracts.governor;
   const { writeContractAsync } = useWriteContract();
-  const { disconnect } = useDisconnect();
+  const { disconnect } = useConnectModal();
 
   const form = useForm({
     defaultValues: {

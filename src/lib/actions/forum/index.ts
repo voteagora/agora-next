@@ -79,6 +79,46 @@ export {
   handlePrismaError,
 } from "./shared";
 
+export {
+  forumSurveyKindSchema,
+  forumSurveyQuestionTypeSchema,
+  surveyQuestionSchema,
+  surveyDefinitionSchema,
+  surveyAnswerInputSchema,
+  surveySubmissionSchema,
+  closeForumSurveySchema,
+} from "./surveySchemas";
+export type {
+  SurveyQuestionInput,
+  SurveyDefinitionInput,
+  SurveyAnswerInput,
+  SurveySubmissionInput,
+  SurveyViewerInput,
+  CloseForumSurveyInput,
+} from "./surveySchemas";
+export type {
+  ForumSurveyStatus,
+  ForumSurveyErrorCode,
+  ForumSurveyAnswerDto,
+  ForumSurveyViewerResponseDto,
+  ForumSurveyViewerDto,
+  ForumSurveyOptionDto,
+  ForumSurveyQuestionDto,
+  ForumSurveyRespondentDto,
+  ForumSurveyDto,
+  ForumSurveySummaryDto,
+  ForumSurveyActionResult,
+} from "./surveyTypes";
+export {
+  getForumSurvey,
+  getForumSurveyByTopic,
+  getForumSurveyByKey,
+  getForumSurveyViewerState,
+  submitForumSurvey,
+  submitForumSurveyResponse,
+  closeForumSurvey,
+} from "./surveys";
+
 // Admin
 export {
   getForumAdmins,

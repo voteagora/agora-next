@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
   const [activeNavItem, setActiveNavItem] = useState(null);
   const navRef = useRef(null);
@@ -20,6 +21,8 @@ export default function Navbar() {
   const hasComingSoon =
     ui.toggle("coming-soon") && ui.toggle("coming-soon").enabled;
   const hasDuna = ui.toggle("duna") && ui.toggle("duna").enabled;
+  const hasInfo = ui.toggle("info") && ui.toggle("info").enabled;
+  const infoFirst = Boolean(ui.toggle("civic")?.enabled);
 
   const { address } = useAccount();
   const { isConnected } = useAgoraContext();
@@ -57,6 +60,19 @@ export default function Navbar() {
     }
   }, [pathname]);
 
+  const infoLink = hasInfo && (
+    <HeaderLink
+      ref={(el) => {
+        linkRefs.current.info = el;
+      }}
+      href="/info"
+      isActive={activeNavItem === "info"}
+      onClick={() => handleNavClick("info")}
+    >
+      {hasDuna ? copy.nav.about : copy.nav.info}
+    </HeaderLink>
+  );
+
   // Update the active indicator position when activeNavItem changes
   useEffect(() => {
     if (activeNavItem && linkRefs.current[activeNavItem]) {
@@ -88,6 +104,8 @@ export default function Navbar() {
         />
       )}
 
+      {infoFirst && infoLink}
+
       {hasProposals && (
         <HeaderLink
           ref={(el) => {
@@ -98,7 +116,7 @@ export default function Navbar() {
           isActive={activeNavItem === "proposals"}
           onClick={() => handleNavClick("proposals")}
         >
-          Proposals
+          {copy.nav.proposals}
         </HeaderLink>
       )}
 
@@ -111,7 +129,7 @@ export default function Navbar() {
           isActive={activeNavItem === "coming-soon"}
           onClick={() => handleNavClick("coming-soon")}
         >
-          Governance
+          {copy.nav.governance}
         </HeaderLink>
       )}
 
@@ -124,21 +142,23 @@ export default function Navbar() {
           isActive={activeNavItem === "forums"}
           onClick={() => handleNavClick("forums")}
         >
-          Discussions
+          {copy.nav.discussions}
         </HeaderLink>
       )}
-      {ui.toggle("delegates") && ui.toggle("delegates").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.delegates = el;
-          }}
-          href="/delegates"
-          isActive={activeNavItem === "delegates"}
-          onClick={() => handleNavClick("delegates")}
-        >
-          Voters
-        </HeaderLink>
-      )}
+      {ui.toggle("delegates") &&
+        ui.toggle("delegates").enabled &&
+        !ui.isNgo && (
+          <HeaderLink
+            ref={(el) => {
+              linkRefs.current.delegates = el;
+            }}
+            href="/delegates"
+            isActive={activeNavItem === "delegates"}
+            onClick={() => handleNavClick("delegates")}
+          >
+            {copy.nav.delegates}
+          </HeaderLink>
+        )}
 
       {ui.toggle("staking") && ui.toggle("staking").enabled && (
         <HeaderLink
@@ -175,22 +195,11 @@ export default function Navbar() {
           isActive={activeNavItem === "grants"}
           onClick={() => handleNavClick("grants")}
         >
-          Grants
+          {copy.nav.grants}
         </HeaderLink>
       )}
 
-      {ui.toggle("info") && ui.toggle("info").enabled && (
-        <HeaderLink
-          ref={(el) => {
-            linkRefs.current.info = el;
-          }}
-          href="/info"
-          isActive={activeNavItem === "info"}
-          onClick={() => handleNavClick("info")}
-        >
-          {hasDuna ? "About" : "Info"}
-        </HeaderLink>
-      )}
+      {!infoFirst && infoLink}
 
       {hasDuna && (
         <HeaderLink
@@ -201,7 +210,7 @@ export default function Navbar() {
           isActive={activeNavItem === "financials"}
           onClick={() => handleNavClick("financials")}
         >
-          Financials
+          {copy.nav.financials}
         </HeaderLink>
       )}
     </div>

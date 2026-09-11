@@ -1,9 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
+import Image from "next/image";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { format, formatDistanceToNow } from "date-fns";
+import { formatEther } from "viem";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { type Proposal } from "@/app/api/common/proposals/proposal";
 import type { Vote } from "@/app/api/common/votes/vote";
 import { type VotingPowerData } from "@/app/api/common/voting-power/votingPower";
@@ -22,22 +26,18 @@ import CastVoteContextProvider, {
 import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
-import Image from "next/image";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import useFetchAllForVoting from "@/hooks/useFetchAllForVoting";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import shareIcon from "@/icons/share.svg";
-import { format, formatDistanceToNow } from "date-fns";
 import { useVotableSupply } from "@/hooks/useVotableSupply";
 
 type Props = {
@@ -50,7 +50,7 @@ export default function CastVoteInput({
   isOptimistic = false,
 }: Props) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
   const { data, isSuccess, isPending } = useFetchAllForVoting({
@@ -65,11 +65,12 @@ export default function CastVoteInput({
   const votingPower = data?.votingPower;
 
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   if (proposal.status !== "ACTIVE") {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <DisabledVoteButton reason="Not open to voting" />
+        <DisabledVoteButton reason={copy.voting.notOpen} />
       </div>
     );
   }
@@ -77,8 +78,8 @@ export default function CastVoteInput({
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <Button className="w-full" onClick={() => setOpen(true)}>
-          Connect wallet to vote
+        <Button className="w-full" onClick={() => openConnectModal()}>
+          {copy.voting.connectWallet}
         </Button>
       </div>
     );
@@ -87,7 +88,7 @@ export default function CastVoteInput({
   if (isPending) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <DisabledVoteButton reason="Loading..." />
+        <DisabledVoteButton reason={copy.voting.loading} />
       </div>
     );
   }
@@ -148,6 +149,7 @@ function CastVoteInputContent({
   } = useCastVoteContext();
 
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   const missingVote = checkMissingVoteForDelegate(
     votes ?? [],
@@ -193,7 +195,7 @@ function CastVoteInputContent({
                 <div className="flex flex-col gap-2">
                   {proposal.status === "ACTIVE" && (
                     <textarea
-                      placeholder="I believe..."
+                      placeholder={copy.voting.reasonPlaceholder}
                       value={reason || undefined}
                       onChange={(e) => setReason(e.target.value)}
                       rows={reason ? undefined : 1}
@@ -221,24 +223,24 @@ function CastVoteInputContent({
           )}
           {isError && (
             <ErrorState
-              message="Error submitting vote"
+              message={copy.voting.errorSubmitting}
               error={error}
               button1={
                 isGasRelayLive && !fallbackToStandardVote
                   ? {
-                      message: "Try regular vote",
+                      message: copy.voting.tryRegularVote,
                       action: () => {
                         resetError();
                         setFallbackToStandardVote(true);
                       },
                     }
                   : {
-                      message: "Cancel",
+                      message: copy.voting.cancel,
                       action: reset,
                     }
               }
               button2={{
-                message: "Try again",
+                message: copy.voting.tryAgain,
                 action: () => {
                   resetError();
                   setTimeout(() => write(), 50);
@@ -266,11 +268,13 @@ function CastVoteInputContent({
 
 function VotingBanner() {
   const { reason } = useCastVoteContext();
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   if (reason) {
     return (
       <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-        Voter statements require gas fees.
+        {copy.voting.statementRequiresGas}
       </div>
     );
   }
@@ -278,7 +282,7 @@ function VotingBanner() {
   return (
     <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
       <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
-      Voting on Agora is free!
+      {copy.voting.freeVoting}
     </div>
   );
 }
@@ -300,6 +304,7 @@ function VoteSubmitButton({
     : null;
   const isOptimismTenant =
     Tenant.current().namespace === TENANT_NAMESPACES.OPTIMISM;
+  const copy = Tenant.current().ui.copy;
 
   if (!supportType && isOptimismTenant && vpToDisplay) {
     return (
@@ -308,7 +313,8 @@ function VoteSubmitButton({
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center gap-1 text-primary font-medium cursor-help">
               <span className="flex items-center text-xs font-semibold text-primary">
-                Proposal voting power{"\u00A0"}
+                {copy.voting.proposalVotingPower}
+                {"\u00A0"}
                 <TokenAmountDisplay amount={vpToDisplay} />
                 <InformationCircleIcon className="w-4 h-4 ml-1" />
               </span>
@@ -321,7 +327,7 @@ function VoteSubmitButton({
               <div className="flex flex-col gap-4">
                 <div>
                   <div className="text-sm font-semibold text-primary">
-                    Proposal launched
+                    {copy.voting.proposalLaunched}
                   </div>
                   <div className="text-sm font-semibold text-primary">
                     {new Intl.DateTimeFormat("en-US", {
@@ -335,12 +341,10 @@ function VoteSubmitButton({
                   </div>
                 </div>
                 <div className="text-sm font-medium text-primary">
-                  Your voting power is captured when proposals launch based on
-                  your token holdings and delegations at that time.
+                  {copy.voting.snapshotExplanation}
                 </div>
                 <div className="text-sm font-medium text-primary">
-                  Any changes to your holdings after launch will not affect
-                  voting on this proposal.
+                  {copy.voting.snapshotChangeExplanation}
                 </div>
               </div>
             </TooltipContent>
@@ -353,7 +357,7 @@ function VoteSubmitButton({
   return (
     <div className="pt-3">
       <SubmitButton onClick={write} disabled={!supportType}>
-        Submit vote
+        {copy.voting.submitVote}
         {vpToDisplay ? (
           <>
             {" "}
@@ -382,17 +386,20 @@ const SubmitButton = ({
 };
 
 function LoadingVote() {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <div className="flex flex-col w-full pt-3">
       <div className="mb-2 text-sm text-secondary font-medium">
-        Casting your vote
+        {copy.voting.castingVote}
       </div>
       <div className="mb-5 text-sm text-secondary">
-        It might take up to a minute for the changes to be reflected.
+        {copy.voting.reflectDelay}
       </div>
       <div>
         <Button className="w-full" disabled={true}>
-          Approve transaction in your wallet to vote
+          {copy.voting.approveTransaction}
         </Button>
       </div>
     </div>
@@ -416,6 +423,8 @@ export function SuccessMessage({
     reason: reasonFromContext,
   } = useCastVoteContext();
   const openDialog = useOpenDialog();
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { data: votableSupply } = useVotableSupply({ enabled: true });
 
   const lastVote = votes?.[votes.length - 1];
@@ -482,11 +491,10 @@ export function SuccessMessage({
         className="w-full text-secondary font-semibold text-xs gap-2 rounded-full border-primary h-8"
       >
         <Image src={shareIcon.src} alt="Share icon" height={18} width={18} />
-        <span>Share your vote</span>
+        <span>{copy.voting.shareVote}</span>
       </Button>
       <p className="text-[14px] font-bold text-secondary text-center mt-2">
-        You voted for this proposal {formatDistanceToNow(new Date(timestamp))}{" "}
-        ago
+        {copy.voting.votedAgo(formatDistanceToNow(new Date(timestamp)))}
       </p>
       <BlockScanUrls
         className="text-xs font-medium text-tertiary mx-auto pt-1"
@@ -507,7 +515,8 @@ function VoteButtons({
   isOptimistic: boolean;
 }) {
   if (proposalStatus !== "ACTIVE") {
-    return <DisabledVoteButton reason="Not open to voting" />;
+    const copy = Tenant.current().ui.copy;
+    return <DisabledVoteButton reason={copy.voting.notOpen} />;
   }
 
   return (
@@ -526,6 +535,7 @@ function VoteButtons({
 
 function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
   const actionString = action.toLowerCase();
+  const copy = Tenant.current().ui.copy;
 
   const { support, setSupport } = useCastVoteContext();
 
@@ -543,7 +553,7 @@ function VoteButton({ action }: { action: SupportTextProps["supportType"] }) {
       className={`${actionString === "for" ? "text-positive" : actionString === "against" ? "text-negative" : "text-secondary"} ${selectedStyle} rounded-md border border-line text-sm font-medium cursor-pointer py-2 px-3 transition-all hover:bg-wash active:shadow-none disabled:bg-line disabled:text-secondary h-8 capitalize flex items-center justify-center flex-1`}
       onClick={() => setSupport(support === action ? null : action)}
     >
-      {action.toLowerCase()}
+      {copy.voting.supportLabel(action)}
     </button>
   );
 }
@@ -557,17 +567,20 @@ function DisabledVoteButton({ reason }: { reason: string }) {
 }
 
 function NoStatementView() {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <div className="flex flex-col gap-3">
       <div className="py-2 px-4 bg-line text-xs text-secondary rounded-lg flex items-center gap-2">
         <Image src={icons.info} alt="Info" width={24} height={24} />
-        Voting requires a delegate statement. Set yours one now to participate.
+        {copy.delegates.statement.requiredToVote}
       </div>
       <Button
         className="w-full"
         onClick={() => (window.location.href = "/delegates/create")}
       >
-        Set up statement
+        {copy.delegates.statement.setupButton}
       </Button>
     </div>
   );

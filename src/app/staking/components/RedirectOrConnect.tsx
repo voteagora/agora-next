@@ -4,10 +4,10 @@ import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 
 export const RedirectOrConnect = () => {
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const { address, isConnected } = useAccount();
 
   useEffect(() => {
@@ -19,7 +19,7 @@ export const RedirectOrConnect = () => {
   return (
     <Button
       className="mt-3 text-neutral bg-brandPrimary"
-      onClick={() => setOpen(true)}
+      onClick={() => openConnectModal()}
     >
       Connect wallet to delegate
     </Button>

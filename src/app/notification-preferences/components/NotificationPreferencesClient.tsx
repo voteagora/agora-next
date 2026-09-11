@@ -1,11 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { useModal } from "connectkit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { usePrivy } from "@privy-io/react-auth";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { Button } from "@/components/ui/button";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
+import { useSiweJwt } from "@/hooks/useSiweJwt";
+import Tenant from "@/lib/tenant/tenant";
+import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
 import type {
   ChannelType,
   PreferenceState,
@@ -13,16 +20,11 @@ import type {
   PreferencesResponse,
   Recipient,
 } from "@/lib/notification-center/types";
-import type { NotificationSettings } from "@/lib/notification-center/notificationPreferences";
-import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import ContactInformationSection, {
   renderStatusIcon,
 } from "./ContactInformationSection";
 import PreferencesMatrix from "./PreferencesMatrix";
 import type { ChannelStatus } from "./ChannelStatusBadge";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
-import { useSiweJwt } from "@/hooks/useSiweJwt";
 
 const CHANNEL_ORDER: ChannelType[] = [
   "email",
@@ -44,7 +46,7 @@ type ChannelStatusInfo = {
 
 export default function NotificationPreferencesClient() {
   const { address, isConnected } = useAccount();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const queryClient = useQueryClient();
   const openDialog = useOpenDialog();
   const [telegramLink, setTelegramLink] = useState<TelegramLinkState | null>(
@@ -56,6 +58,18 @@ export default function NotificationPreferencesClient() {
   );
   const pushState = usePushNotifications();
   const { isSubscribed: isPushSubscribed } = pushState;
+
+  // Get Privy email if tenant uses Privy login (e.g., CIVIC)
+  const { ui } = Tenant.current();
+  const isPrivyEnabled = ui.toggle("privy-login")?.enabled;
+  const { user: privyUser } = usePrivy();
+  const privyEmail =
+    isPrivyEnabled && typeof privyUser?.email?.address === "string"
+      ? privyUser.email.address
+      : "";
+
+  // Track whether we've attempted auto-connect for Privy email
+  const autoConnectAttemptedRef = useRef(false);
 
   // Check if user has grants admin permission
   const { hasPermission: isGrantsAdmin } = useHasPermission(
@@ -303,16 +317,22 @@ export default function NotificationPreferencesClient() {
   };
 
   const updateEmailMutation = useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async ({
+      email,
+      privyVerified,
+    }: {
+      email: string;
+      privyVerified?: boolean;
+    }) => {
       return await authedFetchJson(
         "/api/v1/notification-preferences/channels/email",
         {
           method: "POST",
-          json: { email },
+          json: { email, privyVerified },
         }
       );
     },
-    onMutate: async (email) => {
+    onMutate: async ({ email, privyVerified }) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<NotificationSettings>(queryKey);
 
@@ -323,14 +343,14 @@ export default function NotificationPreferencesClient() {
           email: {
             type: "email",
             address: email,
-            verified: false,
+            verified: privyVerified === true,
           },
         },
       }));
 
       return { previous };
     },
-    onError: (error, _email, context) => {
+    onError: (error, _vars, context) => {
       if (context?.previous) {
         queryClient.setQueryData(queryKey, context.previous);
       }
@@ -340,8 +360,12 @@ export default function NotificationPreferencesClient() {
           : "Failed to update email.";
       toast.error(message);
     },
-    onSuccess: () => {
-      toast.success("Email updated.");
+    onSuccess: (_data, { privyVerified }) => {
+      if (privyVerified) {
+        toast.success("Email connected and verified.");
+      } else {
+        toast.success("Email updated.");
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
@@ -633,6 +657,65 @@ export default function NotificationPreferencesClient() {
     },
   });
 
+  // Auto-connect Privy email when user has verified email but no stored email
+  useEffect(() => {
+    if (autoConnectAttemptedRef.current) return;
+    if (isLoading || !data) return;
+    if (!privyEmail) return;
+    if (!siweJwt) return;
+    if (recipient?.channels?.email) return;
+    if (updateEmailMutation.isPending) return;
+
+    autoConnectAttemptedRef.current = true;
+
+    const autoConnect = async () => {
+      try {
+        await updateEmailMutation.mutateAsync({
+          email: privyEmail,
+          privyVerified: true,
+        });
+
+        // Auto-enable email notifications for proposal events
+        const proposalEventTypes = (data.eventTypes ?? []).filter(
+          (et) => et.category === "proposals" && et.enabled !== false
+        );
+        for (const eventType of proposalEventTypes) {
+          try {
+            await authedFetchJson(
+              "/api/v1/notification-preferences/preferences/set",
+              {
+                method: "POST",
+                json: {
+                  eventType: eventType.event_type,
+                  channel: "email",
+                  state: "on",
+                },
+              }
+            );
+          } catch {
+            // Best-effort
+          }
+        }
+        queryClient.invalidateQueries({ queryKey });
+      } catch {
+        // Silently fail auto-connect; user can still manually connect
+        autoConnectAttemptedRef.current = false;
+      }
+    };
+
+    void autoConnect();
+  }, [
+    isLoading,
+    data,
+    privyEmail,
+    siweJwt,
+    recipient?.channels?.email,
+    updateEmailMutation,
+    authedFetchJson,
+    queryClient,
+    queryKey,
+  ]);
+
   if (!isConnected) {
     return (
       <main className="mx-auto flex max-w-screen-xl flex-col gap-6 px-4 pb-16 pt-12 lg:px-0">
@@ -644,7 +727,7 @@ export default function NotificationPreferencesClient() {
             Connect your wallet to manage notification settings.
           </p>
         </div>
-        <Button className="w-fit" onClick={() => setOpen(true)}>
+        <Button className="w-fit" onClick={() => openConnectModal()}>
           Connect wallet
         </Button>
       </main>
@@ -748,6 +831,45 @@ export default function NotificationPreferencesClient() {
 
   const loadErrorMessage = isError ? ((error as Error)?.message ?? "") : null;
 
+  // Wrapper to handle Privy-verified email connection with auto-enable notifications
+  const handleUpdateEmail = async (email: string) => {
+    const isPrivyVerified =
+      isPrivyEnabled &&
+      privyEmail.length > 0 &&
+      email.toLowerCase() === privyEmail.toLowerCase();
+
+    await updateEmailMutation.mutateAsync({
+      email,
+      privyVerified: isPrivyVerified,
+    });
+
+    // For Privy-verified emails, auto-enable email notifications for proposal events
+    if (isPrivyVerified) {
+      const proposalEventTypes = rawEventTypes.filter(
+        (et) => et.category === "proposals" && et.enabled !== false
+      );
+      for (const eventType of proposalEventTypes) {
+        try {
+          await authedFetchJson(
+            "/api/v1/notification-preferences/preferences/set",
+            {
+              method: "POST",
+              json: {
+                eventType: eventType.event_type,
+                channel: "email",
+                state: "on",
+              },
+            }
+          );
+        } catch {
+          // Best-effort: continue even if some fail
+        }
+      }
+      // Invalidate to refetch updated preferences
+      queryClient.invalidateQueries({ queryKey });
+    }
+  };
+
   return (
     <main className="mx-auto flex max-w-screen-xl flex-col gap-8 px-4 pb-16 pt-12 lg:px-0">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -791,6 +913,7 @@ export default function NotificationPreferencesClient() {
 
           <ContactInformationSection
             email={recipient?.channels?.email?.address ?? ""}
+            suggestedEmail={privyEmail}
             discordWebhook={recipient?.channels?.discord?.webhook_url ?? ""}
             slackWebhook={recipient?.channels?.slack?.webhook_url ?? ""}
             emailStatus={channelStatus.email}
@@ -808,7 +931,7 @@ export default function NotificationPreferencesClient() {
               onStartLinking: telegramLinkMutation.mutateAsync,
               onUnlink: () => deleteChannelMutation.mutateAsync("telegram"),
             }}
-            onUpdateEmail={updateEmailMutation.mutateAsync}
+            onUpdateEmail={handleUpdateEmail}
             onUpdateDiscord={validateAndSaveDiscordMutation.mutateAsync}
             onUpdateSlack={handleSlackSave}
             onSendVerification={emailVerificationMutation.mutateAsync}

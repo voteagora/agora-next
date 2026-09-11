@@ -3,9 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import ENSAvatar from "@/components/shared/ENSAvatar";
-import { MessageCircle, Clock, ChevronUp } from "lucide-react";
+import { BarChart3, MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath, buildForumArticlePath } from "@/lib/forumUtils";
+import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import { ADMIN_TYPES } from "@/lib/constants";
 import { useForum } from "@/hooks/useForum";
@@ -15,7 +16,6 @@ import { rgbStringToHex } from "@/app/lib/utils/color";
 import Tenant from "@/lib/tenant/tenant";
 import { useStableCallback } from "@/hooks/useStableCallback";
 import { InsufficientVPModal } from "@/components/Forum/InsufficientVPModal";
-import ENSName from "@/components/shared/ENSName";
 
 const { ui } = Tenant.current();
 
@@ -104,6 +104,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
   const adminRole = admins[authorAddress] || null;
   const isAuthorAdmin = authorAddress in admins;
+  const isDeletedUser = !!(topic as any).isAuthorDeleted;
 
   const isFinancialStatement = (topic as any).isFinancialStatement ?? false;
   const topicPath = isFinancialStatement
@@ -120,7 +121,7 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
           {/* Avatar */}
           <div className="flex-shrink-0 relative self-center">
             <ENSAvatar
-              ensName={topic.address}
+              ensName={isDeletedUser ? undefined : topic.address}
               className="w-[42px] h-[42px]"
               size={42}
             />
@@ -140,8 +141,28 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
                 <h3 className="text-base font-semibold text-primary truncate group-hover:underline">
                   {topic.title}
                 </h3>
+                {topic.survey && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-wash px-2 py-0.5 text-[11px] font-semibold text-secondary">
+                    <BarChart3 className="h-3 w-3" />
+                    {topic.survey.kind === "poll" ? "Poll" : "Survey"}
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold text-secondary">
+                {topic.survey && (
+                  <div
+                    className="inline-flex items-center gap-1.5"
+                    title={topic.survey.kind === "poll" ? "Votes" : "Responses"}
+                  >
+                    <BarChart3 className="w-3.5 h-3.5" strokeWidth={1.7} />
+                    <span className="tabular-nums">
+                      {topic.survey.responseCount ?? 0}
+                    </span>
+                    <span className="sr-only">
+                      {topic.survey.kind === "poll" ? "votes" : "responses"}
+                    </span>
+                  </div>
+                )}
                 {/* Replies */}
                 <div className="inline-flex items-center gap-1.5">
                   <MessageCircle className="w-3.5 h-3.5" strokeWidth={1.7} />
@@ -157,10 +178,14 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
 
             <p className="mt-1 text-secondary text-sm leading-relaxed line-clamp-1 overflow-hidden max-w-full md:max-w-[556px] break-words">
               By:{" "}
-              {isAuthorAdmin ? (
+              {isAuthorAdmin && !ui.isNgo ? (
                 <span className="text-primary">Cowrie</span>
               ) : (
-                <ENSName address={topic.address} />
+                <ForumAuthorName
+                  address={topic.address}
+                  displayName={topic.authorDisplayName}
+                  isDeleted={isDeletedUser}
+                />
               )}
             </p>
           </div>

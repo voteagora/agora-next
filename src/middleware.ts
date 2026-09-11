@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateBearerToken } from "@/app/lib/auth/edgeAuth";
+import { TENANT_NAMESPACES } from "@/lib/constants";
 
 const API_PREFIXES = ["/api/v1", "/api/v2"] as const;
 const EXCLUDED_ROUTES_FROM_AUTH = [
@@ -9,6 +10,10 @@ const EXCLUDED_ROUTES_FROM_AUTH = [
   "/votable_supply",
 ];
 const ROOT_PATH = process.env.NEXT_PUBLIC_AGORA_ROOT || "/";
+const CIVIC_LANDING_PATH =
+  process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME === TENANT_NAMESPACES.CIVIC
+    ? "/info"
+    : null;
 
 /*
   CORS headers for authenticated API routes are handled poorly by Next
@@ -83,8 +88,9 @@ function getApiPrefix(path: string) {
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  if (path === "/" && ROOT_PATH !== "/") {
-    return NextResponse.redirect(new URL(ROOT_PATH, request.url));
+  const rootPath = ROOT_PATH !== "/" ? ROOT_PATH : CIVIC_LANDING_PATH;
+  if (path === "/" && rootPath) {
+    return NextResponse.redirect(new URL(rootPath, request.url));
   }
 
   // Handle preflight OPTIONS requests

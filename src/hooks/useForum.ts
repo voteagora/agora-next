@@ -43,6 +43,7 @@ import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 import { useQuery } from "@tanstack/react-query";
 import { getForumAdmins } from "@/lib/actions/forum/admin";
 import { useForumPermissionsContext } from "@/contexts/ForumPermissionsContext";
+import type { SurveyDefinitionInput } from "@/lib/actions/forum/surveys";
 import {
   FORUM_SUBSCRIPTIONS_PRIMARY_TYPE,
   FORUM_SUBSCRIPTIONS_TYPED_DATA_DOMAIN,
@@ -65,6 +66,7 @@ interface CreateTopicData {
   content: string;
   categoryId?: number;
   attachment?: File;
+  survey?: SurveyDefinitionInput;
 }
 
 interface CreatePostData {
@@ -205,6 +207,8 @@ export const useForum = () => {
           id: topic.id,
           title: topic.title,
           author: topic.address,
+          authorDisplayName: topic.authorDisplayName ?? null,
+          isAuthorDeleted: topic.isAuthorDeleted,
           content: topic.posts?.[0]?.content || "",
           createdAt: (topic.createdAt instanceof Date
             ? topic.createdAt
@@ -214,6 +218,8 @@ export const useForum = () => {
             topic.posts?.slice(1).map((post: any) => ({
               id: post.id,
               author: post.address,
+              authorDisplayName: post.authorDisplayName ?? null,
+              isAuthorDeleted: post.isAuthorDeleted,
               content: post.content,
               createdAt: (post.createdAt instanceof Date
                 ? post.createdAt
@@ -265,6 +271,7 @@ export const useForum = () => {
           categoryId: data.categoryId,
           address: currentAddress,
           jwt: authData.jwt,
+          survey: data.survey,
         });
 
         if (!result.success) {
@@ -364,6 +371,7 @@ export const useForum = () => {
           id: result.data.topic.id,
           title: result.data.topic.title,
           author: result.data.topic.address,
+          authorDisplayName: result.data.topic.authorDisplayName ?? null,
           content: result.data.post.content,
           createdAt: result.data.topic.createdAt,
           comments: [],
@@ -473,6 +481,7 @@ export const useForum = () => {
         return {
           id: result.data.id,
           author: result.data.address,
+          authorDisplayName: result.data.authorDisplayName ?? null,
           content: result.data.content,
           createdAt: result.data.createdAt,
           parentId: result.data.parentPostId || undefined,
