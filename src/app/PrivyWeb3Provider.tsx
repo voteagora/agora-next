@@ -86,6 +86,23 @@ function hasLinkedWallet(user: User | null) {
   );
 }
 
+// Privy's `createOnLogin: "users-without-wallets"` skips embedded-wallet
+// creation when the user has *any* Ethereum wallet linked, including an
+// external one linked in an earlier session. A user who once signed in with
+// Rabby/MetaMask and now signs in with email/Google therefore has no embedded
+// wallet and no connected external wallet, so useWallets() stays empty. Only a
+// linked *embedded* wallet means "wait for it to sync".
+function hasEmbeddedWallet(user: User | null) {
+  return (
+    user?.linkedAccounts.some(
+      (account) =>
+        account.type === "wallet" &&
+        (account.chainType ?? "ethereum") === "ethereum" &&
+        isEmbeddedPrivyWalletClient(account.walletClientType)
+    ) ?? false
+  );
+}
+
 function PrivyConnectModalBridge({ children }: PropsWithChildren) {
   const { authenticated, ready, user } = usePrivy();
   const { wallets, ready: walletsReady } = useWallets();
@@ -99,6 +116,9 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
   const [creatingWallet, setCreatingWallet] = useState(false);
   const [syncTimedOut, setSyncTimedOut] = useState(false);
   const activatedAddressRef = useRef<string | null>(null);
+  // Privy user id we've already auto-created an embedded wallet for, so a
+  // failure doesn't loop; the Connect button can still retry manually.
+  const autoCreatedForUserRef = useRef<string | null>(null);
   const renderCountRef = useRef(0);
   renderCountRef.current += 1;
 
@@ -170,6 +190,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     },
   });
   const linkedWalletExists = hasLinkedWallet(user);
+  const embeddedWalletExists = hasEmbeddedWallet(user);
 
   // ---- diagnostics: mount / environment -------------------------------------
   useEffect(() => {
@@ -363,6 +384,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
       wallet: summarizePrivyWallet(wallet),
       walletsReady,
       linkedWalletExists,
+      embeddedWalletExists,
       wallets: wallets.map(summarizePrivyWallet),
     });
     if (!wallet) {
@@ -373,16 +395,22 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
         toast.error("Your wallet is still loading. Please try again shortly.");
         return;
       }
-      if (linkedWalletExists) {
+      if (embeddedWalletExists) {
+        // the embedded wallet exists but its iframe/provider hasn't surfaced it
         privyDebugLog("connectActiveWallet.branch", {
-          branch: "linked_wallet_missing_from_useWallets",
+          branch: "embedded_wallet_missing_from_useWallets",
         });
         toast.error(
           "Your wallet connection is still syncing. Please refresh and try again."
         );
         return;
       }
-      privyDebugLog("connectActiveWallet.branch", { branch: "create_wallet" });
+      // no embedded wallet (Privy skipped creation because an external wallet
+      // is linked) and no external wallet connected: create the embedded one
+      privyDebugLog("connectActiveWallet.branch", {
+        branch: "create_wallet",
+        linkedWalletExists,
+      });
       createMissingWallet();
       return;
     }
@@ -393,6 +421,7 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     createMissingWallet,
     getPreferredWallet,
     linkedWalletExists,
+    embeddedWalletExists,
     walletsReady,
     wallets,
   ]);
@@ -435,6 +464,33 @@ function PrivyConnectModalBridge({ children }: PropsWithChildren) {
     walletsReady,
     isConnected,
     wagmi,
+  ]);
+
+  // Email/social users whose account has an external wallet linked from an
+  // earlier session get no embedded wallet from Privy (see hasEmbeddedWallet)
+  // and have nothing for wagmi to connect. Create the embedded wallet once so
+  // the sync effect above can attach it.
+  useEffect(() => {
+    if (!ready || !authenticated || !walletsReady || !user) return;
+    if (wallets.length > 0 || embeddedWalletExists || creatingWallet) return;
+    if (autoCreatedForUserRef.current === user.id) return;
+    autoCreatedForUserRef.current = user.id;
+    privyDebugLog("auto_create_wallet", {
+      userId: user.id,
+      linkedWalletExists,
+      user: summarizePrivyUser(user),
+    });
+    createMissingWallet();
+  }, [
+    ready,
+    authenticated,
+    walletsReady,
+    user,
+    wallets.length,
+    embeddedWalletExists,
+    creatingWallet,
+    linkedWalletExists,
+    createMissingWallet,
   ]);
 
   // ---- diagnostics: poll while stuck ----------------------------------------
