@@ -37,6 +37,17 @@ async function post(request: NextRequest) {
   const { ui } = Tenant.current();
   const isPrivyEnabled = ui.toggle("privy-login")?.enabled === true;
   const verified = isPrivyEnabled && parsed.data.privyVerified === true;
+  console.log(
+    "[privy-debug][server][email-channel]",
+    JSON.stringify({
+      t: new Date().toISOString(),
+      event: "update",
+      recipientId: auth.recipientId,
+      isPrivyEnabled,
+      privyVerifiedClaimed: parsed.data.privyVerified === true,
+      verified,
+    })
+  );
 
   try {
     await ensureNotificationRecipient(auth.recipientId);

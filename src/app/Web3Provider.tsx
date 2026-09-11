@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, PropsWithChildren } from "react";
+import { FC, PropsWithChildren, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { createConfig, WagmiProvider } from "wagmi";
 import { mainnet } from "wagmi/chains";
@@ -18,6 +18,7 @@ import { ConnectKitModalBridge } from "@/components/providers/ConnectModalContex
 import { MiradorProvider } from "@/components/providers/MiradorProvider";
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
 import { shouldEnableMiradorWebClient } from "@/lib/mirador/config";
+import { privyDebugLog } from "@/lib/privyDebug";
 import type { UIPrivyConfig } from "@/lib/tenant/tenantUI";
 import { inter } from "@/styles/fonts";
 import {
@@ -108,6 +109,15 @@ const Web3Provider: FC<
     miradorWebApiKey?: string;
   }>
 > = ({ children, miradorWebApiKey }) => {
+  useEffect(() => {
+    privyDebugLog("web3_provider_selected", {
+      provider: privyConfig ? "privy" : "connectkit",
+      privyToggleEnabled: privyToggle?.enabled ?? false,
+      privyAppIdPresent: !!(privyToggle?.config as UIPrivyConfig)?.appId,
+      loginMethods: (privyToggle?.config as UIPrivyConfig)?.loginMethods,
+    });
+  }, []);
+
   if (privyConfig) {
     return (
       <PrivyWeb3Provider

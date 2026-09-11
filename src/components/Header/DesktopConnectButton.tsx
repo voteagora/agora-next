@@ -10,6 +10,7 @@ import EncourageDelegationDot from "./EncourageDelegationDot";
 import { WalletIcon } from "@/icons/walletIcon";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
 import { useConnectModal } from "@/components/providers/ConnectModalContext";
+import { privyDebugLog } from "@/lib/privyDebug";
 
 export function DesktopConnectButton() {
   const { ui } = Tenant.current();
@@ -23,9 +24,14 @@ export function DesktopConnectButton() {
   return (
     <div
       data-testid="connect-wallet-button"
-      onClick={
-        !isConnected && !isConnecting ? () => openConnectModal() : undefined
-      }
+      onClick={() => {
+        privyDebugLog("DesktopConnectButton.click", {
+          isConnected,
+          isConnecting,
+          address,
+        });
+        if (!isConnected && !isConnecting) openConnectModal();
+      }}
       className={cn(
         `lg:border text-primary font-medium lg:bg-neutral p-0 lg:px-4 lg:py-2 rounded-full cursor-pointer hidden md:flex items-center transition-all hover:lg:shadow-newDefault h-[48px] relative border-line`
       )}

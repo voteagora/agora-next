@@ -18,11 +18,25 @@ const PRIVY_API_URL = "https://auth.privy.io/api/v1";
 
 class PrivyAccountMismatchError extends Error {}
 
+function privyDebug(event: string, data?: Record<string, unknown>) {
+  console.log(
+    "[privy-debug][server][account]",
+    JSON.stringify({ t: new Date().toISOString(), event, ...data })
+  );
+}
+
 async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
   const { ui } = Tenant.current();
   const appId = (ui.toggle("privy-login")?.config as UIPrivyConfig | undefined)
     ?.appId;
   const appSecret = process.env.PRIVY_APP_SECRET_CIVIC;
+  privyDebug("deletePrivyUser.start", {
+    siweAddress,
+    appIdPrefix: appId?.slice(0, 8),
+    appIdPresent: !!appId,
+    appSecretPresent: !!appSecret,
+    tokenLength: privyAccessToken.length,
+  });
   if (!appId || !appSecret) {
     throw new Error("Privy server credentials not configured");
   }
@@ -37,6 +51,11 @@ async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
   if (!payload.sub) {
     throw new Error("Privy token missing subject");
   }
+  privyDebug("deletePrivyUser.jwt_ok", {
+    sub: payload.sub,
+    iat: payload.iat,
+    exp: payload.exp,
+  });
 
   const authHeaders = {
     Authorization: `Basic ${Buffer.from(`${appId}:${appSecret}`).toString("base64")}`,
@@ -48,6 +67,7 @@ async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
   // contract is "delete MY account": the Privy user must be the same identity
   // as the SIWE-authenticated address, or we'd delete mismatched accounts.
   const userResponse = await fetch(userUrl, { headers: authHeaders });
+  privyDebug("deletePrivyUser.user_lookup", { status: userResponse.status });
   if (userResponse.status === 404) {
     return;
   }
@@ -64,6 +84,13 @@ async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
       account.type === "wallet" &&
       account.address?.toLowerCase() === siweAddress
   );
+  privyDebug("deletePrivyUser.linked_accounts", {
+    ownsSiweAddress,
+    accounts: linkedAccounts.map((account) => ({
+      type: account.type,
+      address: account.address,
+    })),
+  });
   if (!ownsSiweAddress) {
     throw new PrivyAccountMismatchError(
       "Privy user is not linked to the authenticated address"
@@ -74,6 +101,7 @@ async function deletePrivyUser(privyAccessToken: string, siweAddress: string) {
     method: "DELETE",
     headers: authHeaders,
   });
+  privyDebug("deletePrivyUser.delete_response", { status: response.status });
   if (!response.ok && response.status !== 404) {
     throw new Error(
       `Privy user deletion failed with status ${response.status}`
@@ -110,6 +138,10 @@ async function del(request: NextRequest) {
   } catch {
     // no body: external-wallet users have no Privy account to delete
   }
+  privyDebug("delete.request", {
+    address,
+    privyTokenPresent: !!privyAccessToken,
+  });
 
   // Burn first: if a later step fails, the retry finds a zero balance and
   // skips, so an account is never deleted while its NFT still exists.
