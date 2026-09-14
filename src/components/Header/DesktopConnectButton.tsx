@@ -55,8 +55,7 @@ export function DesktopConnectButton() {
       ) : (
         <>
           <div className="lg:contents hidden">
-            {"Connect "}
-            <div className="hidden lg:inline-block"> {"Wallet"}</div>
+            {"Login"}
             <ArrowRight className="ml-3 mr-1 stroke-primary" />
           </div>
           <div className="contents lg:hidden">
