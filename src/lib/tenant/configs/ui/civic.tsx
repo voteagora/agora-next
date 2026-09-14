@@ -257,7 +257,7 @@ export const civicTenantUIConfig = new TenantUI({
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x86980b39506b5eDa471BacDbE5a26D80f9A211b5"
             : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
-        minBalance: "0.001",
+        minBalance: "0.0001",
         // 0 so every membership holder qualifies (embedded wallets hold no ETH)
         minVPToUseGasRelay: "0",
       },
@@ -274,7 +274,7 @@ export const civicTenantUIConfig = new TenantUI({
           process.env.NEXT_PUBLIC_AGORA_ENV === "prod"
             ? "0x86980b39506b5eDa471BacDbE5a26D80f9A211b5"
             : "0xf273B37DF9c001156158d31f7D3f64CF68ba27d1",
-        minBalance: "0.001",
+        minBalance: "0.0001",
         minVPToUseGasRelay: "0",
       },
     },
