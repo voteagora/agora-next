@@ -5,6 +5,7 @@ import Image from "next/image";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { format, formatDistanceToNow } from "date-fns";
 import { formatEther } from "viem";
+import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
 import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
@@ -183,6 +184,17 @@ function CastVoteInputContent({
       Number(gasRelayConfig?.minVPToUseGasRelay) &&
     !reason;
 
+  // Voting with a reason cannot be sponsored (the relay only supports
+  // castVoteBySig), so a voter with no ETH at all would only hit an
+  // "insufficient funds" error. Hide the reason input for them instead.
+  const { address: voterAddress } = useAccount();
+  const { data: voterBalance } = useEthBalance({
+    enabled: isGasRelayEnabled && !!voterAddress,
+    address: voterAddress as `0x${string}`,
+  });
+  const showReasonInput =
+    proposal.status === "ACTIVE" && !(isGasRelayEnabled && voterBalance === 0n);
+
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">
       <div
@@ -193,7 +205,7 @@ function CastVoteInputContent({
             <div className="px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
-                  {proposal.status === "ACTIVE" && (
+                  {showReasonInput && (
                     <textarea
                       placeholder={copy.voting.reasonPlaceholder}
                       value={reason || undefined}
