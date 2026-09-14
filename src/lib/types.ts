@@ -197,7 +197,13 @@ export type AnalyticsEvent =
       event_data: {
         proposal_id: string;
         address?: `0x${string}`;
-        type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST";
+        type:
+          | "X"
+          | "COPY_LINK"
+          | "DOWNLOAD_IMAGE"
+          | "WARPCAST"
+          | "LINKEDIN"
+          | "INSTAGRAM";
       };
     }
   | {

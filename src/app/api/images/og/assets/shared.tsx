@@ -6,6 +6,7 @@ import {
   OG_TOWNS_WORDMARK_PATH,
   OG_UNISWAP_WORDMARK_PATH,
 } from "./tenantWordmarkPaths";
+import { OG_CIVIC_LOGO_DATA_URI } from "./civicLogoBase64";
 
 /** Towns / Syndicate OG uses Instrument-style wordmark SVGs only (no Agora + divider). */
 const isOgWordmarkOnlyTenant = (namespace: TenantNamespace) =>
@@ -380,6 +381,18 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
           >
             <path d={OG_TOWNS_WORDMARK_PATH} fill="#171717" />
           </svg>
+        </div>
+      );
+
+    case TENANT_NAMESPACES.CIVIC:
+      return (
+        <div tw="flex items-center">
+          <img
+            src={OG_CIVIC_LOGO_DATA_URI}
+            width={166}
+            height={40}
+            alt="CIVIC"
+          />
         </div>
       );
 
@@ -1047,6 +1060,18 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
           >
             <path d={OG_TOWNS_WORDMARK_PATH} fill="#171717" />
           </svg>
+        </div>
+      );
+
+    case TENANT_NAMESPACES.CIVIC:
+      return (
+        <div tw="flex">
+          <img
+            src={OG_CIVIC_LOGO_DATA_URI}
+            width={116}
+            height={28}
+            alt="CIVIC"
+          />
         </div>
       );
 
