@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import ENSAvatar from "@/components/shared/ENSAvatar";
+import ForumAuthorAvatar from "@/components/ForumShared/ForumAuthorAvatar";
 import { formatRelative } from "@/components/ForumShared/utils";
 import {
   buildForumTopicPath,
@@ -43,6 +43,7 @@ interface Topic {
   title: string;
   address?: string;
   authorDisplayName?: string | null;
+  authorAvatar?: string | null;
   isAuthorDeleted?: boolean;
   createdAt: string;
   revealTime?: string | null;
@@ -222,8 +223,9 @@ function TopicCard({
         <div className="flex min-w-0 items-start">
           {/* Avatar */}
           <div className="relative mr-3 flex-shrink-0 self-center">
-            <ENSAvatar
-              ensName={topic.address}
+            <ForumAuthorAvatar
+              address={topic.address}
+              avatar={topic.authorAvatar}
               className="w-[42px] h-[42px]"
               size={42}
             />

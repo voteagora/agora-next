@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import ENSAvatar from "@/components/shared/ENSAvatar";
+import ForumAuthorAvatar from "@/components/ForumShared/ForumAuthorAvatar";
 import { BarChart3, MessageCircle, Clock, ChevronUp } from "lucide-react";
 import { formatRelative } from "@/components/ForumShared/utils";
 import { buildForumTopicPath, buildForumArticlePath } from "@/lib/forumUtils";
@@ -120,8 +120,9 @@ export default function ForumTopicCard({ topic, admins }: ForumTopicCardProps) {
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="flex-shrink-0 relative self-center">
-            <ENSAvatar
-              ensName={isDeletedUser ? undefined : topic.address}
+            <ForumAuthorAvatar
+              address={isDeletedUser ? undefined : topic.address}
+              avatar={isDeletedUser ? undefined : topic.authorAvatar}
               className="w-[42px] h-[42px]"
               size={42}
             />

@@ -19,6 +19,7 @@ export interface ForumTopic {
   title: string;
   author: string;
   authorDisplayName?: string | null;
+  authorAvatar?: string | null;
   content: string;
   createdAt: string;
   comments: ForumPost[];
@@ -37,6 +38,7 @@ export interface ForumPost {
   id: number;
   author: string;
   authorDisplayName?: string | null;
+  authorAvatar?: string | null;
   content: string;
   createdAt: string;
   parentId?: number;
@@ -180,6 +182,7 @@ export function transformForumTopics(
         id: post.id,
         author: post.address,
         authorDisplayName: post.authorDisplayName ?? null,
+        authorAvatar: post.authorAvatar ?? null,
         content: post.content,
         createdAt: post.createdAt,
         parentId: post.parentPostId || undefined,
@@ -195,6 +198,7 @@ export function transformForumTopics(
       title: topic.title,
       author: topic.address,
       authorDisplayName: topic.authorDisplayName ?? null,
+      authorAvatar: topic.authorAvatar ?? null,
       content: topic.posts?.[0]?.content || "",
       createdAt: topic.createdAt,
       comments,

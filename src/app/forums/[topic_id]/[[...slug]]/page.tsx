@@ -312,6 +312,7 @@ export default async function ForumTopicPage(props: PageProps) {
       truncateAddress(authorAddress) ||
       authorAddress,
     authorDisplayName: transformed.authorDisplayName ?? null,
+    authorAvatar: transformed.authorAvatar ?? null,
     createdAt: createdAtIso,
     revealTime: transformed.revealTime ?? null,
     adminRole: authorRole,

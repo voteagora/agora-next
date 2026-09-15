@@ -6,10 +6,20 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import DelegateStatementForm from "../DelegateStatementForm";
 import type { DelegateStatementFormValues } from "../CurrentDelegateStatement";
+
+function renderForm(form: ReturnType<typeof createForm>) {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <DelegateStatementForm form={form} />
+    </QueryClientProvider>
+  );
+}
 
 const pushMock = vi.fn();
 const submitDelegateStatementMock = vi.fn();
@@ -192,7 +202,7 @@ describe("DelegateStatementForm", () => {
   });
 
   it("submits with a SIWE JWT for EOAs", async () => {
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+    renderForm(createForm(defaultValues));
 
     fireEvent.click(
       screen.getByRole("button", { name: "Submit delegate profile" })
@@ -224,7 +234,7 @@ describe("DelegateStatementForm", () => {
       }
     );
 
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+    renderForm(createForm(defaultValues));
 
     fireEvent.click(
       screen.getByRole("button", { name: "Submit delegate profile" })

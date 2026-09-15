@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import ENSAvatar from "@/components/shared/ENSAvatar";
+import ForumAuthorAvatar from "@/components/ForumShared/ForumAuthorAvatar";
 import { ForumPost } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import ForumAuthorName from "@/components/Forum/ForumAuthorName";
@@ -247,11 +247,16 @@ const CommentItem = ({
               aria-label={profileLabel}
               className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
             >
-              <ENSAvatar ensName={comment.author} size={avatarSize} />
+              <ForumAuthorAvatar
+                address={comment.author}
+                avatar={comment.authorAvatar}
+                size={avatarSize}
+              />
             </Link>
           ) : (
-            <ENSAvatar
-              ensName={isDeletedUser ? undefined : comment.author}
+            <ForumAuthorAvatar
+              address={isDeletedUser ? undefined : comment.author}
+              avatar={isDeletedUser ? undefined : comment.authorAvatar}
               size={avatarSize}
             />
           )}

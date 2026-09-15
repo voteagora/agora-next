@@ -208,6 +208,7 @@ export const useForum = () => {
           title: topic.title,
           author: topic.address,
           authorDisplayName: topic.authorDisplayName ?? null,
+          authorAvatar: topic.authorAvatar ?? null,
           isAuthorDeleted: topic.isAuthorDeleted,
           content: topic.posts?.[0]?.content || "",
           createdAt: (topic.createdAt instanceof Date
@@ -219,6 +220,7 @@ export const useForum = () => {
               id: post.id,
               author: post.address,
               authorDisplayName: post.authorDisplayName ?? null,
+              authorAvatar: post.authorAvatar ?? null,
               isAuthorDeleted: post.isAuthorDeleted,
               content: post.content,
               createdAt: (post.createdAt instanceof Date
@@ -372,6 +374,7 @@ export const useForum = () => {
           title: result.data.topic.title,
           author: result.data.topic.address,
           authorDisplayName: result.data.topic.authorDisplayName ?? null,
+          authorAvatar: result.data.topic.authorAvatar ?? null,
           content: result.data.post.content,
           createdAt: result.data.topic.createdAt,
           comments: [],
@@ -482,6 +485,7 @@ export const useForum = () => {
           id: result.data.id,
           author: result.data.address,
           authorDisplayName: result.data.authorDisplayName ?? null,
+          authorAvatar: result.data.authorAvatar ?? null,
           content: result.data.content,
           createdAt: result.data.createdAt,
           parentId: result.data.parentPostId || undefined,

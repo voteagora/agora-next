@@ -76,34 +76,49 @@ async function getDeletedAccountSet(
   return new Set(rows.map((row) => row.address));
 }
 
-async function getDisplayNameMap(
+type ForumAuthorProfile = {
+  displayName: string | null;
+  avatar: string | null;
+};
+
+async function getAuthorProfileMap(
   addresses: (string | null | undefined)[]
-): Promise<Map<string, string>> {
+): Promise<Map<string, ForumAuthorProfile>> {
   const unique = [
     ...new Set(addresses.map((a) => (a || "").toLowerCase())),
   ].filter(Boolean);
-  const displayNames = new Map<string, string>();
-  if (unique.length === 0) return displayNames;
+  const profiles = new Map<string, ForumAuthorProfile>();
+  if (unique.length === 0) return profiles;
 
   const statements = await prismaWeb2Client.delegateStatements.findMany({
     where: {
       dao_slug: slug,
       address: { in: unique, mode: "insensitive" },
-      username: { not: null },
+      OR: [{ username: { not: null } }, { avatar: { not: null } }],
     },
     orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-    select: { address: true, username: true },
+    select: { address: true, username: true, avatar: true },
   });
 
+  // Newest statement wins per field
   for (const statement of statements) {
     const normalized = statement.address.toLowerCase();
+    const profile = profiles.get(normalized) ?? {
+      displayName: null,
+      avatar: null,
+    };
     const username = statement.username?.trim();
-    if (username && !displayNames.has(normalized)) {
-      displayNames.set(normalized, username);
+    const avatar = statement.avatar?.trim();
+    if (username && !profile.displayName) {
+      profile.displayName = username;
     }
+    if (avatar && !profile.avatar) {
+      profile.avatar = avatar;
+    }
+    profiles.set(normalized, profile);
   }
 
-  return displayNames;
+  return profiles;
 }
 
 async function deleteOwnedForumTopic(topicId: number, address: string) {
@@ -243,9 +258,9 @@ export async function getForumTopics({
       topic.address,
       ...topic.posts.map((p: any) => p.address),
     ]);
-    const [deletedAccounts, displayNames] = await Promise.all([
+    const [deletedAccounts, authorProfiles] = await Promise.all([
       getDeletedAccountSet(authorAddresses),
-      getDisplayNameMap(authorAddresses),
+      getAuthorProfileMap(authorAddresses),
     ]);
 
     return {
@@ -255,11 +270,16 @@ export async function getForumTopics({
         survey: mapForumSurveySummary(topic.survey),
         isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
         authorDisplayName:
-          displayNames.get(topic.address?.toLowerCase()) ?? null,
+          authorProfiles.get(topic.address?.toLowerCase())?.displayName ?? null,
+        authorAvatar:
+          authorProfiles.get(topic.address?.toLowerCase())?.avatar ?? null,
         posts: topic.posts.map((p: any) => ({
           ...p,
           isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
-          authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
+          authorDisplayName:
+            authorProfiles.get(p.address?.toLowerCase())?.displayName ?? null,
+          authorAvatar:
+            authorProfiles.get(p.address?.toLowerCase())?.avatar ?? null,
           reactionsByEmoji: groupByEmojiAddresses(p.reactions),
         })),
         topicReactionsByEmoji: groupByEmojiAddresses(
@@ -348,12 +368,12 @@ export async function getForumTopic(topicId: number) {
       return out;
     };
 
-    const [deletedAccounts, displayNames] = await Promise.all([
+    const [deletedAccounts, authorProfiles] = await Promise.all([
       getDeletedAccountSet([
         (topic as any).address,
         ...(topic as any).posts.map((p: any) => p.address),
       ]),
-      getDisplayNameMap([
+      getAuthorProfileMap([
         (topic as any).address,
         ...(topic as any).posts.map((p: any) => p.address),
       ]),
@@ -362,7 +382,10 @@ export async function getForumTopic(topicId: number) {
     const mappedPosts = (topic as any).posts.map((p: any) => ({
       ...p,
       isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
-      authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
+      authorDisplayName:
+        authorProfiles.get(p.address?.toLowerCase())?.displayName ?? null,
+      authorAvatar:
+        authorProfiles.get(p.address?.toLowerCase())?.avatar ?? null,
       reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       attachments: (p.attachments || []).map((att: any) => ({
         id: att.id,
@@ -395,7 +418,11 @@ export async function getForumTopic(topicId: number) {
       data: {
         ...topic,
         authorDisplayName:
-          displayNames.get((topic as any).address?.toLowerCase()) ?? null,
+          authorProfiles.get((topic as any).address?.toLowerCase())
+            ?.displayName ?? null,
+        authorAvatar:
+          authorProfiles.get((topic as any).address?.toLowerCase())?.avatar ??
+          null,
         survey: mapForumSurveySummary((topic as any).survey),
         isAuthorDeleted: deletedAccounts.has(
           (topic as any).address?.toLowerCase()
@@ -492,20 +519,26 @@ export async function getForumTopicsByUser(
       topic.address,
       ...topic.posts.map((p: any) => p.address),
     ]);
-    const [deletedAccounts, displayNames] = await Promise.all([
+    const [deletedAccounts, authorProfiles] = await Promise.all([
       getDeletedAccountSet(authorAddresses),
-      getDisplayNameMap(authorAddresses),
+      getAuthorProfileMap(authorAddresses),
     ]);
 
     const processedTopics = data.map((topic: any) => ({
       ...topic,
       survey: mapForumSurveySummary(topic.survey),
       isAuthorDeleted: deletedAccounts.has(topic.address?.toLowerCase()),
-      authorDisplayName: displayNames.get(topic.address?.toLowerCase()) ?? null,
+      authorDisplayName:
+        authorProfiles.get(topic.address?.toLowerCase())?.displayName ?? null,
+      authorAvatar:
+        authorProfiles.get(topic.address?.toLowerCase())?.avatar ?? null,
       posts: topic.posts.map((p: any) => ({
         ...p,
         isAuthorDeleted: deletedAccounts.has(p.address?.toLowerCase()),
-        authorDisplayName: displayNames.get(p.address?.toLowerCase()) ?? null,
+        authorDisplayName:
+          authorProfiles.get(p.address?.toLowerCase())?.displayName ?? null,
+        authorAvatar:
+          authorProfiles.get(p.address?.toLowerCase())?.avatar ?? null,
         reactionsByEmoji: groupByEmojiAddresses(p.reactions),
       })),
       topicReactionsByEmoji: groupByEmojiAddresses(topic.posts?.[0]?.reactions),
@@ -786,9 +819,11 @@ export async function createForumTopic(
       );
     }
 
-    const createdDisplayNames = await getDisplayNameMap([normalizedAddress]);
+    const createdProfiles = await getAuthorProfileMap([normalizedAddress]);
     const createdAuthorDisplayName =
-      createdDisplayNames.get(normalizedAddress) ?? null;
+      createdProfiles.get(normalizedAddress)?.displayName ?? null;
+    const createdAuthorAvatar =
+      createdProfiles.get(normalizedAddress)?.avatar ?? null;
 
     return {
       success: true as const,
@@ -798,6 +833,7 @@ export async function createForumTopic(
           title: newTopic.title,
           address: newTopic.address,
           authorDisplayName: createdAuthorDisplayName,
+          authorAvatar: createdAuthorAvatar,
           createdAt: newTopic.createdAt.toISOString(),
         },
         post: {
@@ -805,6 +841,7 @@ export async function createForumTopic(
           content: newPost.content,
           address: newPost.address,
           authorDisplayName: createdAuthorDisplayName,
+          authorAvatar: createdAuthorAvatar,
           createdAt: newPost.createdAt.toISOString(),
         },
         survey: newSurvey
@@ -1481,16 +1518,19 @@ export const getForumData = async ({
     });
 
     const topicAddresses = topics.map((topic) => topic.address);
-    const [deletedAccounts, displayNames] = await Promise.all([
+    const [deletedAccounts, authorProfiles] = await Promise.all([
       getDeletedAccountSet(topicAddresses),
-      getDisplayNameMap(topicAddresses),
+      getAuthorProfileMap(topicAddresses),
     ]);
 
     const processedTopics = topics.map((topic) => ({
       ...topic,
       survey: mapForumSurveySummary((topic as any).survey),
       isAuthorDeleted: deletedAccounts.has(topic.address.toLowerCase()),
-      authorDisplayName: displayNames.get(topic.address.toLowerCase()) ?? null,
+      authorDisplayName:
+        authorProfiles.get(topic.address.toLowerCase())?.displayName ?? null,
+      authorAvatar:
+        authorProfiles.get(topic.address.toLowerCase())?.avatar ?? null,
       createdAt: topic.createdAt.toISOString(),
       revealTime: topic.revealTime
         ? (topic.revealTime instanceof Date

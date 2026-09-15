@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useAccount } from "wagmi";
 
-import ENSAvatar from "@/components/shared/ENSAvatar";
+import ForumAuthorAvatar from "@/components/ForumShared/ForumAuthorAvatar";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
 import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 import { formatRelative } from "@/components/ForumShared/utils";
@@ -22,6 +22,7 @@ interface TopicHeaderProps {
     address?: string;
     authorName?: string;
     authorDisplayName?: string | null;
+    authorAvatar?: string | null;
     createdAt: string;
     revealTime?: string | null;
     adminRole?: string | null;
@@ -73,7 +74,11 @@ export default function TopicHeader({
               aria-label={profileLabel}
               className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded"
             >
-              <ENSAvatar ensName={topic.address} size={20} />
+              <ForumAuthorAvatar
+                address={topic.address}
+                avatar={topic.authorAvatar}
+                size={20}
+              />
               <div className="flex items-center gap-1">
                 <span className="font-medium text-sm text-primary hover:underline">
                   {authorName}
@@ -93,8 +98,9 @@ export default function TopicHeader({
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <ENSAvatar
-                ensName={isDeletedUser ? undefined : topic.address}
+              <ForumAuthorAvatar
+                address={isDeletedUser ? undefined : topic.address}
+                avatar={isDeletedUser ? undefined : topic.authorAvatar}
                 size={20}
               />
               <div className="flex items-center gap-1">
