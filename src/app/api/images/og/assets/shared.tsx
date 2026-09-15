@@ -386,14 +386,7 @@ const ogLogoForNamespace = (namespace: TenantNamespace) => {
 
     case TENANT_NAMESPACES.CIVIC:
       return (
-        <div tw="flex items-center">
-          <img
-            src={OG_CIVIC_LOGO_DATA_URI}
-            width={166}
-            height={40}
-            alt="CIVIC"
-          />
-        </div>
+        <img src={OG_CIVIC_LOGO_DATA_URI} width={80} height={80} alt="CIVIC" />
       );
 
     case TENANT_NAMESPACES.OPTIMISM:
@@ -1065,11 +1058,11 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
 
     case TENANT_NAMESPACES.CIVIC:
       return (
-        <div tw="flex">
+        <div tw="flex w-[80px] h-[80px]">
           <img
             src={OG_CIVIC_LOGO_DATA_URI}
-            width={116}
-            height={28}
+            width={80}
+            height={80}
             alt="CIVIC"
           />
         </div>

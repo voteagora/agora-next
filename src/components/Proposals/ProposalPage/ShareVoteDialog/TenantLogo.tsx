@@ -2,7 +2,7 @@ import { TENANT_NAMESPACES } from "@/lib/constants";
 import { TenantNamespace } from "@/lib/types";
 import Image from "next/image";
 import lineaLogo from "@/assets/tenant/linea_logo.svg";
-import civicLogo from "@/assets/tenant/civic_logo.png";
+import civicLogo from "@/assets/tenant/civic_round_logo.jpg";
 import { OG_UNISWAP_WORDMARK_PATH } from "@/app/api/images/og/assets/tenantWordmarkPaths";
 
 export const ogLogoForShareVote = (namespace: TenantNamespace) => {
@@ -505,7 +505,7 @@ export const ogLogoForShareVote = (namespace: TenantNamespace) => {
         <Image
           src={civicLogo}
           alt="CIVIC Logo"
-          className="h-[28px] w-auto sm:h-[44px]"
+          className="w-[52px] h-[52px] sm:w-[80px] sm:h-[80px]"
         />
       );
     case TENANT_NAMESPACES.OPTIMISM:
