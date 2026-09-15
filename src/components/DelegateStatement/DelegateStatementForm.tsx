@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 import { submitDelegateStatement } from "@/app/delegates/actions";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +16,7 @@ import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
-import { useDelegate } from "@/hooks/useDelegate";
+import { DELEGATE_QK, useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { type DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
@@ -28,6 +29,7 @@ export default function DelegateStatementForm({
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { ui } = Tenant.current();
   const copy = ui.copy;
   const { address, chain } = useAccount();
@@ -85,10 +87,15 @@ export default function DelegateStatementForm({
         throw new Error(copy.delegates.statement.submitError);
       }
 
+      // The header and profile card read the delegate from this query
+      await queryClient.invalidateQueries({
+        queryKey: [DELEGATE_QK, connectedAddress],
+      });
+
       setSaveSuccess(true);
       router.push(`/delegates/${connectedAddress}`);
     },
-    [router, scwAddress, setSaveSuccess]
+    [copy, queryClient, router, scwAddress, setSaveSuccess]
   );
 
   async function onSubmit(values: DelegateStatementFormValues) {

@@ -5,6 +5,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { Check, ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   fetchDelegateStatement,
   submitDelegateStatement,
@@ -21,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LoadingSpinner from "@/components/shared/LoadingSpinner";
+import { DELEGATE_QK } from "@/hooks/useDelegate";
 import { useSiweJwt } from "@/hooks/useSiweJwt";
 import {
   CIVIC_FEATURED_SURVEY_DESCRIPTION,
@@ -163,6 +165,7 @@ async function authedFetchJson(
 
 export default function CivicOnboardingClient() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { ready, authenticated, getAccessToken, user } = usePrivy();
   const { address: wagmiAddress, isConnected } = useAccount();
   const { openConnectModal, isConnecting } = useConnectModal();
@@ -428,6 +431,10 @@ export default function CivicOnboardingClient() {
         scwAddress: existing?.scw_address || undefined,
         auth: { kind: "siwe_jwt", jwt },
       });
+
+      // The header caches the delegate under the wallet's checksummed address,
+      // which may differ in case from memberAddress, so invalidate by prefix.
+      await queryClient.invalidateQueries({ queryKey: [DELEGATE_QK] });
 
       if (enableNotifications && trimmedEmail) {
         await authedFetchJson(
