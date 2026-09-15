@@ -130,7 +130,7 @@ export const civicTenantUIConfig = new TenantUI({
         {
           name: "Donate",
           title: "Donate",
-          url: "https://civiliansinconflict.org/give/",
+          url: "https://www.civiliansinconflict.org/support-our-work/donate/",
           image: civicInfo2,
         },
         {
