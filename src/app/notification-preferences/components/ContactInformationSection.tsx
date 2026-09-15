@@ -407,6 +407,7 @@ export function renderStatusIcon(status: ChannelStatus, label?: string) {
 
 interface ContactInformationSectionProps {
   email: string;
+  suggestedEmail?: string;
   discordWebhook: string;
   slackWebhook: string;
   emailStatus: ChannelStatusInfo;
@@ -437,6 +438,7 @@ interface ContactInformationSectionProps {
 
 export default function ContactInformationSection({
   email,
+  suggestedEmail = "",
   discordWebhook,
   slackWebhook,
   emailStatus,
@@ -472,10 +474,16 @@ export default function ContactInformationSection({
   const [isEditingDiscord, setIsEditingDiscord] = useState(false);
   const [isEditingSlack, setIsEditingSlack] = useState(false);
 
+  // Pre-fill email from stored value, or suggested email (e.g., from Privy)
   useEffect(() => {
-    setEmailValue(email);
+    if (email) {
+      setEmailValue(email);
+    } else if (suggestedEmail) {
+      // Pre-fill with suggested email when no stored email exists
+      setEmailValue((current) => current || suggestedEmail);
+    }
     if (!email) setIsEditingEmail(false);
-  }, [email]);
+  }, [email, suggestedEmail]);
 
   useEffect(() => {
     setDiscordValue(discordWebhook);

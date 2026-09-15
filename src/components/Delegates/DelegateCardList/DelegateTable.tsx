@@ -47,6 +47,7 @@ export default function DelegateTable({
   const fetching = useRef(false);
 
   const { ui, namespace } = Tenant.current();
+  const copy = ui.copy;
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -113,27 +114,31 @@ export default function DelegateTable({
           <Table className="min-w-full">
             <TableHeader className="text-sm text-secondary sticky top-0 bg-neutral z-10 rounded-t-lg">
               <TableRow className="bg-tertiary/5">
-                <TableHead className="h-10 text-secondary">Name</TableHead>
+                <TableHead className="h-10 text-secondary">
+                  {copy.delegates.table.name}
+                </TableHead>
                 <TableHead className="h-10 text-secondary">
                   <span className="inline-flex items-center">
-                    Voting power
+                    {copy.delegates.table.votingPower}
                     <VotingPowerInfoTooltip />
                   </span>
                 </TableHead>
                 {!hide7dChange && (
                   <TableHead className="h-10 text-secondary">
-                    7d Change
+                    {copy.delegates.table.change7d}
                   </TableHead>
                 )}
                 {showParticipation && (
                   <TableHead className="h-10 text-secondary">
-                    Participation
+                    {copy.delegates.table.participation}
                   </TableHead>
                 )}
                 <TableHead className="h-10 text-secondary">
-                  # of Delegators
+                  {copy.delegates.table.delegators}
                 </TableHead>
-                <TableHead className="h-10 text-secondary">Info</TableHead>
+                <TableHead className="h-10 text-secondary">
+                  {copy.delegates.table.info}
+                </TableHead>
                 <TableHead className="h-10 text-secondary"></TableHead>
               </TableRow>
             </TableHeader>
@@ -162,7 +167,7 @@ export default function DelegateTable({
                     5 + (!hide7dChange ? 1 : 0) + (showParticipation ? 1 : 0)
                   }
                 >
-                  None found
+                  {copy.delegates.table.empty}
                 </td>
               ) : (
                 delegates.map((delegate, index) => (

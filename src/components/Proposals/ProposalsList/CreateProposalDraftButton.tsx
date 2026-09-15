@@ -46,11 +46,14 @@ const CreateProposalDraftButton = ({
   const { chain } = useAccount();
   const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const protocolLevelCreateProposalButtonCheck = (
     ui.toggle("proposal-lifecycle")?.config as PLMConfig
   )?.protocolLevelCreateProposalButtonCheck;
   const safeProposalChoiceEnabled =
     ui.toggle("safe-proposal-choice")?.enabled === true;
+  const directOnchainProposalEnabled =
+    ui.toggle("direct-onchain-proposal")?.enabled === true;
 
   const { data: threshold } = useProposalThreshold({
     enabled: !!protocolLevelCreateProposalButtonCheck,
@@ -259,6 +262,11 @@ const CreateProposalDraftButton = ({
       onClick={async () => {
         if (isPending) return;
 
+        if (directOnchainProposalEnabled) {
+          router.push("/proposals/create-proposal");
+          return;
+        }
+
         setIsPending(true);
         const isSafe = await isSafeWallet(address, chain?.id);
 
@@ -277,7 +285,7 @@ const CreateProposalDraftButton = ({
         await createDraftProposal();
       }}
     >
-      Create proposal
+      {copy.proposals.createButton}
     </UpdatedButton>
   );
 };

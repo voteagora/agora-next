@@ -20,7 +20,6 @@ import {
 import { useHasTownsNFT } from "@/hooks/useHasTownsNFT";
 import {
   PostType,
-  postTypeOptions,
   ProposalType,
   CreatePostFormData,
   RelatedItem,
@@ -54,6 +53,7 @@ export function CreatePostClient({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { ui, contracts } = Tenant.current();
+  const copy = ui.copy;
   const { createProposalWithVotingType } = useEASV2();
   const permissions = useForumPermissionsContext();
   const { data: daoSettings } = useDaoSettings(contracts.easRecipient);
@@ -207,14 +207,12 @@ export function CreatePostClient({
 
       await queryClient.invalidateQueries({ queryKey: ["forumTopics"] });
 
-      toast.success(
-        `${selectedPostType === "tempcheck" ? "Temp check" : "Governance proposal"} created successfully!`
-      );
+      toast.success(copy.create.successToast(selectedPostType));
       setShowIndexingModal(true);
     } catch (error) {
       console.error("Failed to create post:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create post"
+        error instanceof Error ? error.message : copy.create.failureToast
       );
     } finally {
       setIsSubmitting(false);
@@ -315,7 +313,9 @@ export function CreatePostClient({
       <div className="mb-6">
         <div className="flex flex-col lg:flex-row items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-primary">
-            Create {postTypeOptions[selectedPostType].toLowerCase()}
+            {copy.create.pageTitle(
+              copy.create.postTypeOptions[selectedPostType]
+            )}
           </h1>
           <PostTypeSelector
             value={selectedPostType}
@@ -370,18 +370,15 @@ export function CreatePostClient({
       <Dialog open={showIndexingModal} onOpenChange={setShowIndexingModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Created Successfully</DialogTitle>
+            <DialogTitle>{copy.create.indexingTitle}</DialogTitle>
             <DialogDescription>
-              Your{" "}
-              {selectedPostType === "tempcheck"
-                ? "temp check"
-                : "governance proposal"}{" "}
-              has been submitted to the blockchain. It may take a couple of
-              minutes for the data to be indexed and appear.
+              {copy.create.indexingDescription(selectedPostType)}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={handleCloseIndexingModal}>Got it</Button>
+            <Button onClick={handleCloseIndexingModal}>
+              {copy.create.gotIt}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

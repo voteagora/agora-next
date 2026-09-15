@@ -15,11 +15,13 @@ function CopyableHumanAddress({
   useAddress = false,
   className = "",
   copyENSName = false,
+  displayName,
 }: {
   address: string;
   useAddress?: boolean;
   className?: string;
   copyENSName?: boolean;
+  displayName?: string;
 }) {
   const [isInCopiedState, setIsInCopiedState] = useState<boolean>(false);
 
@@ -53,7 +55,9 @@ function CopyableHumanAddress({
         setIsInCopiedState(true);
       }}
     >
-      {useAddress ? (
+      {displayName ? (
+        displayName
+      ) : useAddress ? (
         `${address.slice(0, 6)}...${address.slice(-4)}`
       ) : (
         <ENSName address={address} />

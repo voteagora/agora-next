@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ProposalType, PostType, RelatedItem, EASVotingType } from "../types";
+import Tenant from "@/lib/tenant/tenant";
 
 interface ProposalSettingsCardProps {
   selectedProposalType: ProposalType;
@@ -20,12 +21,15 @@ export function ProposalSettingsCard({
   proposalTypes,
   onProposalTypeChange,
 }: ProposalSettingsCardProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <Card>
       <CardContent className="p-6 space-y-6">
         <div className="space-y-3">
           <Label className="text-sm font-medium text-secondary">
-            Proposal type
+            {copy.proposals.proposalTypeLabel}
           </Label>
           <>
             <Select
@@ -33,7 +37,9 @@ export function ProposalSettingsCard({
               onValueChange={onProposalTypeChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select a type" />
+                <SelectValue
+                  placeholder={copy.proposals.proposalTypePlaceholder}
+                />
               </SelectTrigger>
               <SelectContent>
                 {proposalTypes.map((type) => (
@@ -69,8 +75,7 @@ export function ProposalSettingsCard({
 
       <div className="border-t border-line px-6 py-4">
         <p className="text-xs text-tertiary leading-relaxed">
-          All proposal type selections must be approved by the DUNA admin before
-          the vote is allowed to pass.
+          {copy.proposals.proposalTypeDisclaimer}
         </p>
       </div>
     </Card>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
+import { getTwicPicsAvatarUrl } from "@/lib/profileImage";
 import { cn, resolveIPFSUrl } from "@/lib/utils";
 
 type AvatarImageProps = {
@@ -24,8 +25,10 @@ export default function AvatarImage({
   const [hasLoadError, setHasLoadError] = useState(false);
   const resolvedSrc = useMemo(() => {
     const trimmedSrc = src?.trim();
-    return trimmedSrc ? resolveIPFSUrl(trimmedSrc) : null;
-  }, [src]);
+    return trimmedSrc
+      ? getTwicPicsAvatarUrl(resolveIPFSUrl(trimmedSrc), size)
+      : null;
+  }, [size, src]);
 
   useEffect(() => {
     setHasLoadError(false);

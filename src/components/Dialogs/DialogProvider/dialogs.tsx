@@ -40,6 +40,7 @@ import { CreateAccountActionDialog } from "@/components/Admin/CreateAccountActio
 import SponsorOffchainProposalDialog from "@/app/proposals/draft/components/dialogs/SponsorOffchainProposalDialog";
 import { DraftProposal } from "@/app/proposals/draft/types";
 import { ConfirmDialog } from "../ConfirmDialog/ConfirmDialog";
+import { DeleteAccountDialog } from "../DeleteAccountDialog/DeleteAccountDialog";
 import { SafeProposalChoiceDialog } from "../SafeProposalChoiceDialog/SafeProposalChoiceDialog";
 import SafeOffchainSigningDialog from "../SafeOffchainSigningDialog/SafeOffchainSigningDialog";
 import SafeOnchainPendingDialog from "../SafeOnchainPendingDialog/SafeOnchainPendingDialog";
@@ -75,6 +76,7 @@ export type DialogType =
   | AccountActionDialogType
   | SponsorOffchainDraftProposalDialog
   | ConfirmDialogType
+  | DeleteAccountDialogType
   | SafeProposalChoiceDialogType
   | SafeOffchainSigningDialogType
   | SafeOnchainPendingDialogType
@@ -327,6 +329,11 @@ export type ConfirmDialogType = {
     message: string;
     onConfirm: () => void;
   };
+};
+
+export type DeleteAccountDialogType = {
+  type: "DELETE_ACCOUNT";
+  params: {};
 };
 
 export type SafeProposalChoiceDialogType = {
@@ -642,6 +649,9 @@ export const dialogs: DialogDefinitions<DialogType> = {
   },
   ACCOUNT_ACTION: ({}, closeDialog) => {
     return <CreateAccountActionDialog closeDialog={closeDialog} />;
+  },
+  DELETE_ACCOUNT: ({}, closeDialog) => {
+    return <DeleteAccountDialog closeDialog={closeDialog} />;
   },
   CONFIRM: ({ title, message, onConfirm }, closeDialog) => {
     return (

@@ -115,7 +115,10 @@ export async function addForumReaction(
         );
 
         // Convert to number for comparison
-        const currentVP = formatVotingPower(votingPowerBigInt);
+        const currentVP = formatVotingPower(
+          votingPowerBigInt,
+          tenant.token.decimals
+        );
         const vpCheck = await canPerformAction(currentVP, slug);
 
         if (!vpCheck.allowed) {

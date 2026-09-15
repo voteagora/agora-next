@@ -37,6 +37,7 @@ export function RelatedItemsDialog({
   existingItemIds,
 }: RelatedItemsDialogProps) {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const isDarkTenant = ui.theme === "dark";
   const resultItemClass = (selected: boolean) =>
     [
@@ -102,7 +103,7 @@ export function RelatedItemsDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Search className="h-5 w-5" />
-            Search {searchType === "forum" ? "Forum Posts" : "Temp Checks"}
+            {copy.create.searchRelatedTitle(searchType)}
           </DialogTitle>
         </DialogHeader>
 
@@ -110,7 +111,7 @@ export function RelatedItemsDialog({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder={`Search ${searchType === "forum" ? "forum posts" : "temp checks"}...`}
+              placeholder={copy.create.searchRelatedPlaceholder(searchType)}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -131,7 +132,9 @@ export function RelatedItemsDialog({
             ) : results.length === 0 ? (
               <div className="text-center py-12">
                 <Search className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">No results found</p>
+                <p className="text-sm text-gray-500">
+                  {copy.create.noRelatedResults}
+                </p>
               </div>
             ) : (
               results.map((item) => {
@@ -146,7 +149,7 @@ export function RelatedItemsDialog({
                       <div className="absolute top-2 right-2 z-10">
                         <Badge className="bg-green-600 text-white flex items-center gap-1">
                           <Check className="h-3 w-3" />
-                          Added
+                          {copy.create.addedReference}
                         </Badge>
                       </div>
                     )}
@@ -202,7 +205,7 @@ export function RelatedItemsDialog({
                 </div>
               )}
               <p className="text-xs text-gray-500 text-center break-words">
-                Click on an item to add it as a reference
+                {copy.create.clickReferenceHelp}
               </p>
             </div>
           )}

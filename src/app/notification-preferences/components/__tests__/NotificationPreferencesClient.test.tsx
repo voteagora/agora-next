@@ -9,19 +9,23 @@ import {
 } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import NotificationPreferencesClient from "../NotificationPreferencesClient";
 import { useAccount } from "wagmi";
-import { useModal, useSIWE } from "connectkit";
+import { useSIWE } from "connectkit";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { useConnectModal } from "@/components/providers/ConnectModalContext";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useHasPermission } from "@/hooks/useRbacPermissions";
 import {
   clearStoredSiweSession,
   getStoredSiweJwt,
   waitForStoredSiweJwt,
 } from "@/lib/siweSession";
 import { isSafeWallet } from "@/lib/utils";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { useHasPermission } from "@/hooks/useRbacPermissions";
+import NotificationPreferencesClient from "../NotificationPreferencesClient";
+
+vi.mock("@/lib/tenant/tenant", () => ({
+  default: { current: () => ({ ui: { toggle: () => undefined } }) },
+}));
 
 vi.mock("wagmi", () => ({
   useAccount: vi.fn(),
@@ -39,6 +43,10 @@ vi.mock("@/components/shared/SiweProviderConfig", () => ({
 vi.mock("connectkit", () => ({
   useModal: vi.fn(),
   useSIWE: vi.fn(),
+}));
+
+vi.mock("@/components/providers/ConnectModalContext", () => ({
+  useConnectModal: vi.fn(),
 }));
 
 vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
@@ -107,7 +115,7 @@ vi.mock("../PreferencesMatrix", () => ({
 const openDialogMock = vi.fn();
 const signInMock = vi.fn();
 const signOutMock = vi.fn();
-const setOpenMock = vi.fn();
+const openConnectModalMock = vi.fn();
 const fetchMock = vi.fn();
 const address = "0x1234567890123456789012345678901234567890" as const;
 
@@ -167,15 +175,12 @@ describe("NotificationPreferencesClient", () => {
       isReconnecting: false,
       status: "connected",
     } as unknown as ReturnType<typeof useAccount>);
-    vi.mocked(useModal).mockReturnValue({
-      open: false,
-      setOpen: setOpenMock,
-      openAbout: vi.fn(),
-      openOnboarding: vi.fn(),
-      openProfile: vi.fn(),
-      openSwitchNetworks: vi.fn(),
-      openSIWE: vi.fn(),
-    } as unknown as ReturnType<typeof useModal>);
+    vi.mocked(useConnectModal).mockReturnValue({
+      isOpen: false,
+      openConnectModal: openConnectModalMock,
+      disconnect: vi.fn(),
+      isConnecting: false,
+    });
     vi.mocked(useSIWE).mockReturnValue({
       signIn: signInMock,
       signOut: signOutMock,

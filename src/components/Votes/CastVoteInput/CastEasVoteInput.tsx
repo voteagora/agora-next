@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";
@@ -20,7 +20,7 @@ type VoteOption = "for" | "against" | "abstain" | null;
 
 export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const { address } = useAccount();
   const { hasVoted, isLoading } = useUserVotes({
     proposalId: proposal.id,
@@ -43,7 +43,7 @@ export default function CastEasVoteInput({ proposal }: { proposal: Proposal }) {
   if (!isConnected) {
     return (
       <div className="flex flex-col justify-between py-3 px-3 border-line">
-        <Button className="w-full" onClick={() => setOpen(true)}>
+        <Button className="w-full" onClick={() => openConnectModal()}>
           Connect wallet to vote
         </Button>
       </div>

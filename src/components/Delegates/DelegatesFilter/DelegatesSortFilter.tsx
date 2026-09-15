@@ -12,15 +12,27 @@ import { useDelegatesSort } from "./useDelegatesSort";
 
 export default function DelegatesSortFilter() {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [isOpen, setIsOpen] = useState(false);
   const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
 
   // Use shared sort hook
   const { orderByParam, handleSortChange, resetSort } = useDelegatesSort();
+  const labelByKey: Record<keyof typeof delegatesFilterOptions, string> = {
+    weightedRandom: copy.filters.delegates.weightedRandom,
+    mostVotingPower: copy.filters.delegates.mostVotingPower,
+    leastVotingPower: copy.filters.delegates.leastVotingPower,
+    mostDelegators: copy.filters.delegates.mostDelegators,
+    mostRecentDelegation: copy.filters.delegates.mostRecentDelegation,
+    oldestDelegation: copy.filters.delegates.oldestDelegation,
+    latestVotingBlock: copy.filters.delegates.latestVotingBlock,
+    vpChange7d: copy.filters.delegates.vpChange7d,
+    vpChange7dDesc: copy.filters.delegates.vpChange7dDesc,
+  };
 
   return (
     <FilterResetListbox
-      triggerLabel="Sort by"
+      triggerLabel={copy.filters.delegates.sortBy}
       triggerIcon={
         <SortIcon fill={rgbStringToHex(ui?.customization?.primary)} />
       }
@@ -53,11 +65,7 @@ export default function DelegatesSortFilter() {
             .map((key) => (
               <SortOption
                 key={key}
-                label={
-                  delegatesFilterOptions[
-                    key as keyof typeof delegatesFilterOptions
-                  ].value
-                }
+                label={labelByKey[key as keyof typeof delegatesFilterOptions]}
                 value={
                   delegatesFilterOptions[
                     key as keyof typeof delegatesFilterOptions

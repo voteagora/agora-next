@@ -142,14 +142,19 @@ function applyThemeColors(ui: TenantUI) {
 }
 
 export function DevTenantProvider({ children }: { children: React.ReactNode }) {
-  const isTenantSwitcherEnabled =
-    typeof window !== "undefined" &&
-    process.env.NEXT_PUBLIC_AGORA_ENV !== "prod" &&
-    process.env.NEXT_PUBLIC_TENANT_SWITCHER_ENABLED !== "false";
-
+  const [mounted, setMounted] = useState(false);
   const [selectedTenant, setSelectedTenantState] =
     useState<TenantNamespace | null>(null);
   const [overrideUI, setOverrideUI] = useState<TenantUI | null>(null);
+
+  useEffect(() => setMounted(true), []);
+
+  // Gate on `mounted` (not `typeof window`) so the first client render matches
+  // the server (both disabled) and doesn't cause a hydration mismatch.
+  const isTenantSwitcherEnabled =
+    mounted &&
+    process.env.NEXT_PUBLIC_AGORA_ENV !== "prod" &&
+    process.env.NEXT_PUBLIC_TENANT_SWITCHER_ENABLED !== "false";
 
   const setSelectedTenant = (tenant: TenantNamespace) => {
     if (!isTenantSwitcherEnabled) return;

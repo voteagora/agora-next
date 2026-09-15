@@ -18,6 +18,8 @@ import {
   isOptimisticProposalType,
   type ProposalModuleAddresses,
 } from "./proposalTypeUtils";
+import type { TenantCopy } from "@/lib/tenant/tenantCopy";
+import Tenant from "@/lib/tenant/tenant";
 
 function shortPropTitle(title: string, proosalId: string) {
   // This is a hack to hide a proposal formatting mistake from the OP Foundation
@@ -33,10 +35,14 @@ function shortPropTitle(title: string, proosalId: string) {
     : title;
 }
 
-function propHeader(vote: Vote, moduleAddresses: ProposalModuleAddresses) {
+function propHeader(
+  vote: Vote,
+  moduleAddresses: ProposalModuleAddresses,
+  copy: TenantCopy
+) {
   let headerString = "";
   const isTempCheck = (vote as any).isTempCheck === true;
-  const noun = isTempCheck ? "temp check" : "proposal";
+  const noun = isTempCheck ? copy.nouns.tempCheck : copy.nouns.proposal;
   const isApproval = isApprovalProposalType(vote.proposalType, moduleAddresses);
 
   if (
@@ -48,9 +54,9 @@ function propHeader(vote: Vote, moduleAddresses: ProposalModuleAddresses) {
 
   if (isApproval) {
     if (!vote.params || vote.params?.length === 0) {
-      headerString = `Abstained from voting on this proposal `;
+      headerString = `Abstained from voting on this ${copy.nouns.proposal} `;
     } else {
-      headerString = `Voted on ${vote.params?.length} options in this proposal `;
+      headerString = `Voted on ${vote.params?.length} options in this ${copy.nouns.proposal} `;
     }
   }
 
@@ -70,6 +76,7 @@ export default function DelegateVotes({
   const [delegateVotes, setDelegateVotes] = useState(initialVotes.data);
   const [meta, setMeta] = useState(initialVotes.meta);
   const moduleAddresses = useMemo(getProposalModuleAddresses, []);
+  const copy = Tenant.current().ui.copy;
 
   const fetching = useRef(false);
 
@@ -125,7 +132,7 @@ export default function DelegateVotes({
                 <HStack justifyContent="justify-between" gap={2}>
                   <VStack>
                     <span className="text-tertiary text-xs font-medium">
-                      {`${propHeader(vote, moduleAddresses)} with `}
+                      {`${propHeader(vote, moduleAddresses, copy)} with `}
                       {vote.easOodaoMetadata ? (
                         <LazyVotingPower
                           address={vote.address}

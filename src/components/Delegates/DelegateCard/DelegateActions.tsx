@@ -8,7 +8,6 @@ import { AdvancedDelegateButton } from "./AdvancedDelegateButton";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { UpdatedButton } from "@/components/Button";
-import { ConnectKitButton } from "connectkit";
 import { type SyntheticEvent } from "react";
 import Tenant from "@/lib/tenant/tenant";
 import { DELEGATION_MODEL } from "@/lib/constants";

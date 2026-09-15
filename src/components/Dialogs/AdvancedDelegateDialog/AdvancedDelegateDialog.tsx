@@ -1,8 +1,5 @@
 "use client";
 
-import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
-import SubdelegationToRow from "./SubdelegationRow";
-import useAdvancedDelegation from "./useAdvancedDelegation";
 import {
   Dispatch,
   SetStateAction,
@@ -10,30 +7,33 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useParams } from "next/navigation";
 import { useAccount } from "wagmi";
-import { Delegation } from "@/app/api/common/delegations/delegation";
+import { waitForTransactionReceipt } from "wagmi/actions";
 import { DivideIcon, InfoIcon, Repeat2 } from "lucide-react";
+import { formatEther, formatUnits } from "viem";
+import { Delegation } from "@/app/api/common/delegations/delegation";
+import { fetchDelegate } from "@/app/delegates/actions";
+import { resolveENSName } from "@/app/lib/ENSUtils";
+import { config } from "@/app/Web3Provider";
+import { Button } from "@/components/ui/button";
 import {
   AgoraLoaderSmall,
   LogoLoader,
 } from "@/components/shared/AgoraLoader/AgoraLoader";
-import { formatEther, formatUnits } from "viem";
-import { SuccessView } from "./SuccessView";
-import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
-import { waitForTransactionReceipt } from "wagmi/actions";
 import { CloseIcon } from "@/components/shared/CloseIcon";
-import { Button } from "@/components/ui/button";
-import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
 import ENSName from "@/components/shared/ENSName";
-import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
-import { useModal } from "connectkit";
-import { useParams } from "next/navigation";
-import { resolveENSName } from "@/app/lib/ENSUtils";
-import { fetchDelegate } from "@/app/delegates/actions";
+import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
+import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import Tenant from "@/lib/tenant/tenant";
-import { config } from "@/app/Web3Provider";
 import { trackEvent } from "@/lib/analytics";
 import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
+import { AdvancedDelegationDisplayAmount } from "./AdvancedDelegationDisplayAmount";
+import { SuccessView } from "./SuccessView";
+import SubdelegationToRow from "./SubdelegationRow";
+import useAdvancedDelegation from "./useAdvancedDelegation";
+import { AdvancedDelegateDialogType } from "../DialogProvider/dialogs";
 
 type Params = AdvancedDelegateDialogType["params"] & {
   completeDelegation: () => void;
@@ -64,9 +64,10 @@ export function AdvancedDelegateDialog({
   const [opBalance, setOpBalance] = useState<bigint>(0n);
   const [delegators, setDelegators] = useState<Delegation[]>();
   const [directDelegatedVP, setDirectDelegatedVP] = useState<bigint>(0n);
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const params = useParams<{ addressOrENSName: string }>();
   const { ui, slug } = Tenant.current();
+  const copy = ui.copy;
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
 
   const fetchData = useCallback(async () => {
@@ -221,7 +222,7 @@ export function AdvancedDelegateDialog({
               <div className="flex flex-col relative gap-1">
                 <div className="flex flex-col text-xs border border-line rounded-lg justify-center items-center py-8 px-2 relative">
                   <div className="flex flex-row items-center gap-1">
-                    Your total delegatable votes{" "}
+                    {copy.delegates.delegation.totalDelegatableVotes}{" "}
                     <InfoIcon
                       size={12}
                       className="cursor-pointer opacity-70"
@@ -258,9 +259,7 @@ export function AdvancedDelegateDialog({
 
                 {overflowDelegation && (
                   <div className="text-xs max-w-md rounded-bl-xl mt-4">
-                    You have delegated more than the total delegatable votes you
-                    have. Please reduce your current delegation before
-                    delegating more
+                    {copy.delegates.delegation.overflowWarning}
                   </div>
                 )}
 
@@ -271,11 +270,11 @@ export function AdvancedDelegateDialog({
                       className="mt-3"
                       onClick={() => writeWithTracking()}
                     >
-                      Delegation failed
+                      {copy.delegates.delegation.failed}
                     </Button>
                   ) : isLoading ? (
                     <Button disabled={false} className="mt-3">
-                      Submitting your delegation...
+                      {copy.delegates.delegation.submitting}
                     </Button>
                   ) : (
                     <Button
@@ -283,12 +282,12 @@ export function AdvancedDelegateDialog({
                       className="mt-3"
                       onClick={() => writeWithTracking()}
                     >
-                      Delegate your votes
+                      {copy.delegates.delegation.delegateVotesAction}
                     </Button>
                   )
                 ) : (
-                  <Button className="mt-3" onClick={() => setOpen(true)}>
-                    Connect wallet to delegate
+                  <Button className="mt-3" onClick={() => openConnectModal()}>
+                    {copy.delegates.delegation.connectWalletAction}
                   </Button>
                 )}
               </div>
@@ -321,6 +320,7 @@ function InfoDialog({
   delegators: Delegation[] | undefined;
   directDelegatedVP: bigint;
 }) {
+  const copy = Tenant.current().ui.copy;
   const directDelegatedFromOthers = BigInt(directDelegatedVP) - BigInt(balance);
   return (
     <div className="absolute w-full bg-neutral rounded-lg shadow-newDefault">
@@ -337,13 +337,13 @@ function InfoDialog({
           <CloseIcon className="w-4" />
         </div>
         <div className="flex flex-row items-center gap-1">
-          Your total delegatable votes{" "}
+          {copy.delegates.delegation.totalDelegatableVotes}{" "}
           <InfoIcon size={12} className="opacity-50" />
         </div>
         <AdvancedDelegationDisplayAmount amount={availableBalance} />
         <div className="flex flex-col items-start gap-3 w-[95%] py-4 mx-auto mt-4 border-t border-dashed border-line max-h-[256px] overflow-y-scroll">
           <div className="flex flex-row w-full items-center justify-between">
-            <p>You own</p>
+            <p>{copy.delegates.delegation.ownVotesLabel}</p>
             <TokenAmountDecorated amount={balance} />
           </div>
           {delegators?.map((delegator, index) => (
@@ -361,10 +361,9 @@ function InfoDialog({
         </div>
         {directDelegatedFromOthers > 0n && (
           <p className="w-full p-3 text-xs font-medium leading-4 border-t text-primary/30 border-line">
-            You’ve been delegated an additional{" "}
-            <TokenAmountDecorated amount={directDelegatedFromOthers} /> without
-            the right to redelegate. You can only vote with this portion of
-            votes and cannot pass them to others.
+            {copy.delegates.delegation.additionalVotesPrefix}{" "}
+            <TokenAmountDecorated amount={directDelegatedFromOthers} />{" "}
+            {copy.delegates.delegation.additionalVotesSuffix}
           </p>
         )}
       </div>
@@ -377,28 +376,27 @@ function Message({
 }: {
   setShowMessage: Dispatch<SetStateAction<boolean>>;
 }) {
+  const copy = Tenant.current().ui.copy;
   return (
     <div className="relative">
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <div className="text-primary text-xl font-bold">
-            Welcome to advanced delegation
+            {copy.delegates.delegation.advancedTitle}
           </div>
           <div className="text-secondary">
-            As a large token holder, you now have access to advanced delegation,
-            which lets you manage your voting power with more control and
-            flexibility.
+            {copy.delegates.delegation.advancedDescription}
           </div>
         </div>
 
         <div className="flex flex-col gap-3 border border-line rounded-lg p-4">
           <div className="flex items-center">
             <DivideIcon size={20} className="mr-2 text-red-500" />
-            <p>Split your delegation to multiple people</p>
+            <p>{copy.delegates.delegation.splitDelegation}</p>
           </div>
           <div className="flex items-center">
             <Repeat2 size={20} className="mr-2 text-red-500" />
-            <p>Let your delegates re-delegate</p>
+            <p>{copy.delegates.delegation.allowRedelegation}</p>
           </div>
         </div>
         <Button
@@ -407,7 +405,7 @@ function Message({
             setShowMessage(false);
           }}
         >
-          Continue
+          {copy.delegates.delegation.continue}
         </Button>
       </div>
     </div>

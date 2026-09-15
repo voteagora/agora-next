@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import Tenant from "@/lib/tenant/tenant";
 
 import ENSAvatar from "../shared/ENSAvatar";
+import AvatarImage from "../shared/AvatarImage";
 import { Drawer } from "../ui/Drawer";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
 import EncourageDelegationDot from "./EncourageDelegationDot";
 import { SiweStatusBadge } from "./SiweStatusBadge";
+import { useProfileData } from "@/hooks/useProfileData";
 
 type Props = {
   ensName: string | undefined;
@@ -16,6 +18,9 @@ type Props = {
 export const MobileProfileDropDown = ({ ensName }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const { ui } = Tenant.current();
+  const { address, delegate } = useProfileData();
+  const profileUsername = delegate?.statement?.username?.trim();
+  const profileAvatar = delegate?.statement?.avatar;
   const isDelegationEncouragementEnabled = ui.toggle(
     "delegation-encouragement"
   )?.enabled;
@@ -38,7 +43,16 @@ export const MobileProfileDropDown = ({ ensName }: Props) => {
           {isDelegationEncouragementEnabled && (
             <EncourageDelegationDot className="right-[-3px]" />
           )}
-          <ENSAvatar ensName={ensName} size={30} className="rounded-full" />
+          {profileAvatar ? (
+            <AvatarImage
+              src={profileAvatar}
+              alt={`${profileUsername || address} avatar`}
+              size={30}
+              className="rounded-full"
+            />
+          ) : (
+            <ENSAvatar ensName={ensName} size={30} className="rounded-full" />
+          )}
           <SiweStatusBadge showTooltip={false} />
         </div>
       </button>

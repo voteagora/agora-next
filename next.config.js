@@ -83,6 +83,19 @@ const nextConfig = withBundleAnalyzer({
       require.resolve("swagger-ui-react");
     config.resolve.alias["@react-native-async-storage/async-storage$"] =
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
+    // Privy's optional peers (fiat onramp, Farcaster/Solana, abstract) are not
+    // installed and unused by civic's login; ignore so webpack can resolve.
+    for (const optionalPrivyPeer of [
+      "@stripe/crypto",
+      "@farcaster/mini-app-solana",
+      "@solana/kit",
+      "@solana-program/system",
+      "@solana-program/token",
+      "@solana-program/memo",
+      "@abstract-foundation/agw-client",
+    ]) {
+      config.resolve.alias[optionalPrivyPeer] = false;
+    }
     return config;
   },
   // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297

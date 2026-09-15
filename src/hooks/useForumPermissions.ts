@@ -4,7 +4,7 @@ import { getPublicClient } from "@/lib/viem";
 import Tenant from "@/lib/tenant/tenant";
 import {
   fetchVotingPowerFromContract,
-  formatVotingPowerString,
+  formatVotingPower,
 } from "@/lib/votingPowerUtils";
 import { useHasPermission } from "./useRbacPermissions";
 
@@ -40,7 +40,7 @@ interface ForumPermissions {
  */
 export function useForumPermissions(): ForumPermissions {
   const { address } = useAccount();
-  const { slug, contracts, namespace } = Tenant.current();
+  const { slug, contracts, namespace, token } = Tenant.current();
   const client = getPublicClient();
 
   // This hook is mounted from the global layout, so it must not trigger SIWE
@@ -129,7 +129,7 @@ export function useForumPermissions(): ForumPermissions {
   const currentVotes = votingPower || BigInt(0);
 
   // Convert voting power to number for comparisons
-  const vpAsNumber = Number(currentVotes / BigInt(10 ** 18));
+  const vpAsNumber = formatVotingPower(currentVotes, token.decimals);
 
   // Get VP thresholds from settings
   const minVpForTopics = Number(settings?.minVpForTopics || 0);

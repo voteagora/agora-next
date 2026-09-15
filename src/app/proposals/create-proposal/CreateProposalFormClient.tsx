@@ -72,6 +72,7 @@ import { resolveSafePublishSummary } from "./helpers";
 import type { SafeTrackedTransactionSummary } from "@/lib/safeTrackedTransactions";
 
 const { ui } = Tenant.current();
+const copy = ui.copy;
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
 const plmConfig = ui.toggle("proposal-lifecycle")?.config as PLMConfig;
 
@@ -798,7 +799,7 @@ export default function CreateProposalFormClient({
                     disabled={votingModuleType === ProposalType.SOCIAL}
                     onClick={handleSubmit(onSubmitOnchain)}
                   >
-                    {isHybrid ? "Submit on-chain" : "Create proposal"}
+                    {isHybrid ? "Submit on-chain" : copy.proposals.createButton}
                   </UpdatedButton>
                 </div>
               )}
@@ -817,7 +818,7 @@ export default function CreateProposalFormClient({
                     isLoading={isOffchainPending}
                     onClick={handleSubmit(onSubmitOffchain)}
                   >
-                    Submit offchain proposal
+                    Submit offchain {copy.nouns.proposal}
                   </UpdatedButton>
                 </div>
               )}

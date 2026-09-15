@@ -63,6 +63,7 @@ export const TENANT_NAMESPACES = {
   DEMO4: "demo4",
   DEMO3: "demo3",
   SHAPE: "shape",
+  CIVIC: "civic",
 } as const;
 
 // SIWE localStorage keys
@@ -262,6 +263,7 @@ export const TENANT_PROPOSAL_SOURCES: Record<
   scroll: ["dao-node"],
   linea: ["dao-node"],
   pguild: ["dao-node"],
+  civic: ["dao-node"],
   boost: ["dao-node"],
   xai: ["dao-node"],
   b3: ["dao-node"],

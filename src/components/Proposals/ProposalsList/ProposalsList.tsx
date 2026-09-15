@@ -40,6 +40,7 @@ export default function ProposalsList({
 }) {
   const { address } = useAccount();
   const { ui, slug } = Tenant.current();
+  const copy = ui.copy;
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
 
@@ -93,7 +94,7 @@ export default function ProposalsList({
     <div className="flex flex-col max-w-[76rem]">
       {/* {address && <NonVotedProposalsList address={address} />} */}
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
-        <PageHeader headerText="All Proposals" />
+        <PageHeader headerText={copy.proposals.allTitle} />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
           {tenantSupportsProposalLifecycle && address && (
@@ -118,7 +119,7 @@ export default function ProposalsList({
           <div>
             {proposals.length === 0 ? (
               <div className="flex flex-row justify-center py-8 text-secondary">
-                No proposals currently
+                {copy.proposals.empty}
               </div>
             ) : (
               <InfiniteScroll

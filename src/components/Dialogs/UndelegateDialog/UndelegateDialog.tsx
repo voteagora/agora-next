@@ -46,11 +46,11 @@ interface UndelegateActionButtonsProps {
   executeDelegate: () => void;
   isError: boolean;
   didFailDelegation: boolean;
-  didFailSponsoredUnelegation: boolean;
+  didFailSponsoredUndelegation: boolean;
   isProcessingDelegation: boolean;
-  isProcessingSponsoredUnelegation: boolean;
+  isProcessingSponsoredUndelegation: boolean;
   didProcessDelegation: boolean;
-  didProcessSponsoredUnelegation: boolean;
+  didProcessSponsoredUndelegation: boolean;
   isGasRelayLive: boolean;
   sponsoredTxnHash: `0x${string}` | undefined;
   delegateTxHash: `0x${string}` | undefined;
@@ -63,42 +63,47 @@ const UndelegateActionButtons = ({
   executeDelegate,
   isError,
   didFailDelegation,
-  didFailSponsoredUnelegation,
+  didFailSponsoredUndelegation,
   isProcessingDelegation,
-  isProcessingSponsoredUnelegation,
+  isProcessingSponsoredUndelegation,
   didProcessDelegation,
-  didProcessSponsoredUnelegation,
+  didProcessSponsoredUndelegation,
   isGasRelayLive,
   sponsoredTxnHash,
   delegateTxHash,
 }: UndelegateActionButtonsProps) => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   if (isDisabledInTenant) {
     return (
       <Button disabled={true}>
-        {tokenSymbol} delegation is disabled at this time
+        {copy.delegates.delegation.disabled(tokenSymbol)}
       </Button>
     );
   }
 
-  if (isError || didFailDelegation || didFailSponsoredUnelegation) {
+  if (isError || didFailDelegation || didFailSponsoredUndelegation) {
     return (
       <Button disabled={false} onClick={executeDelegate}>
-        Undelegation failed - try again
+        {copy.delegates.delegation.undelegationFailed}
       </Button>
     );
   }
 
-  if (isProcessingDelegation || isProcessingSponsoredUnelegation) {
+  if (isProcessingDelegation || isProcessingSponsoredUndelegation) {
     return (
-      <Button disabled={true}>Submitting your undelegation request...</Button>
+      <Button disabled={true}>
+        {copy.delegates.delegation.undelegationSubmitting}
+      </Button>
     );
   }
 
-  if (didProcessDelegation || didProcessSponsoredUnelegation) {
+  if (didProcessDelegation || didProcessSponsoredUndelegation) {
     return (
       <div>
         <Button className="w-full" disabled={false}>
-          Undelegation completed!
+          {copy.delegates.delegation.undelegationCompleted}
         </Button>
         <BlockScanUrls
           hash1={isGasRelayLive ? sponsoredTxnHash : delegateTxHash}
@@ -110,12 +115,16 @@ const UndelegateActionButtons = ({
   if (sameDelegatee) {
     return (
       <ShadcnButton onClick={executeDelegate}>
-        Remove your own delegation
+        {copy.delegates.delegation.removeOwnDelegation}
       </ShadcnButton>
     );
   }
 
-  return <ShadcnButton onClick={executeDelegate}>Undelegate</ShadcnButton>;
+  return (
+    <ShadcnButton onClick={executeDelegate}>
+      {copy.delegates.delegation.undelegateAction}
+    </ShadcnButton>
+  );
 };
 
 export function UndelegateDialog({
@@ -132,6 +141,7 @@ export function UndelegateDialog({
   ) => Promise<DelegateePayload | null>;
 }) {
   const { ui, contracts, token } = Tenant.current();
+  const copy = ui.copy;
   const delegationTraceRef = useRef<FrontendMiradorTrace>(null);
   const shouldHideAgoraBranding = ui.hideAgoraBranding;
   const {
@@ -172,9 +182,9 @@ export function UndelegateDialog({
 
   const {
     call,
-    isFetching: isProcessingSponsoredUnelegation,
-    isFetched: didProcessSponsoredUnelegation,
-    isError: didFailSponsoredUnelegation,
+    isFetching: isProcessingSponsoredUndelegation,
+    isFetched: didProcessSponsoredUndelegation,
+    isError: didFailSponsoredUndelegation,
     txHash: sponsoredTxnHash,
   } = useSponsoredDelegation({
     address: accountAddress,
@@ -322,7 +332,7 @@ export function UndelegateDialog({
       }
     }
 
-    if (didProcessDelegation || didProcessSponsoredUnelegation) {
+    if (didProcessDelegation || didProcessSponsoredUndelegation) {
       // Refresh delegation
       if (Number(votingPower) > 0) {
         setRefetchDelegate({
@@ -332,7 +342,7 @@ export function UndelegateDialog({
       }
       revalidateData();
     }
-  }, [didProcessDelegation, didProcessSponsoredUnelegation]);
+  }, [didProcessDelegation, didProcessSponsoredUndelegation]);
 
   useEffect(() => {
     if (!delegationTraceRef.current || isGasRelayLive) {
@@ -395,12 +405,11 @@ export function UndelegateDialog({
           <div className="flex flex-col gap-3 items-center w-full text-tertiary text-xs">
             <div>
               <h2 className="text-xl font-bold text-primary">
-                Remove <ENSName address={delegatee.delegatee} /> as your
-                delegate
+                Remove <ENSName address={delegatee.delegatee} /> as your{" "}
+                {copy.nouns.representative}
               </h2>
               <p className="text-sm text-secondary mt-1">
-                This delegate will no longer be able to vote on your behalf.
-                Your votes will be returned to you.
+                {copy.delegates.delegation.removeDescription}
               </p>
             </div>
             <div className="flex flex-col relative w-full border border-line rounded-lg">
@@ -412,7 +421,7 @@ export function UndelegateDialog({
                 />
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Currently delegated to
+                    {copy.delegates.delegation.currentDelegate}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={delegatee.delegatee} />
@@ -425,7 +434,7 @@ export function UndelegateDialog({
               <div className="flex flex-row items-center gap-3 p-4">
                 <div className="flex flex-col">
                   <p className="text-xs font-medium text-secondary">
-                    Remove your delegate votes
+                    {copy.delegates.delegation.removeVotes}
                   </p>
                   <div className="font-medium text-primary max-w-[6rem] sm:max-w-full">
                     <ENSName address={zeroAddress} />
@@ -437,7 +446,7 @@ export function UndelegateDialog({
         ) : (
           <div className="flex flex-col gap-4">
             <p className="text-xl font-bold text-left">
-              You are not currently delegating any votes.
+              {copy.delegates.delegation.notDelegating}
             </p>
           </div>
         )}
@@ -449,11 +458,11 @@ export function UndelegateDialog({
           executeDelegate={executeDelegate}
           isError={isError || !!walletReadinessError}
           didFailDelegation={didFailDelegation}
-          didFailSponsoredUnelegation={didFailSponsoredUnelegation}
+          didFailSponsoredUndelegation={didFailSponsoredUndelegation}
           isProcessingDelegation={isProcessingDelegation}
-          isProcessingSponsoredUnelegation={isProcessingSponsoredUnelegation}
+          isProcessingSponsoredUndelegation={isProcessingSponsoredUndelegation}
           didProcessDelegation={didProcessDelegation}
-          didProcessSponsoredUnelegation={didProcessSponsoredUnelegation}
+          didProcessSponsoredUndelegation={didProcessSponsoredUndelegation}
           isGasRelayLive={isGasRelayLive}
           sponsoredTxnHash={sponsoredTxnHash}
           delegateTxHash={delegateTxHash}
