@@ -1,4 +1,5 @@
 import DelegateStatementInputGroup from "./DelegateStatementInputGroup";
+import DelegateStatementAvatarUpload from "./DelegateStatementAvatarUpload";
 import DelegateStatementBoolSelector, {
   DelegateStatementDaoPrinciplesSelector,
 } from "./DelegateStatementBoolSelector";
@@ -33,12 +34,7 @@ export default function OtherInfoFormSection({
               name="username"
               form={form}
             />
-            <DelegateStatementInputGroup
-              title="Avatar URL"
-              placeholder="https://example.com/avatar.png"
-              name="avatar"
-              form={form}
-            />
+            <DelegateStatementAvatarUpload form={form} />
           </>
         )}
         <DelegateStatementInputGroup

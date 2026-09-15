@@ -2,9 +2,12 @@ import { NextRequest } from "next/server";
 import { ImageResponse } from "next/og";
 import { truncateString } from "@/app/lib/utils/text";
 import { LogoPill } from "@/app/api/images/og/assets/shared";
+import { getTwicPicsAvatarUrl } from "@/lib/profileImage";
 import { TenantNamespace } from "@/lib/types";
 
 export const runtime = "edge";
+
+const OG_AVATAR_SIZE = 60;
 
 function resolveAvatarUrl(url: string | null) {
   if (!url) return null;
@@ -19,7 +22,10 @@ export async function GET(req: NextRequest) {
 
   const address = searchParams.get("address") || "voter.eth";
 
-  const avatar = resolveAvatarUrl(searchParams.get("avatar"));
+  const avatar = getTwicPicsAvatarUrl(
+    resolveAvatarUrl(searchParams.get("avatar")),
+    OG_AVATAR_SIZE
+  );
   const votes = searchParams.get("votes") || null;
   const description = searchParams.get("description") || "";
   const statement = searchParams.has("statement")
