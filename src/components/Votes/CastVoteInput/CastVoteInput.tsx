@@ -24,7 +24,6 @@ import CastVoteContextProvider, {
   SupportTextProps,
   useCastVoteContext,
 } from "./CastVoteContext";
-import freeGasMegaphon from "@/icons/freeGasMegaphon.gif";
 import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
@@ -283,18 +282,13 @@ function VotingBanner() {
   const { ui } = Tenant.current();
   const copy = ui.copy;
 
-  if (reason) {
-    return (
-      <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-        {copy.voting.statementRequiresGas}
-      </div>
-    );
+  if (!reason) {
+    return null;
   }
 
   return (
     <div className="flex items-center text-sm text-secondary font-medium py-2 px-4 bg-wash border-b border-line rounded-b-lg">
-      <img src={freeGasMegaphon.src} alt="Free gas" className="w-6 h-6 mr-2" />
-      {copy.voting.freeVoting}
+      {copy.voting.statementRequiresGas}
     </div>
   );
 }
