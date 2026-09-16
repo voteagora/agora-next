@@ -287,7 +287,7 @@ export const civicTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
-      name: "delegates/hide-warpcast-input",
+      name: "delegates/warpcast-as-linkedin",
       enabled: true,
     },
     {

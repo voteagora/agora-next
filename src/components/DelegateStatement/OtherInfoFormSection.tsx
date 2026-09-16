@@ -20,6 +20,9 @@ export default function OtherInfoFormSection({
   )?.enabled;
   const hideDiscordInput = ui.toggle("delegates/hide-discord-input")?.enabled;
   const hideWarpcastInput = ui.toggle("delegates/hide-warpcast-input")?.enabled;
+  const warpcastAsLinkedin = ui.toggle(
+    "delegates/warpcast-as-linkedin"
+  )?.enabled;
 
   return (
     <div className="py-8 px-6 border-b border-line">
@@ -43,13 +46,22 @@ export default function OtherInfoFormSection({
           name="twitter"
           form={form}
         />
-        {!hideWarpcastInput && (
+        {warpcastAsLinkedin ? (
           <DelegateStatementInputGroup
-            title="Warpcast"
-            placeholder="@yourname"
+            title="LinkedIn"
+            placeholder="https://www.linkedin.com/in/yourname"
             name="warpcast"
             form={form}
           />
+        ) : (
+          !hideWarpcastInput && (
+            <DelegateStatementInputGroup
+              title="Warpcast"
+              placeholder="@yourname"
+              name="warpcast"
+              form={form}
+            />
+          )
         )}
         {!hideDiscordInput && (
           <DelegateStatementInputGroup
