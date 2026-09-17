@@ -11,7 +11,7 @@ import { keccak256, type Hex, type WalletClient } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
 import { extractEasTxInputData } from "./easTxContext";
-import { getPublicClient } from "./viem";
+import { waitForTransactionReceipt } from "viem/actions";
 
 const { slug, contracts } = Tenant.current();
 
@@ -265,8 +265,10 @@ async function attestWithWallet(
       data: txInputData,
       value: request.data.value,
     });
-    const receipt = await getPublicClient(chain).waitForTransactionReceipt({
+    // Keep wallet-specific receipt handling, including Safe transaction IDs.
+    const receipt = await waitForTransactionReceipt(walletClient, {
       hash: txHash,
+      timeout: 0, // Preserve the previous ethers wait() behavior for slow transactions.
     });
     if (receipt.status !== "success") {
       throw new Error("Attestation transaction reverted.");

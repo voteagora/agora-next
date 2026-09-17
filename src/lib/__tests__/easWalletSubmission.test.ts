@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AbiCoder } from "ethers";
-import { createPublicClient, createWalletClient, custom } from "viem";
+import { createWalletClient, custom } from "viem";
 import { mainnet } from "viem/chains";
 import {
   createApprovalVoteAttestation,
@@ -9,9 +9,12 @@ import {
   createV2CreateProposalAttestation,
 } from "../eas";
 import { EAS } from "@ethereum-attestation-service/eas-sdk";
+import { SafeAppProvider } from "@safe-global/safe-apps-provider";
 
 const { getPublicClientMock } = vi.hoisted(() => ({
-  getPublicClientMock: vi.fn(),
+  getPublicClientMock: vi.fn(() => {
+    throw new Error("Receipt lookups must use the connected wallet provider");
+  }),
 }));
 vi.mock("../viem", () => ({ getPublicClient: getPublicClientMock }));
 vi.mock("../tenant/tenant", async () => {
@@ -93,6 +96,7 @@ function setup(
     status?: string;
     logs?: ReturnType<typeof attested>[];
     reject?: boolean;
+    receiptReady?: Promise<void>;
   } = {}
 ) {
   const request = vi.fn(
@@ -108,7 +112,8 @@ function setup(
           throw { code: 4001, message: "User rejected the request" };
         return hash;
       }
-      if (method === "eth_getTransactionReceipt")
+      if (method === "eth_getTransactionReceipt") {
+        await options.receiptReady;
         return {
           transactionHash: hash,
           blockHash: hash,
@@ -125,6 +130,7 @@ function setup(
           type: "0x2",
           logs: options.logs ?? [attested(schema)],
         };
+      }
       throw new Error(`Unexpected RPC method: ${method}`);
     }
   );
@@ -134,9 +140,6 @@ function setup(
     chain: mainnet,
     transport,
   });
-  getPublicClientMock.mockReturnValue(
-    createPublicClient({ chain: mainnet, transport })
-  );
   return { request, walletClient };
 }
 
@@ -251,5 +254,74 @@ describe("EAS wallet submission", () => {
       createVoteAttestation({ choice: 1, reason, proposalId, walletClient })
     ).rejects.toThrow("User rejected");
     expect(getPublicClientMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps waiting beyond three minutes and accepts the eventual receipt", async () => {
+    vi.useFakeTimers();
+    let releaseReceipt!: () => void;
+    const receiptReady = new Promise<void>((resolve) => {
+      releaseReceipt = resolve;
+    });
+    const { walletClient } = setup(cases[0].schema, { receiptReady });
+    const settled = vi.fn();
+    const submission = createVoteAttestation({
+      choice: 1,
+      reason,
+      proposalId,
+      walletClient,
+    });
+    void submission.then(settled, settled);
+    try {
+      await vi.advanceTimersByTimeAsync(180_001);
+      expect(settled).not.toHaveBeenCalled();
+      releaseReceipt();
+      await expect(submission).resolves.toMatchObject({
+        txHash: hash,
+        transactionHash: uid,
+      });
+    } finally {
+      releaseReceipt();
+      await submission.catch(() => undefined);
+      vi.useRealTimers();
+    }
+  });
+
+  it("uses Safe's provider to resolve its transaction ID when reading the receipt", async () => {
+    const { request } = setup();
+    // Public RPCs cannot resolve Safe's internal hash; its provider can.
+    getPublicClientMock.mockImplementation(() => {
+      throw new Error("Cannot look up a Safe transaction ID on a public RPC");
+    });
+    const safeTxHash = `0x${"ef".repeat(32)}`;
+    const sdk = {
+      txs: {
+        send: vi.fn().mockResolvedValue({ safeTxHash }),
+        getBySafeTxHash: vi.fn().mockResolvedValue({ txHash: hash }),
+      },
+      eth: {
+        getTransactionReceipt: vi.fn(async (params) =>
+          request({ method: "eth_getTransactionReceipt", params })
+        ),
+      },
+    };
+    const provider = new SafeAppProvider(
+      { safeAddress: account, chainId: mainnet.id } as never,
+      sdk as never
+    );
+    const walletClient = createWalletClient({
+      account,
+      chain: mainnet,
+      transport: custom(provider),
+    });
+    const result = await createVoteAttestation({
+      choice: 1,
+      reason,
+      proposalId,
+      walletClient,
+    });
+    expect(sdk.txs.getBySafeTxHash).toHaveBeenCalledWith(safeTxHash);
+    expect(sdk.eth.getTransactionReceipt).toHaveBeenCalledWith([hash]);
+    expect(result).toMatchObject({ transactionHash: uid, txHash: safeTxHash });
+    expect(sdk.txs.send.mock.calls[0][0].txs[0]).not.toHaveProperty("gas");
   });
 });
