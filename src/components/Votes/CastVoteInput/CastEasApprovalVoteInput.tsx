@@ -9,9 +9,14 @@ import { useEASV2 } from "@/hooks/useEASV2";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { useUserVotes } from "@/hooks/useProposalVotes";
-import { parseVoteError } from "@/lib/voteErrorUtils";
+import {
+  classifyVoteError,
+  type ClassifiedVoteError,
+} from "@/lib/voteErrorUtils";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 import { DisabledVoteButton } from "../components/DisabledVoteButton";
+import { ContractWalletNotice } from "../components/ContractWalletNotice";
+import { VoteErrorNotice } from "../components/VoteErrorNotice";
 
 interface ApprovalOption {
   index: number;
@@ -102,8 +107,9 @@ function CastEasApprovalVoteInputContent({
   const { createApprovalVote, isCreatingApprovalVote } = useEASV2();
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ClassifiedVoteError | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
 
   const handleOptionToggle = (index: number) => {
     setSelectedOptions((prev) => {
@@ -120,14 +126,17 @@ function CastEasApprovalVoteInputContent({
 
   const handleSubmitVote = async () => {
     if (selectedOptions.length === 0 || !address) {
-      setError("Please select at least one option");
+      setError({
+        code: "UNKNOWN",
+        message: "Please select at least one option",
+      });
       return;
     }
 
     setError(null);
 
     try {
-      await createApprovalVote({
+      const result = await createApprovalVote({
         choices: selectedOptions,
         reason: reason || "",
         proposalId: proposal.id,
@@ -135,15 +144,16 @@ function CastEasApprovalVoteInputContent({
 
       setSelectedOptions([]);
       setReason("");
+      setIsPendingConfirmation(!result.confirmed);
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting approval vote:", err);
-      setError(parseVoteError(err));
+      setError(classifyVoteError(err));
     }
   };
 
   if (isSuccess) {
-    return <VoteSuccessMessage />;
+    return <VoteSuccessMessage pending={isPendingConfirmation} />;
   }
 
   return (
@@ -200,7 +210,9 @@ function CastEasApprovalVoteInputContent({
         disabled={isCreatingApprovalVote}
       />
 
-      {error && <div className="mb-3 text-sm text-negative">{error}</div>}
+      <ContractWalletNotice />
+
+      <VoteErrorNotice error={error} />
 
       <button
         onClick={handleSubmitVote}

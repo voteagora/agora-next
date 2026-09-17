@@ -66,6 +66,12 @@ function getConnectors() {
     coinbaseWallet({
       appName: metadata.name,
       appLogoUrl: metadata.icons[0],
+      // "eoaOnly" hides Coinbase's passkey Smart Wallet (a separate address
+      // with no voting power) and keeps users on their EOA, including EOAs
+      // upgraded in place via EIP-7702.
+      preference: ui.toggle("coinbase-wallet-eoa-only")?.enabled
+        ? "eoaOnly"
+        : "all",
     }),
     ...(projectId
       ? [

@@ -495,6 +495,10 @@ export const syndicateTenantUIConfig = new TenantUI({
       enabled: true,
     },
     {
+      name: "coinbase-wallet-eoa-only",
+      enabled: true, // Hide Coinbase passkey Smart Wallet; votes must come from the SYND-holding EOA
+    },
+    {
       name: "easv2-extended-voting",
       enabled: false, // Enables approval and optimistic voting types
     },

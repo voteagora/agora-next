@@ -590,13 +590,6 @@ export const mapArbitrumBlockToMainnetBlock = unstable_cache(
   }
 );
 
-export const isContractWallet = async (address: Address) => {
-  const publicClient = getPublicClient();
-  const bytecode = await publicClient.getCode({ address });
-
-  return bytecode && bytecode !== "0x" ? true : false;
-};
-
 const SAFE_THRESHOLD_ABI = [
   {
     type: "function",

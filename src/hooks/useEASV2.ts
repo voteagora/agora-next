@@ -1,14 +1,17 @@
-import { useAccount, useWalletClient } from "wagmi";
-import { useMutation } from "@tanstack/react-query";
+import { useAccount, useConfig, useSwitchChain } from "wagmi";
+import { getWalletClient } from "wagmi/actions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BrowserProvider } from "ethers";
 import {
   createV2CreateProposalAttestation,
-  createApprovalVoteAttestation,
-  createOptimisticVoteAttestation,
-  createVoteAttestation,
   EAS_VOTING_TYPE,
   EAS_APPROVAL_CRITERIA,
 } from "@/lib/eas";
+import type { VoteAttestationParams } from "@/lib/easVote";
+import {
+  submitVoteAttestation,
+  type VoteAttestationResult,
+} from "@/lib/easVoteSubmit";
 import Tenant from "@/lib/tenant/tenant";
 import {
   EASVotingType,
@@ -23,6 +26,9 @@ import {
   startFrontendMiradorFlowTrace,
 } from "@/lib/mirador/frontendFlowTrace";
 import { MiradorAttributeMap, MiradorFlow } from "@/lib/mirador/types";
+import { getPublicClient } from "@/lib/viem";
+import { getWalletTransactionReadinessError } from "@/lib/wallet/transactionReadiness";
+import { getWalletAccountType } from "@/lib/wallet/walletType";
 
 type TraceableEasResult = {
   txHash?: string;
@@ -49,6 +55,16 @@ type RunMiradorTraceOptions<T extends TraceableEasResult> = {
   proposalId?: string;
 };
 
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never;
+
+/** Vote params as passed by the UI; chain and recipient come from the tenant. */
+type VoteParams = DistributiveOmit<
+  VoteAttestationParams,
+  "chainId" | "recipient"
+>;
+
 function getMiradorResultTxHash(
   result: TraceableEasResult
 ): string | undefined {
@@ -62,18 +78,89 @@ function getMiradorAttestationId(
 }
 
 export function useEASV2() {
-  const { address } = useAccount();
-  const { data: walletClient } = useWalletClient();
+  const { address, chainId: currentChainId, connector, status } = useAccount();
+  const config = useConfig();
+  const { switchChainAsync } = useSwitchChain();
+  const queryClient = useQueryClient();
   const { ui, contracts } = Tenant.current();
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+  const targetChain = contracts.token.chain;
 
-  const getSigner = async () => {
-    if (!walletClient) {
+  const assertWalletReady = () => {
+    if (!isEASV2Enabled) {
+      throw new Error("EAS v2 not enabled or wallet not connected");
+    }
+    if (!address) {
       throw new Error("Wallet not connected");
     }
+    const readinessError = getWalletTransactionReadinessError({
+      connector,
+      status,
+    });
+    if (readinessError) {
+      throw readinessError;
+    }
+    return address;
+  };
+
+  const ensureTargetChain = async () => {
+    if (currentChainId !== targetChain.id) {
+      await switchChainAsync({ chainId: targetChain.id });
+    }
+  };
+
+  // Proposal creation still goes through the eas-sdk / ethers signer path.
+  const getSigner = async () => {
+    assertWalletReady();
+    await ensureTargetChain();
+    const walletClient = await getWalletClient(config, {
+      chainId: targetChain.id,
+    });
     return await new BrowserProvider(walletClient.transport as any).getSigner();
   };
+
+  const getWalletAccountTypeAttribute = async () => {
+    if (!address) return "unknown";
+    return getWalletAccountType(address, targetChain.id);
+  };
+
+  const castVote = async (
+    voteParams: VoteParams
+  ): Promise<VoteAttestationResult> => {
+    const voter = assertWalletReady();
+
+    const result = await submitVoteAttestation(
+      {
+        address: voter,
+        currentChainId,
+        targetChain,
+        publicClient: getPublicClient(targetChain),
+        switchChain: (chainId) => switchChainAsync({ chainId }),
+        getWalletClient: (chainId) => getWalletClient(config, { chainId }),
+      },
+      {
+        ...voteParams,
+        chainId: targetChain.id,
+        recipient: contracts.easRecipient,
+      } as VoteAttestationParams
+    );
+
+    void queryClient.invalidateQueries({
+      queryKey: ["userVotes", voteParams.proposalId, voter],
+    });
+
+    return result;
+  };
+
+  const voteSuccessDetails =
+    (voteKind: string) => (result: VoteAttestationResult) => ({
+      voteKind,
+      transactionHash: getMiradorResultTxHash(result),
+      attestationUid: result.attestationUid,
+      confirmed: result.confirmed,
+      preflight: result.preflight,
+    });
 
   const runMiradorTrace = async <T extends TraceableEasResult>({
     name,
@@ -178,9 +265,6 @@ export function useEASV2() {
         successEventName: "proposal_attestation_succeeded",
         failureEventName: "proposal_attestation_failed",
         action: async () => {
-          if (!walletClient || !isEASV2Enabled) {
-            throw new Error("EAS v2 not enabled or wallet not connected");
-          }
           const signer = await getSigner();
           return createV2CreateProposalAttestation({
             title,
@@ -245,9 +329,6 @@ export function useEASV2() {
           attestationUid: getMiradorAttestationId(result),
         }),
         action: async () => {
-          if (!walletClient || !isEASV2Enabled) {
-            throw new Error("EAS v2 not enabled or wallet not connected");
-          }
           const signer = await getSigner();
           return createV2CreateProposalAttestation({
             title,
@@ -279,6 +360,7 @@ export function useEASV2() {
       reason: string;
       proposalId: string;
     }) => {
+      const walletAccountType = await getWalletAccountTypeAttribute();
       return runMiradorTrace({
         name: "GovernanceVote",
         flow: MIRADOR_FLOW.governanceVote,
@@ -288,27 +370,15 @@ export function useEASV2() {
           voteKind: "eas_standard",
           choice,
           hasReason: Boolean(reason),
+          walletAccountType,
         },
         txDetails: "EAS standard vote attestation transaction",
         successEventName: "governance_vote_succeeded",
         failureEventName: "governance_vote_failed",
-        successDetails: (result) => ({
-          voteKind: "eas_standard",
-          transactionHash: getMiradorResultTxHash(result),
-        }),
+        successDetails: voteSuccessDetails("eas_standard"),
         proposalId,
-        action: async () => {
-          if (!walletClient || !isEASV2Enabled) {
-            throw new Error("EAS v2 not enabled or wallet not connected");
-          }
-          const signer = await getSigner();
-          return createVoteAttestation({
-            choice,
-            reason,
-            signer,
-            proposalId,
-          });
-        },
+        action: () =>
+          castVote({ kind: "standard", choice, reason, proposalId }),
       });
     },
   });
@@ -323,6 +393,7 @@ export function useEASV2() {
       reason: string;
       proposalId: string;
     }) => {
+      const walletAccountType = await getWalletAccountTypeAttribute();
       return runMiradorTrace({
         name: "GovernanceVote",
         flow: MIRADOR_FLOW.governanceVote,
@@ -332,27 +403,15 @@ export function useEASV2() {
           voteKind: "eas_approval",
           choiceCount: choices.length,
           hasReason: Boolean(reason),
+          walletAccountType,
         },
         txDetails: "EAS approval vote attestation transaction",
         successEventName: "governance_vote_succeeded",
         failureEventName: "governance_vote_failed",
-        successDetails: (result) => ({
-          voteKind: "eas_approval",
-          transactionHash: getMiradorResultTxHash(result),
-        }),
+        successDetails: voteSuccessDetails("eas_approval"),
         proposalId,
-        action: async () => {
-          if (!walletClient || !isEASV2Enabled) {
-            throw new Error("EAS v2 not enabled or wallet not connected");
-          }
-          const signer = await getSigner();
-          return createApprovalVoteAttestation({
-            choices,
-            reason,
-            signer,
-            proposalId,
-          });
-        },
+        action: () =>
+          castVote({ kind: "approval", choices, reason, proposalId }),
       });
     },
   });
@@ -365,6 +424,7 @@ export function useEASV2() {
       reason: string;
       proposalId: string;
     }) => {
+      const walletAccountType = await getWalletAccountTypeAttribute();
       return runMiradorTrace({
         name: "GovernanceVote",
         flow: MIRADOR_FLOW.governanceVote,
@@ -373,26 +433,14 @@ export function useEASV2() {
         attributes: {
           voteKind: "eas_optimistic",
           hasReason: Boolean(reason),
+          walletAccountType,
         },
         txDetails: "EAS optimistic vote attestation transaction",
         successEventName: "governance_vote_succeeded",
         failureEventName: "governance_vote_failed",
-        successDetails: (result) => ({
-          voteKind: "eas_optimistic",
-          transactionHash: getMiradorResultTxHash(result),
-        }),
+        successDetails: voteSuccessDetails("eas_optimistic"),
         proposalId,
-        action: async () => {
-          if (!walletClient || !isEASV2Enabled) {
-            throw new Error("EAS v2 not enabled or wallet not connected");
-          }
-          const signer = await getSigner();
-          return createOptimisticVoteAttestation({
-            reason,
-            signer,
-            proposalId,
-          });
-        },
+        action: () => castVote({ kind: "optimistic", reason, proposalId }),
       });
     },
   });

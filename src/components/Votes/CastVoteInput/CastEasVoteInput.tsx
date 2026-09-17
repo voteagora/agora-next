@@ -9,9 +9,14 @@ import { useModal } from "connectkit";
 import { useUserVotes } from "@/hooks/useProposalVotes";
 import { useArchiveUserVotingPower } from "@/hooks/useArchiveUserVotingPower";
 import { TokenAmountDisplay } from "@/lib/utils";
-import { parseVoteError } from "@/lib/voteErrorUtils";
+import {
+  classifyVoteError,
+  type ClassifiedVoteError,
+} from "@/lib/voteErrorUtils";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 import { DisabledVoteButton } from "../components/DisabledVoteButton";
+import { ContractWalletNotice } from "../components/ContractWalletNotice";
+import { VoteErrorNotice } from "../components/VoteErrorNotice";
 import CastEasApprovalVoteInput from "./CastEasApprovalVoteInput";
 import CastEasOptimisticVoteInput from "./CastEasOptimisticVoteInput";
 import { useEASV2 } from "@/hooks/useEASV2";
@@ -104,8 +109,9 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
   const { createStandardVote, isCreatingStandardVote } = useEASV2();
   const [selectedVote, setSelectedVote] = useState<VoteOption>(null);
   const [reason, setReason] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ClassifiedVoteError | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
 
   const { data: votingPower } = useArchiveUserVotingPower({
     proposalId: proposal.id,
@@ -114,7 +120,10 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
 
   const handleSubmitVote = async () => {
     if (!selectedVote || !address) {
-      setError("Please connect wallet and select a vote option");
+      setError({
+        code: "UNKNOWN",
+        message: "Please connect wallet and select a vote option",
+      });
       return;
     }
 
@@ -127,7 +136,7 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         abstain: 2,
       };
 
-      await createStandardVote({
+      const result = await createStandardVote({
         choice: choiceMap[selectedVote],
         reason: reason || "",
         proposalId: proposal.id,
@@ -135,15 +144,16 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
 
       setSelectedVote(null);
       setReason("");
+      setIsPendingConfirmation(!result.confirmed);
       setIsSuccess(true);
     } catch (err) {
       console.error("Error submitting vote:", err);
-      setError(parseVoteError(err));
+      setError(classifyVoteError(err));
     }
   };
 
   if (isSuccess) {
-    return <VoteSuccessMessage />;
+    return <VoteSuccessMessage pending={isPendingConfirmation} />;
   }
 
   return (
@@ -195,7 +205,9 @@ function CastEasVoteInputContent({ proposal }: { proposal: Proposal }) {
         </button>
       </div>
 
-      {error && <div className="mb-3 text-sm text-negative">{error}</div>}
+      <ContractWalletNotice />
+
+      <VoteErrorNotice error={error} />
 
       <button
         onClick={handleSubmitVote}

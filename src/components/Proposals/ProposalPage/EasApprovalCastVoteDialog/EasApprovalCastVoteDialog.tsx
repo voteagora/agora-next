@@ -11,6 +11,12 @@ import { cn } from "@/lib/utils";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import { useEASV2 } from "@/hooks/useEASV2";
 import TokenAmountDecorated from "@/components/shared/TokenAmountDecorated";
+import { ContractWalletNotice } from "@/components/Votes/components/ContractWalletNotice";
+import { VoteErrorNotice } from "@/components/Votes/components/VoteErrorNotice";
+import {
+  classifyVoteError,
+  type ClassifiedVoteError,
+} from "@/lib/voteErrorUtils";
 
 export function ReviewEasApprovalVoteDialog({
   selectedOptions,
@@ -90,6 +96,7 @@ export function ReviewEasApprovalVoteDialog({
             </span>
           )}
         </div>
+        <ContractWalletNotice className="mt-6 text-xs text-secondary" />
         <Button
           onClick={() => {
             onSubmit();
@@ -128,7 +135,8 @@ export function EasApprovalCastVoteDialog({
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [reason, setReason] = useState<string>("");
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
+  const [error, setError] = useState<ClassifiedVoteError | null>(null);
   const maxChecked = proposalData.proposalSettings.maxApprovals;
 
   const { createApprovalVote, isCreatingApprovalVote } = useEASV2();
@@ -145,12 +153,13 @@ export function EasApprovalCastVoteDialog({
     setError(null);
 
     try {
-      await createApprovalVote({
+      const result = await createApprovalVote({
         choices: selectedOptions,
         reason: reason || "",
         proposalId: proposal.id,
       });
 
+      setIsPendingConfirmation(!result.confirmed);
       setIsSuccess(true);
       // Close dialog after short delay to show success
       setTimeout(() => {
@@ -158,22 +167,8 @@ export function EasApprovalCastVoteDialog({
       }, 1500);
     } catch (err) {
       console.error("Error submitting approval vote:", err);
-
-      const errorMessage = err instanceof Error ? err.message : String(err);
-
-      if (errorMessage.includes("0xb8daf542")) {
-        setError(
-          "Invalid attester - you are not authorized to vote on this proposal"
-        );
-      } else if (errorMessage.includes("0x7c9a1cf9")) {
-        setError("You have already voted on this proposal");
-      } else if (errorMessage.includes("0x7fa01202")) {
-        setError("Voting has not started yet");
-      } else if (errorMessage.includes("0x7a19ed05")) {
-        setError("Voting has ended for this proposal");
-      } else {
-        setError(err instanceof Error ? err.message : "Failed to submit vote");
-      }
+      setError(classifyVoteError(err));
+      setInReviewStep(false);
     }
   };
 
@@ -190,7 +185,11 @@ export function EasApprovalCastVoteDialog({
           <CheckIcon className="w-6 h-6 text-positive" />
         </div>
         <p className="text-xl font-bold text-primary">Vote Submitted!</p>
-        <p className="text-secondary mt-2">Your vote has been recorded.</p>
+        <p className="text-secondary mt-2">
+          {isPendingConfirmation
+            ? "Your vote was submitted and is waiting for confirmation."
+            : "Your vote has been recorded."}
+        </p>
       </div>
     );
   }
@@ -215,7 +214,7 @@ export function EasApprovalCastVoteDialog({
     <div style={{ transformStyle: "preserve-3d" }}>
       {error && (
         <div className="mb-4 p-3 bg-negative/10 border border-negative rounded-lg">
-          <p className="text-sm text-negative">{error}</p>
+          <VoteErrorNotice error={error} className="text-sm text-negative" />
         </div>
       )}
       <div className="flex flex-col gap-3">

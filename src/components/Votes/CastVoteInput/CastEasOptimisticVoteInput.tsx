@@ -20,6 +20,7 @@ import {
 import { parseVoteError } from "@/lib/voteErrorUtils";
 import { VoteSuccessMessage } from "../components/VoteSuccessMessage";
 import { DisabledVoteButton } from "../components/DisabledVoteButton";
+import { ContractWalletNotice } from "../components/ContractWalletNotice";
 
 interface CastEasOptimisticVoteInputProps {
   proposal: Proposal;
@@ -109,6 +110,7 @@ function CastEasOptimisticVoteInputContent({
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
+  const [isPendingConfirmation, setIsPendingConfirmation] = useState(false);
   const [support, setSupport] = useState<"AGAINST" | null>(null);
   const [voteTimestamp, setVoteTimestamp] = useState<Date | null>(null);
 
@@ -135,7 +137,8 @@ function CastEasOptimisticVoteInputContent({
         proposalId: proposal.id,
       });
 
-      setTransactionHash(result.transactionHash);
+      setTransactionHash(result.txHash);
+      setIsPendingConfirmation(!result.confirmed);
       setVoteTimestamp(new Date());
       setIsSuccess(true);
     } catch (err) {
@@ -161,6 +164,7 @@ function CastEasOptimisticVoteInputContent({
           transactionHash={transactionHash}
           timestamp={voteTimestamp}
           showTimestamp={true}
+          pending={isPendingConfirmation}
         />
       </div>
     );
@@ -193,6 +197,9 @@ function CastEasOptimisticVoteInputContent({
                 </div>
               )}
               {isCreatingOptimisticVote && <LoadingVote />}
+              {!isCreatingOptimisticVote && (
+                <ContractWalletNotice className="mt-3 text-xs text-secondary" />
+              )}
               {!isCreatingOptimisticVote && proposal.status === "ACTIVE" && (
                 <VoteSubmitButton
                   support={support}
