@@ -3,14 +3,15 @@ import {
   NO_EXPIRATION,
   EAS,
   ZERO_BYTES32,
+  type AttestationRequest,
 } from "@ethereum-attestation-service/eas-sdk";
 import { JsonRpcSigner, toUtf8Bytes } from "ethers";
 import Tenant from "./tenant/tenant";
-import { keccak256 } from "viem";
+import { keccak256, type Hex, type WalletClient } from "viem";
 import { defaultAbiCoder } from "@ethersproject/abi";
 import { getEASAddress } from "./constants";
-import { easVotingTypeToNumber } from "@/app/create/types";
 import { extractEasTxInputData } from "./easTxContext";
+import { getPublicClient } from "./viem";
 
 const { slug, contracts } = Tenant.current();
 
@@ -241,6 +242,66 @@ export const signDelegatedAttestation = async ({
 
 // EAS v2 Governance Functions (Syndicate)
 
+async function attestWithWallet(
+  request: { schema: string; data: Required<AttestationRequest["data"]> },
+  walletClient: WalletClient
+) {
+  const { account } = walletClient;
+  if (!account) throw new Error("Wallet not connected");
+
+  const chain = contracts.token.chain;
+  const easAddress = getEASAddress(chain.id);
+  const txInputData = eas.contract.interface.encodeFunctionData("attest", [
+    request,
+  ]) as Hex;
+  let txHash: Hex | undefined;
+
+  try {
+    // Leave gas unset: the wallet must estimate its full smart-account execution.
+    txHash = await walletClient.sendTransaction({
+      account,
+      chain,
+      to: easAddress,
+      data: txInputData,
+      value: request.data.value,
+    });
+    const receipt = await getPublicClient(chain).waitForTransactionReceipt({
+      hash: txHash,
+    });
+    if (receipt.status !== "success") {
+      throw new Error("Attestation transaction reverted.");
+    }
+
+    // A successful bundler transaction can contain another account's attestation.
+    const attestation = receipt.logs
+      .filter((log) => log.address.toLowerCase() === easAddress.toLowerCase())
+      .map((log) => eas.contract.interface.parseLog(log))
+      .find(
+        (event) =>
+          event?.name === "Attested" &&
+          event.args.attester.toLowerCase() === account.address.toLowerCase() &&
+          event.args.schemaUID === request.schema &&
+          event.args.recipient.toLowerCase() ===
+            request.data.recipient.toLowerCase()
+      );
+    if (!attestation) {
+      throw new Error("Transaction did not produce the expected attestation.");
+    }
+
+    return {
+      transactionHash: attestation.args.uid as string,
+      txHash: receipt.transactionHash,
+      chainId: chain.id,
+      txInputData,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      Object.assign(error, { txHash, chainId: chain.id, txInputData });
+    }
+    throw error;
+  }
+}
+
 // Voting type constants
 export const EAS_VOTING_TYPE = {
   STANDARD: 0,
@@ -270,7 +331,7 @@ export async function createV2CreateProposalAttestation({
   endts,
   tags,
   proposal_type_uid,
-  signer,
+  walletClient,
   votingType = "standard",
   choices = [],
   maxApprovals = 1,
@@ -284,7 +345,7 @@ export async function createV2CreateProposalAttestation({
   endts: bigint;
   tags: string;
   proposal_type_uid?: string;
-  signer: JsonRpcSigner;
+  walletClient: WalletClient;
   votingType?: string;
   choices?: string[];
   maxApprovals?: number;
@@ -292,7 +353,6 @@ export async function createV2CreateProposalAttestation({
   criteriaValue?: number;
   budget?: number;
 }) {
-  eas.connect(signer as any);
   let kwargs;
   if (votingType === "approval") {
     kwargs = {
@@ -318,27 +378,22 @@ export async function createV2CreateProposalAttestation({
     { name: "kwargs", value: JSON.stringify(kwargs), type: "string" },
   ]);
 
-  const txResponse = await eas.attest({
-    schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
-    data: {
-      recipient:
-        contracts.easRecipient || "0x0000000000000000000000000000000000000000",
-      expirationTime: NO_EXPIRATION,
-      revocable: true,
-      refUID: proposal_type_uid || ZERO_BYTES32,
-      data: encodedData,
-      value: 0n,
+  return attestWithWallet(
+    {
+      schema: EAS_V2_SCHEMA_IDS.CREATE_PROPOSAL,
+      data: {
+        recipient:
+          contracts.easRecipient ||
+          "0x0000000000000000000000000000000000000000",
+        expirationTime: NO_EXPIRATION,
+        revocable: true,
+        refUID: proposal_type_uid || ZERO_BYTES32,
+        data: encodedData,
+        value: 0n,
+      },
     },
-  });
-  const txInputData = extractEasTxInputData(txResponse);
-
-  const receipt = await txResponse.wait();
-  return {
-    transactionHash: receipt,
-    txHash: getEasTransactionHash(txResponse, receipt),
-    chainId: contracts.token.chain.id,
-    txInputData,
-  };
+    walletClient
+  );
 }
 
 export { EAS_V2_SCHEMA_IDS };
@@ -346,16 +401,14 @@ export { EAS_V2_SCHEMA_IDS };
 export async function createVoteAttestation({
   choice,
   reason,
-  signer,
+  walletClient,
   proposalId,
 }: {
   choice: number; // 0 = against, 1 = for, 2 = abstain
   reason: string;
-  signer: JsonRpcSigner;
+  walletClient: WalletClient;
   proposalId: string;
 }) {
-  eas.connect(signer as any);
-
   const encodedData = v2SchemaEncoders.VOTE.encodeData([
     { name: "choice", value: choice, type: "int8" },
     { name: "reason", value: reason, type: "string" },
@@ -366,35 +419,20 @@ export async function createVoteAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
-  const txResponse = await eas.attest({
-    schema: EAS_V2_SCHEMA_IDS.VOTE[contracts.token.chain.id],
-    data: {
-      recipient,
-      expirationTime,
-      revocable,
-      refUID: proposalId,
-      data: encodedData,
-      value: 0n,
+  return attestWithWallet(
+    {
+      schema: EAS_V2_SCHEMA_IDS.VOTE[contracts.token.chain.id],
+      data: {
+        recipient,
+        expirationTime,
+        revocable,
+        refUID: proposalId,
+        data: encodedData,
+        value: 0n,
+      },
     },
-  });
-  const txInputData = extractEasTxInputData(txResponse);
-
-  const receipt = await txResponse.wait();
-
-  if (!receipt) {
-    console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
-    );
-    throw new Error("Transaction failed or was not mined.");
-  }
-
-  return {
-    transactionHash: receipt,
-    txHash: getEasTransactionHash(txResponse, receipt),
-    chainId: contracts.token.chain.id,
-    txInputData,
-  };
+    walletClient
+  );
 }
 
 /**
@@ -405,16 +443,14 @@ export async function createVoteAttestation({
 export async function createApprovalVoteAttestation({
   choices,
   reason,
-  signer,
+  walletClient,
   proposalId,
 }: {
   choices: number[];
   reason: string;
-  signer: JsonRpcSigner;
+  walletClient: WalletClient;
   proposalId: string;
 }) {
-  eas.connect(signer as any);
-
   const choiceString = choices.join(",");
 
   const encodedData = v2SchemaEncoders.ADVANCED_VOTE.encodeData([
@@ -427,38 +463,24 @@ export async function createApprovalVoteAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
-  const txResponse = await eas.attest({
-    schema:
-      EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
-        contracts.token.chain.id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
-      ],
-    data: {
-      recipient,
-      expirationTime,
-      revocable,
-      refUID: proposalId,
-      data: encodedData,
-      value: 0n,
+  return attestWithWallet(
+    {
+      schema:
+        EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
+          contracts.token.chain
+            .id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
+        ],
+      data: {
+        recipient,
+        expirationTime,
+        revocable,
+        refUID: proposalId,
+        data: encodedData,
+        value: 0n,
+      },
     },
-  });
-  const txInputData = extractEasTxInputData(txResponse);
-
-  const receipt = await txResponse.wait();
-
-  if (!receipt) {
-    console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
-    );
-    throw new Error("Transaction failed or was not mined.");
-  }
-
-  return {
-    transactionHash: receipt,
-    txHash: getEasTransactionHash(txResponse, receipt),
-    chainId: contracts.token.chain.id,
-    txInputData,
-  };
+    walletClient
+  );
 }
 
 /**
@@ -468,15 +490,13 @@ export async function createApprovalVoteAttestation({
  */
 export async function createOptimisticVoteAttestation({
   reason,
-  signer,
+  walletClient,
   proposalId,
 }: {
   reason: string;
-  signer: JsonRpcSigner;
+  walletClient: WalletClient;
   proposalId: string;
 }) {
-  eas.connect(signer as any);
-
   const choiceString = "0"; // 0 = AGAINST/VETO
 
   const encodedData = v2SchemaEncoders.ADVANCED_VOTE.encodeData([
@@ -489,36 +509,22 @@ export async function createOptimisticVoteAttestation({
   const expirationTime = NO_EXPIRATION;
   const revocable = false;
 
-  const txResponse = await eas.attest({
-    schema:
-      EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
-        contracts.token.chain.id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
-      ],
-    data: {
-      recipient,
-      expirationTime,
-      revocable,
-      refUID: proposalId,
-      data: encodedData,
-      value: 0n,
+  return attestWithWallet(
+    {
+      schema:
+        EAS_V2_SCHEMA_IDS.ADVANCED_VOTE[
+          contracts.token.chain
+            .id as keyof typeof EAS_V2_SCHEMA_IDS.ADVANCED_VOTE
+        ],
+      data: {
+        recipient,
+        expirationTime,
+        revocable,
+        refUID: proposalId,
+        data: encodedData,
+        value: 0n,
+      },
     },
-  });
-  const txInputData = extractEasTxInputData(txResponse);
-
-  const receipt = await txResponse.wait();
-
-  if (!receipt) {
-    console.error(
-      "Transaction failed or was not mined. Full response:",
-      receipt
-    );
-    throw new Error("Transaction failed or was not mined.");
-  }
-
-  return {
-    transactionHash: receipt,
-    txHash: getEasTransactionHash(txResponse, receipt),
-    chainId: contracts.token.chain.id,
-    txInputData,
-  };
+    walletClient
+  );
 }
