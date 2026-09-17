@@ -1,5 +1,6 @@
 import { useAccount, useWalletClient } from "wagmi";
 import { useMutation } from "@tanstack/react-query";
+import { BrowserProvider } from "ethers";
 import {
   createV2CreateProposalAttestation,
   createApprovalVoteAttestation,
@@ -66,6 +67,23 @@ export function useEASV2() {
   const { ui, contracts } = Tenant.current();
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+
+  const getSigner = async () => {
+    if (!walletClient) {
+      throw new Error("Wallet not connected");
+    }
+    return await new BrowserProvider({
+      request: ({ method, params }) => {
+        if (method === "eth_sendTransaction" && Array.isArray(params)) {
+          // Let the wallet budget gas for its execution path (e.g. a 7702 UserOp).
+          const transaction = { ...params[0] };
+          delete transaction.gas;
+          params = [transaction];
+        }
+        return walletClient.transport.request({ method, params });
+      },
+    }).getSigner();
+  };
 
   const runMiradorTrace = async <T extends TraceableEasResult>({
     name,
@@ -173,6 +191,7 @@ export function useEASV2() {
           if (!walletClient || !isEASV2Enabled) {
             throw new Error("EAS v2 not enabled or wallet not connected");
           }
+          const signer = await getSigner();
           return createV2CreateProposalAttestation({
             title,
             description,
@@ -180,7 +199,7 @@ export function useEASV2() {
             endts,
             tags,
             proposal_type_uid,
-            walletClient,
+            signer,
             votingType: "standard",
           });
         },
@@ -239,6 +258,7 @@ export function useEASV2() {
           if (!walletClient || !isEASV2Enabled) {
             throw new Error("EAS v2 not enabled or wallet not connected");
           }
+          const signer = await getSigner();
           return createV2CreateProposalAttestation({
             title,
             description,
@@ -246,7 +266,7 @@ export function useEASV2() {
             endts,
             tags,
             proposal_type_uid,
-            walletClient,
+            signer,
             votingType,
             choices,
             maxApprovals,
@@ -291,10 +311,11 @@ export function useEASV2() {
           if (!walletClient || !isEASV2Enabled) {
             throw new Error("EAS v2 not enabled or wallet not connected");
           }
+          const signer = await getSigner();
           return createVoteAttestation({
             choice,
             reason,
-            walletClient,
+            signer,
             proposalId,
           });
         },
@@ -334,10 +355,11 @@ export function useEASV2() {
           if (!walletClient || !isEASV2Enabled) {
             throw new Error("EAS v2 not enabled or wallet not connected");
           }
+          const signer = await getSigner();
           return createApprovalVoteAttestation({
             choices,
             reason,
-            walletClient,
+            signer,
             proposalId,
           });
         },
@@ -374,9 +396,10 @@ export function useEASV2() {
           if (!walletClient || !isEASV2Enabled) {
             throw new Error("EAS v2 not enabled or wallet not connected");
           }
+          const signer = await getSigner();
           return createOptimisticVoteAttestation({
             reason,
-            walletClient,
+            signer,
             proposalId,
           });
         },
