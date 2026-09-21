@@ -72,7 +72,17 @@ export function useEASV2() {
     if (!walletClient) {
       throw new Error("Wallet not connected");
     }
-    return await new BrowserProvider(walletClient.transport as any).getSigner();
+    return await new BrowserProvider({
+      request: ({ method, params }) => {
+        if (method === "eth_sendTransaction" && Array.isArray(params)) {
+          // Let the wallet budget gas for its execution path (e.g. a 7702 UserOp).
+          const transaction = { ...params[0] };
+          delete transaction.gas;
+          params = [transaction];
+        }
+        return walletClient.transport.request({ method, params });
+      },
+    }).getSigner();
   };
 
   const runMiradorTrace = async <T extends TraceableEasResult>({
