@@ -1,4 +1,4 @@
-## Getting Started
+# Agora Next
 
 1. Git clone this repo
 
