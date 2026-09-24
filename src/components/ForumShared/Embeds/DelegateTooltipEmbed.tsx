@@ -11,6 +11,8 @@ import { formatNumber } from "@/lib/tokenUtils";
 
 type DelegateEmbedData = {
   address: string;
+  username?: string;
+  avatar?: string;
   votingPower: string;
   votingPowerRaw?: string;
   delegatorsCount: number;
@@ -42,6 +44,7 @@ export default function DelegateTooltipEmbed({
   });
 
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   if (isLoading) {
     return (
@@ -86,6 +89,8 @@ export default function DelegateTooltipEmbed({
         <div className="flex flex-col items-stretch p-7 gap-4 [&_a]:no-underline [&_a]:hover:no-underline">
           <DelegateProfileImageWithMetadata
             address={data.address}
+            username={data.username}
+            avatar={data.avatar}
             votingPower={votingPowerRaw.toString()}
             endorsed={false}
             description={sanitizedStatement}
@@ -95,15 +100,15 @@ export default function DelegateTooltipEmbed({
 
         <div className="flex flex-col p-7 border-t border-line gap-4">
           <PanelRow
-            title="Voting power"
+            title={copy.delegates.table.votingPower}
             detail={formatNumber(votingPowerRaw)}
           />
           <PanelRow
-            title="Delegated addresses"
+            title={copy.delegates.table.delegators}
             detail={data.delegatorsCount.toString()}
           />
           <PanelRow
-            title="Proposals created"
+            title={`${copy.proposals.tabTitle} created`}
             detail={data.proposalsCreated.toString()}
           />
           {data.voteStats &&

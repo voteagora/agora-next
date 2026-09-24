@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RelatedItem, PostType } from "../types";
 import { RelatedItemsSection } from "./RelatedItemsSection";
+import Tenant from "@/lib/tenant/tenant";
 
 interface RelatedItemsCardProps {
   postType: PostType;
@@ -25,6 +26,8 @@ export function RelatedItemsCard({
   onRemoveRelatedTempCheck,
   onRemoveCard,
 }: RelatedItemsCardProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const showTempChecks = postType === "gov-proposal";
   const hasSelectedItems =
     relatedDiscussions.length > 0 || relatedTempChecks.length > 0;
@@ -34,7 +37,7 @@ export function RelatedItemsCard({
       <CardContent className="mt-4">
         <div className="space-y-6">
           <RelatedItemsSection
-            label="Related Discussions"
+            label={copy.create.relatedDiscussions}
             items={relatedDiscussions}
             onAdd={onAddRelatedDiscussion}
             onRemove={onRemoveRelatedDiscussion}
@@ -47,7 +50,7 @@ export function RelatedItemsCard({
             <div className="border-t my-6 -mx-6" />
             <div className="space-y-6">
               <RelatedItemsSection
-                label="Related Temp Check"
+                label={copy.create.relatedTempCheck}
                 items={relatedTempChecks}
                 onAdd={onAddRelatedTempCheck}
                 onRemove={onRemoveRelatedTempCheck}

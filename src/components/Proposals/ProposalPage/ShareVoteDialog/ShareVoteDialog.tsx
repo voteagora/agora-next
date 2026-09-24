@@ -1,6 +1,8 @@
 import { ArrowDownToLine, Copy } from "lucide-react";
 import warpcastIcon from "@/icons/warpcast.svg";
 import xIcon from "@/icons/x.svg";
+import linkedinIcon from "@/icons/linkedin.svg";
+import instagramIcon from "@/icons/instagram.svg";
 import { cn } from "@/lib/utils";
 import Tenant from "@/lib/tenant/tenant";
 import { Button } from "@/components/ui/button";
@@ -308,7 +310,13 @@ export function ShareDialog({
   }
 
   const trackShareVote = (
-    type: "X" | "COPY_LINK" | "DOWNLOAD_IMAGE" | "WARPCAST"
+    type:
+      | "X"
+      | "COPY_LINK"
+      | "DOWNLOAD_IMAGE"
+      | "WARPCAST"
+      | "LINKEDIN"
+      | "INSTAGRAM"
   ) => {
     trackEvent({
       event_name: ANALYTICS_EVENT_NAMES.SHARE_VOTE,
@@ -318,6 +326,27 @@ export function ShareDialog({
         type,
       },
     });
+  };
+
+  const shareImageFilename = `${namespace}-${proposalTitle}-vote.png`;
+
+  const fetchShareImageBlob = async () => {
+    const stringifiedOptions = JSON.stringify(options);
+    const response = await fetch(
+      `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${supportType}&blockNumber=${blockNumberToUse}&voteDate=${voteDateToUse}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`
+    );
+    return response.blob();
+  };
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   };
 
   return (
@@ -389,24 +418,86 @@ export function ShareDialog({
             />
             Share on X
           </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 font-semibold text-sm sm:text-base"
+            onClick={() => {
+              window.open(
+                `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(text)}`,
+                "_blank"
+              );
+              trackShareVote("LINKEDIN");
+            }}
+          >
+            <Image
+              height={20}
+              width={20}
+              className="w-5 h-5"
+              src={linkedinIcon.src}
+              alt="LinkedIn icon"
+            />
+            Share on LinkedIn
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 font-semibold text-sm sm:text-base"
+            onClick={async () => {
+              // Instagram has no web share intent. Use the native share sheet with the
+              // image when the browser supports sharing files; otherwise download the
+              // image, copy the caption, and open Instagram so the user can post manually.
+              // Support is probed synchronously so the fallback tab opens inside the click
+              // gesture and is not popup-blocked.
+              const probe = new File([], shareImageFilename, {
+                type: "image/png",
+              });
+              const canShareFiles =
+                typeof navigator.canShare === "function" &&
+                navigator.canShare({ files: [probe] });
+
+              if (!canShareFiles) {
+                window.open("https://www.instagram.com/", "_blank");
+                navigator.clipboard.writeText(text).catch(() => {});
+              }
+
+              try {
+                const blob = await fetchShareImageBlob();
+                if (canShareFiles) {
+                  const file = new File([blob], shareImageFilename, {
+                    type: "image/png",
+                  });
+                  await navigator.share({
+                    files: [file],
+                    text: textWithoutLinkForWarpcast,
+                  });
+                } else {
+                  downloadBlob(blob, shareImageFilename);
+                }
+              } catch (error) {
+                if ((error as DOMException)?.name !== "AbortError") {
+                  console.error("Error sharing to Instagram:", error);
+                }
+              }
+              trackShareVote("INSTAGRAM");
+            }}
+          >
+            <Image
+              height={20}
+              width={20}
+              className="w-5 h-5"
+              src={instagramIcon.src}
+              alt="Instagram icon"
+            />
+            Share on Instagram
+          </Button>
           <Button
             variant="link"
             className="w-full justify-center gap-2 text-secondary font-semibold text-sm sm:text-base"
             onClick={async () => {
               try {
-                const stringifiedOptions = JSON.stringify(options);
-                const response = await fetch(
-                  `/api/images/og/share-my-vote?namespace=${namespace.toUpperCase()}&supportType=${supportType}&blockNumber=${blockNumberToUse}&voteDate=${voteDateToUse}&endsIn=${endsIn}&forPercentage=${forPercentage}&againstPercentage=${againstPercentage}&proposalType=${proposal.proposalType}&options=${stringifiedOptions}&totalOptions=${totalOptions}`
-                );
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `${namespace}-${proposalTitle}-vote.png`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
+                const blob = await fetchShareImageBlob();
+                downloadBlob(blob, shareImageFilename);
               } catch (error) {
                 console.error("Error downloading image:", error);
               }

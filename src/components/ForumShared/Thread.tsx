@@ -2,10 +2,10 @@
 
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import ENSAvatar from "@/components/shared/ENSAvatar";
-import ENSName from "@/components/shared/ENSName";
+import ForumAuthorAvatar from "@/components/ForumShared/ForumAuthorAvatar";
 import { ForumPost } from "@/lib/forumUtils";
 import ForumAdminBadge from "@/components/Forum/ForumAdminBadge";
+import ForumAuthorName from "@/components/Forum/ForumAuthorName";
 
 import { useAccount } from "wagmi";
 import { useForum, useForumAdmin } from "@/hooks/useForum";
@@ -28,6 +28,7 @@ import { convertFileToAttachmentData } from "@/lib/fileUtils";
 import toast from "react-hot-toast";
 import { useHasPermission } from "@/hooks/useRbacPermissions";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import Tenant from "@/lib/tenant/tenant";
 
 export interface ThreadProps {
   comments: ForumPost[];
@@ -85,6 +86,7 @@ const CommentItem = ({
 }: CommentItemProps) => {
   // Replies are always shown (no expand/collapse toggle)
   const { address } = useAccount();
+  const { ui } = Tenant.current();
   const { deletePost, restorePost } = useForum();
   const openDialog = useOpenDialog();
   const { isAdmin, canManageTopics } = useForumAdmin(categoryId || undefined);
@@ -128,9 +130,11 @@ const CommentItem = ({
     ? adminAddressSet.has(authorAddress)
     : false;
   const adminLabel = adminRole || undefined;
-  const profileHref = comment.author
-    ? `/delegates/${encodeURIComponent(comment.author)}`
-    : null;
+  const isDeletedUser = !!comment.isAuthorDeleted;
+  const profileHref =
+    comment.author && !isDeletedUser
+      ? `/delegates/${encodeURIComponent(comment.author)}`
+      : null;
   const profileLabel = comment.author
     ? `View profile for ${comment.author}`
     : "View profile";
@@ -243,10 +247,18 @@ const CommentItem = ({
               aria-label={profileLabel}
               className="inline-flex rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black"
             >
-              <ENSAvatar ensName={comment.author} size={avatarSize} />
+              <ForumAuthorAvatar
+                address={comment.author}
+                avatar={comment.authorAvatar}
+                size={avatarSize}
+              />
             </Link>
           ) : (
-            <ENSAvatar ensName={comment.author} size={avatarSize} />
+            <ForumAuthorAvatar
+              address={isDeletedUser ? undefined : comment.author}
+              avatar={isDeletedUser ? undefined : comment.authorAvatar}
+              size={avatarSize}
+            />
           )}
         </div>
         {hasReplies && forForums && (
@@ -264,18 +276,26 @@ const CommentItem = ({
                   aria-label={profileLabel}
                   className="text-sm font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-black rounded font-medium text-sm text-primary"
                 >
-                  {isAuthorAdmin ? (
+                  {isAuthorAdmin && !ui.isNgo ? (
                     "Cowrie"
                   ) : (
-                    <ENSName address={comment.author || ""} />
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      displayName={comment.authorDisplayName}
+                      isDeleted={isDeletedUser}
+                    />
                   )}
                 </Link>
               ) : (
                 <span className="text-sm font-medium text-primary">
-                  {isAuthorAdmin ? (
+                  {isAuthorAdmin && !ui.isNgo ? (
                     "Cowrie"
                   ) : (
-                    <ENSName address={comment.author || ""} />
+                    <ForumAuthorName
+                      address={comment.author || ""}
+                      displayName={comment.authorDisplayName}
+                      isDeleted={isDeletedUser}
+                    />
                   )}
                 </span>
               )}

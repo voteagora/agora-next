@@ -41,6 +41,7 @@ import TiersSettings from "@/app/proposals/draft/components/TiersSettings";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
 
 const { ui } = Tenant.current();
+const copy = ui.copy;
 const offchainProposals = ui.toggle("proposals/offchain")?.enabled;
 
 const DraftFormClient = ({
@@ -182,7 +183,7 @@ const DraftFormClient = ({
               <div className="relative">
                 <SelectInput
                   control={control}
-                  label="Proposal type"
+                  label={copy.proposals.proposalTypeLabel}
                   required={true}
                   options={validProposalTypes.map((typeConfig) => ({
                     label: `${typeConfig.name} (${typeConfig.quorum / 100}% Quorum, ${typeConfig.approval_threshold / 100}% Approval)`,
@@ -195,7 +196,9 @@ const DraftFormClient = ({
 
               {(selectedProposalType?.scopes?.length || 0) > 0 && (
                 <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium">Scopes</span>
+                  <span className="text-sm font-medium">
+                    {copy.proposals.scopesLabel}
+                  </span>
                   {selectedProposalType?.scopes?.map((scope) => (
                     <div
                       key={scope.scope_key}
@@ -208,16 +211,17 @@ const DraftFormClient = ({
               )}
               <TiersSettings form={methods} />
               <TextInput
-                label="Title"
+                label={copy.proposals.titleLabel}
                 name="title"
                 required={true}
                 control={methods.control}
               />
               <MarkdownTextareaInput
                 control={methods.control}
-                label="Description"
+                label={copy.proposals.descriptionLabel}
                 required={true}
                 name="abstract"
+                placeholder={copy.proposals.draftBodyPlaceholder}
               />
             </div>
           </FormCard.Section>
@@ -248,7 +252,9 @@ const DraftFormClient = ({
                 isLoading={isPending}
                 onClick={handleSubmit(onSubmit)}
               >
-                {draftProposal.title ? "Update draft" : "Create draft"}
+                {draftProposal.title
+                  ? copy.proposals.updateDraftButton
+                  : copy.proposals.createDraftButton}
               </UpdatedButton>
             </div>
           </FormCard.Section>

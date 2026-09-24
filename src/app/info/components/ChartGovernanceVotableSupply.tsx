@@ -25,7 +25,8 @@ interface Props {
 
 const ChartGovernanceVotableSupply = ({ getData }: Props) => {
   const { primary, gradient } = useTenantColorScheme();
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
+  const copy = ui.copy;
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
     FREQUENCY_FILTERS.YEAR
@@ -111,7 +112,7 @@ const ChartGovernanceVotableSupply = ({ getData }: Props) => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-semibold text-gray-4f">
-            Total Votable Supply
+            {copy.info.governanceCharts.totalVotableSupply}
           </p>
         </div>
 
@@ -124,13 +125,17 @@ const ChartGovernanceVotableSupply = ({ getData }: Props) => {
 export default ChartGovernanceVotableSupply;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const copy = Tenant.current().ui.copy;
+
   if (active && payload && payload.length) {
     return (
       <div className="bg-white border border-gray-200 p-4 rounded shadow-lg">
         <p className="text-xs font-medium text-gray-4f">{`${label}`}</p>
         <div className="flex flex-row gap-1 justify-center items-center text-center mt-4">
           <p className="text-xs font-medium text-gray-4f ">
-            <span className="pr-10">All Delegates</span>
+            <span className="pr-10">
+              {copy.info.governanceCharts.allRepresentatives}
+            </span>
             <TokenAmountDecorated amount={payload[0].value} />
           </p>
         </div>

@@ -1,5 +1,31 @@
-import { DelegateStatement } from "@/app/api/delegateStatement/delegateStatement";
 import { Prisma } from "@prisma/client";
+
+export type DelegateStatement = {
+  address?: string;
+  username?: string | null;
+  avatar?: string | null;
+  dao_slug?: string;
+  message_hash?: string;
+  signature?: string;
+  payload: {
+    delegateStatement?: string;
+    topIssues?: { type: string; value: string }[];
+    topStakeholders?: { type: string; value?: string }[];
+    [key: string]: unknown;
+  };
+  twitter?: string | null;
+  warpcast?: string | null;
+  discord?: string | null;
+  scw_address?: string | null;
+  endorsed?: boolean;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  created_at?: Date | null;
+  updated_at?: Date | null;
+  created_at_ts?: Date | null;
+  updated_at_ts?: Date | null;
+  stage?: string | null;
+};
 
 export type Delegate = {
   address: string;
@@ -42,18 +68,6 @@ export type DelegatesGetPayload = {
   advanced_vp: Prisma.Decimal;
   voting_power: Prisma.Decimal;
   statement: DelegateStatement;
-};
-
-type DelegateStatement = {
-  created_at: Date;
-  discord: string | null;
-  endorsed: boolean;
-  payload: { delegateStatement: string };
-  signature: string;
-  twitter: string | null;
-  updated_at: Date;
-  warpcast: string | null;
-  scw_address: string | null;
 };
 
 export type DelegateStats = {

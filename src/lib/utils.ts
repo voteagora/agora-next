@@ -511,6 +511,9 @@ export const getTransportForChain = (chainId: number) => {
     // base
     case 8453:
       return rpcTransport();
+    // base sepolia
+    case 84532:
+      return rpcTransport();
     // arbitrum one
     case 42161:
       return rpcTransport();

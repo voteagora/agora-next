@@ -88,10 +88,13 @@ const DelegateCardWrapper = async ({
 };
 
 export const DelegateCardLoadingState = () => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <div>
       <div className="flex flex-row justify-between items-center">
-        <h1 className="text-primary font-bold">Delegates</h1>
+        <h1 className="text-primary font-bold">{copy.delegates.pageTitle}</h1>
         <div className="flex flex-row gap-2 mt-3 md:mt-0">
           <span className="hidden md:block w-[42px] md:w-[228px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
           <span className="block w-[42px] md:w-[115px] h-[42px] rounded-md bg-tertiary/10 animate-pulse"></span>
