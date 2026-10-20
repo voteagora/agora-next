@@ -295,6 +295,7 @@ export type TenantCopy = {
     approveTransaction: string;
     reflectDelay: string;
     statementRequiresGas: string;
+    zeroVpSnapshotNotice: string;
     freeVoting: string;
     shareVote: string;
     votedAgo: (ago: string) => string;
@@ -671,6 +672,8 @@ Discourse username:`,
     reflectDelay:
       "It might take up to a minute for the changes to be reflected.",
     statementRequiresGas: "Voter statements require gas fees.",
+    zeroVpSnapshotNotice:
+      "Voting power is snapshotted when voting starts. You held no voting power at that moment, so your vote will be recorded onchain but will not count toward the outcome.",
     freeVoting: "Voting on Agora is free!",
     shareVote: "Share your vote",
     votedAgo: (ago) => `You voted for this proposal ${ago} ago`,

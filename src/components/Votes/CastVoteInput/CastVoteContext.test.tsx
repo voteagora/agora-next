@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import CastVoteContextProvider, { useCastVoteContext } from "./CastVoteContext";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { useEthBalance } from "@/hooks/useEthBalance";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 import useSponsoredVoting from "@/hooks/useSponsoredVoting";
 import useStandardVoting from "@/hooks/useStandardVoting";
 import React from "react";
@@ -65,6 +66,7 @@ vi.mock(import("react"), async (importOriginal) => {
 });
 
 vi.mock("@/hooks/useEthBalance");
+vi.mock("@/hooks/useTokenBalance");
 vi.mock("@/hooks/useSponsoredVoting");
 vi.mock("@/hooks/useStandardVoting");
 vi.mock("@/hooks/useAdvancedVoting");
@@ -192,6 +194,12 @@ describe("CastVoteContext - minVPToUseGasRelay", () => {
       directVP: "0",
       advancedVP: "0",
     };
+    // Default: voter holds no tokens, so eligibility depends on VP alone.
+    vi.mocked(useTokenBalance).mockReturnValue({
+      data: 0n,
+      isFetching: false,
+      isFetched: true,
+    } as any);
   });
 
   afterEach(() => {
@@ -373,6 +381,81 @@ describe("CastVoteContext - minVPToUseGasRelay", () => {
       );
 
       (window as any).__setFallbackToStandardVote(true);
+
+      expect(screen.getByTestId("canUseGasRelay").textContent).toBe("false");
+    });
+  });
+
+  describe("Gas relay eligibility based on token balance", () => {
+    const zeroVotingPower = {
+      totalVP: "0",
+      directVP: "0",
+      advancedVP: "0",
+    };
+
+    const renderWithZeroVp = () =>
+      render(
+        <CastVoteContextProvider
+          proposal={mockProposal as any}
+          votes={mockVotes}
+          chains={mockChains}
+          votingPower={zeroVotingPower}
+        >
+          <TestComponent />
+        </CastVoteContextProvider>
+      );
+
+    beforeEach(() => {
+      mockTenantConfig.sponsoredVote.config.minVPToUseGasRelay = "0";
+      vi.mocked(useEthBalance).mockReturnValue({
+        data: BigInt("200000000000000000"),
+      } as any);
+      vi.mocked(useSponsoredVoting).mockReturnValue({
+        write: {
+          name: "sponsoredVoting",
+          write: () => {},
+        },
+      } as any);
+      vi.mocked(useStandardVoting).mockReturnValue({
+        write: {
+          name: "standardVoting",
+          write: () => {},
+        },
+      } as any);
+    });
+
+    it("should enable gas relay for a token holder with 0 snapshot voting power", () => {
+      vi.mocked(useTokenBalance).mockReturnValue({
+        data: 1n,
+        isFetching: false,
+        isFetched: true,
+      } as any);
+
+      renderWithZeroVp();
+
+      expect(screen.getByTestId("canUseGasRelay").textContent).toBe("true");
+    });
+
+    it("should disable gas relay when the voter has 0 voting power and holds no tokens", () => {
+      vi.mocked(useTokenBalance).mockReturnValue({
+        data: 0n,
+        isFetching: false,
+        isFetched: true,
+      } as any);
+
+      renderWithZeroVp();
+
+      expect(screen.getByTestId("canUseGasRelay").textContent).toBe("false");
+    });
+
+    it("should not enable gas relay while the token balance is still loading", () => {
+      vi.mocked(useTokenBalance).mockReturnValue({
+        data: undefined,
+        isFetching: true,
+        isFetched: false,
+      } as any);
+
+      renderWithZeroVp();
 
       expect(screen.getByTestId("canUseGasRelay").textContent).toBe("false");
     });

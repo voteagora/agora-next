@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import Image from "next/image";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { format, formatDistanceToNow } from "date-fns";
-import { formatEther } from "viem";
 import { useAccount } from "wagmi";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,8 @@ import Tenant from "@/lib/tenant/tenant";
 import { icons } from "@/icons/icons";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { isGasRelayEligible } from "@/lib/gasRelayUtils";
 import {
   Tooltip,
   TooltipContent,
@@ -173,26 +174,41 @@ function CastVoteInputContent({
     enabled: isGasRelayEnabled,
     address: gasRelayConfig?.sponsorAddress,
   });
+  const { address: voterAddress } = useAccount();
+  const { data: tokenBalance } = useTokenBalance(
+    isGasRelayEnabled ? voterAddress : undefined
+  );
 
-  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough VP
+  // Gas relay is only LIVE when it is enabled in the settings, the sponsor
+  // meets minimum eth requirements, and the voter has enough snapshot VP or
+  // currently holds enough of the token.
   const isGasRelayLive =
-    isGasRelayEnabled &&
-    Number(formatEther(sponsorBalance || 0n)) >=
-      Number(gasRelayConfig.minBalance) &&
-    Number(votingPower?.totalVP ?? "0") >
-      Number(gasRelayConfig?.minVPToUseGasRelay) &&
-    !reason;
+    isGasRelayEligible({
+      enabled: isGasRelayEnabled,
+      sponsorBalance,
+      minBalance: gasRelayConfig?.minBalance,
+      totalVP: votingPower?.totalVP,
+      tokenBalance,
+      minVPToUseGasRelay: gasRelayConfig?.minVPToUseGasRelay,
+    }) && !reason;
 
   // Voting with a reason cannot be sponsored (the relay only supports
   // castVoteBySig), so a voter with no ETH at all would only hit an
   // "insufficient funds" error. Hide the reason input for them instead.
-  const { address: voterAddress } = useAccount();
   const { data: voterBalance } = useEthBalance({
     enabled: isGasRelayEnabled && !!voterAddress,
     address: voterAddress as `0x${string}`,
   });
   const showReasonInput =
     proposal.status === "ACTIVE" && !(isGasRelayEnabled && voterBalance === 0n);
+
+  // Voter holds the token today but had no voting power at the proposal
+  // snapshot (e.g. received tokens after voting started). Their vote is
+  // recorded onchain with zero weight, so explain why before they cast it.
+  const hasZeroSnapshotVP =
+    !!votingPower && BigInt(votingPower.totalVP || "0") === 0n;
+  const showZeroVpSnapshotNotice =
+    hasZeroSnapshotVP && tokenBalance !== undefined && tokenBalance > 0n;
 
   return (
     <div className="flex flex-col flex-shrink rounded-b-lg">
@@ -204,6 +220,12 @@ function CastVoteInputContent({
             <div className="px-4 pb-3 pt-1">
               {!isLoading && (
                 <div className="flex flex-col gap-2">
+                  {showZeroVpSnapshotNotice && (
+                    <div className="flex items-start gap-2 text-xs text-secondary font-medium bg-wash border border-line rounded-lg px-3 py-2 mt-3">
+                      <InformationCircleIcon className="w-4 h-4 shrink-0 mt-[1px]" />
+                      <span>{copy.voting.zeroVpSnapshotNotice}</span>
+                    </div>
+                  )}
                   {showReasonInput && (
                     <textarea
                       placeholder={copy.voting.reasonPlaceholder}
