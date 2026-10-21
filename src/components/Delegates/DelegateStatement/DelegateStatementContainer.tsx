@@ -6,6 +6,7 @@ import DelegateStatement from "./DelegateStatement";
 import { Delegate } from "@/app/api/common/delegates/delegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { useEffect, useRef } from "react";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   delegate: Delegate;
@@ -14,6 +15,8 @@ interface Props {
 export default function DelegateStatementContainer({ delegate }: Props) {
   const { isConnected } = useAgoraContext();
   const { address } = useAccount();
+  const copy = Tenant.current().ui.copy;
+  const statementTitle = copy.delegates.statement.title;
   const showSuccessMessage = useDelegateStatementStore(
     (state) => state.showSaveSuccess
   );
@@ -69,11 +72,9 @@ export default function DelegateStatementContainer({ delegate }: Props) {
       )}
       {!delegateStatement && (
         <div className="flex flex-col gap-2">
-          <h2 className="text-2xl font-bold text-primary">
-            Delegate Statement
-          </h2>
+          <h2 className="text-2xl font-bold text-primary">{statementTitle}</h2>
           <p className="break-words p-8 text-center text-secondary align-middle bg-wash rounded-xl shadow-newDefault border border-line">
-            No delegate statement for {delegate.address}
+            No {statementTitle.toLowerCase()} for {delegate.address}
           </p>
           {isConnected && address === delegate.address && (
             <p className="my-3">
@@ -83,7 +84,7 @@ export default function DelegateStatementContainer({ delegate }: Props) {
                 className="underline"
                 href="/delegates/create"
               >
-                Create your delegate statement
+                Create your {statementTitle.toLowerCase()}
               </a>
             </p>
           )}

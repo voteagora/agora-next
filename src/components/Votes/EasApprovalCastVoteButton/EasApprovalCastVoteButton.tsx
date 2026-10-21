@@ -2,7 +2,7 @@
 
 import { VStack, HStack } from "@/components/Layout/Stack";
 import { Button } from "@/components/ui/button";
-import { useModal } from "connectkit";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import { Proposal } from "@/app/api/common/proposals/proposal";
@@ -95,7 +95,7 @@ function VoteButton({
   votes: Vote[] | null;
 }) {
   const { isConnected } = useAgoraContext();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
 
   if (hasVoted) {
     return (
@@ -113,7 +113,7 @@ function VoteButton({
 
   if (!isConnected) {
     return (
-      <Button variant={"outline"} onClick={() => setOpen(true)}>
+      <Button variant={"outline"} onClick={() => openConnectModal()}>
         Connect wallet to vote
       </Button>
     );

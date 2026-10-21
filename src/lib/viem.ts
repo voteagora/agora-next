@@ -9,6 +9,7 @@ import {
   arbitrum,
   arbitrumSepolia,
   base,
+  baseSepolia,
   bsc,
   cyber,
   mainnet,
@@ -147,6 +148,8 @@ export const getChainById = (chainId: number): Chain | null => {
       return arbitrumSepolia;
     case base.id:
       return base;
+    case baseSepolia.id:
+      return baseSepolia;
     case bsc.id:
       return bsc;
     default:

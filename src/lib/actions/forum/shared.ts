@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { surveyDefinitionSchema } from "./surveySchemas";
 
 const authFields = {
   address: z.string().min(1, "Address is required"),
@@ -11,6 +12,7 @@ export const createTopicSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   categoryId: z.number().optional(),
+  survey: surveyDefinitionSchema.optional(),
   ...authFields,
 });
 

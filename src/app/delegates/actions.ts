@@ -124,6 +124,8 @@ export async function submitDelegateStatement({
   });
 
   revalidateDelegateAddressPage(address.toLowerCase());
+  // cachedFetchDelegateStatement is tagged so it can be busted on save
+  revalidateTag("delegateStatement", { expire: 0 });
   revalidatePath("/delegates/create", "page");
   return response;
 }

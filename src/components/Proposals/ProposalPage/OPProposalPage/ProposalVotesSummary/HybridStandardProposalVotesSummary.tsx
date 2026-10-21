@@ -29,7 +29,8 @@ import {
 } from "@/components/ui/hover-card";
 import { HybridStandardVotesSummaryTooltip } from "./HybridStandardVotesSummaryTooltip";
 
-const { token } = Tenant.current();
+const { token, ui } = Tenant.current();
+const copy = ui.copy;
 
 const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   const proposalResults =
@@ -67,7 +68,7 @@ const HybridStandardVotesGroup = ({ proposal }: { proposal: Proposal }) => {
   if (proposal.proposalType === "HYBRID_STANDARD") {
     voteGroups = [
       {
-        name: "Delegates",
+        name: copy.delegates.pageTitle,
         forVotes: formatNumber(
           (proposalResults?.DELEGATES?.for || "0").toString()
         ),

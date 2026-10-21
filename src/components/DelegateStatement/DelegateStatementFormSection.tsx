@@ -14,6 +14,7 @@ export default function DelegateStatementFormSection({
 }) {
   const delegateStatement = useWatch({ name: "delegateStatement" });
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   const templateLink = ui.link("delegate-statement-template");
 
@@ -24,18 +25,14 @@ export default function DelegateStatementFormSection({
   };
 
   // Keep this value multiline
-  const defaultValue = `A brief intro to yourself:
-
-A message to the community and ecosystem:
-
-Discourse username:`;
+  const defaultValue = copy.delegates.statement.defaultPlaceholder;
 
   return (
     <div className="flex flex-col py-8 px-6 border-b border-line text-primary">
       <Tabs defaultValue="write">
         <div className="flex flex-row gap-4 justify-between items-baseline">
           <div className="flex flex-row items-baseline gap-2">
-            <h3 className="font-bold">Delegate statement</h3>
+            <h3 className="font-bold">{copy.delegates.statement.title}</h3>
             {templateLink && (
               <a href={templateLink.url} rel="noreferrer" target="_blank">
                 <p className="text-sm opacity-50">{templateLink.title}</p>

@@ -10,6 +10,7 @@ export default function DelegateStatement({ statement }) {
   const [shouldShowButton, setShouldShowButton] = useState(false);
   const contentRef = useRef(null);
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   // Maximum height in pixels before truncation (approximately 10 lines)
   const MAX_HEIGHT = 200;
@@ -27,7 +28,9 @@ export default function DelegateStatement({ statement }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-2xl font-bold text-primary">Delegate Statement</h2>
+      <h2 className="text-2xl font-bold text-primary">
+        {copy.delegates.statement.title}
+      </h2>
       <div
         className={`relative p-4 text-secondary ${useNeutral ? "bg-neutral" : "bg-wash"} rounded-xl shadow-newDefault border border-line`}
       >

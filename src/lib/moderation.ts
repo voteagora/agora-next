@@ -40,7 +40,8 @@ export interface ModerationResult {
 }
 
 export async function moderateTextContent(
-  text: string
+  text: string,
+  options: { failOnError?: boolean } = {}
 ): Promise<ModerationResult> {
   try {
     const response = await openai.moderations.create({
@@ -51,6 +52,9 @@ export async function moderateTextContent(
     return response.results[0] as ModerationResult;
   } catch (error) {
     console.error("Error moderating text content:", error);
+    if (options.failOnError) {
+      throw error;
+    }
     // Return a safe default in case of API error
     return {
       flagged: false,

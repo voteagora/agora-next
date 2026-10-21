@@ -71,6 +71,23 @@ vi.mock("@/icons/CheckMark", () => ({
 // Mock wagmi's useAccount hook
 vi.mock("wagmi");
 
+// Mock Tenant so tests don't depend on the tenant selected via env vars
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          toggle: () => ({ enabled: false }),
+        },
+      }),
+    },
+  };
+});
+
 describe("DelegatesFilter", () => {
   // Default mock values
   const defaultMockValues = {

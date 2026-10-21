@@ -9,6 +9,7 @@ import {
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { fetchAllForAdvancedDelegation } from "@/app/delegates/actions";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
+import Tenant from "@/lib/tenant/tenant";
 
 export function AdvancedDelegateButton({
   delegate,
@@ -25,6 +26,10 @@ export function AdvancedDelegateButton({
     !!(
       isSelfDelegation || delegators?.includes(delegate.address?.toLowerCase())
     );
+  const copy = Tenant.current().ui.copy;
+  const unsupportedTarget = isSelfDelegation
+    ? copy.delegates.delegation.circularDelegationSelfTarget
+    : copy.delegates.delegation.circularDelegationDelegatorTarget;
 
   return (
     <TooltipProvider>
@@ -39,11 +44,9 @@ export function AdvancedDelegateButton({
 
         <TooltipContent>
           <p>
-            Delegating back to{" "}
-            {isSelfDelegation
-              ? "yourself"
-              : "your direct or indirect delegator"}{" "}
-            is not supported
+            {copy.delegates.delegation.circularDelegationUnsupported(
+              unsupportedTarget
+            )}
           </p>
         </TooltipContent>
       </Tooltip>
@@ -59,6 +62,7 @@ const DelegateButton = ({
   isDisabled: boolean;
 }) => {
   const openDialog = useOpenDialog();
+  const copy = Tenant.current().ui.copy;
 
   return (
     <Button
@@ -76,7 +80,7 @@ const DelegateButton = ({
         });
       }}
     >
-      Delegate
+      {copy.delegates.delegation.action}
     </Button>
   );
 };

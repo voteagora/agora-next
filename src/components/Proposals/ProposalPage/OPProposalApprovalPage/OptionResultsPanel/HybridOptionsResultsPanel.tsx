@@ -116,6 +116,7 @@ function SingleOption({
   proposal: Proposal;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const copy = Tenant.current().ui.copy;
 
   const weightedDisplayPercentage = weightedPercentage;
 
@@ -152,7 +153,7 @@ function SingleOption({
   const voteGroups = [
     getVoteData(
       "DELEGATES",
-      "Delegates",
+      copy.delegates.pageTitle,
       HYBRID_VOTE_WEIGHTS.delegates,
       eligibleVoters.delegates
     ),

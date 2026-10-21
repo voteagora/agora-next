@@ -177,6 +177,18 @@ export default class TenantTokenFactory {
           decimals: 18,
           address: "0x0000000000000000000000000000000000000000",
         };
+      case TENANT_NAMESPACES.CIVIC:
+        return {
+          name: "CIVIC",
+          symbol: "CIVIC",
+          // The Supporter Pass is an ERC-721. Its balance and voting units are
+          // whole tokens, so forum eligibility must not apply ERC-20 scaling.
+          decimals: 0,
+          address: isProd
+            ? "0x44b685edf24ff97fba0103ec7e365923a3b65f0b"
+            : "0x2d0886464a7175a6d7b10aaa6942c49232bd8d1f",
+        };
+
       default:
         throw new Error(`Invalid namespace: ${namespace}`);
     }

@@ -133,8 +133,11 @@ export function formatVotingPower(
   votingPower: bigint,
   decimals: number = 18
 ): number {
-  // Convert to number by dividing by 10^decimals
-  const divisor = BigInt(10 ** decimals);
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("Token decimals must be a non-negative integer");
+  }
+
+  const divisor = 10n ** BigInt(decimals);
   return Number(votingPower / divisor);
 }
 
@@ -151,17 +154,24 @@ export function formatVotingPowerString(
   decimals: number = 18,
   maxDecimals: number = 2
 ): string {
-  const divisor = BigInt(10 ** decimals);
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("Token decimals must be a non-negative integer");
+  }
+
+  const divisor = 10n ** BigInt(decimals);
   const wholePart = votingPower / divisor;
   const fractionalPart = votingPower % divisor;
 
-  if (fractionalPart === BigInt(0)) {
+  if (fractionalPart === 0n || decimals === 0 || maxDecimals <= 0) {
     return wholePart.toString();
   }
 
-  const fractionalDivisor = BigInt(10 ** (decimals - maxDecimals));
+  const displayedDecimals = Math.min(decimals, Math.floor(maxDecimals));
+  const fractionalDivisor = 10n ** BigInt(decimals - displayedDecimals);
   const roundedFractional = fractionalPart / fractionalDivisor;
-  const fractionalStr = roundedFractional.toString().padStart(maxDecimals, "0");
+  const fractionalStr = roundedFractional
+    .toString()
+    .padStart(displayedDecimals, "0");
 
   return `${wholePart}.${fractionalStr}`;
 }

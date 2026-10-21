@@ -19,6 +19,7 @@ export const BRAND_NAME_MAPPINGS: Record<string, string> = {
   demo: "Canopy",
   towns: "Towns Lodge",
   shape: "Structura",
+  civic: "CIVIC",
 };
 
 export default class Tenant {

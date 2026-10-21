@@ -77,8 +77,12 @@ export async function generateMetadata(
   const statement = (
     delegate.statement?.payload as { delegateStatement: string }
   )?.delegateStatement;
+  const displayName =
+    delegate.statement?.username || ensOrTruncatedAddress || address;
 
   const imgParams = [
+    delegate.statement?.avatar &&
+      `avatar=${encodeURIComponent(delegate.statement.avatar)}`,
     delegate.votingPower &&
       `votes=${encodeURIComponent(
         `${formatNumber(delegate.votingPower.total || "0")} ${token.symbol}`
@@ -88,9 +92,9 @@ export async function generateMetadata(
 
   const preview = `/api/images/og/delegate?${imgParams.join(
     "&"
-  )}&address=${ensOrTruncatedAddress}`;
-  const title = `${ensOrTruncatedAddress} on Agora`;
-  const description = `See what ${ensOrTruncatedAddress} believes and how they vote on ${token.name} governance.`;
+  )}&address=${encodeURIComponent(displayName)}`;
+  const title = `${displayName} on Agora`;
+  const description = `See what ${displayName} believes and how they vote on ${token.name} governance.`;
 
   return {
     title: title,

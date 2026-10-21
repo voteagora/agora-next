@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { PostType, postTypeOptions } from "../types";
+import Tenant from "@/lib/tenant/tenant";
 
 interface PostTypeSelectorProps {
   value: PostType;
@@ -7,6 +8,8 @@ interface PostTypeSelectorProps {
 }
 
 export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [activeIndicator, setActiveIndicator] = useState({ left: 0, width: 0 });
   const selectorRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<PostType, HTMLButtonElement | null>>({
@@ -42,7 +45,7 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
           opacity: activeIndicator.width ? 1 : 0,
         }}
       />
-      {Object.entries(postTypeOptions).map(([key, label]) => (
+      {Object.entries(postTypeOptions).map(([key]) => (
         <button
           key={key}
           ref={(el) => {
@@ -55,7 +58,7 @@ export function PostTypeSelector({ value, onChange }: PostTypeSelectorProps) {
               : "text-tertiary hover:text-secondary"
           }`}
         >
-          {label}
+          {copy.create.postTypeOptions[key as PostType]}
         </button>
       ))}
     </div>

@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Tenant from "@/lib/tenant/tenant";
+import { useRouter } from "next/navigation";
 import { useAccount } from "wagmi";
-import { useModal } from "connectkit";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import DynamicFormField from "./DynamicFormField";
+import { useConnectModal as useModal } from "@/components/providers/ConnectModalContext";
 import { useProposalActionAuth } from "@/hooks/useProposalActionAuth";
+import Tenant from "@/lib/tenant/tenant";
+import DynamicFormField from "./DynamicFormField";
 
 interface FormField {
   id: string;
@@ -109,7 +109,7 @@ function renderTextWithLinks(text: string) {
 
 export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   const { isConnected, address } = useAccount();
-  const { setOpen } = useModal();
+  const { openConnectModal } = useModal();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const grantsFollowXHandle = Tenant.current().ui.grantsFollowXHandle;
@@ -362,7 +362,7 @@ export default function GrantIntakeForm({ grant }: GrantIntakeFormProps) {
   };
 
   const handleConnectWallet = () => {
-    setOpen(true);
+    openConnectModal();
   };
 
   // Sort dynamic fields by order if available

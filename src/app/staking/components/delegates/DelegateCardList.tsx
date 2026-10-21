@@ -96,6 +96,8 @@ export default function DelegateCardList({
               <DelegateCard
                 action={"Select as delegate"}
                 address={delegate.address}
+                username={delegate.statement?.username}
+                avatar={delegate.statement?.avatar}
                 discord={discord}
                 key={delegate.address}
                 onSelect={onSelect}

@@ -22,13 +22,12 @@ export default function LogoLink() {
           <Image
             src={ui.logo}
             alt="logo"
-            width={ui.logoSize ? parseInt(ui.logoSize) : 48}
-            height={ui.logoSize ? parseInt(ui.logoSize) : 48}
-            className={
-              ui.logoSize
-                ? `h-[${parseInt(ui.logoSize) - 2}px] w-auto`
-                : "h-[46px] w-auto"
-            }
+            width={200}
+            height={48}
+            className="w-auto"
+            style={{
+              height: ui.logoSize ? `${parseInt(ui.logoSize, 10)}px` : "46px",
+            }}
           />
         )}
         {!isProd && (

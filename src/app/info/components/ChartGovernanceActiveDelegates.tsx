@@ -13,6 +13,7 @@ import ChartTabs from "./ChartTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import type { MetricTimeSeriesValue } from "@/lib/types";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   getData: (
@@ -29,6 +30,7 @@ type ChartData = {
 
 const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
   const { primary } = useTenantColorScheme();
+  const copy = Tenant.current().ui.copy;
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
     FREQUENCY_FILTERS.YEAR
@@ -114,14 +116,14 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
             dataKey="active"
             stroke={primary}
             fill="url(#colorAllDelegates)"
-            name="All delegates"
+            name={copy.info.governanceCharts.allRepresentatives}
           />
           <Line
             type="linear"
             dataKey="large"
             stroke={primary}
             strokeDasharray="3 3"
-            name=">100k tokens"
+            name={copy.info.governanceCharts.representativesOver100kTokens}
             dot={false}
           />
         </ComposedChart>
@@ -133,7 +135,9 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
               style={{ backgroundColor: primary }}
               className="w-4 h-[2px]"
             ></div>
-            <p className="text-xs font-semibold text-gray-4f">All Delegates</p>
+            <p className="text-xs font-semibold text-gray-4f">
+              {copy.info.governanceCharts.allRepresentatives}
+            </p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
             <div
@@ -141,7 +145,7 @@ const ChartGovernanceActiveDelegates = ({ getData }: Props) => {
               className="w-4 border border-b-1 border-dashed"
             />
             <p className="text-xs font-semibold text-gray-4f">
-              Delegates with over 100K tokens
+              {copy.info.governanceCharts.representativesOver100kTokens}
             </p>
           </div>
         </div>
@@ -156,6 +160,7 @@ export default ChartGovernanceActiveDelegates;
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   const { primary } = useTenantColorScheme();
+  const copy = Tenant.current().ui.copy;
 
   if (active && payload && payload.length) {
     return (
@@ -167,7 +172,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-medium text-gray-4f ">
-            All Delegates
+            {copy.info.governanceCharts.allRepresentatives}
             <span className="font-bold pl-3">
               {Number(payload[0].value).toFixed(2)}%
             </span>

@@ -45,6 +45,8 @@ export default function DelegateTableRow({
             truncateText
             endorsed={delegate.statement?.endorsed}
             address={delegate.address}
+            username={delegate.statement?.username}
+            avatar={delegate.statement?.avatar}
             votingPower={delegate.votingPower.total}
           />
         </div>

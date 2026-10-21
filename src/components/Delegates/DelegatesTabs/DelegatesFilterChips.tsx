@@ -51,6 +51,7 @@ export const DelegatesFilterChips = () => {
     endorsedToggleConfig,
     removeFilterToUrl,
   } = useDelegatesFilter();
+  const copy = ui.copy;
 
   useEffect(() => {
     const filters: { label: string; param: string; key?: string }[] = [];
@@ -68,14 +69,14 @@ export const DelegatesFilterChips = () => {
 
     if (activeFilterParams.includes(HAS_STATEMENT_FILTER_PARAM)) {
       filters.push({
-        label: "Has statement",
+        label: copy.filters.delegates.hasStatement,
         param: HAS_STATEMENT_FILTER_PARAM,
       });
     }
 
     if (activeFilterParams.includes(MY_DELEGATES_FILTER_PARAM)) {
       filters.push({
-        label: "My delegate(s)",
+        label: copy.filters.delegates.myRepresentatives,
         param: MY_DELEGATES_FILTER_PARAM,
       });
     }
@@ -116,6 +117,8 @@ export const DelegatesFilterChips = () => {
     issuesFromUrl,
     stakeholdersFromUrl,
     endorsedToggleConfig?.showFilterLabel,
+    copy.filters.delegates.hasStatement,
+    copy.filters.delegates.myRepresentatives,
     ui.governanceIssues,
     ui.governanceStakeholders,
   ]);

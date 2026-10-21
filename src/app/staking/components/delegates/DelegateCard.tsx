@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 interface DelegateCardProps {
   action: string;
   address: string;
-  discord?: string;
+  discord?: string | null;
   onSelect: (address: string) => void;
   statement: string;
-  twitter?: string;
+  twitter?: string | null;
   votingPower?: string;
-  warpcast?: string;
+  warpcast?: string | null;
+  username?: string | null;
+  avatar?: string | null;
 }
 
 export const DelegateCard = ({
@@ -22,12 +24,19 @@ export const DelegateCard = ({
   twitter,
   votingPower,
   warpcast,
+  username,
+  avatar,
 }: DelegateCardProps) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col gap-4 bg-wash border border-line shadow-newDefault rounded-xl p-4">
         <div className="flex flex-col gap-4 justify-center">
-          <DelegateProfileImage address={address} votingPower={votingPower} />
+          <DelegateProfileImage
+            address={address}
+            username={username}
+            avatar={avatar}
+            votingPower={votingPower}
+          />
           <p className="break-words text-secondary overflow-hidden overflow-ellipsis line-clamp-2 text-base min-h-[48px]">
             {statement}
           </p>

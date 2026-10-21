@@ -150,10 +150,10 @@ const useSponsoredVoting = ({
       try {
         const nextSignature = await signTypedDataAsync({
           domain: {
-            ...gasRelayConfig.signature,
             name,
             chainId: contracts.governor.chain.id,
             verifyingContract: contracts.governor.address as `0x${string}`,
+            ...gasRelayConfig.signature,
           },
           types,
           primaryType: "Ballot",

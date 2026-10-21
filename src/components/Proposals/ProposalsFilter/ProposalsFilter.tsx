@@ -12,6 +12,7 @@ export default function ProposalsFilter() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const tenantHaseasOO = ui.toggle("has-eas-oodao")?.enabled === true;
 
   const options = useMemo(() => {
@@ -50,6 +51,16 @@ export default function ProposalsFilter() {
     [pathname, router]
   );
 
+  const getOptionLabel = (filterValue: string) => {
+    if (filterValue === proposalsFilterOptions.relevant.filter) {
+      return copy.filters.proposals.relevant;
+    }
+    if (filterValue === proposalsFilterOptions.everything.filter) {
+      return copy.filters.proposals.everything;
+    }
+    return copy.filters.proposals.tempChecks;
+  };
+
   return (
     <div className="relative text-primary">
       <Listbox value={selected} onChange={handleChange}>
@@ -57,12 +68,12 @@ export default function ProposalsFilter() {
           data-testid="proposal-filter-dropdown"
           className="text-primary w-full sm:w-fit bg-neutral font-medium border-wash rounded-full py-2 px-4 flex items-center"
         >
-          {
+          {getOptionLabel(
             (
               options.find((option) => option.filter === selected) ??
               proposalsFilterOptions.relevant
-            ).value
-          }
+            ).filter
+          )}
           <ChevronDown className="h-4 w-4 ml-[2px] opacity-30 hover:opacity-100" />
         </Listbox.Button>
         <Listbox.Options className="mt-3 absolute bg-wash border border-line p-2 rounded-2xl flex flex-col gap-1 z-50 w-max">
@@ -76,7 +87,7 @@ export default function ProposalsFilter() {
                       : "text-tertiary border-transparent"
                   }`}
                 >
-                  {option.value}
+                  {getOptionLabel(option.filter)}
                 </div>
               )}
             </Listbox.Option>

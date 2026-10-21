@@ -165,7 +165,7 @@ const Card = ({
           {image ? (
             <Image
               src={image}
-              className="w-full rounded scale"
+              className="w-full h-full rounded object-cover"
               fill={true}
               alt=""
             />

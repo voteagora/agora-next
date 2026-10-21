@@ -6,6 +6,7 @@ import {
 } from "../DelegatesFilterChips";
 import { useAgoraContext } from "@/contexts/AgoraContext";
 import Tenant from "@/lib/tenant/tenant";
+import { getTenantCopy } from "@/lib/tenant/tenantCopy";
 import {
   ENDORSED_FILTER_PARAM,
   HAS_STATEMENT_FILTER_PARAM,
@@ -41,10 +42,15 @@ vi.mock("@/contexts/AgoraContext", () => ({
 }));
 
 // Mock Tenant
-vi.mock("@/lib/tenant/tenant", () => ({
+vi.mock("@/lib/tenant/tenant", async () => ({
   default: {
     current: vi.fn().mockReturnValue({
       ui: {
+        copy: (
+          await vi.importActual<typeof import("@/lib/tenant/tenantCopy")>(
+            "@/lib/tenant/tenantCopy"
+          )
+        ).getTenantCopy("dao"),
         toggle: vi.fn().mockImplementation((key) => {
           if (key === "delegates/endorsed-filter") {
             return {
@@ -90,6 +96,7 @@ const setupTenantMock = ({
 
   (Tenant.current as any).mockReturnValue({
     ui: {
+      copy: getTenantCopy("dao"),
       toggle: () => mockToggle,
       governanceIssues,
       governanceStakeholders,
@@ -264,7 +271,7 @@ describe("DelegatesFilterChips", () => {
       vi.runAllTimers();
     });
 
-    const myDelegatesChip = screen.getByText("My delegate(s)");
+    const myDelegatesChip = screen.getByText("My Delegate(s)");
     expect(myDelegatesChip).toBeInTheDocument();
 
     const chipButton = myDelegatesChip.closest("button");

@@ -5,12 +5,18 @@ import { useAccount } from "wagmi";
 import discordIcon from "@/icons/discord.svg";
 import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
+import linkedinIcon from "@/icons/linkedin.svg";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useGetVotes } from "@/hooks/useGetVotes";
 import { Proposal } from "@/app/api/common/proposals/proposal";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
+import {
+  buildLinkedinUrl,
+  buildWarpcastUrl,
+  isWarpcastAsLinkedin,
+} from "@/lib/delegateStatement/socialLinks";
 import ENSName from "@/components/shared/ENSName";
 import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
@@ -33,14 +39,15 @@ export function ProposalSingleNonVoter({
     warpcast: string | null;
     citizen_type: string | null;
     voterMetadata: {
-      name: string;
-      image: string;
-      type: string;
+      name?: string | null;
+      image?: string | null;
+      type?: string | null;
     } | null;
     votingPowerSource?: "cpls_snapshot";
   };
 }) {
   const { namespace, ui } = Tenant.current();
+  const warpcastAsLinkedin = isWarpcastAsLinkedin();
 
   const useArchiveVoteHistory = ui.toggle(
     "use-archive-for-vote-history"
@@ -158,7 +165,9 @@ export function ProposalSingleNonVoter({
                 e.stopPropagation();
                 window &&
                   window.open(
-                    `https://warpcast.com/${voter.warpcast?.replace(/@/g, "")}`,
+                    warpcastAsLinkedin
+                      ? buildLinkedinUrl(voter.warpcast ?? "")
+                      : buildWarpcastUrl(voter.warpcast ?? ""),
                     "_blank"
                   );
               }}
@@ -166,8 +175,8 @@ export function ProposalSingleNonVoter({
               <Image
                 height={10}
                 width={10}
-                src={warpcastIcon.src}
-                alt="warpcast icon"
+                src={warpcastAsLinkedin ? linkedinIcon.src : warpcastIcon.src}
+                alt={warpcastAsLinkedin ? "linkedin icon" : "warpcast icon"}
               />
             </button>
           )}

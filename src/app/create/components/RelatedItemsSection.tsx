@@ -24,6 +24,7 @@ export function RelatedItemsSection({
   searchType,
 }: RelatedItemsSectionProps) {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const isDarkTenant = ui.theme === "dark";
   const addButtonClass = [
     "w-full",
@@ -99,7 +100,7 @@ export function RelatedItemsSection({
             onClick={() => setIsOpen(true)}
             className={addButtonClass}
           >
-            + Add Reference
+            {copy.create.addReference}
           </Button>
         )}
       </div>

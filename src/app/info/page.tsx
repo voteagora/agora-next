@@ -9,6 +9,7 @@ import GovernorSettings from "@/app/info/components/GovernorSettings";
 import GovernanceCharts from "@/app/info/components/GovernanceCharts";
 import DunaAbout from "@/app/duna/components/DunaAbout";
 import DunaDisclosuresContent from "@/app/duna/components/DunaDisclosuresContent";
+import CivicInfoPage from "@/app/info/components/CivicInfoPage";
 import GovernanceInfoSections from "@/app/info/components/GovernanceInfoSections";
 import Tenant from "@/lib/tenant/tenant";
 import { FREQUENCY_FILTERS, TENANT_NAMESPACES } from "@/lib/constants";
@@ -64,6 +65,15 @@ export default async function Page() {
   if (!ui.toggle("info")?.enabled) {
     return (
       <div className="text-primary">Route not supported for namespace</div>
+    );
+  }
+
+  // Bespoke CIVIC-only info page
+  if (ui.toggle("civic")?.enabled) {
+    return (
+      <div className="flex flex-col">
+        <CivicInfoPage />
+      </div>
     );
   }
 

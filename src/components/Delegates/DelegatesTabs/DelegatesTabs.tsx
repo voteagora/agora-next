@@ -18,6 +18,7 @@ import { MobileDelegatesFilter } from "../DelegatesFilter/MobileDelegatesFilter"
 
 export default function DelegatesTabs({ children }: { children: ReactNode }) {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const delegatesLayout = ui.toggle("delegates-layout-list")?.enabled
     ? "list"
     : "grid";
@@ -49,7 +50,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
       <div className="flex flex-row justify-between items-baseline gap-2 mt-3 md:mt-0">
         <TabsList>
           <TabsTrigger className="text-2xl font-extrabold" value="delegates">
-            Delegates
+            {copy.delegates.pageTitle}
           </TabsTrigger>
         </TabsList>
         <div className="flex flex-row self-end md:justify-between gap-2 w-fit">
@@ -60,7 +61,7 @@ export default function DelegatesTabs({ children }: { children: ReactNode }) {
             <button
               onClick={() => toggleExpandMobileSearch()}
               className="flex items-center justify-center p-3 rounded-sm md:rounded-lg bg-wash border border-line"
-              aria-label="Open search"
+              aria-label={copy.delegates.openSearchAria}
             >
               <MagnifyingGlassIcon className="text-primary w-4 h-4" />
             </button>

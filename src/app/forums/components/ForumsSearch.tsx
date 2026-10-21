@@ -46,6 +46,8 @@ const SearchInput: React.FC<SearchInputProps> = ({
   onQueryChange,
   registerClear,
 }) => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { query, refine } = useSearchBox();
   const [inputValue, setInputValue] = React.useState(query);
 
@@ -78,9 +80,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
         onChange={handleChange}
         onFocus={onFocus}
         onBlur={onBlur}
-        placeholder={placeholder || "Search discussions"}
+        placeholder={placeholder || copy.forums.searchPlaceholder}
         className="w-full rounded-md border border-cardBorder bg-cardBackground py-2 pl-10 pr-10 text-sm text-primary placeholder:text-tertiary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary"
-        aria-label="Search forum topics"
+        aria-label={copy.forums.searchAriaLabel}
       />
     </div>
   );
@@ -92,6 +94,8 @@ interface DropdownHitsProps {
 }
 
 const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { items } = useHits<ForumTopicHit>();
 
   const filteredHits = React.useMemo(() => {
@@ -116,7 +120,9 @@ const DropdownHits: React.FC<DropdownHitsProps> = ({ open, onSelect }) => {
   return (
     <div className="absolute z-20 mt-2 w-full rounded-md border border-cardBorder bg-cardBackground shadow-lg">
       {filteredHits.length === 0 ? (
-        <div className="px-4 py-3 text-sm text-tertiary">No matches found.</div>
+        <div className="px-4 py-3 text-sm text-tertiary">
+          {copy.forums.noMatches}
+        </div>
       ) : (
         <ul className="max-h-72 overflow-y-auto py-2">
           {filteredHits.map((hit) => {
@@ -174,6 +180,8 @@ function formatDate(timestamp?: number): string | null {
 
 const ForumsSearch: React.FC<ForumsSearchProps> = ({ className }) => {
   const router = useRouter();
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [isFocused, setIsFocused] = React.useState(false);
   const [query, setQuery] = React.useState("");
   const clearRef = React.useRef<(() => void) | null>(null);
@@ -235,7 +243,7 @@ const ForumsSearch: React.FC<ForumsSearchProps> = ({ className }) => {
     >
       <InstantSearch indexName={indexName} searchClient={searchClient}>
         <SearchInput
-          placeholder="Search discussions"
+          placeholder={copy.forums.searchPlaceholder}
           onFocus={() => setIsFocused(true)}
           onBlur={(event) => {
             const nextFocus = event.relatedTarget as HTMLElement | null;

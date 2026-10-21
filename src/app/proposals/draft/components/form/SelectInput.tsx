@@ -88,7 +88,7 @@ function SelectInput<
             {options.length > 0 ? (
               <div className="">
                 <Listbox
-                  value={value}
+                  value={value ?? ""}
                   onChange={(v) => {
                     field.onChange(v);
                     setValue(v);

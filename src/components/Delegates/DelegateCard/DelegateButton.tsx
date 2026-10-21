@@ -13,6 +13,7 @@ export function DelegateButton({
 }) {
   const openDialog = useOpenDialog();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const useNeutral =
     ui.toggle("syndicate-colours-fix-delegate-pages")?.enabled ?? false;
 
@@ -32,7 +33,7 @@ export function DelegateButton({
       }}
       className={full ? "w-full" : undefined}
     >
-      Delegate
+      {copy.delegates.delegation.action}
     </UpdatedButton>
   );
 }

@@ -35,7 +35,8 @@ function DelegationsContainer({
     limit: number;
   }) => Promise<PaginatedResult<Delegation[]>>;
 }) {
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
+  const copy = ui.copy;
   const isERC721 = contracts.token.isERC721();
   const delegatedFromColumnCount = isERC721 ? 3 : 4;
 
@@ -80,9 +81,11 @@ function DelegationsContainer({
   if (delegatees.length === 0 && delegators.length === 0) {
     return (
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold text-primary">Delegations</h2>
+        <h2 className="text-2xl font-bold text-primary">
+          {copy.delegates.profile.delegationsTitle}
+        </h2>
         <div className="p-8 text-center text-secondary align-middle bg-wash rounded-xl border border-line shadow-newDefault">
-          No delegations found.
+          {copy.delegates.profile.noDelegations}
         </div>
       </div>
     );
@@ -101,13 +104,13 @@ function DelegationsContainer({
               className="text-2xl opacity-60 data-[state=active]:opacity-100"
               value="delegatedFrom"
             >
-              Delegated from
+              {copy.delegates.profile.delegatedFrom}
             </TabsTrigger>
             <TabsTrigger
               className="text-2xl opacity-60 data-[state=active]:opacity-100"
               value="delegatedTo"
             >
-              Delegated to
+              {copy.delegates.profile.delegatedTo}
             </TabsTrigger>
           </TabsList>
         </div>
@@ -120,17 +123,17 @@ function DelegationsContainer({
                     <TableRow>
                       {!isERC721 && (
                         <TableHead className="h-10 text-secondary">
-                          Voting Power
+                          {copy.delegates.profile.votingPowerColumn}
                         </TableHead>
                       )}
                       <TableHead className="h-10 text-secondary">
-                        Delegated on
+                        {copy.delegates.profile.delegatedOn}
                       </TableHead>
                       <TableHead className="h-10 text-secondary">
-                        From
+                        {copy.delegates.profile.from}
                       </TableHead>
                       <TableHead className="h-10 text-secondary">
-                        Txn Hash
+                        {copy.delegates.profile.txnHash}
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -141,8 +144,8 @@ function DelegationsContainer({
                         colSpan={delegatedFromColumnCount}
                       >
                         {numOfDelegators > 0n
-                          ? "Accounts with 0 VP or Dust are hidden"
-                          : "None found"}
+                          ? copy.delegates.profile.hiddenDust
+                          : copy.delegates.table.empty}
                       </td>
                     ) : (
                       delegators.map((delegation) => (
@@ -162,7 +165,9 @@ function DelegationsContainer({
                       disabled={isLoading}
                       className="px-4 py-2 text-primary text-sm bg-wash hover:bg-wash/80 rounded-lg"
                     >
-                      {isLoading ? "Loading..." : "Load More"}
+                      {isLoading
+                        ? copy.voting.loading
+                        : copy.delegates.profile.loadMore}
                     </button>
                   </div>
                 )}
@@ -176,14 +181,16 @@ function DelegationsContainer({
               <TableHeader className="text-xs text-secondary sticky top-0 bg-white z-10">
                 <TableRow>
                   <TableHead className="h-10 text-secondary">
-                    Current Token Balance
+                    {copy.delegates.profile.currentTokenBalance}
                   </TableHead>
                   <TableHead className="h-10 text-secondary">
-                    Delegated on
+                    {copy.delegates.profile.delegatedOn}
                   </TableHead>
-                  <TableHead className="h-10 text-secondary">To</TableHead>
                   <TableHead className="h-10 text-secondary">
-                    Txn Hash
+                    {copy.delegates.profile.to}
+                  </TableHead>
+                  <TableHead className="h-10 text-secondary">
+                    {copy.delegates.profile.txnHash}
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -194,7 +201,7 @@ function DelegationsContainer({
                       className="w-full p-4 bg-neutral text-center text-secondary text-sm"
                       colSpan={6}
                     >
-                      None found
+                      {copy.delegates.table.empty}
                     </td>
                   </TableRow>
                 ) : (

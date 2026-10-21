@@ -64,7 +64,8 @@ const TransactionFormItem = ({
 };
 
 const BasicProposalForm = () => {
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
+  const copy = ui.copy;
   const [formDirty, setFormDirty] = useState(false);
   const [allTransactionFieldsValid, setAllTransactionFieldsValid] =
     useState(true);
@@ -211,13 +212,13 @@ const BasicProposalForm = () => {
       <h3 className="text-primary font-semibold">Proposed transactions</h3>
       {proposal_scope !== ProposalScope.OFFCHAIN_ONLY ? (
         <p className="mt-2 text-tertiary">
-          Proposed transactions will execute after a proposal passes and then
-          gets executed.
+          Proposed transactions will execute after a {copy.nouns.proposal}{" "}
+          passes and then gets executed.
         </p>
       ) : (
         <p className="mt-2 text-tertiary">
-          This is an off-chain only proposal and will not execute on-chain
-          transactions.
+          This is an off-chain only {copy.nouns.proposal} and will not execute
+          on-chain transactions.
         </p>
       )}
 

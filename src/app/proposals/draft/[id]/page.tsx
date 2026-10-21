@@ -12,11 +12,12 @@ export async function generateMetadata(props: {
   params: Promise<{ id: string }>;
 }) {
   const params = await props.params;
-  const { brandName } = Tenant.current();
+  const { brandName, ui } = Tenant.current();
+  const proposalLabel = ui.copy.nouns.governanceProposal;
 
   return buildPageMetadata({
     title: `Draft Proposal | ${brandName}`,
-    description: `Review and edit a ${brandName} governance proposal draft.`,
+    description: `Review and edit a ${brandName} ${proposalLabel} draft.`,
     path: `/proposals/draft/${params.id}`,
     robots: {
       index: false,
