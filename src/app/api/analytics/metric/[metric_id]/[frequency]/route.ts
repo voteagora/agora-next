@@ -2,8 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { metric_id: string; frequency: string } }
+  props: { params: Promise<{ metric_id: string; frequency: string }> }
 ) {
+  const params = await props.params;
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { apiFetchMetricTS } = await import("./getMetricsTS");
 

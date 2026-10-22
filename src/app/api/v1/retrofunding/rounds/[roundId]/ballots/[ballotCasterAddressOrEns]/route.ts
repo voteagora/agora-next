@@ -3,8 +3,11 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  props: {
+    params: Promise<{ roundId: string; ballotCasterAddressOrEns: string }>;
+  }
 ) {
+  const params = await props.params;
   const { authenticateApiUser, getCategoryScope, validateAddressScope } =
     await import("@/app/lib/auth/serverAuth");
   const { fetchBallot } = await import("@/app/api/common/ballots/getBallots");

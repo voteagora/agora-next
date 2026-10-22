@@ -3,7 +3,7 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { roundId: string; projectId: string } }
+  route: { params: Promise<{ roundId: string; projectId: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
@@ -19,7 +19,7 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, projectId } = route.params;
+      const { roundId, projectId } = await route.params;
 
       const projects = await fetchProjectApi({
         round: roundId,

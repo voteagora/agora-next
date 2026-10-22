@@ -4,8 +4,9 @@ import { fetchRawProposalVotesFromArchive } from "@/lib/archiveUtils";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { proposalId: string } }
+  props: { params: Promise<{ proposalId: string }> }
 ) {
+  const params = await props.params;
   const { proposalId } = params;
   if (!proposalId) {
     return NextResponse.json({ error: "Missing proposal id" }, { status: 400 });

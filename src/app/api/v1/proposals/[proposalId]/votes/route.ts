@@ -27,7 +27,7 @@ const offsetValidator = createOptionalNumberValidator(
 
 export async function GET(
   request: NextRequest,
-  route: { params: { proposalId: string } }
+  route: { params: Promise<{ proposalId: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
@@ -44,7 +44,7 @@ export async function GET(
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
-      const { proposalId } = route.params;
+      const { proposalId } = await route.params;
       const sort = sortValidator.parse(params.get("sort"));
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));

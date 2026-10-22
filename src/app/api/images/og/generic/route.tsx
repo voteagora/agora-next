@@ -11,18 +11,23 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
   const unsafeTitle = searchParams.get("title") || "Agora Proposal";
-  const unsafeDescription =
-    searchParams.get("description") || "Home of token governance";
+  const unsafeDescription = searchParams.get("description");
   const unsafeAuthor = searchParams.get("author");
   const isPost = searchParams.get("isPost") === "true";
 
   // Sanitize the URL parameters to prevent XSS
   const sanitizedTitle = sanitizeOgParam(unsafeTitle);
-  const sanitizedDescription = sanitizeOgParam(unsafeDescription);
+  // If description param exists (even if empty), use it; otherwise fall back to default
+  const sanitizedDescription =
+    unsafeDescription !== null
+      ? sanitizeOgParam(unsafeDescription)
+      : "Home of token governance";
   const sanitizedAuthor = unsafeAuthor ? sanitizeOgParam(unsafeAuthor) : null;
 
   const title = truncateString(sanitizedTitle, 70);
-  const description = truncateString(sanitizedDescription, 150);
+  const description = sanitizedDescription
+    ? truncateString(sanitizedDescription, 150)
+    : null;
   const author = sanitizedAuthor ? truncateString(sanitizedAuthor, 42) : null;
   const namespace = (process.env.NEXT_PUBLIC_AGORA_INSTANCE_NAME ||
     "optimism") as TenantNamespace;
@@ -67,9 +72,11 @@ export async function GET(req: NextRequest) {
                 Comment by {author}
               </div>
               <div tw="font-bold text-5xl w-full">{title}</div>
-              <div tw="font-normal mt-[30px] text-4xl text-secondary">
-                {description}
-              </div>
+              {description && (
+                <div tw="font-normal mt-[30px] text-4xl text-secondary">
+                  {description}
+                </div>
+              )}
             </div>
           </div>
         </div>

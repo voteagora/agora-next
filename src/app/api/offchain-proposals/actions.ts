@@ -7,7 +7,7 @@ import { verifyAuth, type AuthParams } from "@/lib/auth/authHelpers";
 import { appendServerTraceEvent } from "@/lib/mirador/serverTrace";
 import { MiradorTraceContext } from "@/lib/mirador/types";
 import Tenant from "@/lib/tenant/tenant";
-import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES, ProposalType } from "@/lib/types";
 import { getPublicClient } from "@/lib/viem";
 
 interface OffchainProposalData {

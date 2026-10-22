@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { frequency: string } }
+  { params }: { params: Promise<{ frequency: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
   const { apiFetchTreasuryBalanceTS } = await import(

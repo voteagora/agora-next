@@ -4,11 +4,11 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 export async function POST(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       toggle: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -24,7 +24,7 @@ export async function POST(
     return new Response(authResponse.failReason, { status: 401 });
   }
 
-  const { roundId, ballotCasterAddressOrEns, toggle } = route.params;
+  const { roundId, ballotCasterAddressOrEns, toggle } = await route.params;
   const scopeError = await validateAddressScope(
     ballotCasterAddressOrEns,
     authResponse

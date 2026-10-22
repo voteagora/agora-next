@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Tenant from "@/lib/tenant/tenant";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 interface VerifyEmailPageProps {
   searchParams: Promise<{
@@ -10,6 +11,20 @@ interface VerifyEmailPageProps {
     error?: string;
     email?: string;
   }>;
+}
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `Verify Email | ${brandName}`,
+    description: `Verify an email address for ${brandName} governance notifications.`,
+    path: "/notification-preferences/verify-email",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
 }
 
 export default async function VerifyEmailPage({

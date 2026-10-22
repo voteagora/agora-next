@@ -7,11 +7,11 @@ import type { DistributionStrategy as DistStrat } from "@/app/api/common/ballots
 export async function POST(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
       ballotCasterAddressOrEns: string;
       distributionMethod: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -35,7 +35,7 @@ export async function POST(
   }
 
   const { roundId, ballotCasterAddressOrEns, distributionMethod } =
-    route.params;
+    await route.params;
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {

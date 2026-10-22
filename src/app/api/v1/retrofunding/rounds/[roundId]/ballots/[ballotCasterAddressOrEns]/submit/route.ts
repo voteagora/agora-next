@@ -39,22 +39,27 @@ export type ProjectsBallotSubmission = z.infer<
 
 export async function POST(
   request: NextRequest,
-  route: { params: { roundId: string; ballotCasterAddressOrEns: string } }
+  route: {
+    params: Promise<{ roundId: string; ballotCasterAddressOrEns: string }>;
+  }
 ) {
   const { submitBallot } = await import(
     "@/app/api/common/ballots/submitBallot"
   );
 
-  if (route.params.roundId === "4" || route.params.roundId === "5") {
+  if (
+    (await route.params).roundId === "4" ||
+    (await route.params).roundId === "5"
+  ) {
     return new Response("Ballot submission for Round 4 is closed", {
       status: 403,
     });
   }
 
   return await traceWithUserId(
-    route.params.ballotCasterAddressOrEns as string,
+    (await route.params).ballotCasterAddressOrEns as string,
     async () => {
-      const { roundId, ballotCasterAddressOrEns } = route.params;
+      const { roundId, ballotCasterAddressOrEns } = await route.params;
       try {
         const payload = await request.json();
 

@@ -3,7 +3,7 @@ import { traceWithUserId } from "../../../apiUtils";
 
 export async function GET(
   request: NextRequest,
-  route: { params: { addressOrENSName: string } }
+  route: { params: Promise<{ addressOrENSName: string }> }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
 
@@ -38,7 +38,7 @@ export async function GET(
   return await traceWithUserId(authResponse.userId as string, async () => {
     const params = request.nextUrl.searchParams;
     try {
-      const { addressOrENSName } = route.params;
+      const { addressOrENSName } = await route.params;
       const limit = limitValidator.parse(params.get("limit"));
       const offset = offsetValidator.parse(params.get("offset"));
       const delegate = await fetchCurrentDelegators(addressOrENSName, {

@@ -8,8 +8,23 @@ import { getForumTopic } from "@/lib/actions/forum/topics";
 import Tenant from "@/lib/tenant/tenant";
 import { deriveStatus } from "@/components/Proposals/Proposal/Archive/archiveProposalUtils";
 import { filterProposalTypesByType } from "./utils/proposalTypeUtils";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 const { namespace, ui } = Tenant.current();
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `Create Post | ${brandName}`,
+    description: `Create a proposal for the ${brandName} community.`,
+    path: "/create",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 function getInitialPostType(searchParams: {
   [key: string]: string | string[] | undefined;

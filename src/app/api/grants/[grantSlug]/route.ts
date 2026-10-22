@@ -5,8 +5,9 @@ export const revalidate = 0;
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { grantSlug: string } }
+  props: { params: Promise<{ grantSlug: string }> }
 ) {
+  const params = await props.params;
   try {
     const grant = await getGrant(params.grantSlug);
 

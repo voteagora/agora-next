@@ -1,7 +1,18 @@
 import Tenant from "@/lib/tenant/tenant";
 import GrantsList from "./components/GrantsList";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 export const revalidate = 0;
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `${brandName} Grants`,
+    description: `Explore active grants and funding opportunities from ${brandName}.`,
+    path: "/grants",
+  });
+}
 
 export default async function GrantsPage() {
   const { ui } = Tenant.current();

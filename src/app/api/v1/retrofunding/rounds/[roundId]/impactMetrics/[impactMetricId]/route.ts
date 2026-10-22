@@ -4,11 +4,10 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 export async function GET(
   request: NextRequest,
   route: {
-    params: {
+    params: Promise<{
       roundId: string;
-      ballotCasterAddressOrEns: string;
       impactMetricId: string;
-    };
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -25,8 +24,7 @@ export async function GET(
 
   return await traceWithUserId(authResponse.userId as string, async () => {
     try {
-      const { roundId, ballotCasterAddressOrEns, impactMetricId } =
-        route.params;
+      const { roundId, impactMetricId } = await route.params;
       const impactMetrics = await fetchImpactMetricApi(impactMetricId, roundId);
       return NextResponse.json(impactMetrics);
     } catch (e: any) {

@@ -18,7 +18,7 @@ import {
 import { useDAOMetrics } from "@/hooks/useDAOMetrics";
 import { AgoraIconWithText } from "@/icons/AgoraIconWithText";
 import { trackEvent } from "@/lib/analytics";
-import { ANALYTICS_EVENT_NAMES } from "@/lib/types.d";
+import { ANALYTICS_EVENT_NAMES } from "@/lib/types";
 import { useAccount } from "wagmi";
 
 export default function DAOMetricsHeader() {

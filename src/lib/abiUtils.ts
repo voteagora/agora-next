@@ -107,10 +107,12 @@ async function getContractAbi(
   }
 }
 
-export const cachedGetContractAbi = unstable_cache(
-  getContractAbi,
-  ["contract-abi"],
-  {
-    revalidate: 86400,
-  }
-);
+const cachedContractAbi = unstable_cache(getContractAbi, ["contract-abi"], {
+  revalidate: 86400,
+});
+
+export async function cachedGetContractAbi(
+  ...args: Parameters<typeof getContractAbi>
+) {
+  return cachedContractAbi(...args);
+}

@@ -25,9 +25,7 @@ export type InfiniteScrollProps = {
   getScrollParent?: () => HTMLElement | null;
   className?: string;
   style?: CSSProperties;
-  element?:
-    | keyof JSX.IntrinsicElements
-    | ComponentType<Record<string, unknown>>;
+  element?: string | ComponentType<Record<string, unknown>>;
   isReverse?: boolean;
   loader?: ReactNode;
   ref?: Ref<unknown>;

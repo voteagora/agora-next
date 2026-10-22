@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
-export function authenticateAgoraApiUser(request) {
-  const headersList = headers();
+export async function authenticateAgoraApiUser(request) {
+  const headersList = await headers();
   const apiKey = headersList.get("agora-api-key");
 
   // Use your method of checking the API user's key

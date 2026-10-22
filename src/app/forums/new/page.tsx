@@ -4,8 +4,23 @@ import ForumNewClient, {
 } from "./ForumNewClient";
 import { fetchProposalFromArchive } from "@/lib/archiveUtils";
 import Tenant from "@/lib/tenant/tenant";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 const { namespace } = Tenant.current();
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `New Forum Topic | ${brandName}`,
+    description: `Start a new governance forum discussion for the ${brandName} community.`,
+    path: "/forums/new",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 async function getInitialFormData(searchParams: {
   [key: string]: string | string[] | undefined;

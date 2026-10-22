@@ -48,6 +48,9 @@ export async function checkNewProposal({
   const governor = tenant.contracts.governor;
   const provider = tenant.contracts.governor.provider;
   const governorType = tenant.contracts.governorType;
+  if (!governorType) {
+    throw new Error("Governor type is not configured for this tenant");
+  }
 
   const config: SimulationConfigNew = {
     governorAddress: governor.address,
@@ -125,6 +128,9 @@ export async function checkExistingProposal({
   const governor = tenant.contracts.governor;
   const provider = tenant.contracts.governor.provider;
   const governorType = tenant.contracts.governorType;
+  if (!governorType) {
+    throw new Error("Governor type is not configured for this tenant");
+  }
 
   const config: SimulationConfigProposed = {
     governorAddress: governor.address,
@@ -232,6 +238,9 @@ export async function checkNewApprovalProposal({
   const governor = tenant.contracts.governor;
   const provider = tenant.contracts.governor.provider;
   const governorType = tenant.contracts.governorType;
+  if (!governorType) {
+    throw new Error("Governor type is not configured for this tenant");
+  }
 
   // Avoiding importing ProposalType from @/app/proposals/draft/types to avoid circular dependency
   const moduleAddress = getProposalTypeAddress("approval" as any);

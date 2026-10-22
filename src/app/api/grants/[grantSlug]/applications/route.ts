@@ -192,9 +192,9 @@ function buildDynamicSchema(grant: any) {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { grantSlug: string } }
+  { params }: { params: Promise<{ grantSlug: string }> }
 ) {
-  const { grantSlug } = params;
+  const { grantSlug } = await params;
 
   try {
     const authResponse = await authenticateApiUser(req);

@@ -14,11 +14,6 @@ const nextConfig = withBundleAnalyzer({
     // Skipping here to reduce Vercel build time and memory usage.
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // Linting is handled and flagged by CI (GitHub Actions).
-    // Skipping here to reduce Vercel build time and memory usage.
-    ignoreDuringBuilds: true,
-  },
   async redirects() {
     return [];
   },
@@ -80,10 +75,9 @@ const nextConfig = withBundleAnalyzer({
       path.resolve(__dirname, "src/lib/shims/asyncStorage.ts");
     return config;
   },
+  // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
+  serverExternalPackages: ["@opentelemetry/sdk-node"],
   experimental: {
-    instrumentationHook: true,
-    // Necessary to prevent github.com/open-telemetry/opentelemetry-js/issues/4297
-    serverComponentsExternalPackages: ["@opentelemetry/sdk-node"],
     serverActions: {
       bodySizeLimit: "10mb",
     },

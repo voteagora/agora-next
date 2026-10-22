@@ -12,8 +12,23 @@ import { getBlockScanAddress } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import linkIcon from "@/assets/icons/link.svg";
+import { buildPageMetadata } from "@/app/lib/utils/metadata";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata() {
+  const { brandName } = Tenant.current();
+
+  return buildPageMetadata({
+    title: `${brandName} Configuration`,
+    description: `View configuration details for the current ${brandName} tenant instance.`,
+    path: "/debug",
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
 
 const Section = ({
   title,

@@ -3,8 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { address: string; blockNumber: string } }
+  props: { params: Promise<{ address: string; blockNumber: string }> }
 ) {
+  const params = await props.params;
   const { address, blockNumber } = params;
 
   if (!address || !blockNumber) {

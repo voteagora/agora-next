@@ -267,10 +267,10 @@ export function ProposalSingleVote({
                           zeroVpVote
                             ? "text-tertiary opacity-40"
                             : vote.support === "AGAINST"
-                            ? "text-negative"
-                            : vote.support === "FOR"
-                              ? "text-positive"
-                              : "text-tertiary"
+                              ? "text-negative"
+                              : vote.support === "FOR"
+                                ? "text-positive"
+                                : "text-tertiary"
                         }
                       >
                         <TokenAmountDecorated

@@ -4,7 +4,11 @@ import { traceWithUserId } from "@/app/api/v1/apiUtils";
 export async function GET(
   request: NextRequest,
   route: {
-    params: { roundId: string; impactMetricId: string; commentId: string };
+    params: Promise<{
+      roundId: string;
+      impactMetricId: string;
+      commentId: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -20,7 +24,7 @@ export async function GET(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { commentId } = route.params;
+    const { commentId } = await route.params;
     try {
       const comments = await fetchImpactMetricComment(Number(commentId));
       return NextResponse.json(comments);
@@ -35,7 +39,11 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   route: {
-    params: { roundId: string; impactMetricId: string; commentId: string };
+    params: Promise<{
+      roundId: string;
+      impactMetricId: string;
+      commentId: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -57,7 +65,7 @@ export async function PUT(
   }
 
   return await traceWithUserId(authResponse.userId, async () => {
-    const { commentId, impactMetricId } = route.params;
+    const { commentId, impactMetricId } = await route.params;
 
     const body = await request.json();
     if (!body.comment) {
@@ -83,7 +91,11 @@ export async function PUT(
 export async function DELETE(
   request: NextRequest,
   route: {
-    params: { roundId: string; impactMetricId: string; commentId: string };
+    params: Promise<{
+      roundId: string;
+      impactMetricId: string;
+      commentId: string;
+    }>;
   }
 ) {
   const { authenticateApiUser } = await import("@/app/lib/auth/serverAuth");
@@ -99,7 +111,7 @@ export async function DELETE(
   }
 
   return await traceWithUserId(authResponse.userId as string, async () => {
-    const { commentId } = route.params;
+    const { commentId } = await route.params;
     try {
       const comments = await deleteImpactMetricComment({
         commentId: Number(commentId),

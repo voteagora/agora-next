@@ -21,8 +21,12 @@ const getDraftProposal = async (id: number) => {
   return draftProposal;
 };
 
-export default async function OGImage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function OGImage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
   const draftProposal = await getDraftProposal(parseInt(id));
   const title = draftProposal?.title || "Agora Proposal";

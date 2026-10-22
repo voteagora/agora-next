@@ -26,11 +26,10 @@ interface Grant {
 
 export const revalidate = 0;
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
   const grantData = await getGrant(params.slug);
 
   if (!grantData) {
@@ -71,11 +70,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function GrantPage({
-  params,
-}: {
-  params: { slug: string };
+export default async function GrantPage(props: {
+  params: Promise<{ slug: string }>;
 }) {
+  const params = await props.params;
   const { ui, slug } = Tenant.current();
 
   if (!ui.toggle("grants") || !ui.toggle("grants/intake-form")) {
