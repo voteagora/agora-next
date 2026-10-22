@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run generate-typechain & npx prisma generate & next dev --webpack",
-    "build": "next build --webpack",
+    "build": "node -v && next build --webpack",
     "analyze": "ANALYZE=true next build --webpack",
     "start": "next start",
     "lint": "eslint .",

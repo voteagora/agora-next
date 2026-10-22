@@ -4,6 +4,7 @@ export const SERVICE_NAME = "agora-app";
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
+    console.log("Node version:", process.version);
     await import("./instrumentation.node");
   } else {
     registerOTel({
