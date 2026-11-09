@@ -1,7 +1,7 @@
 // Cast for more accurate arithmetic
 import Tenant from "@/lib/tenant/tenant";
 import { Block } from "ethers";
-import { optimism, scroll } from "viem/chains";
+import { base, optimism, scroll } from "viem/chains";
 
 const VARIABLE_BLOCK_TIMES = [
   {
@@ -13,6 +13,12 @@ const VARIABLE_BLOCK_TIMES = [
     id: scroll.id,
     secondsBeforeUpdate: 1.5,
     updateBlockNumber: 25688713,
+  },
+  {
+    // Base moved from 2s to 200ms blocks on 2026-11-05 18:00 UTC
+    id: base.id,
+    secondsBeforeUpdate: 2,
+    updateBlockNumber: 53556127,
   },
 ];
 
@@ -36,7 +42,6 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
   switch (chainId) {
     case 10: // Optimism
     case 11155420: // Optimism sepolia
-    case 8453: // Base Mainnet
     case 59144: // Linea Mainnet
     case 59141: // Linea Testnet
     case 360: // Shape Mainnet
@@ -49,6 +54,10 @@ export function getSecondsPerBlock(chainId: number | undefined): number {
 
     case 534352: // Scroll
       return 2;
+
+    case 8453: // Base Mainnet (200ms since block 53556127, 2026-11-05)
+    case 84532: // Base Sepolia
+      return 0.2;
 
     case 42161: // Arbitrum one
     case 421614: // Arbitrum sepolia

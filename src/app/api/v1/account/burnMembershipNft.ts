@@ -28,7 +28,10 @@ const transferEvent = parseAbiItem(
 );
 
 const DEPLOYMENT_BLOCK = 48_296_940n; // Civic membership token on Base
-const LOG_BLOCK_RANGE = 10_000n; // Goldsky's supported query range
+// Fallback page size when the RPC rejects the full-history query (Goldsky
+// caps eth_getLogs at 10k blocks). Base produces 200ms blocks since
+// 2026-11-05, so a 10k page is only ~33 minutes of history.
+const LOG_BLOCK_RANGE = 10_000n;
 
 export async function burnMembershipNfts(owner: `0x${string}`) {
   const { contracts } = Tenant.current();
@@ -61,14 +64,11 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
 
   // Not enumerable: ids only exist in Transfer logs. Reads share one block so
   // the balance and the ownership checks cannot disagree.
-  // ponytail: history scans grow with token age; use indexed ids if they outgrow the request timeout.
   const ownedIds: bigint[] = [];
   const seenIds = new Set<bigint>();
-  let toBlock = blockNumber;
-  while (toBlock >= DEPLOYMENT_BLOCK && BigInt(ownedIds.length) < balance) {
-    const start = toBlock - LOG_BLOCK_RANGE + 1n;
-    const fromBlock = start < DEPLOYMENT_BLOCK ? DEPLOYMENT_BLOCK : start;
-    const logs = await publicClient.getLogs({
+
+  const fetchTransfers = (fromBlock: bigint, toBlock: bigint) =>
+    publicClient.getLogs({
       address: tokenAddress,
       event: transferEvent,
       args: { to: owner },
@@ -76,6 +76,10 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
       toBlock,
     });
 
+  // Returns true once every owned token has been found.
+  const collectOwnedIds = async (
+    logs: Awaited<ReturnType<typeof fetchTransfers>>
+  ): Promise<boolean> => {
     for (const {
       args: { tokenId },
     } of logs) {
@@ -106,10 +110,35 @@ export async function burnMembershipNfts(owner: `0x${string}`) {
         throw error;
       }
       if (BigInt(ownedIds.length) === balance) {
-        break;
+        return true;
       }
     }
-    toBlock = fromBlock - 1n;
+    return false;
+  };
+
+  // The `to` filter is indexed so the result is tiny; try the whole history
+  // in one request and only page backwards if the RPC rejects the range.
+  let fullHistoryLogs: Awaited<ReturnType<typeof fetchTransfers>> | null = null;
+  try {
+    fullHistoryLogs = await fetchTransfers(DEPLOYMENT_BLOCK, blockNumber);
+  } catch {
+    fullHistoryLogs = null;
+  }
+
+  if (fullHistoryLogs) {
+    await collectOwnedIds(fullHistoryLogs);
+  } else {
+    // ponytail: history scans grow with token age; use indexed ids if they outgrow the request timeout.
+    let toBlock = blockNumber;
+    while (toBlock >= DEPLOYMENT_BLOCK && BigInt(ownedIds.length) < balance) {
+      const start = toBlock - LOG_BLOCK_RANGE + 1n;
+      const fromBlock = start < DEPLOYMENT_BLOCK ? DEPLOYMENT_BLOCK : start;
+      const logs = await fetchTransfers(fromBlock, toBlock);
+      if (await collectOwnedIds(logs)) {
+        break;
+      }
+      toBlock = fromBlock - 1n;
+    }
   }
   if (BigInt(ownedIds.length) !== balance) {
     throw new Error(

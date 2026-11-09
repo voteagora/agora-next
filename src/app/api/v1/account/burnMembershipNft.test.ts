@@ -105,6 +105,7 @@ describe("burnMembershipNfts", () => {
         toBlock,
       ])
     ).toEqual([
+      [DEPLOY_BLOCK, HEAD],
       [HEAD - 9_999n, HEAD],
       [HEAD - 19_999n, HEAD - 10_000n],
     ]);
@@ -123,6 +124,30 @@ describe("burnMembershipNfts", () => {
     expect(reads.at(-1)).not.toHaveProperty("blockNumber");
   });
 
+  it("uses a single full-history query when the RPC accepts the range", async () => {
+    transfers = [
+      { block: DEPLOY_BLOCK + 10n, tokenId: 12n },
+      { block: HEAD - 20_000n, tokenId: 13n },
+    ];
+    ownedIds = new Set([12n, 13n]);
+    client.getLogs.mockImplementation(
+      ({ fromBlock, toBlock }: { fromBlock: bigint; toBlock: bigint }) =>
+        transfers
+          .filter(({ block }) => block >= fromBlock && block <= toBlock)
+          .map(({ tokenId }) => ({ args: { tokenId } }))
+    );
+
+    await burnMembershipNfts(OWNER);
+
+    expect(client.getLogs).toHaveBeenCalledOnce();
+    expect(client.getLogs).toHaveBeenCalledWith(
+      expect.objectContaining({ fromBlock: DEPLOY_BLOCK, toBlock: HEAD })
+    );
+    expect(
+      writeContract.mock.calls.map(([{ args }]) => args[0]).sort()
+    ).toEqual([12n, 13n]);
+  });
+
   it("covers page boundaries and the deployment block, retaining token zero and deduplicating IDs", async () => {
     transfers = [0n, 5_000n, 5_001n, 15_000n, 15_001n, 25_000n].map(
       (offset, index) => ({
@@ -135,7 +160,7 @@ describe("burnMembershipNfts", () => {
 
     await burnMembershipNfts(OWNER);
 
-    expect(client.getLogs).toHaveBeenCalledTimes(3);
+    expect(client.getLogs).toHaveBeenCalledTimes(4);
     expect(client.getLogs).toHaveBeenLastCalledWith(
       expect.objectContaining({
         fromBlock: DEPLOY_BLOCK,
