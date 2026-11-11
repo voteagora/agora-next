@@ -1,7 +1,7 @@
-import { getAddress } from "@ethersproject/address";
 import { bullet } from "../report";
 import type { Log, ProposalCheck } from "../types";
 import { getContractName } from "../simulate";
+import { safeGetAddress } from "../tenderly-api";
 
 /**
  * Reports all emitted events from the proposal
@@ -19,10 +19,12 @@ export const checkLogs: ProposalCheck = {
 
     const events = sim.transaction.transaction_info.logs?.reduce(
       (logs, log) => {
-        const addr = getAddress(log.raw.address);
+        const addr = safeGetAddress(log.raw?.address);
+        // Skip logs without a usable emitter address
+        if (!addr) return logs;
         // Check if this is a log that should be filtered out
-        const isGovernor = getAddress(addr) === deps.governor.address;
-        const isTimelock = getAddress(addr) === deps.timelock.address;
+        const isGovernor = addr === deps.governor.address;
+        const isTimelock = addr === deps.timelock.address;
         const shouldSkipLog =
           (isGovernor && log.name === "ProposalExecuted") ||
           (isTimelock && log.name === "ExecuteTransaction");

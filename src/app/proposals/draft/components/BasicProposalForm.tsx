@@ -166,7 +166,7 @@ const BasicProposalForm = () => {
     const transactions = getValues("transactions");
 
     try {
-      const report = await checkNewProposal({
+      const result = await checkNewProposal({
         targets: transactions.map((transaction) => transaction.target),
         values: transactions.map((transaction) => BigInt(transaction.value)),
         calldatas: transactions.map((transaction) => transaction.calldata),
@@ -176,6 +176,8 @@ const BasicProposalForm = () => {
         draftId: "1", // todo use correct draft id => used for storing simulation results
         title: getValues("title"),
       });
+      if (!result.ok) throw new Error(result.error);
+      const report = result.report;
 
       setSimulationReport(report?.structuredReport ?? null);
       setValue("simulation_state", report?.status ?? "UNCONFIRMED");

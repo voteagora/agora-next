@@ -357,7 +357,7 @@ const ApprovalProposalForm = () => {
       // Simulate each combination and collect results
       const simulationResults = await Promise.all(
         combinations.map(async (combination) => {
-          const report = await checkNewApprovalProposal({
+          const result = await checkNewApprovalProposal({
             unformattedProposalData,
             description: "Approval Proposal",
             draftId: "1",
@@ -368,8 +368,9 @@ const ApprovalProposalForm = () => {
             title:
               "Simulation of options with index: " + combination?.join(", "),
           });
+          if (!result.ok) throw new Error(result.error);
 
-          return report?.structuredReport;
+          return result.report?.structuredReport;
         })
       );
 

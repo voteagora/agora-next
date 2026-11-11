@@ -1,9 +1,9 @@
-import { getAddress } from "@ethersproject/address";
 import { bullet } from "../report";
 import type { ProposalCheck, StateDiff } from "../types";
 import { getContractName } from "../simulate";
 import { decodeStorageSlot } from "../../seatbelt/encode-state";
 import { extractTenderlyRevertReason } from "../tenderlyRevert";
+import { safeGetAddress } from "../tenderly-api";
 
 /**
  * Reports all state changes from the proposal
@@ -31,13 +31,15 @@ export const checkStateChanges: ProposalCheck = {
 
     const stateDiffs = sim.transaction.transaction_info.state_diff.reduce(
       (diffs, diff) => {
-        const addr = getAddress(diff.raw[0].address);
+        const addr = safeGetAddress(diff.raw?.[0]?.address);
+        // Skip diffs without a usable contract address
+        if (!addr) return diffs;
         // Check if this is a diff that should be filtered out
-        const isGovernor = getAddress(addr) === deps.governor.address;
+        const isGovernor = addr === deps.governor.address;
         const isProposalsVar =
           diff.soltype?.name === "proposals" ||
           diff.soltype?.name === "_proposals";
-        const isTimelock = getAddress(addr) === deps.timelock.address;
+        const isTimelock = addr === deps.timelock.address;
         const isTimelockTimestamps = diff.soltype?.name === "_timestamps";
         const isQueuedTx = diff.soltype?.name.includes("queuedTransactions");
         const isExecutedSlot =

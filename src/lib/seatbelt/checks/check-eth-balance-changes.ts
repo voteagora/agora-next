@@ -6,6 +6,7 @@ import type {
   TenderlyContract,
 } from "../types";
 import { getContractName } from "../simulate";
+import { safeGetAddress } from "../tenderly-api";
 import { getBlockScanAddress } from "@/lib/utils";
 
 /**
@@ -23,8 +24,12 @@ export const checkEthBalanceChanges: ProposalCheck = {
     }
 
     // Filter for ETH transfers
+    // Tenderly can report entries with an empty `from`/`to`; those can't be attributed, so skip them
     const ethTransfers = sim.transaction.transaction_info.asset_changes.filter(
-      (change) => change.token_info.type === "Native"
+      (change) =>
+        change.token_info?.type === "Native" &&
+        safeGetAddress(change.from) !== null &&
+        safeGetAddress(change.to) !== null
     );
 
     if (ethTransfers.length === 0) {
@@ -44,8 +49,9 @@ export const checkEthBalanceChanges: ProposalCheck = {
 
     // Helper function to find a contract by address
     const findContractByAddress = (address: string) => {
+      const addressLower = address.toLowerCase();
       return sim.contracts.find(
-        (c) => getAddress(c.address) === getAddress(address)
+        (c) => c.address?.toLowerCase() === addressLower
       );
     };
 
@@ -180,7 +186,11 @@ function addBalanceChangesTable(
 
   // Sort balance changes by address for consistency
   const sortedBalanceChanges = [...balanceChanges]
-    .filter((change) => ethAddresses.has(change.address.toLowerCase())) // Only include addresses involved in ETH transfers
+    .filter(
+      (change) =>
+        safeGetAddress(change.address) !== null &&
+        ethAddresses.has(change.address.toLowerCase())
+    ) // Only include addresses involved in ETH transfers
     .sort((a, b) =>
       a.address.toLowerCase().localeCompare(b.address.toLowerCase())
     );

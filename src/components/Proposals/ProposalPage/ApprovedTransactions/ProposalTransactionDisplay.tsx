@@ -192,20 +192,19 @@ const ProposalTransactionDisplay = ({
   const simulateTransactions = async () => {
     try {
       setIsSimulating(true);
-      let report;
-      if (proposal?.id) {
-        report = await checkExistingProposal({
-          existingProposal: proposal,
-        });
-      } else {
-        report = await checkNewProposal({
-          targets,
-          values: values.map((v) => BigInt(v)),
-          signatures: signatures ?? Array(targets.length).fill(""),
-          calldatas,
-          draftId: "1",
-        });
-      }
+      const result = proposal?.id
+        ? await checkExistingProposal({
+            existingProposal: proposal,
+          })
+        : await checkNewProposal({
+            targets,
+            values: values.map((v) => BigInt(v)),
+            signatures: signatures ?? Array(targets.length).fill(""),
+            calldatas,
+            draftId: "1",
+          });
+      if (!result.ok) throw new Error(result.error);
+      const report = result.report;
 
       openDialog({
         type: "SIMULATION_REPORT",

@@ -9,9 +9,9 @@ import Tenant from "../tenant/tenant";
 import ALL_CHECKS from "./checks";
 import { handleCrossChainSimulations } from "./cross-chain/tenderly-execution-engine";
 import { generateReport } from "./report";
+import { runChecks } from "./runChecks";
 import { simulateNew, simulateNewApproval, simulateProposed } from "./simulate";
 import {
-  AllCheckResults,
   ApprovalProposalOption,
   ApprovalProposalSettings,
   SimulationConfigNew,
@@ -32,6 +32,27 @@ const getBlockCached = unstable_cache(
   { revalidate: ONE_HOUR_IN_SECONDS }
 );
 
+type SimulationActionResult<T> =
+  | { ok: true; report: T }
+  | { ok: false; error: string };
+
+// Errors thrown from a server action are redacted in production (the client only sees
+// "Minified React error #441"), so failures are logged here and returned as data instead.
+async function toActionResult<T>(
+  label: string,
+  run: () => Promise<T>
+): Promise<SimulationActionResult<T>> {
+  try {
+    return { ok: true, report: await run() };
+  } catch (error) {
+    console.error(`${label} failed:`, error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 async function runCrossChainIfL1Ok(
   simulationResult: SimulationResult
 ): Promise<SimulationResult> {
@@ -39,7 +60,7 @@ async function runCrossChainIfL1Ok(
   return handleCrossChainSimulations(simulationResult);
 }
 
-export async function checkNewProposal({
+async function checkNewProposalImpl({
   targets,
   values,
   signatures,
@@ -89,21 +110,7 @@ export async function checkNewProposal({
 
   proposal.title = title;
 
-  const checkResults: AllCheckResults = Object.fromEntries(
-    await Promise.all(
-      Object.keys(ALL_CHECKS).map(async (checkId) => [
-        checkId,
-        {
-          name: ALL_CHECKS[checkId].name,
-          result: await ALL_CHECKS[checkId].checkProposal(
-            proposal,
-            sim,
-            proposalData
-          ),
-        },
-      ])
-    )
-  );
+  const checkResults = await runChecks(ALL_CHECKS, proposal, sim, proposalData);
 
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
@@ -124,7 +131,7 @@ export async function checkNewProposal({
   return report;
 }
 
-export async function checkExistingProposal({
+async function checkExistingProposalImpl({
   existingProposal,
 }: {
   existingProposal: Proposal;
@@ -162,23 +169,11 @@ export async function checkExistingProposal({
   proposalEvent.title =
     proposalEvent.title || existingProposal.markdowntitle || "";
 
-  const checkResults: AllCheckResults = Object.fromEntries(
-    await Promise.all(
-      Object.keys(ALL_CHECKS).map(async (checkId) => {
-        const result = await ALL_CHECKS[checkId].checkProposal(
-          proposalEvent,
-          sim,
-          proposalData
-        );
-        return [
-          checkId,
-          {
-            name: ALL_CHECKS[checkId].name,
-            result,
-          },
-        ];
-      })
-    )
+  const checkResults = await runChecks(
+    ALL_CHECKS,
+    proposalEvent,
+    sim,
+    proposalData
   );
 
   const [startBlock, endBlock] = await Promise.all([
@@ -202,7 +197,7 @@ export async function checkExistingProposal({
   return report;
 }
 
-export async function checkNewApprovalProposal({
+async function checkNewApprovalProposalImpl({
   unformattedProposalData,
   description,
   draftId,
@@ -260,21 +255,7 @@ export async function checkNewApprovalProposal({
 
   proposal.title = title;
 
-  const checkResults: AllCheckResults = Object.fromEntries(
-    await Promise.all(
-      Object.keys(ALL_CHECKS).map(async (checkId) => [
-        checkId,
-        {
-          name: ALL_CHECKS[checkId].name,
-          result: await ALL_CHECKS[checkId].checkProposal(
-            proposal,
-            sim,
-            proposalData
-          ),
-        },
-      ])
-    )
-  );
+  const checkResults = await runChecks(ALL_CHECKS, proposal, sim, proposalData);
 
   const [startBlock, endBlock] = await Promise.all([
     proposal.startBlock && Number(proposal.startBlock) <= latestBlock.number
@@ -293,4 +274,26 @@ export async function checkNewApprovalProposal({
   );
 
   return report;
+}
+
+export async function checkNewProposal(
+  args: Parameters<typeof checkNewProposalImpl>[0]
+) {
+  return toActionResult("checkNewProposal", () => checkNewProposalImpl(args));
+}
+
+export async function checkExistingProposal(
+  args: Parameters<typeof checkExistingProposalImpl>[0]
+) {
+  return toActionResult("checkExistingProposal", () =>
+    checkExistingProposalImpl(args)
+  );
+}
+
+export async function checkNewApprovalProposal(
+  args: Parameters<typeof checkNewApprovalProposalImpl>[0]
+) {
+  return toActionResult("checkNewApprovalProposal", () =>
+    checkNewApprovalProposalImpl(args)
+  );
 }

@@ -4,6 +4,7 @@ import { decodeFunctionData, parseAbiItem, toFunctionSelector } from "viem";
 import { bullet } from "../report";
 import type { FluffyCall, ProposalCheck, TenderlyContract } from "../types";
 import { getContractName } from "../simulate";
+import { findMatchingCall } from "./call-trace";
 import Tenant from "@/lib/tenant/tenant";
 import { cachedDecodeEnhanced } from "@/lib/transactionDecoder";
 import { getFunctionSignature } from "@/lib/utils";
@@ -58,8 +59,9 @@ export const checkDecodeCalldata: ProposalCheck = {
 
         // Get the contract information from the simulation
         const targetAddress = proposal.targets[i];
+        const targetLower = String(targetAddress).toLowerCase();
         const contract = sim.contracts.find(
-          (c) => getAddress(c.address) === getAddress(targetAddress)
+          (c) => c.address?.toLowerCase() === targetLower
         );
 
         return prettifyCalldata(call, targetAddress, warnings, contract);
@@ -74,33 +76,6 @@ export const checkDecodeCalldata: ProposalCheck = {
 };
 
 // --- Helper methods ---
-
-/**
- * Given an array of calls, find the call matching the provided from address and calldata by
- * recursively traversing all calls in the trace. This is required because the call we're looking
- * for is not always at the same depth of the call stack. If all governor `execute` calls were made
- * from an EOA this would be true, but because calls to `execute` can also be made from contracts
- * we don't know the depth of the call containing `calldata`
- * @dev Using any[] due to incompatible call types (CallTraceCall, FluffyCall) that share common properties
- */
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-function findMatchingCall(
-  from: string,
-  calldata: string,
-  calls: any[]
-): FluffyCall | null {
-  if (!calls || !calls.length) return null;
-  const callMatches = (f: string, c: string) =>
-    getAddress(f) === getAddress(from) && c === calldata;
-  for (const call of calls) {
-    if (callMatches(call.from, call.input)) return call;
-    if (call.calls) {
-      const foundCall = findMatchingCall(from, calldata, call.calls);
-      if (foundCall) return foundCall;
-    }
-  }
-  return null;
-}
 
 /**
  * Given a call, check if any subcalls have matching calldata. If so, return the deepest call as

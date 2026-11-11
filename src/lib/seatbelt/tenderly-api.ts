@@ -4,6 +4,19 @@ import type { TenderlyPayload, TenderlySimulation } from "./types";
 
 export const BLOCK_GAS_LIMIT = 30_000_000;
 
+/**
+ * Checksums an address taken from a Tenderly response. Tenderly data is not guaranteed to be
+ * well formed (e.g. empty `from` on some trace entries), so this returns null instead of throwing.
+ */
+export function safeGetAddress(value: unknown): string | null {
+  if (typeof value !== "string" || !value) return null;
+  try {
+    return getAddress(value);
+  } catch {
+    return null;
+  }
+}
+
 export const DEFAULT_SIMULATION_FROM =
   "0xD73a92Be73EfbFcF3854433A5FcbAbF9c1316073";
 
@@ -91,9 +104,11 @@ export async function sendSimulation(
       }
     );
 
-    sim.transaction.addresses = sim.transaction.addresses.map(getAddress);
+    sim.transaction.addresses = sim.transaction.addresses
+      .map(safeGetAddress)
+      .filter((addr): addr is string => addr !== null);
     for (const contract of sim.contracts) {
-      contract.address = getAddress(contract.address);
+      contract.address = safeGetAddress(contract.address) ?? contract.address;
     }
 
     return sim;
