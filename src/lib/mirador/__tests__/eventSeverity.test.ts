@@ -81,4 +81,78 @@ describe("inferMiradorEventSeverity", () => {
       })
     ).toBe("error");
   });
+
+  it.each([
+    [
+      "governance_vote_failed",
+      {
+        voteKind: "standard",
+        error: "Connect your wallet before submitting this transaction.",
+      },
+    ],
+    [
+      "governance_delegation_failed",
+      { error: "RPC endpoint returned too many errors, retrying shortly." },
+    ],
+    [
+      "governance_vote_failed",
+      { voteKind: "sponsored", error: "The device must be opened first." },
+    ],
+    [
+      "governance_vote_failed",
+      { voteKind: "standard", error: "Extension context invalidated." },
+    ],
+    [
+      "governance_vote_failed",
+      {
+        voteKind: "standard",
+        error: "nonce too low: next nonce 95, tx nonce 94",
+      },
+    ],
+    [
+      "governance_vote_failed",
+      {
+        voteKind: "standard",
+        error: "GovernorVotingSimple: vote already cast",
+      },
+    ],
+    [
+      "governance_vote_failed",
+      {
+        voteKind: "standard",
+        error: "insufficient funds for gas * price + value",
+      },
+    ],
+    [
+      "siwe_login_failed",
+      { message: "Cannot read properties of undefined (reading 'includes')" },
+    ],
+    ["siwe_login_failed", { message: "Request expired. Please try again." }],
+  ])("downgrades a known client outcome for %s", (eventName, details) => {
+    expect(inferMiradorEventSeverity(eventName, details)).toBe("warn");
+  });
+
+  it("treats wallet scan cancellation as info", () => {
+    expect(
+      inferMiradorEventSeverity("governance_delegation_failed", {
+        error: "Keyring Controller signTypedMessage: Scan cancelled",
+      })
+    ).toBe("info");
+  });
+
+  it.each([
+    ["relay_vote_submission_failed", { error: "nonce too low" }],
+    ["siwe_login_failed", { error: "An internal error has occurred" }],
+    ["governance_vote_failed", { error: "Error processing the transaction" }],
+    [
+      "governance_vote_failed",
+      { voteKind: "sponsored", error: "nonce too low" },
+    ],
+    [
+      "governance_vote_failed",
+      { voteKind: "standard", error: "tx hint expired after 6 hours" },
+    ],
+  ])("keeps an actionable failure for %s as error", (eventName, details) => {
+    expect(inferMiradorEventSeverity(eventName, details)).toBe("error");
+  });
 });

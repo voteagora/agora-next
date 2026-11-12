@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSIWE, SIWE_NONCE_QUERY_KEY } from "connectkit";
 import { useQueryClient } from "@tanstack/react-query";
-import { useSignMessage } from "wagmi";
+import { useAccount, useSignMessage } from "wagmi";
 import { getAddress } from "viem";
 
 import { siweProviderConfig } from "@/components/shared/SiweProviderConfig";
@@ -78,6 +78,7 @@ export function useEnsureSiweSession(params: {
 }) {
   const { address, chainId, purpose } = params;
   const { signOut } = useSIWE();
+  const { connector } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const queryClient = useQueryClient();
   const openDialog = useOpenDialog();
@@ -145,20 +146,38 @@ export function useEnsureSiweSession(params: {
       throw new Error("Wallet not connected");
     }
     const nonce = await siweProviderConfig.getNonce();
-    const message = await siweProviderConfig.createMessage({
+    let message = await siweProviderConfig.createMessage({
       // siwe library requires EIP-55 checksummed address; params.address is lowercased
       address: getAddress(address),
       chainId,
       nonce,
     });
-    const signature = await signMessageAsync({ message });
+    let signature: `0x${string}`;
+    try {
+      signature = await signMessageAsync({ message });
+    } catch (error) {
+      if (
+        !(error instanceof Error) ||
+        error.name !== "ConnectorChainMismatchError" ||
+        !connector
+      ) {
+        throw error;
+      }
+
+      message = await siweProviderConfig.createMessage({
+        address: getAddress(address),
+        chainId: await connector.getChainId(),
+        nonce,
+      });
+      signature = await signMessageAsync({ message, connector });
+    }
     const success = await siweProviderConfig.verifyMessage({
       message,
       signature,
     });
     void queryClient.invalidateQueries({ queryKey: [SIWE_NONCE_QUERY_KEY] });
     return success;
-  }, [address, chainId, signMessageAsync, queryClient]);
+  }, [address, chainId, connector, signMessageAsync, queryClient]);
 
   const openSafeSiweDialog = useCallback(
     (options?: EnsureSiweSessionOptions) => {
