@@ -60,6 +60,7 @@ export default function ArchiveProposalsList({
   const filter =
     searchParams?.get("filter") ?? proposalsFilterOptions.relevant.filter;
   const { ui, slug } = Tenant.current();
+  const copy = ui.copy;
 
   let tenantSupportsProposalLifecycle =
     ui.toggle("proposal-lifecycle")?.enabled;
@@ -133,7 +134,7 @@ export default function ArchiveProposalsList({
   return (
     <div className="flex flex-col max-w-[76rem]">
       <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2 mb-4 sm:mb-auto">
-        <PageHeader headerText="All Proposals" />
+        <PageHeader headerText={copy.proposals.allTitle} />
         <div className="flex flex-col sm:flex-row justify-between gap-4 w-full sm:w-fit items-center">
           <ProposalsFilter />
           {address ? (
@@ -145,7 +146,7 @@ export default function ArchiveProposalsList({
                   window.location.href = `/create`;
                 }}
               >
-                Create proposal
+                {copy.proposals.createButton}
               </UpdatedButton>
             ) : (
               <CreateProposalDraftButton address={address} />
@@ -170,7 +171,7 @@ export default function ArchiveProposalsList({
           <div>
             {sortedProposals.length === 0 ? (
               <div className="flex flex-row justify-center py-8 text-secondary">
-                No proposals currently
+                {copy.proposals.empty}
               </div>
             ) : (
               <div>

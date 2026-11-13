@@ -8,6 +8,7 @@ import {
   ZERO_ADDRESS,
 } from "@/lib/constants";
 import { disapprovalThreshold } from "@/lib/constants";
+import { NO_OP_TIMELOCK_CALLDATA } from "@/lib/noOpTransaction";
 import { getProposalTypeAddress } from "./stages";
 
 const transferABI = [
@@ -107,8 +108,10 @@ export function getInputData(proposal: DraftProposal): {
         );
         values.push(0);
         calldatas.push(
-          contracts.supportScopes ? "0xf27a0c92" : ("0x" as `0x${string}`)
-        ); // 0xf27a0c92 is the calldata to call the getMinDelay read function on the timelock => its only purpose is to allow for empty signal only proposals
+          contracts.supportScopes
+            ? NO_OP_TIMELOCK_CALLDATA
+            : ("0x" as `0x${string}`)
+        ); // NO_OP_TIMELOCK_CALLDATA calls the getMinDelay read function on the timelock => its only purpose is to allow for empty signal only proposals
         signatures.push("");
       } else {
         proposal.transactions.forEach((t) => {

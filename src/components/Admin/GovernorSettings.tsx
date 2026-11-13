@@ -77,9 +77,10 @@ export default function GovernorSettings() {
   const [manager, setManager] = useState("0x...");
   const [votingPeriod, setVotingPeriod] = useState("");
 
+  // Round (not floor) so float noise like 17999.999 never lands one block short.
   function convertToBlocks(valueInHours: string) {
     return BigInt(
-      Math.floor((Number(valueInHours) * SECONDS_IN_HOUR) / secondsPerBlock)
+      Math.round((Number(valueInHours) * SECONDS_IN_HOUR) / secondsPerBlock)
     );
   }
 
@@ -177,6 +178,9 @@ export default function GovernorSettings() {
               writeContract={writeSetVotingPeriod}
               setConfig={votingPeriodConfig}
               period={"hours"}
+              blocks={
+                votingPeriod === "" ? null : convertToBlocks(votingPeriod)
+              }
               isError={votingPeriodError}
             />
             <GovernorUnlockedSetting
@@ -189,6 +193,7 @@ export default function GovernorSettings() {
               writeContract={writeSetVotingDelay}
               setConfig={votingDelayConfig}
               period={"hours"}
+              blocks={votingDelay === "" ? null : convertToBlocks(votingDelay)}
               isError={votingDelayError}
             />
           </div>
@@ -255,6 +260,7 @@ interface GovernLockSettingProps {
   writeContract?: any;
   setConfig?: any;
   isError?: boolean;
+  blocks?: bigint | null;
 }
 
 function GovernorUnlockedSetting(props: GovernLockSettingProps) {
@@ -290,6 +296,11 @@ function GovernorUnlockedSetting(props: GovernLockSettingProps) {
           Update
         </Button>
       </div>
+      {props.blocks !== undefined && props.blocks !== null && (
+        <p className="mt-1 text-xs text-tertiary">
+          = {props.blocks.toLocaleString()} blocks on-chain
+        </p>
+      )}
     </div>
   );
 }

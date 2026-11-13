@@ -19,7 +19,8 @@ import {
 } from "react";
 import { UIGasRelayConfig } from "@/lib/tenant/tenantUI";
 import { useEthBalance } from "@/hooks/useEthBalance";
-import { formatEther } from "viem";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
+import { isGasRelayEligible } from "@/lib/gasRelayUtils";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import useEffectEvent from "@/hooks/useEffectEvent";
 import { useAccount } from "wagmi";
@@ -131,13 +132,22 @@ const CastVoteContextProvider = ({
     enabled: isGasRelayEnabled,
     address: gasRelayConfig?.sponsorAddress,
   });
-  // Gas relay is only LIVE when it is enabled in the settings and the sponsor meets minimum eth requirements and the user has enough VP
+  const { data: tokenBalance } = useTokenBalance(
+    isGasRelayEnabled ? address : undefined
+  );
+  // Gas relay is only LIVE when it is enabled in the settings, the sponsor
+  // meets minimum eth requirements, and the voter has enough snapshot VP or
+  // currently holds enough of the token (so holders who received tokens after
+  // the snapshot can still vote with sponsored gas).
   const isGasRelayLive =
-    isGasRelayEnabled &&
-    Number(formatEther(sponsorBalance || 0n)) >=
-      Number(gasRelayConfig.minBalance) &&
-    Number(votingPower?.totalVP ?? "0") >
-      Number(gasRelayConfig?.minVPToUseGasRelay) &&
+    isGasRelayEligible({
+      enabled: isGasRelayEnabled,
+      sponsorBalance,
+      minBalance: gasRelayConfig?.minBalance,
+      totalVP: votingPower?.totalVP,
+      tokenBalance,
+      minVPToUseGasRelay: gasRelayConfig?.minVPToUseGasRelay,
+    }) &&
     !reason &&
     !fallbackToStandardVote;
 

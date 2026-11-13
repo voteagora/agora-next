@@ -136,29 +136,35 @@ const mockConfig = {
 };
 let mockSafeProposalChoiceEnabled = true;
 
-vi.mock("@/lib/tenant/tenant", () => ({
-  default: {
-    current: () => ({
-      ui: {
-        toggle: (name: string) => {
-          if (name === "proposal-lifecycle") {
-            return {
-              config: mockConfig,
-            };
-          }
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          toggle: (name: string) => {
+            if (name === "proposal-lifecycle") {
+              return {
+                config: mockConfig,
+              };
+            }
 
-          if (name === "safe-proposal-choice") {
-            return {
-              enabled: mockSafeProposalChoiceEnabled,
-            };
-          }
+            if (name === "safe-proposal-choice") {
+              return {
+                enabled: mockSafeProposalChoiceEnabled,
+              };
+            }
 
-          return undefined;
+            return undefined;
+          },
         },
-      },
-    }),
-  },
-}));
+      }),
+    },
+  };
+});
 
 describe("CreateProposalDraftButton", () => {
   const mockAddress = "0x123" as `0x${string}`;

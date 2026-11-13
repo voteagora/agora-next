@@ -14,6 +14,7 @@ import ChartTabs from "./ChartTabs";
 import useTenantColorScheme from "@/hooks/useTenantColorScheme";
 import { FREQUENCY_FILTERS } from "@/lib/constants";
 import type { MetricTimeSeriesValue } from "@/lib/types";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   getData: (
@@ -30,6 +31,7 @@ type ChartData = {
 
 const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
   const { primary, gradient } = useTenantColorScheme();
+  const copy = Tenant.current().ui.copy;
 
   const [filter, setFilter] = useState<FREQUENCY_FILTERS>(
     FREQUENCY_FILTERS.YEAR
@@ -130,7 +132,7 @@ const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
               className="w-4 h-[2px]"
             ></div>
             <p className="text-xs font-semibold text-gray-4f">
-              # of delegates to reach 50% of votable supply
+              {copy.info.governanceCharts.representativesToReachHalfSupply}
             </p>
           </div>
           <div className="flex flex-row gap-1 justify-center items-center">
@@ -139,7 +141,7 @@ const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
               className="w-4 border border-b-1 border-dashed"
             />
             <p className="text-xs font-semibold text-gray-4f">
-              # of delegates to reach quorum
+              {copy.info.governanceCharts.representativesToReachQuorum}
             </p>
           </div>
         </div>
@@ -152,6 +154,7 @@ const ChartGovernanceRequiredDelegates = ({ getData }: Props) => {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   const { primary } = useTenantColorScheme();
+  const copy = Tenant.current().ui.copy;
 
   if (active && payload && payload.length) {
     return (
@@ -163,7 +166,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 h-[2px]"
           ></div>
           <p className="text-xs font-medium text-gray-4f ">
-            To reach 50%{" "}
+            {copy.info.governanceCharts.toReachHalfSupply}{" "}
             <span className="font-bold pl-3">{payload[0].value}</span>
           </p>
         </div>
@@ -173,7 +176,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             className="w-4 border border-b-1 border-dashed"
           />
           <p className="text-xs font-medium text-gray-4f">
-            To reach quorum{" "}
+            {copy.info.governanceCharts.toReachQuorum}{" "}
             <span className="font-bold pl-6">{payload[1].value}</span>
           </p>
         </div>

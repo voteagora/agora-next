@@ -6,10 +6,20 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import DelegateStatementForm from "../DelegateStatementForm";
 import type { DelegateStatementFormValues } from "../CurrentDelegateStatement";
+
+function renderForm(form: ReturnType<typeof createForm>) {
+  const queryClient = new QueryClient();
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <DelegateStatementForm form={form} />
+    </QueryClientProvider>
+  );
+}
 
 const pushMock = vi.fn();
 const submitDelegateStatementMock = vi.fn();
@@ -42,6 +52,10 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: pushMock,
   }),
+}));
+
+vi.mock("@/components/Dialogs/DialogProvider/DialogProvider", () => ({
+  useOpenDialog: () => vi.fn(),
 }));
 
 vi.mock("wagmi", () => ({
@@ -129,17 +143,24 @@ vi.mock("@/components/Delegates/DelegateCard/DelegateCard", () => ({
   default: () => <div>DelegateCard</div>,
 }));
 
-vi.mock("@/lib/tenant/tenant", () => ({
-  default: {
-    current: () => ({
-      ui: {
-        governanceIssues: [],
-        governanceStakeholders: [],
-      },
-      contracts: {},
-    }),
-  },
-}));
+vi.mock("@/lib/tenant/tenant", async () => {
+  const { getTenantCopy } = await vi.importActual<
+    typeof import("@/lib/tenant/tenantCopy")
+  >("@/lib/tenant/tenantCopy");
+  return {
+    default: {
+      current: () => ({
+        ui: {
+          copy: getTenantCopy("dao"),
+          toggle: () => undefined,
+          governanceIssues: [],
+          governanceStakeholders: [],
+        },
+        contracts: {},
+      }),
+    },
+  };
+});
 
 vi.mock("react-hook-form", async () => {
   const actual =
@@ -181,7 +202,7 @@ describe("DelegateStatementForm", () => {
   });
 
   it("submits with a SIWE JWT for EOAs", async () => {
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+    renderForm(createForm(defaultValues));
 
     fireEvent.click(
       screen.getByRole("button", { name: "Submit delegate profile" })
@@ -213,7 +234,7 @@ describe("DelegateStatementForm", () => {
       }
     );
 
-    render(<DelegateStatementForm form={createForm(defaultValues)} />);
+    renderForm(createForm(defaultValues));
 
     fireEvent.click(
       screen.getByRole("button", { name: "Submit delegate profile" })

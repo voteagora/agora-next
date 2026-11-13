@@ -53,6 +53,7 @@ export default function OODaoProposalTypeApproval({
   ).archiveMetadata;
   const isTempCheck = archiveMetadata?.rawTag === "tempcheck";
   const { namespace, ui } = Tenant.current();
+  const copy = ui.copy;
   const isDark = ui.theme === "dark";
 
   // Only show for eas-oodao proposals
@@ -126,6 +127,7 @@ export default function OODaoProposalTypeApproval({
     router.push(`/forums/new?${params.toString()}`);
   };
   const now = new Date();
+  const subject = isTempCheck ? copy.nouns.tempCheck : copy.nouns.proposal;
 
   if (
     !showCreateButton &&
@@ -151,13 +153,13 @@ export default function OODaoProposalTypeApproval({
         <div className="relative">
           <div className="flex items-center justify-between">
             <div className="w-[151px] text-xs font-semibold text-[#444444]">
-              You are eligible to turn this into a gov proposal
+              {copy.proposals.eligibleToCreateGovernanceProposal}
             </div>
             <Button
               className="px-5 py-3 text-xs font-semibold"
               onClick={handleCreateGovProposal}
             >
-              Create gov proposal
+              {copy.proposals.createGovernanceProposalButton}
             </Button>
           </div>
         </div>
@@ -165,14 +167,13 @@ export default function OODaoProposalTypeApproval({
         <div className="relative">
           <div className="flex items-center justify-between">
             <div className="w-[151px] text-xs font-semibold text-[#444444]">
-              Want to discuss this {isTempCheck ? "temp check" : "proposal"}{" "}
-              further?
+              {copy.proposals.discussPrompt(subject)}
             </div>
             <Button
               className="px-5 py-3 text-xs font-semibold"
               onClick={handleCreateDiscussion}
             >
-              Create discussion
+              {copy.proposals.createDiscussionButton}
             </Button>
           </div>
         </div>
@@ -181,15 +182,14 @@ export default function OODaoProposalTypeApproval({
           {endTime && endTime > now && (
             <div className="flex items-center justify-between text-xs font-semibold text-secondary mb-4">
               <span className="inline-flex items-center gap-2">
-                Proposal type not yet approved
+                {copy.proposals.proposalTypeNotApproved}
                 <TooltipProvider delayDuration={150}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <InformationCircleIcon className="h-4 w-4 cursor-pointer text-secondary hover:text-primary" />
                     </TooltipTrigger>
                     <TooltipContent className="max-w-xs text-xs text-secondary">
-                      This temp check still needs admin approval with proposal
-                      type before it can proceed to a governance proposal.
+                      {copy.proposals.proposalTypeTooltip}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -202,21 +202,22 @@ export default function OODaoProposalTypeApproval({
             {minQuorum !== maxQuorum && (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                  <span>Quorum</span>
+                  <span>{copy.proposals.quorum}</span>
                   {namespace === TENANT_NAMESPACES.SYNDICATE && isTempCheck && (
                     <SyndicateTempCheckTooltip />
                   )}
                 </div>
                 <span>
-                  {minQuorum}% – {maxQuorum}% until type approved
+                  {minQuorum}% – {maxQuorum}% {copy.proposals.untilTypeApproved}
                 </span>
               </div>
             )}
             {minApproval !== maxApproval && (
               <div className="flex items-center justify-between">
-                <span>Approval Threshold</span>
+                <span>{copy.proposals.approvalThreshold}</span>
                 <span>
-                  {minApproval}% – {maxApproval}% until type approved
+                  {minApproval}% – {maxApproval}%{" "}
+                  {copy.proposals.untilTypeApproved}
                 </span>
               </div>
             )}

@@ -4,6 +4,7 @@ import { TextInputWithTooltip } from "@/components/shared/Form/TextInputWithTool
 import { useState } from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { useRouter } from "next/navigation";
+import Tenant from "@/lib/tenant/tenant";
 
 export default function DelegatesSearch({
   className,
@@ -14,6 +15,8 @@ export default function DelegatesSearch({
   closeButton?: boolean;
   onClose?: () => void;
 }) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const router = useRouter();
   const [enteredName, setEnteredName] = useState("");
 
@@ -37,8 +40,8 @@ export default function DelegatesSearch({
 
         <TextInputWithTooltip
           onChange={(value) => setEnteredName(value)}
-          placeholder="Exact ENS or address"
-          tooltipMessage="Please input exact ENS or address. Partial and fuzzy search is not supported yet."
+          placeholder={copy.delegates.searchPlaceholder}
+          tooltipMessage={copy.delegates.searchTooltip}
           className="py-2 pl-8 rounded-sm sm:rounded-lg bg-wash border border-line w-full sm:w-auto placeholder-tertiary/50 text-secondary"
         />
         {closeButton && (
@@ -46,7 +49,7 @@ export default function DelegatesSearch({
             type="button"
             onClick={onClose}
             className="sm:hidden absolute right-3 top-2.5 p-1"
-            aria-label="Close search"
+            aria-label={copy.delegates.closeSearchAria}
           >
             <XMarkIcon className="w-4 h-4 text-tertiary" />
           </button>

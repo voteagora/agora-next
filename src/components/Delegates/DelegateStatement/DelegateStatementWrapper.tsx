@@ -4,6 +4,7 @@ import DelegateStatementContainer from "./DelegateStatementContainer";
 import TopStakeholders from "./TopStakeholders";
 import TopIssues from "./TopIssues";
 import { Delegate } from "@/app/api/common/delegates/delegate";
+import Tenant from "@/lib/tenant/tenant";
 
 interface Props {
   delegate: Delegate;
@@ -11,6 +12,9 @@ interface Props {
 }
 
 function ZeroVotingPowerNotice() {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <div
       role="alert"
@@ -22,13 +26,10 @@ function ZeroVotingPowerNotice() {
       />
       <div className="min-w-0 flex-1 flex flex-col gap-2 text-primary">
         <p className="text-base font-semibold leading-snug">
-          This profile has no voting power
+          {copy.delegates.profile.noVotingPowerTitle}
         </p>
         <p className="text-sm text-secondary leading-relaxed">
-          Our records show that this delegate currently holds no voting weight
-          on this protocol. Any statements or votes posted from this profile do
-          not influence proposal outcomes. Profiles like this are sometimes used
-          for signaling or scams; please review with appropriate context.
+          {copy.delegates.profile.noVotingPowerDescription}
         </p>
       </div>
     </div>

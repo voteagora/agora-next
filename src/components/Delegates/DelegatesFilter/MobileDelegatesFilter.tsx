@@ -23,6 +23,7 @@ import Tenant from "@/lib/tenant/tenant";
 
 export const MobileDelegatesFilter = () => {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const hide7dChange = ui.toggle("hide-7d-change")?.enabled ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
@@ -136,10 +137,21 @@ export const MobileDelegatesFilter = () => {
   };
 
   const totalActiveFiltersCount = getTotalActiveFiltersCount();
+  const sortLabelByKey: Record<keyof typeof delegatesFilterOptions, string> = {
+    weightedRandom: copy.filters.delegates.weightedRandom,
+    mostVotingPower: copy.filters.delegates.mostVotingPower,
+    leastVotingPower: copy.filters.delegates.leastVotingPower,
+    mostDelegators: copy.filters.delegates.mostDelegators,
+    mostRecentDelegation: copy.filters.delegates.mostRecentDelegation,
+    oldestDelegation: copy.filters.delegates.oldestDelegation,
+    latestVotingBlock: copy.filters.delegates.latestVotingBlock,
+    vpChange7d: copy.filters.delegates.vpChange7d,
+    vpChange7dDesc: copy.filters.delegates.vpChange7dDesc,
+  };
 
   return (
     <FilterResetListbox
-      triggerLabel="Sort"
+      triggerLabel={copy.filters.delegates.sort}
       triggerIcon={
         <FilterIcon
           className={
@@ -181,7 +193,9 @@ export const MobileDelegatesFilter = () => {
                 return (
                   <MobileSortOption
                     key={key}
-                    label={option.value}
+                    label={
+                      sortLabelByKey[key as keyof typeof delegatesFilterOptions]
+                    }
                     checked={option.sort === tempSortParam}
                     onClick={() => handleTempSortChange(option.sort)}
                   />
@@ -195,25 +209,25 @@ export const MobileDelegatesFilter = () => {
       <div className="self-stretch flex flex-col justify-start items-start">
         <div className="self-stretch h-16 px-4 py-2 inline-flex justify-between items-center">
           <div className="text-secondary text-base font-semibold leading-normal">
-            Filter
+            {copy.filters.delegates.filter}
           </div>
           <button
             onClick={resetAllFiltersToUrl}
             className="justify-center text-primary text-xs font-medium leading-none cursor-pointer"
           >
-            Reset
+            {copy.filters.delegates.reset}
           </button>
         </div>
         <div className="self-stretch px-2.5 pb-6 bg-wash flex flex-col justify-start items-start gap-2.5">
           <div className="self-stretch inline-flex justify-start items-start gap-2.5 flex-wrap content-start">
             <FilterButton
-              label="All Delegates"
+              label={copy.filters.delegates.allRepresentatives}
               isActive={!tempMyDelegates && !tempEndorsed && !tempHasStatement}
               onClick={() => handleToggleFilter("all")}
             />
             {connectedAddress && (
               <FilterButton
-                label="My Delegate(s)"
+                label={copy.filters.delegates.myRepresentatives}
                 isActive={tempMyDelegates}
                 onClick={() => handleToggleFilter(MY_DELEGATES_FILTER_PARAM)}
               />
@@ -235,7 +249,7 @@ export const MobileDelegatesFilter = () => {
               />
             )}
             <FilterButton
-              label="Has statement"
+              label={copy.filters.delegates.hasStatement}
               isActive={tempHasStatement}
               onClick={() => handleToggleFilter(HAS_STATEMENT_FILTER_PARAM)}
             />
@@ -262,7 +276,7 @@ export const MobileDelegatesFilter = () => {
           onClick={applyAllFilters}
           className="w-full rounded-lg py-3 px-2 text-neutral bg-brandPrimary hover:bg-brandPrimary/90 flex justify-center"
         >
-          Apply
+          {copy.filters.delegates.apply}
         </button>
       </div>
     </FilterResetListbox>

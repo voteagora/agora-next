@@ -24,8 +24,10 @@ export async function createDelegateStatement({
   auth: DelegateStatementAuthPayload;
 }) {
   const { twitter, warpcast, discord } = delegateStatement;
-  const { slug } = Tenant.current();
+  const { slug, ui } = Tenant.current();
   const normalizedAddress = address.toLowerCase();
+  const canManageProfileMetadata =
+    ui.toggle("delegates/profile-metadata")?.enabled ?? false;
 
   const verifiedAddress = await verifyJwtAndGetAddress(auth.jwt);
 
@@ -36,8 +38,28 @@ export async function createDelegateStatement({
   const storedPayload = buildStoredDelegateStatementPayload(delegateStatement);
   const messageHash = getDelegateStatementPayloadHash(storedPayload);
 
+  const existingStatementMetadata =
+    await prismaWeb2Client.delegateStatements.findFirst({
+      where: { address: normalizedAddress, dao_slug: slug },
+      orderBy: [{ updated_at_ts: "desc" }, { created_at_ts: "desc" }],
+      select: {
+        username: true,
+        avatar: true,
+      },
+    });
+  const normalizeProfileMetadata = (value?: string) => {
+    const trimmed = value?.trim();
+    return trimmed ? trimmed : null;
+  };
+
   const data: any = {
     address: normalizedAddress,
+    username: canManageProfileMetadata
+      ? normalizeProfileMetadata(delegateStatement.username)
+      : (existingStatementMetadata?.username ?? undefined),
+    avatar: canManageProfileMetadata
+      ? normalizeProfileMetadata(delegateStatement.avatar)
+      : (existingStatementMetadata?.avatar ?? undefined),
     dao_slug: slug,
     message_hash: messageHash,
     signature: DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER,

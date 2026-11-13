@@ -28,6 +28,7 @@ import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import useBlockCacheWrappedEns from "@/hooks/useBlockCacheWrappedEns";
 import { truncateAddress } from "@/app/lib/utils/text";
 import AvatarImage from "@/components/shared/AvatarImage";
+import { isZeroWeight, ZeroVpRowTooltip } from "@/components/Votes/zeroVpVote";
 
 const { token, ui } = Tenant.current();
 
@@ -39,22 +40,6 @@ function isOffchain(vote: Vote) {
     proposalType.includes("OFFCHAIN") ||
     proposalType === "SNAPSHOT"
   );
-}
-
-const ZERO_VP_VOTE_TOOLTIP =
-  "0 VP at snapshot. Vote is recorded onchain but does not affect the proposal outcome.";
-
-const zeroVpTooltipContentClass =
-  "max-w-[11rem] px-3 py-2 text-xs text-secondary leading-snug";
-
-function isZeroVotingPowerVote(vote: Vote): boolean {
-  const raw = (vote.weight ?? "").toString().trim().replace(/,/g, "") || "0";
-  try {
-    return BigInt(raw) === 0n;
-  } catch {
-    const n = Number.parseFloat(raw);
-    return Number.isFinite(n) && n === 0;
-  }
 }
 
 function getVoteTooltipText(vote: Vote) {
@@ -135,7 +120,7 @@ export function ProposalSingleVote({
   };
 
   const name = vote.voterMetadata?.name || ensFromBlockCache?.name;
-  const zeroVpVote = isZeroVotingPowerVote(vote);
+  const zeroVpVote = isZeroWeight(vote.weight);
 
   const ensAvatar = () => {
     if (vote.voterMetadata?.image) {
@@ -156,6 +141,31 @@ export function ProposalSingleVote({
     );
   };
 
+  const amount = (
+    <div
+      className={
+        zeroVpVote
+          ? "text-tertiary opacity-40"
+          : vote.support === "AGAINST"
+            ? "text-negative"
+            : vote.support === "FOR"
+              ? "text-positive"
+              : "text-tertiary"
+      }
+    >
+      <TokenAmountDecorated
+        amount={vote.weight}
+        hideCurrency
+        decimals={isOffchainVote ? 0 : undefined}
+        specialFormatting
+        className={
+          fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+        }
+        icon={supportIconForVote(vote.support as Support, zeroVpVote)}
+      />
+    </div>
+  );
+
   return (
     <VStack
       key={vote.transactionHash}
@@ -169,137 +179,112 @@ export function ProposalSingleVote({
           onOpenChange={(open) => _onOpenChange(open)}
         >
           <HoverCardTrigger>
-            <HStack
-              justifyContent="justify-between"
-              className="font-semibold text-secondary"
-            >
-              <HStack gap={1} alignItems="items-center">
-                <div
-                  className={
-                    zeroVpVote ? "shrink-0 opacity-30 grayscale" : "shrink-0"
-                  }
-                >
-                  {ensAvatar()}
-                </div>
-                <div className="flex flex-col">
+            <ZeroVpRowTooltip active={zeroVpVote}>
+              <HStack
+                justifyContent="justify-between"
+                className="font-semibold text-secondary"
+              >
+                <HStack gap={1} alignItems="items-center">
                   <div
                     className={
-                      zeroVpVote
-                        ? "text-tertiary opacity-40 font-bold cursor-default"
-                        : "text-primary font-bold hover:underline"
+                      zeroVpVote ? "shrink-0 opacity-30 grayscale" : "shrink-0"
                     }
                   >
-                    {zeroVpVote ? (
-                      <span>
-                        {name ? (
-                          name
-                        ) : resolveEns ? (
-                          <ENSName address={vote.address} />
-                        ) : (
-                          truncateAddress(vote.address)
-                        )}
-                      </span>
-                    ) : (
-                      <Link
-                        href={
-                          vote.citizenType
-                            ? `https://atlas.optimism.io/voter_address_info/${vote.address}`
-                            : `/delegates/${vote.address}`
-                        }
-                        target={vote.citizenType ? "_blank" : undefined}
-                        rel={
-                          vote.citizenType ? "noopener noreferrer" : undefined
-                        }
-                      >
-                        {name ? (
-                          name
-                        ) : resolveEns ? (
-                          <ENSName address={vote.address} />
-                        ) : (
-                          truncateAddress(vote.address)
-                        )}
-                      </Link>
+                    {ensAvatar()}
+                  </div>
+                  <div className="flex flex-col">
+                    <div
+                      className={
+                        zeroVpVote
+                          ? "text-tertiary opacity-40 font-bold cursor-help"
+                          : "text-primary font-bold hover:underline"
+                      }
+                    >
+                      {zeroVpVote ? (
+                        <span>
+                          {name ? (
+                            name
+                          ) : resolveEns ? (
+                            <ENSName address={vote.address} />
+                          ) : (
+                            truncateAddress(vote.address)
+                          )}
+                        </span>
+                      ) : (
+                        <Link
+                          href={
+                            vote.citizenType
+                              ? `https://atlas.optimism.io/voter_address_info/${vote.address}`
+                              : `/delegates/${vote.address}`
+                          }
+                          target={vote.citizenType ? "_blank" : undefined}
+                          rel={
+                            vote.citizenType ? "noopener noreferrer" : undefined
+                          }
+                        >
+                          {name ? (
+                            name
+                          ) : resolveEns ? (
+                            <ENSName address={vote.address} />
+                          ) : (
+                            truncateAddress(vote.address)
+                          )}
+                        </Link>
+                      )}
+                    </div>
+                    {vote.citizenType && (
+                      <div className="text-[9px] font-bold text-tertiary">
+                        {vote.citizenType?.charAt(0).toUpperCase() +
+                          vote.citizenType?.slice(1).toLowerCase()}
+                      </div>
                     )}
                   </div>
-                  {vote.citizenType && (
-                    <div className="text-[9px] font-bold text-tertiary">
-                      {vote.citizenType?.charAt(0).toUpperCase() +
-                        vote.citizenType?.slice(1).toLowerCase()}
-                    </div>
-                  )}
-                </div>
-                {vote.address === connectedAddress?.toLowerCase() && (
-                  <p
-                    className={
-                      zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
-                    }
-                  >
-                    (you)
-                  </p>
-                )}
-                {hovered && (!!hash1 || !!hash2) && !zeroVpVote && (
-                  <>
-                    <a
-                      href={getBlockScanUrl(hash1)}
-                      target="_blank"
-                      rel="noreferrer noopener"
+                  {vote.address === connectedAddress?.toLowerCase() && (
+                    <p
+                      className={
+                        zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+                      }
                     >
-                      <ArrowTopRightOnSquareIcon className="w-3 h-3" />
-                    </a>
-                    {hash2 && (
+                      (you)
+                    </p>
+                  )}
+                  {hovered && (!!hash1 || !!hash2) && !zeroVpVote && (
+                    <>
                       <a
-                        href={getBlockScanUrl(hash2)}
+                        href={getBlockScanUrl(hash1)}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
-                        <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                        <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                       </a>
-                    )}
-                  </>
-                )}
+                      {hash2 && (
+                        <a
+                          href={getBlockScanUrl(hash2)}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                        </a>
+                      )}
+                    </>
+                  )}
+                </HStack>
+                <HStack alignItems="items-center">
+                  {zeroVpVote ? (
+                    amount
+                  ) : (
+                    <TooltipProvider delayDuration={0}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>{amount}</TooltipTrigger>
+                        <TooltipContent className="p-4">
+                          {getVoteTooltipText(vote)}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </HStack>
               </HStack>
-              <HStack alignItems="items-center">
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div
-                        className={
-                          zeroVpVote
-                            ? "text-tertiary opacity-40"
-                            : vote.support === "AGAINST"
-                              ? "text-negative"
-                              : vote.support === "FOR"
-                                ? "text-positive"
-                                : "text-tertiary"
-                        }
-                      >
-                        <TokenAmountDecorated
-                          amount={vote.weight}
-                          hideCurrency
-                          decimals={isOffchainVote ? 0 : undefined}
-                          specialFormatting
-                          className={
-                            fontMapper[ui?.customization?.tokenAmountFont || ""]
-                              ?.variable
-                          }
-                          icon={supportIconForVote(
-                            vote.support as Support,
-                            zeroVpVote
-                          )}
-                        />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      className={zeroVpVote ? zeroVpTooltipContentClass : "p-4"}
-                    >
-                      {zeroVpVote
-                        ? ZERO_VP_VOTE_TOOLTIP
-                        : getVoteTooltipText(vote)}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </HStack>
-            </HStack>
+            </ZeroVpRowTooltip>
           </HoverCardTrigger>
         </HoverCard>
       </VStack>

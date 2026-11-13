@@ -3,6 +3,7 @@ import ForumsSidebar from "./ForumsSidebar";
 import { getForumData } from "@/lib/actions/forum/topics";
 import ForumsHeader from "./components/ForumsHeader";
 import TopicList from "./components/TopicList";
+import Tenant from "@/lib/tenant/tenant";
 
 interface ForumsPageContentProps {
   categoryId: number | null;
@@ -15,6 +16,8 @@ export default async function ForumsPageContent({
   categoryTitle,
   description,
 }: ForumsPageContentProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const selectedCategoryId =
     typeof categoryId === "number" && Number.isFinite(categoryId)
       ? categoryId
@@ -28,7 +31,7 @@ export default async function ForumsPageContent({
   if (!result.success) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-500">Error loading forum data</p>
+        <p className="text-red-500">{copy.forums.errorLoading}</p>
       </div>
     );
   }
@@ -48,7 +51,7 @@ export default async function ForumsPageContent({
 
   const breadcrumbs = selectedCategoryTitle
     ? [
-        { label: "Discussions", href: "/forums" },
+        { label: copy.forums.title, href: "/forums" },
         { label: selectedCategoryTitle },
       ]
     : [];
@@ -77,7 +80,7 @@ export default async function ForumsPageContent({
           <div className="space-y-3">
             {sortedTopics.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-tertiary">No topics found</p>
+                <p className="text-tertiary">{copy.forums.noTopics}</p>
               </div>
             ) : (
               <TopicList topics={sortedTopics} admins={admins} />

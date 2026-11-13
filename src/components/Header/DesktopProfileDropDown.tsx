@@ -5,8 +5,10 @@ import { Popover, Transition } from "@headlessui/react";
 import { useAccount } from "wagmi";
 import ENSAvatar from "../shared/ENSAvatar";
 import ENSName from "@/components/shared/ENSName";
+import AvatarImage from "@/components/shared/AvatarImage";
 import { ProfileDropDownContent } from "./ProfileDropDownContent";
 import { SiweStatusBadge } from "./SiweStatusBadge";
+import { useProfileData } from "@/hooks/useProfileData";
 
 type Props = {
   ensName: string | undefined;
@@ -14,6 +16,9 @@ type Props = {
 
 export const DesktopProfileDropDown = ({ ensName }: Props) => {
   const { address } = useAccount();
+  const { delegate } = useProfileData();
+  const profileUsername = delegate?.statement?.username?.trim();
+  const profileAvatar = delegate?.statement?.avatar;
 
   return (
     <Popover className="relative cursor-auto">
@@ -24,11 +29,19 @@ export const DesktopProfileDropDown = ({ ensName }: Props) => {
         >
           <div className="text-primary flex items-center gap-3">
             <div className="relative w-[30px] h-[30px] lg:w-6 lg:h-6 shadow-newDefault rounded-full flex">
-              <ENSAvatar ensName={ensName} size={24} />
+              {profileAvatar ? (
+                <AvatarImage
+                  src={profileAvatar}
+                  alt={`${profileUsername || address} avatar`}
+                  size={24}
+                />
+              ) : (
+                <ENSAvatar ensName={ensName} size={24} />
+              )}
               <SiweStatusBadge />
             </div>
             <div className="hidden lg:inline">
-              {address && <ENSName address={address} />}
+              {profileUsername || (address && <ENSName address={address} />)}
             </div>
           </div>
         </Popover.Button>

@@ -41,10 +41,13 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
     return null;
   }
 
+  const hidePendingActivity = ui.isNgo;
   let votesCount: number;
   let totalProposals: number;
   if (useArchiveParticipationSource) {
-    if (!archiveParticipation) return <PendingActivityHeader />;
+    if (!archiveParticipation) {
+      return hidePendingActivity ? null : <PendingActivityHeader />;
+    }
     votesCount = archiveParticipation.participated;
     totalProposals = archiveParticipation.totalProposals;
   } else {
@@ -58,7 +61,9 @@ export const DelegateCardHeader = ({ delegate }: Props) => {
   }
 
   const eligible = totalProposals >= 10;
-  if (!eligible) return <PendingActivityHeader />;
+  if (!eligible) {
+    return hidePendingActivity ? null : <PendingActivityHeader />;
+  }
 
   const participationRate = votesCount / totalProposals;
   const participationString = Math.floor(participationRate * 100);
@@ -90,11 +95,13 @@ const ActiveHeader = ({
   totalProposals: number;
   percentParticipation: number;
 }) => {
+  const copy = Tenant.current().ui.copy;
+
   return (
     <CardHeader
-      title="Active delegate 🎉"
+      title={`${copy.delegates.profile.activeTitle} 🎉`}
       cornerTitle={`${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
+      subtitle={copy.delegates.profile.votedRecent(outOfTen, totalProposals)}
     />
   );
 };
@@ -108,23 +115,25 @@ const InactiveHeader = ({
   totalProposals: number;
   percentParticipation: number;
 }) => {
+  const copy = Tenant.current().ui.copy;
+
   return (
     <CardHeader
-      title="Inactive delegate 💤"
+      title={`${copy.delegates.profile.inactiveTitle} 💤`}
       cornerTitle={`${percentParticipation}%`}
-      subtitle={`Voted in ${outOfTen}/${totalProposals} of the most recent proposals`}
+      subtitle={copy.delegates.profile.votedRecent(outOfTen, totalProposals)}
     />
   );
 };
 
 const PendingActivityHeader = () => {
+  const copy = Tenant.current().ui.copy;
+
   return (
     <CardHeader
-      title={"Gathering Data"}
+      title={copy.delegates.profile.pendingActivityTitle}
       cornerTitle={"⏰"}
-      subtitle={
-        "This delegate has not had voting power for a sufficient number of recent proposals. Check back later!"
-      }
+      subtitle={copy.delegates.profile.pendingActivitySubtitle}
     />
   );
 };

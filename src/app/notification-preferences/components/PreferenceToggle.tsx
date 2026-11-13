@@ -38,7 +38,7 @@ export default function PreferenceToggle({
             : "bg-primary"
           : isDarkTheme
             ? "bg-line"
-            : "bg-neutral",
+            : "bg-line",
         isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
       )}
     >
@@ -50,7 +50,7 @@ export default function PreferenceToggle({
             ? checked
               ? "bg-cardBackground"
               : "bg-tertiary"
-            : "bg-wash"
+            : "bg-neutral"
         )}
       />
       {isLoading ? (

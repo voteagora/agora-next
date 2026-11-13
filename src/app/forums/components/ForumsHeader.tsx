@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import ForumsSearch from "./ForumsSearch";
 import NewTopicButton from "./NewTopicButton";
+import Tenant from "@/lib/tenant/tenant";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -40,12 +41,14 @@ export default function ForumsHeader({
   breadcrumbs = [],
   description,
   showBreadcrumb = breadcrumbs.length > 0,
-  fallbackTitle = "Discussions",
+  fallbackTitle,
   isDuna = false,
   topicContext,
   showSearch = false,
   headerActions,
 }: ForumsHeaderProps) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const shouldRenderBreadcrumb = showBreadcrumb && breadcrumbs.length > 0;
 
   return (
@@ -76,7 +79,9 @@ export default function ForumsHeader({
               </BreadcrumbList>
             </Breadcrumb>
           ) : (
-            <h3 className="text-primary font-bold">{fallbackTitle}</h3>
+            <h3 className="text-primary font-bold">
+              {fallbackTitle ?? copy.forums.title}
+            </h3>
           )}
 
           {description ? <h3 className="text-primary">{description}</h3> : null}

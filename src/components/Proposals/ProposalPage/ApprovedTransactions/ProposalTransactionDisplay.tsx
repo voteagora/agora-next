@@ -38,6 +38,7 @@ import { Proposal } from "@/app/api/common/proposals/proposal";
 import { TENDERLY_VALID_CHAINS } from "@/app/proposals/draft/components/BasicProposalForm";
 import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
 import { ExecutionTxInspectorIconLink } from "@/components/Execution/ExecutionTxInspectorLink";
+import { stripNoOpTransactions } from "@/lib/noOpTransaction";
 
 import { Button } from "@/components/ui/button";
 
@@ -110,13 +111,13 @@ const tokenSymbolsToCheck = {
 };
 
 const ProposalTransactionDisplay = ({
-  targets,
-  calldatas,
-  values,
-  descriptions,
+  targets: rawTargets,
+  calldatas: rawCalldatas,
+  values: rawValues,
+  descriptions: rawDescriptions,
   executedTransactionHash,
   network = "mainnet",
-  signatures,
+  signatures: rawSignatures,
   proposal,
 }: {
   targets: string[];
@@ -132,6 +133,19 @@ const ProposalTransactionDisplay = ({
   network?: string;
   proposal?: Proposal;
 }) => {
+  // Signal-only proposals are created with a placeholder no-op transaction
+  // (see getInputData). Hide it so they read as having no transactions.
+  const { targets, calldatas, values, descriptions, signatures } =
+    stripNoOpTransactions(
+      {
+        targets: rawTargets,
+        calldatas: rawCalldatas,
+        values: rawValues,
+        descriptions: rawDescriptions,
+        signatures: rawSignatures,
+      },
+      contracts.timelock?.address
+    );
   const [collapsed, setCollapsed] = useState(true);
   const allActionsSupported = areAllActionsSupported(calldatas);
   const prettyViewAvailable = isPrettyViewEnabled && allActionsSupported;

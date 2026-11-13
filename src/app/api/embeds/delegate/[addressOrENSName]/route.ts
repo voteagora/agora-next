@@ -9,6 +9,8 @@ export const runtime = "nodejs";
 
 type DelegateEmbedData = {
   address: string;
+  username?: string;
+  avatar?: string;
   votingPower: string;
   votingPowerRaw?: string;
   delegatorsCount: number;
@@ -37,6 +39,8 @@ async function getDelegateEmbedData(
 
   return {
     address: delegate.address,
+    username: delegate.statement?.username || undefined,
+    avatar: delegate.statement?.avatar || undefined,
     votingPower: delegate.votingPower?.total
       ? `${formatNumber(delegate.votingPower.total)} ${token.symbol}`
       : "0",

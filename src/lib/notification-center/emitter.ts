@@ -21,16 +21,29 @@ const ALL_CHANNELS: ChannelType[] = [
 
 /**
  * Format an address for display in notifications.
- * Returns ENS name if available, otherwise truncated address (0x1234...abcd).
+ * Prefers profile display name, then ENS, then truncated address.
  */
 export async function formatAddressForNotification(
   address: string
 ): Promise<string> {
   try {
+    const { prismaWeb2Client } = await import("@/app/lib/prisma");
+    const Tenant = (await import("@/lib/tenant/tenant")).default;
+    const statement = await prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        dao_slug: Tenant.current().slug,
+        address: { equals: address, mode: "insensitive" },
+        username: { not: null },
+      },
+      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+      select: { username: true },
+    });
+    const username = statement?.username?.trim();
+    if (username) return username;
+
     const formatted = await processAddressOrEnsName(address);
     return formatted || address;
   } catch (error) {
-    // Fallback to raw address if ENS lookup fails
     return address;
   }
 }

@@ -22,7 +22,8 @@ function SubdelegationToRow({
   index: number;
   setOverFlowDelegation: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
+  const copy = ui.copy;
   const [newAllowanceInput, setNewAllowanceInput] = useState("");
 
   const allowance = allowances[index];
@@ -130,7 +131,9 @@ function SubdelegationToRow({
         <HStack gap={3}>
           <ENSAvatar ensName={data} className="h-10 w-10" />
           <VStack>
-            <p className="text-xs font-medium text-secondary">Delegated to</p>
+            <p className="text-xs font-medium text-secondary">
+              {copy.delegates.delegation.delegatedEntryLabel}
+            </p>
             <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
               <ENSName address={to} />
             </div>

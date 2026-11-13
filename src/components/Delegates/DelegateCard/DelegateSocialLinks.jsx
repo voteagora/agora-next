@@ -2,13 +2,19 @@ import Image from "next/image";
 import discordIcon from "@/icons/discord.svg";
 import xIcon from "@/icons/x.svg";
 import warpcastIcon from "@/icons/warpcast.svg";
+import linkedinIcon from "@/icons/linkedin.svg";
 import toast from "react-hot-toast";
+import {
+  buildLinkedinUrl,
+  buildWarpcastUrl,
+  isWarpcastAsLinkedin,
+} from "@/lib/delegateStatement/socialLinks";
 
 const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
 
 export function DelegateSocialLinks({ discord, twitter, warpcast }) {
-  const warpcastUsername = warpcast?.replace(/@/g, "");
+  const warpcastAsLinkedin = isWarpcastAsLinkedin();
   return (
     <div className="flex flex-row gap-4 h-auto w-max">
       {twitter && (
@@ -34,14 +40,19 @@ export function DelegateSocialLinks({ discord, twitter, warpcast }) {
             e.preventDefault();
             e.stopPropagation();
             window &&
-              window.open(`https://warpcast.com/${warpcastUsername}`, "_blank");
+              window.open(
+                warpcastAsLinkedin
+                  ? buildLinkedinUrl(warpcast)
+                  : buildWarpcastUrl(warpcast),
+                "_blank"
+              );
           }}
         >
           <Image
             height={ICON_HEIGHT}
             width={ICON_WIDTH}
-            src={warpcastIcon.src}
-            alt="Warpcast icon"
+            src={warpcastAsLinkedin ? linkedinIcon.src : warpcastIcon.src}
+            alt={warpcastAsLinkedin ? "LinkedIn icon" : "Warpcast icon"}
           />
         </button>
       )}

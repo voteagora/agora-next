@@ -21,11 +21,11 @@ export type Vote = {
   timestamp: Date | null;
   blockNumber?: bigint;
   citizenType: string | null;
-  voterMetadata: Record<{
-    name: string;
-    image: string;
-    type: string;
-  }> | null;
+  voterMetadata: {
+    name?: string | null;
+    image?: string | null;
+    type?: string | null;
+  } | null;
   easOodaoMetadata?: {
     createdBlockNumber: number;
   } | null;

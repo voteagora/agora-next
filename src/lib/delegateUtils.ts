@@ -8,14 +8,14 @@ export interface DelegateStatementPayload {
 
 export interface DelegateStatement {
   payload?: DelegateStatementPayload | Record<string, unknown>;
-  twitter?: string;
-  discord?: string;
-  warpcast?: string;
+  twitter?: string | null;
+  discord?: string | null;
+  warpcast?: string | null;
 }
 
 export interface Delegate {
   address: string;
-  statement?: DelegateStatement;
+  statement?: DelegateStatement | null;
   votingPower?: {
     total: string;
   };

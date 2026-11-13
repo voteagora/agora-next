@@ -6,6 +6,7 @@ import { useEnsName } from "wagmi";
 import { formatNumber } from "@/lib/tokenUtils";
 import React, { useEffect, useMemo } from "react";
 import Image from "next/image";
+import AvatarImage from "@/components/shared/AvatarImage";
 import { useConnectButtonContext } from "@/contexts/ConnectButtonContext";
 import { formatEther } from "viem";
 import Tenant from "@/lib/tenant/tenant";
@@ -27,13 +28,15 @@ import { useForumAdminsList } from "@/hooks/useForum";
 interface Props {
   address: string;
   copyable?: boolean;
-  endorsed: boolean;
+  endorsed?: boolean;
   votingPower: string;
-  scwAddress?: string;
+  scwAddress?: string | null;
   truncateText?: boolean;
   showVotingPower?: boolean;
   participation?: number;
   showParticipation?: boolean;
+  username?: string | null;
+  avatar?: string | null;
 }
 
 function useForumAdminRole(address: string) {
@@ -57,6 +60,8 @@ export function DelegateProfileImage({
   showVotingPower = false,
   participation,
   showParticipation = false,
+  username,
+  avatar,
 }: Props) {
   const { ui } = Tenant.current();
   const { refetchDelegate, setRefetchDelegate } = useConnectButtonContext();
@@ -73,6 +78,7 @@ export function DelegateProfileImage({
     chainId: 1,
     address: address as `0x${string}`,
   });
+  const displayUsername = username?.trim();
 
   useEffect(() => {
     /**
@@ -105,7 +111,19 @@ export function DelegateProfileImage({
   return (
     <div className="flex flex-row gap-4 items-center">
       <div className="relative aspect-square">
-        <ENSAvatar className="rounded-full w-[44px] h-[44px]" ensName={data} />
+        {avatar ? (
+          <AvatarImage
+            src={avatar}
+            alt={`${displayUsername || address} avatar`}
+            className="rounded-full w-[44px] h-[44px]"
+            size={44}
+          />
+        ) : (
+          <ENSAvatar
+            className="rounded-full w-[44px] h-[44px]"
+            ensName={data}
+          />
+        )}
       </div>
 
       <div className="flex flex-col min-w-0">
@@ -117,7 +135,12 @@ export function DelegateProfileImage({
             )}
           >
             {copyable ? (
-              <CopyableHumanAddress address={address} />
+              <CopyableHumanAddress
+                address={address}
+                displayName={displayUsername}
+              />
+            ) : displayUsername ? (
+              displayUsername
             ) : (
               <ENSName address={address} />
             )}
@@ -177,6 +200,8 @@ export function DelegateProfileImageWithMetadata({
   showVotingPower = false,
   participation,
   showParticipation = false,
+  username,
+  avatar,
 }: Omit<Props, "truncateText"> & {
   description?: string;
   location?: string;
@@ -199,6 +224,7 @@ export function DelegateProfileImageWithMetadata({
     chainId: 1,
     address: address as `0x${string}`,
   });
+  const displayUsername = username?.trim();
 
   useEffect(() => {
     /**
@@ -249,7 +275,16 @@ export function DelegateProfileImageWithMetadata({
     <div className="flex flex-col gap-2">
       <div className="flex flex-row gap-4 items-center">
         <div className="relative aspect-square">
-          <ENSAvatar className="rounded-full" ensName={data} size={48} />
+          {avatar ? (
+            <AvatarImage
+              src={avatar}
+              alt={`${displayUsername || address} avatar`}
+              className="rounded-full"
+              size={48}
+            />
+          ) : (
+            <ENSAvatar className="rounded-full" ensName={data} size={48} />
+          )}
         </div>
         <div className="flex flex-col">
           <div className="text-primary flex flex-row gap-1 font-semibold hover:opacity-90">
@@ -257,9 +292,10 @@ export function DelegateProfileImageWithMetadata({
               <CopyableHumanAddress
                 className="font-bold"
                 address={address}
-                copyENSName
+                copyENSName={!displayUsername}
+                displayName={displayUsername}
               />
-              {data ? ( // Only show address if ENS name is available and displayed in the above CopyableHumanAddress
+              {displayUsername || data ? ( // Only show address if a profile name or ENS name is displayed above
                 <CopyableHumanAddress
                   className="text-xs font-medium"
                   address={address}

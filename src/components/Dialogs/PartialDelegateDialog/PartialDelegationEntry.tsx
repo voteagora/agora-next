@@ -21,7 +21,8 @@ export const PartialDelegationEntry = ({
   onChange,
   reset,
 }: Props) => {
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
+  const copy = ui.copy;
 
   const [value, setValue] = useState(
     Number(delegation.percentage) *
@@ -55,7 +56,9 @@ export const PartialDelegationEntry = ({
       <div className="flex flex-row gap-4">
         <ENSAvatar ensName={ensName} className="h-10 w-10" size={40} />
         <div className="flex flex-col">
-          <div className="text-xs font-medium text-secondary">Delegated to</div>
+          <div className="text-xs font-medium text-secondary">
+            {copy.delegates.delegation.delegatedEntryLabel}
+          </div>
           <div className="text-primary w-full font-medium text-ellipsis overflow-hidden max-w-[6rem] sm:max-w-[8rem]">
             <ENSName address={delegation.to} />
           </div>

@@ -8,11 +8,12 @@ import { buildPageMetadata } from "@/app/lib/utils/metadata";
 export const maxDuration = 120;
 
 export async function generateMetadata() {
-  const { brandName } = Tenant.current();
+  const { brandName, ui } = Tenant.current();
+  const proposalLabel = ui.copy.nouns.governanceProposal;
 
   return buildPageMetadata({
     title: `Create Proposal | ${brandName}`,
-    description: `Create a governance proposal for ${brandName}.`,
+    description: `Create a ${proposalLabel} for ${brandName}.`,
     path: "/proposals/create-proposal",
     robots: {
       index: false,

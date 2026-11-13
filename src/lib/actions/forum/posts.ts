@@ -114,7 +114,10 @@ export async function upvoteForumTopic(data: z.infer<typeof topicVoteSchema>) {
         );
 
         // Convert to number for comparison
-        const currentVP = formatVotingPower(votingPowerBigInt);
+        const currentVP = formatVotingPower(
+          votingPowerBigInt,
+          tenant.token.decimals
+        );
         const vpCheck = await canPerformAction(currentVP, slug);
 
         if (!vpCheck.allowed) {
@@ -396,7 +399,10 @@ export async function createForumPost(
         );
 
         // Convert to number for comparison
-        const currentVP = formatVotingPower(votingPowerBigInt);
+        const currentVP = formatVotingPower(
+          votingPowerBigInt,
+          tenant.token.decimals
+        );
         const vpCheck = await canCreatePost(currentVP, slug);
 
         if (!vpCheck.allowed) {
@@ -547,11 +553,25 @@ export async function createForumPost(
       addRecipientAttributeValue(normalizedAddress, "engaged_topics", topicId);
     }
 
+    const createdProfile = await prismaWeb2Client.delegateStatements.findFirst({
+      where: {
+        dao_slug: slug,
+        address: { equals: normalizedAddress, mode: "insensitive" },
+        OR: [{ username: { not: null } }, { avatar: { not: null } }],
+      },
+      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+      select: { username: true, avatar: true },
+    });
+    const createdUsername = createdProfile?.username?.trim();
+    const createdAvatar = createdProfile?.avatar?.trim();
+
     return {
       success: true as const,
       data: {
         id: newPost.id,
         address: newPost.address,
+        authorDisplayName: createdUsername || null,
+        authorAvatar: createdAvatar || null,
         content: newPost.content,
         createdAt: newPost.createdAt.toISOString(),
         parentPostId: newPost.parentPostId,

@@ -15,13 +15,6 @@ interface InsufficientVPModalProps {
   action: "topic" | "post" | "upvote" | "react";
 }
 
-const ACTION_TEXT = {
-  topic: "create topics",
-  post: "post replies",
-  upvote: "upvote",
-  react: "react to posts",
-};
-
 export function InsufficientVPModal({
   isOpen,
   onClose,
@@ -30,7 +23,8 @@ export function InsufficientVPModal({
   const { address } = useAccount();
   const delegateData = useConnectedDelegate();
   const permissions = useForumPermissionsContext();
-  const { token } = Tenant.current();
+  const { token, ui } = Tenant.current();
+  const copy = ui.copy;
 
   const delegate = delegateData.delegate;
   const hasStatement = hasDelegateStatement(delegate);
@@ -61,11 +55,12 @@ export function InsufficientVPModal({
           {/* Headline */}
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-bold text-primary">
-              Oh no, you don&apos;t have enough tokens to {ACTION_TEXT[action]}
+              {copy.permissions.insufficientTitle(
+                copy.permissions.actionText[action]
+              )}
             </h2>
             <p className="text-sm text-secondary">
-              It&apos;s important that conversations are aligned only to token
-              holders
+              {copy.permissions.alignedToTokenHolders}
             </p>
           </div>
 
@@ -73,7 +68,7 @@ export function InsufficientVPModal({
           <div className="bg-wash rounded-lg p-4 flex justify-between items-center">
             <div>
               <p className="text-sm text-secondary inline-flex items-center">
-                Your voting power and token balance
+                {copy.permissions.yourVotingPowerAndBalance}
                 <VotingPowerInfoTooltip />
               </p>
               <p className="text-2xl font-bold text-primary">
@@ -82,7 +77,7 @@ export function InsufficientVPModal({
             </div>
             <div className="text-right">
               <p className="text-sm text-secondary inline-flex items-center justify-end">
-                Required voting power
+                {copy.permissions.requiredVotingPower}
                 <VotingPowerInfoTooltip />
               </p>
               <p className="text-2xl font-bold text-primary">
@@ -94,7 +89,7 @@ export function InsufficientVPModal({
           {/* How to get tokens */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-primary">
-              How can I get tokens?
+              {copy.permissions.howToGetTokens}
             </h3>
 
             <div className="grid gap-4">
@@ -143,13 +138,10 @@ export function InsufficientVPModal({
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold text-primary mb-1">
-                      Buy {token.symbol} tokens
+                      {copy.permissions.buyTokens(token.symbol)}
                     </h4>
                     <p className="text-sm text-secondary mb-3">
-                      Purchase {token.symbol} tokens to gain voting power. Your
-                      token balance counts as voting power, even without
-                      delegation. You can also delegate to yourself or others
-                      for additional governance participation.
+                      {copy.permissions.buyTokensDescription(token.symbol)}
                     </p>
                     {/* <div className="flex gap-2">
                       {address && (
@@ -173,7 +165,7 @@ export function InsufficientVPModal({
               onClick={onClose}
               className="px-4 py-2 bg-wash text-secondary rounded-lg hover:bg-wash transition-colors font-medium"
             >
-              Got it
+              {copy.create.gotIt}
             </button>
           </div>
         </div>

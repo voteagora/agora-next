@@ -113,6 +113,8 @@ interface MappedDelegate {
   };
   statement: {
     address: string;
+    username: string | null;
+    avatar: string | null;
     payload: {
       delegateStatement: string;
       topIssues: { type: string; value: string }[];
@@ -147,10 +149,20 @@ export const getProposalTypesFromDaoNode = unstable_cache(
       return null;
     }
 
-    const response = await fetch(`${url}v1/proposal_types`);
-    const data = await response.json();
-
-    return data;
+    try {
+      const response = await fetch(`${url}v1/proposal_types`);
+      if (!response.ok) {
+        console.error(
+          `Failed to fetch proposal types from DAO Node: ${response.status} (${url})`
+        );
+        return null;
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch proposal types from DAO Node:", error);
+      return null;
+    }
   },
   ["proposal-types"],
   {

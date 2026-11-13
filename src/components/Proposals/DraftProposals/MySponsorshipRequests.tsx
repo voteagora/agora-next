@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import { useEffect, useState, useCallback } from "react";
 import { ProposalDraft } from "@prisma/client";
 import DraftProposalCard from "./DraftProposalCard";
+import Tenant from "@/lib/tenant/tenant";
 
 const MySponsorshipRequests = ({
   fetchDraftProposals,
@@ -12,6 +13,8 @@ const MySponsorshipRequests = ({
   fetchDraftProposals: (address: `0x${string}`) => Promise<ProposalDraft[]>;
   onCountChange?: (count: number) => void;
 }) => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { address } = useAccount();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
@@ -45,7 +48,9 @@ const MySponsorshipRequests = ({
 
   return (
     <div className="mb-16">
-      <h1 className="text-2xl font-black mb-6">Requests for sponsorship</h1>
+      <h1 className="text-2xl font-black mb-6">
+        {copy.proposals.sponsorshipRequestsTitle}
+      </h1>
       <div className="space-y-6">
         {draftProposals.map((proposal) => (
           <Link

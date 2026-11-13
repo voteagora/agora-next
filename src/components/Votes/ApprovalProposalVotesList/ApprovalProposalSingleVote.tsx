@@ -23,24 +23,9 @@ import { HoverCard, HoverCardTrigger } from "@/components/ui/hover-card";
 import Markdown from "@/components/shared/Markdown/Markdown";
 import AvatarImage from "@/components/shared/AvatarImage";
 import { truncateAddress } from "@/app/lib/utils/text";
+import { isZeroWeight, ZeroVpRowTooltip } from "@/components/Votes/zeroVpVote";
 
 const { token, ui } = Tenant.current();
-
-const ZERO_VP_VOTE_TOOLTIP =
-  "Zero weight at snapshot—does not affect the outcome.";
-
-const zeroVpTooltipContentClass =
-  "max-w-[11rem] px-3 py-2 text-xs text-secondary leading-snug";
-
-function isZeroVotingPowerWeight(weight: string): boolean {
-  const raw = (weight ?? "").toString().trim().replace(/,/g, "") || "0";
-  try {
-    return BigInt(raw) === 0n;
-  } catch {
-    const n = Number.parseFloat(raw);
-    return Number.isFinite(n) && n === 0;
-  }
-}
 
 export default function ApprovalProposalSingleVote({
   vote,
@@ -95,7 +80,20 @@ export default function ApprovalProposalSingleVote({
     }
   };
 
-  const zeroVpVote = isZeroVotingPowerWeight(weight);
+  const zeroVpVote = isZeroWeight(weight);
+
+  const amount = (
+    <div>
+      <TokenAmountDecorated
+        amount={weight}
+        hideCurrency
+        specialFormatting
+        className={
+          fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+        }
+      />
+    </div>
+  );
 
   return (
     <VStack>
@@ -105,115 +103,105 @@ export default function ApprovalProposalSingleVote({
         onOpenChange={(open) => _onOpenChange(open)}
       >
         <HoverCardTrigger>
-          <HStack
-            alignItems="items-center"
-            justifyContent="justify-between"
-            className="mb-2 text-xs leading-4"
-          >
-            <div
-              className={
-                zeroVpVote
-                  ? "text-tertiary font-semibold flex items-center"
-                  : "text-primary font-semibold flex items-center"
-              }
+          <ZeroVpRowTooltip active={zeroVpVote}>
+            <HStack
+              alignItems="items-center"
+              justifyContent="justify-between"
+              className="mb-2 text-xs leading-4"
             >
-              <div
-                className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}
-              >
-                {avatar()}
-              </div>
               <div
                 className={
                   zeroVpVote
-                    ? "text-tertiary opacity-40 cursor-default"
-                    : "text-primary hover:underline"
+                    ? "text-tertiary font-semibold flex items-center"
+                    : "text-primary font-semibold flex items-center"
                 }
               >
-                {zeroVpVote ? (
-                  <span>
-                    {displayName ? (
-                      displayName
-                    ) : resolveEns ? (
-                      <ENSName address={voterAddress} />
-                    ) : (
-                      truncateAddress(voterAddress)
-                    )}
-                  </span>
-                ) : (
-                  <Link href={`/delegates/${voterAddress}`}>
-                    {displayName ? (
-                      displayName
-                    ) : resolveEns ? (
-                      <ENSName address={voterAddress} />
-                    ) : (
-                      truncateAddress(voterAddress)
-                    )}
-                  </Link>
-                )}
-              </div>
-              {address?.toLowerCase() === voterAddress && (
-                <span
+                <div
+                  className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}
+                >
+                  {avatar()}
+                </div>
+                <div
                   className={
-                    zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+                    zeroVpVote
+                      ? "text-tertiary opacity-40 cursor-help"
+                      : "text-primary hover:underline"
                   }
                 >
-                  &nbsp;(you)
-                </span>
-              )}
-              {hovered && !zeroVpVote && (
-                <>
-                  <a
-                    href={getBlockScanUrl(hash1)}
-                    target="_blank"
-                    rel="noreferrer noopener"
+                  {zeroVpVote ? (
+                    <span>
+                      {displayName ? (
+                        displayName
+                      ) : resolveEns ? (
+                        <ENSName address={voterAddress} />
+                      ) : (
+                        truncateAddress(voterAddress)
+                      )}
+                    </span>
+                  ) : (
+                    <Link href={`/delegates/${voterAddress}`}>
+                      {displayName ? (
+                        displayName
+                      ) : resolveEns ? (
+                        <ENSName address={voterAddress} />
+                      ) : (
+                        truncateAddress(voterAddress)
+                      )}
+                    </Link>
+                  )}
+                </div>
+                {address?.toLowerCase() === voterAddress && (
+                  <span
+                    className={
+                      zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+                    }
                   >
-                    <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
-                  </a>
-                  {hash2 && (
+                    &nbsp;(you)
+                  </span>
+                )}
+                {hovered && !zeroVpVote && (
+                  <>
                     <a
-                      href={getBlockScanUrl(hash2)}
+                      href={getBlockScanUrl(hash1)}
                       target="_blank"
                       rel="noreferrer noopener"
                     >
                       <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
                     </a>
-                  )}
-                </>
-              )}
-            </div>
-            <div
-              className={
-                zeroVpVote
-                  ? "font-semibold text-tertiary opacity-40"
-                  : "font-semibold text-primary"
-              }
-            >
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div>
-                      <TokenAmountDecorated
-                        amount={weight}
-                        hideCurrency
-                        specialFormatting
-                        className={
-                          fontMapper[ui?.customization?.tokenAmountFont || ""]
-                            ?.variable
-                        }
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className={zeroVpVote ? zeroVpTooltipContentClass : "p-4"}
-                  >
-                    {zeroVpVote
-                      ? ZERO_VP_VOTE_TOOLTIP
-                      : `${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </HStack>
+                    {hash2 && (
+                      <a
+                        href={getBlockScanUrl(hash2)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        <ArrowTopRightOnSquareIcon className="w-3 h-3 ml-1" />
+                      </a>
+                    )}
+                  </>
+                )}
+              </div>
+              <div
+                className={
+                  zeroVpVote
+                    ? "font-semibold text-tertiary opacity-40"
+                    : "font-semibold text-primary"
+                }
+              >
+                {zeroVpVote ? (
+                  amount
+                ) : (
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>{amount}</TooltipTrigger>
+                      <TooltipContent className="p-4">
+                        {`${formatNumber(vote.weight, token.decimals, 2, false, false)} ${token.symbol} Voted ${capitalizeFirstLetter(vote.support)}`}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            </HStack>
+          </ZeroVpRowTooltip>
         </HoverCardTrigger>
       </HoverCard>
       <VStack className={"text-xs leading-4 mb-2"}>

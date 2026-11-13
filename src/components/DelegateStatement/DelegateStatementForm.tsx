@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { type UseFormReturn, useWatch } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { useAccount } from "wagmi";
+import { useQueryClient } from "@tanstack/react-query";
 import { submitDelegateStatement } from "@/app/delegates/actions";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,10 +16,12 @@ import { type DelegateStatementFormValues } from "./CurrentDelegateStatement";
 import Tenant from "@/lib/tenant/tenant";
 import TopStakeholdersFormSection from "@/components/DelegateStatement/TopStakeholdersFormSection";
 import { useSmartAccountAddress } from "@/hooks/useSmartAccountAddress";
-import { useDelegate } from "@/hooks/useDelegate";
+import { DELEGATE_QK, useDelegate } from "@/hooks/useDelegate";
 import { useDelegateStatementStore } from "@/stores/delegateStatement";
 import { type DelegateStatementAuthPayload } from "@/lib/delegateStatement/auth";
 import { useEnsureSiweSession } from "@/hooks/useEnsureSiweSession";
+import { useOpenDialog } from "@/components/Dialogs/DialogProvider/DialogProvider";
+import { TrashIcon } from "@heroicons/react/20/solid";
 
 export default function DelegateStatementForm({
   form,
@@ -26,8 +29,12 @@ export default function DelegateStatementForm({
   form: UseFormReturn<DelegateStatementFormValues>;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { address, chain } = useAccount();
+  const openDialog = useOpenDialog();
+  const isDeleteAccountEnabled = ui.toggle("delete-account")?.enabled;
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { ensureSiweSession, isSigningIn: isSiweSigningIn } =
     useEnsureSiweSession({
@@ -77,15 +84,18 @@ export default function DelegateStatementForm({
       });
 
       if (!response) {
-        throw new Error(
-          "There was an error submitting your delegate profile, please try again."
-        );
+        throw new Error(copy.delegates.statement.submitError);
       }
+
+      // The header and profile card read the delegate from this query
+      await queryClient.invalidateQueries({
+        queryKey: [DELEGATE_QK, connectedAddress],
+      });
 
       setSaveSuccess(true);
       router.push(`/delegates/${connectedAddress}`);
     },
-    [router, scwAddress, setSaveSuccess]
+    [copy, queryClient, router, scwAddress, setSaveSuccess]
   );
 
   async function onSubmit(values: DelegateStatementFormValues) {
@@ -173,8 +183,7 @@ export default function DelegateStatementForm({
 
               <div className="flex flex-col sm:flex-row justify-end sm:justify-between items-stretch sm:items-center gap-4 py-8 px-6 flex-wrap">
                 <span className="text-sm text-primary">
-                  Tip: you can always come back and edit your profile at any
-                  time.
+                  {copy.delegates.statement.editTip}
                 </span>
 
                 <Button
@@ -183,16 +192,16 @@ export default function DelegateStatementForm({
                   disabled={!canSubmit}
                   type="submit"
                 >
-                  Submit delegate profile
+                  {copy.delegates.statement.submitProfile}
                 </Button>
                 {form.formState.isSubmitted && !agreeCodeConduct && (
                   <span className="text-red-700 text-sm">
-                    You must agree with the code of conduct to continue
+                    {copy.delegates.statement.codeOfConductRequired}
                   </span>
                 )}
                 {form.formState.isSubmitted && !agreeDaoPrinciples && (
                   <span className="text-red-700 text-sm">
-                    You must agree with the DAO principles to continue
+                    {copy.delegates.statement.principlesRequired}
                   </span>
                 )}
                 {submissionError && (
@@ -204,6 +213,27 @@ export default function DelegateStatementForm({
             </form>
           </Form>
         </div>
+
+        {isDeleteAccountEnabled && (
+          <div className="flex flex-col bg-neutral border rounded-xl border-line shadow-newDefault mt-6 p-6">
+            <h3 className="text-lg font-semibold text-primary mb-2">
+              Danger zone
+            </h3>
+            <p className="text-sm text-secondary mb-4">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <Button
+              variant="outline"
+              type="button"
+              className="w-fit border-negative text-negative hover:bg-negative/10"
+              onClick={() => openDialog({ type: "DELETE_ACCOUNT", params: {} })}
+            >
+              <TrashIcon className="w-4 h-4 mr-2" />
+              Delete my account
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

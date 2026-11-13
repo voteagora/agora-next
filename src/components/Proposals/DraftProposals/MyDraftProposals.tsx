@@ -20,6 +20,7 @@ const MyDraftProposals = ({
 }) => {
   const tenant = Tenant.current();
   const plmToggle = tenant.ui.toggle("proposal-lifecycle");
+  const copy = tenant.ui.copy;
   const { address } = useAccount();
   const [draftProposals, setDraftProposals] = useState<ProposalDraft[]>([]);
 
@@ -58,7 +59,9 @@ const MyDraftProposals = ({
   return (
     <div className="mb-16">
       <div className="flex flex-row justify-between items-center mb-6 mt-4 sm:mt-0">
-        <h1 className="text-2xl font-black text-primary">My proposals</h1>
+        <h1 className="text-2xl font-black text-primary">
+          {copy.proposals.myDraftsTitle}
+        </h1>
         {address && (
           <ClearAllDraftsButton
             draftCount={draftProposals.length}

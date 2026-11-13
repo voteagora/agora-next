@@ -12,6 +12,7 @@ import DelegatesIssuesFilter from "./DelegatesIssuesFilter";
 import DelegatesStakeholdersFilter from "./DelegatesStakeholdersFilter";
 import { useDelegatesFilter } from "./useDelegatesFilter";
 import { useAccount } from "wagmi";
+import Tenant from "@/lib/tenant/tenant";
 
 type FilterButtonProps = {
   label: string;
@@ -41,6 +42,8 @@ export const FilterButton = ({
 );
 
 export const DelegatesFilter = () => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   // Filter state
   const [isOpen, setIsOpen] = useState(false);
   const { address: connectedAddress } = useAccount();
@@ -80,7 +83,7 @@ export const DelegatesFilter = () => {
 
   return (
     <FilterResetListbox
-      triggerLabel="Filter"
+      triggerLabel={copy.filters.delegates.filter}
       triggerIcon={
         <FilterIcon
           className={
@@ -100,13 +103,13 @@ export const DelegatesFilter = () => {
       <div className="self-stretch px-2.5 py-6 bg-wash flex flex-col justify-start items-start">
         <div className="self-stretch inline-flex justify-start items-start gap-2.5 flex-wrap content-start">
           <FilterButton
-            label="All Delegates"
+            label={copy.filters.delegates.allRepresentatives}
             isActive={activeFilters.length === 0}
             onClick={() => toggleFilterToUrl("all")}
           />
           {connectedAddress && (
             <FilterButton
-              label="My Delegate(s)"
+              label={copy.filters.delegates.myRepresentatives}
               isActive={activeFilters.includes(MY_DELEGATES_FILTER_PARAM)}
               onClick={() => toggleFilterToUrl(MY_DELEGATES_FILTER_PARAM)}
             />

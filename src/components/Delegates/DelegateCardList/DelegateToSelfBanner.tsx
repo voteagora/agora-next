@@ -5,8 +5,11 @@ import { DelegateToSelf } from "../Delegations/DelegateToSelf";
 import { useProfileData } from "@/hooks/useProfileData";
 import { DelegateChunk } from "@/app/api/common/delegates/delegate";
 import { ZERO_ADDRESS } from "@/lib/constants";
+import Tenant from "@/lib/tenant/tenant";
 
 export const DelegateToSelfBanner = () => {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const { delegate, tokenBalance, delegatees } = useProfileData();
   const filteredDelegations = useMemo(() => {
     return delegatees?.filter((delegation) => delegation.to !== ZERO_ADDRESS);
@@ -29,11 +32,10 @@ export const DelegateToSelfBanner = () => {
       <ExclamationCircleIcon className="w-6 h-6 stroke-negative" />
       <div className="flex-1 flex-col justify-start items-start gap-1 text-primary">
         <div className="text-base font-bold leading-normal">
-          Your tokens can&#39;t be voted with!
+          {copy.delegates.delegation.selfBannerTitle}
         </div>
         <div className="text-sm font-medium leading-[21px]">
-          Make your vote count, delegate to yourself or someone else in the
-          community.
+          {copy.delegates.delegation.selfBannerDescription}
         </div>
       </div>
       <DelegateToSelf

@@ -7,7 +7,12 @@ export const DELEGATE_STATEMENT_SIWE_SIGNATURE_MARKER = "siwe:jwt";
 export function buildStoredDelegateStatementPayload(
   delegateStatement: DelegateStatementFormValues
 ) {
-  const { delegateStatement: statement, ...rest } = delegateStatement;
+  const {
+    delegateStatement: statement,
+    username: _username,
+    avatar: _avatar,
+    ...rest
+  } = delegateStatement;
 
   return {
     ...rest,

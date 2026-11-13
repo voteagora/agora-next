@@ -17,6 +17,8 @@ export default function ProposalDescription({
 }: {
   proposal: Proposal;
 }) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const proposalsWithBadDescription = [
     "94365805422398770067924881378455503928423439630602149628781926844759467250082",
     "64930538748268257621925093712454552173772860987977453334165023026835711650357",
@@ -54,7 +56,6 @@ export default function ProposalDescription({
   // @ts-ignore
   const options = proposal.proposalData?.options;
   const option = options?.[0];
-  const { ui } = Tenant.current();
   const tagBackground = ui.customization?.tagBackground;
   const tagBgStyle = tagBackground
     ? {
@@ -92,8 +93,8 @@ export default function ProposalDescription({
               style={tagBgStyle}
             >
               {typeBadgeLabel === "Gov Proposal"
-                ? "⚖️️ Gov Proposal"
-                : "🌡️ Temp Check"}
+                ? `⚖️️ ${copy.create.postTypeOptions["gov-proposal"]}`
+                : `🌡️ ${copy.create.postTypeOptions.tempcheck}`}
             </div>
           )}
           <div

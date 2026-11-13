@@ -24,6 +24,8 @@ const formSchema = z.object({
   daoSlug: z.string(),
   discord: z.string(),
   delegateStatement: z.string(),
+  username: z.string().optional(),
+  avatar: z.string().optional(),
   twitter: z.string(),
   warpcast: z.string(),
   scwAddress: z.string().optional(),
@@ -93,6 +95,8 @@ export default function CurrentDelegateStatement() {
       agreeDaoPrinciples: !requireDaoPrinciples,
       daoSlug,
       discord: delegateStatement?.discord || "",
+      username: delegateStatement?.username || "",
+      avatar: delegateStatement?.avatar || "",
       delegateStatement:
         (delegateStatement?.payload as { delegateStatement?: string })
           ?.delegateStatement || "",

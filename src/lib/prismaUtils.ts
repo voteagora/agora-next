@@ -35,6 +35,9 @@ export function findDelagatee({
       return prismaWeb3Client.deriveDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildDelegatees.findFirst(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostDelegatees.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -97,6 +100,9 @@ export function findAdvancedDelegatee({
       return prismaWeb3Client.deriveAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildAdvancedDelegatees.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostAdvancedDelegatees.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -156,6 +162,9 @@ export function findVotableSupply({
       return prismaWeb3Client.deriveVotableSupply.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildVotableSupply.findFirst({});
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicVotableSupply.findFirst({});
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostVotableSupply.findFirst({});
     case TENANT_NAMESPACES.XAI:
@@ -215,6 +224,8 @@ export function findSnapshotProposalsQueryFromDb({
       return prismaWeb3Client.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -323,6 +334,9 @@ export function findProposalsQueryFromDB({
       return prismaWeb3Client.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -381,6 +395,8 @@ export function findProposal({
       return prismaWeb3Client.deriveProposals.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findFirst(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -437,6 +453,9 @@ export function findProposalsByIds({
       return prismaWeb3Client.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -503,6 +522,8 @@ export function findOffchainProposal({
       return prismaWeb3Client.deriveProposals.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findFirst(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -562,6 +583,8 @@ export function findOffchainProposalsByOnchainIds({
       return prismaWeb3Client.deriveProposals.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.findMany(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -614,6 +637,9 @@ export function findProposalType({
       return prismaWeb3Client.deriveProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposalTypes.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposalTypes.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -672,6 +698,9 @@ export function findVotes({
       return prismaWeb3Client.deriveVotes.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildVotes.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicVotes.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostVotes.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -733,6 +762,8 @@ export function findVotingPower({
       return prismaWeb3Client.deriveVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildVotingPower.findFirst(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -785,6 +816,9 @@ export function findAdvancedVotingPower({
       return prismaWeb3Client.deriveAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildAdvancedVotingPower.findFirst(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostAdvancedVotingPower.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -843,6 +877,8 @@ export async function findStakedDeposit({
       return prismaWeb3Client.deriveStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildStakedDeposits.findFirst(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostStakedDeposits.findFirst(condition);
     case TENANT_NAMESPACES.XAI:
@@ -904,6 +940,9 @@ export function findStakedDeposits({
       return prismaWeb3Client.deriveStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildStakedDeposits.findMany(condition);
+
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostStakedDeposits.findMany(condition);
     case TENANT_NAMESPACES.XAI:
@@ -963,6 +1002,8 @@ export function getProposalsCount({
       return prismaWeb3Client.deriveProposals.count(condition);
     case TENANT_NAMESPACES.PGUILD:
       return prismaWeb3Client.pguildProposals.count(condition);
+    case TENANT_NAMESPACES.CIVIC:
+      return prismaWeb3Client.civicProposals.count(condition);
     case TENANT_NAMESPACES.BOOST:
       return prismaWeb3Client.boostProposals.count(condition);
     case TENANT_NAMESPACES.XAI:

@@ -49,6 +49,7 @@ const SCWVoteDialog = ({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const copy = Tenant.current().ui.copy;
 
   if (!delegate) {
     // todo: log
@@ -78,7 +79,7 @@ const SCWVoteDialog = ({
                 </div>
               )}
               <div className="text-lg text-primary font-extrabold">
-                Casting vote&nbsp;{supportType.toLowerCase()}
+                {copy.voting.castVoteTitle(supportType)}
               </div>
             </div>
             <div className="flex flex-col items-end text-primary">
@@ -93,13 +94,14 @@ const SCWVoteDialog = ({
               </div>
             ) : (
               <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
-                No voting reason provided
+                {copy.voting.noReason}
               </div>
             )}
           </div>
           <div>
             <VoteButton onClick={write}>
-              Vote {supportType.toLowerCase()} with{"\u00A0"}
+              {copy.voting.voteWithPower(supportType)}
+              {"\u00A0"}
               <TokenAmountDecorated amount={vpToDisplay} />
             </VoteButton>
           </div>
@@ -127,6 +129,7 @@ const BasicVoteDialog = ({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const copy = Tenant.current().ui.copy;
 
   const requireStatement =
     Tenant.current().ui.toggle("delegates/votingRequiresStatement")?.enabled !==
@@ -159,7 +162,7 @@ const BasicVoteDialog = ({
                 </div>
               )}
               <div className="text-lg text-primary font-extrabold">
-                Casting vote&nbsp;{supportType.toLowerCase()}
+                {copy.voting.castVoteTitle(supportType)}
               </div>
             </div>
             <div className="flex flex-col items-end text-primary">
@@ -174,14 +177,15 @@ const BasicVoteDialog = ({
               </div>
             ) : (
               <div className="w-full py-6 px-4 rounded-lg border border-line text-center text-secondary">
-                No voting reason provided
+                {copy.voting.noReason}
               </div>
             )}
           </div>
           <div>
             {delegate.statement || !requireStatement ? (
               <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
+                {copy.voting.voteWithPower(supportType)}
+                {"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />
               </VoteButton>
             ) : (
@@ -215,6 +219,7 @@ function AdvancedVoteDialog({
   });
 
   const vpToDisplay = getVpToDisplay(votingPower, missingVote);
+  const copy = Tenant.current().ui.copy;
 
   const requireStatement =
     Tenant.current().ui.toggle("delegates/votingRequiresStatement")?.enabled !==
@@ -248,7 +253,7 @@ function AdvancedVoteDialog({
                 </div>
               )}
               <div className="text-lg text-primary font-extrabold">
-                Casting vote&nbsp;{supportType.toLowerCase()}
+                {copy.voting.castVoteTitle(supportType)}
               </div>
             </div>
             <div className="flex flex-col items-end text-primary">
@@ -263,14 +268,15 @@ function AdvancedVoteDialog({
               </div>
             ) : (
               <div className="w-full py-6 px-4 rounded-lg border border-dashed border-line text-secondary">
-                No voting reason provided
+                {copy.voting.noReason}
               </div>
             )}
           </div>
           <div>
             {delegate.statement || !requireStatement ? (
               <VoteButton onClick={write}>
-                Vote {supportType.toLowerCase()} with{"\u00A0"}
+                {copy.voting.voteWithPower(supportType)}
+                {"\u00A0"}
                 <TokenAmountDecorated amount={vpToDisplay} />
               </VoteButton>
             ) : (
@@ -312,6 +318,7 @@ export function SuccessMessage({
   };
 }) {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   return (
     <div className="flex flex-col w-full">
@@ -323,11 +330,10 @@ export function SuccessMessage({
         alt="agora loading"
       />
       <div className="mb-2 text-2xl font-black text-primary">
-        Your vote has been submitted!
+        {copy.voting.submittedTitle}
       </div>
       <div className="mb-5 text-sm text-secondary">
-        It might take up to a minute for the changes to be reflected. Thank you
-        for your active participation in governance.
+        {copy.voting.submittedDescription}
       </div>
       <div>
         <div
@@ -338,7 +344,7 @@ export function SuccessMessage({
           }}
           className="text-center bg-neutral rounded-md border border-line font-medium shadow-newDefault cursor-pointer py-3 px-4 transition-all hover:bg-wash active:shadow-none disabled:bg-line text-secondary"
         >
-          Got it
+          {copy.create.gotIt}
         </div>
       </div>
       <BlockScanUrls
@@ -351,6 +357,7 @@ export function SuccessMessage({
 
 export function LoadingVote() {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   return (
     <div className="flex flex-col w-full">
@@ -360,17 +367,17 @@ export function LoadingVote() {
         alt="Vote pending"
       />
       <div className="mb-2 text-2xl font-black text-primary">
-        Casting your vote
+        {copy.voting.castingVote}
       </div>
       <div className="mb-5 text-sm text-secondary">
-        It might take up to a minute for the changes to be reflected.
+        {copy.voting.reflectDelay}
       </div>
       <div>
         <div
           className={`flex flex-row justify-center w-full py-3 bg-line rounded-lg`}
         >
           <div className="font-medium text-secondary">
-            Writing your vote to the chain...
+            {copy.voting.writingToChain}
           </div>
         </div>
       </div>
@@ -379,15 +386,18 @@ export function LoadingVote() {
 }
 
 export function NoStatementView({ closeDialog }: { closeDialog: () => void }) {
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
+
   return (
     <div className="py-2 px-4 z-[1099] bg-line text-xs text-secondary rounded-lg">
-      You do not have a delegate statement.{" "}
+      {copy.voting.noStatementInline}{" "}
       <Link
         href={"/delegates/create"}
         className="underline"
         onClick={closeDialog}
       >
-        Please set one up to vote.
+        {copy.voting.noStatementLink}
       </Link>
     </div>
   );
@@ -399,6 +409,7 @@ export function DisabledVoteDialog({
   closeDialog: () => void;
 }) {
   const { ui } = Tenant.current();
+  const copy = ui.copy;
 
   return (
     <div className="flex flex-col w-full">
@@ -410,19 +421,17 @@ export function DisabledVoteDialog({
         alt="agora loading"
       />
       <div className="mb-2 text-2xl font-black">
-        Voting will be available soon!
+        {copy.voting.availableSoonTitle}
       </div>
       <div className="mb-5 text-sm text-secondary">
-        Thanks for trying to vote early! It looks like you’ve received votes via
-        advanced delegation – a new beta feature. Voting will be enabled
-        shortly. Please check back in a few days.
+        {copy.voting.availableSoonDescription}
       </div>
       <div>
         <div
           className={`flex flex-row justify-center w-full py-3 border border-line rounded-lg cursor-pointer`}
           onClick={closeDialog}
         >
-          <div className="font-medium">Got it, I’ll come back later</div>
+          <div className="font-medium">{copy.voting.comeBackLater}</div>
         </div>
       </div>
     </div>

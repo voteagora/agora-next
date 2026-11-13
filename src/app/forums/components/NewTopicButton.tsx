@@ -2,15 +2,18 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { ExistingTempCheckModal } from "./ExistingTempCheckModal";
 import useRequireLogin from "@/hooks/useRequireLogin";
+import { useForumPermissions } from "@/hooks/useForumPermissions";
 import Tenant from "@/lib/tenant/tenant";
 import { TENANT_NAMESPACES } from "@/lib/constants";
 import { getForumTopicTempChecks } from "@/lib/actions/proposalLinks";
 
 const { namespace, ui } = Tenant.current();
+const copy = ui.copy;
 
 interface TopicContext {
   id: number;
@@ -38,8 +41,17 @@ export default function NewTopicButton({
   >(null);
   const requireLogin = useRequireLogin();
   const router = useRouter();
+  const { isConnected } = useAccount();
+  const { canCreateTopic, isLoading: permissionsLoading } =
+    useForumPermissions();
 
   const isEASV2Enabled = ui.toggle("easv2-govlessvoting")?.enabled;
+
+  // Hide button for connected users who don't have permission to create topics
+  // Non-connected users still see the button (they'll be prompted to login)
+  if (isConnected && !permissionsLoading && !canCreateTopic) {
+    return null;
+  }
 
   const handleClick = async () => {
     const loggedIn = await requireLogin();
@@ -97,7 +109,9 @@ export default function NewTopicButton({
     namespace === TENANT_NAMESPACES.OG ||
     namespace === TENANT_NAMESPACES.SHAPE
       ? "bg-white"
-      : "bg-buttonBackground";
+      : namespace === TENANT_NAMESPACES.CIVIC
+        ? "bg-primary"
+        : "bg-buttonBackground";
   const textStyle =
     namespace === TENANT_NAMESPACES.SYNDICATE ||
     namespace === TENANT_NAMESPACES.TOWNS ||
@@ -112,7 +126,7 @@ export default function NewTopicButton({
         <div className="flex gap-2">
           {!topicContext.isTempCheck && (
             <Button onClick={handleCreateTempCheck} size="lg">
-              Create temp check
+              {copy.create.createTempCheckButton}
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           )}
@@ -145,7 +159,7 @@ export default function NewTopicButton({
           ? "+ Discuss DUNA"
           : isEASV2Enabled
             ? "+ Create"
-            : "+ New Topic"}
+            : copy.forums.newTopicButton}
       </Button>
 
       {existingTempCheckId && (

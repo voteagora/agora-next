@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronUp } from "lucide-react";
+import { ChevronUp, Loader2 } from "lucide-react";
 import { useForum } from "@/hooks/useForum";
 import { useAccount } from "wagmi";
 import useRequireLogin from "@/hooks/useRequireLogin";
@@ -24,10 +24,9 @@ export default function TopicUpvote({
     removeUpvoteTopic,
     fetchTopicUpvotes,
     hasUpvotedTopic,
-    permissions,
     checkVPBeforeAction,
   } = useForum();
-  const [count, setCount] = React.useState<number>(0);
+  const [count, setCount] = React.useState<number | null>(null);
   const [mine, setMine] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const requireLogin = useRequireLogin();
@@ -42,6 +41,7 @@ export default function TopicUpvote({
 
   React.useEffect(() => {
     let mounted = true;
+    setCount(null);
     (async () => {
       const c = await fetchTopicUpvotes(topicId);
       const m = await hasUpvotedTopic(topicId);
@@ -56,7 +56,7 @@ export default function TopicUpvote({
   }, [topicId, address, fetchTopicUpvotes, hasUpvotedTopic]);
 
   const toggle = async () => {
-    if (loading) return;
+    if (loading || count === null) return;
     const loggedIn = await requireLogin();
     if (!loggedIn) return;
 
@@ -94,8 +94,9 @@ export default function TopicUpvote({
       <button
         type="button"
         onClick={toggle}
-        disabled={loading}
+        disabled={loading || count === null}
         title={mine ? "Remove upvote" : "Upvote"}
+        aria-label={count === null ? "Loading upvotes" : `${count} upvotes`}
         className={`w-8 h-[42px] bg-neutral rounded relative inline-flex items-center justify-center ${className}`}
       >
         <div className="absolute inset-x-0 top-1 flex justify-center text-secondary bg-neutral">
@@ -107,8 +108,12 @@ export default function TopicUpvote({
             }
           />
         </div>
-        <div className="absolute inset-x-0 bottom-2 text-center text-secondary text-xs font-semibold">
-          {count}
+        <div className="absolute inset-x-0 bottom-2 flex justify-center text-secondary text-xs font-semibold">
+          {count === null ? (
+            <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+          ) : (
+            count
+          )}
         </div>
       </button>
 

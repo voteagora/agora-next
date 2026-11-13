@@ -14,17 +14,19 @@ export const DelegateToSelf = ({
   variant = "default",
   className,
   delegate,
-  label = "Delegate to self",
+  label,
 }: {
   variant?: "rounded" | "default";
   className?: string;
   delegate: DelegateChunk;
   label?: string;
 }) => {
-  const { contracts } = Tenant.current();
+  const { contracts, ui } = Tenant.current();
+  const copy = ui.copy;
   const hasAlligator = contracts?.alligator;
   const { isAdvancedUser } = useIsAdvancedUser();
   const openDialog = useOpenDialog();
+  const buttonLabel = label ?? copy.delegates.delegation.selfAction;
 
   const onButtonClick = () => {
     if (contracts.delegationModel === DELEGATION_MODEL.PARTIAL) {
@@ -70,7 +72,7 @@ export const DelegateToSelf = ({
         onButtonClick();
       }}
     >
-      <div className="justify-center text-base font-medium">{label}</div>
+      <div className="justify-center text-base font-medium">{buttonLabel}</div>
     </Button>
   );
 };

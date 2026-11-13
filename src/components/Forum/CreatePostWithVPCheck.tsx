@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForum } from "@/hooks/useForum";
 import { InsufficientVPModal } from "./InsufficientVPModal";
+import Tenant from "@/lib/tenant/tenant";
 
 interface CreatePostWithVPCheckProps {
   topicId: number;
@@ -18,6 +19,8 @@ export function CreatePostWithVPCheck({
   onSuccess,
 }: CreatePostWithVPCheckProps) {
   const { createPost, permissions, checkVPBeforeAction } = useForum();
+  const { ui } = Tenant.current();
+  const copy = ui.copy;
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVPModal, setShowVPModal] = useState(false);
@@ -56,7 +59,7 @@ export function CreatePostWithVPCheck({
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your reply..."
+          placeholder={copy.forums.replyPlaceholder}
           className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           disabled={isSubmitting}
         />
@@ -67,7 +70,7 @@ export function CreatePostWithVPCheck({
             disabled={isSubmitting || !content.trim()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isSubmitting ? "Posting..." : "Post Reply"}
+            {isSubmitting ? copy.forums.postingReply : copy.forums.postReply}
           </button>
         </div>
       </form>

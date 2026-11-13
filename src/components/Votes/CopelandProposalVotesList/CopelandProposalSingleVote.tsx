@@ -13,14 +13,9 @@ import { fontMapper } from "@/styles/fonts";
 import Link from "next/link";
 import AvatarImage from "@/components/shared/AvatarImage";
 import { truncateAddress } from "@/app/lib/utils/text";
+import { isZeroWeight, ZeroVpRowTooltip } from "@/components/Votes/zeroVpVote";
 
 const { token, ui } = Tenant.current();
-
-const ZERO_VP_VOTE_TOOLTIP =
-  "Zero weight at snapshot—does not affect the outcome.";
-
-const zeroVpTooltipContentClass =
-  "max-w-[11rem] px-3 py-2 text-xs text-secondary leading-snug";
 
 export default function CopelandProposalSingleVote({
   vote,
@@ -51,94 +46,90 @@ export default function CopelandProposalSingleVote({
 
     return <ENSAvatar ensName={voterAddress} className="w-5 h-5" size={20} />;
   };
-  const zeroVpVote = vote.votingPower === 0 || Math.round(weight) === 0;
+  const zeroVpVote =
+    isZeroWeight(vote.votingPower) || isZeroWeight(Math.round(weight));
+
+  const amount = (
+    <div>
+      <TokenAmountDecorated
+        amount={String(Math.round(weight))}
+        decimals={0}
+        hideCurrency
+        specialFormatting
+        className={
+          fontMapper[ui?.customization?.tokenAmountFont || ""]?.variable
+        }
+      />
+    </div>
+  );
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between mb-2 text-xs leading-4">
-        <div
-          className={
-            zeroVpVote
-              ? "text-tertiary font-semibold flex items-center"
-              : "text-primary font-semibold flex items-center"
-          }
-        >
-          <div className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}>
-            {avatar()}
+      <ZeroVpRowTooltip active={zeroVpVote}>
+        <div className="flex items-center justify-between mb-2 text-xs leading-4">
+          <div
+            className={
+              zeroVpVote
+                ? "text-tertiary font-semibold flex items-center"
+                : "text-primary font-semibold flex items-center"
+            }
+          >
+            <div className={zeroVpVote ? "mr-1 opacity-30 grayscale" : "mr-1"}>
+              {avatar()}
+            </div>
+            <div
+              className={
+                zeroVpVote
+                  ? "text-tertiary opacity-40 cursor-help"
+                  : "text-primary hover:underline"
+              }
+            >
+              {zeroVpVote ? (
+                <span>
+                  {displayName ? (
+                    displayName
+                  ) : resolveEns ? (
+                    <ENSName address={voterAddress} />
+                  ) : (
+                    truncateAddress(voterAddress)
+                  )}
+                </span>
+              ) : (
+                <Link href={`/delegates/${voterAddress}`}>
+                  {displayName ? (
+                    displayName
+                  ) : resolveEns ? (
+                    <ENSName address={voterAddress} />
+                  ) : (
+                    truncateAddress(voterAddress)
+                  )}
+                </Link>
+              )}
+            </div>
+            {address?.toLowerCase() === voterAddress && (
+              <span
+                className={
+                  zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
+                }
+              >
+                &nbsp;(you)
+              </span>
+            )}
           </div>
           <div
             className={
               zeroVpVote
-                ? "text-tertiary opacity-40 cursor-default"
-                : "text-primary hover:underline"
+                ? "font-semibold text-tertiary opacity-40"
+                : "font-semibold text-primary"
             }
           >
             {zeroVpVote ? (
-              <span>
-                {displayName ? (
-                  displayName
-                ) : resolveEns ? (
-                  <ENSName address={voterAddress} />
-                ) : (
-                  truncateAddress(voterAddress)
-                )}
-              </span>
+              amount
             ) : (
-              <Link href={`/delegates/${voterAddress}`}>
-                {displayName ? (
-                  displayName
-                ) : resolveEns ? (
-                  <ENSName address={voterAddress} />
-                ) : (
-                  truncateAddress(voterAddress)
-                )}
-              </Link>
-            )}
-          </div>
-          {address?.toLowerCase() === voterAddress && (
-            <span
-              className={
-                zeroVpVote ? "text-tertiary opacity-40" : "text-primary"
-              }
-            >
-              &nbsp;(you)
-            </span>
-          )}
-        </div>
-        <div
-          className={
-            zeroVpVote
-              ? "font-semibold text-tertiary opacity-40"
-              : "font-semibold text-primary"
-          }
-        >
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <TokenAmountDecorated
-                    amount={String(Math.round(weight))}
-                    decimals={0}
-                    hideCurrency
-                    specialFormatting
-                    className={
-                      fontMapper[ui?.customization?.tokenAmountFont || ""]
-                        ?.variable
-                    }
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent
-                className={
-                  zeroVpVote
-                    ? zeroVpTooltipContentClass
-                    : "p-4 max-h-[300px] overflow-y-auto flex flex-col gap-2"
-                }
-              >
-                {zeroVpVote ? (
-                  <span>{ZERO_VP_VOTE_TOOLTIP}</span>
-                ) : (
-                  <>
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>{amount}</TooltipTrigger>
+                  <TooltipContent className="p-4 max-h-[300px] overflow-y-auto flex flex-col gap-2">
                     <span>
                       {`${formatNumber(String(Math.round(vote.votingPower)), 0, 2, false, false)} ${token.symbol} Voted`}
                     </span>
@@ -149,13 +140,13 @@ export default function CopelandProposalSingleVote({
                         </p>
                       ))}
                     </div>
-                  </>
-                )}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
         </div>
-      </div>
+      </ZeroVpRowTooltip>
       <div className={"flex flex-col text-xs leading-4 mb-2"}>
         {choiceLabels?.map((option: string, index: number) => (
           <p
