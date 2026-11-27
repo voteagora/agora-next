@@ -1,3 +1,5 @@
+> **Companion repo:** [TakeAIt](https://github.com/voteagora/takeait) is the companion AI-native ticket and agent platform used alongside agora-next for governance workflows.
+
 ## Getting Started
 
 1. Git clone this repo
